@@ -3,6 +3,7 @@ export type Mode = "strict" | "open";
 import type { RootMapV1 } from "@/shared/deepRoot.rootMap.v1";
 import type { DeepRootHeartGateV01 } from "@/shared/deepRootHeartGate.v0.1";
 import type { GenericFunctionalWitnessRuntimeProjectionV1 } from "@/shared/openInstrument/genericFunctionalWitnessRuntimeProjection.v1";
+import type { DoctrineReadingV1 } from "@/shared/openInstrument/doctrineReadingContract.v1";
 
 /**
  * UI contract for vowel chips. Keep this as the only allowed vowel set.
@@ -27,6 +28,7 @@ export type PresentOrMissing<T> =
   | { kind: "missing"; missing: MissingState; note?: string };
 
 export type RootMapVM = RootMapV1;
+export type DoctrineReadingVM = DoctrineReadingV1;
 
 export type SoundRootsWarningVM = {
   code: string;
@@ -289,6 +291,7 @@ export type AnalysisStatusV0_1VM = {
 };
 export interface TelemetryViewModel {
   readout: TelemetryReadout;
+  doctrineReading: PresentOrMissing<DoctrineReadingVM | null>;
   evidence: EvidenceLedger;
   candidates: CandidateRowVM[];
   math: PresentOrMissing<MathTelemetryVM>;

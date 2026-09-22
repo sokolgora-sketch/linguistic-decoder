@@ -25,8 +25,23 @@ import type {
   PhoneticIpaV0_1VM,
   ResonanceProfileV1VM,
 } from "../telemetry/types";
+import {
+  DOCTRINE_READING_COMPOSITION_MODE_V1,
+  DOCTRINE_READING_CONTRACT_SCHEMA_V1,
+  DOCTRINE_READING_PATH_COMPOSITION_V1,
+  DOCTRINE_READING_PROVENANCE_V1,
+  type DoctrineReadingV1,
+} from "@/shared/openInstrument/doctrineReadingContract.v1";
+import {
+  DOCTRINE_FUNCTIONAL_PROFILE_COMPLETENESS_V0_1,
+  DOCTRINE_FUNCTIONAL_PROFILE_ENGINE_AUTHORITY_V0_1,
+  DOCTRINE_FUNCTIONAL_PROFILE_NORMALIZATION_STATUS_V0_1,
+  DOCTRINE_FUNCTIONAL_PROFILE_SCHEMA_V0_1,
+  DOCTRINE_FUNCTIONAL_PROFILE_TRUTH_CLASSIFICATION_V0_1,
+} from "@/shared/openInstrument/doctrineFunctionalProfile.v0_1";
 import type { RootMapV1 } from "@/shared/deepRoot.rootMap.v1";
 import { computeDeepRootHeartGateV01 } from "@/shared/deepRootHeartGate.v0.1.compute";
+import { isSevenVoiceKey } from "@/shared/sevenVoiceOrderedViews.v0.1";
 import { SEVEN_PRINCIPLES, vowelToIndex1, vowelToRingIndex, vowelToColor, vowelToNote } from "@/shared/sevenPrinciples.v1";
 import type { AnalysisStatusV0_1VM } from "../telemetry/types";
 import {
@@ -333,6 +348,106 @@ function isRecord(v: unknown): v is Record<string, unknown> {
 
 function asString(v: unknown): string | null {
   return typeof v === "string" ? v : null;
+}
+
+function isDoctrineReadingV1(value: unknown): value is DoctrineReadingV1 {
+  if (!isRecord(value)) return false;
+  if (value.schemaVersion !== DOCTRINE_READING_CONTRACT_SCHEMA_V1) return false;
+  if (value.compositionMode !== DOCTRINE_READING_COMPOSITION_MODE_V1) return false;
+  if (value.pathComposition !== DOCTRINE_READING_PATH_COMPOSITION_V1) return false;
+  if (value.providerIndependent !== true) return false;
+  if (value.externalEvidenceIndependent !== true) return false;
+  if (value.candidateWinnerIndependent !== true) return false;
+  if (value.userDecisionPosture !== "user_decides") return false;
+  if (value.noSingleWinner !== true) return false;
+
+  const analyzedVoicePath = value.analyzedVoicePath;
+  const entries = value.entries;
+  if (!Array.isArray(analyzedVoicePath) || !analyzedVoicePath.every(isSevenVoiceKey)) {
+    return false;
+  }
+  if (!Array.isArray(entries) || entries.length !== analyzedVoicePath.length) return false;
+
+  const roleSet = new Set<string>(Object.values(SEVEN_PRINCIPLES).map((principle) => principle.role));
+  for (const [index, entryValue] of entries.entries()) {
+    if (!isRecord(entryValue)) return false;
+    if (entryValue.pathIndex !== index) return false;
+    if (
+      typeof entryValue.voice !== "string" ||
+      !isSevenVoiceKey(entryValue.voice) ||
+      entryValue.voice !== analyzedVoicePath[index]
+    ) {
+      return false;
+    }
+    if (typeof entryValue.doctrineRole !== "string" || !roleSet.has(entryValue.doctrineRole)) {
+      return false;
+    }
+    if (entryValue.profileSchemaVersion !== DOCTRINE_FUNCTIONAL_PROFILE_SCHEMA_V0_1) return false;
+    if (entryValue.profileEngineAuthority !== DOCTRINE_FUNCTIONAL_PROFILE_ENGINE_AUTHORITY_V0_1) return false;
+    if (entryValue.profileNormalizationStatus !== DOCTRINE_FUNCTIONAL_PROFILE_NORMALIZATION_STATUS_V0_1) return false;
+    if (entryValue.profileCompleteness !== DOCTRINE_FUNCTIONAL_PROFILE_COMPLETENESS_V0_1) return false;
+    if (entryValue.profileTruthClassification !== DOCTRINE_FUNCTIONAL_PROFILE_TRUTH_CLASSIFICATION_V0_1) return false;
+
+    if (!Array.isArray(entryValue.functionalProperties)) return false;
+    for (const property of entryValue.functionalProperties) {
+      if (!isRecord(property)) return false;
+      if (typeof property.id !== "string" || property.id.trim().length === 0) return false;
+      if (property.sourceClass !== "EXPLICIT_DOCTRINE" && property.sourceClass !== "FUNCTIONAL_INTERPRETATION") {
+        return false;
+      }
+      if (property.normalizationStatus !== DOCTRINE_FUNCTIONAL_PROFILE_NORMALIZATION_STATUS_V0_1) {
+        return false;
+      }
+      if (!Array.isArray(property.sourceRefs)) return false;
+      if (
+        !property.sourceRefs.every(
+          (sourceRef) =>
+            isRecord(sourceRef) &&
+            typeof sourceRef.sourceId === "string" &&
+            typeof sourceRef.locator === "string" &&
+            sourceRef.sourceKind === "AUTHOR_PRIMARY_DOCTRINE_SOURCE" &&
+            sourceRef.sourceStatus === "VERBATIM" &&
+            sourceRef.engineAuthority === "NOT_EXECUTABLE_DIRECTLY",
+        )
+      ) {
+        return false;
+      }
+    }
+  }
+
+  const claimBoundary = value.claimBoundary;
+  if (
+    !isRecord(claimBoundary) ||
+    claimBoundary.historicalOriginClaim !== "not_claimed" ||
+    claimBoundary.historicalTransmissionClaim !== "not_claimed" ||
+    claimBoundary.winnerClaim !== "not_claimed" ||
+    claimBoundary.languageSuperiorityClaim !== "not_claimed" ||
+    claimBoundary.candidateTruthClaim !== "not_claimed" ||
+    claimBoundary.lexicalMeaningClaim !== "not_claimed"
+  ) {
+    return false;
+  }
+
+  const provenance = value.provenance;
+  return (
+    isRecord(provenance) &&
+    provenance.doctrineProjectionSchema === DOCTRINE_READING_PROVENANCE_V1.doctrineProjectionSchema &&
+    provenance.orderedViewsSchema === DOCTRINE_READING_PROVENANCE_V1.orderedViewsSchema &&
+    provenance.doctrineAuthority === DOCTRINE_READING_PROVENANCE_V1.doctrineAuthority &&
+    provenance.roleVocabularyAuthority === DOCTRINE_READING_PROVENANCE_V1.roleVocabularyAuthority &&
+    provenance.functionalProfileSchema === DOCTRINE_READING_PROVENANCE_V1.functionalProfileSchema &&
+    provenance.functionalProfileAuthority === DOCTRINE_READING_PROVENANCE_V1.functionalProfileAuthority
+  );
+}
+
+function parseDoctrineReading(
+  value: unknown,
+): PresentOrMissing<DoctrineReadingV1 | null> {
+  if (value === undefined) return missing("not_emitted", "doctrineReading");
+  if (value === null) return present(null);
+  return isDoctrineReadingV1(value)
+    ? present(value)
+    : missing("malformed", "doctrineReading expected the public V1 shape");
 }
 
 type CandidateStatus = "pass" | "fail" | "unknown";
@@ -701,6 +816,7 @@ function parseAnalysisStatusV0_1(
 
 export function adaptAnalysisToTelemetryVM(raw: unknown): TelemetryViewModel {
   const payload = raw;
+  const doctrineReading = parseDoctrineReading(getField(payload, "doctrineReading"));
 
   const vp = pickVoicePaths(payload);
 
@@ -1864,6 +1980,7 @@ const originClaimGates: OriginClaimGatesVM = {
       },
     },
 
+    doctrineReading,
     evidence: {
       normalizationSteps: pomStringListFromEvidenceField(evidence, "normalizationSteps"),
       ops: pomStringListFromEvidenceField(evidence, "ops"),
