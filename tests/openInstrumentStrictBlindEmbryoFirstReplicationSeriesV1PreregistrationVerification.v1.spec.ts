@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import { verifyStrictBlindEmbryoFirstReplicationSeriesV1Preregistration } from "../scripts/openInstrumentStrictBlindEmbryoFirstReplicationSeriesV1PreregistrationVerification.mjs";
@@ -44,5 +45,15 @@ describe("Open Instrument strict blind embryo-first replication series v1 prereg
     expect(artifact.claimBoundaries).toEqual(expect.arrayContaining(["research_only", "no_production_evidence", "no_single_winner", "user_decides", "null_is_valid"]));
     expect(artifact.protocolIntegrity.productionEvidenceAdmitted).toBe(false);
     expect(artifact.protocolIntegrity.runtimeMutated).toBe(false);
+  });
+
+  test("keeps frozen baseline metadata independent from the evolved current product fixture", () => {
+    const artifact = JSON.parse(readFileSync(artifactPath, "utf8"));
+    const currentBaselineBytes = readFileSync(resolve(root, artifact.repository.baselineArtifactPath));
+    const currentBaselineSha = createHash("sha256").update(currentBaselineBytes).digest("hex");
+
+    expect(artifact.repository.baselineArtifactSha256).toBe("12a92a4fe5faec0516b30d3a7e86e75924f9c68349b905a2c07d61289d406650");
+    expect(currentBaselineSha).not.toBe(artifact.repository.baselineArtifactSha256);
+    expect(() => verifyStrictBlindEmbryoFirstReplicationSeriesV1Preregistration()).not.toThrow();
   });
 });
