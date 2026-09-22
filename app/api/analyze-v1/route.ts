@@ -35,6 +35,7 @@ import { AnalyzeWordResultV1ContractSchema } from "@/shared/analyzeWordResult.v1
 
 // ✅ Heart Instrument v1 (stable sub-object)
 import { buildHeartInstrumentV1 } from "@/v1/heartInstrument.v1";
+import { projectDoctrineReadingV1 } from "@/shared/openInstrument/doctrineReadingContract.v1";
 
 const BodySchema = z
   .object({
@@ -877,6 +878,14 @@ async function runAnalyzeV1Orchestration(
 
   try {
     const heartInstrumentV1 = buildHeartInstrumentV1(word);
+    const doctrineProjection = projectDoctrineReadingV1(
+      heartInstrumentV1.surfaceVowels,
+    );
+    if (!doctrineProjection.ok) {
+      throw new Error(
+        `doctrine reading projection rejected canonical Heart surface path: ${doctrineProjection.reasonCodes.join(",")}`,
+      );
+    }
 
     const payload = await runAnalysisDeterministic(word, {
       mode: engineMode,
@@ -1060,6 +1069,7 @@ async function runAnalyzeV1Orchestration(
         ? { ...((ensured as any).raw as any), evidence: finalEvidence }
         : (ensured as any).raw,
       heartInstrumentV1,
+      doctrineReading: doctrineProjection.doctrineReading,
     };
 
     // ✅ Contract check should validate ONLY the contract-picked projection

@@ -14,6 +14,7 @@ import type {
 } from "./resultShape.v1";
 import type { OriginClaimV1 as OriginClaimProtocolV1 } from "./originClaim.v1";
 import type { AnalysisStatusV0_1 } from "./analysisStatus.v0_1";
+import type { DoctrineReadingV1 } from "./openInstrument/doctrineReadingContract.v1";
 
 // -------------------- Canonical V1 enums --------------------
 
@@ -48,6 +49,9 @@ export type AnalyzeWordResultV1 = {
     // Heart primary path (adapter-safe): used for RootMap preference + DeepRoot↔Heart gate wiring.
     // Keep unknown because upstream may emit string/array/arrow/dash formats; normalization happens elsewhere.
     heartPrimaryPath?: unknown;
+
+  // Additive Seven-Voices doctrine reading projection.
+  doctrineReading?: DoctrineReadingV1 | null;
 
   // Frontier alternatives (if present)
   frontier?: FrontierCandidate[];

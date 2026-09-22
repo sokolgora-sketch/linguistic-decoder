@@ -221,6 +221,7 @@ export const AnalyzeWordResultV1ContractSchema = z
     originClaimGates: z.unknown().optional(),
     raw: z.unknown().optional(),
     heartInstrumentV1: z.unknown().optional(),
+    doctrineReading: z.unknown().nullable().optional(),
   })
   .strict();
 
@@ -268,6 +269,7 @@ export function toAnalyzeWordResultV1Contract(input: unknown): AnalyzeWordResult
     originClaimGates: o.originClaimGates,
     raw: o.raw,
     heartInstrumentV1: o.heartInstrumentV1,
+    doctrineReading: o.doctrineReading,
   };
 
   return AnalyzeWordResultV1ContractSchema.parse(picked);
