@@ -38,6 +38,7 @@ import {
   DOCTRINE_FUNCTIONAL_PROFILE_NORMALIZATION_STATUS_V0_1,
   DOCTRINE_FUNCTIONAL_PROFILE_SCHEMA_V0_1,
   DOCTRINE_FUNCTIONAL_PROFILE_TRUTH_CLASSIFICATION_V0_1,
+  getSevenVoiceDoctrineFunctionalProfileV0_1,
 } from "@/shared/openInstrument/doctrineFunctionalProfile.v0_1";
 import type { RootMapV1 } from "@/shared/deepRoot.rootMap.v1";
 import { computeDeepRootHeartGateV01 } from "@/shared/deepRootHeartGate.v0.1.compute";
@@ -388,10 +389,15 @@ function isDoctrineReadingV1(value: unknown): value is DoctrineReadingV1 {
     if (entryValue.profileCompleteness !== DOCTRINE_FUNCTIONAL_PROFILE_COMPLETENESS_V0_1) return false;
     if (entryValue.profileTruthClassification !== DOCTRINE_FUNCTIONAL_PROFILE_TRUTH_CLASSIFICATION_V0_1) return false;
 
+    const canonicalProfile = getSevenVoiceDoctrineFunctionalProfileV0_1(entryValue.voice);
+    if (!canonicalProfile) return false;
     if (!Array.isArray(entryValue.functionalProperties)) return false;
     for (const property of entryValue.functionalProperties) {
       if (!isRecord(property)) return false;
       if (typeof property.id !== "string" || property.id.trim().length === 0) return false;
+      if (!canonicalProfile.functionalProperties.some((expected) => expected.id === property.id)) {
+        return false;
+      }
       if (property.sourceClass !== "EXPLICIT_DOCTRINE" && property.sourceClass !== "FUNCTIONAL_INTERPRETATION") {
         return false;
       }

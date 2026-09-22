@@ -56,6 +56,26 @@ describe("Open Instrument Seven-Voices doctrine reading UI v0.1", () => {
     });
   });
 
+  it("renders malformed doctrine output as a visible contract error", () => {
+    render(<InstrumentPanel payload={{ word: "x", doctrineReading: "bad" }} />);
+
+    expect(screen.getByTestId("doctrine-reading-malformed")).toBeVisible();
+    expect(screen.getByText("Seven-Voices doctrinal reading unavailable")).toBeVisible();
+    expect(screen.queryByTestId("doctrine-reading-card")).not.toBeInTheDocument();
+  });
+
+  it("rejects unknown doctrine property identifiers", async () => {
+    const body = await analyze("study");
+    const malformed = JSON.parse(JSON.stringify(body)) as AnalyzeBody;
+    malformed.doctrineReading.entries[0].functionalProperties[0].id = "invented_property";
+
+    expect(adaptAnalysisToTelemetryVM(malformed).doctrineReading).toEqual({
+      kind: "missing",
+      missing: "malformed",
+      note: "doctrineReading expected the public V1 shape",
+    });
+  });
+
   it("renders doctrine reading for wind independently of Evidence Null", async () => {
     const body = await analyze("wind");
     expect(body.analysisStatusV0_1.status).toBe("null_no_supported_candidate");

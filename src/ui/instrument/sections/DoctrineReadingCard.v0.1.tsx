@@ -8,9 +8,30 @@ export function DoctrineReadingCard({
 }: {
   doctrineReading?: PresentOrMissing<DoctrineReadingVM | null>;
 }) {
-  if (!doctrineReading || doctrineReading.kind !== "present" || doctrineReading.value === null) {
+  if (!doctrineReading) return null;
+  if (doctrineReading.kind === "present" && doctrineReading.value === null) {
     return null;
   }
+
+  if (doctrineReading.kind === "missing") {
+    if (doctrineReading.missing !== "malformed") return null;
+
+    return (
+      <section
+        data-testid="doctrine-reading-malformed"
+        className="rounded-xl border border-rose-300 bg-rose-50 p-5 dark:border-rose-400/30 dark:bg-rose-500/5"
+      >
+        <div className="text-xs font-semibold uppercase tracking-[0.16em] text-rose-700 dark:text-rose-200">
+          Seven-Voices doctrinal reading unavailable
+        </div>
+        <div className="mt-2 text-sm text-rose-800 dark:text-rose-200">
+          The API emitted a doctrine reading with an invalid public shape. No doctrine interpretation was rendered.
+        </div>
+      </section>
+    );
+  }
+
+  if (doctrineReading.value === null) return null;
 
   const reading = doctrineReading.value;
 
