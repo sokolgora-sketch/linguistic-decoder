@@ -1,0 +1,235 @@
+{
+  "schemaVersion": "open-instrument.frozen-target-functional-research-trial.v0_1",
+  "protocol": "open-instrument.frozen-target-functional-research-trial.v0_1.restart_01",
+  "trialStatus": "COMPLETED_NO_ADMISSION",
+  "previousTrialStatus": "INVALID_PRE_SELECTION_FIREWALL_BREACH",
+  "selection": {
+    "poolArtifactSha256": "0bee1120ec263dee6572ec70a67989e64b6056a0c5f081e5f3a87cbcbb9b3a92",
+    "selectionRule": "LEXICOGRAPHIC_FIRST_RESOLVED_CASE_ID",
+    "eligibleCaseIds": [
+      "scale50.blood.body",
+      "scale50.child.human-social",
+      "scale50.mother.human-social",
+      "scale50.mountain.nature",
+      "scale50.river.nature",
+      "scale50.speak.action",
+      "scale50.woman.human-social"
+    ],
+    "selectedCaseId": "scale50.blood.body",
+    "targetSelectionFrozen": true,
+    "targetSelectionFreezeSha256": "6d289afea73a2e9ac28de5e4dd1e0935d8b6a455e1e2c8e882f2ef1ab87fb064"
+  },
+  "targetFreeze": {
+    "caseId": "scale50.blood.body",
+    "targetWord": "blood",
+    "targetSenseId": "cambridge.en.blood.noun.body-liquid-1",
+    "targetSenseLabel": "physical bodily blood",
+    "targetSenseDefinition": "the red liquid circulated through the body by the heart",
+    "targetSenseAuthority": "Cambridge Dictionary English",
+    "targetSenseLocator": "noun, A2, LIQUID, first ordinary bodily sense",
+    "currentStatus": "structural_unreviewed",
+    "deterministicEmbryo": ["LO", "OOD"],
+    "sevenVoicesPath": ["O"],
+    "structuralHypotheses": [
+      {
+        "id": "logic-structural:blood:lo:peel_right_vowel_led_expansion+peel_left_consonant_frame",
+        "sourceKind": "logic_derived_structural_hypothesis",
+        "claimBoundary": "logic-derived structural hypothesis only; independent meaning unknown; not reviewed evidence, candidate truth, or historical origin"
+      },
+      {
+        "id": "logic-structural:blood:ood:peel_left_consonant_frame+peel_left_consonant_frame",
+        "sourceKind": "logic_derived_structural_hypothesis",
+        "claimBoundary": "logic-derived structural hypothesis only; independent meaning unknown; not reviewed evidence, candidate truth, or historical origin"
+      }
+    ],
+    "expansionChain": [
+      ["LO", "BLO", "BLOOD"],
+      ["OOD", "LOOD", "BLOOD"]
+    ],
+    "existingEvidenceRefIds": [
+      "research.external.fjale-gjak-blood.scale50.citation.v0_1"
+    ],
+    "existingFunctionalCorrespondenceCount": 0,
+    "existingReviewedFunctionalCount": 0,
+    "noSingleWinner": true,
+    "userDecides": true,
+    "targetFreezeSha256": "49012d0a95634b3873ef0d7b65ab6f53c7fb0d7ab8348e2c234c8ed1a626410b"
+  },
+  "preTargetSourceResearch": [
+    {
+      "sourceId": "source.lo.oxford-learners-dictionary.v0_1",
+      "sourceTitle": "Oxford Advanced Learner's Dictionary — lo",
+      "authorOrEditor": "Oxford University Press",
+      "publisherOrHost": "Oxford University Press",
+      "sourceDateOrVersion": "accessed 2026-09-22",
+      "language": "English",
+      "queryForm": "lo",
+      "entryLocator": "lo, exclamation, sense 1",
+      "attestedForm": "lo",
+      "attestedMeaningOrFunction": "used for calling attention to a surprising thing",
+      "accessResult": "RESOLVED_EXACT_ENTRY",
+      "evidenceClass": "SOURCE_ATTESTED_FUNCTION",
+      "sourceUrlOrArchiveRef": "https://www.oxfordlearnersdictionaries.com/us/definition/english/lo"
+    },
+    {
+      "sourceId": "source.gjak.fjale.sense-1.v0_1",
+      "sourceTitle": "FJALË — Gjak",
+      "authorOrEditor": null,
+      "publisherOrHost": "FJALË — Fjalor Shqip",
+      "sourceDateOrVersion": "accessed 2026-09-07 (existing repository citation)",
+      "language": "Albanian",
+      "queryForm": "gjak",
+      "entryLocator": "GJAK m., sense 1",
+      "attestedForm": "gjak",
+      "attestedMeaningOrFunction": "red liquid circulating in human and animal bodies to carry food and oxygen to cells, support exchange of substances, and protect the organism",
+      "accessResult": "RESOLVED_EXISTING_DURABLE_REPOSITORY_CITATION",
+      "evidenceClass": "SOURCE_ATTESTED_FUNCTION",
+      "sourceUrlOrArchiveRef": "https://fjale.al/gjak"
+    },
+    {
+      "sourceId": "source.ood.collins.v0_1",
+      "sourceTitle": "Collins English Dictionary — OOD",
+      "authorOrEditor": "Webster's New World College Dictionary",
+      "publisherOrHost": "HarperCollins Publishers",
+      "sourceDateOrVersion": "accessed 2026-09-22",
+      "language": "English",
+      "queryForm": "ood",
+      "entryLocator": "OOD in American English, abbreviation, senses 1–2",
+      "attestedForm": "OOD",
+      "attestedMeaningOrFunction": "Officer of the Day; Officer of the Deck",
+      "accessResult": "RESOLVED_ABBREVIATION_NOT_LEXICAL_EMBRYO_FUNCTION",
+      "evidenceClass": "INSUFFICIENT",
+      "sourceUrlOrArchiveRef": "https://www.collinsdictionary.com/us/dictionary/english/ood"
+    },
+    {
+      "sourceId": "source.lo.logeion-query.v0_1",
+      "sourceTitle": "Logeion Latin lexical search",
+      "authorOrEditor": "University of Chicago",
+      "publisherOrHost": "Logeion",
+      "sourceDateOrVersion": "accessed 2026-09-22",
+      "language": "Latin",
+      "queryForm": "lo",
+      "entryLocator": "query surfaced en, not an exact lo entry",
+      "attestedForm": "en",
+      "attestedMeaningOrFunction": "calling attention or expressing surprise; lo/behold/see",
+      "accessResult": "NO_EXACT_FORM_ENTRY",
+      "evidenceClass": "INSUFFICIENT",
+      "sourceUrlOrArchiveRef": "https://logeion.uchicago.edu/en"
+    },
+    {
+      "sourceId": "source.lo.scaife-query.v0_1",
+      "sourceTitle": "Scaife Viewer lexical search",
+      "authorOrEditor": null,
+      "publisherOrHost": "Scaife Viewer / Perseus Digital Library",
+      "sourceDateOrVersion": "accessed 2026-09-22",
+      "language": "Ancient Greek and Latin corpus",
+      "queryForm": "lo",
+      "entryLocator": "translation occurrences only; no exact source lemma lo established",
+      "attestedForm": null,
+      "attestedMeaningOrFunction": null,
+      "accessResult": "TRANSLATION_TEXT_ONLY",
+      "evidenceClass": "INSUFFICIENT",
+      "sourceUrlOrArchiveRef": "https://scaife.perseus.org/"
+    },
+    {
+      "sourceId": "source.ood.cambridge-query.v0_1",
+      "sourceTitle": "Cambridge Dictionary lexical search",
+      "authorOrEditor": "Cambridge University Press & Assessment",
+      "publisherOrHost": "Cambridge Dictionary",
+      "sourceDateOrVersion": "accessed 2026-09-22",
+      "language": "English",
+      "queryForm": "ood",
+      "entryLocator": "exact ood headword not returned; neighboring OD/OUD/OODLES entries surfaced",
+      "attestedForm": null,
+      "attestedMeaningOrFunction": null,
+      "accessResult": "NO_EXACT_HEADWORD",
+      "evidenceClass": "INSUFFICIENT",
+      "sourceUrlOrArchiveRef": "https://dictionary.cambridge.org/dictionary/english/ood"
+    }
+  ],
+  "preTargetFunctionFreeze": {
+    "result": "BOUNDED_FUNCTIONS_FOUND",
+    "boundedFunctionCount": 2,
+    "functions": [
+      {
+        "functionId": "lo.attention-calling-exclamation.v0_1",
+        "functionDescription": "attention-calling exclamation used to direct attention to a surprising thing",
+        "sourceFactIds": ["source.lo.oxford-learners-dictionary.v0_1"],
+        "sourceRefs": ["https://www.oxfordlearnersdictionaries.com/us/definition/english/lo"],
+        "specificityBoundary": "communicative attention-call; not a bodily, material, or circulatory function",
+        "truthLevel": "INFERENCE_FROM_SOURCE_FACT"
+      },
+      {
+        "functionId": "gjak.physiological-transport-exchange-protection.v0_1",
+        "functionDescription": "bodily liquid circulating through human and animal bodies to carry food and oxygen to cells, support exchange of substances, and protect the organism",
+        "sourceFactIds": ["source.gjak.fjale.sense-1.v0_1"],
+        "sourceRefs": ["https://fjale.al/gjak"],
+        "specificityBoundary": "physiological transport/exchange/protection role; no embryo identity, historical, or target-derivation claim",
+        "truthLevel": "INFERENCE_FROM_SOURCE_FACT"
+      }
+    ],
+    "preTargetFunctionFreezeSha256": "2fee4635d037925a53fb62d2119028908597968b401a26748283b6fdcc05e6be"
+  },
+  "targetCorrespondenceEvaluation": [
+    {
+      "functionId": "lo.attention-calling-exclamation.v0_1",
+      "classification": "UNSUPPORTED_BRIDGE",
+      "mechanism": "communicative attention call",
+      "targetSenseBinding": "exact target word and frozen target sense evaluated",
+      "specificity": "mismatched; the function is not bodily, material, or circulatory",
+      "alternativeExplanations": ["the source form is an exclamation rather than a physical-substance term"],
+      "missingSemanticSteps": ["no defensible step connects attention-calling to physical bodily blood"],
+      "lexicalEquivalenceRisk": "none; the source does not translate the target sense",
+      "phoneticResemblanceRisk": "not used",
+      "postHocFitRisk": "high",
+      "structuralRelationStatus": "source form equals the LO embryo string only; no target-semantic structural support",
+      "functionalRelationDependsOnEmbryo": "NO"
+    },
+    {
+      "functionId": "gjak.physiological-transport-exchange-protection.v0_1",
+      "classification": "INSUFFICIENT_CORRESPONDENCE",
+      "mechanism": "physiological transport, exchange, and organism-protection role",
+      "targetSenseBinding": "target word matches; existing lexical row has no persisted targetSenseId, so exact sense binding is supplied only by this trial freeze",
+      "specificity": "descriptive of the same bodily referent, but not an embryo-backed mechanism",
+      "alternativeExplanations": ["the function is ordinary dictionary content defining blood rather than an independent motivation for the target form"],
+      "missingSemanticSteps": ["no relation connects gjak or its physiological role to LO or OOD"],
+      "lexicalEquivalenceRisk": "high",
+      "phoneticResemblanceRisk": "not used",
+      "postHocFitRisk": "medium",
+      "structuralRelationStatus": "gjak differs from LO and OOD; no structural relation claimed",
+      "functionalRelationDependsOnEmbryo": "NO"
+    }
+  ],
+  "scientificDecision": "NO_ADMISSION_INSUFFICIENT_FUNCTIONAL_EVIDENCE",
+  "reasonCodes": [
+    "NO_EMBRYO_BACKED_FUNCTIONAL_MECHANISM",
+    "LEXICAL_DEFINITION_FUNCTION_NOT_SUFFICIENT_FOR_FUNCTIONAL_CORRESPONDENCE",
+    "NO_STRUCTURAL_RELATION_FOR_GJAK",
+    "NO_FUNCTIONAL_CORRESPONDENCE_ROW_CREATED"
+  ],
+  "claimBoundaries": {
+    "functionalBridgeTruth": "hypothesis",
+    "claimBoundary": "research_only_no_production_evidence",
+    "historicalOriginClaim": "not_claimed",
+    "borrowingClaim": "not_claimed",
+    "cognacyClaim": "not_claimed",
+    "languageSuperiorityClaim": "not_claimed",
+    "candidateTruthClaim": "not_claimed",
+    "winnerClaim": "not_claimed",
+    "noSingleWinner": true,
+    "userDecides": true
+  },
+  "outcome": {
+    "targetStatusBefore": "structural_unreviewed",
+    "targetStatusAfter": "structural_unreviewed",
+    "targetFunctionalRowsBefore": 0,
+    "targetFunctionalRowsAfter": 0,
+    "reviewedPromotions": 0,
+    "structuralMutations": 0,
+    "targetSwitches": 0,
+    "preSelectionEvidenceExposures": 0,
+    "catalogMutation": false,
+    "baselineMutation": false,
+    "runtimeMutation": false
+  }
+}
