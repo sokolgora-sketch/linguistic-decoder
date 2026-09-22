@@ -34,7 +34,7 @@
       "partOfSpeech": "noun",
       "targetSenseLabel": "person before adulthood",
       "targetSenseId": "cambridge.en.child.noun.before-adult-1",
-      "targetSenseDefinition": "a boy or girl from birth until adulthood, or a son or daughter of any age",
+      "targetSenseDefinition": "a boy or girl from birth until adulthood",
       "targetSenseTruth": "FACT_FROM_SOURCE",
       "sourceAuthority": "Cambridge Dictionary English",
       "sourcePublisherOrHost": "Cambridge University Press & Assessment",

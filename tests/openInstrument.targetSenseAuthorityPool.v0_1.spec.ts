@@ -43,6 +43,10 @@ describe("Open Instrument target-sense authority pool v0.1", () => {
       TARGET_SENSE_AUTHORITY_POOL_V0_1,
       "scale50.mother.human-social",
     )?.targetSenseId).toBe("cambridge.en.mother.noun.female-parent-1");
+    expect(getTargetSenseAuthorityEntryByCaseIdV0_1(
+      TARGET_SENSE_AUTHORITY_POOL_V0_1,
+      "scale50.child.human-social",
+    )?.targetSenseDefinition).toBe("a boy or girl from birth until adulthood");
   });
 
   test("is source-backed target identity only, not functional or structural evidence", () => {
