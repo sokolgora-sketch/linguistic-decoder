@@ -154,7 +154,7 @@ function OpenInstrumentEmptyState() {
       className="rounded-[18px] border border-[#2f3742] bg-[#13171d] p-6 shadow-[0_18px_48px_rgba(0,0,0,0.24)] sm:p-8"
     >
       <p className={`${MT.sectionLabel} text-[#8ea4ba]`}>
-        Functional motivation
+        ZË-RO reading
       </p>
 
       <h2 className="mt-3 text-[26px] font-semibold leading-tight text-[#f5f7fb]">
@@ -162,9 +162,9 @@ function OpenInstrumentEmptyState() {
       </h2>
 
       <p className="mt-3 max-w-2xl text-[14px] leading-7 text-[#b8c3cf]">
-        Type a word below to see the strongest supported functional candidate,
-        its smallest meaningful embryos, their plain meanings, and the current
-        evidence state.
+        Type a word below to see its deterministic Voice path, doctrinal
+        reading, and available functional or source-evidence context. The
+        interpretation remains for you to judge.
       </p>
     </section>
   );

@@ -39,6 +39,7 @@ import { CandidatesAccordion } from '../candidates/CandidatesAccordion';
 import { DeepRootHeartGateSummaryCard } from "./DeepRootHeartGateSummaryCard";
 import { EmbryoExpansionContextCardV0_1 } from "./sections/EmbryoExpansionContextCard.v0_1";
 import { DoctrineReadingCard } from "./sections/DoctrineReadingCard.v0.1";
+import { PrimaryReadingOrientationCardV0_1 } from "./sections/PrimaryReadingOrientationCard.v0_1";
 import { OriginClaimCard } from '@/components/OriginClaimCard';
 import { cn } from "@/lib/utils";
 import { safeText } from "./safeText";
@@ -510,6 +511,8 @@ export function InstrumentPanel(props: Props) {
         <div className="space-y-4">
           <TabPanel id="overview" active={activeSection}>
             <div className="space-y-4">
+              <PrimaryReadingOrientationCardV0_1 vm={vm} />
+
               {primaryNullStatus ? (
                 <AnalysisStatusCardV0_1
                   status={primaryNullStatus}
