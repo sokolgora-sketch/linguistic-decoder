@@ -84,8 +84,11 @@ describe("Open Instrument Level-3 pair candidate generator v0.1", () => {
     expect(forward.candidateReading).toBe(
       "initiating beginning with expanding growth",
     );
+    expect(reverse.candidateReading).toBe(
+      "expanding growth with initiating beginning",
+    );
     expect(forward.status).toBe(DOCTRINE_LEVEL3_PAIR_PRODUCTION_STATUS_V0_1);
-    expect(reverse.status).toBe(DOCTRINE_LEVEL3_PAIR_CANDIDATE_REVIEW_STATUS_V0_1);
+    expect(reverse.status).toBe(DOCTRINE_LEVEL3_PAIR_PRODUCTION_STATUS_V0_1);
     expect(selfPair.status).toBe(DOCTRINE_LEVEL3_PAIR_SELF_PAIR_STATUS_V0_1);
     expect(first).toEqual(repeated);
     expect(forward.candidateReading).not.toBe(reverse.candidateReading);
@@ -102,7 +105,7 @@ describe("Open Instrument Level-3 pair candidate generator v0.1", () => {
     expect(first).not.toHaveProperty("language");
   });
 
-  it("generates the complete ordered 7x7 matrix with two production rows", () => {
+  it("generates the complete ordered 7x7 matrix with three production rows", () => {
     const matrix = generateDoctrineLevel3PairReviewMatrixV0_1();
     const pairs = matrix.map((candidate) => candidate.pair);
 
@@ -114,13 +117,14 @@ describe("Open Instrument Level-3 pair candidate generator v0.1", () => {
       ),
     ).toEqual([
       expect.objectContaining({ pair: "A→E" }),
+      expect.objectContaining({ pair: "E→A" }),
       expect.objectContaining({ pair: "U→Y" }),
     ]);
     expect(
       matrix.filter(
         (candidate) => candidate.status === DOCTRINE_LEVEL3_PAIR_CANDIDATE_REVIEW_STATUS_V0_1,
       ),
-    ).toHaveLength(40);
+    ).toHaveLength(39);
     expect(
       matrix.filter(
         (candidate) => candidate.status === DOCTRINE_LEVEL3_PAIR_SELF_PAIR_STATUS_V0_1,
@@ -135,17 +139,19 @@ describe("Open Instrument Level-3 pair candidate generator v0.1", () => {
     expect(readReviewArtifact()).toEqual(buildDoctrineLevel3PairReviewArtifactV0_1());
   });
 
-  it("keeps production authorization restricted to U/Y and A/E", () => {
+  it("keeps production authorization restricted to U/Y, A/E, and E/A", () => {
     expect(projectLevel3DoctrineReadingV0_1(["U", "Y"])).toMatchObject({
       reading: "grounded depth with reflective exploration",
     });
     expect(projectLevel3DoctrineReadingV0_1(["A", "E"])).toMatchObject({
       reading: "initiating beginning with expanding growth",
     });
+    expect(projectLevel3DoctrineReadingV0_1(["E", "A"])).toMatchObject({
+      reading: "expanding growth with initiating beginning",
+    });
 
     for (const path of [
       ["Y", "U"],
-      ["E", "A"],
       ["A", "A"],
       ["E", "E"],
       ["U", "U"],
@@ -155,6 +161,11 @@ describe("Open Instrument Level-3 pair candidate generator v0.1", () => {
     }
 
     expect(projectLevel3DoctrineReadingV0_1(["A", "E", "I"])).toBeNull();
+    expect(projectLevel3DoctrineReadingV0_1(["E", "A", "E"])).toBeNull();
     expect(projectLevel3DoctrineReadingV0_1([])).toBeNull();
+
+    expect(readReviewArtifact()).toMatchObject({
+      productionAuthorizedPairs: ["U→Y", "A→E", "E→A"],
+    });
   });
 });

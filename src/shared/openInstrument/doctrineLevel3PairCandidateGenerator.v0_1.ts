@@ -225,7 +225,7 @@ export type DoctrineLevel3PairReviewArtifactV0_1 = Readonly<{
   ];
   templateId: typeof DOCTRINE_LEVEL3_PAIR_CANDIDATE_TEMPLATE_ID_V0_1;
   orderedViewsSchema: typeof sevenVoiceOrderedViewsSchemaVersion;
-  productionAuthorizedPairs: readonly ["U→Y", "A→E"];
+  productionAuthorizedPairs: readonly ["U→Y", "A→E", "E→A"];
   atoms: readonly DoctrineLevel3AtomProposalV0_1[];
   orderedPairCandidates: readonly DoctrineLevel3PairCandidateV0_1[];
 }>;
@@ -272,7 +272,8 @@ export function candidatePairReadingV0_1(
   const secondAtom = getDoctrineLevel3AtomProposalV0_1(secondVoice);
   const isAuthorizedProofPair =
     (firstVoice === "U" && secondVoice === "Y") ||
-    (firstVoice === "A" && secondVoice === "E");
+    (firstVoice === "A" && secondVoice === "E") ||
+    (firstVoice === "E" && secondVoice === "A");
   const isSelfPair = firstVoice === secondVoice;
 
   return Object.freeze({
@@ -321,7 +322,7 @@ export function buildDoctrineLevel3PairReviewArtifactV0_1(): DoctrineLevel3PairR
     ] as const,
     templateId: DOCTRINE_LEVEL3_PAIR_CANDIDATE_TEMPLATE_ID_V0_1,
     orderedViewsSchema: sevenVoiceOrderedViewsSchemaVersion,
-    productionAuthorizedPairs: ["U→Y", "A→E"] as const,
+    productionAuthorizedPairs: ["U→Y", "A→E", "E→A"] as const,
     atoms: getDoctrineLevel3AtomProposalsV0_1(),
     orderedPairCandidates: generateDoctrineLevel3PairReviewMatrixV0_1(),
   });

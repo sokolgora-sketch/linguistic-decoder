@@ -62,6 +62,23 @@ describe("Open Instrument Seven-Voices doctrine reading UI v0.1", () => {
     );
   });
 
+  it("renders the registered E to A reversal reading", async () => {
+    const body = await analyze("ea");
+
+    render(<InstrumentPanel payload={body} />);
+
+    const card = screen.getByTestId("doctrine-reading-card");
+    expect(within(card).getByTestId("doctrine-reading-path")).toHaveTextContent(
+      "E → A",
+    );
+    expect(within(card).getByTestId("doctrine-level3-reading-text")).toHaveTextContent(
+      "expanding growth with initiating beginning",
+    );
+    expect(within(card).getByTestId("doctrine-level3-reading-boundary")).toHaveTextContent(
+      /Doctrine inference only.*not a lexical definition.*historical origin claim.*candidate proof.*winner selection/i,
+    );
+  });
+
   it("keeps absent, malformed, and structural Null doctrine states distinct", () => {
     expect(adaptAnalysisToTelemetryVM({ word: "x" }).doctrineReading).toEqual({
       kind: "missing",

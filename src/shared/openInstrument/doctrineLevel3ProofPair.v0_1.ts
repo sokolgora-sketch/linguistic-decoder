@@ -15,8 +15,12 @@ export const DOCTRINE_LEVEL3_PROOF_PAIR_RULE_ID_V0_1 =
 export const DOCTRINE_LEVEL3_PROOF_PAIR_A_E_RULE_ID_V0_1 =
   "level3.proof-pair.a-e.v0_1" as const;
 
+export const DOCTRINE_LEVEL3_PROOF_PAIR_E_A_RULE_ID_V0_1 =
+  "level3.proof-pair.e-a.v0_1" as const;
+
 const AUTHORIZED_PATH_U_Y_V0_1 = Object.freeze(["U", "Y"] as const);
 const AUTHORIZED_PATH_A_E_V0_1 = Object.freeze(["A", "E"] as const);
+const AUTHORIZED_PATH_E_A_V0_1 = Object.freeze(["E", "A"] as const);
 
 const CLAIM_BOUNDARY_V0_1 = Object.freeze({
   historicalOriginClaim: "not_claimed",
@@ -52,18 +56,29 @@ const PROVENANCE_A_E_V0_1 = Object.freeze({
   analyzedVoicePath: AUTHORIZED_PATH_A_E_V0_1,
 } as const);
 
+const PROVENANCE_E_A_V0_1 = Object.freeze({
+  ruleId: DOCTRINE_LEVEL3_PROOF_PAIR_E_A_RULE_ID_V0_1,
+  doctrineAuthority: "src/shared/openInstrument/doctrineFunctionalProfile.v0_1.ts",
+  doctrineProfileSchema: DOCTRINE_FUNCTIONAL_PROFILE_SCHEMA_V0_1,
+  orderedViewsSchema: sevenVoiceOrderedViewsSchemaVersion,
+  analyzedVoicePath: AUTHORIZED_PATH_E_A_V0_1,
+} as const);
+
 export type DoctrineLevel3ProofPairReadingV0_1 = Readonly<{
   schemaVersion: typeof DOCTRINE_LEVEL3_PROOF_PAIR_SCHEMA_V0_1;
   ruleId:
     | typeof DOCTRINE_LEVEL3_PROOF_PAIR_RULE_ID_V0_1
-    | typeof DOCTRINE_LEVEL3_PROOF_PAIR_A_E_RULE_ID_V0_1;
+    | typeof DOCTRINE_LEVEL3_PROOF_PAIR_A_E_RULE_ID_V0_1
+    | typeof DOCTRINE_LEVEL3_PROOF_PAIR_E_A_RULE_ID_V0_1;
   level: 3;
   analyzedVoicePath:
     | typeof AUTHORIZED_PATH_U_Y_V0_1
-    | typeof AUTHORIZED_PATH_A_E_V0_1;
+    | typeof AUTHORIZED_PATH_A_E_V0_1
+    | typeof AUTHORIZED_PATH_E_A_V0_1;
   reading:
     | "grounded depth with reflective exploration"
-    | "initiating beginning with expanding growth";
+    | "initiating beginning with expanding growth"
+    | "expanding growth with initiating beginning";
   truthClassification: "inference";
   doctrineAuthority: "src/shared/openInstrument/doctrineFunctionalProfile.v0_1.ts";
   doctrineProfileSchema: typeof DOCTRINE_FUNCTIONAL_PROFILE_SCHEMA_V0_1;
@@ -76,7 +91,10 @@ export type DoctrineLevel3ProofPairReadingV0_1 = Readonly<{
   claimBoundary: typeof CLAIM_BOUNDARY_V0_1;
   userDecisionPosture: "user_decides";
   noSingleWinner: true;
-  provenance: typeof PROVENANCE_V0_1 | typeof PROVENANCE_A_E_V0_1;
+  provenance:
+    | typeof PROVENANCE_V0_1
+    | typeof PROVENANCE_A_E_V0_1
+    | typeof PROVENANCE_E_A_V0_1;
 }>;
 
 export const DOCTRINE_LEVEL3_PROOF_PAIR_U_Y_V0_1 = Object.freeze({
@@ -121,9 +139,31 @@ export const DOCTRINE_LEVEL3_PROOF_PAIR_A_E_V0_1 = Object.freeze({
   provenance: PROVENANCE_A_E_V0_1,
 } satisfies DoctrineLevel3ProofPairReadingV0_1);
 
+export const DOCTRINE_LEVEL3_PROOF_PAIR_E_A_V0_1 = Object.freeze({
+  schemaVersion: DOCTRINE_LEVEL3_PROOF_PAIR_SCHEMA_V0_1,
+  ruleId: DOCTRINE_LEVEL3_PROOF_PAIR_E_A_RULE_ID_V0_1,
+  level: 3,
+  analyzedVoicePath: AUTHORIZED_PATH_E_A_V0_1,
+  reading: "expanding growth with initiating beginning",
+  truthClassification: "inference",
+  doctrineAuthority: "src/shared/openInstrument/doctrineFunctionalProfile.v0_1.ts",
+  doctrineProfileSchema: DOCTRINE_FUNCTIONAL_PROFILE_SCHEMA_V0_1,
+  outputShape: "bounded_phrase_or_short_clause",
+  genericComposition: "NOT_AUTHORIZED",
+  level4TransitionSemantics: "NOT_AUTHORIZED",
+  providerIndependent: true,
+  externalEvidenceIndependent: true,
+  candidateWinnerIndependent: true,
+  claimBoundary: CLAIM_BOUNDARY_V0_1,
+  userDecisionPosture: "user_decides",
+  noSingleWinner: true,
+  provenance: PROVENANCE_E_A_V0_1,
+} satisfies DoctrineLevel3ProofPairReadingV0_1);
+
 export const DOCTRINE_LEVEL3_PROOF_PAIR_AUTHORITY_REGISTRY_V0_1 = Object.freeze([
   DOCTRINE_LEVEL3_PROOF_PAIR_U_Y_V0_1,
   DOCTRINE_LEVEL3_PROOF_PAIR_A_E_V0_1,
+  DOCTRINE_LEVEL3_PROOF_PAIR_E_A_V0_1,
 ] as const);
 
 function isRecordV0_1(value: unknown): value is Record<string, unknown> {

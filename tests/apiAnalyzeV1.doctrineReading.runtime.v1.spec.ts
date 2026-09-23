@@ -90,6 +90,26 @@ describe("/api/analyze-v1 doctrine reading runtime projection v1", () => {
     );
   });
 
+  it("projects the E to A reversal without adding transition semantics", async () => {
+    const body = await analyze("ea");
+    const reading = body.doctrineReading as AnalyzeBody;
+
+    expect(body.heartInstrumentV1.surfaceVowels).toEqual(["E", "A"]);
+    expect(reading.analyzedVoicePath).toEqual(["E", "A"]);
+    expect(reading.level3WholePathReading).toMatchObject({
+      ruleId: "level3.proof-pair.e-a.v0_1",
+      analyzedVoicePath: ["E", "A"],
+      reading: "expanding growth with initiating beginning",
+      truthClassification: "inference",
+      level: 3,
+      genericComposition: "NOT_AUTHORIZED",
+      level4TransitionSemantics: "NOT_AUTHORIZED",
+      userDecisionPosture: "user_decides",
+      noSingleWinner: true,
+    });
+    expectDoctrineBoundaries(reading);
+  });
+
   it("preserves repeated surface Voice positions as distinct entries", async () => {
     const body = await analyze("banana");
     const reading = body.doctrineReading as AnalyzeBody;

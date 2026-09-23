@@ -2,6 +2,8 @@ import {
   DOCTRINE_LEVEL3_PROOF_PAIR_A_E_RULE_ID_V0_1,
   DOCTRINE_LEVEL3_PROOF_PAIR_A_E_V0_1,
   DOCTRINE_LEVEL3_PROOF_PAIR_AUTHORITY_REGISTRY_V0_1,
+  DOCTRINE_LEVEL3_PROOF_PAIR_E_A_RULE_ID_V0_1,
+  DOCTRINE_LEVEL3_PROOF_PAIR_E_A_V0_1,
   DOCTRINE_LEVEL3_PROOF_PAIR_SCHEMA_V0_1,
   DOCTRINE_LEVEL3_PROOF_PAIR_U_Y_V0_1,
   isDoctrineLevel3ProofPairReadingV0_1,
@@ -9,7 +11,7 @@ import {
 } from "@/shared/openInstrument/doctrineLevel3ProofPair.v0_1";
 
 describe("Open Instrument Level-3 proof pair authority v0.1", () => {
-  test("registers exactly two deterministic proof-pair readings", () => {
+  test("registers exactly three deterministic proof-pair readings", () => {
     expect(DOCTRINE_LEVEL3_PROOF_PAIR_U_Y_V0_1).toMatchObject({
       schemaVersion: DOCTRINE_LEVEL3_PROOF_PAIR_SCHEMA_V0_1,
       ruleId: "level3.proof-pair.u-y.v0_1",
@@ -49,20 +51,41 @@ describe("Open Instrument Level-3 proof pair authority v0.1", () => {
         DOCTRINE_LEVEL3_PROOF_PAIR_A_E_V0_1,
       ),
     ).toBe(true);
-    expect(DOCTRINE_LEVEL3_PROOF_PAIR_AUTHORITY_REGISTRY_V0_1).toHaveLength(2);
+
+    expect(DOCTRINE_LEVEL3_PROOF_PAIR_E_A_V0_1).toMatchObject({
+      schemaVersion: DOCTRINE_LEVEL3_PROOF_PAIR_SCHEMA_V0_1,
+      ruleId: DOCTRINE_LEVEL3_PROOF_PAIR_E_A_RULE_ID_V0_1,
+      level: 3,
+      analyzedVoicePath: ["E", "A"],
+      reading: "expanding growth with initiating beginning",
+      truthClassification: "inference",
+      doctrineAuthority: "src/shared/openInstrument/doctrineFunctionalProfile.v0_1.ts",
+      outputShape: "bounded_phrase_or_short_clause",
+      genericComposition: "NOT_AUTHORIZED",
+      level4TransitionSemantics: "NOT_AUTHORIZED",
+      userDecisionPosture: "user_decides",
+      noSingleWinner: true,
+    });
+    expect(
+      isDoctrineLevel3ProofPairReadingV0_1(
+        DOCTRINE_LEVEL3_PROOF_PAIR_E_A_V0_1,
+      ),
+    ).toBe(true);
+    expect(DOCTRINE_LEVEL3_PROOF_PAIR_AUTHORITY_REGISTRY_V0_1).toHaveLength(3);
     expect(
       DOCTRINE_LEVEL3_PROOF_PAIR_AUTHORITY_REGISTRY_V0_1.map((entry) => entry.ruleId),
     ).toEqual([
       "level3.proof-pair.u-y.v0_1",
       "level3.proof-pair.a-e.v0_1",
+      "level3.proof-pair.e-a.v0_1",
     ]);
   });
 
   test.each([
     ["U to Y", ["U", "Y"], true],
     ["A to E", ["A", "E"], true],
+    ["E to A", ["E", "A"], true],
     ["Y to U", ["Y", "U"], false],
-    ["E to A", ["E", "A"], false],
     ["A to A", ["A", "A"], false],
     ["E to E", ["E", "E"], false],
     ["U to U", ["U", "U"], false],
@@ -77,7 +100,9 @@ describe("Open Instrument Level-3 proof pair authority v0.1", () => {
       expect(result).toBe(
         label === "U to Y"
           ? DOCTRINE_LEVEL3_PROOF_PAIR_U_Y_V0_1
-          : DOCTRINE_LEVEL3_PROOF_PAIR_A_E_V0_1,
+          : label === "A to E"
+            ? DOCTRINE_LEVEL3_PROOF_PAIR_A_E_V0_1
+            : DOCTRINE_LEVEL3_PROOF_PAIR_E_A_V0_1,
       );
     }
   });
@@ -86,6 +111,9 @@ describe("Open Instrument Level-3 proof pair authority v0.1", () => {
     expect(projectLevel3DoctrineReadingV0_1(null)).toBeNull();
     expect(projectLevel3DoctrineReadingV0_1(["X", "Y"])).toBeNull();
     expect(projectLevel3DoctrineReadingV0_1(["U", "Y", "U"])).toBeNull();
+    expect(projectLevel3DoctrineReadingV0_1(["A", "E", "A"])).toBeNull();
+    expect(projectLevel3DoctrineReadingV0_1(["E", "A", "E"])).toBeNull();
+    expect(projectLevel3DoctrineReadingV0_1(["A", "A", "E"])).toBeNull();
   });
 
   test("is repeatable and independent of word or target-sense data", () => {
@@ -109,5 +137,18 @@ describe("Open Instrument Level-3 proof pair authority v0.1", () => {
     expect(JSON.stringify(reading)).not.toContain("study");
     expect(JSON.stringify(reading)).not.toContain("semanticBridge");
     expect(JSON.stringify(reading)).not.toContain("transition");
+  });
+
+  test("keeps the E to A reversal distinct and independently bounded", () => {
+    const reading = projectLevel3DoctrineReadingV0_1(["E", "A"]);
+
+    expect(reading).toBe(DOCTRINE_LEVEL3_PROOF_PAIR_E_A_V0_1);
+    expect(reading?.analyzedVoicePath).toEqual(["E", "A"]);
+    expect(reading?.reading).toBe("expanding growth with initiating beginning");
+    expect(reading?.reading).not.toBe(
+      DOCTRINE_LEVEL3_PROOF_PAIR_A_E_V0_1.reading,
+    );
+    expect(JSON.stringify(reading)).not.toContain("transition");
+    expect(JSON.stringify(reading)).not.toContain("targetSenseId");
   });
 });
