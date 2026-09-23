@@ -332,6 +332,70 @@ function validationScore(
   return 1;
 }
 
+function compareSupportedFunctionalCandidatesV0_1(
+  a: CandidateRowVM,
+  b: CandidateRowVM,
+): number {
+  // Keep the primary selector and the Overview stack on the same
+  // validated-before-partial ordering rule.
+  const validationDelta =
+    validationScore(b) -
+    validationScore(a);
+
+  if (validationDelta !== 0) {
+    return validationDelta;
+  }
+
+  const aTokens = candidateTokens(a);
+  const bTokens = candidateTokens(b);
+  const tokenDelta =
+    aTokens.length -
+    bTokens.length;
+
+  if (tokenDelta !== 0) {
+    return tokenDelta;
+  }
+
+  const sizeDelta =
+    aTokens.join("").length -
+    bTokens.join("").length;
+
+  return sizeDelta || a.index - b.index;
+}
+
+function supportedFunctionalCandidatesV0_1(
+  rows: CandidateRowVM[],
+): CandidateRowVM[] {
+  const supported = rows
+    .filter(isFunctionalCandidate)
+    .filter((row) => {
+      const validation = presentString(row.validationOutcome);
+
+      return (
+        validation === "validated" ||
+        validation === "partial"
+      );
+    })
+    .sort(compareSupportedFunctionalCandidatesV0_1);
+
+  const seenIds = new Set<string>();
+
+  return supported.filter((row) => {
+    const id = row.id.trim();
+
+    if (!id) {
+      return true;
+    }
+
+    if (seenIds.has(id)) {
+      return false;
+    }
+
+    seenIds.add(id);
+    return true;
+  });
+}
+
 function usefulFunctionalCandidate(
   rows: CandidateRowVM[],
 ): CandidateRowVM | null {
@@ -345,76 +409,11 @@ function usefulFunctionalCandidate(
   }
 
   const supported =
-    functional.filter(
-      (row) => {
-        const validation =
-          presentString(
-            row.validationOutcome,
-          );
-
-        return (
-          validation ===
-            "validated" ||
-          validation ===
-            "partial"
-        );
-      },
-    );
+    supportedFunctionalCandidatesV0_1(rows);
 
   if (supported.length > 0) {
     return (
-      [...supported].sort(
-        (a, b) => {
-          // Embryo-first canonical rule:
-          //
-          // 1. stronger evidence first;
-          // 2. then the smallest functional embryo/component set;
-          // 3. then the smallest textual embryo;
-          // 4. preserve emitted order as the final tie-breaker.
-          //
-          // A larger partial composition must never displace a
-          // smaller validated functional embryo merely because it
-          // contains multiple components.
-          const validationDelta =
-            validationScore(b) -
-            validationScore(a);
-
-          if (
-            validationDelta !== 0
-          ) {
-            return validationDelta;
-          }
-
-          const aTokens =
-            candidateTokens(a);
-
-          const bTokens =
-            candidateTokens(b);
-
-          const tokenDelta =
-            aTokens.length -
-            bTokens.length;
-
-          if (
-            tokenDelta !== 0
-          ) {
-            return tokenDelta;
-          }
-
-          const sizeDelta =
-            aTokens
-              .join("")
-              .length -
-            bTokens
-              .join("")
-              .length;
-
-          return (
-            sizeDelta ||
-            a.index - b.index
-          );
-        },
-      )[0] ?? null
+      supported[0] ?? null
     );
   }
 
@@ -455,6 +454,146 @@ function usefulFunctionalCandidate(
         );
       },
     )[0] ?? null
+  );
+}
+
+function functionalCandidateDisplayFormV0_1(
+  row: CandidateRowVM,
+): string {
+  const tokens = candidateTokens(row);
+
+  return (
+    tokens.join(" + ") ||
+    presentString(row.form) ||
+    "not emitted"
+  );
+}
+
+function functionalCandidateMeaningV0_1(
+  row: CandidateRowVM,
+): string | null {
+  const statement = presentString(row.functionalStatement);
+
+  if (statement) {
+    return statement;
+  }
+
+  const componentMeanings = presentFunctionalComponents(row)
+    .map((component) => {
+      const meaning = presentString(component.plainMeaning);
+      return meaning
+        ? `${component.embryo}: ${meaning}`
+        : null;
+    })
+    .filter((value): value is string => Boolean(value));
+
+  return (
+    componentMeanings.join("; ") ||
+    presentString(row.plainStandaloneGloss)
+  );
+}
+
+function FunctionalCandidateStackV0_1({
+  rows,
+  primaryCandidate,
+  candidateUiRows,
+}: {
+  rows: CandidateRowVM[];
+  primaryCandidate: CandidateRowVM;
+  candidateUiRows: UICandidateRow[];
+}) {
+  const additionalCandidates =
+    supportedFunctionalCandidatesV0_1(rows).filter(
+      (candidate) => candidate.id !== primaryCandidate.id,
+    );
+
+  if (additionalCandidates.length === 0) {
+    return null;
+  }
+
+  const candidateUiRowsById = new Map(
+    candidateUiRows.map((row) => [row.id, row]),
+  );
+
+  return (
+    <section
+      data-testid="functional-candidate-stack"
+      className="mt-5 rounded-lg border border-emerald-300/70 bg-white/70 p-4 dark:border-emerald-400/25 dark:bg-black/20"
+    >
+      <div className="text-xs font-semibold uppercase tracking-[0.14em] text-emerald-700 dark:text-emerald-200">
+        Other qualifying functional candidates
+      </div>
+
+      <div className="mt-3 space-y-3">
+        {additionalCandidates.map((candidate) => {
+          const validation = presentString(candidate.validationOutcome);
+          const status =
+            validation === "validated"
+              ? "Reviewed"
+              : "Partial";
+          const components = presentFunctionalComponents(candidate);
+          const meaning = functionalCandidateMeaningV0_1(candidate);
+          const uiRow = candidateUiRowsById.get(candidate.id);
+
+          return (
+            <div
+              key={candidate.id}
+              data-testid="functional-candidate-stack-item"
+              className="rounded-md border border-slate-300 bg-slate-50/80 p-3 dark:border-slate-700 dark:bg-slate-950/35"
+            >
+              <div className="flex flex-wrap items-start justify-between gap-2">
+                <div className="min-w-0">
+                  <div className="font-mono text-lg font-semibold text-slate-950 dark:text-white">
+                    {functionalCandidateDisplayFormV0_1(candidate)}
+                  </div>
+                  {meaning ? (
+                    <div className="mt-1 text-sm leading-6 text-slate-800 dark:text-slate-200">
+                      {meaning}
+                    </div>
+                  ) : null}
+                </div>
+
+                <span className="rounded-full border border-amber-400/50 bg-amber-100 px-2.5 py-1 text-xs font-semibold text-amber-900 dark:bg-amber-500/10 dark:text-amber-100">
+                  {`Evidence: ${status}`}
+                </span>
+              </div>
+
+              {components.length > 0 ? (
+                <div className="mt-3 grid gap-2 sm:grid-cols-2">
+                  {components.map((component) => {
+                    const componentMeaning = presentString(component.plainMeaning);
+
+                    return (
+                      <div
+                        key={`${candidate.id}:${component.embryo}`}
+                        className="rounded-md border border-slate-300/80 bg-white/70 p-2 dark:border-slate-700 dark:bg-black/20"
+                      >
+                        <div className="font-mono text-sm font-semibold text-slate-950 dark:text-white">
+                          {component.embryo}
+                        </div>
+                        {componentMeaning ? (
+                          <div className="mt-1 text-xs leading-5 text-slate-700 dark:text-slate-300">
+                            {componentMeaning}
+                          </div>
+                        ) : null}
+                      </div>
+                    );
+                  })}
+                </div>
+              ) : null}
+
+              {uiRow ? (
+                <CandidateEvidenceReferences row={uiRow} tone="light" />
+              ) : null}
+            </div>
+          );
+        })}
+      </div>
+
+      <div className="mt-3 text-xs leading-5 text-slate-600 dark:text-slate-400">
+        No single winner is selected. User decides.
+      </div>
+    </section>
   );
 }
 
@@ -1645,6 +1784,13 @@ export function EmbryoExpansionContextCardV0_1({
           : "Functional motivation, not historical etymology."}
       </div>
       </section>
+      {showPrimaryEvidence ? (
+        <FunctionalCandidateStackV0_1
+          rows={rows}
+          primaryCandidate={primaryCandidate}
+          candidateUiRows={candidateUiRows}
+        />
+      ) : null}
       {lexicalSourceEvidence}
     </>
   );
