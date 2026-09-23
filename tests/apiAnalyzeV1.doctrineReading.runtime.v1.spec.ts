@@ -14,10 +14,10 @@ import {
 
 type AnalyzeBody = Record<string, any>;
 
-async function analyze(word: string): Promise<AnalyzeBody> {
+async function analyze(word: string, suffix = ""): Promise<AnalyzeBody> {
   const route = await import("../app/api/analyze-v1/route");
   const response = await route.GET({
-    url: `http://localhost/api/analyze-v1?word=${encodeURIComponent(word)}&mode=strict`,
+    url: `http://localhost/api/analyze-v1?word=${encodeURIComponent(word)}&mode=strict${suffix}`,
   } as any);
 
   expect(response.status).toBe(200);
@@ -58,6 +58,12 @@ describe("/api/analyze-v1 doctrine reading runtime projection v1", () => {
       [0, "U"],
       [1, "Y"],
     ]);
+    expect(reading.level3WholePathReading).toMatchObject({
+      analyzedVoicePath: ["U", "Y"],
+      reading: "grounded depth with reflective exploration",
+      truthClassification: "inference",
+      level: 3,
+    });
     expectDoctrineBoundaries(reading);
   });
 
@@ -67,6 +73,7 @@ describe("/api/analyze-v1 doctrine reading runtime projection v1", () => {
 
     expect(body.heartInstrumentV1.surfaceVowels).toEqual(["A", "A", "A"]);
     expect(reading.analyzedVoicePath).toEqual(["A", "A", "A"]);
+    expect(reading.level3WholePathReading).toBeUndefined();
     expect(reading.entries.map((entry: AnalyzeBody) => [entry.pathIndex, entry.voice])).toEqual([
       [0, "A"],
       [1, "A"],
@@ -82,7 +89,20 @@ describe("/api/analyze-v1 doctrine reading runtime projection v1", () => {
     expect(body.heartInstrumentV1.surfaceVowels.length).toBeGreaterThan(0);
     expect(reading).not.toBeNull();
     expect(body.candidates).toEqual([]);
+    expect(reading.level3WholePathReading).toBeUndefined();
     expectDoctrineBoundaries(reading);
+  });
+
+  it("keeps the U to Y proof reading independent of target-sense context", async () => {
+    const withoutTargetSense = await analyze("study");
+    const withTargetSense = await analyze(
+      "study",
+      "&targetSenseId=study.v1&targetSenseLabel=to%20study",
+    );
+
+    expect(withoutTargetSense.doctrineReading.level3WholePathReading).toEqual(
+      withTargetSense.doctrineReading.level3WholePathReading,
+    );
   });
 
   it("keeps the additive field inside the strict public contract", async () => {

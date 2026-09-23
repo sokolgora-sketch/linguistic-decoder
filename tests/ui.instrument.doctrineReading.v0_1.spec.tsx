@@ -37,6 +37,10 @@ describe("Open Instrument Seven-Voices doctrine reading UI v0.1", () => {
     );
     expect(vm.doctrineReading.value.entries.map((entry) => entry.voice)).toEqual(["U", "Y"]);
     expect(vm.doctrineReading.value.entries.map((entry) => entry.pathIndex)).toEqual([0, 1]);
+    expect(vm.doctrineReading.value.level3WholePathReading).toMatchObject({
+      reading: "grounded depth with reflective exploration",
+      truthClassification: "inference",
+    });
   });
 
   it("keeps absent, malformed, and structural Null doctrine states distinct", () => {
@@ -76,11 +80,24 @@ describe("Open Instrument Seven-Voices doctrine reading UI v0.1", () => {
     });
   });
 
+  it("rejects malformed Level-3 proof-pair output", async () => {
+    const body = await analyze("study");
+    const malformed = JSON.parse(JSON.stringify(body)) as AnalyzeBody;
+    malformed.doctrineReading.level3WholePathReading.reading = "invented reading";
+
+    expect(adaptAnalysisToTelemetryVM(malformed).doctrineReading).toEqual({
+      kind: "missing",
+      missing: "malformed",
+      note: "doctrineReading expected the public V1 shape",
+    });
+  });
+
   it("renders doctrine reading for wind independently of Evidence Null", async () => {
     const body = await analyze("wind");
     expect(body.analysisStatusV0_1.status).toBe("null_no_supported_candidate");
     expect(body.candidates).toEqual([]);
     expect(body.doctrineReading).not.toBeNull();
+    expect(body.doctrineReading.level3WholePathReading).toBeUndefined();
 
     render(<InstrumentPanel payload={body} />);
 
@@ -92,6 +109,7 @@ describe("Open Instrument Seven-Voices doctrine reading UI v0.1", () => {
   it("preserves three repeated A entries for banana", async () => {
     const body = await analyze("banana");
     expect(body.doctrineReading.analyzedVoicePath).toEqual(["A", "A", "A"]);
+    expect(body.doctrineReading.level3WholePathReading).toBeUndefined();
 
     render(<InstrumentPanel payload={body} />);
 
@@ -112,10 +130,15 @@ describe("Open Instrument Seven-Voices doctrine reading UI v0.1", () => {
     const card = screen.getByTestId("doctrine-reading-card");
     const entries = within(card).getAllByTestId("doctrine-reading-entry");
     expect(entries.map((entry) => entry.getAttribute("data-voice"))).toEqual(["U", "Y"]);
+    expect(within(card).getByTestId("doctrine-level3-reading-text")).toHaveTextContent(
+      "grounded depth with reflective exploration",
+    );
+    expect(within(card).getByTestId("doctrine-level3-reading-boundary")).toHaveTextContent(
+      /Doctrine inference only.*not a lexical definition.*historical origin claim.*candidate proof.*winner selection/i,
+    );
     expect(within(card).getByText("Containment/Depth")).toBeInTheDocument();
     expect(within(card).getByText("Reflection/Mirror")).toBeInTheDocument();
-    expect(within(card).getByText(/not a lexical definition, historical origin claim, candidate proof, or winner selection/i)).toBeInTheDocument();
-    expect(within(card).getByText(/User decides the final interpretation/i)).toBeInTheDocument();
+    expect(within(card).getByText("This is not a lexical definition, historical origin claim, candidate proof, or winner selection. User decides the final interpretation.")).toBeInTheDocument();
     expect(screen.getAllByText("Evidence: Reviewed")).toHaveLength(2);
   });
 

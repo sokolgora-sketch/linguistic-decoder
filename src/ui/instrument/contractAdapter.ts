@@ -40,6 +40,8 @@ import {
   DOCTRINE_FUNCTIONAL_PROFILE_TRUTH_CLASSIFICATION_V0_1,
   getSevenVoiceDoctrineFunctionalProfileV0_1,
 } from "@/shared/openInstrument/doctrineFunctionalProfile.v0_1";
+import { isDoctrineLevel3ProofPairReadingV0_1 } from
+  "@/shared/openInstrument/doctrineLevel3ProofPair.v0_1";
 import type { RootMapV1 } from "@/shared/deepRoot.rootMap.v1";
 import { computeDeepRootHeartGateV01 } from "@/shared/deepRootHeartGate.v0.1.compute";
 import { isSevenVoiceKey } from "@/shared/sevenVoiceOrderedViews.v0.1";
@@ -361,6 +363,13 @@ function isDoctrineReadingV1(value: unknown): value is DoctrineReadingV1 {
   if (value.candidateWinnerIndependent !== true) return false;
   if (value.userDecisionPosture !== "user_decides") return false;
   if (value.noSingleWinner !== true) return false;
+  if (
+    value.level3WholePathReading !== undefined &&
+    value.level3WholePathReading !== null &&
+    !isDoctrineLevel3ProofPairReadingV0_1(value.level3WholePathReading)
+  ) {
+    return false;
+  }
 
   const analyzedVoicePath = value.analyzedVoicePath;
   const entries = value.entries;

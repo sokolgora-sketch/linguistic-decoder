@@ -22,6 +22,10 @@ import {
   sevenVoiceOrderedViewsSchemaVersion,
   type SevenVoiceKey,
 } from "@/shared/sevenVoiceOrderedViews.v0.1";
+import {
+  projectLevel3DoctrineReadingV0_1,
+  type DoctrineLevel3ProofPairReadingV0_1,
+} from "@/shared/openInstrument/doctrineLevel3ProofPair.v0_1";
 import type { PrincipleRole } from "@/shared/sevenPrinciples.v1";
 
 export const DOCTRINE_READING_CONTRACT_SCHEMA_V1 =
@@ -77,6 +81,7 @@ export type DoctrineReadingV1 = Readonly<{
   providerIndependent: true;
   externalEvidenceIndependent: true;
   candidateWinnerIndependent: true;
+  level3WholePathReading?: DoctrineLevel3ProofPairReadingV0_1 | null;
   claimBoundary: typeof DOCTRINE_READING_CLAIM_BOUNDARY_V1;
   userDecisionPosture: "user_decides";
   noSingleWinner: true;
@@ -151,6 +156,10 @@ export function projectDoctrineReadingV1(
     } satisfies DoctrineReadingEntryV1;
   });
 
+  const level3WholePathReading = projectLevel3DoctrineReadingV0_1(
+    projection.inputPath,
+  );
+
   return {
     ok: true,
     schemaVersion: DOCTRINE_READING_CONTRACT_SCHEMA_V1,
@@ -163,6 +172,7 @@ export function projectDoctrineReadingV1(
       providerIndependent: true,
       externalEvidenceIndependent: true,
       candidateWinnerIndependent: true,
+      ...(level3WholePathReading ? { level3WholePathReading } : {}),
       claimBoundary: DOCTRINE_READING_CLAIM_BOUNDARY_V1,
       userDecisionPosture: "user_decides",
       noSingleWinner: true,
