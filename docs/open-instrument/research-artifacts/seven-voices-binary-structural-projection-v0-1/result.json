@@ -1,0 +1,764 @@
+{
+  "byConstructionProperties": [
+    {
+      "byConstruction": true,
+      "eligibleAsAdditionalInvariant": false,
+      "property": "the seven Voices occupy the seven nonzero codes",
+      "why": "The mapping assigns seven Voices to all seven nonzero codes while 000 is fixed as the unused sentinel."
+    },
+    {
+      "byConstruction": true,
+      "eligibleAsAdditionalInvariant": false,
+      "property": "the first two bits encode the ring ordinal 0,1,2,3 for O, I/U, E/Y, A/Ë",
+      "why": "The frozen code prefixes are exactly 00, 01, 10, and 11 for the four canonical ring ordinals."
+    },
+    {
+      "byConstruction": true,
+      "eligibleAsAdditionalInvariant": false,
+      "property": "each non-self mirror pair differs only in the least-significant bit",
+      "why": "Each frozen mirror pair has equal first two bits and opposite final bits."
+    },
+    {
+      "byConstruction": true,
+      "eligibleAsAdditionalInvariant": false,
+      "property": "A↔Ë, E↔Y, and I↔U each have Hamming distance 1",
+      "why": "Each declared non-self mirror pair differs in exactly one bit under the frozen mapping."
+    },
+    {
+      "byConstruction": true,
+      "eligibleAsAdditionalInvariant": false,
+      "property": "each non-self mirror pair XORs to 001, the code assigned to O",
+      "why": "The XOR of each frozen mirror pair is 001 by direct calculation."
+    },
+    {
+      "byConstruction": true,
+      "eligibleAsAdditionalInvariant": false,
+      "property": "O is a self-mirror exception and is not represented as an ordinary binary edge",
+      "why": "O is the only self-mirror Voice and the preregistration excludes it from ordinary mirror-edge counting."
+    },
+    {
+      "byConstruction": true,
+      "eligibleAsAdditionalInvariant": false,
+      "property": "the code sequence is fixed by the selected construction",
+      "why": "The candidate is the single explicitly frozen STRUCTURAL_V0_1 mapping."
+    }
+  ],
+  "candidateSignature": {
+    "exactRingCandidateEquivalenceClassSizes": {
+      "code_sequence": 1,
+      "cube_edge_incidence": 1,
+      "distance_from_sentinel_sequence": 1,
+      "distance_to_center_sequence": 1,
+      "hamming_transition_signature": 1,
+      "hamming_weight_sequence": 1,
+      "ordered_xor_transition_signature": 1,
+      "pairwise_hamming_distance_matrix": 1,
+      "pairwise_xor_matrix": 1
+    },
+    "mapping": {
+      "A": "110",
+      "E": "100",
+      "I": "010",
+      "O": "001",
+      "U": "011",
+      "Y": "101",
+      "Ë": "111"
+    },
+    "metrics": {
+      "code_sequence": "110|100|010|001|011|101|111",
+      "cube_edge_incidence": "110001000100100110011",
+      "distance_from_sentinel_sequence": "2,1,1,1,2,2,3",
+      "distance_to_center_sequence": "3,2,2,0,1,1,2",
+      "hamming_transition_signature": "1,2,2,1,2,1",
+      "hamming_weight_sequence": "2,1,1,1,2,2,3",
+      "ordered_xor_transition_signature": "010|110|011|010|110|010",
+      "pairwise_hamming_distance_matrix": "1,1,3,2,2,1,2,2,3,1,2,2,1,3,2,1,1,2,2,1,1",
+      "pairwise_xor_matrix": "010|100|111|101|011|001|110|101|111|001|011|011|001|111|101|010|100|110|110|100|010"
+    }
+  },
+  "canonicalInputFingerprint": "d0450375a862a994c359fab7f30479e06fef51f50449ab452eafc0040818f481",
+  "classification": "REDUNDANT",
+  "controlFamilies": [
+    {
+      "derivedCount": 5040,
+      "enumeratedCount": 5040,
+      "formalPredicate": "every bijection in the fixed-sentinel universe",
+      "match": true,
+      "name": "UNRESTRICTED",
+      "relation": "superset of all other families"
+    },
+    {
+      "derivedCount": 720,
+      "enumeratedCount": 720,
+      "formalPredicate": "code(O) = 001",
+      "match": true,
+      "name": "CENTER_PRESERVING",
+      "relation": "contains CENTERED_MIRROR_EDGE and PAIR_BLOCK_PRESERVING"
+    },
+    {
+      "derivedCount": 528,
+      "enumeratedCount": 528,
+      "formalPredicate": "Hamming(code(a),code(b)) = 1 for (a,b) in (A,Ë),(E,Y),(I,U); O has no ordinary edge requirement",
+      "match": true,
+      "name": "MIRROR_EDGE_PRESERVING",
+      "relation": "contains CENTERED_MIRROR_EDGE; O self-mirror is excluded from edge counting"
+    },
+    {
+      "derivedCount": 144,
+      "enumeratedCount": 144,
+      "formalPredicate": "CENTER_PRESERVING and MIRROR_EDGE_PRESERVING",
+      "match": true,
+      "name": "CENTERED_MIRROR_EDGE",
+      "relation": "contains PAIR_BLOCK_PRESERVING and EXACT_RING_PRESERVING"
+    },
+    {
+      "derivedCount": 48,
+      "enumeratedCount": 48,
+      "formalPredicate": "each non-self mirror pair has equal first-two-bit block; with 000 excluded this forces O=001",
+      "match": true,
+      "name": "PAIR_BLOCK_PRESERVING",
+      "relation": "subset of CENTERED_MIRROR_EDGE; exact ring blocks may be permuted"
+    },
+    {
+      "derivedCount": 8,
+      "enumeratedCount": 8,
+      "formalPredicate": "binaryValue(code(v)[0:2]) = canonical ring(v) for every Voice v",
+      "match": true,
+      "name": "EXACT_RING_PRESERVING",
+      "relation": "subset of PAIR_BLOCK_PRESERVING"
+    },
+    {
+      "derivedCount": 1,
+      "enumeratedCount": 1,
+      "formalPredicate": "code(v) equals the frozen mapping for every Voice v",
+      "match": true,
+      "name": "STRUCTURAL_V0_1",
+      "relation": "member of EXACT_RING_PRESERVING"
+    }
+  ],
+  "controlFamilyCounts": {
+    "CENTERED_MIRROR_EDGE": {
+      "expected": 144,
+      "match": true,
+      "observed": 144
+    },
+    "CENTER_PRESERVING": {
+      "expected": 720,
+      "match": true,
+      "observed": 720
+    },
+    "EXACT_RING_PRESERVING": {
+      "expected": 8,
+      "match": true,
+      "observed": 8
+    },
+    "MIRROR_EDGE_PRESERVING": {
+      "expected": 528,
+      "match": true,
+      "observed": 528
+    },
+    "PAIR_BLOCK_PRESERVING": {
+      "expected": 48,
+      "match": true,
+      "observed": 48
+    },
+    "STRUCTURAL_V0_1": {
+      "expected": 1,
+      "match": true,
+      "observed": 1
+    },
+    "UNRESTRICTED": {
+      "expected": 5040,
+      "match": true,
+      "observed": 5040
+    }
+  },
+  "controlSignatureSummary": {
+    "CENTERED_MIRROR_EDGE": {
+      "code_sequence": {
+        "candidateEquivalenceClassSize": 1,
+        "largestEquivalenceClassSize": 1,
+        "rawMappings": 144,
+        "uniqueSignatures": 144
+      },
+      "cube_edge_incidence": {
+        "candidateEquivalenceClassSize": 2,
+        "largestEquivalenceClassSize": 2,
+        "rawMappings": 144,
+        "uniqueSignatures": 72
+      },
+      "distance_from_sentinel_sequence": {
+        "candidateEquivalenceClassSize": 6,
+        "largestEquivalenceClassSize": 6,
+        "rawMappings": 144,
+        "uniqueSignatures": 24
+      },
+      "distance_to_center_sequence": {
+        "candidateEquivalenceClassSize": 6,
+        "largestEquivalenceClassSize": 6,
+        "rawMappings": 144,
+        "uniqueSignatures": 24
+      },
+      "hamming_transition_signature": {
+        "candidateEquivalenceClassSize": 8,
+        "largestEquivalenceClassSize": 12,
+        "rawMappings": 144,
+        "uniqueSignatures": 46
+      },
+      "hamming_weight_sequence": {
+        "candidateEquivalenceClassSize": 6,
+        "largestEquivalenceClassSize": 6,
+        "rawMappings": 144,
+        "uniqueSignatures": 24
+      },
+      "ordered_xor_transition_signature": {
+        "candidateEquivalenceClassSize": 1,
+        "largestEquivalenceClassSize": 1,
+        "rawMappings": 144,
+        "uniqueSignatures": 144
+      },
+      "pairwise_hamming_distance_matrix": {
+        "candidateEquivalenceClassSize": 2,
+        "largestEquivalenceClassSize": 2,
+        "rawMappings": 144,
+        "uniqueSignatures": 72
+      },
+      "pairwise_xor_matrix": {
+        "candidateEquivalenceClassSize": 1,
+        "largestEquivalenceClassSize": 1,
+        "rawMappings": 144,
+        "uniqueSignatures": 144
+      }
+    },
+    "CENTER_PRESERVING": {
+      "code_sequence": {
+        "candidateEquivalenceClassSize": 1,
+        "largestEquivalenceClassSize": 1,
+        "rawMappings": 720,
+        "uniqueSignatures": 720
+      },
+      "cube_edge_incidence": {
+        "candidateEquivalenceClassSize": 2,
+        "largestEquivalenceClassSize": 2,
+        "rawMappings": 720,
+        "uniqueSignatures": 360
+      },
+      "distance_from_sentinel_sequence": {
+        "candidateEquivalenceClassSize": 12,
+        "largestEquivalenceClassSize": 12,
+        "rawMappings": 720,
+        "uniqueSignatures": 60
+      },
+      "distance_to_center_sequence": {
+        "candidateEquivalenceClassSize": 12,
+        "largestEquivalenceClassSize": 12,
+        "rawMappings": 720,
+        "uniqueSignatures": 60
+      },
+      "hamming_transition_signature": {
+        "candidateEquivalenceClassSize": 16,
+        "largestEquivalenceClassSize": 24,
+        "rawMappings": 720,
+        "uniqueSignatures": 148
+      },
+      "hamming_weight_sequence": {
+        "candidateEquivalenceClassSize": 12,
+        "largestEquivalenceClassSize": 12,
+        "rawMappings": 720,
+        "uniqueSignatures": 60
+      },
+      "ordered_xor_transition_signature": {
+        "candidateEquivalenceClassSize": 1,
+        "largestEquivalenceClassSize": 1,
+        "rawMappings": 720,
+        "uniqueSignatures": 720
+      },
+      "pairwise_hamming_distance_matrix": {
+        "candidateEquivalenceClassSize": 2,
+        "largestEquivalenceClassSize": 2,
+        "rawMappings": 720,
+        "uniqueSignatures": 360
+      },
+      "pairwise_xor_matrix": {
+        "candidateEquivalenceClassSize": 1,
+        "largestEquivalenceClassSize": 1,
+        "rawMappings": 720,
+        "uniqueSignatures": 720
+      }
+    },
+    "EXACT_RING_PRESERVING": {
+      "code_sequence": {
+        "candidateEquivalenceClassSize": 1,
+        "largestEquivalenceClassSize": 1,
+        "rawMappings": 8,
+        "uniqueSignatures": 8
+      },
+      "cube_edge_incidence": {
+        "candidateEquivalenceClassSize": 1,
+        "largestEquivalenceClassSize": 1,
+        "rawMappings": 8,
+        "uniqueSignatures": 8
+      },
+      "distance_from_sentinel_sequence": {
+        "candidateEquivalenceClassSize": 1,
+        "largestEquivalenceClassSize": 1,
+        "rawMappings": 8,
+        "uniqueSignatures": 8
+      },
+      "distance_to_center_sequence": {
+        "candidateEquivalenceClassSize": 1,
+        "largestEquivalenceClassSize": 1,
+        "rawMappings": 8,
+        "uniqueSignatures": 8
+      },
+      "hamming_transition_signature": {
+        "candidateEquivalenceClassSize": 1,
+        "largestEquivalenceClassSize": 1,
+        "rawMappings": 8,
+        "uniqueSignatures": 8
+      },
+      "hamming_weight_sequence": {
+        "candidateEquivalenceClassSize": 1,
+        "largestEquivalenceClassSize": 1,
+        "rawMappings": 8,
+        "uniqueSignatures": 8
+      },
+      "ordered_xor_transition_signature": {
+        "candidateEquivalenceClassSize": 1,
+        "largestEquivalenceClassSize": 1,
+        "rawMappings": 8,
+        "uniqueSignatures": 8
+      },
+      "pairwise_hamming_distance_matrix": {
+        "candidateEquivalenceClassSize": 1,
+        "largestEquivalenceClassSize": 1,
+        "rawMappings": 8,
+        "uniqueSignatures": 8
+      },
+      "pairwise_xor_matrix": {
+        "candidateEquivalenceClassSize": 1,
+        "largestEquivalenceClassSize": 1,
+        "rawMappings": 8,
+        "uniqueSignatures": 8
+      }
+    },
+    "MIRROR_EDGE_PRESERVING": {
+      "code_sequence": {
+        "candidateEquivalenceClassSize": 1,
+        "largestEquivalenceClassSize": 1,
+        "rawMappings": 528,
+        "uniqueSignatures": 528
+      },
+      "cube_edge_incidence": {
+        "candidateEquivalenceClassSize": 6,
+        "largestEquivalenceClassSize": 6,
+        "rawMappings": 528,
+        "uniqueSignatures": 88
+      },
+      "distance_from_sentinel_sequence": {
+        "candidateEquivalenceClassSize": 18,
+        "largestEquivalenceClassSize": 18,
+        "rawMappings": 528,
+        "uniqueSignatures": 32
+      },
+      "distance_to_center_sequence": {
+        "candidateEquivalenceClassSize": 18,
+        "largestEquivalenceClassSize": 18,
+        "rawMappings": 528,
+        "uniqueSignatures": 32
+      },
+      "hamming_transition_signature": {
+        "candidateEquivalenceClassSize": 24,
+        "largestEquivalenceClassSize": 48,
+        "rawMappings": 528,
+        "uniqueSignatures": 48
+      },
+      "hamming_weight_sequence": {
+        "candidateEquivalenceClassSize": 18,
+        "largestEquivalenceClassSize": 18,
+        "rawMappings": 528,
+        "uniqueSignatures": 32
+      },
+      "ordered_xor_transition_signature": {
+        "candidateEquivalenceClassSize": 1,
+        "largestEquivalenceClassSize": 1,
+        "rawMappings": 528,
+        "uniqueSignatures": 528
+      },
+      "pairwise_hamming_distance_matrix": {
+        "candidateEquivalenceClassSize": 6,
+        "largestEquivalenceClassSize": 6,
+        "rawMappings": 528,
+        "uniqueSignatures": 88
+      },
+      "pairwise_xor_matrix": {
+        "candidateEquivalenceClassSize": 1,
+        "largestEquivalenceClassSize": 1,
+        "rawMappings": 528,
+        "uniqueSignatures": 528
+      }
+    },
+    "PAIR_BLOCK_PRESERVING": {
+      "code_sequence": {
+        "candidateEquivalenceClassSize": 1,
+        "largestEquivalenceClassSize": 1,
+        "rawMappings": 48,
+        "uniqueSignatures": 48
+      },
+      "cube_edge_incidence": {
+        "candidateEquivalenceClassSize": 2,
+        "largestEquivalenceClassSize": 2,
+        "rawMappings": 48,
+        "uniqueSignatures": 24
+      },
+      "distance_from_sentinel_sequence": {
+        "candidateEquivalenceClassSize": 2,
+        "largestEquivalenceClassSize": 2,
+        "rawMappings": 48,
+        "uniqueSignatures": 24
+      },
+      "distance_to_center_sequence": {
+        "candidateEquivalenceClassSize": 2,
+        "largestEquivalenceClassSize": 2,
+        "rawMappings": 48,
+        "uniqueSignatures": 24
+      },
+      "hamming_transition_signature": {
+        "candidateEquivalenceClassSize": 4,
+        "largestEquivalenceClassSize": 4,
+        "rawMappings": 48,
+        "uniqueSignatures": 20
+      },
+      "hamming_weight_sequence": {
+        "candidateEquivalenceClassSize": 2,
+        "largestEquivalenceClassSize": 2,
+        "rawMappings": 48,
+        "uniqueSignatures": 24
+      },
+      "ordered_xor_transition_signature": {
+        "candidateEquivalenceClassSize": 1,
+        "largestEquivalenceClassSize": 1,
+        "rawMappings": 48,
+        "uniqueSignatures": 48
+      },
+      "pairwise_hamming_distance_matrix": {
+        "candidateEquivalenceClassSize": 2,
+        "largestEquivalenceClassSize": 2,
+        "rawMappings": 48,
+        "uniqueSignatures": 24
+      },
+      "pairwise_xor_matrix": {
+        "candidateEquivalenceClassSize": 1,
+        "largestEquivalenceClassSize": 1,
+        "rawMappings": 48,
+        "uniqueSignatures": 48
+      }
+    },
+    "STRUCTURAL_V0_1": {
+      "code_sequence": {
+        "candidateEquivalenceClassSize": 1,
+        "largestEquivalenceClassSize": 1,
+        "rawMappings": 1,
+        "uniqueSignatures": 1
+      },
+      "cube_edge_incidence": {
+        "candidateEquivalenceClassSize": 1,
+        "largestEquivalenceClassSize": 1,
+        "rawMappings": 1,
+        "uniqueSignatures": 1
+      },
+      "distance_from_sentinel_sequence": {
+        "candidateEquivalenceClassSize": 1,
+        "largestEquivalenceClassSize": 1,
+        "rawMappings": 1,
+        "uniqueSignatures": 1
+      },
+      "distance_to_center_sequence": {
+        "candidateEquivalenceClassSize": 1,
+        "largestEquivalenceClassSize": 1,
+        "rawMappings": 1,
+        "uniqueSignatures": 1
+      },
+      "hamming_transition_signature": {
+        "candidateEquivalenceClassSize": 1,
+        "largestEquivalenceClassSize": 1,
+        "rawMappings": 1,
+        "uniqueSignatures": 1
+      },
+      "hamming_weight_sequence": {
+        "candidateEquivalenceClassSize": 1,
+        "largestEquivalenceClassSize": 1,
+        "rawMappings": 1,
+        "uniqueSignatures": 1
+      },
+      "ordered_xor_transition_signature": {
+        "candidateEquivalenceClassSize": 1,
+        "largestEquivalenceClassSize": 1,
+        "rawMappings": 1,
+        "uniqueSignatures": 1
+      },
+      "pairwise_hamming_distance_matrix": {
+        "candidateEquivalenceClassSize": 1,
+        "largestEquivalenceClassSize": 1,
+        "rawMappings": 1,
+        "uniqueSignatures": 1
+      },
+      "pairwise_xor_matrix": {
+        "candidateEquivalenceClassSize": 1,
+        "largestEquivalenceClassSize": 1,
+        "rawMappings": 1,
+        "uniqueSignatures": 1
+      }
+    },
+    "UNRESTRICTED": {
+      "code_sequence": {
+        "candidateEquivalenceClassSize": 1,
+        "largestEquivalenceClassSize": 1,
+        "rawMappings": 5040,
+        "uniqueSignatures": 5040
+      },
+      "cube_edge_incidence": {
+        "candidateEquivalenceClassSize": 6,
+        "largestEquivalenceClassSize": 6,
+        "rawMappings": 5040,
+        "uniqueSignatures": 840
+      },
+      "distance_from_sentinel_sequence": {
+        "candidateEquivalenceClassSize": 36,
+        "largestEquivalenceClassSize": 36,
+        "rawMappings": 5040,
+        "uniqueSignatures": 140
+      },
+      "distance_to_center_sequence": {
+        "candidateEquivalenceClassSize": 36,
+        "largestEquivalenceClassSize": 36,
+        "rawMappings": 5040,
+        "uniqueSignatures": 140
+      },
+      "hamming_transition_signature": {
+        "candidateEquivalenceClassSize": 66,
+        "largestEquivalenceClassSize": 108,
+        "rawMappings": 5040,
+        "uniqueSignatures": 295
+      },
+      "hamming_weight_sequence": {
+        "candidateEquivalenceClassSize": 36,
+        "largestEquivalenceClassSize": 36,
+        "rawMappings": 5040,
+        "uniqueSignatures": 140
+      },
+      "ordered_xor_transition_signature": {
+        "candidateEquivalenceClassSize": 1,
+        "largestEquivalenceClassSize": 1,
+        "rawMappings": 5040,
+        "uniqueSignatures": 5040
+      },
+      "pairwise_hamming_distance_matrix": {
+        "candidateEquivalenceClassSize": 6,
+        "largestEquivalenceClassSize": 6,
+        "rawMappings": 5040,
+        "uniqueSignatures": 840
+      },
+      "pairwise_xor_matrix": {
+        "candidateEquivalenceClassSize": 1,
+        "largestEquivalenceClassSize": 1,
+        "rawMappings": 5040,
+        "uniqueSignatures": 5040
+      }
+    }
+  },
+  "equivalenceGroups": {
+    "fixedSentinelQ3AutomorphismGroupOrder": 6,
+    "gf2LinearGroupOrder": 168,
+    "q3AutomorphismGroupOrder": 48,
+    "rawCandidateUniquenessIsNotResult": true
+  },
+  "experimentId": "SEVEN_VOICES_BINARY_STRUCTURAL_PROJECTION_EXPERIMENT_V0_1",
+  "falsificationChecks": [
+    {
+      "check": "required_canonical_ring_structure_preserved",
+      "reasonCode": "RING_SIGNATURE_MATCHES_FROZEN_MAPPING",
+      "status": "PASS"
+    },
+    {
+      "check": "required_canonical_mirror_structure_preserved",
+      "reasonCode": "MIRROR_SIGNATURE_MATCHES_FROZEN_MAPPING",
+      "status": "PASS"
+    },
+    {
+      "check": "apparent_binary_structure_entirely_by_construction",
+      "reasonCode": "ALL_DECLARED_PROPERTIES_EXCLUDED_AS_BY_CONSTRUCTION",
+      "status": "PASS"
+    },
+    {
+      "check": "candidate_indistinguishable_under_relevant_control_family",
+      "detail": {
+        "exactRingCandidateClasses": {
+          "code_sequence": 1,
+          "cube_edge_incidence": 1,
+          "distance_from_sentinel_sequence": 1,
+          "distance_to_center_sequence": 1,
+          "hamming_transition_signature": 1,
+          "hamming_weight_sequence": 1,
+          "ordered_xor_transition_signature": 1,
+          "pairwise_hamming_distance_matrix": 1,
+          "pairwise_xor_matrix": 1
+        }
+      },
+      "reasonCode": "RAW_CANDIDATE_UNIQUENESS_IS_EXPLICITLY_NOT_RESULT",
+      "status": "NOT_APPLICABLE"
+    },
+    {
+      "check": "claimed_invariant_survives_bit_relabeling",
+      "reasonCode": "NO_UNSUPPORTED_INVARIANT_CLAIMED",
+      "status": "NOT_APPLICABLE"
+    },
+    {
+      "check": "claimed_invariant_survives_q3_symmetry",
+      "reasonCode": "NO_UNSUPPORTED_INVARIANT_CLAIMED",
+      "status": "NOT_APPLICABLE"
+    },
+    {
+      "check": "claimed_invariant_survives_gf2_equivalence",
+      "reasonCode": "NO_UNSUPPORTED_INVARIANT_CLAIMED",
+      "status": "NOT_APPLICABLE"
+    },
+    {
+      "check": "semantic_interpretation_required",
+      "reasonCode": "STRUCTURAL_ONLY_EXECUTION",
+      "status": "PASS"
+    },
+    {
+      "check": "selected_mapping_only_effect_exists",
+      "reasonCode": "EXHAUSTIVE_CONTROL_UNIVERSE_EXECUTED",
+      "status": "PASS"
+    },
+    {
+      "check": "metric_family_definition_remained_valid",
+      "reasonCode": "FROZEN_DEFINITIONS_RECOMPUTED",
+      "status": "PASS"
+    },
+    {
+      "check": "frozen_structural_signature",
+      "detail": {
+        "exactRingCandidateEquivalenceClassSizes": {
+          "code_sequence": 1,
+          "cube_edge_incidence": 1,
+          "distance_from_sentinel_sequence": 1,
+          "distance_to_center_sequence": 1,
+          "hamming_transition_signature": 1,
+          "hamming_weight_sequence": 1,
+          "ordered_xor_transition_signature": 1,
+          "pairwise_hamming_distance_matrix": 1,
+          "pairwise_xor_matrix": 1
+        },
+        "mapping": {
+          "A": "110",
+          "E": "100",
+          "I": "010",
+          "O": "001",
+          "U": "011",
+          "Y": "101",
+          "Ë": "111"
+        },
+        "metrics": {
+          "code_sequence": "110|100|010|001|011|101|111",
+          "cube_edge_incidence": "110001000100100110011",
+          "distance_from_sentinel_sequence": "2,1,1,1,2,2,3",
+          "distance_to_center_sequence": "3,2,2,0,1,1,2",
+          "hamming_transition_signature": "1,2,2,1,2,1",
+          "hamming_weight_sequence": "2,1,1,1,2,2,3",
+          "ordered_xor_transition_signature": "010|110|011|010|110|010",
+          "pairwise_hamming_distance_matrix": "1,1,3,2,2,1,2,2,3,1,2,2,1,3,2,1,1,2,2,1,1",
+          "pairwise_xor_matrix": "010|100|111|101|011|001|110|101|111|001|011|011|001|111|101|010|100|110|110|100|010"
+        }
+      },
+      "reasonCode": "CANDIDATE_SIGNATURE_RECOMPUTED",
+      "status": "PASS"
+    }
+  ],
+  "invariantFindings": {
+    "byConstructionCount": 7,
+    "candidateInvariantCount": 7,
+    "proof": "Every declared candidate property is by construction; every raw metric distinction is either fixed-label orientation or the singleton frozen candidate, and no unsupported invariant survives the preregistered control/symmetry rule.",
+    "survivingAdditionalInvariants": [],
+    "symmetryArtifactCount": 9
+  },
+  "linguisticClaimsMade": false,
+  "mappingDefinition": {
+    "A": "110",
+    "E": "100",
+    "I": "010",
+    "O": "001",
+    "U": "011",
+    "Y": "101",
+    "Ë": "111"
+  },
+  "mappingId": "STRUCTURAL_V0_1",
+  "mappingUniverseSize": 5040,
+  "preregistrationSha": "240e7af20ff90122b254db31eaa407053c922b937ad93489a8f6c085a95d412f",
+  "preregistrationVersion": "open-instrument.seven-voices-binary-structural-projection-preregistration.v0_1",
+  "primaryMetric": {
+    "byConstructionCount": 7,
+    "candidateInvariants": [
+      "the seven Voices occupy the seven nonzero codes",
+      "the first two bits encode the ring ordinal 0,1,2,3 for O, I/U, E/Y, A/Ë",
+      "each non-self mirror pair differs only in the least-significant bit",
+      "A↔Ë, E↔Y, and I↔U each have Hamming distance 1",
+      "each non-self mirror pair XORs to 001, the code assigned to O",
+      "O is a self-mirror exception and is not represented as an ordinary binary edge",
+      "the code sequence is fixed by the selected construction"
+    ],
+    "name": "ADDITIONAL_STRUCTURAL_INVARIANT_COUNT",
+    "survivingAdditionalInvariants": [],
+    "symmetryArtifactCount": 9,
+    "symmetryArtifacts": [
+      "code_sequence",
+      "pairwise_hamming_distance_matrix",
+      "pairwise_xor_matrix",
+      "ordered_xor_transition_signature",
+      "hamming_weight_sequence",
+      "hamming_transition_signature",
+      "cube_edge_incidence",
+      "distance_to_center_sequence",
+      "distance_from_sentinel_sequence"
+    ],
+    "value": 0
+  },
+  "productionAuthorityChanged": false,
+  "reasonCodes": [
+    "PREREGISTRATION_HASH_MATCH",
+    "STRUCTURAL_INPUT_HASH_MATCH",
+    "MAPPING_UNIVERSE_MATCH",
+    "CONTROL_COUNTS_MATCH",
+    "REQUIRED_RING_PRESERVED",
+    "REQUIRED_MIRROR_PRESERVED",
+    "ALL_DECLARED_PROPERTIES_BY_CONSTRUCTION",
+    "RAW_FIXED_LABEL_DISTINCTIONS_NOT_ADDITIVE",
+    "NO_SURVIVING_ADDITIONAL_INVARIANT",
+    "NO_SEMANTIC_INTERPRETATION_USED"
+  ],
+  "repositoryBaseSha": "e04f5b96299e0f170b59dcdb8ed9d0ac8aad4e26",
+  "resultSha256": "301d9185b36804309246887ef3437a392083b9822bb98a8cb8c3127d2391207b",
+  "schemaVersion": "open-instrument.seven-voices-binary-structural-projection-experiment.v0_1",
+  "secondaryMetrics": [
+    "pairwise_hamming_distance_matrix",
+    "pairwise_xor_matrix",
+    "ordered_xor_transition_signature",
+    "hamming_weight_sequence",
+    "hamming_transition_signature",
+    "cube_edge_incidence",
+    "distance_to_center_sequence",
+    "distance_from_sentinel_sequence",
+    "equivalence_class_size"
+  ],
+  "semanticClaimsMade": false,
+  "sentinelPolicy": {
+    "code": "000",
+    "isMath7Value": false,
+    "isNullVoice": false,
+    "isProductionSymbol": false,
+    "isVoice": false,
+    "kind": "EXPERIMENTAL_UNUSED_SENTINEL"
+  }
+}
