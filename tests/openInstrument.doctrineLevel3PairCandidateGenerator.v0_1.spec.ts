@@ -11,6 +11,7 @@ import {
   buildDoctrineLevel3PairReviewArtifactV0_1,
   candidatePairReadingV0_1,
   DOCTRINE_LEVEL3_PAIR_CANDIDATE_REVIEW_STATUS_V0_1,
+  DOCTRINE_LEVEL3_PAIR_GENERIC_PRODUCTION_STATUS_V0_1,
   DOCTRINE_LEVEL3_PAIR_PRODUCTION_STATUS_V0_1,
   DOCTRINE_LEVEL3_PAIR_SELF_PAIR_STATUS_V0_1,
   DOCTRINE_LEVEL3_PAIR_CANDIDATE_TEMPLATE_ID_V0_1,
@@ -87,14 +88,14 @@ describe("Open Instrument Level-3 pair candidate generator v0.1", () => {
     expect(reverse.candidateReading).toBe(
       "expanding growth with initiating beginning",
     );
-    expect(forward.status).toBe(DOCTRINE_LEVEL3_PAIR_PRODUCTION_STATUS_V0_1);
-    expect(reverse.status).toBe(DOCTRINE_LEVEL3_PAIR_PRODUCTION_STATUS_V0_1);
+    expect(forward.status).toBe(DOCTRINE_LEVEL3_PAIR_GENERIC_PRODUCTION_STATUS_V0_1);
+    expect(reverse.status).toBe(DOCTRINE_LEVEL3_PAIR_GENERIC_PRODUCTION_STATUS_V0_1);
     expect(selfPair.status).toBe(DOCTRINE_LEVEL3_PAIR_SELF_PAIR_STATUS_V0_1);
     expect(candidatePairReadingV0_1("I", "O").status).toBe(
-      DOCTRINE_LEVEL3_PAIR_PRODUCTION_STATUS_V0_1,
+      DOCTRINE_LEVEL3_PAIR_GENERIC_PRODUCTION_STATUS_V0_1,
     );
     expect(candidatePairReadingV0_1("I", "U").status).toBe(
-      DOCTRINE_LEVEL3_PAIR_CANDIDATE_REVIEW_STATUS_V0_1,
+      DOCTRINE_LEVEL3_PAIR_GENERIC_PRODUCTION_STATUS_V0_1,
     );
     expect(first).toEqual(repeated);
     expect(forward.candidateReading).not.toBe(reverse.candidateReading);
@@ -111,7 +112,7 @@ describe("Open Instrument Level-3 pair candidate generator v0.1", () => {
     expect(first).not.toHaveProperty("language");
   });
 
-  it("generates the complete ordered 7x7 matrix with four production rows", () => {
+  it("generates the complete ordered 7x7 matrix with 42 generic production rows", () => {
     const matrix = generateDoctrineLevel3PairReviewMatrixV0_1();
     const pairs = matrix.map((candidate) => candidate.pair);
 
@@ -119,19 +120,14 @@ describe("Open Instrument Level-3 pair candidate generator v0.1", () => {
     expect(new Set(pairs).size).toBe(49);
     expect(
       matrix.filter(
-        (candidate) => candidate.status === DOCTRINE_LEVEL3_PAIR_PRODUCTION_STATUS_V0_1,
+        (candidate) => candidate.status === DOCTRINE_LEVEL3_PAIR_GENERIC_PRODUCTION_STATUS_V0_1,
       ),
-    ).toEqual([
-      expect.objectContaining({ pair: "A→E" }),
-      expect.objectContaining({ pair: "E→A" }),
-      expect.objectContaining({ pair: "I→O" }),
-      expect.objectContaining({ pair: "U→Y" }),
-    ]);
+    ).toHaveLength(42);
     expect(
       matrix.filter(
         (candidate) => candidate.status === DOCTRINE_LEVEL3_PAIR_CANDIDATE_REVIEW_STATUS_V0_1,
       ),
-    ).toHaveLength(38);
+    ).toHaveLength(0);
     expect(
       matrix.filter(
         (candidate) => candidate.status === DOCTRINE_LEVEL3_PAIR_SELF_PAIR_STATUS_V0_1,
@@ -146,28 +142,25 @@ describe("Open Instrument Level-3 pair candidate generator v0.1", () => {
     expect(readReviewArtifact()).toEqual(buildDoctrineLevel3PairReviewArtifactV0_1());
   });
 
-  it("keeps production authorization restricted to U/Y, A/E, E/A, and I/O", () => {
-    expect(projectLevel3DoctrineReadingV0_1(["U", "Y"])).toMatchObject({
-      reading: "grounded depth with reflective exploration",
-    });
-    expect(projectLevel3DoctrineReadingV0_1(["A", "E"])).toMatchObject({
-      reading: "initiating beginning with expanding growth",
-    });
-    expect(projectLevel3DoctrineReadingV0_1(["E", "A"])).toMatchObject({
-      reading: "expanding growth with initiating beginning",
-    });
-    expect(projectLevel3DoctrineReadingV0_1(["I", "O"])).toMatchObject({
-      reading: "clear understanding with balanced mediation",
-    });
+  it("authorizes every exact two-distinct-Voice path and rejects self/longer paths", () => {
+    for (const firstVoice of symbolicMathOrder) {
+      for (const secondVoice of symbolicMathOrder) {
+        const candidate = candidatePairReadingV0_1(firstVoice, secondVoice);
+        const reading = projectLevel3DoctrineReadingV0_1([
+          firstVoice,
+          secondVoice,
+        ]);
 
-    for (const path of [
-      ["Y", "U"],
-      ["A", "A"],
-      ["E", "E"],
-      ["U", "U"],
-      ["O", "I"],
-    ] as const) {
-      expect(projectLevel3DoctrineReadingV0_1(path)).toBeNull();
+        if (firstVoice === secondVoice) {
+          expect(candidate.status).toBe(DOCTRINE_LEVEL3_PAIR_SELF_PAIR_STATUS_V0_1);
+          expect(reading).toBeNull();
+        } else {
+          expect(candidate.status).toBe(
+            DOCTRINE_LEVEL3_PAIR_GENERIC_PRODUCTION_STATUS_V0_1,
+          );
+          expect(reading?.reading).toBe(candidate.candidateReading);
+        }
+      }
     }
 
     expect(projectLevel3DoctrineReadingV0_1(["A", "E", "I"])).toBeNull();
@@ -175,7 +168,9 @@ describe("Open Instrument Level-3 pair candidate generator v0.1", () => {
     expect(projectLevel3DoctrineReadingV0_1([])).toBeNull();
 
     expect(readReviewArtifact()).toMatchObject({
-      productionAuthorizedPairs: ["U→Y", "A→E", "E→A", "I→O"],
+      authorizationLaw:
+        "OPEN_INSTRUMENT_GENERIC_DISTINCT_PAIR_LEVEL3_COMPOSITION_LAW_V1",
+      historicalExplicitProofPairs: ["U→Y", "A→E", "E→A", "I→O"],
     });
   });
 
@@ -224,7 +219,7 @@ describe("Open Instrument Level-3 pair candidate generator v0.1", () => {
     expect(selectedRow).toMatchObject({
       pair: "I→O",
       templateId: DOCTRINE_LEVEL3_PAIR_CANDIDATE_TEMPLATE_ID_V0_1,
-      status: DOCTRINE_LEVEL3_PAIR_PRODUCTION_STATUS_V0_1,
+      status: DOCTRINE_LEVEL3_PAIR_GENERIC_PRODUCTION_STATUS_V0_1,
     });
     expect(selectedRow.candidateReading).toBe(
       candidatePairReadingV0_1("I", "O").candidateReading,

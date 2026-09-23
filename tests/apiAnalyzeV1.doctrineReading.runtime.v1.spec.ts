@@ -78,7 +78,7 @@ describe("/api/analyze-v1 doctrine reading runtime projection v1", () => {
     expect(withoutTargetSense.heartInstrumentV1.surfaceVowels).toEqual(["A", "E"]);
     expect(reading.analyzedVoicePath).toEqual(["A", "E"]);
     expect(reading.level3WholePathReading).toMatchObject({
-      ruleId: "level3.proof-pair.a-e.v0_1",
+      ruleId: "level3.generic-distinct-pair.v1",
       analyzedVoicePath: ["A", "E"],
       reading: "initiating beginning with expanding growth",
       truthClassification: "inference",
@@ -97,12 +97,12 @@ describe("/api/analyze-v1 doctrine reading runtime projection v1", () => {
     expect(body.heartInstrumentV1.surfaceVowels).toEqual(["E", "A"]);
     expect(reading.analyzedVoicePath).toEqual(["E", "A"]);
     expect(reading.level3WholePathReading).toMatchObject({
-      ruleId: "level3.proof-pair.e-a.v0_1",
+      ruleId: "level3.generic-distinct-pair.v1",
       analyzedVoicePath: ["E", "A"],
       reading: "expanding growth with initiating beginning",
       truthClassification: "inference",
       level: 3,
-      genericComposition: "NOT_AUTHORIZED",
+      genericComposition: "AUTHORIZED",
       level4TransitionSemantics: "NOT_AUTHORIZED",
       userDecisionPosture: "user_decides",
       noSingleWinner: true,

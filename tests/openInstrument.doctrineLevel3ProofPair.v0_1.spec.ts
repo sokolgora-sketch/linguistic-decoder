@@ -8,6 +8,7 @@ import {
   DOCTRINE_LEVEL3_PROOF_PAIR_I_O_V0_1,
   DOCTRINE_LEVEL3_PROOF_PAIR_SCHEMA_V0_1,
   DOCTRINE_LEVEL3_PROOF_PAIR_U_Y_V0_1,
+  DOCTRINE_LEVEL3_GENERIC_DISTINCT_PAIR_RULE_ID_V1,
   isDoctrineLevel3ProofPairReadingV0_1,
   projectLevel3DoctrineReadingV0_1,
 } from "@/shared/openInstrument/doctrineLevel3ProofPair.v0_1";
@@ -23,7 +24,7 @@ describe("Open Instrument Level-3 proof pair authority v0.1", () => {
       truthClassification: "inference",
       doctrineAuthority: "src/shared/openInstrument/doctrineFunctionalProfile.v0_1.ts",
       outputShape: "bounded_phrase_or_short_clause",
-      genericComposition: "NOT_AUTHORIZED",
+      genericComposition: "AUTHORIZED",
       level4TransitionSemantics: "NOT_AUTHORIZED",
       userDecisionPosture: "user_decides",
       noSingleWinner: true,
@@ -43,7 +44,7 @@ describe("Open Instrument Level-3 proof pair authority v0.1", () => {
       truthClassification: "inference",
       doctrineAuthority: "src/shared/openInstrument/doctrineFunctionalProfile.v0_1.ts",
       outputShape: "bounded_phrase_or_short_clause",
-      genericComposition: "NOT_AUTHORIZED",
+      genericComposition: "AUTHORIZED",
       level4TransitionSemantics: "NOT_AUTHORIZED",
       userDecisionPosture: "user_decides",
       noSingleWinner: true,
@@ -63,7 +64,7 @@ describe("Open Instrument Level-3 proof pair authority v0.1", () => {
       truthClassification: "inference",
       doctrineAuthority: "src/shared/openInstrument/doctrineFunctionalProfile.v0_1.ts",
       outputShape: "bounded_phrase_or_short_clause",
-      genericComposition: "NOT_AUTHORIZED",
+      genericComposition: "AUTHORIZED",
       level4TransitionSemantics: "NOT_AUTHORIZED",
       userDecisionPosture: "user_decides",
       noSingleWinner: true,
@@ -83,7 +84,7 @@ describe("Open Instrument Level-3 proof pair authority v0.1", () => {
       truthClassification: "inference",
       doctrineAuthority: "src/shared/openInstrument/doctrineFunctionalProfile.v0_1.ts",
       outputShape: "bounded_phrase_or_short_clause",
-      genericComposition: "NOT_AUTHORIZED",
+      genericComposition: "AUTHORIZED",
       level4TransitionSemantics: "NOT_AUTHORIZED",
       userDecisionPosture: "user_decides",
       noSingleWinner: true,
@@ -109,8 +110,9 @@ describe("Open Instrument Level-3 proof pair authority v0.1", () => {
     ["A to E", ["A", "E"], true],
     ["E to A", ["E", "A"], true],
     ["I to O", ["I", "O"], true],
-    ["Y to U", ["Y", "U"], false],
-    ["I to U review-only pair", ["I", "U"], false],
+    ["Y to U", ["Y", "U"], true],
+    ["I to U formerly review-only pair", ["I", "U"], true],
+    ["O to I formerly review-only pair", ["O", "I"], true],
     ["A to A", ["A", "A"], false],
     ["E to E", ["E", "E"], false],
     ["I to I", ["I", "I"], false],
@@ -118,7 +120,6 @@ describe("Open Instrument Level-3 proof pair authority v0.1", () => {
     ["U to U", ["U", "U"], false],
     ["Y to Y", ["Y", "Y"], false],
     ["Ë to Ë", ["Ë", "Ë"], false],
-    ["O to I", ["O", "I"], false],
     ["single Voice", ["A"], false],
     ["three Voices", ["A", "U", "Y"], false],
     ["selected pair inside triple", ["I", "O", "A"], false],
@@ -128,15 +129,12 @@ describe("Open Instrument Level-3 proof pair authority v0.1", () => {
     const result = projectLevel3DoctrineReadingV0_1(path);
     expect(Boolean(result)).toBe(supported);
     if (supported) {
-      expect(result).toBe(
-        label === "U to Y"
-          ? DOCTRINE_LEVEL3_PROOF_PAIR_U_Y_V0_1
-          : label === "A to E"
-          ? DOCTRINE_LEVEL3_PROOF_PAIR_A_E_V0_1
-            : label === "E to A"
-              ? DOCTRINE_LEVEL3_PROOF_PAIR_E_A_V0_1
-              : DOCTRINE_LEVEL3_PROOF_PAIR_I_O_V0_1,
-      );
+      expect(result).toMatchObject({
+        ruleId: DOCTRINE_LEVEL3_GENERIC_DISTINCT_PAIR_RULE_ID_V1,
+        analyzedVoicePath: path,
+        truthClassification: "inference",
+        genericComposition: "AUTHORIZED",
+      });
     }
   });
 
@@ -164,7 +162,11 @@ describe("Open Instrument Level-3 proof pair authority v0.1", () => {
   test("keeps the A to E phrase independent of target-sense data", () => {
     const reading = projectLevel3DoctrineReadingV0_1(["A", "E"]);
 
-    expect(reading).toBe(DOCTRINE_LEVEL3_PROOF_PAIR_A_E_V0_1);
+    expect(reading).toMatchObject({
+      ruleId: DOCTRINE_LEVEL3_GENERIC_DISTINCT_PAIR_RULE_ID_V1,
+      analyzedVoicePath: ["A", "E"],
+      reading: DOCTRINE_LEVEL3_PROOF_PAIR_A_E_V0_1.reading,
+    });
     expect(JSON.stringify(reading)).not.toContain("water");
     expect(JSON.stringify(reading)).not.toContain("targetSenseId");
     expect(JSON.stringify(reading)).not.toContain("study");
@@ -175,7 +177,11 @@ describe("Open Instrument Level-3 proof pair authority v0.1", () => {
   test("keeps the E to A reversal distinct and independently bounded", () => {
     const reading = projectLevel3DoctrineReadingV0_1(["E", "A"]);
 
-    expect(reading).toBe(DOCTRINE_LEVEL3_PROOF_PAIR_E_A_V0_1);
+    expect(reading).toMatchObject({
+      ruleId: DOCTRINE_LEVEL3_GENERIC_DISTINCT_PAIR_RULE_ID_V1,
+      analyzedVoicePath: ["E", "A"],
+      reading: DOCTRINE_LEVEL3_PROOF_PAIR_E_A_V0_1.reading,
+    });
     expect(reading?.analyzedVoicePath).toEqual(["E", "A"]);
     expect(reading?.reading).toBe("expanding growth with initiating beginning");
     expect(reading?.reading).not.toBe(
@@ -188,7 +194,11 @@ describe("Open Instrument Level-3 proof pair authority v0.1", () => {
   test("keeps the independent-family I to O reading exact and target-independent", () => {
     const reading = projectLevel3DoctrineReadingV0_1(["I", "O"]);
 
-    expect(reading).toBe(DOCTRINE_LEVEL3_PROOF_PAIR_I_O_V0_1);
+    expect(reading).toMatchObject({
+      ruleId: DOCTRINE_LEVEL3_GENERIC_DISTINCT_PAIR_RULE_ID_V1,
+      analyzedVoicePath: ["I", "O"],
+      reading: DOCTRINE_LEVEL3_PROOF_PAIR_I_O_V0_1.reading,
+    });
     expect(reading?.analyzedVoicePath).toEqual(["I", "O"]);
     expect(reading?.reading).toBe("clear understanding with balanced mediation");
     expect(reading?.reading).not.toContain("transition");

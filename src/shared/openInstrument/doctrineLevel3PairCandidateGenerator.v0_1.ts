@@ -24,6 +24,12 @@ export const DOCTRINE_LEVEL3_PAIR_CANDIDATE_REVIEW_STATUS_V0_1 =
 export const DOCTRINE_LEVEL3_PAIR_PRODUCTION_STATUS_V0_1 =
   "ALREADY_PRODUCTION_AUTHORIZED_PROOF_PAIR" as const;
 
+export const DOCTRINE_LEVEL3_PAIR_GENERIC_PRODUCTION_STATUS_V0_1 =
+  "AUTHORIZED_BY_GENERIC_DISTINCT_PAIR_LEVEL3_LAW_V1" as const;
+
+export const DOCTRINE_LEVEL3_GENERIC_AUTHORIZATION_ID_V0_1 =
+  "OPEN_INSTRUMENT_GENERIC_DISTINCT_PAIR_LEVEL3_COMPOSITION_LAW_V1" as const;
+
 export const DOCTRINE_LEVEL3_PAIR_SELF_PAIR_STATUS_V0_1 =
   "SELF_PAIR_UNRESOLVED_NON_PRODUCTION" as const;
 
@@ -174,6 +180,7 @@ const ATOM_PROPOSALS_V0_1 = Object.freeze({
 export type DoctrineLevel3PairCandidateStatusV0_1 =
   | typeof DOCTRINE_LEVEL3_PAIR_CANDIDATE_REVIEW_STATUS_V0_1
   | typeof DOCTRINE_LEVEL3_PAIR_PRODUCTION_STATUS_V0_1
+  | typeof DOCTRINE_LEVEL3_PAIR_GENERIC_PRODUCTION_STATUS_V0_1
   | typeof DOCTRINE_LEVEL3_PAIR_SELF_PAIR_STATUS_V0_1;
 
 export type DoctrineLevel3AtomProposalV0_1 = Readonly<{
@@ -203,7 +210,9 @@ export type DoctrineLevel3PairCandidateV0_1 = Readonly<{
   candidateReading: string;
   templateId: typeof DOCTRINE_LEVEL3_PAIR_CANDIDATE_TEMPLATE_ID_V0_1;
   status: DoctrineLevel3PairCandidateStatusV0_1;
-  semanticStatus: "BOUNDED_REVIEW_CANDIDATE_ONLY";
+  semanticStatus:
+    | "BOUNDED_REVIEW_CANDIDATE_ONLY"
+    | "BOUNDED_LEVEL3_DOCTRINAL_INFERENCE";
   causality: "NOT_AUTHORIZED";
   temporality: "NOT_AUTHORIZED";
   transformation: "NOT_AUTHORIZED";
@@ -214,10 +223,11 @@ export type DoctrineLevel3PairCandidateV0_1 = Readonly<{
 export type DoctrineLevel3PairReviewArtifactV0_1 = Readonly<{
   schemaVersion: typeof DOCTRINE_LEVEL3_PAIR_CANDIDATE_SCHEMA_V0_1;
   generationStatus: typeof DOCTRINE_LEVEL3_PAIR_GENERATION_STATUS_V0_1;
-  matrixAuthorizationStatus: "NOT_PRODUCTION_AUTHORIZED";
+  matrixAuthorizationStatus: typeof DOCTRINE_LEVEL3_PAIR_GENERIC_PRODUCTION_STATUS_V0_1;
   boundaryLabels: readonly [
     "GENERATED_FOR_DF_REVIEW",
-    "NOT_PRODUCTION_AUTHORIZED",
+    "GENERIC_DISTINCT_PAIR_LEVEL3_LAW_AUTHORIZED",
+    "SELF_PAIRS_UNRESOLVED_NON_PRODUCTION",
     "NOT_LEXICAL_DEFINITION",
     "NOT_EXTERNAL_EVIDENCE",
     "NOT_TARGET_VALIDATION",
@@ -225,7 +235,8 @@ export type DoctrineLevel3PairReviewArtifactV0_1 = Readonly<{
   ];
   templateId: typeof DOCTRINE_LEVEL3_PAIR_CANDIDATE_TEMPLATE_ID_V0_1;
   orderedViewsSchema: typeof sevenVoiceOrderedViewsSchemaVersion;
-  productionAuthorizedPairs: readonly ["U→Y", "A→E", "E→A", "I→O"];
+  authorizationLaw: typeof DOCTRINE_LEVEL3_GENERIC_AUTHORIZATION_ID_V0_1;
+  historicalExplicitProofPairs: readonly ["U→Y", "A→E", "E→A", "I→O"];
   atoms: readonly DoctrineLevel3AtomProposalV0_1[];
   orderedPairCandidates: readonly DoctrineLevel3PairCandidateV0_1[];
 }>;
@@ -264,17 +275,19 @@ export function getDoctrineLevel3AtomProposalsV0_1(): readonly DoctrineLevel3Ato
   return symbolicMathOrder.map((voice) => getDoctrineLevel3AtomProposalV0_1(voice));
 }
 
+export function renderDoctrineLevel3PairReadingV0_1(
+  firstVoice: SevenVoiceKey,
+  secondVoice: SevenVoiceKey,
+): string {
+  return `${getDoctrineLevel3AtomProposalV0_1(firstVoice).proposedCompactExpression} with ${getDoctrineLevel3AtomProposalV0_1(secondVoice).proposedCompactExpression}`;
+}
+
 export function candidatePairReadingV0_1(
   firstVoice: SevenVoiceKey,
   secondVoice: SevenVoiceKey,
 ): DoctrineLevel3PairCandidateV0_1 {
   const firstAtom = getDoctrineLevel3AtomProposalV0_1(firstVoice);
   const secondAtom = getDoctrineLevel3AtomProposalV0_1(secondVoice);
-  const isAuthorizedProofPair =
-    (firstVoice === "U" && secondVoice === "Y") ||
-    (firstVoice === "A" && secondVoice === "E") ||
-    (firstVoice === "E" && secondVoice === "A") ||
-    (firstVoice === "I" && secondVoice === "O");
   const isSelfPair = firstVoice === secondVoice;
 
   return Object.freeze({
@@ -284,14 +297,14 @@ export function candidatePairReadingV0_1(
     firstAtom: firstAtom.proposedCompactExpression,
     secondVoice,
     secondAtom: secondAtom.proposedCompactExpression,
-    candidateReading: `${firstAtom.proposedCompactExpression} with ${secondAtom.proposedCompactExpression}`,
+    candidateReading: renderDoctrineLevel3PairReadingV0_1(firstVoice, secondVoice),
     templateId: DOCTRINE_LEVEL3_PAIR_CANDIDATE_TEMPLATE_ID_V0_1,
-    status: isAuthorizedProofPair
-      ? DOCTRINE_LEVEL3_PAIR_PRODUCTION_STATUS_V0_1
-      : isSelfPair
-        ? DOCTRINE_LEVEL3_PAIR_SELF_PAIR_STATUS_V0_1
-        : DOCTRINE_LEVEL3_PAIR_CANDIDATE_REVIEW_STATUS_V0_1,
-    semanticStatus: "BOUNDED_REVIEW_CANDIDATE_ONLY",
+    status: isSelfPair
+      ? DOCTRINE_LEVEL3_PAIR_SELF_PAIR_STATUS_V0_1
+      : DOCTRINE_LEVEL3_PAIR_GENERIC_PRODUCTION_STATUS_V0_1,
+    semanticStatus: isSelfPair
+      ? "BOUNDED_REVIEW_CANDIDATE_ONLY"
+      : "BOUNDED_LEVEL3_DOCTRINAL_INFERENCE",
     causality: "NOT_AUTHORIZED",
     temporality: "NOT_AUTHORIZED",
     transformation: "NOT_AUTHORIZED",
@@ -312,10 +325,11 @@ export function buildDoctrineLevel3PairReviewArtifactV0_1(): DoctrineLevel3PairR
   return Object.freeze({
     schemaVersion: DOCTRINE_LEVEL3_PAIR_CANDIDATE_SCHEMA_V0_1,
     generationStatus: DOCTRINE_LEVEL3_PAIR_GENERATION_STATUS_V0_1,
-    matrixAuthorizationStatus: "NOT_PRODUCTION_AUTHORIZED",
+    matrixAuthorizationStatus: DOCTRINE_LEVEL3_PAIR_GENERIC_PRODUCTION_STATUS_V0_1,
     boundaryLabels: [
       "GENERATED_FOR_DF_REVIEW",
-      "NOT_PRODUCTION_AUTHORIZED",
+      "GENERIC_DISTINCT_PAIR_LEVEL3_LAW_AUTHORIZED",
+      "SELF_PAIRS_UNRESOLVED_NON_PRODUCTION",
       "NOT_LEXICAL_DEFINITION",
       "NOT_EXTERNAL_EVIDENCE",
       "NOT_TARGET_VALIDATION",
@@ -323,7 +337,8 @@ export function buildDoctrineLevel3PairReviewArtifactV0_1(): DoctrineLevel3PairR
     ] as const,
     templateId: DOCTRINE_LEVEL3_PAIR_CANDIDATE_TEMPLATE_ID_V0_1,
     orderedViewsSchema: sevenVoiceOrderedViewsSchemaVersion,
-    productionAuthorizedPairs: ["U→Y", "A→E", "E→A", "I→O"] as const,
+    authorizationLaw: DOCTRINE_LEVEL3_GENERIC_AUTHORIZATION_ID_V0_1,
+    historicalExplicitProofPairs: ["U→Y", "A→E", "E→A", "I→O"] as const,
     atoms: getDoctrineLevel3AtomProposalsV0_1(),
     orderedPairCandidates: generateDoctrineLevel3PairReviewMatrixV0_1(),
   });
