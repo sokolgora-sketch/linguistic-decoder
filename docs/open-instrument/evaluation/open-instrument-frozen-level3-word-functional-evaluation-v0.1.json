@@ -1,0 +1,2846 @@
+{
+  "schemaVersion": "open-instrument.frozen-level3-word-functional-evaluation.v0_1",
+  "evaluationId": "OPEN_INSTRUMENT_FROZEN_LEVEL3_WORD_FUNCTIONAL_EVALUATION_V0_1",
+  "evaluationStatus": "COMPLETE_DETERMINISTIC_SCREENING_NO_PRODUCTION_CHANGE",
+  "repository": {
+    "repositoryIdentity": "sokolgora-sketch/linguistic-decoder",
+    "mainShaAtEvaluationFreeze": "70ba8d94b113a97ffdd0354a65772ff9fbd9557d",
+    "baselineArtifactPath": "tests/fixtures/openInstrument/analysis-capability-baseline.v1.json",
+    "baselineArtifactSha256": "096792e7aa68f22a6a49585e342f886811ffac6b6b8c6ecc9adcb594ca36070a"
+  },
+  "frozenCanon": {
+    "genericLevel3Law": "OPEN_INSTRUMENT_GENERIC_DISTINCT_PAIR_LEVEL3_COMPOSITION_LAW_V1",
+    "atoms": {
+      "A": "initiating beginning",
+      "E": "expanding growth",
+      "I": "clear understanding",
+      "O": "balanced mediation",
+      "U": "grounded depth",
+      "Y": "reflective exploration",
+      "Ë": "harmonious resolution"
+    },
+    "connector": "with",
+    "level3Domain": "exact ordered path of two distinct canonical Voices",
+    "genericAuthorizedPairCount": 42,
+    "selfPairs": "SELF_PAIR_UNRESOLVED_NON_PRODUCTION",
+    "triples": "NOT_AUTHORIZED",
+    "longerPaths": "NOT_AUTHORIZED",
+    "level4": "NOT_AUTHORIZED",
+    "truthClass": "inference",
+    "evidencePromotion": "NOT_PERFORMED",
+    "changedDuringEvaluation": false
+  },
+  "methodology": {
+    "populationRule": "Every current baseline case whose complete canonical surface Voice path has length exactly 2 and distinct canonical Voices.",
+    "historicalProofPaths": [
+      "U→Y",
+      "A→E",
+      "E→A",
+      "I→O"
+    ],
+    "semanticScreeningTruthLevel": "RESEARCHER_SCREENING_HYPOTHESIS",
+    "targetSensePolicy": "Use only frozen baseline request context or the existing target-sense authority pool; do not invent or select a more convenient sense.",
+    "evidencePolicy": "Doctrine-only screening is kept separate from existing evidence context and cannot change status, candidates, or evidence references.",
+    "providerPolicy": "No provider, model, internet search, or external source lookup was used."
+  },
+  "population": {
+    "baselineCaseCount": 57,
+    "exactTwoDistinctCount": 30,
+    "historicalProofCaseCount": 14,
+    "newGenericCaseCount": 16,
+    "outOfDomainCaseCount": 27,
+    "caseIds": [
+      "canonical.study",
+      "canonical.water",
+      "target-sense.candle",
+      "target-sense.water-physical-liquid",
+      "scale50.rain.nature",
+      "scale50.river.nature",
+      "scale50.stone.nature",
+      "scale50.sea.nature",
+      "scale50.cloud.nature",
+      "scale50.head.body",
+      "scale50.heart.body",
+      "scale50.bone.body",
+      "scale50.mouth.body",
+      "scale50.ear.body",
+      "scale50.nose.body",
+      "scale50.speak.action",
+      "scale50.hear.action",
+      "scale50.eat.action",
+      "scale50.build.action",
+      "scale50.break.action",
+      "scale50.carry.action",
+      "scale50.time.abstract",
+      "scale50.life.abstract",
+      "scale50.death.abstract",
+      "scale50.order.abstract",
+      "scale50.change.abstract",
+      "scale50.mother.human-social",
+      "scale50.friend.human-social",
+      "scale50.home.human-social",
+      "scale50.woman.human-social"
+    ]
+  },
+  "cases": [
+    {
+      "caseId": "canonical.study",
+      "word": "study",
+      "category": "canonical",
+      "cohort": "HISTORICAL_PROOF_PATH",
+      "targetSense": {
+        "status": "MISSING",
+        "source": null,
+        "targetSenseId": null,
+        "targetSenseLabel": null,
+        "targetSenseDefinition": null,
+        "truthLevel": "FACT",
+        "authority": null,
+        "locator": null,
+        "sourceStatus": null
+      },
+      "voicePath": [
+        "U",
+        "Y"
+      ],
+      "voice1": "U",
+      "voice2": "Y",
+      "atom1": "grounded depth",
+      "atom2": "reflective exploration",
+      "expectedLevel3Reading": "grounded depth with reflective exploration",
+      "actualLevel3Reading": {
+        "analyzedVoicePath": [
+          "U",
+          "Y"
+        ],
+        "reading": "grounded depth with reflective exploration",
+        "ruleId": "level3.generic-distinct-pair.v1",
+        "truthClassification": "inference",
+        "genericComposition": "AUTHORIZED",
+        "level4TransitionSemantics": "NOT_AUTHORIZED",
+        "userDecisionPosture": "user_decides",
+        "noSingleWinner": true
+      },
+      "mechanical": {
+        "truthLevel": "FACT",
+        "pathSource": "baseline.paths.surface, independently rechecked with buildHeartInstrumentV1",
+        "readingSource": "projectLevel3DoctrineReadingV0_1",
+        "match": true
+      },
+      "semanticScreening": {
+        "truthLevel": "UNKNOWN",
+        "relevance": "TARGET_SENSE_INSUFFICIENT",
+        "specificity": "UNKNOWN",
+        "postHocRisk": "UNKNOWN",
+        "correspondenceRationale": null,
+        "prohibitedAdditionsFound": []
+      },
+      "presentation": {
+        "truthLevel": "FACT",
+        "status": "PRESENTATION_COMPLETE",
+        "basis": [
+          "src/ui/instrument/sections/DoctrineReadingCard.v0.1.tsx",
+          "tests/ui.instrument.doctrineReading.v0_1.spec.tsx"
+        ],
+        "humanComprehension": "UNKNOWN_AWAITING_HUMAN_PARTICIPANTS"
+      },
+      "existingEvidenceContext": {
+        "truthLevel": "FACT",
+        "analyticalStatus": "reviewed_functional_evidence",
+        "candidateStatus": "CANDIDATES_PRESENT",
+        "candidateCount": 4,
+        "evidenceStatus": "REVIEWED_EVIDENCE_REFS_PRESENT",
+        "evidenceRefCount": 1,
+        "reviewedEvidenceRefCount": 1,
+        "researchEvidenceRefCount": 0
+      },
+      "antiCircularity": {
+        "truthLevel": "INFERENCE",
+        "prohibitedAdditionsFound": [],
+        "status": "PASS"
+      }
+    },
+    {
+      "caseId": "canonical.water",
+      "word": "water",
+      "category": "canonical",
+      "cohort": "HISTORICAL_PROOF_PATH",
+      "targetSense": {
+        "status": "MISSING",
+        "source": null,
+        "targetSenseId": null,
+        "targetSenseLabel": null,
+        "targetSenseDefinition": null,
+        "truthLevel": "FACT",
+        "authority": null,
+        "locator": null,
+        "sourceStatus": null
+      },
+      "voicePath": [
+        "A",
+        "E"
+      ],
+      "voice1": "A",
+      "voice2": "E",
+      "atom1": "initiating beginning",
+      "atom2": "expanding growth",
+      "expectedLevel3Reading": "initiating beginning with expanding growth",
+      "actualLevel3Reading": {
+        "analyzedVoicePath": [
+          "A",
+          "E"
+        ],
+        "reading": "initiating beginning with expanding growth",
+        "ruleId": "level3.generic-distinct-pair.v1",
+        "truthClassification": "inference",
+        "genericComposition": "AUTHORIZED",
+        "level4TransitionSemantics": "NOT_AUTHORIZED",
+        "userDecisionPosture": "user_decides",
+        "noSingleWinner": true
+      },
+      "mechanical": {
+        "truthLevel": "FACT",
+        "pathSource": "baseline.paths.surface, independently rechecked with buildHeartInstrumentV1",
+        "readingSource": "projectLevel3DoctrineReadingV0_1",
+        "match": true
+      },
+      "semanticScreening": {
+        "truthLevel": "UNKNOWN",
+        "relevance": "TARGET_SENSE_INSUFFICIENT",
+        "specificity": "UNKNOWN",
+        "postHocRisk": "UNKNOWN",
+        "correspondenceRationale": null,
+        "prohibitedAdditionsFound": []
+      },
+      "presentation": {
+        "truthLevel": "FACT",
+        "status": "PRESENTATION_COMPLETE",
+        "basis": [
+          "src/ui/instrument/sections/DoctrineReadingCard.v0.1.tsx",
+          "tests/ui.instrument.doctrineReading.v0_1.spec.tsx"
+        ],
+        "humanComprehension": "UNKNOWN_AWAITING_HUMAN_PARTICIPANTS"
+      },
+      "existingEvidenceContext": {
+        "truthLevel": "FACT",
+        "analyticalStatus": "structural_unreviewed",
+        "candidateStatus": "CANDIDATES_PRESENT",
+        "candidateCount": 3,
+        "evidenceStatus": "RESEARCH_EVIDENCE_REFS_PRESENT",
+        "evidenceRefCount": 2,
+        "reviewedEvidenceRefCount": 0,
+        "researchEvidenceRefCount": 2
+      },
+      "antiCircularity": {
+        "truthLevel": "INFERENCE",
+        "prohibitedAdditionsFound": [],
+        "status": "PASS"
+      }
+    },
+    {
+      "caseId": "target-sense.candle",
+      "word": "candle",
+      "category": "target_sense",
+      "cohort": "HISTORICAL_PROOF_PATH",
+      "targetSense": {
+        "status": "PRESENT_LABEL_ONLY",
+        "source": "baseline.request.targetSenseLabel",
+        "targetSenseId": null,
+        "targetSenseLabel": "a wax light source",
+        "targetSenseDefinition": null,
+        "truthLevel": "FACT",
+        "authority": null,
+        "locator": null,
+        "sourceStatus": "baseline_context_only"
+      },
+      "voicePath": [
+        "A",
+        "E"
+      ],
+      "voice1": "A",
+      "voice2": "E",
+      "atom1": "initiating beginning",
+      "atom2": "expanding growth",
+      "expectedLevel3Reading": "initiating beginning with expanding growth",
+      "actualLevel3Reading": {
+        "analyzedVoicePath": [
+          "A",
+          "E"
+        ],
+        "reading": "initiating beginning with expanding growth",
+        "ruleId": "level3.generic-distinct-pair.v1",
+        "truthClassification": "inference",
+        "genericComposition": "AUTHORIZED",
+        "level4TransitionSemantics": "NOT_AUTHORIZED",
+        "userDecisionPosture": "user_decides",
+        "noSingleWinner": true
+      },
+      "mechanical": {
+        "truthLevel": "FACT",
+        "pathSource": "baseline.paths.surface, independently rechecked with buildHeartInstrumentV1",
+        "readingSource": "projectLevel3DoctrineReadingV0_1",
+        "match": true
+      },
+      "semanticScreening": {
+        "truthLevel": "HYPOTHESIS",
+        "relevance": "UNSUPPORTED_BRIDGE",
+        "specificity": "TOO_GENERAL_TO_DISCRIMINATE",
+        "postHocRisk": "HIGH",
+        "correspondenceRationale": "The frozen Level-3 phrase does not identify or entail the frozen target referent; connecting them would require an unstated semantic bridge beyond the two atoms and the weak 'with' connector.",
+        "prohibitedAdditionsFound": []
+      },
+      "presentation": {
+        "truthLevel": "FACT",
+        "status": "PRESENTATION_COMPLETE",
+        "basis": [
+          "src/ui/instrument/sections/DoctrineReadingCard.v0.1.tsx",
+          "tests/ui.instrument.doctrineReading.v0_1.spec.tsx"
+        ],
+        "humanComprehension": "UNKNOWN_AWAITING_HUMAN_PARTICIPANTS"
+      },
+      "existingEvidenceContext": {
+        "truthLevel": "FACT",
+        "analyticalStatus": "structural_unreviewed",
+        "candidateStatus": "CANDIDATES_PRESENT",
+        "candidateCount": 3,
+        "evidenceStatus": "RESEARCH_EVIDENCE_REFS_PRESENT",
+        "evidenceRefCount": 2,
+        "reviewedEvidenceRefCount": 0,
+        "researchEvidenceRefCount": 2
+      },
+      "antiCircularity": {
+        "truthLevel": "INFERENCE",
+        "prohibitedAdditionsFound": [],
+        "status": "PASS"
+      }
+    },
+    {
+      "caseId": "target-sense.water-physical-liquid",
+      "word": "water",
+      "category": "target_sense",
+      "cohort": "HISTORICAL_PROOF_PATH",
+      "targetSense": {
+        "status": "ID_ONLY_NO_TEXT",
+        "source": "baseline.request.targetSenseId",
+        "targetSenseId": "physical_water_liquid",
+        "targetSenseLabel": null,
+        "targetSenseDefinition": null,
+        "truthLevel": "FACT",
+        "authority": null,
+        "locator": null,
+        "sourceStatus": "baseline_context_only"
+      },
+      "voicePath": [
+        "A",
+        "E"
+      ],
+      "voice1": "A",
+      "voice2": "E",
+      "atom1": "initiating beginning",
+      "atom2": "expanding growth",
+      "expectedLevel3Reading": "initiating beginning with expanding growth",
+      "actualLevel3Reading": {
+        "analyzedVoicePath": [
+          "A",
+          "E"
+        ],
+        "reading": "initiating beginning with expanding growth",
+        "ruleId": "level3.generic-distinct-pair.v1",
+        "truthClassification": "inference",
+        "genericComposition": "AUTHORIZED",
+        "level4TransitionSemantics": "NOT_AUTHORIZED",
+        "userDecisionPosture": "user_decides",
+        "noSingleWinner": true
+      },
+      "mechanical": {
+        "truthLevel": "FACT",
+        "pathSource": "baseline.paths.surface, independently rechecked with buildHeartInstrumentV1",
+        "readingSource": "projectLevel3DoctrineReadingV0_1",
+        "match": true
+      },
+      "semanticScreening": {
+        "truthLevel": "UNKNOWN",
+        "relevance": "TARGET_SENSE_INSUFFICIENT",
+        "specificity": "UNKNOWN",
+        "postHocRisk": "UNKNOWN",
+        "correspondenceRationale": null,
+        "prohibitedAdditionsFound": []
+      },
+      "presentation": {
+        "truthLevel": "FACT",
+        "status": "PRESENTATION_COMPLETE",
+        "basis": [
+          "src/ui/instrument/sections/DoctrineReadingCard.v0.1.tsx",
+          "tests/ui.instrument.doctrineReading.v0_1.spec.tsx"
+        ],
+        "humanComprehension": "UNKNOWN_AWAITING_HUMAN_PARTICIPANTS"
+      },
+      "existingEvidenceContext": {
+        "truthLevel": "FACT",
+        "analyticalStatus": "structural_unreviewed",
+        "candidateStatus": "CANDIDATES_PRESENT",
+        "candidateCount": 3,
+        "evidenceStatus": "RESEARCH_EVIDENCE_REFS_PRESENT",
+        "evidenceRefCount": 2,
+        "reviewedEvidenceRefCount": 0,
+        "researchEvidenceRefCount": 2
+      },
+      "antiCircularity": {
+        "truthLevel": "INFERENCE",
+        "prohibitedAdditionsFound": [],
+        "status": "PASS"
+      }
+    },
+    {
+      "caseId": "scale50.rain.nature",
+      "word": "rain",
+      "category": "nature",
+      "cohort": "NEW_GENERIC_PATH",
+      "targetSense": {
+        "status": "MISSING",
+        "source": null,
+        "targetSenseId": null,
+        "targetSenseLabel": null,
+        "targetSenseDefinition": null,
+        "truthLevel": "FACT",
+        "authority": null,
+        "locator": null,
+        "sourceStatus": null
+      },
+      "voicePath": [
+        "A",
+        "I"
+      ],
+      "voice1": "A",
+      "voice2": "I",
+      "atom1": "initiating beginning",
+      "atom2": "clear understanding",
+      "expectedLevel3Reading": "initiating beginning with clear understanding",
+      "actualLevel3Reading": {
+        "analyzedVoicePath": [
+          "A",
+          "I"
+        ],
+        "reading": "initiating beginning with clear understanding",
+        "ruleId": "level3.generic-distinct-pair.v1",
+        "truthClassification": "inference",
+        "genericComposition": "AUTHORIZED",
+        "level4TransitionSemantics": "NOT_AUTHORIZED",
+        "userDecisionPosture": "user_decides",
+        "noSingleWinner": true
+      },
+      "mechanical": {
+        "truthLevel": "FACT",
+        "pathSource": "baseline.paths.surface, independently rechecked with buildHeartInstrumentV1",
+        "readingSource": "projectLevel3DoctrineReadingV0_1",
+        "match": true
+      },
+      "semanticScreening": {
+        "truthLevel": "UNKNOWN",
+        "relevance": "TARGET_SENSE_INSUFFICIENT",
+        "specificity": "UNKNOWN",
+        "postHocRisk": "UNKNOWN",
+        "correspondenceRationale": null,
+        "prohibitedAdditionsFound": []
+      },
+      "presentation": {
+        "truthLevel": "FACT",
+        "status": "PRESENTATION_COMPLETE",
+        "basis": [
+          "src/ui/instrument/sections/DoctrineReadingCard.v0.1.tsx",
+          "tests/ui.instrument.doctrineReading.v0_1.spec.tsx"
+        ],
+        "humanComprehension": "UNKNOWN_AWAITING_HUMAN_PARTICIPANTS"
+      },
+      "existingEvidenceContext": {
+        "truthLevel": "FACT",
+        "analyticalStatus": "null_no_supported_candidate",
+        "candidateStatus": "CANDIDATES_PRESENT",
+        "candidateCount": 1,
+        "evidenceStatus": "RESEARCH_EVIDENCE_REFS_PRESENT",
+        "evidenceRefCount": 1,
+        "reviewedEvidenceRefCount": 0,
+        "researchEvidenceRefCount": 1
+      },
+      "antiCircularity": {
+        "truthLevel": "INFERENCE",
+        "prohibitedAdditionsFound": [],
+        "status": "PASS"
+      }
+    },
+    {
+      "caseId": "scale50.river.nature",
+      "word": "river",
+      "category": "nature",
+      "cohort": "NEW_GENERIC_PATH",
+      "targetSense": {
+        "status": "FROZEN_AUTHORITY",
+        "source": "open-instrument.target-sense-authority-pool.v0_1",
+        "targetSenseId": "cambridge.en.river.noun.freshwater-flow-1",
+        "targetSenseLabel": "natural freshwater flow",
+        "targetSenseDefinition": "a natural wide flow of fresh water across land into a sea, lake, or another river",
+        "truthLevel": "FACT",
+        "authority": "Cambridge Dictionary English",
+        "locator": "noun, A1, first ordinary river sense",
+        "sourceStatus": "VERIFIED_SOURCE_LOOKUP"
+      },
+      "voicePath": [
+        "I",
+        "E"
+      ],
+      "voice1": "I",
+      "voice2": "E",
+      "atom1": "clear understanding",
+      "atom2": "expanding growth",
+      "expectedLevel3Reading": "clear understanding with expanding growth",
+      "actualLevel3Reading": {
+        "analyzedVoicePath": [
+          "I",
+          "E"
+        ],
+        "reading": "clear understanding with expanding growth",
+        "ruleId": "level3.generic-distinct-pair.v1",
+        "truthClassification": "inference",
+        "genericComposition": "AUTHORIZED",
+        "level4TransitionSemantics": "NOT_AUTHORIZED",
+        "userDecisionPosture": "user_decides",
+        "noSingleWinner": true
+      },
+      "mechanical": {
+        "truthLevel": "FACT",
+        "pathSource": "baseline.paths.surface, independently rechecked with buildHeartInstrumentV1",
+        "readingSource": "projectLevel3DoctrineReadingV0_1",
+        "match": true
+      },
+      "semanticScreening": {
+        "truthLevel": "HYPOTHESIS",
+        "relevance": "UNSUPPORTED_BRIDGE",
+        "specificity": "TOO_GENERAL_TO_DISCRIMINATE",
+        "postHocRisk": "HIGH",
+        "correspondenceRationale": "The frozen Level-3 phrase does not identify or entail the frozen target referent; connecting them would require an unstated semantic bridge beyond the two atoms and the weak 'with' connector.",
+        "prohibitedAdditionsFound": []
+      },
+      "presentation": {
+        "truthLevel": "FACT",
+        "status": "PRESENTATION_COMPLETE",
+        "basis": [
+          "src/ui/instrument/sections/DoctrineReadingCard.v0.1.tsx",
+          "tests/ui.instrument.doctrineReading.v0_1.spec.tsx"
+        ],
+        "humanComprehension": "UNKNOWN_AWAITING_HUMAN_PARTICIPANTS"
+      },
+      "existingEvidenceContext": {
+        "truthLevel": "FACT",
+        "analyticalStatus": "structural_unreviewed",
+        "candidateStatus": "CANDIDATES_PRESENT",
+        "candidateCount": 2,
+        "evidenceStatus": "RESEARCH_EVIDENCE_REFS_PRESENT",
+        "evidenceRefCount": 1,
+        "reviewedEvidenceRefCount": 0,
+        "researchEvidenceRefCount": 1
+      },
+      "antiCircularity": {
+        "truthLevel": "INFERENCE",
+        "prohibitedAdditionsFound": [],
+        "status": "PASS"
+      }
+    },
+    {
+      "caseId": "scale50.stone.nature",
+      "word": "stone",
+      "category": "nature",
+      "cohort": "NEW_GENERIC_PATH",
+      "targetSense": {
+        "status": "MISSING",
+        "source": null,
+        "targetSenseId": null,
+        "targetSenseLabel": null,
+        "targetSenseDefinition": null,
+        "truthLevel": "FACT",
+        "authority": null,
+        "locator": null,
+        "sourceStatus": null
+      },
+      "voicePath": [
+        "O",
+        "E"
+      ],
+      "voice1": "O",
+      "voice2": "E",
+      "atom1": "balanced mediation",
+      "atom2": "expanding growth",
+      "expectedLevel3Reading": "balanced mediation with expanding growth",
+      "actualLevel3Reading": {
+        "analyzedVoicePath": [
+          "O",
+          "E"
+        ],
+        "reading": "balanced mediation with expanding growth",
+        "ruleId": "level3.generic-distinct-pair.v1",
+        "truthClassification": "inference",
+        "genericComposition": "AUTHORIZED",
+        "level4TransitionSemantics": "NOT_AUTHORIZED",
+        "userDecisionPosture": "user_decides",
+        "noSingleWinner": true
+      },
+      "mechanical": {
+        "truthLevel": "FACT",
+        "pathSource": "baseline.paths.surface, independently rechecked with buildHeartInstrumentV1",
+        "readingSource": "projectLevel3DoctrineReadingV0_1",
+        "match": true
+      },
+      "semanticScreening": {
+        "truthLevel": "UNKNOWN",
+        "relevance": "TARGET_SENSE_INSUFFICIENT",
+        "specificity": "UNKNOWN",
+        "postHocRisk": "UNKNOWN",
+        "correspondenceRationale": null,
+        "prohibitedAdditionsFound": []
+      },
+      "presentation": {
+        "truthLevel": "FACT",
+        "status": "PRESENTATION_COMPLETE",
+        "basis": [
+          "src/ui/instrument/sections/DoctrineReadingCard.v0.1.tsx",
+          "tests/ui.instrument.doctrineReading.v0_1.spec.tsx"
+        ],
+        "humanComprehension": "UNKNOWN_AWAITING_HUMAN_PARTICIPANTS"
+      },
+      "existingEvidenceContext": {
+        "truthLevel": "FACT",
+        "analyticalStatus": "candidate_only",
+        "candidateStatus": "CANDIDATES_PRESENT",
+        "candidateCount": 2,
+        "evidenceStatus": "NO_EVIDENCE_REFS",
+        "evidenceRefCount": 0,
+        "reviewedEvidenceRefCount": 0,
+        "researchEvidenceRefCount": 0
+      },
+      "antiCircularity": {
+        "truthLevel": "INFERENCE",
+        "prohibitedAdditionsFound": [],
+        "status": "PASS"
+      }
+    },
+    {
+      "caseId": "scale50.sea.nature",
+      "word": "sea",
+      "category": "nature",
+      "cohort": "HISTORICAL_PROOF_PATH",
+      "targetSense": {
+        "status": "MISSING",
+        "source": null,
+        "targetSenseId": null,
+        "targetSenseLabel": null,
+        "targetSenseDefinition": null,
+        "truthLevel": "FACT",
+        "authority": null,
+        "locator": null,
+        "sourceStatus": null
+      },
+      "voicePath": [
+        "E",
+        "A"
+      ],
+      "voice1": "E",
+      "voice2": "A",
+      "atom1": "expanding growth",
+      "atom2": "initiating beginning",
+      "expectedLevel3Reading": "expanding growth with initiating beginning",
+      "actualLevel3Reading": {
+        "analyzedVoicePath": [
+          "E",
+          "A"
+        ],
+        "reading": "expanding growth with initiating beginning",
+        "ruleId": "level3.generic-distinct-pair.v1",
+        "truthClassification": "inference",
+        "genericComposition": "AUTHORIZED",
+        "level4TransitionSemantics": "NOT_AUTHORIZED",
+        "userDecisionPosture": "user_decides",
+        "noSingleWinner": true
+      },
+      "mechanical": {
+        "truthLevel": "FACT",
+        "pathSource": "baseline.paths.surface, independently rechecked with buildHeartInstrumentV1",
+        "readingSource": "projectLevel3DoctrineReadingV0_1",
+        "match": true
+      },
+      "semanticScreening": {
+        "truthLevel": "UNKNOWN",
+        "relevance": "TARGET_SENSE_INSUFFICIENT",
+        "specificity": "UNKNOWN",
+        "postHocRisk": "UNKNOWN",
+        "correspondenceRationale": null,
+        "prohibitedAdditionsFound": []
+      },
+      "presentation": {
+        "truthLevel": "FACT",
+        "status": "PRESENTATION_COMPLETE",
+        "basis": [
+          "src/ui/instrument/sections/DoctrineReadingCard.v0.1.tsx",
+          "tests/ui.instrument.doctrineReading.v0_1.spec.tsx"
+        ],
+        "humanComprehension": "UNKNOWN_AWAITING_HUMAN_PARTICIPANTS"
+      },
+      "existingEvidenceContext": {
+        "truthLevel": "FACT",
+        "analyticalStatus": "structural_unreviewed",
+        "candidateStatus": "CANDIDATES_PRESENT",
+        "candidateCount": 3,
+        "evidenceStatus": "RESEARCH_EVIDENCE_REFS_PRESENT",
+        "evidenceRefCount": 2,
+        "reviewedEvidenceRefCount": 0,
+        "researchEvidenceRefCount": 2
+      },
+      "antiCircularity": {
+        "truthLevel": "INFERENCE",
+        "prohibitedAdditionsFound": [],
+        "status": "PASS"
+      }
+    },
+    {
+      "caseId": "scale50.cloud.nature",
+      "word": "cloud",
+      "category": "nature",
+      "cohort": "NEW_GENERIC_PATH",
+      "targetSense": {
+        "status": "MISSING",
+        "source": null,
+        "targetSenseId": null,
+        "targetSenseLabel": null,
+        "targetSenseDefinition": null,
+        "truthLevel": "FACT",
+        "authority": null,
+        "locator": null,
+        "sourceStatus": null
+      },
+      "voicePath": [
+        "O",
+        "U"
+      ],
+      "voice1": "O",
+      "voice2": "U",
+      "atom1": "balanced mediation",
+      "atom2": "grounded depth",
+      "expectedLevel3Reading": "balanced mediation with grounded depth",
+      "actualLevel3Reading": {
+        "analyzedVoicePath": [
+          "O",
+          "U"
+        ],
+        "reading": "balanced mediation with grounded depth",
+        "ruleId": "level3.generic-distinct-pair.v1",
+        "truthClassification": "inference",
+        "genericComposition": "AUTHORIZED",
+        "level4TransitionSemantics": "NOT_AUTHORIZED",
+        "userDecisionPosture": "user_decides",
+        "noSingleWinner": true
+      },
+      "mechanical": {
+        "truthLevel": "FACT",
+        "pathSource": "baseline.paths.surface, independently rechecked with buildHeartInstrumentV1",
+        "readingSource": "projectLevel3DoctrineReadingV0_1",
+        "match": true
+      },
+      "semanticScreening": {
+        "truthLevel": "UNKNOWN",
+        "relevance": "TARGET_SENSE_INSUFFICIENT",
+        "specificity": "UNKNOWN",
+        "postHocRisk": "UNKNOWN",
+        "correspondenceRationale": null,
+        "prohibitedAdditionsFound": []
+      },
+      "presentation": {
+        "truthLevel": "FACT",
+        "status": "PRESENTATION_COMPLETE",
+        "basis": [
+          "src/ui/instrument/sections/DoctrineReadingCard.v0.1.tsx",
+          "tests/ui.instrument.doctrineReading.v0_1.spec.tsx"
+        ],
+        "humanComprehension": "UNKNOWN_AWAITING_HUMAN_PARTICIPANTS"
+      },
+      "existingEvidenceContext": {
+        "truthLevel": "FACT",
+        "analyticalStatus": "structural_unreviewed",
+        "candidateStatus": "CANDIDATES_PRESENT",
+        "candidateCount": 4,
+        "evidenceStatus": "RESEARCH_EVIDENCE_REFS_PRESENT",
+        "evidenceRefCount": 2,
+        "reviewedEvidenceRefCount": 0,
+        "researchEvidenceRefCount": 2
+      },
+      "antiCircularity": {
+        "truthLevel": "INFERENCE",
+        "prohibitedAdditionsFound": [],
+        "status": "PASS"
+      }
+    },
+    {
+      "caseId": "scale50.head.body",
+      "word": "head",
+      "category": "body",
+      "cohort": "HISTORICAL_PROOF_PATH",
+      "targetSense": {
+        "status": "MISSING",
+        "source": null,
+        "targetSenseId": null,
+        "targetSenseLabel": null,
+        "targetSenseDefinition": null,
+        "truthLevel": "FACT",
+        "authority": null,
+        "locator": null,
+        "sourceStatus": null
+      },
+      "voicePath": [
+        "E",
+        "A"
+      ],
+      "voice1": "E",
+      "voice2": "A",
+      "atom1": "expanding growth",
+      "atom2": "initiating beginning",
+      "expectedLevel3Reading": "expanding growth with initiating beginning",
+      "actualLevel3Reading": {
+        "analyzedVoicePath": [
+          "E",
+          "A"
+        ],
+        "reading": "expanding growth with initiating beginning",
+        "ruleId": "level3.generic-distinct-pair.v1",
+        "truthClassification": "inference",
+        "genericComposition": "AUTHORIZED",
+        "level4TransitionSemantics": "NOT_AUTHORIZED",
+        "userDecisionPosture": "user_decides",
+        "noSingleWinner": true
+      },
+      "mechanical": {
+        "truthLevel": "FACT",
+        "pathSource": "baseline.paths.surface, independently rechecked with buildHeartInstrumentV1",
+        "readingSource": "projectLevel3DoctrineReadingV0_1",
+        "match": true
+      },
+      "semanticScreening": {
+        "truthLevel": "UNKNOWN",
+        "relevance": "TARGET_SENSE_INSUFFICIENT",
+        "specificity": "UNKNOWN",
+        "postHocRisk": "UNKNOWN",
+        "correspondenceRationale": null,
+        "prohibitedAdditionsFound": []
+      },
+      "presentation": {
+        "truthLevel": "FACT",
+        "status": "PRESENTATION_COMPLETE",
+        "basis": [
+          "src/ui/instrument/sections/DoctrineReadingCard.v0.1.tsx",
+          "tests/ui.instrument.doctrineReading.v0_1.spec.tsx"
+        ],
+        "humanComprehension": "UNKNOWN_AWAITING_HUMAN_PARTICIPANTS"
+      },
+      "existingEvidenceContext": {
+        "truthLevel": "FACT",
+        "analyticalStatus": "null_no_supported_candidate",
+        "candidateStatus": "NO_CANDIDATES",
+        "candidateCount": 0,
+        "evidenceStatus": "NO_EVIDENCE_REFS",
+        "evidenceRefCount": 0,
+        "reviewedEvidenceRefCount": 0,
+        "researchEvidenceRefCount": 0
+      },
+      "antiCircularity": {
+        "truthLevel": "INFERENCE",
+        "prohibitedAdditionsFound": [],
+        "status": "PASS"
+      }
+    },
+    {
+      "caseId": "scale50.heart.body",
+      "word": "heart",
+      "category": "body",
+      "cohort": "HISTORICAL_PROOF_PATH",
+      "targetSense": {
+        "status": "MISSING",
+        "source": null,
+        "targetSenseId": null,
+        "targetSenseLabel": null,
+        "targetSenseDefinition": null,
+        "truthLevel": "FACT",
+        "authority": null,
+        "locator": null,
+        "sourceStatus": null
+      },
+      "voicePath": [
+        "E",
+        "A"
+      ],
+      "voice1": "E",
+      "voice2": "A",
+      "atom1": "expanding growth",
+      "atom2": "initiating beginning",
+      "expectedLevel3Reading": "expanding growth with initiating beginning",
+      "actualLevel3Reading": {
+        "analyzedVoicePath": [
+          "E",
+          "A"
+        ],
+        "reading": "expanding growth with initiating beginning",
+        "ruleId": "level3.generic-distinct-pair.v1",
+        "truthClassification": "inference",
+        "genericComposition": "AUTHORIZED",
+        "level4TransitionSemantics": "NOT_AUTHORIZED",
+        "userDecisionPosture": "user_decides",
+        "noSingleWinner": true
+      },
+      "mechanical": {
+        "truthLevel": "FACT",
+        "pathSource": "baseline.paths.surface, independently rechecked with buildHeartInstrumentV1",
+        "readingSource": "projectLevel3DoctrineReadingV0_1",
+        "match": true
+      },
+      "semanticScreening": {
+        "truthLevel": "UNKNOWN",
+        "relevance": "TARGET_SENSE_INSUFFICIENT",
+        "specificity": "UNKNOWN",
+        "postHocRisk": "UNKNOWN",
+        "correspondenceRationale": null,
+        "prohibitedAdditionsFound": []
+      },
+      "presentation": {
+        "truthLevel": "FACT",
+        "status": "PRESENTATION_COMPLETE",
+        "basis": [
+          "src/ui/instrument/sections/DoctrineReadingCard.v0.1.tsx",
+          "tests/ui.instrument.doctrineReading.v0_1.spec.tsx"
+        ],
+        "humanComprehension": "UNKNOWN_AWAITING_HUMAN_PARTICIPANTS"
+      },
+      "existingEvidenceContext": {
+        "truthLevel": "FACT",
+        "analyticalStatus": "null_no_supported_candidate",
+        "candidateStatus": "CANDIDATES_PRESENT",
+        "candidateCount": 2,
+        "evidenceStatus": "RESEARCH_EVIDENCE_REFS_PRESENT",
+        "evidenceRefCount": 2,
+        "reviewedEvidenceRefCount": 0,
+        "researchEvidenceRefCount": 2
+      },
+      "antiCircularity": {
+        "truthLevel": "INFERENCE",
+        "prohibitedAdditionsFound": [],
+        "status": "PASS"
+      }
+    },
+    {
+      "caseId": "scale50.bone.body",
+      "word": "bone",
+      "category": "body",
+      "cohort": "NEW_GENERIC_PATH",
+      "targetSense": {
+        "status": "MISSING",
+        "source": null,
+        "targetSenseId": null,
+        "targetSenseLabel": null,
+        "targetSenseDefinition": null,
+        "truthLevel": "FACT",
+        "authority": null,
+        "locator": null,
+        "sourceStatus": null
+      },
+      "voicePath": [
+        "O",
+        "E"
+      ],
+      "voice1": "O",
+      "voice2": "E",
+      "atom1": "balanced mediation",
+      "atom2": "expanding growth",
+      "expectedLevel3Reading": "balanced mediation with expanding growth",
+      "actualLevel3Reading": {
+        "analyzedVoicePath": [
+          "O",
+          "E"
+        ],
+        "reading": "balanced mediation with expanding growth",
+        "ruleId": "level3.generic-distinct-pair.v1",
+        "truthClassification": "inference",
+        "genericComposition": "AUTHORIZED",
+        "level4TransitionSemantics": "NOT_AUTHORIZED",
+        "userDecisionPosture": "user_decides",
+        "noSingleWinner": true
+      },
+      "mechanical": {
+        "truthLevel": "FACT",
+        "pathSource": "baseline.paths.surface, independently rechecked with buildHeartInstrumentV1",
+        "readingSource": "projectLevel3DoctrineReadingV0_1",
+        "match": true
+      },
+      "semanticScreening": {
+        "truthLevel": "UNKNOWN",
+        "relevance": "TARGET_SENSE_INSUFFICIENT",
+        "specificity": "UNKNOWN",
+        "postHocRisk": "UNKNOWN",
+        "correspondenceRationale": null,
+        "prohibitedAdditionsFound": []
+      },
+      "presentation": {
+        "truthLevel": "FACT",
+        "status": "PRESENTATION_COMPLETE",
+        "basis": [
+          "src/ui/instrument/sections/DoctrineReadingCard.v0.1.tsx",
+          "tests/ui.instrument.doctrineReading.v0_1.spec.tsx"
+        ],
+        "humanComprehension": "UNKNOWN_AWAITING_HUMAN_PARTICIPANTS"
+      },
+      "existingEvidenceContext": {
+        "truthLevel": "FACT",
+        "analyticalStatus": "null_no_supported_candidate",
+        "candidateStatus": "CANDIDATES_PRESENT",
+        "candidateCount": 1,
+        "evidenceStatus": "RESEARCH_EVIDENCE_REFS_PRESENT",
+        "evidenceRefCount": 1,
+        "reviewedEvidenceRefCount": 0,
+        "researchEvidenceRefCount": 1
+      },
+      "antiCircularity": {
+        "truthLevel": "INFERENCE",
+        "prohibitedAdditionsFound": [],
+        "status": "PASS"
+      }
+    },
+    {
+      "caseId": "scale50.mouth.body",
+      "word": "mouth",
+      "category": "body",
+      "cohort": "NEW_GENERIC_PATH",
+      "targetSense": {
+        "status": "MISSING",
+        "source": null,
+        "targetSenseId": null,
+        "targetSenseLabel": null,
+        "targetSenseDefinition": null,
+        "truthLevel": "FACT",
+        "authority": null,
+        "locator": null,
+        "sourceStatus": null
+      },
+      "voicePath": [
+        "O",
+        "U"
+      ],
+      "voice1": "O",
+      "voice2": "U",
+      "atom1": "balanced mediation",
+      "atom2": "grounded depth",
+      "expectedLevel3Reading": "balanced mediation with grounded depth",
+      "actualLevel3Reading": {
+        "analyzedVoicePath": [
+          "O",
+          "U"
+        ],
+        "reading": "balanced mediation with grounded depth",
+        "ruleId": "level3.generic-distinct-pair.v1",
+        "truthClassification": "inference",
+        "genericComposition": "AUTHORIZED",
+        "level4TransitionSemantics": "NOT_AUTHORIZED",
+        "userDecisionPosture": "user_decides",
+        "noSingleWinner": true
+      },
+      "mechanical": {
+        "truthLevel": "FACT",
+        "pathSource": "baseline.paths.surface, independently rechecked with buildHeartInstrumentV1",
+        "readingSource": "projectLevel3DoctrineReadingV0_1",
+        "match": true
+      },
+      "semanticScreening": {
+        "truthLevel": "UNKNOWN",
+        "relevance": "TARGET_SENSE_INSUFFICIENT",
+        "specificity": "UNKNOWN",
+        "postHocRisk": "UNKNOWN",
+        "correspondenceRationale": null,
+        "prohibitedAdditionsFound": []
+      },
+      "presentation": {
+        "truthLevel": "FACT",
+        "status": "PRESENTATION_COMPLETE",
+        "basis": [
+          "src/ui/instrument/sections/DoctrineReadingCard.v0.1.tsx",
+          "tests/ui.instrument.doctrineReading.v0_1.spec.tsx"
+        ],
+        "humanComprehension": "UNKNOWN_AWAITING_HUMAN_PARTICIPANTS"
+      },
+      "existingEvidenceContext": {
+        "truthLevel": "FACT",
+        "analyticalStatus": "null_no_supported_candidate",
+        "candidateStatus": "NO_CANDIDATES",
+        "candidateCount": 0,
+        "evidenceStatus": "NO_EVIDENCE_REFS",
+        "evidenceRefCount": 0,
+        "reviewedEvidenceRefCount": 0,
+        "researchEvidenceRefCount": 0
+      },
+      "antiCircularity": {
+        "truthLevel": "INFERENCE",
+        "prohibitedAdditionsFound": [],
+        "status": "PASS"
+      }
+    },
+    {
+      "caseId": "scale50.ear.body",
+      "word": "ear",
+      "category": "body",
+      "cohort": "HISTORICAL_PROOF_PATH",
+      "targetSense": {
+        "status": "MISSING",
+        "source": null,
+        "targetSenseId": null,
+        "targetSenseLabel": null,
+        "targetSenseDefinition": null,
+        "truthLevel": "FACT",
+        "authority": null,
+        "locator": null,
+        "sourceStatus": null
+      },
+      "voicePath": [
+        "E",
+        "A"
+      ],
+      "voice1": "E",
+      "voice2": "A",
+      "atom1": "expanding growth",
+      "atom2": "initiating beginning",
+      "expectedLevel3Reading": "expanding growth with initiating beginning",
+      "actualLevel3Reading": {
+        "analyzedVoicePath": [
+          "E",
+          "A"
+        ],
+        "reading": "expanding growth with initiating beginning",
+        "ruleId": "level3.generic-distinct-pair.v1",
+        "truthClassification": "inference",
+        "genericComposition": "AUTHORIZED",
+        "level4TransitionSemantics": "NOT_AUTHORIZED",
+        "userDecisionPosture": "user_decides",
+        "noSingleWinner": true
+      },
+      "mechanical": {
+        "truthLevel": "FACT",
+        "pathSource": "baseline.paths.surface, independently rechecked with buildHeartInstrumentV1",
+        "readingSource": "projectLevel3DoctrineReadingV0_1",
+        "match": true
+      },
+      "semanticScreening": {
+        "truthLevel": "UNKNOWN",
+        "relevance": "TARGET_SENSE_INSUFFICIENT",
+        "specificity": "UNKNOWN",
+        "postHocRisk": "UNKNOWN",
+        "correspondenceRationale": null,
+        "prohibitedAdditionsFound": []
+      },
+      "presentation": {
+        "truthLevel": "FACT",
+        "status": "PRESENTATION_COMPLETE",
+        "basis": [
+          "src/ui/instrument/sections/DoctrineReadingCard.v0.1.tsx",
+          "tests/ui.instrument.doctrineReading.v0_1.spec.tsx"
+        ],
+        "humanComprehension": "UNKNOWN_AWAITING_HUMAN_PARTICIPANTS"
+      },
+      "existingEvidenceContext": {
+        "truthLevel": "FACT",
+        "analyticalStatus": "null_no_supported_candidate",
+        "candidateStatus": "CANDIDATES_PRESENT",
+        "candidateCount": 1,
+        "evidenceStatus": "RESEARCH_EVIDENCE_REFS_PRESENT",
+        "evidenceRefCount": 1,
+        "reviewedEvidenceRefCount": 0,
+        "researchEvidenceRefCount": 1
+      },
+      "antiCircularity": {
+        "truthLevel": "INFERENCE",
+        "prohibitedAdditionsFound": [],
+        "status": "PASS"
+      }
+    },
+    {
+      "caseId": "scale50.nose.body",
+      "word": "nose",
+      "category": "body",
+      "cohort": "NEW_GENERIC_PATH",
+      "targetSense": {
+        "status": "MISSING",
+        "source": null,
+        "targetSenseId": null,
+        "targetSenseLabel": null,
+        "targetSenseDefinition": null,
+        "truthLevel": "FACT",
+        "authority": null,
+        "locator": null,
+        "sourceStatus": null
+      },
+      "voicePath": [
+        "O",
+        "E"
+      ],
+      "voice1": "O",
+      "voice2": "E",
+      "atom1": "balanced mediation",
+      "atom2": "expanding growth",
+      "expectedLevel3Reading": "balanced mediation with expanding growth",
+      "actualLevel3Reading": {
+        "analyzedVoicePath": [
+          "O",
+          "E"
+        ],
+        "reading": "balanced mediation with expanding growth",
+        "ruleId": "level3.generic-distinct-pair.v1",
+        "truthClassification": "inference",
+        "genericComposition": "AUTHORIZED",
+        "level4TransitionSemantics": "NOT_AUTHORIZED",
+        "userDecisionPosture": "user_decides",
+        "noSingleWinner": true
+      },
+      "mechanical": {
+        "truthLevel": "FACT",
+        "pathSource": "baseline.paths.surface, independently rechecked with buildHeartInstrumentV1",
+        "readingSource": "projectLevel3DoctrineReadingV0_1",
+        "match": true
+      },
+      "semanticScreening": {
+        "truthLevel": "UNKNOWN",
+        "relevance": "TARGET_SENSE_INSUFFICIENT",
+        "specificity": "UNKNOWN",
+        "postHocRisk": "UNKNOWN",
+        "correspondenceRationale": null,
+        "prohibitedAdditionsFound": []
+      },
+      "presentation": {
+        "truthLevel": "FACT",
+        "status": "PRESENTATION_COMPLETE",
+        "basis": [
+          "src/ui/instrument/sections/DoctrineReadingCard.v0.1.tsx",
+          "tests/ui.instrument.doctrineReading.v0_1.spec.tsx"
+        ],
+        "humanComprehension": "UNKNOWN_AWAITING_HUMAN_PARTICIPANTS"
+      },
+      "existingEvidenceContext": {
+        "truthLevel": "FACT",
+        "analyticalStatus": "null_no_supported_candidate",
+        "candidateStatus": "CANDIDATES_PRESENT",
+        "candidateCount": 1,
+        "evidenceStatus": "RESEARCH_EVIDENCE_REFS_PRESENT",
+        "evidenceRefCount": 1,
+        "reviewedEvidenceRefCount": 0,
+        "researchEvidenceRefCount": 1
+      },
+      "antiCircularity": {
+        "truthLevel": "INFERENCE",
+        "prohibitedAdditionsFound": [],
+        "status": "PASS"
+      }
+    },
+    {
+      "caseId": "scale50.speak.action",
+      "word": "speak",
+      "category": "action",
+      "cohort": "HISTORICAL_PROOF_PATH",
+      "targetSense": {
+        "status": "FROZEN_AUTHORITY",
+        "source": "open-instrument.target-sense-authority-pool.v0_1",
+        "targetSenseId": "cambridge.en.speak.verb.say-words-1",
+        "targetSenseLabel": "say words or use the voice",
+        "targetSenseDefinition": "to say words, use the voice, or have a conversation",
+        "truthLevel": "FACT",
+        "authority": "Cambridge Dictionary English",
+        "locator": "verb, A1, SAY WORDS, first ordinary sense",
+        "sourceStatus": "VERIFIED_SOURCE_LOOKUP"
+      },
+      "voicePath": [
+        "E",
+        "A"
+      ],
+      "voice1": "E",
+      "voice2": "A",
+      "atom1": "expanding growth",
+      "atom2": "initiating beginning",
+      "expectedLevel3Reading": "expanding growth with initiating beginning",
+      "actualLevel3Reading": {
+        "analyzedVoicePath": [
+          "E",
+          "A"
+        ],
+        "reading": "expanding growth with initiating beginning",
+        "ruleId": "level3.generic-distinct-pair.v1",
+        "truthClassification": "inference",
+        "genericComposition": "AUTHORIZED",
+        "level4TransitionSemantics": "NOT_AUTHORIZED",
+        "userDecisionPosture": "user_decides",
+        "noSingleWinner": true
+      },
+      "mechanical": {
+        "truthLevel": "FACT",
+        "pathSource": "baseline.paths.surface, independently rechecked with buildHeartInstrumentV1",
+        "readingSource": "projectLevel3DoctrineReadingV0_1",
+        "match": true
+      },
+      "semanticScreening": {
+        "truthLevel": "HYPOTHESIS",
+        "relevance": "UNSUPPORTED_BRIDGE",
+        "specificity": "TOO_GENERAL_TO_DISCRIMINATE",
+        "postHocRisk": "HIGH",
+        "correspondenceRationale": "The frozen Level-3 phrase does not identify or entail the frozen target referent; connecting them would require an unstated semantic bridge beyond the two atoms and the weak 'with' connector.",
+        "prohibitedAdditionsFound": []
+      },
+      "presentation": {
+        "truthLevel": "FACT",
+        "status": "PRESENTATION_COMPLETE",
+        "basis": [
+          "src/ui/instrument/sections/DoctrineReadingCard.v0.1.tsx",
+          "tests/ui.instrument.doctrineReading.v0_1.spec.tsx"
+        ],
+        "humanComprehension": "UNKNOWN_AWAITING_HUMAN_PARTICIPANTS"
+      },
+      "existingEvidenceContext": {
+        "truthLevel": "FACT",
+        "analyticalStatus": "structural_unreviewed",
+        "candidateStatus": "CANDIDATES_PRESENT",
+        "candidateCount": 3,
+        "evidenceStatus": "RESEARCH_EVIDENCE_REFS_PRESENT",
+        "evidenceRefCount": 1,
+        "reviewedEvidenceRefCount": 0,
+        "researchEvidenceRefCount": 1
+      },
+      "antiCircularity": {
+        "truthLevel": "INFERENCE",
+        "prohibitedAdditionsFound": [],
+        "status": "PASS"
+      }
+    },
+    {
+      "caseId": "scale50.hear.action",
+      "word": "hear",
+      "category": "action",
+      "cohort": "HISTORICAL_PROOF_PATH",
+      "targetSense": {
+        "status": "MISSING",
+        "source": null,
+        "targetSenseId": null,
+        "targetSenseLabel": null,
+        "targetSenseDefinition": null,
+        "truthLevel": "FACT",
+        "authority": null,
+        "locator": null,
+        "sourceStatus": null
+      },
+      "voicePath": [
+        "E",
+        "A"
+      ],
+      "voice1": "E",
+      "voice2": "A",
+      "atom1": "expanding growth",
+      "atom2": "initiating beginning",
+      "expectedLevel3Reading": "expanding growth with initiating beginning",
+      "actualLevel3Reading": {
+        "analyzedVoicePath": [
+          "E",
+          "A"
+        ],
+        "reading": "expanding growth with initiating beginning",
+        "ruleId": "level3.generic-distinct-pair.v1",
+        "truthClassification": "inference",
+        "genericComposition": "AUTHORIZED",
+        "level4TransitionSemantics": "NOT_AUTHORIZED",
+        "userDecisionPosture": "user_decides",
+        "noSingleWinner": true
+      },
+      "mechanical": {
+        "truthLevel": "FACT",
+        "pathSource": "baseline.paths.surface, independently rechecked with buildHeartInstrumentV1",
+        "readingSource": "projectLevel3DoctrineReadingV0_1",
+        "match": true
+      },
+      "semanticScreening": {
+        "truthLevel": "UNKNOWN",
+        "relevance": "TARGET_SENSE_INSUFFICIENT",
+        "specificity": "UNKNOWN",
+        "postHocRisk": "UNKNOWN",
+        "correspondenceRationale": null,
+        "prohibitedAdditionsFound": []
+      },
+      "presentation": {
+        "truthLevel": "FACT",
+        "status": "PRESENTATION_COMPLETE",
+        "basis": [
+          "src/ui/instrument/sections/DoctrineReadingCard.v0.1.tsx",
+          "tests/ui.instrument.doctrineReading.v0_1.spec.tsx"
+        ],
+        "humanComprehension": "UNKNOWN_AWAITING_HUMAN_PARTICIPANTS"
+      },
+      "existingEvidenceContext": {
+        "truthLevel": "FACT",
+        "analyticalStatus": "null_no_supported_candidate",
+        "candidateStatus": "NO_CANDIDATES",
+        "candidateCount": 0,
+        "evidenceStatus": "NO_EVIDENCE_REFS",
+        "evidenceRefCount": 0,
+        "reviewedEvidenceRefCount": 0,
+        "researchEvidenceRefCount": 0
+      },
+      "antiCircularity": {
+        "truthLevel": "INFERENCE",
+        "prohibitedAdditionsFound": [],
+        "status": "PASS"
+      }
+    },
+    {
+      "caseId": "scale50.eat.action",
+      "word": "eat",
+      "category": "action",
+      "cohort": "HISTORICAL_PROOF_PATH",
+      "targetSense": {
+        "status": "MISSING",
+        "source": null,
+        "targetSenseId": null,
+        "targetSenseLabel": null,
+        "targetSenseDefinition": null,
+        "truthLevel": "FACT",
+        "authority": null,
+        "locator": null,
+        "sourceStatus": null
+      },
+      "voicePath": [
+        "E",
+        "A"
+      ],
+      "voice1": "E",
+      "voice2": "A",
+      "atom1": "expanding growth",
+      "atom2": "initiating beginning",
+      "expectedLevel3Reading": "expanding growth with initiating beginning",
+      "actualLevel3Reading": {
+        "analyzedVoicePath": [
+          "E",
+          "A"
+        ],
+        "reading": "expanding growth with initiating beginning",
+        "ruleId": "level3.generic-distinct-pair.v1",
+        "truthClassification": "inference",
+        "genericComposition": "AUTHORIZED",
+        "level4TransitionSemantics": "NOT_AUTHORIZED",
+        "userDecisionPosture": "user_decides",
+        "noSingleWinner": true
+      },
+      "mechanical": {
+        "truthLevel": "FACT",
+        "pathSource": "baseline.paths.surface, independently rechecked with buildHeartInstrumentV1",
+        "readingSource": "projectLevel3DoctrineReadingV0_1",
+        "match": true
+      },
+      "semanticScreening": {
+        "truthLevel": "UNKNOWN",
+        "relevance": "TARGET_SENSE_INSUFFICIENT",
+        "specificity": "UNKNOWN",
+        "postHocRisk": "UNKNOWN",
+        "correspondenceRationale": null,
+        "prohibitedAdditionsFound": []
+      },
+      "presentation": {
+        "truthLevel": "FACT",
+        "status": "PRESENTATION_COMPLETE",
+        "basis": [
+          "src/ui/instrument/sections/DoctrineReadingCard.v0.1.tsx",
+          "tests/ui.instrument.doctrineReading.v0_1.spec.tsx"
+        ],
+        "humanComprehension": "UNKNOWN_AWAITING_HUMAN_PARTICIPANTS"
+      },
+      "existingEvidenceContext": {
+        "truthLevel": "FACT",
+        "analyticalStatus": "null_no_supported_candidate",
+        "candidateStatus": "CANDIDATES_PRESENT",
+        "candidateCount": 2,
+        "evidenceStatus": "RESEARCH_EVIDENCE_REFS_PRESENT",
+        "evidenceRefCount": 2,
+        "reviewedEvidenceRefCount": 0,
+        "researchEvidenceRefCount": 2
+      },
+      "antiCircularity": {
+        "truthLevel": "INFERENCE",
+        "prohibitedAdditionsFound": [],
+        "status": "PASS"
+      }
+    },
+    {
+      "caseId": "scale50.build.action",
+      "word": "build",
+      "category": "action",
+      "cohort": "NEW_GENERIC_PATH",
+      "targetSense": {
+        "status": "MISSING",
+        "source": null,
+        "targetSenseId": null,
+        "targetSenseLabel": null,
+        "targetSenseDefinition": null,
+        "truthLevel": "FACT",
+        "authority": null,
+        "locator": null,
+        "sourceStatus": null
+      },
+      "voicePath": [
+        "U",
+        "I"
+      ],
+      "voice1": "U",
+      "voice2": "I",
+      "atom1": "grounded depth",
+      "atom2": "clear understanding",
+      "expectedLevel3Reading": "grounded depth with clear understanding",
+      "actualLevel3Reading": {
+        "analyzedVoicePath": [
+          "U",
+          "I"
+        ],
+        "reading": "grounded depth with clear understanding",
+        "ruleId": "level3.generic-distinct-pair.v1",
+        "truthClassification": "inference",
+        "genericComposition": "AUTHORIZED",
+        "level4TransitionSemantics": "NOT_AUTHORIZED",
+        "userDecisionPosture": "user_decides",
+        "noSingleWinner": true
+      },
+      "mechanical": {
+        "truthLevel": "FACT",
+        "pathSource": "baseline.paths.surface, independently rechecked with buildHeartInstrumentV1",
+        "readingSource": "projectLevel3DoctrineReadingV0_1",
+        "match": true
+      },
+      "semanticScreening": {
+        "truthLevel": "UNKNOWN",
+        "relevance": "TARGET_SENSE_INSUFFICIENT",
+        "specificity": "UNKNOWN",
+        "postHocRisk": "UNKNOWN",
+        "correspondenceRationale": null,
+        "prohibitedAdditionsFound": []
+      },
+      "presentation": {
+        "truthLevel": "FACT",
+        "status": "PRESENTATION_COMPLETE",
+        "basis": [
+          "src/ui/instrument/sections/DoctrineReadingCard.v0.1.tsx",
+          "tests/ui.instrument.doctrineReading.v0_1.spec.tsx"
+        ],
+        "humanComprehension": "UNKNOWN_AWAITING_HUMAN_PARTICIPANTS"
+      },
+      "existingEvidenceContext": {
+        "truthLevel": "FACT",
+        "analyticalStatus": "null_no_supported_candidate",
+        "candidateStatus": "CANDIDATES_PRESENT",
+        "candidateCount": 2,
+        "evidenceStatus": "RESEARCH_EVIDENCE_REFS_PRESENT",
+        "evidenceRefCount": 2,
+        "reviewedEvidenceRefCount": 0,
+        "researchEvidenceRefCount": 2
+      },
+      "antiCircularity": {
+        "truthLevel": "INFERENCE",
+        "prohibitedAdditionsFound": [],
+        "status": "PASS"
+      }
+    },
+    {
+      "caseId": "scale50.break.action",
+      "word": "break",
+      "category": "action",
+      "cohort": "HISTORICAL_PROOF_PATH",
+      "targetSense": {
+        "status": "MISSING",
+        "source": null,
+        "targetSenseId": null,
+        "targetSenseLabel": null,
+        "targetSenseDefinition": null,
+        "truthLevel": "FACT",
+        "authority": null,
+        "locator": null,
+        "sourceStatus": null
+      },
+      "voicePath": [
+        "E",
+        "A"
+      ],
+      "voice1": "E",
+      "voice2": "A",
+      "atom1": "expanding growth",
+      "atom2": "initiating beginning",
+      "expectedLevel3Reading": "expanding growth with initiating beginning",
+      "actualLevel3Reading": {
+        "analyzedVoicePath": [
+          "E",
+          "A"
+        ],
+        "reading": "expanding growth with initiating beginning",
+        "ruleId": "level3.generic-distinct-pair.v1",
+        "truthClassification": "inference",
+        "genericComposition": "AUTHORIZED",
+        "level4TransitionSemantics": "NOT_AUTHORIZED",
+        "userDecisionPosture": "user_decides",
+        "noSingleWinner": true
+      },
+      "mechanical": {
+        "truthLevel": "FACT",
+        "pathSource": "baseline.paths.surface, independently rechecked with buildHeartInstrumentV1",
+        "readingSource": "projectLevel3DoctrineReadingV0_1",
+        "match": true
+      },
+      "semanticScreening": {
+        "truthLevel": "UNKNOWN",
+        "relevance": "TARGET_SENSE_INSUFFICIENT",
+        "specificity": "UNKNOWN",
+        "postHocRisk": "UNKNOWN",
+        "correspondenceRationale": null,
+        "prohibitedAdditionsFound": []
+      },
+      "presentation": {
+        "truthLevel": "FACT",
+        "status": "PRESENTATION_COMPLETE",
+        "basis": [
+          "src/ui/instrument/sections/DoctrineReadingCard.v0.1.tsx",
+          "tests/ui.instrument.doctrineReading.v0_1.spec.tsx"
+        ],
+        "humanComprehension": "UNKNOWN_AWAITING_HUMAN_PARTICIPANTS"
+      },
+      "existingEvidenceContext": {
+        "truthLevel": "FACT",
+        "analyticalStatus": "structural_unreviewed",
+        "candidateStatus": "CANDIDATES_PRESENT",
+        "candidateCount": 4,
+        "evidenceStatus": "RESEARCH_EVIDENCE_REFS_PRESENT",
+        "evidenceRefCount": 2,
+        "reviewedEvidenceRefCount": 0,
+        "researchEvidenceRefCount": 2
+      },
+      "antiCircularity": {
+        "truthLevel": "INFERENCE",
+        "prohibitedAdditionsFound": [],
+        "status": "PASS"
+      }
+    },
+    {
+      "caseId": "scale50.carry.action",
+      "word": "carry",
+      "category": "action",
+      "cohort": "NEW_GENERIC_PATH",
+      "targetSense": {
+        "status": "MISSING",
+        "source": null,
+        "targetSenseId": null,
+        "targetSenseLabel": null,
+        "targetSenseDefinition": null,
+        "truthLevel": "FACT",
+        "authority": null,
+        "locator": null,
+        "sourceStatus": null
+      },
+      "voicePath": [
+        "A",
+        "Y"
+      ],
+      "voice1": "A",
+      "voice2": "Y",
+      "atom1": "initiating beginning",
+      "atom2": "reflective exploration",
+      "expectedLevel3Reading": "initiating beginning with reflective exploration",
+      "actualLevel3Reading": {
+        "analyzedVoicePath": [
+          "A",
+          "Y"
+        ],
+        "reading": "initiating beginning with reflective exploration",
+        "ruleId": "level3.generic-distinct-pair.v1",
+        "truthClassification": "inference",
+        "genericComposition": "AUTHORIZED",
+        "level4TransitionSemantics": "NOT_AUTHORIZED",
+        "userDecisionPosture": "user_decides",
+        "noSingleWinner": true
+      },
+      "mechanical": {
+        "truthLevel": "FACT",
+        "pathSource": "baseline.paths.surface, independently rechecked with buildHeartInstrumentV1",
+        "readingSource": "projectLevel3DoctrineReadingV0_1",
+        "match": true
+      },
+      "semanticScreening": {
+        "truthLevel": "UNKNOWN",
+        "relevance": "TARGET_SENSE_INSUFFICIENT",
+        "specificity": "UNKNOWN",
+        "postHocRisk": "UNKNOWN",
+        "correspondenceRationale": null,
+        "prohibitedAdditionsFound": []
+      },
+      "presentation": {
+        "truthLevel": "FACT",
+        "status": "PRESENTATION_COMPLETE",
+        "basis": [
+          "src/ui/instrument/sections/DoctrineReadingCard.v0.1.tsx",
+          "tests/ui.instrument.doctrineReading.v0_1.spec.tsx"
+        ],
+        "humanComprehension": "UNKNOWN_AWAITING_HUMAN_PARTICIPANTS"
+      },
+      "existingEvidenceContext": {
+        "truthLevel": "FACT",
+        "analyticalStatus": "null_no_supported_candidate",
+        "candidateStatus": "CANDIDATES_PRESENT",
+        "candidateCount": 2,
+        "evidenceStatus": "RESEARCH_EVIDENCE_REFS_PRESENT",
+        "evidenceRefCount": 2,
+        "reviewedEvidenceRefCount": 0,
+        "researchEvidenceRefCount": 2
+      },
+      "antiCircularity": {
+        "truthLevel": "INFERENCE",
+        "prohibitedAdditionsFound": [],
+        "status": "PASS"
+      }
+    },
+    {
+      "caseId": "scale50.time.abstract",
+      "word": "time",
+      "category": "abstract",
+      "cohort": "NEW_GENERIC_PATH",
+      "targetSense": {
+        "status": "MISSING",
+        "source": null,
+        "targetSenseId": null,
+        "targetSenseLabel": null,
+        "targetSenseDefinition": null,
+        "truthLevel": "FACT",
+        "authority": null,
+        "locator": null,
+        "sourceStatus": null
+      },
+      "voicePath": [
+        "I",
+        "E"
+      ],
+      "voice1": "I",
+      "voice2": "E",
+      "atom1": "clear understanding",
+      "atom2": "expanding growth",
+      "expectedLevel3Reading": "clear understanding with expanding growth",
+      "actualLevel3Reading": {
+        "analyzedVoicePath": [
+          "I",
+          "E"
+        ],
+        "reading": "clear understanding with expanding growth",
+        "ruleId": "level3.generic-distinct-pair.v1",
+        "truthClassification": "inference",
+        "genericComposition": "AUTHORIZED",
+        "level4TransitionSemantics": "NOT_AUTHORIZED",
+        "userDecisionPosture": "user_decides",
+        "noSingleWinner": true
+      },
+      "mechanical": {
+        "truthLevel": "FACT",
+        "pathSource": "baseline.paths.surface, independently rechecked with buildHeartInstrumentV1",
+        "readingSource": "projectLevel3DoctrineReadingV0_1",
+        "match": true
+      },
+      "semanticScreening": {
+        "truthLevel": "UNKNOWN",
+        "relevance": "TARGET_SENSE_INSUFFICIENT",
+        "specificity": "UNKNOWN",
+        "postHocRisk": "UNKNOWN",
+        "correspondenceRationale": null,
+        "prohibitedAdditionsFound": []
+      },
+      "presentation": {
+        "truthLevel": "FACT",
+        "status": "PRESENTATION_COMPLETE",
+        "basis": [
+          "src/ui/instrument/sections/DoctrineReadingCard.v0.1.tsx",
+          "tests/ui.instrument.doctrineReading.v0_1.spec.tsx"
+        ],
+        "humanComprehension": "UNKNOWN_AWAITING_HUMAN_PARTICIPANTS"
+      },
+      "existingEvidenceContext": {
+        "truthLevel": "FACT",
+        "analyticalStatus": "null_no_supported_candidate",
+        "candidateStatus": "NO_CANDIDATES",
+        "candidateCount": 0,
+        "evidenceStatus": "NO_EVIDENCE_REFS",
+        "evidenceRefCount": 0,
+        "reviewedEvidenceRefCount": 0,
+        "researchEvidenceRefCount": 0
+      },
+      "antiCircularity": {
+        "truthLevel": "INFERENCE",
+        "prohibitedAdditionsFound": [],
+        "status": "PASS"
+      }
+    },
+    {
+      "caseId": "scale50.life.abstract",
+      "word": "life",
+      "category": "abstract",
+      "cohort": "NEW_GENERIC_PATH",
+      "targetSense": {
+        "status": "MISSING",
+        "source": null,
+        "targetSenseId": null,
+        "targetSenseLabel": null,
+        "targetSenseDefinition": null,
+        "truthLevel": "FACT",
+        "authority": null,
+        "locator": null,
+        "sourceStatus": null
+      },
+      "voicePath": [
+        "I",
+        "E"
+      ],
+      "voice1": "I",
+      "voice2": "E",
+      "atom1": "clear understanding",
+      "atom2": "expanding growth",
+      "expectedLevel3Reading": "clear understanding with expanding growth",
+      "actualLevel3Reading": {
+        "analyzedVoicePath": [
+          "I",
+          "E"
+        ],
+        "reading": "clear understanding with expanding growth",
+        "ruleId": "level3.generic-distinct-pair.v1",
+        "truthClassification": "inference",
+        "genericComposition": "AUTHORIZED",
+        "level4TransitionSemantics": "NOT_AUTHORIZED",
+        "userDecisionPosture": "user_decides",
+        "noSingleWinner": true
+      },
+      "mechanical": {
+        "truthLevel": "FACT",
+        "pathSource": "baseline.paths.surface, independently rechecked with buildHeartInstrumentV1",
+        "readingSource": "projectLevel3DoctrineReadingV0_1",
+        "match": true
+      },
+      "semanticScreening": {
+        "truthLevel": "UNKNOWN",
+        "relevance": "TARGET_SENSE_INSUFFICIENT",
+        "specificity": "UNKNOWN",
+        "postHocRisk": "UNKNOWN",
+        "correspondenceRationale": null,
+        "prohibitedAdditionsFound": []
+      },
+      "presentation": {
+        "truthLevel": "FACT",
+        "status": "PRESENTATION_COMPLETE",
+        "basis": [
+          "src/ui/instrument/sections/DoctrineReadingCard.v0.1.tsx",
+          "tests/ui.instrument.doctrineReading.v0_1.spec.tsx"
+        ],
+        "humanComprehension": "UNKNOWN_AWAITING_HUMAN_PARTICIPANTS"
+      },
+      "existingEvidenceContext": {
+        "truthLevel": "FACT",
+        "analyticalStatus": "null_no_supported_candidate",
+        "candidateStatus": "CANDIDATES_PRESENT",
+        "candidateCount": 1,
+        "evidenceStatus": "RESEARCH_EVIDENCE_REFS_PRESENT",
+        "evidenceRefCount": 1,
+        "reviewedEvidenceRefCount": 0,
+        "researchEvidenceRefCount": 1
+      },
+      "antiCircularity": {
+        "truthLevel": "INFERENCE",
+        "prohibitedAdditionsFound": [],
+        "status": "PASS"
+      }
+    },
+    {
+      "caseId": "scale50.death.abstract",
+      "word": "death",
+      "category": "abstract",
+      "cohort": "HISTORICAL_PROOF_PATH",
+      "targetSense": {
+        "status": "MISSING",
+        "source": null,
+        "targetSenseId": null,
+        "targetSenseLabel": null,
+        "targetSenseDefinition": null,
+        "truthLevel": "FACT",
+        "authority": null,
+        "locator": null,
+        "sourceStatus": null
+      },
+      "voicePath": [
+        "E",
+        "A"
+      ],
+      "voice1": "E",
+      "voice2": "A",
+      "atom1": "expanding growth",
+      "atom2": "initiating beginning",
+      "expectedLevel3Reading": "expanding growth with initiating beginning",
+      "actualLevel3Reading": {
+        "analyzedVoicePath": [
+          "E",
+          "A"
+        ],
+        "reading": "expanding growth with initiating beginning",
+        "ruleId": "level3.generic-distinct-pair.v1",
+        "truthClassification": "inference",
+        "genericComposition": "AUTHORIZED",
+        "level4TransitionSemantics": "NOT_AUTHORIZED",
+        "userDecisionPosture": "user_decides",
+        "noSingleWinner": true
+      },
+      "mechanical": {
+        "truthLevel": "FACT",
+        "pathSource": "baseline.paths.surface, independently rechecked with buildHeartInstrumentV1",
+        "readingSource": "projectLevel3DoctrineReadingV0_1",
+        "match": true
+      },
+      "semanticScreening": {
+        "truthLevel": "UNKNOWN",
+        "relevance": "TARGET_SENSE_INSUFFICIENT",
+        "specificity": "UNKNOWN",
+        "postHocRisk": "UNKNOWN",
+        "correspondenceRationale": null,
+        "prohibitedAdditionsFound": []
+      },
+      "presentation": {
+        "truthLevel": "FACT",
+        "status": "PRESENTATION_COMPLETE",
+        "basis": [
+          "src/ui/instrument/sections/DoctrineReadingCard.v0.1.tsx",
+          "tests/ui.instrument.doctrineReading.v0_1.spec.tsx"
+        ],
+        "humanComprehension": "UNKNOWN_AWAITING_HUMAN_PARTICIPANTS"
+      },
+      "existingEvidenceContext": {
+        "truthLevel": "FACT",
+        "analyticalStatus": "null_no_supported_candidate",
+        "candidateStatus": "NO_CANDIDATES",
+        "candidateCount": 0,
+        "evidenceStatus": "NO_EVIDENCE_REFS",
+        "evidenceRefCount": 0,
+        "reviewedEvidenceRefCount": 0,
+        "researchEvidenceRefCount": 0
+      },
+      "antiCircularity": {
+        "truthLevel": "INFERENCE",
+        "prohibitedAdditionsFound": [],
+        "status": "PASS"
+      }
+    },
+    {
+      "caseId": "scale50.order.abstract",
+      "word": "order",
+      "category": "abstract",
+      "cohort": "NEW_GENERIC_PATH",
+      "targetSense": {
+        "status": "MISSING",
+        "source": null,
+        "targetSenseId": null,
+        "targetSenseLabel": null,
+        "targetSenseDefinition": null,
+        "truthLevel": "FACT",
+        "authority": null,
+        "locator": null,
+        "sourceStatus": null
+      },
+      "voicePath": [
+        "O",
+        "E"
+      ],
+      "voice1": "O",
+      "voice2": "E",
+      "atom1": "balanced mediation",
+      "atom2": "expanding growth",
+      "expectedLevel3Reading": "balanced mediation with expanding growth",
+      "actualLevel3Reading": {
+        "analyzedVoicePath": [
+          "O",
+          "E"
+        ],
+        "reading": "balanced mediation with expanding growth",
+        "ruleId": "level3.generic-distinct-pair.v1",
+        "truthClassification": "inference",
+        "genericComposition": "AUTHORIZED",
+        "level4TransitionSemantics": "NOT_AUTHORIZED",
+        "userDecisionPosture": "user_decides",
+        "noSingleWinner": true
+      },
+      "mechanical": {
+        "truthLevel": "FACT",
+        "pathSource": "baseline.paths.surface, independently rechecked with buildHeartInstrumentV1",
+        "readingSource": "projectLevel3DoctrineReadingV0_1",
+        "match": true
+      },
+      "semanticScreening": {
+        "truthLevel": "UNKNOWN",
+        "relevance": "TARGET_SENSE_INSUFFICIENT",
+        "specificity": "UNKNOWN",
+        "postHocRisk": "UNKNOWN",
+        "correspondenceRationale": null,
+        "prohibitedAdditionsFound": []
+      },
+      "presentation": {
+        "truthLevel": "FACT",
+        "status": "PRESENTATION_COMPLETE",
+        "basis": [
+          "src/ui/instrument/sections/DoctrineReadingCard.v0.1.tsx",
+          "tests/ui.instrument.doctrineReading.v0_1.spec.tsx"
+        ],
+        "humanComprehension": "UNKNOWN_AWAITING_HUMAN_PARTICIPANTS"
+      },
+      "existingEvidenceContext": {
+        "truthLevel": "FACT",
+        "analyticalStatus": "null_no_supported_candidate",
+        "candidateStatus": "CANDIDATES_PRESENT",
+        "candidateCount": 2,
+        "evidenceStatus": "RESEARCH_EVIDENCE_REFS_PRESENT",
+        "evidenceRefCount": 2,
+        "reviewedEvidenceRefCount": 0,
+        "researchEvidenceRefCount": 2
+      },
+      "antiCircularity": {
+        "truthLevel": "INFERENCE",
+        "prohibitedAdditionsFound": [],
+        "status": "PASS"
+      }
+    },
+    {
+      "caseId": "scale50.change.abstract",
+      "word": "change",
+      "category": "abstract",
+      "cohort": "HISTORICAL_PROOF_PATH",
+      "targetSense": {
+        "status": "MISSING",
+        "source": null,
+        "targetSenseId": null,
+        "targetSenseLabel": null,
+        "targetSenseDefinition": null,
+        "truthLevel": "FACT",
+        "authority": null,
+        "locator": null,
+        "sourceStatus": null
+      },
+      "voicePath": [
+        "A",
+        "E"
+      ],
+      "voice1": "A",
+      "voice2": "E",
+      "atom1": "initiating beginning",
+      "atom2": "expanding growth",
+      "expectedLevel3Reading": "initiating beginning with expanding growth",
+      "actualLevel3Reading": {
+        "analyzedVoicePath": [
+          "A",
+          "E"
+        ],
+        "reading": "initiating beginning with expanding growth",
+        "ruleId": "level3.generic-distinct-pair.v1",
+        "truthClassification": "inference",
+        "genericComposition": "AUTHORIZED",
+        "level4TransitionSemantics": "NOT_AUTHORIZED",
+        "userDecisionPosture": "user_decides",
+        "noSingleWinner": true
+      },
+      "mechanical": {
+        "truthLevel": "FACT",
+        "pathSource": "baseline.paths.surface, independently rechecked with buildHeartInstrumentV1",
+        "readingSource": "projectLevel3DoctrineReadingV0_1",
+        "match": true
+      },
+      "semanticScreening": {
+        "truthLevel": "UNKNOWN",
+        "relevance": "TARGET_SENSE_INSUFFICIENT",
+        "specificity": "UNKNOWN",
+        "postHocRisk": "UNKNOWN",
+        "correspondenceRationale": null,
+        "prohibitedAdditionsFound": []
+      },
+      "presentation": {
+        "truthLevel": "FACT",
+        "status": "PRESENTATION_COMPLETE",
+        "basis": [
+          "src/ui/instrument/sections/DoctrineReadingCard.v0.1.tsx",
+          "tests/ui.instrument.doctrineReading.v0_1.spec.tsx"
+        ],
+        "humanComprehension": "UNKNOWN_AWAITING_HUMAN_PARTICIPANTS"
+      },
+      "existingEvidenceContext": {
+        "truthLevel": "FACT",
+        "analyticalStatus": "structural_unreviewed",
+        "candidateStatus": "CANDIDATES_PRESENT",
+        "candidateCount": 4,
+        "evidenceStatus": "RESEARCH_EVIDENCE_REFS_PRESENT",
+        "evidenceRefCount": 2,
+        "reviewedEvidenceRefCount": 0,
+        "researchEvidenceRefCount": 2
+      },
+      "antiCircularity": {
+        "truthLevel": "INFERENCE",
+        "prohibitedAdditionsFound": [],
+        "status": "PASS"
+      }
+    },
+    {
+      "caseId": "scale50.mother.human-social",
+      "word": "mother",
+      "category": "human_social",
+      "cohort": "NEW_GENERIC_PATH",
+      "targetSense": {
+        "status": "FROZEN_AUTHORITY",
+        "source": "open-instrument.target-sense-authority-pool.v0_1",
+        "targetSenseId": "cambridge.en.mother.noun.female-parent-1",
+        "targetSenseLabel": "female parent",
+        "targetSenseDefinition": "a female parent",
+        "truthLevel": "FACT",
+        "authority": "Cambridge Dictionary English",
+        "locator": "noun, A1, PARENT, first ordinary sense",
+        "sourceStatus": "VERIFIED_SOURCE_LOOKUP"
+      },
+      "voicePath": [
+        "O",
+        "E"
+      ],
+      "voice1": "O",
+      "voice2": "E",
+      "atom1": "balanced mediation",
+      "atom2": "expanding growth",
+      "expectedLevel3Reading": "balanced mediation with expanding growth",
+      "actualLevel3Reading": {
+        "analyzedVoicePath": [
+          "O",
+          "E"
+        ],
+        "reading": "balanced mediation with expanding growth",
+        "ruleId": "level3.generic-distinct-pair.v1",
+        "truthClassification": "inference",
+        "genericComposition": "AUTHORIZED",
+        "level4TransitionSemantics": "NOT_AUTHORIZED",
+        "userDecisionPosture": "user_decides",
+        "noSingleWinner": true
+      },
+      "mechanical": {
+        "truthLevel": "FACT",
+        "pathSource": "baseline.paths.surface, independently rechecked with buildHeartInstrumentV1",
+        "readingSource": "projectLevel3DoctrineReadingV0_1",
+        "match": true
+      },
+      "semanticScreening": {
+        "truthLevel": "HYPOTHESIS",
+        "relevance": "UNSUPPORTED_BRIDGE",
+        "specificity": "TOO_GENERAL_TO_DISCRIMINATE",
+        "postHocRisk": "HIGH",
+        "correspondenceRationale": "The frozen Level-3 phrase does not identify or entail the frozen target referent; connecting them would require an unstated semantic bridge beyond the two atoms and the weak 'with' connector.",
+        "prohibitedAdditionsFound": []
+      },
+      "presentation": {
+        "truthLevel": "FACT",
+        "status": "PRESENTATION_COMPLETE",
+        "basis": [
+          "src/ui/instrument/sections/DoctrineReadingCard.v0.1.tsx",
+          "tests/ui.instrument.doctrineReading.v0_1.spec.tsx"
+        ],
+        "humanComprehension": "UNKNOWN_AWAITING_HUMAN_PARTICIPANTS"
+      },
+      "existingEvidenceContext": {
+        "truthLevel": "FACT",
+        "analyticalStatus": "structural_unreviewed",
+        "candidateStatus": "CANDIDATES_PRESENT",
+        "candidateCount": 2,
+        "evidenceStatus": "RESEARCH_EVIDENCE_REFS_PRESENT",
+        "evidenceRefCount": 1,
+        "reviewedEvidenceRefCount": 0,
+        "researchEvidenceRefCount": 1
+      },
+      "antiCircularity": {
+        "truthLevel": "INFERENCE",
+        "prohibitedAdditionsFound": [],
+        "status": "PASS"
+      }
+    },
+    {
+      "caseId": "scale50.friend.human-social",
+      "word": "friend",
+      "category": "human_social",
+      "cohort": "NEW_GENERIC_PATH",
+      "targetSense": {
+        "status": "MISSING",
+        "source": null,
+        "targetSenseId": null,
+        "targetSenseLabel": null,
+        "targetSenseDefinition": null,
+        "truthLevel": "FACT",
+        "authority": null,
+        "locator": null,
+        "sourceStatus": null
+      },
+      "voicePath": [
+        "I",
+        "E"
+      ],
+      "voice1": "I",
+      "voice2": "E",
+      "atom1": "clear understanding",
+      "atom2": "expanding growth",
+      "expectedLevel3Reading": "clear understanding with expanding growth",
+      "actualLevel3Reading": {
+        "analyzedVoicePath": [
+          "I",
+          "E"
+        ],
+        "reading": "clear understanding with expanding growth",
+        "ruleId": "level3.generic-distinct-pair.v1",
+        "truthClassification": "inference",
+        "genericComposition": "AUTHORIZED",
+        "level4TransitionSemantics": "NOT_AUTHORIZED",
+        "userDecisionPosture": "user_decides",
+        "noSingleWinner": true
+      },
+      "mechanical": {
+        "truthLevel": "FACT",
+        "pathSource": "baseline.paths.surface, independently rechecked with buildHeartInstrumentV1",
+        "readingSource": "projectLevel3DoctrineReadingV0_1",
+        "match": true
+      },
+      "semanticScreening": {
+        "truthLevel": "UNKNOWN",
+        "relevance": "TARGET_SENSE_INSUFFICIENT",
+        "specificity": "UNKNOWN",
+        "postHocRisk": "UNKNOWN",
+        "correspondenceRationale": null,
+        "prohibitedAdditionsFound": []
+      },
+      "presentation": {
+        "truthLevel": "FACT",
+        "status": "PRESENTATION_COMPLETE",
+        "basis": [
+          "src/ui/instrument/sections/DoctrineReadingCard.v0.1.tsx",
+          "tests/ui.instrument.doctrineReading.v0_1.spec.tsx"
+        ],
+        "humanComprehension": "UNKNOWN_AWAITING_HUMAN_PARTICIPANTS"
+      },
+      "existingEvidenceContext": {
+        "truthLevel": "FACT",
+        "analyticalStatus": "structural_unreviewed",
+        "candidateStatus": "CANDIDATES_PRESENT",
+        "candidateCount": 4,
+        "evidenceStatus": "RESEARCH_EVIDENCE_REFS_PRESENT",
+        "evidenceRefCount": 2,
+        "reviewedEvidenceRefCount": 0,
+        "researchEvidenceRefCount": 2
+      },
+      "antiCircularity": {
+        "truthLevel": "INFERENCE",
+        "prohibitedAdditionsFound": [],
+        "status": "PASS"
+      }
+    },
+    {
+      "caseId": "scale50.home.human-social",
+      "word": "home",
+      "category": "human_social",
+      "cohort": "NEW_GENERIC_PATH",
+      "targetSense": {
+        "status": "MISSING",
+        "source": null,
+        "targetSenseId": null,
+        "targetSenseLabel": null,
+        "targetSenseDefinition": null,
+        "truthLevel": "FACT",
+        "authority": null,
+        "locator": null,
+        "sourceStatus": null
+      },
+      "voicePath": [
+        "O",
+        "E"
+      ],
+      "voice1": "O",
+      "voice2": "E",
+      "atom1": "balanced mediation",
+      "atom2": "expanding growth",
+      "expectedLevel3Reading": "balanced mediation with expanding growth",
+      "actualLevel3Reading": {
+        "analyzedVoicePath": [
+          "O",
+          "E"
+        ],
+        "reading": "balanced mediation with expanding growth",
+        "ruleId": "level3.generic-distinct-pair.v1",
+        "truthClassification": "inference",
+        "genericComposition": "AUTHORIZED",
+        "level4TransitionSemantics": "NOT_AUTHORIZED",
+        "userDecisionPosture": "user_decides",
+        "noSingleWinner": true
+      },
+      "mechanical": {
+        "truthLevel": "FACT",
+        "pathSource": "baseline.paths.surface, independently rechecked with buildHeartInstrumentV1",
+        "readingSource": "projectLevel3DoctrineReadingV0_1",
+        "match": true
+      },
+      "semanticScreening": {
+        "truthLevel": "UNKNOWN",
+        "relevance": "TARGET_SENSE_INSUFFICIENT",
+        "specificity": "UNKNOWN",
+        "postHocRisk": "UNKNOWN",
+        "correspondenceRationale": null,
+        "prohibitedAdditionsFound": []
+      },
+      "presentation": {
+        "truthLevel": "FACT",
+        "status": "PRESENTATION_COMPLETE",
+        "basis": [
+          "src/ui/instrument/sections/DoctrineReadingCard.v0.1.tsx",
+          "tests/ui.instrument.doctrineReading.v0_1.spec.tsx"
+        ],
+        "humanComprehension": "UNKNOWN_AWAITING_HUMAN_PARTICIPANTS"
+      },
+      "existingEvidenceContext": {
+        "truthLevel": "FACT",
+        "analyticalStatus": "null_no_supported_candidate",
+        "candidateStatus": "NO_CANDIDATES",
+        "candidateCount": 0,
+        "evidenceStatus": "NO_EVIDENCE_REFS",
+        "evidenceRefCount": 0,
+        "reviewedEvidenceRefCount": 0,
+        "researchEvidenceRefCount": 0
+      },
+      "antiCircularity": {
+        "truthLevel": "INFERENCE",
+        "prohibitedAdditionsFound": [],
+        "status": "PASS"
+      }
+    },
+    {
+      "caseId": "scale50.woman.human-social",
+      "word": "woman",
+      "category": "human_social",
+      "cohort": "NEW_GENERIC_PATH",
+      "targetSense": {
+        "status": "FROZEN_AUTHORITY",
+        "source": "open-instrument.target-sense-authority-pool.v0_1",
+        "targetSenseId": "cambridge.en.woman.noun.adult-female-human-1",
+        "targetSenseLabel": "adult female human",
+        "targetSenseDefinition": "an adult female human being",
+        "truthLevel": "FACT",
+        "authority": "Cambridge Dictionary English",
+        "locator": "noun, A1, first ordinary woman sense",
+        "sourceStatus": "VERIFIED_SOURCE_LOOKUP"
+      },
+      "voicePath": [
+        "O",
+        "A"
+      ],
+      "voice1": "O",
+      "voice2": "A",
+      "atom1": "balanced mediation",
+      "atom2": "initiating beginning",
+      "expectedLevel3Reading": "balanced mediation with initiating beginning",
+      "actualLevel3Reading": {
+        "analyzedVoicePath": [
+          "O",
+          "A"
+        ],
+        "reading": "balanced mediation with initiating beginning",
+        "ruleId": "level3.generic-distinct-pair.v1",
+        "truthClassification": "inference",
+        "genericComposition": "AUTHORIZED",
+        "level4TransitionSemantics": "NOT_AUTHORIZED",
+        "userDecisionPosture": "user_decides",
+        "noSingleWinner": true
+      },
+      "mechanical": {
+        "truthLevel": "FACT",
+        "pathSource": "baseline.paths.surface, independently rechecked with buildHeartInstrumentV1",
+        "readingSource": "projectLevel3DoctrineReadingV0_1",
+        "match": true
+      },
+      "semanticScreening": {
+        "truthLevel": "HYPOTHESIS",
+        "relevance": "UNSUPPORTED_BRIDGE",
+        "specificity": "TOO_GENERAL_TO_DISCRIMINATE",
+        "postHocRisk": "HIGH",
+        "correspondenceRationale": "The frozen Level-3 phrase does not identify or entail the frozen target referent; connecting them would require an unstated semantic bridge beyond the two atoms and the weak 'with' connector.",
+        "prohibitedAdditionsFound": []
+      },
+      "presentation": {
+        "truthLevel": "FACT",
+        "status": "PRESENTATION_COMPLETE",
+        "basis": [
+          "src/ui/instrument/sections/DoctrineReadingCard.v0.1.tsx",
+          "tests/ui.instrument.doctrineReading.v0_1.spec.tsx"
+        ],
+        "humanComprehension": "UNKNOWN_AWAITING_HUMAN_PARTICIPANTS"
+      },
+      "existingEvidenceContext": {
+        "truthLevel": "FACT",
+        "analyticalStatus": "structural_unreviewed",
+        "candidateStatus": "CANDIDATES_PRESENT",
+        "candidateCount": 2,
+        "evidenceStatus": "RESEARCH_EVIDENCE_REFS_PRESENT",
+        "evidenceRefCount": 1,
+        "reviewedEvidenceRefCount": 0,
+        "researchEvidenceRefCount": 1
+      },
+      "antiCircularity": {
+        "truthLevel": "INFERENCE",
+        "prohibitedAdditionsFound": [],
+        "status": "PASS"
+      }
+    }
+  ],
+  "metrics": {
+    "mechanical": {
+      "pass": 30,
+      "fail": 0,
+      "passRate": 1
+    },
+    "relevance": {
+      "DIRECTLY_RELEVANT": 0,
+      "PLAUSIBLY_RELEVANT": 0,
+      "INSUFFICIENT_CORRESPONDENCE": 0,
+      "UNSUPPORTED_BRIDGE": 5,
+      "TARGET_SENSE_INSUFFICIENT": 25
+    },
+    "specificity": {
+      "SPECIFIC": 0,
+      "MODERATELY_SPECIFIC": 0,
+      "BROAD": 0,
+      "TOO_GENERAL_TO_DISCRIMINATE": 5,
+      "UNKNOWN": 25
+    },
+    "postHoc": {
+      "LOW": 0,
+      "MEDIUM": 0,
+      "HIGH": 5,
+      "UNKNOWN": 25
+    },
+    "presentation": {
+      "complete": 30,
+      "incomplete": 0,
+      "error": 0
+    },
+    "humanParticipantCount": 0,
+    "providerCalls": 0
+  },
+  "cohortSummaries": {
+    "historicalProof": {
+      "caseCount": 14,
+      "relevance": {
+        "DIRECTLY_RELEVANT": 0,
+        "PLAUSIBLY_RELEVANT": 0,
+        "INSUFFICIENT_CORRESPONDENCE": 0,
+        "UNSUPPORTED_BRIDGE": 2,
+        "TARGET_SENSE_INSUFFICIENT": 12
+      },
+      "specificity": {
+        "SPECIFIC": 0,
+        "MODERATELY_SPECIFIC": 0,
+        "BROAD": 0,
+        "TOO_GENERAL_TO_DISCRIMINATE": 2,
+        "UNKNOWN": 12
+      },
+      "postHoc": {
+        "LOW": 0,
+        "MEDIUM": 0,
+        "HIGH": 2,
+        "UNKNOWN": 12
+      }
+    },
+    "newGeneric": {
+      "caseCount": 16,
+      "relevance": {
+        "DIRECTLY_RELEVANT": 0,
+        "PLAUSIBLY_RELEVANT": 0,
+        "INSUFFICIENT_CORRESPONDENCE": 0,
+        "UNSUPPORTED_BRIDGE": 3,
+        "TARGET_SENSE_INSUFFICIENT": 13
+      },
+      "specificity": {
+        "SPECIFIC": 0,
+        "MODERATELY_SPECIFIC": 0,
+        "BROAD": 0,
+        "TOO_GENERAL_TO_DISCRIMINATE": 3,
+        "UNKNOWN": 13
+      },
+      "postHoc": {
+        "LOW": 0,
+        "MEDIUM": 0,
+        "HIGH": 3,
+        "UNKNOWN": 13
+      }
+    }
+  },
+  "pathDiagnostics": [
+    {
+      "path": "U→Y",
+      "caseCount": 1,
+      "mechanicalPass": 1,
+      "relevance": {
+        "DIRECTLY_RELEVANT": 0,
+        "PLAUSIBLY_RELEVANT": 0,
+        "INSUFFICIENT_CORRESPONDENCE": 0,
+        "UNSUPPORTED_BRIDGE": 0,
+        "TARGET_SENSE_INSUFFICIENT": 1
+      },
+      "specificity": {
+        "SPECIFIC": 0,
+        "MODERATELY_SPECIFIC": 0,
+        "BROAD": 0,
+        "TOO_GENERAL_TO_DISCRIMINATE": 0,
+        "UNKNOWN": 1
+      },
+      "postHoc": {
+        "LOW": 0,
+        "MEDIUM": 0,
+        "HIGH": 0,
+        "UNKNOWN": 1
+      }
+    },
+    {
+      "path": "A→E",
+      "caseCount": 4,
+      "mechanicalPass": 4,
+      "relevance": {
+        "DIRECTLY_RELEVANT": 0,
+        "PLAUSIBLY_RELEVANT": 0,
+        "INSUFFICIENT_CORRESPONDENCE": 0,
+        "UNSUPPORTED_BRIDGE": 1,
+        "TARGET_SENSE_INSUFFICIENT": 3
+      },
+      "specificity": {
+        "SPECIFIC": 0,
+        "MODERATELY_SPECIFIC": 0,
+        "BROAD": 0,
+        "TOO_GENERAL_TO_DISCRIMINATE": 1,
+        "UNKNOWN": 3
+      },
+      "postHoc": {
+        "LOW": 0,
+        "MEDIUM": 0,
+        "HIGH": 1,
+        "UNKNOWN": 3
+      }
+    },
+    {
+      "path": "A→I",
+      "caseCount": 1,
+      "mechanicalPass": 1,
+      "relevance": {
+        "DIRECTLY_RELEVANT": 0,
+        "PLAUSIBLY_RELEVANT": 0,
+        "INSUFFICIENT_CORRESPONDENCE": 0,
+        "UNSUPPORTED_BRIDGE": 0,
+        "TARGET_SENSE_INSUFFICIENT": 1
+      },
+      "specificity": {
+        "SPECIFIC": 0,
+        "MODERATELY_SPECIFIC": 0,
+        "BROAD": 0,
+        "TOO_GENERAL_TO_DISCRIMINATE": 0,
+        "UNKNOWN": 1
+      },
+      "postHoc": {
+        "LOW": 0,
+        "MEDIUM": 0,
+        "HIGH": 0,
+        "UNKNOWN": 1
+      }
+    },
+    {
+      "path": "I→E",
+      "caseCount": 4,
+      "mechanicalPass": 4,
+      "relevance": {
+        "DIRECTLY_RELEVANT": 0,
+        "PLAUSIBLY_RELEVANT": 0,
+        "INSUFFICIENT_CORRESPONDENCE": 0,
+        "UNSUPPORTED_BRIDGE": 1,
+        "TARGET_SENSE_INSUFFICIENT": 3
+      },
+      "specificity": {
+        "SPECIFIC": 0,
+        "MODERATELY_SPECIFIC": 0,
+        "BROAD": 0,
+        "TOO_GENERAL_TO_DISCRIMINATE": 1,
+        "UNKNOWN": 3
+      },
+      "postHoc": {
+        "LOW": 0,
+        "MEDIUM": 0,
+        "HIGH": 1,
+        "UNKNOWN": 3
+      }
+    },
+    {
+      "path": "O→E",
+      "caseCount": 6,
+      "mechanicalPass": 6,
+      "relevance": {
+        "DIRECTLY_RELEVANT": 0,
+        "PLAUSIBLY_RELEVANT": 0,
+        "INSUFFICIENT_CORRESPONDENCE": 0,
+        "UNSUPPORTED_BRIDGE": 1,
+        "TARGET_SENSE_INSUFFICIENT": 5
+      },
+      "specificity": {
+        "SPECIFIC": 0,
+        "MODERATELY_SPECIFIC": 0,
+        "BROAD": 0,
+        "TOO_GENERAL_TO_DISCRIMINATE": 1,
+        "UNKNOWN": 5
+      },
+      "postHoc": {
+        "LOW": 0,
+        "MEDIUM": 0,
+        "HIGH": 1,
+        "UNKNOWN": 5
+      }
+    },
+    {
+      "path": "E→A",
+      "caseCount": 9,
+      "mechanicalPass": 9,
+      "relevance": {
+        "DIRECTLY_RELEVANT": 0,
+        "PLAUSIBLY_RELEVANT": 0,
+        "INSUFFICIENT_CORRESPONDENCE": 0,
+        "UNSUPPORTED_BRIDGE": 1,
+        "TARGET_SENSE_INSUFFICIENT": 8
+      },
+      "specificity": {
+        "SPECIFIC": 0,
+        "MODERATELY_SPECIFIC": 0,
+        "BROAD": 0,
+        "TOO_GENERAL_TO_DISCRIMINATE": 1,
+        "UNKNOWN": 8
+      },
+      "postHoc": {
+        "LOW": 0,
+        "MEDIUM": 0,
+        "HIGH": 1,
+        "UNKNOWN": 8
+      }
+    },
+    {
+      "path": "O→U",
+      "caseCount": 2,
+      "mechanicalPass": 2,
+      "relevance": {
+        "DIRECTLY_RELEVANT": 0,
+        "PLAUSIBLY_RELEVANT": 0,
+        "INSUFFICIENT_CORRESPONDENCE": 0,
+        "UNSUPPORTED_BRIDGE": 0,
+        "TARGET_SENSE_INSUFFICIENT": 2
+      },
+      "specificity": {
+        "SPECIFIC": 0,
+        "MODERATELY_SPECIFIC": 0,
+        "BROAD": 0,
+        "TOO_GENERAL_TO_DISCRIMINATE": 0,
+        "UNKNOWN": 2
+      },
+      "postHoc": {
+        "LOW": 0,
+        "MEDIUM": 0,
+        "HIGH": 0,
+        "UNKNOWN": 2
+      }
+    },
+    {
+      "path": "U→I",
+      "caseCount": 1,
+      "mechanicalPass": 1,
+      "relevance": {
+        "DIRECTLY_RELEVANT": 0,
+        "PLAUSIBLY_RELEVANT": 0,
+        "INSUFFICIENT_CORRESPONDENCE": 0,
+        "UNSUPPORTED_BRIDGE": 0,
+        "TARGET_SENSE_INSUFFICIENT": 1
+      },
+      "specificity": {
+        "SPECIFIC": 0,
+        "MODERATELY_SPECIFIC": 0,
+        "BROAD": 0,
+        "TOO_GENERAL_TO_DISCRIMINATE": 0,
+        "UNKNOWN": 1
+      },
+      "postHoc": {
+        "LOW": 0,
+        "MEDIUM": 0,
+        "HIGH": 0,
+        "UNKNOWN": 1
+      }
+    },
+    {
+      "path": "A→Y",
+      "caseCount": 1,
+      "mechanicalPass": 1,
+      "relevance": {
+        "DIRECTLY_RELEVANT": 0,
+        "PLAUSIBLY_RELEVANT": 0,
+        "INSUFFICIENT_CORRESPONDENCE": 0,
+        "UNSUPPORTED_BRIDGE": 0,
+        "TARGET_SENSE_INSUFFICIENT": 1
+      },
+      "specificity": {
+        "SPECIFIC": 0,
+        "MODERATELY_SPECIFIC": 0,
+        "BROAD": 0,
+        "TOO_GENERAL_TO_DISCRIMINATE": 0,
+        "UNKNOWN": 1
+      },
+      "postHoc": {
+        "LOW": 0,
+        "MEDIUM": 0,
+        "HIGH": 0,
+        "UNKNOWN": 1
+      }
+    },
+    {
+      "path": "O→A",
+      "caseCount": 1,
+      "mechanicalPass": 1,
+      "relevance": {
+        "DIRECTLY_RELEVANT": 0,
+        "PLAUSIBLY_RELEVANT": 0,
+        "INSUFFICIENT_CORRESPONDENCE": 0,
+        "UNSUPPORTED_BRIDGE": 1,
+        "TARGET_SENSE_INSUFFICIENT": 0
+      },
+      "specificity": {
+        "SPECIFIC": 0,
+        "MODERATELY_SPECIFIC": 0,
+        "BROAD": 0,
+        "TOO_GENERAL_TO_DISCRIMINATE": 1,
+        "UNKNOWN": 0
+      },
+      "postHoc": {
+        "LOW": 0,
+        "MEDIUM": 0,
+        "HIGH": 1,
+        "UNKNOWN": 0
+      }
+    }
+  ],
+  "atomDiagnostics": {
+    "A": {
+      "caseCount": 16,
+      "directlyRelevant": 0,
+      "plausiblyRelevant": 0,
+      "insufficientCorrespondence": 0,
+      "unsupportedBridge": 3,
+      "targetSenseInsufficient": 13,
+      "highPostHocCount": 3,
+      "diagnosticStatus": "ATOM_DIAGNOSTIC_ONLY"
+    },
+    "E": {
+      "caseCount": 23,
+      "directlyRelevant": 0,
+      "plausiblyRelevant": 0,
+      "insufficientCorrespondence": 0,
+      "unsupportedBridge": 4,
+      "targetSenseInsufficient": 19,
+      "highPostHocCount": 4,
+      "diagnosticStatus": "ATOM_DIAGNOSTIC_ONLY"
+    },
+    "I": {
+      "caseCount": 6,
+      "directlyRelevant": 0,
+      "plausiblyRelevant": 0,
+      "insufficientCorrespondence": 0,
+      "unsupportedBridge": 1,
+      "targetSenseInsufficient": 5,
+      "highPostHocCount": 1,
+      "diagnosticStatus": "ATOM_DIAGNOSTIC_ONLY"
+    },
+    "O": {
+      "caseCount": 9,
+      "directlyRelevant": 0,
+      "plausiblyRelevant": 0,
+      "insufficientCorrespondence": 0,
+      "unsupportedBridge": 2,
+      "targetSenseInsufficient": 7,
+      "highPostHocCount": 2,
+      "diagnosticStatus": "ATOM_DIAGNOSTIC_ONLY"
+    },
+    "U": {
+      "caseCount": 4,
+      "directlyRelevant": 0,
+      "plausiblyRelevant": 0,
+      "insufficientCorrespondence": 0,
+      "unsupportedBridge": 0,
+      "targetSenseInsufficient": 4,
+      "highPostHocCount": 0,
+      "diagnosticStatus": "ATOM_DIAGNOSTIC_ONLY"
+    },
+    "Y": {
+      "caseCount": 2,
+      "directlyRelevant": 0,
+      "plausiblyRelevant": 0,
+      "insufficientCorrespondence": 0,
+      "unsupportedBridge": 0,
+      "targetSenseInsufficient": 2,
+      "highPostHocCount": 0,
+      "diagnosticStatus": "ATOM_DIAGNOSTIC_ONLY"
+    },
+    "Ë": {
+      "caseCount": 0,
+      "directlyRelevant": 0,
+      "plausiblyRelevant": 0,
+      "insufficientCorrespondence": 0,
+      "unsupportedBridge": 0,
+      "targetSenseInsufficient": 0,
+      "highPostHocCount": 0,
+      "diagnosticStatus": "ATOM_DIAGNOSTIC_ONLY"
+    }
+  },
+  "antiCircularity": {
+    "positiveRationales": 5,
+    "prohibitedAdditionsFound": [],
+    "reclassifiedCases": [],
+    "diagnosticStatus": "ATOM_DIAGNOSTIC_ONLY"
+  },
+  "evidenceSeparation": {
+    "analyticalStatusChanges": 0,
+    "evidenceStatusChanges": 0,
+    "candidateStatusChanges": 0,
+    "evidenceRefsChanged": 0,
+    "productionEvidencePromoted": 0
+  },
+  "humanEvaluation": {
+    "participantCount": 0,
+    "status": "AWAITING_HUMAN_PARTICIPANTS",
+    "comprehension": "UNKNOWN",
+    "remainsUnknown": [
+      "human comprehension",
+      "human naturalness",
+      "human preference",
+      "population-level functional validity"
+    ]
+  },
+  "provider": {
+    "calls": 0,
+    "executionObserved": false
+  },
+  "claimBoundary": {
+    "researcherScreeningIsNotFact": true,
+    "researcherScreeningIsNotHumanValidated": true,
+    "researcherScreeningIsNotProductionEvidence": true,
+    "noAtomRevision": true,
+    "noTemplateRevision": true,
+    "noEvidencePromotion": true,
+    "noWinnerSelection": true,
+    "userDecides": true
+  },
+  "limitations": [
+    "Most baseline cases do not carry a usable frozen target sense, so semantic screening is TARGET_SENSE_INSUFFICIENT rather than an invented word gloss.",
+    "The researcher screening is not a human participant evaluation and cannot establish user comprehension or population validity.",
+    "A mechanically exact Level-3 phrase is independent of lexical evidence and does not validate a functional explanation of the word."
+  ]
+}
