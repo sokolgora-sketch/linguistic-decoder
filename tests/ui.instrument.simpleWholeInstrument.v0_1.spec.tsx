@@ -74,13 +74,21 @@ describe(
           ),
         ).toBeVisible();
 
+        const functionalCandidateStack = within(
+          overviewPanel,
+        ).getByTestId("functional-candidate-stack");
+
         expect(
-          within(
-            overviewPanel,
-          ).queryByText(
+          within(functionalCandidateStack).getByText(
             "SHTU + DI",
+            { exact: true },
           ),
-        ).not.toBeInTheDocument();
+        ).toBeVisible();
+        expect(
+          within(functionalCandidateStack).getByText(
+            "Evidence: Partial",
+          ),
+        ).toBeVisible();
 
         expect(
           screen.queryByText(

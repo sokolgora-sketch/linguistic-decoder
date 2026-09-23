@@ -2,6 +2,7 @@ import React from "react";
 import {
   render,
   screen,
+  within,
 } from "@testing-library/react";
 
 import {
@@ -35,6 +36,7 @@ async function analyzeV1(
 
 function renderPayload(
   payload: any,
+  showPrimaryEvidence = false,
 ) {
   const vm =
     adaptAnalysisToTelemetryVM(
@@ -44,6 +46,7 @@ function renderPayload(
   render(
     <EmbryoExpansionContextCardV0_1
       vm={vm}
+      showPrimaryEvidence={showPrimaryEvidence}
     />,
   );
 
@@ -98,6 +101,37 @@ describe(
       ).not.toBeInTheDocument();
     });
 
+    it("surfaces the ranked study candidate stack without changing the primary candidate", async () => {
+      const body = await analyzeV1("study");
+
+      renderPayload(body, true);
+
+      const primary = screen.getByTestId("functional-motivation-card");
+      const stack = screen.getByTestId("functional-candidate-stack");
+      const stackItem = within(stack).getByTestId(
+        "functional-candidate-stack-item",
+      );
+
+      expect(within(primary).getByText("Evidence: Reviewed")).toBeInTheDocument();
+      expect(within(primary).getAllByText("DI", { exact: true }).length).toBeGreaterThanOrEqual(1);
+      expect(within(stackItem).getByText("SHTU + DI", { exact: true })).toBeInTheDocument();
+      expect(within(stackItem).getByText("Evidence: Partial")).toBeInTheDocument();
+      expect(
+        within(stackItem).getByText(
+          "Adding or increasing knowledge; making knowledge yours through learning.",
+        ),
+      ).toBeInTheDocument();
+      expect(within(stackItem).getByText("SHTU", { exact: true })).toBeInTheDocument();
+      expect(within(stackItem).getByText("DI", { exact: true })).toBeInTheDocument();
+      expect(
+        screen.getByText("No single winner is selected. User decides."),
+      ).toBeInTheDocument();
+      expect(
+        primary.compareDocumentPosition(stack) &
+          Node.DOCUMENT_POSITION_FOLLOWING,
+      ).toBeTruthy();
+    });
+
     it("keeps damage on the shared reviewed DA embryo-first path", async () => {
       const body =
         await analyzeV1(
@@ -150,6 +184,48 @@ describe(
           "AT · reviewed",
         ),
       ).toBeInTheDocument();
+    });
+
+    it("does not fabricate a functional candidate stack for wind", async () => {
+      const body = await analyzeV1("wind");
+
+      renderPayload(body, true);
+
+      expect(
+        screen.getByText("No supported functional candidate yet."),
+      ).toBeInTheDocument();
+      expect(
+        screen.queryByTestId("functional-candidate-stack"),
+      ).not.toBeInTheDocument();
+    });
+
+    it("does not fabricate a functional candidate stack for Structural Null 123", async () => {
+      const body = await analyzeV1("123");
+
+      renderPayload(body, true);
+
+      expect(
+        screen.getByText("No supported functional candidate yet."),
+      ).toBeInTheDocument();
+      expect(
+        screen.queryByTestId("functional-candidate-stack"),
+      ).not.toBeInTheDocument();
+    });
+
+    it("does not promote a generic doctrinal candidate into the functional stack", async () => {
+      const body = await analyzeV1("banana");
+
+      renderPayload(body, true);
+
+      expect(
+        screen.queryByTestId("functional-candidate-stack"),
+      ).not.toBeInTheDocument();
+      expect(
+        screen.queryByText("Evidence: Reviewed"),
+      ).not.toBeInTheDocument();
+      expect(
+        screen.queryByText("Evidence: Partial"),
+      ).not.toBeInTheDocument();
     });
 
     it("shows a one-embryo functional candidate even when RootMap also exists", async () => {
