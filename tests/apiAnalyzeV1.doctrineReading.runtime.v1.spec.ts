@@ -67,6 +67,29 @@ describe("/api/analyze-v1 doctrine reading runtime projection v1", () => {
     expectDoctrineBoundaries(reading);
   });
 
+  it("projects the A to E proof reading independently of target-sense context", async () => {
+    const withoutTargetSense = await analyze("water");
+    const withTargetSense = await analyze(
+      "water",
+      "&targetSenseId=water.v1&targetSenseLabel=water",
+    );
+    const reading = withoutTargetSense.doctrineReading as AnalyzeBody;
+
+    expect(withoutTargetSense.heartInstrumentV1.surfaceVowels).toEqual(["A", "E"]);
+    expect(reading.analyzedVoicePath).toEqual(["A", "E"]);
+    expect(reading.level3WholePathReading).toMatchObject({
+      ruleId: "level3.proof-pair.a-e.v0_1",
+      analyzedVoicePath: ["A", "E"],
+      reading: "initiating beginning with expanding growth",
+      truthClassification: "inference",
+      level: 3,
+    });
+    expectDoctrineBoundaries(reading);
+    expect(withoutTargetSense.doctrineReading).toEqual(
+      withTargetSense.doctrineReading,
+    );
+  });
+
   it("preserves repeated surface Voice positions as distinct entries", async () => {
     const body = await analyze("banana");
     const reading = body.doctrineReading as AnalyzeBody;

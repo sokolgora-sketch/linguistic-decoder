@@ -12,6 +12,7 @@ import {
   candidatePairReadingV0_1,
   DOCTRINE_LEVEL3_PAIR_CANDIDATE_REVIEW_STATUS_V0_1,
   DOCTRINE_LEVEL3_PAIR_PRODUCTION_STATUS_V0_1,
+  DOCTRINE_LEVEL3_PAIR_SELF_PAIR_STATUS_V0_1,
   DOCTRINE_LEVEL3_PAIR_CANDIDATE_TEMPLATE_ID_V0_1,
   generateDoctrineLevel3PairReviewMatrixV0_1,
   getDoctrineLevel3AtomProposalsV0_1,
@@ -80,6 +81,12 @@ describe("Open Instrument Level-3 pair candidate generator v0.1", () => {
     expect(first.candidateReading).toBe(
       "grounded depth with reflective exploration",
     );
+    expect(forward.candidateReading).toBe(
+      "initiating beginning with expanding growth",
+    );
+    expect(forward.status).toBe(DOCTRINE_LEVEL3_PAIR_PRODUCTION_STATUS_V0_1);
+    expect(reverse.status).toBe(DOCTRINE_LEVEL3_PAIR_CANDIDATE_REVIEW_STATUS_V0_1);
+    expect(selfPair.status).toBe(DOCTRINE_LEVEL3_PAIR_SELF_PAIR_STATUS_V0_1);
     expect(first).toEqual(repeated);
     expect(forward.candidateReading).not.toBe(reverse.candidateReading);
     expect(selfPair.firstAtom).toBe(selfPair.secondAtom);
@@ -95,7 +102,7 @@ describe("Open Instrument Level-3 pair candidate generator v0.1", () => {
     expect(first).not.toHaveProperty("language");
   });
 
-  it("generates the complete ordered 7x7 review matrix with one production anchor", () => {
+  it("generates the complete ordered 7x7 matrix with two production rows", () => {
     const matrix = generateDoctrineLevel3PairReviewMatrixV0_1();
     const pairs = matrix.map((candidate) => candidate.pair);
 
@@ -105,28 +112,44 @@ describe("Open Instrument Level-3 pair candidate generator v0.1", () => {
       matrix.filter(
         (candidate) => candidate.status === DOCTRINE_LEVEL3_PAIR_PRODUCTION_STATUS_V0_1,
       ),
-    ).toEqual([expect.objectContaining({ pair: "U→Y" })]);
+    ).toEqual([
+      expect.objectContaining({ pair: "A→E" }),
+      expect.objectContaining({ pair: "U→Y" }),
+    ]);
     expect(
       matrix.filter(
         (candidate) => candidate.status === DOCTRINE_LEVEL3_PAIR_CANDIDATE_REVIEW_STATUS_V0_1,
       ),
-    ).toHaveLength(48);
+    ).toHaveLength(40);
+    expect(
+      matrix.filter(
+        (candidate) => candidate.status === DOCTRINE_LEVEL3_PAIR_SELF_PAIR_STATUS_V0_1,
+      ),
+    ).toHaveLength(7);
+    expect(
+      matrix.filter((candidate) => candidate.firstVoice === candidate.secondVoice),
+    ).toHaveLength(7);
   });
 
   it("reproduces the review artifact deterministically", () => {
     expect(readReviewArtifact()).toEqual(buildDoctrineLevel3PairReviewArtifactV0_1());
   });
 
-  it("keeps production authorization restricted to U/Y", () => {
+  it("keeps production authorization restricted to U/Y and A/E", () => {
     expect(projectLevel3DoctrineReadingV0_1(["U", "Y"])).toMatchObject({
       reading: "grounded depth with reflective exploration",
+    });
+    expect(projectLevel3DoctrineReadingV0_1(["A", "E"])).toMatchObject({
+      reading: "initiating beginning with expanding growth",
     });
 
     for (const path of [
       ["Y", "U"],
-      ["A", "E"],
       ["E", "A"],
+      ["A", "A"],
+      ["E", "E"],
       ["U", "U"],
+      ["I", "O"],
     ] as const) {
       expect(projectLevel3DoctrineReadingV0_1(path)).toBeNull();
     }

@@ -93,6 +93,24 @@ describe("Open Instrument Seven-Voices doctrine reading contract v1", () => {
     expect(longerReading.level3WholePathReading).toBeUndefined();
   });
 
+  test("projects the registered A to E Level-3 proof pair", () => {
+    const reading = successfulReading(["A", "E"]);
+    const reverseReading = successfulReading(["E", "A"]);
+
+    expect(reading.level3WholePathReading).toMatchObject({
+      ruleId: "level3.proof-pair.a-e.v0_1",
+      level: 3,
+      analyzedVoicePath: ["A", "E"],
+      reading: "initiating beginning with expanding growth",
+      truthClassification: "inference",
+      genericComposition: "NOT_AUTHORIZED",
+      level4TransitionSemantics: "NOT_AUTHORIZED",
+      userDecisionPosture: "user_decides",
+      noSingleWinner: true,
+    });
+    expect(reverseReading.level3WholePathReading).toBeUndefined();
+  });
+
   test("uses the locked doctrine boundaries without transition semantics", () => {
     const reading = successfulReading(["A", "E"]);
 

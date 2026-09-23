@@ -24,6 +24,9 @@ export const DOCTRINE_LEVEL3_PAIR_CANDIDATE_REVIEW_STATUS_V0_1 =
 export const DOCTRINE_LEVEL3_PAIR_PRODUCTION_STATUS_V0_1 =
   "ALREADY_PRODUCTION_AUTHORIZED_PROOF_PAIR" as const;
 
+export const DOCTRINE_LEVEL3_PAIR_SELF_PAIR_STATUS_V0_1 =
+  "SELF_PAIR_UNRESOLVED_NON_PRODUCTION" as const;
+
 export const DOCTRINE_LEVEL3_PAIR_GENERATION_STATUS_V0_1 =
   "GENERATED_FOR_DF_REVIEW" as const;
 
@@ -170,7 +173,8 @@ const ATOM_PROPOSALS_V0_1 = Object.freeze({
 
 export type DoctrineLevel3PairCandidateStatusV0_1 =
   | typeof DOCTRINE_LEVEL3_PAIR_CANDIDATE_REVIEW_STATUS_V0_1
-  | typeof DOCTRINE_LEVEL3_PAIR_PRODUCTION_STATUS_V0_1;
+  | typeof DOCTRINE_LEVEL3_PAIR_PRODUCTION_STATUS_V0_1
+  | typeof DOCTRINE_LEVEL3_PAIR_SELF_PAIR_STATUS_V0_1;
 
 export type DoctrineLevel3AtomProposalV0_1 = Readonly<{
   voice: SevenVoiceKey;
@@ -221,7 +225,7 @@ export type DoctrineLevel3PairReviewArtifactV0_1 = Readonly<{
   ];
   templateId: typeof DOCTRINE_LEVEL3_PAIR_CANDIDATE_TEMPLATE_ID_V0_1;
   orderedViewsSchema: typeof sevenVoiceOrderedViewsSchemaVersion;
-  productionAuthorizedPair: "U→Y";
+  productionAuthorizedPairs: readonly ["U→Y", "A→E"];
   atoms: readonly DoctrineLevel3AtomProposalV0_1[];
   orderedPairCandidates: readonly DoctrineLevel3PairCandidateV0_1[];
 }>;
@@ -266,7 +270,10 @@ export function candidatePairReadingV0_1(
 ): DoctrineLevel3PairCandidateV0_1 {
   const firstAtom = getDoctrineLevel3AtomProposalV0_1(firstVoice);
   const secondAtom = getDoctrineLevel3AtomProposalV0_1(secondVoice);
-  const isAuthorizedProofPair = firstVoice === "U" && secondVoice === "Y";
+  const isAuthorizedProofPair =
+    (firstVoice === "U" && secondVoice === "Y") ||
+    (firstVoice === "A" && secondVoice === "E");
+  const isSelfPair = firstVoice === secondVoice;
 
   return Object.freeze({
     schemaVersion: DOCTRINE_LEVEL3_PAIR_CANDIDATE_SCHEMA_V0_1,
@@ -279,7 +286,9 @@ export function candidatePairReadingV0_1(
     templateId: DOCTRINE_LEVEL3_PAIR_CANDIDATE_TEMPLATE_ID_V0_1,
     status: isAuthorizedProofPair
       ? DOCTRINE_LEVEL3_PAIR_PRODUCTION_STATUS_V0_1
-      : DOCTRINE_LEVEL3_PAIR_CANDIDATE_REVIEW_STATUS_V0_1,
+      : isSelfPair
+        ? DOCTRINE_LEVEL3_PAIR_SELF_PAIR_STATUS_V0_1
+        : DOCTRINE_LEVEL3_PAIR_CANDIDATE_REVIEW_STATUS_V0_1,
     semanticStatus: "BOUNDED_REVIEW_CANDIDATE_ONLY",
     causality: "NOT_AUTHORIZED",
     temporality: "NOT_AUTHORIZED",
@@ -312,7 +321,7 @@ export function buildDoctrineLevel3PairReviewArtifactV0_1(): DoctrineLevel3PairR
     ] as const,
     templateId: DOCTRINE_LEVEL3_PAIR_CANDIDATE_TEMPLATE_ID_V0_1,
     orderedViewsSchema: sevenVoiceOrderedViewsSchemaVersion,
-    productionAuthorizedPair: "U→Y",
+    productionAuthorizedPairs: ["U→Y", "A→E"] as const,
     atoms: getDoctrineLevel3AtomProposalsV0_1(),
     orderedPairCandidates: generateDoctrineLevel3PairReviewMatrixV0_1(),
   });
