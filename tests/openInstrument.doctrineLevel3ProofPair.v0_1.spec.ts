@@ -1,12 +1,15 @@
 import {
+  DOCTRINE_LEVEL3_PROOF_PAIR_A_E_RULE_ID_V0_1,
+  DOCTRINE_LEVEL3_PROOF_PAIR_A_E_V0_1,
+  DOCTRINE_LEVEL3_PROOF_PAIR_AUTHORITY_REGISTRY_V0_1,
   DOCTRINE_LEVEL3_PROOF_PAIR_SCHEMA_V0_1,
   DOCTRINE_LEVEL3_PROOF_PAIR_U_Y_V0_1,
   isDoctrineLevel3ProofPairReadingV0_1,
   projectLevel3DoctrineReadingV0_1,
 } from "@/shared/openInstrument/doctrineLevel3ProofPair.v0_1";
 
-describe("Open Instrument Level-3 U to Y proof pair v0.1", () => {
-  test("registers exactly one deterministic U to Y reading", () => {
+describe("Open Instrument Level-3 proof pair authority v0.1", () => {
+  test("registers exactly two deterministic proof-pair readings", () => {
     expect(DOCTRINE_LEVEL3_PROOF_PAIR_U_Y_V0_1).toMatchObject({
       schemaVersion: DOCTRINE_LEVEL3_PROOF_PAIR_SCHEMA_V0_1,
       ruleId: "level3.proof-pair.u-y.v0_1",
@@ -26,21 +29,56 @@ describe("Open Instrument Level-3 U to Y proof pair v0.1", () => {
         DOCTRINE_LEVEL3_PROOF_PAIR_U_Y_V0_1,
       ),
     ).toBe(true);
+
+    expect(DOCTRINE_LEVEL3_PROOF_PAIR_A_E_V0_1).toMatchObject({
+      schemaVersion: DOCTRINE_LEVEL3_PROOF_PAIR_SCHEMA_V0_1,
+      ruleId: DOCTRINE_LEVEL3_PROOF_PAIR_A_E_RULE_ID_V0_1,
+      level: 3,
+      analyzedVoicePath: ["A", "E"],
+      reading: "initiating beginning with expanding growth",
+      truthClassification: "inference",
+      doctrineAuthority: "src/shared/openInstrument/doctrineFunctionalProfile.v0_1.ts",
+      outputShape: "bounded_phrase_or_short_clause",
+      genericComposition: "NOT_AUTHORIZED",
+      level4TransitionSemantics: "NOT_AUTHORIZED",
+      userDecisionPosture: "user_decides",
+      noSingleWinner: true,
+    });
+    expect(
+      isDoctrineLevel3ProofPairReadingV0_1(
+        DOCTRINE_LEVEL3_PROOF_PAIR_A_E_V0_1,
+      ),
+    ).toBe(true);
+    expect(DOCTRINE_LEVEL3_PROOF_PAIR_AUTHORITY_REGISTRY_V0_1).toHaveLength(2);
+    expect(
+      DOCTRINE_LEVEL3_PROOF_PAIR_AUTHORITY_REGISTRY_V0_1.map((entry) => entry.ruleId),
+    ).toEqual([
+      "level3.proof-pair.u-y.v0_1",
+      "level3.proof-pair.a-e.v0_1",
+    ]);
   });
 
   test.each([
     ["U to Y", ["U", "Y"], true],
+    ["A to E", ["A", "E"], true],
     ["Y to U", ["Y", "U"], false],
-    ["A to E", ["A", "E"], false],
+    ["E to A", ["E", "A"], false],
+    ["A to A", ["A", "A"], false],
+    ["E to E", ["E", "E"], false],
     ["U to U", ["U", "U"], false],
+    ["I to O", ["I", "O"], false],
     ["single Voice", ["A"], false],
     ["three Voices", ["A", "U", "Y"], false],
     ["empty path", [], false],
-  ])("projects %s without generalizing", (_label, path, supported) => {
+  ])("projects %s by exact whole-path registry lookup", (label, path, supported) => {
     const result = projectLevel3DoctrineReadingV0_1(path);
     expect(Boolean(result)).toBe(supported);
     if (supported) {
-      expect(result).toBe(DOCTRINE_LEVEL3_PROOF_PAIR_U_Y_V0_1);
+      expect(result).toBe(
+        label === "U to Y"
+          ? DOCTRINE_LEVEL3_PROOF_PAIR_U_Y_V0_1
+          : DOCTRINE_LEVEL3_PROOF_PAIR_A_E_V0_1,
+      );
     }
   });
 
@@ -60,5 +98,16 @@ describe("Open Instrument Level-3 U to Y proof pair v0.1", () => {
     expect(JSON.stringify(first)).not.toContain("targetSenseId");
     expect(JSON.stringify(first)).not.toContain("semanticBridge");
     expect(JSON.stringify(first)).not.toContain("transition");
+  });
+
+  test("keeps the A to E phrase independent of target-sense data", () => {
+    const reading = projectLevel3DoctrineReadingV0_1(["A", "E"]);
+
+    expect(reading).toBe(DOCTRINE_LEVEL3_PROOF_PAIR_A_E_V0_1);
+    expect(JSON.stringify(reading)).not.toContain("water");
+    expect(JSON.stringify(reading)).not.toContain("targetSenseId");
+    expect(JSON.stringify(reading)).not.toContain("study");
+    expect(JSON.stringify(reading)).not.toContain("semanticBridge");
+    expect(JSON.stringify(reading)).not.toContain("transition");
   });
 });
