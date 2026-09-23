@@ -95,6 +95,16 @@ describe("Open Instrument primary reading orientation card v0.1", () => {
     );
   });
 
+  it("preserves malformed doctrine as a contract error instead of ordinary absence", () => {
+    render(<InstrumentPanel payload={{ word: "x", doctrineReading: "bad" }} />);
+
+    const card = screen.getByTestId("primary-reading-orientation-card");
+    expect(within(card).getByTestId("orientation-doctrine")).toHaveTextContent(
+      "The doctrinal reading is malformed; see the detailed contract error below.",
+    );
+    expect(screen.getByTestId("doctrine-reading-malformed")).toBeVisible();
+  });
+
   it.each(["mountain", "banana"])(
     "explains why %s has no authorized whole-path Level-3 reading without inventing one",
     async (word) => {

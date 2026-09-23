@@ -66,6 +66,13 @@ function statusEvidenceSummary(
 }
 
 function doctrineSummary(vm: TelemetryViewModel): string {
+  if (vm.doctrineReading?.kind === "missing") {
+    if (vm.doctrineReading.missing === "malformed") {
+      return "The doctrinal reading is malformed; see the detailed contract error below.";
+    }
+    return "No doctrinal reading was emitted.";
+  }
+
   if (vm.doctrineReading?.kind !== "present" || vm.doctrineReading.value === null) {
     return "No doctrinal reading was emitted.";
   }
