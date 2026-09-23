@@ -124,6 +124,23 @@ describe("Open Instrument Seven-Voices doctrine reading contract v1", () => {
     );
   });
 
+  test("projects the selected independent-family I to O proof pair", () => {
+    const reading = successfulReading(["I", "O"]);
+
+    expect(reading.level3WholePathReading).toMatchObject({
+      ruleId: "level3.proof-pair.i-o.v0_1",
+      level: 3,
+      analyzedVoicePath: ["I", "O"],
+      reading: "clear understanding with balanced mediation",
+      truthClassification: "inference",
+      genericComposition: "NOT_AUTHORIZED",
+      level4TransitionSemantics: "NOT_AUTHORIZED",
+      userDecisionPosture: "user_decides",
+      noSingleWinner: true,
+    });
+    expect(successfulReading(["O", "I"]).level3WholePathReading).toBeUndefined();
+  });
+
   test("uses the locked doctrine boundaries without transition semantics", () => {
     const reading = successfulReading(["A", "E"]);
 
