@@ -73,48 +73,53 @@ describe("Open Instrument Seven-Voices doctrine reading contract v1", () => {
     );
   });
 
-  test("projects only the registered U to Y Level-3 proof pair", () => {
+  test("projects every distinct two-Voice Level-3 path and rejects longer paths", () => {
     const studyReading = successfulReading(["U", "Y"]);
     const reverseReading = successfulReading(["Y", "U"]);
     const longerReading = successfulReading(["A", "U", "Y"]);
 
     expect(studyReading.level3WholePathReading).toMatchObject({
-      ruleId: "level3.proof-pair.u-y.v0_1",
+      ruleId: "level3.generic-distinct-pair.v1",
       level: 3,
       analyzedVoicePath: ["U", "Y"],
       reading: "grounded depth with reflective exploration",
       truthClassification: "inference",
-      genericComposition: "NOT_AUTHORIZED",
+      genericComposition: "AUTHORIZED",
       level4TransitionSemantics: "NOT_AUTHORIZED",
       userDecisionPosture: "user_decides",
       noSingleWinner: true,
     });
-    expect(reverseReading.level3WholePathReading).toBeUndefined();
+    expect(reverseReading.level3WholePathReading).toMatchObject({
+      ruleId: "level3.generic-distinct-pair.v1",
+      analyzedVoicePath: ["Y", "U"],
+      reading: "reflective exploration with grounded depth",
+      genericComposition: "AUTHORIZED",
+    });
     expect(longerReading.level3WholePathReading).toBeUndefined();
   });
 
-  test("projects the registered A to E and E to A Level-3 proof pairs", () => {
+  test("preserves ordered A to E and E to A Level-3 readings", () => {
     const reading = successfulReading(["A", "E"]);
     const reversedReading = successfulReading(["E", "A"]);
 
     expect(reading.level3WholePathReading).toMatchObject({
-      ruleId: "level3.proof-pair.a-e.v0_1",
+      ruleId: "level3.generic-distinct-pair.v1",
       level: 3,
       analyzedVoicePath: ["A", "E"],
       reading: "initiating beginning with expanding growth",
       truthClassification: "inference",
-      genericComposition: "NOT_AUTHORIZED",
+      genericComposition: "AUTHORIZED",
       level4TransitionSemantics: "NOT_AUTHORIZED",
       userDecisionPosture: "user_decides",
       noSingleWinner: true,
     });
     expect(reversedReading.level3WholePathReading).toMatchObject({
-      ruleId: "level3.proof-pair.e-a.v0_1",
+      ruleId: "level3.generic-distinct-pair.v1",
       level: 3,
       analyzedVoicePath: ["E", "A"],
       reading: "expanding growth with initiating beginning",
       truthClassification: "inference",
-      genericComposition: "NOT_AUTHORIZED",
+      genericComposition: "AUTHORIZED",
       level4TransitionSemantics: "NOT_AUTHORIZED",
       userDecisionPosture: "user_decides",
       noSingleWinner: true,
@@ -124,21 +129,26 @@ describe("Open Instrument Seven-Voices doctrine reading contract v1", () => {
     );
   });
 
-  test("projects the selected independent-family I to O proof pair", () => {
+  test("projects the formerly selected independent-family I to O pair and its reversal", () => {
     const reading = successfulReading(["I", "O"]);
 
     expect(reading.level3WholePathReading).toMatchObject({
-      ruleId: "level3.proof-pair.i-o.v0_1",
+      ruleId: "level3.generic-distinct-pair.v1",
       level: 3,
       analyzedVoicePath: ["I", "O"],
       reading: "clear understanding with balanced mediation",
       truthClassification: "inference",
-      genericComposition: "NOT_AUTHORIZED",
+      genericComposition: "AUTHORIZED",
       level4TransitionSemantics: "NOT_AUTHORIZED",
       userDecisionPosture: "user_decides",
       noSingleWinner: true,
     });
-    expect(successfulReading(["O", "I"]).level3WholePathReading).toBeUndefined();
+    expect(successfulReading(["O", "I"]).level3WholePathReading).toMatchObject({
+      ruleId: "level3.generic-distinct-pair.v1",
+      analyzedVoicePath: ["O", "I"],
+      reading: "balanced mediation with clear understanding",
+      genericComposition: "AUTHORIZED",
+    });
   });
 
   test("uses the locked doctrine boundaries without transition semantics", () => {
