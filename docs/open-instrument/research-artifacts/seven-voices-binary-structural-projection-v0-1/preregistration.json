@@ -1,0 +1,379 @@
+{
+  "schemaVersion": "open-instrument.seven-voices-binary-structural-projection-preregistration.v0_1",
+  "experimentId": "SEVEN_VOICES_BINARY_STRUCTURAL_PROJECTION_EXPERIMENT_V0_1",
+  "title": "Seven Voices Binary Structural Projection Experiment v0.1",
+  "status": "PREREGISTERED_BEFORE_EXPERIMENT",
+  "executionBoundary": {
+    "thisArtifactIs": "preregistration_only",
+    "experimentExecuted": false,
+    "resultComputed": false,
+    "productionBinarySemanticsAuthorized": false,
+    "semanticClaimsMade": false,
+    "linguisticClaimsMade": false,
+    "productionAuthorityChanged": false
+  },
+  "repository": {
+    "identity": "sokolgora-sketch/linguistic-decoder",
+    "mainSha": "e04f5b96299e0f170b59dcdb8ed9d0ac8aad4e26",
+    "baselineArtifactPath": "tests/fixtures/openInstrument/analysis-capability-baseline.v1.json",
+    "baselineArtifactSha256": "096792e7aa68f22a6a49585e342f886811ffac6b6b8c6ecc9adcb594ca36070a"
+  },
+  "canonicalStructuralInput": {
+    "voiceOrder": ["A", "E", "I", "O", "U", "Y", "Ë"],
+    "oneBasedIndices": {"A": 1, "E": 2, "I": 3, "O": 4, "U": 5, "Y": 6, "Ë": 7},
+    "rings": {"A": 3, "E": 2, "I": 1, "O": 0, "U": 1, "Y": 2, "Ë": 3},
+    "mirrorPairs": [["A", "Ë"], ["E", "Y"], ["I", "U"]],
+    "selfMirror": "O",
+    "authority": [
+      "src/shared/sevenVoiceOrderedViews.v0.1.ts",
+      "src/core/sevenVowelsCore.ts",
+      "src/shared/sevenPrinciples.math.v1.ts"
+    ]
+  },
+  "semanticFirewall": {
+    "included": [
+      "Voice identity",
+      "canonical order",
+      "one-based index",
+      "ring",
+      "structural mirror relation",
+      "binary vector and graph mathematics"
+    ],
+    "excluded": [
+      "functional profiles",
+      "semantic role labels",
+      "Reflection/Mirror",
+      "Network Integrity",
+      "Nisma",
+      "Chapter-4 vocabulary",
+      "Level-3 atoms",
+      "word meanings",
+      "target senses",
+      "historical etymology",
+      "lexical witnesses",
+      "functional candidate evidence",
+      "color",
+      "gender/polarity",
+      "metaphorical imagery",
+      "phonetics",
+      "I↔Y functional claims",
+      "E↔U functional claims",
+      "Fano semantic claims"
+    ],
+    "yDriftExcluded": true,
+    "iYExcluded": true
+  },
+  "structuralV0_1": {
+    "bitOrder": "left_to_right_most_significant_to_least_significant",
+    "mapping": {
+      "A": "110",
+      "E": "100",
+      "I": "010",
+      "O": "001",
+      "U": "011",
+      "Y": "101",
+      "Ë": "111"
+    },
+    "sentinel": {
+      "code": "000",
+      "kind": "EXPERIMENTAL_UNUSED_SENTINEL",
+      "isVoice": false,
+      "isMath7Value": false,
+      "isNullVoice": false,
+      "isProductionSymbol": false
+    },
+    "byConstructionProperties": [
+      "the seven Voices occupy the seven nonzero codes",
+      "the first two bits encode the ring ordinal 0,1,2,3 for O, I/U, E/Y, A/Ë",
+      "each non-self mirror pair differs only in the least-significant bit",
+      "A↔Ë, E↔Y, and I↔U each have Hamming distance 1",
+      "each non-self mirror pair XORs to 001, the code assigned to O",
+      "O is a self-mirror exception and is not represented as an ordinary binary edge",
+      "the code sequence is fixed by the selected construction"
+    ],
+    "requiredPreservation": ["canonical ring", "canonical mirror pairs", "canonical Voice labels"]
+  },
+  "sentinelAnalysis": {
+    "fixedSentinel": "000",
+    "implications": [
+      "000 is the graph/vector origin for mathematical calculations but has no Voice semantics",
+      "Hamming weight is distance from the experimental sentinel, not a canonical ring value",
+      "the canonical structural center remains O at 001",
+      "fixing 000 removes the translation freedom from the selected mapping universe",
+      "the chosen bit labels are a representation convention and are not semantic claims"
+    ],
+    "isomorphismNotes": [
+      "allowing any unused cube vertex would produce 8*7! labeled assignments",
+      "the fixed-sentinel universe uses one representative convention with 7! assignments",
+      "a different unused vertex is mathematically cube-isomorphic only after transforming the complete code labeling",
+      "no sentinel choice receives semantic interpretation in v0.1"
+    ]
+  },
+  "mappingUniverse": {
+    "definition": "bijections from the seven canonical Voices to the seven nonzero 3-bit codes with 000 fixed as unused",
+    "formula": "7!",
+    "derivedCount": 5040,
+    "enumeratedCount": 5040,
+    "match": true
+  },
+  "controlFamilies": [
+    {
+      "name": "UNRESTRICTED",
+      "formalPredicate": "every bijection in the fixed-sentinel universe",
+      "derivedCount": 5040,
+      "enumeratedCount": 5040,
+      "match": true,
+      "relation": "superset of all other families"
+    },
+    {
+      "name": "CENTER_PRESERVING",
+      "formalPredicate": "code(O) = 001",
+      "derivedCount": 720,
+      "enumeratedCount": 720,
+      "match": true,
+      "relation": "contains CENTERED_MIRROR_EDGE and PAIR_BLOCK_PRESERVING"
+    },
+    {
+      "name": "MIRROR_EDGE_PRESERVING",
+      "formalPredicate": "Hamming(code(a),code(b)) = 1 for (a,b) in (A,Ë),(E,Y),(I,U); O has no ordinary edge requirement",
+      "derivedCount": 528,
+      "enumeratedCount": 528,
+      "match": true,
+      "relation": "contains CENTERED_MIRROR_EDGE; O self-mirror is excluded from edge counting"
+    },
+    {
+      "name": "CENTERED_MIRROR_EDGE",
+      "formalPredicate": "CENTER_PRESERVING and MIRROR_EDGE_PRESERVING",
+      "derivedCount": 144,
+      "enumeratedCount": 144,
+      "match": true,
+      "relation": "contains PAIR_BLOCK_PRESERVING and EXACT_RING_PRESERVING"
+    },
+    {
+      "name": "PAIR_BLOCK_PRESERVING",
+      "formalPredicate": "each non-self mirror pair has equal first-two-bit block; with 000 excluded this forces O=001",
+      "derivedCount": 48,
+      "enumeratedCount": 48,
+      "match": true,
+      "relation": "subset of CENTERED_MIRROR_EDGE; exact ring blocks may be permuted"
+    },
+    {
+      "name": "EXACT_RING_PRESERVING",
+      "formalPredicate": "binaryValue(code(v)[0:2]) = canonical ring(v) for every Voice v",
+      "derivedCount": 8,
+      "enumeratedCount": 8,
+      "match": true,
+      "relation": "subset of PAIR_BLOCK_PRESERVING"
+    },
+    {
+      "name": "STRUCTURAL_V0_1",
+      "formalPredicate": "code(v) equals the frozen mapping for every Voice v",
+      "derivedCount": 1,
+      "enumeratedCount": 1,
+      "match": true,
+      "relation": "member of EXACT_RING_PRESERVING"
+    }
+  ],
+  "mirrorEdgeDefinition": {
+    "meaning": "literal Hamming-cube adjacency for the three non-self mirror pairs",
+    "hammingDistance": 1,
+    "oSelfMirror": "not an ordinary edge",
+    "noAlternativeEdgeMeaning": true
+  },
+  "ringDefinition": {
+    "observable": "integer value of the first two bits",
+    "ringCodes": {"0": "00", "1": "01", "2": "10", "3": "11"},
+    "center": "O is ring 0 and code 001; sentinel 000 is not the center Voice"
+  },
+  "metricEquivalence": {
+    "comparisonRule": "raw deterministic signatures are counted within each control family; candidate uniqueness is reported but is not by itself additive evidence",
+    "metrics": [
+      {"name": "code_sequence", "definition": "codes in canonical Voice order", "invariance": "none under nontrivial fixed-label code relabeling"},
+      {"name": "pairwise_hamming_distance_matrix", "definition": "upper-triangular pairwise Hamming distances in canonical Voice order", "invariance": "Hamming-cube automorphisms; fixed-sentinel subgroup is coordinate permutations"},
+      {"name": "pairwise_xor_matrix", "definition": "upper-triangular pairwise XOR vectors in canonical Voice order", "invariance": "translation-invariant; vector values transform under GL(3,2)"},
+      {"name": "ordered_xor_transition_signature", "definition": "XOR(code(v_i),code(v_{i+1})) across canonical order", "invariance": "translation-invariant; raw vector labels are GL(3,2)-orientation-sensitive"},
+      {"name": "hamming_weight_sequence", "definition": "Hamming weight in canonical Voice order", "invariance": "coordinate-permutation invariant; not invariant to bit flips"},
+      {"name": "hamming_transition_signature", "definition": "consecutive Hamming distances across canonical Voice order", "invariance": "Hamming-cube automorphism invariant"},
+      {"name": "cube_edge_incidence", "definition": "whether every canonical Voice pair is a literal Hamming-1 edge", "invariance": "Hamming-cube automorphism invariant"},
+      {"name": "distance_to_center_sequence", "definition": "Hamming distance from each code to code(O), in canonical Voice order", "invariance": "Hamming-cube automorphism invariant when O is transformed with the mapping"},
+      {"name": "distance_from_sentinel_sequence", "definition": "Hamming distance from 000 in canonical Voice order", "invariance": "coordinate-permutation invariant under the fixed-sentinel subgroup"}
+    ],
+    "familySummaries": {
+      "UNRESTRICTED": {
+        "code_sequence": [5040, 5040, 1],
+        "pairwise_hamming_distance_matrix": [5040, 840, 6],
+        "pairwise_xor_matrix": [5040, 5040, 1],
+        "ordered_xor_transition_signature": [5040, 5040, 1],
+        "hamming_weight_sequence": [5040, 140, 36],
+        "hamming_transition_signature": [5040, 295, 108],
+        "cube_edge_incidence": [5040, 840, 6],
+        "distance_to_center_sequence": [5040, 140, 36],
+        "distance_from_sentinel_sequence": [5040, 140, 36]
+      },
+      "CENTER_PRESERVING": {
+        "code_sequence": [720, 720, 1],
+        "pairwise_hamming_distance_matrix": [720, 360, 2],
+        "pairwise_xor_matrix": [720, 720, 1],
+        "ordered_xor_transition_signature": [720, 720, 1],
+        "hamming_weight_sequence": [720, 60, 12],
+        "hamming_transition_signature": [720, 148, 24],
+        "cube_edge_incidence": [720, 360, 2],
+        "distance_to_center_sequence": [720, 60, 12],
+        "distance_from_sentinel_sequence": [720, 60, 12]
+      },
+      "MIRROR_EDGE_PRESERVING": {
+        "code_sequence": [528, 528, 1],
+        "pairwise_hamming_distance_matrix": [528, 88, 6],
+        "pairwise_xor_matrix": [528, 528, 1],
+        "ordered_xor_transition_signature": [528, 528, 1],
+        "hamming_weight_sequence": [528, 32, 18],
+        "hamming_transition_signature": [528, 48, 48],
+        "cube_edge_incidence": [528, 88, 6],
+        "distance_to_center_sequence": [528, 32, 18],
+        "distance_from_sentinel_sequence": [528, 32, 18]
+      },
+      "CENTERED_MIRROR_EDGE": {
+        "code_sequence": [144, 144, 1],
+        "pairwise_hamming_distance_matrix": [144, 72, 2],
+        "pairwise_xor_matrix": [144, 144, 1],
+        "ordered_xor_transition_signature": [144, 144, 1],
+        "hamming_weight_sequence": [144, 24, 6],
+        "hamming_transition_signature": [144, 46, 12],
+        "cube_edge_incidence": [144, 72, 2],
+        "distance_to_center_sequence": [144, 24, 6],
+        "distance_from_sentinel_sequence": [144, 24, 6]
+      },
+      "PAIR_BLOCK_PRESERVING": {
+        "code_sequence": [48, 48, 1],
+        "pairwise_hamming_distance_matrix": [48, 24, 2],
+        "pairwise_xor_matrix": [48, 48, 1],
+        "ordered_xor_transition_signature": [48, 48, 1],
+        "hamming_weight_sequence": [48, 24, 2],
+        "hamming_transition_signature": [48, 20, 4],
+        "cube_edge_incidence": [48, 24, 2],
+        "distance_to_center_sequence": [48, 24, 2],
+        "distance_from_sentinel_sequence": [48, 24, 2]
+      },
+      "EXACT_RING_PRESERVING": {
+        "code_sequence": [8, 8, 1],
+        "pairwise_hamming_distance_matrix": [8, 8, 1],
+        "pairwise_xor_matrix": [8, 8, 1],
+        "ordered_xor_transition_signature": [8, 8, 1],
+        "hamming_weight_sequence": [8, 8, 1],
+        "hamming_transition_signature": [8, 8, 1],
+        "cube_edge_incidence": [8, 8, 1],
+        "distance_to_center_sequence": [8, 8, 1],
+        "distance_from_sentinel_sequence": [8, 8, 1]
+      },
+      "STRUCTURAL_V0_1": {
+        "code_sequence": [1, 1, 1],
+        "pairwise_hamming_distance_matrix": [1, 1, 1],
+        "pairwise_xor_matrix": [1, 1, 1],
+        "ordered_xor_transition_signature": [1, 1, 1],
+        "hamming_weight_sequence": [1, 1, 1],
+        "hamming_transition_signature": [1, 1, 1],
+        "cube_edge_incidence": [1, 1, 1],
+        "distance_to_center_sequence": [1, 1, 1],
+        "distance_from_sentinel_sequence": [1, 1, 1]
+      }
+    },
+    "tupleMeaning": ["rawMappings", "uniqueSignatures", "largestEquivalenceClassSize"],
+    "candidateUniquenessIsNotResult": true
+  },
+  "mathematicalStructures": {
+    "gf2VectorSpace": {
+      "operations": ["XOR", "linear dependence", "subspace incidence"],
+      "linearSymmetryGroup": "GL(3,2)",
+      "groupOrder": 168,
+      "fanoFirewall": "nonzero-vector incidence may be reported mathematically only; no semantic assignment"
+    },
+    "hammingCube": {
+      "graph": "Q3",
+      "operations": ["Hamming distance", "literal edges", "weights relative to a chosen origin"],
+      "automorphismGroup": "coordinate permutations and bit flips",
+      "groupOrder": 48,
+      "fixedSentinelSubgroup": "coordinate permutations fixing 000",
+      "fixedSentinelSubgroupOrder": 6
+    },
+    "nonConflationRule": "GF(2)^3 linear equivalence and Q3 graph equivalence are reported separately"
+  },
+  "primaryQuestion": "DOES STRUCTURAL_V0_1 PROVIDE STRUCTURAL INFORMATION NOT ALREADY DETERMINED BY THE CANONICAL ORDER/RING/MIRROR GEOMETRY?",
+  "primaryMetric": {
+    "name": "ADDITIONAL_STRUCTURAL_INVARIANT_COUNT",
+    "inputs": ["frozen canonical structural input", "STRUCTURAL_V0_1 mapping", "exhaustive fixed-sentinel control families", "predeclared symmetry normalizations"],
+    "transformation": "derive only the listed binary signatures, compare candidate and control equivalence classes, and exclude by-construction and symmetry-only distinctions",
+    "control": "EXACT_RING_PRESERVING plus CENTERED_MIRROR_EDGE and UNRESTRICTED context",
+    "output": "count of preregistered nontrivial binary invariants surviving the applicable symmetry/control test",
+    "decisionRule": "zero surviving invariants is REDUNDANT; raw distinctions that disappear under the applicable symmetry are PARTIALLY_ADDITIVE; at least one invariant that survives the symmetry/control test is ADDITIVE; failed required structure is LOSSY; invalid definitions or serialization are INVALID_EXPERIMENT"
+  },
+  "secondaryMetrics": [
+    "pairwise_hamming_distance_matrix",
+    "pairwise_xor_matrix",
+    "ordered_xor_transition_signature",
+    "hamming_weight_sequence",
+    "hamming_transition_signature",
+    "cube_edge_incidence",
+    "distance_to_center_sequence",
+    "distance_from_sentinel_sequence",
+    "equivalence_class_size"
+  ],
+  "classificationRules": {
+    "REDUNDANT": "required canonical structure is preserved and no nontrivial binary invariant survives the preregistered control and symmetry tests",
+    "PARTIALLY_ADDITIVE": "an apparent extra relation exists in a raw fixed-label representation but disappears under the applicable symmetry or is only an encoding-orientation distinction",
+    "ADDITIVE": "at least one preregistered nontrivial binary invariant survives the applicable symmetry/control test and is not determined by canonical order/ring/mirror",
+    "LOSSY": "the mapping or representation fails to preserve any required canonical Voice, ring, or mirror property",
+    "INVALID_EXPERIMENT": "mapping space, control predicates, metric serialization, symmetry definitions, or preregistration integrity are invalid"
+  },
+  "falsificationRules": [
+    "required canonical ring or mirror structure not preserved => LOSSY",
+    "all apparent binary structure is by construction or symmetry-equivalent to canonical geometry => REDUNDANT",
+    "claimed additional invariant disappears under equivalent bit relabeling or cube automorphism => not ADDITIVE",
+    "metric cannot distinguish the candidate from its relevant control family => no positive result under that metric",
+    "semantic interpretation is required => outside V0.1",
+    "effect appears only in selected mappings and not exhaustive controls => no additive structural claim",
+    "invalid family or metric definitions => INVALID_EXPERIMENT and repair preregistration before execution"
+  ],
+  "outputContract": {
+    "fields": [
+      "experimentId", "preregistrationVersion", "preregistrationSha", "repositoryBaseSha", "canonicalInputFingerprint", "mappingId", "mappingDefinition", "sentinelPolicy", "mappingUniverseSize", "controlFamilies", "controlFamilyCounts", "primaryMetric", "secondaryMetrics", "equivalenceGroups", "byConstructionProperties", "candidateSignature", "controlSignatureSummary", "classification", "reasonCodes", "invariantFindings", "falsificationChecks", "semanticClaimsMade", "linguisticClaimsMade", "productionAuthorityChanged"
+    ],
+    "classificationEnum": ["REDUNDANT", "PARTIALLY_ADDITIVE", "ADDITIVE", "LOSSY", "INVALID_EXPERIMENT"],
+    "semanticClaimsMade": false,
+    "linguisticClaimsMade": false,
+    "productionAuthorityChanged": false
+  },
+  "reproducibility": {
+    "enumerationOrder": "canonical Voice order A,E,I,O,U,Y,Ë; assign lexicographically ordered nonzero codes 001,010,011,100,101,110,111 by permutation order",
+    "mappingSerialization": "Voice order joined as A=code|E=code|I=code|O=code|U=code|Y=code|Ë=code",
+    "metricSerialization": "canonical Voice order, upper-triangular pairs where applicable, pipe-delimited binary strings, comma-delimited numeric sequences",
+    "hashAlgorithm": "SHA-256",
+    "numericComparison": "exact integer comparison; no floating point",
+    "tieHandling": "equal serialized signatures are one equivalence class",
+    "randomness": "none"
+  },
+  "protectedSurfaces": [
+    "SevenVoiceKey",
+    "Math7",
+    "canonical Voice order",
+    "ring definitions",
+    "mirror definitions",
+    "doctrine profiles",
+    "Level-3 contracts",
+    "analysis API",
+    "runtime analysis",
+    "UI",
+    "evidence registries",
+    "candidate registries",
+    "provider execution",
+    "baseline artifact",
+    "closeout branch"
+  ],
+  "preregistrationIntegrity": {
+    "sourceResearchPerformed": false,
+    "experimentExecuted": false,
+    "resultReportCreated": false,
+    "semanticVocabularyUsed": false,
+    "wordDataUsed": false,
+    "productionMutationAuthorized": false
+  }
+}
