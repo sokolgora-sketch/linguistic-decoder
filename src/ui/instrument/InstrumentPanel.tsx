@@ -38,6 +38,7 @@ import { buildCandidateRowsFromVM } from '../candidates/candidateModel';
 import { CandidatesAccordion } from '../candidates/CandidatesAccordion';
 import { DeepRootHeartGateSummaryCard } from "./DeepRootHeartGateSummaryCard";
 import { EmbryoExpansionContextCardV0_1 } from "./sections/EmbryoExpansionContextCard.v0_1";
+import { DoctrineReadingCard } from "./sections/DoctrineReadingCard.v0.1";
 import { OriginClaimCard } from '@/components/OriginClaimCard';
 import { cn } from "@/lib/utils";
 import { safeText } from "./safeText";
@@ -519,6 +520,8 @@ export function InstrumentPanel(props: Props) {
                   variant="primary"
                 />
               ) : null}
+
+              <DoctrineReadingCard doctrineReading={vm.doctrineReading} />
 
               <EmbryoExpansionContextCardV0_1
                 vm={vm}
