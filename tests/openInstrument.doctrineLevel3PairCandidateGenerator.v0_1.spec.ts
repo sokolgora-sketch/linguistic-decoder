@@ -90,6 +90,12 @@ describe("Open Instrument Level-3 pair candidate generator v0.1", () => {
     expect(forward.status).toBe(DOCTRINE_LEVEL3_PAIR_PRODUCTION_STATUS_V0_1);
     expect(reverse.status).toBe(DOCTRINE_LEVEL3_PAIR_PRODUCTION_STATUS_V0_1);
     expect(selfPair.status).toBe(DOCTRINE_LEVEL3_PAIR_SELF_PAIR_STATUS_V0_1);
+    expect(candidatePairReadingV0_1("I", "O").status).toBe(
+      DOCTRINE_LEVEL3_PAIR_PRODUCTION_STATUS_V0_1,
+    );
+    expect(candidatePairReadingV0_1("I", "U").status).toBe(
+      DOCTRINE_LEVEL3_PAIR_CANDIDATE_REVIEW_STATUS_V0_1,
+    );
     expect(first).toEqual(repeated);
     expect(forward.candidateReading).not.toBe(reverse.candidateReading);
     expect(selfPair.firstAtom).toBe(selfPair.secondAtom);
@@ -105,7 +111,7 @@ describe("Open Instrument Level-3 pair candidate generator v0.1", () => {
     expect(first).not.toHaveProperty("language");
   });
 
-  it("generates the complete ordered 7x7 matrix with three production rows", () => {
+  it("generates the complete ordered 7x7 matrix with four production rows", () => {
     const matrix = generateDoctrineLevel3PairReviewMatrixV0_1();
     const pairs = matrix.map((candidate) => candidate.pair);
 
@@ -118,13 +124,14 @@ describe("Open Instrument Level-3 pair candidate generator v0.1", () => {
     ).toEqual([
       expect.objectContaining({ pair: "A→E" }),
       expect.objectContaining({ pair: "E→A" }),
+      expect.objectContaining({ pair: "I→O" }),
       expect.objectContaining({ pair: "U→Y" }),
     ]);
     expect(
       matrix.filter(
         (candidate) => candidate.status === DOCTRINE_LEVEL3_PAIR_CANDIDATE_REVIEW_STATUS_V0_1,
       ),
-    ).toHaveLength(39);
+    ).toHaveLength(38);
     expect(
       matrix.filter(
         (candidate) => candidate.status === DOCTRINE_LEVEL3_PAIR_SELF_PAIR_STATUS_V0_1,
@@ -139,7 +146,7 @@ describe("Open Instrument Level-3 pair candidate generator v0.1", () => {
     expect(readReviewArtifact()).toEqual(buildDoctrineLevel3PairReviewArtifactV0_1());
   });
 
-  it("keeps production authorization restricted to U/Y, A/E, and E/A", () => {
+  it("keeps production authorization restricted to U/Y, A/E, E/A, and I/O", () => {
     expect(projectLevel3DoctrineReadingV0_1(["U", "Y"])).toMatchObject({
       reading: "grounded depth with reflective exploration",
     });
@@ -149,13 +156,16 @@ describe("Open Instrument Level-3 pair candidate generator v0.1", () => {
     expect(projectLevel3DoctrineReadingV0_1(["E", "A"])).toMatchObject({
       reading: "expanding growth with initiating beginning",
     });
+    expect(projectLevel3DoctrineReadingV0_1(["I", "O"])).toMatchObject({
+      reading: "clear understanding with balanced mediation",
+    });
 
     for (const path of [
       ["Y", "U"],
       ["A", "A"],
       ["E", "E"],
       ["U", "U"],
-      ["I", "O"],
+      ["O", "I"],
     ] as const) {
       expect(projectLevel3DoctrineReadingV0_1(path)).toBeNull();
     }
@@ -165,7 +175,59 @@ describe("Open Instrument Level-3 pair candidate generator v0.1", () => {
     expect(projectLevel3DoctrineReadingV0_1([])).toBeNull();
 
     expect(readReviewArtifact()).toMatchObject({
-      productionAuthorizedPairs: ["U→Y", "A→E", "E→A"],
+      productionAuthorizedPairs: ["U→Y", "A→E", "E→A", "I→O"],
     });
+  });
+
+  it("freezes the identity-only selection before candidate wording review", () => {
+    const selection = JSON.parse(
+      readFileSync(
+        path.resolve(
+          process.cwd(),
+          "docs/open-instrument/level3-independent-family-generalization-proof-v0.1-selection.json",
+        ),
+        "utf8",
+      ),
+    ) as Record<string, any>;
+
+    expect(selection.selectedPairKey).toBe("I→O");
+    expect(selection.selectionFrozenBeforePhraseReview).toBe(true);
+    expect(selection.eligiblePairKeys).toEqual([
+      "I→O",
+      "I→U",
+      "I→Y",
+      "I→Ë",
+      "O→I",
+      "O→U",
+      "O→Y",
+      "O→Ë",
+      "U→I",
+      "U→O",
+      "U→Ë",
+      "Y→I",
+      "Y→O",
+      "Y→U",
+      "Y→Ë",
+      "Ë→I",
+      "Ë→O",
+      "Ë→U",
+      "Ë→Y",
+    ]);
+    expect(selection).not.toHaveProperty("candidateReading");
+    expect(selection).not.toHaveProperty("firstAtom");
+    expect(selection).not.toHaveProperty("secondAtom");
+
+    const selectedCandidate = readReviewArtifact() as any;
+    const selectedRow = selectedCandidate.orderedPairCandidates.find(
+      (candidate: any) => candidate.pair === selection.selectedPairKey,
+    );
+    expect(selectedRow).toMatchObject({
+      pair: "I→O",
+      templateId: DOCTRINE_LEVEL3_PAIR_CANDIDATE_TEMPLATE_ID_V0_1,
+      status: DOCTRINE_LEVEL3_PAIR_PRODUCTION_STATUS_V0_1,
+    });
+    expect(selectedRow.candidateReading).toBe(
+      candidatePairReadingV0_1("I", "O").candidateReading,
+    );
   });
 });

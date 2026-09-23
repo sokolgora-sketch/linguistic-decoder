@@ -15,7 +15,8 @@
   "productionAuthorizedPairs": [
     "U→Y",
     "A→E",
-    "E→A"
+    "E→A",
+    "I→O"
   ],
   "atoms": [
     {
@@ -554,7 +555,7 @@
       "secondAtom": "balanced mediation",
       "candidateReading": "clear understanding with balanced mediation",
       "templateId": "level3.ordered-pair.with-template.v0_1",
-      "status": "DOCTRINE_CANDIDATE_FOR_DF_REVIEW",
+      "status": "ALREADY_PRODUCTION_AUTHORIZED_PROOF_PAIR",
       "semanticStatus": "BOUNDED_REVIEW_CANDIDATE_ONLY",
       "causality": "NOT_AUTHORIZED",
       "temporality": "NOT_AUTHORIZED",

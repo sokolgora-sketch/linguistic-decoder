@@ -1,0 +1,49 @@
+{
+  "experimentId": "open-instrument.level3-independent-family-generalization-proof.v0_1",
+  "repositoryMainSha": "bee7a600c1d0085f5bf0909f7563f58f8df2b7d6",
+  "selectionRule": {
+    "canonicalVoiceOrder": ["A", "E", "I", "O", "U", "Y", "Ë"],
+    "sortKeys": ["firstVoiceCanonicalIndex", "secondVoiceCanonicalIndex"],
+    "select": "firstEligiblePair"
+  },
+  "eligibilityConstraints": [
+    "length_exactly_2",
+    "both_voices_canonical",
+    "neither_voice_A",
+    "neither_voice_E",
+    "first_voice_differs_from_second_voice",
+    "not_production_authorized",
+    "present_in_current_pr_2009_derived_review_matrix",
+    "uses_existing_seven_compact_atoms",
+    "uses_existing_level3.ordered-pair.with-template.v0.1",
+    "requires_no_new_semantic_content"
+  ],
+  "eligiblePairKeys": [
+    "I→O",
+    "I→U",
+    "I→Y",
+    "I→Ë",
+    "O→I",
+    "O→U",
+    "O→Y",
+    "O→Ë",
+    "U→I",
+    "U→O",
+    "U→Ë",
+    "Y→I",
+    "Y→O",
+    "Y→U",
+    "Y→Ë",
+    "Ë→I",
+    "Ë→O",
+    "Ë→U",
+    "Ë→Y"
+  ],
+  "selectedPairKey": "I→O",
+  "selectionFrozenBeforePhraseReview": true,
+  "sourceReviewMatrix": {
+    "path": "docs/open-instrument/doctrine-level3-pair-candidate-review-matrix-v0.1.json",
+    "sha256": "f8446afdfb3dab2ec1d7c1460233957fb4366433e590e2797190c5e320de21cb"
+  },
+  "productionAuthorityBeforeSelection": ["U→Y", "A→E", "E→A"]
+}
