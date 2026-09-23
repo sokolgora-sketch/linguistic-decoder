@@ -220,6 +220,49 @@ function isRecordV0_1(value: unknown): value is Record<string, unknown> {
   return Boolean(value) && typeof value === "object" && !Array.isArray(value);
 }
 
+function hasExactKeysV0_1(
+  actual: Record<string, unknown>,
+  expected: object,
+): boolean {
+  return JSON.stringify(Object.keys(actual).sort()) ===
+    JSON.stringify(Object.keys(expected).sort());
+}
+
+function matchesClaimBoundaryV0_1(value: unknown): boolean {
+  if (!isRecordV0_1(value) || !hasExactKeysV0_1(value, CLAIM_BOUNDARY_V0_1)) {
+    return false;
+  }
+
+  return Object.entries(CLAIM_BOUNDARY_V0_1).every(
+    ([key, expectedValue]) => value[key] === expectedValue,
+  );
+}
+
+function matchesGenericProvenanceV1(value: unknown, expectedPath: readonly [SevenVoiceKey, SevenVoiceKey]): boolean {
+  if (!isRecordV0_1(value)) return false;
+
+  const expected = {
+    ruleId: DOCTRINE_LEVEL3_GENERIC_DISTINCT_PAIR_RULE_ID_V1,
+    doctrineAuthority:
+      "src/shared/openInstrument/doctrineFunctionalProfile.v0_1.ts",
+    doctrineProfileSchema: DOCTRINE_FUNCTIONAL_PROFILE_SCHEMA_V0_1,
+    orderedViewsSchema: sevenVoiceOrderedViewsSchemaVersion,
+    analyzedVoicePath: expectedPath,
+  } as const;
+
+  return (
+    hasExactKeysV0_1(value, expected) &&
+    value.ruleId === expected.ruleId &&
+    value.doctrineAuthority === expected.doctrineAuthority &&
+    value.doctrineProfileSchema === expected.doctrineProfileSchema &&
+    value.orderedViewsSchema === expected.orderedViewsSchema &&
+    Array.isArray(value.analyzedVoicePath) &&
+    value.analyzedVoicePath.length === expectedPath.length &&
+    value.analyzedVoicePath[0] === expectedPath[0] &&
+    value.analyzedVoicePath[1] === expectedPath[1]
+  );
+}
+
 function buildGenericDistinctPairReadingV1(
   inputPath: DoctrineLevel3ProofPairVoicePathV0_1,
 ): DoctrineLevel3ProofPairReadingV0_1 {
@@ -310,11 +353,29 @@ export function isDoctrineLevel3ProofPairReadingV0_1(
     return false;
   }
 
+  const expected = buildGenericDistinctPairReadingV1([path[0], path[1]]);
   return (
-    JSON.stringify(value) ===
-    JSON.stringify(
-      buildGenericDistinctPairReadingV1([path[0], path[1]]),
-    )
+    hasExactKeysV0_1(value, expected) &&
+    value.schemaVersion === expected.schemaVersion &&
+    value.ruleId === expected.ruleId &&
+    value.level === expected.level &&
+    Array.isArray(value.analyzedVoicePath) &&
+    value.analyzedVoicePath[0] === expected.analyzedVoicePath[0] &&
+    value.analyzedVoicePath[1] === expected.analyzedVoicePath[1] &&
+    value.reading === expected.reading &&
+    value.truthClassification === expected.truthClassification &&
+    value.doctrineAuthority === expected.doctrineAuthority &&
+    value.doctrineProfileSchema === expected.doctrineProfileSchema &&
+    value.outputShape === expected.outputShape &&
+    value.genericComposition === expected.genericComposition &&
+    value.level4TransitionSemantics === expected.level4TransitionSemantics &&
+    value.providerIndependent === expected.providerIndependent &&
+    value.externalEvidenceIndependent === expected.externalEvidenceIndependent &&
+    value.candidateWinnerIndependent === expected.candidateWinnerIndependent &&
+    matchesClaimBoundaryV0_1(value.claimBoundary) &&
+    value.userDecisionPosture === expected.userDecisionPosture &&
+    value.noSingleWinner === expected.noSingleWinner &&
+    matchesGenericProvenanceV1(value.provenance, [path[0], path[1]])
   );
 }
 

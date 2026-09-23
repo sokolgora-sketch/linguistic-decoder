@@ -159,6 +159,59 @@ describe("Open Instrument Level-3 proof pair authority v0.1", () => {
     expect(JSON.stringify(first)).not.toContain("transition");
   });
 
+  test("accepts semantically identical generic readings with reordered object keys", () => {
+    const reading = projectLevel3DoctrineReadingV0_1(["I", "O"]);
+    expect(reading).not.toBeNull();
+
+    const reordered = {
+      noSingleWinner: reading?.noSingleWinner,
+      userDecisionPosture: reading?.userDecisionPosture,
+      provenance: {
+        analyzedVoicePath: reading?.provenance.analyzedVoicePath,
+        orderedViewsSchema: reading?.provenance.orderedViewsSchema,
+        doctrineProfileSchema: reading?.provenance.doctrineProfileSchema,
+        doctrineAuthority: reading?.provenance.doctrineAuthority,
+        ruleId: reading?.provenance.ruleId,
+      },
+      claimBoundary: {
+        stateTransition: reading?.claimBoundary.stateTransition,
+        dominance: reading?.claimBoundary.dominance,
+        transformation: reading?.claimBoundary.transformation,
+        temporalProgression: reading?.claimBoundary.temporalProgression,
+        causalRelation: reading?.claimBoundary.causalRelation,
+        consonantSemantics: reading?.claimBoundary.consonantSemantics,
+        targetSenseValidation: reading?.claimBoundary.targetSenseValidation,
+        reviewedFunctionalEvidenceClaim:
+          reading?.claimBoundary.reviewedFunctionalEvidenceClaim,
+        externalEvidenceClaim: reading?.claimBoundary.externalEvidenceClaim,
+        lexicalMeaningClaim: reading?.claimBoundary.lexicalMeaningClaim,
+        candidateTruthClaim: reading?.claimBoundary.candidateTruthClaim,
+        languageSuperiorityClaim:
+          reading?.claimBoundary.languageSuperiorityClaim,
+        winnerClaim: reading?.claimBoundary.winnerClaim,
+        historicalTransmissionClaim:
+          reading?.claimBoundary.historicalTransmissionClaim,
+        historicalOriginClaim: reading?.claimBoundary.historicalOriginClaim,
+      },
+      candidateWinnerIndependent: reading?.candidateWinnerIndependent,
+      externalEvidenceIndependent: reading?.externalEvidenceIndependent,
+      providerIndependent: reading?.providerIndependent,
+      level4TransitionSemantics: reading?.level4TransitionSemantics,
+      genericComposition: reading?.genericComposition,
+      outputShape: reading?.outputShape,
+      doctrineProfileSchema: reading?.doctrineProfileSchema,
+      doctrineAuthority: reading?.doctrineAuthority,
+      truthClassification: reading?.truthClassification,
+      reading: reading?.reading,
+      analyzedVoicePath: reading?.analyzedVoicePath,
+      level: reading?.level,
+      ruleId: reading?.ruleId,
+      schemaVersion: reading?.schemaVersion,
+    };
+
+    expect(isDoctrineLevel3ProofPairReadingV0_1(reordered)).toBe(true);
+  });
+
   test("keeps the A to E phrase independent of target-sense data", () => {
     const reading = projectLevel3DoctrineReadingV0_1(["A", "E"]);
 
