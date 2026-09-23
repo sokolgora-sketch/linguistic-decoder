@@ -55,6 +55,30 @@ export function DoctrineReadingCard({
         {reading.analyzedVoicePath.join(" → ")}
       </div>
 
+      {reading.level3WholePathReading ? (
+        <div
+          data-testid="doctrine-level3-reading"
+          className="mt-4 rounded-lg border border-emerald-200 bg-emerald-50/70 p-3 dark:border-emerald-400/20 dark:bg-emerald-500/5"
+        >
+          <div className="text-xs font-semibold uppercase tracking-[0.16em] text-emerald-700 dark:text-emerald-200">
+            Whole-path doctrinal reading
+          </div>
+          <div
+            data-testid="doctrine-level3-reading-text"
+            className="mt-2 text-base font-semibold text-slate-950 dark:text-white"
+          >
+            {reading.level3WholePathReading.reading}
+          </div>
+          <div
+            data-testid="doctrine-level3-reading-boundary"
+            className="mt-2 text-xs leading-5 text-slate-600 dark:text-slate-400"
+          >
+            Doctrine inference only; not a lexical definition, historical origin claim,
+            candidate proof, or winner selection. User decides the final interpretation.
+          </div>
+        </div>
+      ) : null}
+
       <ol className="mt-4 space-y-3">
         {reading.entries.map((entry) => (
           <li
