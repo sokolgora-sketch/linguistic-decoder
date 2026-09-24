@@ -14,6 +14,7 @@ import { Worker } from "node:worker_threads";
 
 import {
   STRICT_BLIND_REAL_EXECUTION_AUTHORIZED_V1,
+  STRICT_BLIND_REPLICATION_OUTCOME_V1,
   verifyStrictBlindFrozenArtifactsV1,
   type StrictBlindCorrespondenceEvaluationV1,
   type StrictBlindFrozenArtifactPathsV1,
@@ -401,6 +402,18 @@ function assertCompleteCoverageV1(
 }
 
 function assertEvaluationV1(evaluation: StrictBlindCorrespondenceEvaluationV1): void {
+  if (
+    !evaluation ||
+    !STRICT_BLIND_REPLICATION_OUTCOME_V1.includes(evaluation.classification) ||
+    !["MATCHED", "FAILED", "NOT_EVALUATED"].includes(evaluation.targetBinding) ||
+    !["SEPARATE", "NONE", "INSUFFICIENT"].includes(evaluation.structuralRelationStatus) ||
+    typeof evaluation.reasonCode !== "string" ||
+    typeof evaluation.evidenceBeyondGloss !== "boolean" ||
+    (evaluation.functionalMechanism !== null &&
+      typeof evaluation.functionalMechanism !== "string")
+  ) {
+    throw new Error("POST_REVEAL_EVALUATION_ENUM_INVALID");
+  }
   if (!evaluation.reasonCode.trim()) throw new Error("POST_REVEAL_REASON_INVALID");
   if (
     evaluation.classification === "FUNCTIONAL_CORRESPONDENCE" &&

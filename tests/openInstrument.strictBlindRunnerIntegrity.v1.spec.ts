@@ -291,6 +291,34 @@ describe("strict-blind runner integrity repair v1", () => {
     ).toThrow("STRICT_BLIND_INTEGRITY_PACKAGE_INVALID");
   });
 
+  test("rejects unknown post-reveal evaluation enums", async () => {
+    const input = makeInput();
+    await runStrictBlindIntegritySyntheticCaseV1(input);
+    const packagePath = join(input.artifactDirectory, "result-package.json");
+    const postRevealPath = join(input.artifactDirectory, "post-reveal.json");
+    const packageValue = JSON.parse(readFileSync(packagePath, "utf8")) as Record<string, unknown> & {
+      postRevealEvaluation: Record<string, unknown>;
+    };
+    const postRevealValue = JSON.parse(readFileSync(postRevealPath, "utf8")) as Record<string, unknown> & {
+      evaluation: Record<string, unknown>;
+    };
+    const invalidEvaluation = {
+      ...packageValue.postRevealEvaluation,
+      classification: "UNKNOWN_CLASSIFICATION",
+    };
+    writeFileSync(packagePath, JSON.stringify({ ...packageValue, postRevealEvaluation: invalidEvaluation }));
+    writeFileSync(postRevealPath, JSON.stringify({ ...postRevealValue, evaluation: invalidEvaluation }));
+    expect(() =>
+      verifyStrictBlindIntegrityPackageV1({
+        packagePath,
+        durabilityDirectory: input.artifactDirectory,
+        authorizationDirectory: join(input.artifactDirectory, "authorization"),
+        frozenArtifacts: paths,
+        replicationSlot: "SBR-01",
+      }),
+    ).toThrow("POST_REVEAL_EVALUATION_ENUM_INVALID");
+  });
+
   test("does not permit reveal or verification before durable recovery", () => {
     const directory = makeDirectory();
     writeFileSync(join(directory, "pre-reveal.primary.json"), "{}");
