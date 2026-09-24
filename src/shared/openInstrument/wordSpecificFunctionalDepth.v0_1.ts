@@ -188,7 +188,8 @@ function isReviewedFunctionalCandidate(
 ): boolean {
   return (
     candidate.claimType === "functionalMotivation" &&
-    candidate.sourceKind === "reviewed_dictionary_source" &&
+    (candidate.sourceKind === "reviewed_dictionary_source" ||
+      candidate.sourceKind === "reviewed_lexical_source") &&
     candidate.sourceStatus === "reviewed_accepted" &&
     candidate.validationOutcome === "validated" &&
     evidenceRefs(candidate).length > 0 &&

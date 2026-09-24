@@ -52,6 +52,38 @@ describe("word-specific functional depth runtime v0.1", () => {
     expect(screen.getByText(/No single candidate is selected\. User decides\./)).toBeVisible();
   });
 
+  it("aligns the explicitly authorized reviewed lexical father row with word-specific depth", async () => {
+    const result = await analyze("father");
+
+    expect(result.analysisStatusV0_1?.status).toBe("reviewed_functional_evidence");
+    expect(result.candidates?.find((candidate) => candidate.form === "at")?.sourceKind).toBe(
+      "reviewed_lexical_source",
+    );
+    expect(result.wordSpecificFunctionalDepth).toMatchObject({
+      status: "reviewed_functional_evidence",
+      authorityClass: "reviewed_functional",
+      evidenceRefs: ["reviewed.external.albanian-at.father.citation.v0_1"],
+      userDecisionPosture: "user_decides",
+      noSingleWinner: true,
+    });
+
+    const vm = adaptAnalysisToTelemetryVM(result);
+    render(
+      <EmbryoExpansionContextCardV0_1
+        vm={vm}
+        showPrimaryEvidence
+      />,
+    );
+
+    expect(screen.getByTestId("word-specific-functional-depth")).toBeVisible();
+    expect(screen.getByText("Reviewed functional motivation")).toBeVisible();
+    expect(
+      within(screen.getByTestId("word-specific-functional-depth")).getByText("at"),
+    ).toBeVisible();
+    expect(screen.queryByText("No supported word-specific functional motivation yet.")).toBeNull();
+    expect(screen.getByText(/No single candidate is selected\. User decides\./)).toBeVisible();
+  });
+
   it("emits a truthful Null depth for a structural Null without suppressing the existing analysis state", async () => {
     const result = await analyze("head");
 
