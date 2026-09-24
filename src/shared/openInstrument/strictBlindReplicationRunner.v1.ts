@@ -167,7 +167,7 @@ export type StrictBlindPreRevealContextV1 = Readonly<{
   recordSourceObservation: (observation: StrictBlindSourceObservationV1) => void;
   recordSourceUnavailable: (event: StrictBlindSourceUnavailableV1) => void;
   freezeFunction: (value: Omit<StrictBlindFunctionFreezeV1, "kind">) => void;
-  freezeNull: (value: StrictBlindNullFreezeV1) => void;
+  freezeNull: (value: Omit<StrictBlindNullFreezeV1, "kind">) => void;
   markContaminated: (reasonCode: string) => void;
   readTarget: () => never;
 }>;
@@ -594,7 +594,7 @@ function buildPreRevealContextV1(
       ) {
         throw new Error("NULL_FREEZE_INVALID");
       }
-      decision.value = Object.freeze({ ...value });
+      decision.value = Object.freeze({ kind: "NULL", ...value });
     },
     markContaminated(reasonCode) {
       if (!exactNonEmptyTextV1(reasonCode)) {

@@ -141,6 +141,14 @@ describe("strict blind replication runner v1", () => {
       }),
     );
     expect(nullResult.postRevealEvaluation?.classification).toBe("NULL");
+    expect(nullResult.preRevealArtifact.preRevealNullState).toEqual({
+      kind: "NULL",
+      reasonCode: "NO_BOUNDED_FUNCTION_AT_PRE_REVEAL_FREEZE",
+    });
+    expect(nullResult.preRevealArtifact.frozenDecision).toEqual({
+      kind: "NULL",
+      reasonCode: "NO_BOUNDED_FUNCTION_AT_PRE_REVEAL_FREEZE",
+    });
     expect(insufficientResult.postRevealEvaluation?.classification).toBe(
       "INSUFFICIENT_CORRESPONDENCE",
     );
