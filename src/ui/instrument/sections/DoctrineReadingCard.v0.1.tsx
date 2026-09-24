@@ -45,12 +45,18 @@ export function DoctrineReadingCard({
       </div>
 
       <div className="mt-2 text-sm text-slate-600 dark:text-slate-400">
-        Deterministic doctrine profiles for the analyzed Voice path.
+        Deterministic doctrine profiles for the Heart surface Voice path.
       </div>
 
       <div
+        data-testid="doctrine-reading-path-label"
+        className="mt-4 text-xs font-semibold uppercase tracking-[0.16em] text-violet-700 dark:text-violet-200"
+      >
+        Heart surface Voice path used for doctrine:
+      </div>
+      <div
         data-testid="doctrine-reading-path"
-        className="mt-4 rounded-lg border border-violet-200 bg-white/70 px-3 py-2 font-mono text-base font-semibold text-slate-950 dark:border-violet-400/20 dark:bg-black/20 dark:text-white"
+        className="mt-2 rounded-lg border border-violet-200 bg-white/70 px-3 py-2 font-mono text-base font-semibold text-slate-950 dark:border-violet-400/20 dark:bg-black/20 dark:text-white"
       >
         {reading.analyzedVoicePath.join(" → ")}
       </div>

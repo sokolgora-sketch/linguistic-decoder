@@ -94,14 +94,15 @@ function doctrineSummary(vm: TelemetryViewModel): string {
 function buildOrientationState(vm: TelemetryViewModel): OrientationState {
   const hasPath = hasDetectedVoicePath(vm);
   const hasLexicalEvidence = hasLexicalSourceEvidence(vm);
+  const formattedPath = formatVoicePath(vm);
   const status =
     vm.analysisStatusV0_1?.kind === "present"
       ? vm.analysisStatusV0_1.value.status
       : undefined;
 
   return {
-    structure: formatVoicePath(vm)
-      ? `Voice path: ${formatVoicePath(vm)}`
+    structure: formattedPath
+      ? formattedPath
       : "No canonical Voice path was detected for this input.",
     doctrine: doctrineSummary(vm),
     evidence: statusEvidenceSummary(status, hasPath, hasLexicalEvidence),
@@ -137,7 +138,7 @@ export function PrimaryReadingOrientationCardV0_1({
 
       <dl className="mt-4 grid gap-3 text-[13px] leading-6 text-[#c6d0dc] sm:grid-cols-3">
         <div data-testid="orientation-structure">
-          <dt className="font-semibold text-[#8ea4ba]">Structure / path</dt>
+          <dt className="font-semibold text-[#8ea4ba]">Engine-selected Voice path:</dt>
           <dd>{orientation.structure}</dd>
         </div>
         <div data-testid="orientation-doctrine">
