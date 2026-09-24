@@ -3,6 +3,7 @@
 import type { EngineMetaSummary } from "@/lib/engineMetaSummary";
 import type { HeartInstrumentV1 } from "@/v1/heartInstrument.v1";
 import type { GenericFunctionalWitnessRuntimeProjectionV1 } from "./openInstrument/genericFunctionalWitnessRuntimeProjection.v1";
+import type { WordSpecificFunctionalDepthV0_1 } from "./openInstrument/wordSpecificFunctionalDepth.v0_1";
 
 export interface EngineMetaRaw {
   engineName?: string;
@@ -123,6 +124,10 @@ export interface AnalyzeWordResultUI {
   engineMeta: EngineMetaRaw;
 
   heartInstrumentV1: HeartInstrumentV1;
+
+  // Additive word-specific functional-depth projection. The UI consumes this
+  // contract; it does not infer functional depth from candidate prose.
+  wordSpecificFunctionalDepth?: WordSpecificFunctionalDepthV0_1 | null;
 
   // Debug / legacy fields used only by the main page
   raw?: unknown;

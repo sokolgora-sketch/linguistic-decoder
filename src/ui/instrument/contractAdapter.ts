@@ -50,6 +50,10 @@ import type { AnalysisStatusV0_1VM } from "../telemetry/types";
 import {
   parseGenericFunctionalWitnessRuntimeProjectionV1,
 } from "@/shared/openInstrument/genericFunctionalWitnessRuntimeProjection.v1";
+import {
+  isWordSpecificFunctionalDepthV0_1,
+} from "@/shared/openInstrument/wordSpecificFunctionalDepth.v0_1";
+import type { WordSpecificFunctionalDepthV0_1 } from "@/shared/openInstrument/wordSpecificFunctionalDepth.v0_1";
 
 type ParseRootMapResult = { ok: true; value: RootMapV1 } | { ok: false; reason: string };
 
@@ -465,6 +469,18 @@ function parseDoctrineReading(
     : missing("malformed", "doctrineReading expected the public V1 shape");
 }
 
+function parseWordSpecificFunctionalDepthV0_1(
+  value: unknown,
+): PresentOrMissing<WordSpecificFunctionalDepthV0_1 | null> {
+  if (value === undefined) {
+    return missing("not_emitted", "wordSpecificFunctionalDepth");
+  }
+  if (value === null) return present(null);
+  return isWordSpecificFunctionalDepthV0_1(value)
+    ? present(value)
+    : missing("malformed", "wordSpecificFunctionalDepth contract");
+}
+
 type CandidateStatus = "pass" | "fail" | "unknown";
 
 function parseCandidateStatus(v: unknown): CandidateStatus | null {
@@ -832,6 +848,9 @@ function parseAnalysisStatusV0_1(
 export function adaptAnalysisToTelemetryVM(raw: unknown): TelemetryViewModel {
   const payload = raw;
   const doctrineReading = parseDoctrineReading(getField(payload, "doctrineReading"));
+  const wordSpecificFunctionalDepth = parseWordSpecificFunctionalDepthV0_1(
+    getField(payload, "wordSpecificFunctionalDepth"),
+  );
 
   const vp = pickVoicePaths(payload);
 
@@ -1996,6 +2015,9 @@ const originClaimGates: OriginClaimGatesVM = {
     },
 
     doctrineReading,
+    ...(wordSpecificFunctionalDepth.kind === "missing"
+      ? {}
+      : { wordSpecificFunctionalDepth }),
     evidence: {
       normalizationSteps: pomStringListFromEvidenceField(evidence, "normalizationSteps"),
       ops: pomStringListFromEvidenceField(evidence, "ops"),

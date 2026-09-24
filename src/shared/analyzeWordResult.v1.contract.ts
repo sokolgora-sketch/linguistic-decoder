@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { WordSpecificFunctionalDepthContractSchema } from "./openInstrument/wordSpecificFunctionalDepth.v0_1";
 
 /**
  * analyze-v1 CONTRACT (runtime enforced)
@@ -222,6 +223,8 @@ export const AnalyzeWordResultV1ContractSchema = z
     raw: z.unknown().optional(),
     heartInstrumentV1: z.unknown().optional(),
     doctrineReading: z.unknown().nullable().optional(),
+    wordSpecificFunctionalDepth:
+      WordSpecificFunctionalDepthContractSchema.nullable().optional(),
   })
   .strict();
 
@@ -270,6 +273,7 @@ export function toAnalyzeWordResultV1Contract(input: unknown): AnalyzeWordResult
     raw: o.raw,
     heartInstrumentV1: o.heartInstrumentV1,
     doctrineReading: o.doctrineReading,
+    wordSpecificFunctionalDepth: o.wordSpecificFunctionalDepth,
   };
 
   return AnalyzeWordResultV1ContractSchema.parse(picked);

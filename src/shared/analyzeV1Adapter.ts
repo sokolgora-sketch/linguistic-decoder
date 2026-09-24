@@ -383,6 +383,9 @@ export function adaptAnalyzeV1ToUI(rawInput: unknown): AnalyzeWordResultUI {
       deepRoot: raw?.deepRoot ?? null,
       resonanceProfileV1: raw?.resonanceProfileV1 ?? null,
     candidates,
+    ...(Object.prototype.hasOwnProperty.call(raw, "wordSpecificFunctionalDepth")
+      ? { wordSpecificFunctionalDepth: raw.wordSpecificFunctionalDepth ?? null }
+      : {}),
     primaryPath,
     frontier,
     languageFamilies,

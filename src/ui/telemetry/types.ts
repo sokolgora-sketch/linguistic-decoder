@@ -3,6 +3,7 @@ export type Mode = "strict" | "open";
 import type { RootMapV1 } from "@/shared/deepRoot.rootMap.v1";
 import type { DeepRootHeartGateV01 } from "@/shared/deepRootHeartGate.v0.1";
 import type { GenericFunctionalWitnessRuntimeProjectionV1 } from "@/shared/openInstrument/genericFunctionalWitnessRuntimeProjection.v1";
+import type { WordSpecificFunctionalDepthV0_1 } from "@/shared/openInstrument/wordSpecificFunctionalDepth.v0_1";
 import type { DoctrineReadingV1 } from "@/shared/openInstrument/doctrineReadingContract.v1";
 
 /**
@@ -292,6 +293,7 @@ export type AnalysisStatusV0_1VM = {
 export interface TelemetryViewModel {
   readout: TelemetryReadout;
   doctrineReading: PresentOrMissing<DoctrineReadingVM | null>;
+  wordSpecificFunctionalDepth?: PresentOrMissing<WordSpecificFunctionalDepthV0_1 | null>;
   evidence: EvidenceLedger;
   candidates: CandidateRowVM[];
   math: PresentOrMissing<MathTelemetryVM>;
