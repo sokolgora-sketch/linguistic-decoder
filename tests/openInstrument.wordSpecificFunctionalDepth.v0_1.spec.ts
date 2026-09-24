@@ -27,11 +27,16 @@ const reviewedStatus = {
   userDecisionPosture: "user_decides" as const,
 };
 
-function reviewedCandidate(id: string, form: string) {
+function reviewedCandidate(
+  id: string,
+  form: string,
+  sourceKind: "reviewed_dictionary_source" | "reviewed_lexical_source" =
+    "reviewed_dictionary_source",
+) {
   return {
     id,
     form,
-    sourceKind: "reviewed_dictionary_source",
+    sourceKind,
     sourceStatus: "reviewed_accepted",
     claimType: "functionalMotivation",
     validationOutcome: "validated",
@@ -70,6 +75,48 @@ describe("word-specific functional depth v0.1", () => {
     expect(depth.userDecisionPosture).toBe("user_decides");
     expect(WordSpecificFunctionalDepthContractSchema.parse(depth)).toEqual(depth);
     expect(isWordSpecificFunctionalDepthV0_1(depth)).toBe(true);
+  });
+
+  it("qualifies an explicitly authorized reviewed lexical source through the same generic authority rule", () => {
+    const depth = buildWordSpecificFunctionalDepthV0_1({
+      word: "arbitrary",
+      analysisStatus: reviewedStatus,
+      candidates: [
+        reviewedCandidate(
+          "reviewed-lexical-source",
+          "lexical-form",
+          "reviewed_lexical_source",
+        ),
+      ],
+    });
+
+    expect(depth.status).toBe("reviewed_functional_evidence");
+    expect(depth.authorityClass).toBe("reviewed_functional");
+    expect(depth.results.map((result) => result.candidateId)).toEqual([
+      "reviewed-lexical-source",
+    ]);
+  });
+
+  it("does not promote reviewed lexical source evidence without the functional candidate contract", () => {
+    const depth = buildWordSpecificFunctionalDepthV0_1({
+      word: "arbitrary",
+      analysisStatus: reviewedStatus,
+      candidates: [
+        {
+          id: "lexical-only",
+          form: "lexical-form",
+          sourceKind: "reviewed_lexical_source",
+          sourceStatus: "reviewed_accepted",
+          claimType: "unresolved",
+          evidenceBasis: "lexical_equivalence",
+          evidenceRefs: ["lexical-only:citation"],
+          claimBoundary: "lexical_source_evidence_only",
+        },
+      ],
+    });
+
+    expect(depth.status).toBeNull();
+    expect(depth.results).toEqual([]);
   });
 
   it("keeps lexical and structural candidates out of word-specific functional depth", () => {
