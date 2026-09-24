@@ -190,10 +190,10 @@ describe(
           expect(
             within(
               candidatesPanel,
-            ).getByText(
+            ).getAllByText(
               candidate.form,
-            ),
-          ).toBeInTheDocument();
+            ).length,
+          ).toBeGreaterThanOrEqual(1);
         }
       },
     );

@@ -8,6 +8,7 @@ import type {
   Vowel,
 } from "@/ui/telemetry/types";
 import type { GenericFunctionalWitnessRuntimeProjectionV1 } from "@/shared/openInstrument/genericFunctionalWitnessRuntimeProjection.v1";
+import type { WordSpecificFunctionalDepthV0_1 } from "@/shared/openInstrument/wordSpecificFunctionalDepth.v0_1";
 
 import { buildCandidateRowsFromVM } from "@/ui/candidates/candidateModel";
 import type { UICandidateRow } from "@/ui/candidates/candidateModel";
@@ -738,6 +739,73 @@ function NoSupportedFunctionalCandidate({
   );
 }
 
+function WordSpecificFunctionalDepthSummaryV0_1({
+  value,
+}: {
+  value: WordSpecificFunctionalDepthV0_1 | undefined;
+}) {
+  if (value === undefined) return null;
+
+  if (value.status === null) {
+    return (
+      <section
+        data-testid="word-specific-functional-depth"
+        className="mb-4 rounded-lg border border-slate-300 bg-slate-50 p-4 dark:border-slate-700 dark:bg-slate-900/40"
+      >
+        <div className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-600 dark:text-slate-300">
+          Word-specific functional depth
+        </div>
+        <div className="mt-2 text-sm font-semibold text-slate-900 dark:text-white">
+          No supported word-specific functional motivation yet.
+        </div>
+        <div className="mt-2 text-xs leading-5 text-slate-500 dark:text-slate-400">
+          Doctrinal readings, structural context, and lexical source evidence remain separate.
+        </div>
+      </section>
+    );
+  }
+
+  const authorityLabel =
+    value.authorityClass === "reviewed_functional"
+      ? "Reviewed functional motivation"
+      : "Research functional hypothesis";
+
+  return (
+    <section
+      data-testid="word-specific-functional-depth"
+      className="mb-4 rounded-lg border border-emerald-300/70 bg-emerald-50/80 p-4 dark:border-emerald-400/25 dark:bg-emerald-500/5"
+    >
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <div className="text-xs font-semibold uppercase tracking-[0.14em] text-emerald-700 dark:text-emerald-200">
+          Word-specific functional depth
+        </div>
+        <span className="rounded-full border border-emerald-400/50 bg-white/70 px-2.5 py-1 text-[11px] font-semibold text-emerald-900 dark:bg-black/20 dark:text-emerald-100">
+          {authorityLabel}
+        </span>
+      </div>
+
+      <div className="mt-3 text-sm leading-6 text-slate-800 dark:text-slate-200">
+        {`${value.results.length} qualifying result${value.results.length === 1 ? "" : "s"}; source and claim boundaries remain explicit.`}
+      </div>
+
+      <div className="mt-2 flex flex-wrap gap-2">
+        {value.results.map((result) => (
+          <span
+            key={result.candidateId}
+            className="rounded-md border border-emerald-300/70 bg-white/70 px-2 py-1 font-mono text-xs text-slate-800 dark:border-emerald-400/25 dark:bg-black/20 dark:text-slate-200"
+          >
+            {result.form}
+          </span>
+        ))}
+      </div>
+
+      <div className="mt-3 text-xs leading-5 text-slate-600 dark:text-slate-400">
+        No single candidate is selected. User decides. Historical origin and candidate truth are not claimed.
+      </div>
+    </section>
+  );
+}
+
 function presentWitnessProjection(
   row: CandidateRowVM,
 ): GenericFunctionalWitnessRuntimeProjectionV1 | null {
@@ -886,6 +954,17 @@ export function EmbryoExpansionContextCardV0_1({
       ? vm.candidates
       : [];
 
+  const wordSpecificFunctionalDepth =
+    vm.wordSpecificFunctionalDepth?.kind === "present"
+      ? vm.wordSpecificFunctionalDepth.value ?? undefined
+      : undefined;
+
+  const wordSpecificFunctionalDepthSummary = (
+    <WordSpecificFunctionalDepthSummaryV0_1
+      value={wordSpecificFunctionalDepth}
+    />
+  );
+
   const primaryCandidate =
     usefulFunctionalCandidate(
       rows,
@@ -907,6 +986,7 @@ export function EmbryoExpansionContextCardV0_1({
   if (!primaryCandidate) {
     return (
       <>
+        {wordSpecificFunctionalDepthSummary}
         <NoSupportedFunctionalCandidate
           word={word}
         />
@@ -1497,6 +1577,7 @@ export function EmbryoExpansionContextCardV0_1({
 
   return (
     <>
+      {wordSpecificFunctionalDepthSummary}
       <section
         data-testid="functional-motivation-card"
         className="rounded-xl border border-emerald-300 bg-emerald-50 p-5 dark:border-emerald-400/35 dark:bg-emerald-500/5"

@@ -19,6 +19,16 @@ export const volatileTimestampFieldNames = Object.freeze([
 
 const volatileTimestampFieldNameSet = new Set(volatileTimestampFieldNames);
 
+// Presentation-only additive projections are intentionally outside the
+// analysis capability baseline. They remain available through the API/UI,
+// while the baseline continues to fingerprint structural/status/evidence
+// behavior only.
+export const presentationOnlyFieldNames = Object.freeze([
+  "wordSpecificFunctionalDepth",
+]);
+
+const presentationOnlyFieldNameSet = new Set(presentationOnlyFieldNames);
+
 function isRecord(value) {
   return value !== null && typeof value === "object" && !Array.isArray(value);
 }
@@ -34,7 +44,10 @@ export function normalizeAnalyzeV1ForStableRegressionFingerprint(value) {
 
   const normalized = {};
   for (const key of Object.keys(value).sort()) {
-    if (volatileTimestampFieldNameSet.has(key)) {
+    if (
+      volatileTimestampFieldNameSet.has(key) ||
+      presentationOnlyFieldNameSet.has(key)
+    ) {
       continue;
     }
 

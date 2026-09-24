@@ -68,6 +68,7 @@ import type {
 } from "./openInstrument/genericFunctionalWitnessRuntimeProjection.v1";
 import { verifyLogicDerivedFunctionalHypothesisV0_1 } from "./verifier/verifyLogicDerivedFunctionalHypothesis.v0_1";
 import type { SemanticAlignmentAssessmentV0_1 } from "./openInstrument/semanticAlignment.v0_1";
+import { buildWordSpecificFunctionalDepthV0_1 } from "./openInstrument/wordSpecificFunctionalDepth.v0_1";
 
 const multiSourceFunctionalResearchEvidenceCatalogV0_1 =
   loadMultiSourceFunctionalResearchEvidenceCatalogV0_1();
@@ -1134,6 +1135,15 @@ export function enginePayloadToAnalysisResult(payload: EnginePayload): AnalyzeWo
         ...existingCandidates,
       ]);
   }
+
+  // Additive word-specific functional-depth projection. This consumes the
+  // final candidate surface but never changes candidate ordering or status.
+  result.wordSpecificFunctionalDepth =
+    buildWordSpecificFunctionalDepthV0_1({
+      word: rootMapBasis,
+      analysisStatus: result.analysisStatusV0_1,
+      candidates: result.candidates ?? [],
+    });
 
 return result;
 }

@@ -15,6 +15,7 @@ import type {
 import type { OriginClaimV1 as OriginClaimProtocolV1 } from "./originClaim.v1";
 import type { AnalysisStatusV0_1 } from "./analysisStatus.v0_1";
 import type { DoctrineReadingV1 } from "./openInstrument/doctrineReadingContract.v1";
+import type { WordSpecificFunctionalDepthV0_1 } from "./openInstrument/wordSpecificFunctionalDepth.v0_1";
 
 // -------------------- Canonical V1 enums --------------------
 
@@ -52,6 +53,10 @@ export type AnalyzeWordResultV1 = {
 
   // Additive Seven-Voices doctrine reading projection.
   doctrineReading?: DoctrineReadingV1 | null;
+
+  // Additive word-specific functional-depth projection. This is derived from
+  // already-authorized candidates and never changes candidate/status logic.
+  wordSpecificFunctionalDepth?: WordSpecificFunctionalDepthV0_1 | null;
 
   // Frontier alternatives (if present)
   frontier?: FrontierCandidate[];
