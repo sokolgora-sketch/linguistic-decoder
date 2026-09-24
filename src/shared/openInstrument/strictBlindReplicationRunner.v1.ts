@@ -26,6 +26,29 @@ export type StrictBlindReplicationOutcomeV1 =
 
 export type StrictBlindRunnerModeV1 = "synthetic" | "real";
 
+export const STRICT_BLIND_EXECUTION_AUTHORIZATION_SCHEMA_V1 =
+  "open-instrument.strict-blind-replication-execution-authorization.v1" as const;
+
+export type StrictBlindExecutionAuthorizationV1 = Readonly<{
+  schemaVersion: typeof STRICT_BLIND_EXECUTION_AUTHORIZATION_SCHEMA_V1;
+  authorizationId: string;
+  experimentId: string;
+  preregistrationSha256: string;
+  workerEnvelopeSha256: string;
+  authorizedCases: readonly ["SBR-01", "SBR-02", "SBR-03"];
+  payloadSha256: Readonly<{
+    "SBR-01": string;
+    "SBR-02": string;
+    "SBR-03": string;
+  }>;
+  sourceUniverseId: string;
+  searchPolicyVersion: string;
+  realExecutionAuthorized: true;
+  providerCallsAllowed: false;
+  productionMutationAllowed: false;
+  oneShot: true;
+}>;
+
 export type StrictBlindReadinessCheckV1 = Readonly<{
   preregistrationHashMatch: boolean;
   payloadHashesMatch: boolean;
@@ -186,6 +209,12 @@ export type StrictBlindPostRevealEvaluationInputV1 = Readonly<{
   targetSenseId: string;
   targetSenseLabel: string;
   preRevealArtifact: StrictBlindPreRevealArtifactV1;
+}>;
+
+export type StrictBlindTargetRevealV1 = Readonly<{
+  targetWord: string;
+  targetSenseId: string;
+  targetSenseLabel: string;
 }>;
 
 export type StrictBlindResultPackageV1 = Readonly<{
@@ -647,6 +676,284 @@ export type RunSyntheticStrictBlindCaseInputV1 = Readonly<{
   ) => StrictBlindCorrespondenceEvaluationV1;
 }>;
 
+export type RunAuthorizedStrictBlindCaseInputV1 = Readonly<{
+  mode: "real";
+  authorization: StrictBlindExecutionAuthorizationV1;
+  caseOpaqueId: string;
+  replicationSlot: string;
+  frozenArtifacts: StrictBlindFrozenArtifactPathsV1;
+  structuralInput: Readonly<{ embryo: string; voicePath: readonly string[] }>;
+  durabilityStore: StrictBlindDurabilityStoreV1;
+  worker: (context: StrictBlindPreRevealContextV1) => void;
+  revealTarget: () => StrictBlindTargetRevealV1;
+  evaluateAfterReveal: (
+    input: StrictBlindPostRevealEvaluationInputV1,
+  ) => StrictBlindCorrespondenceEvaluationV1;
+}>;
+
+function assertStrictBlindExecutionAuthorizationV1(
+  authorization: StrictBlindExecutionAuthorizationV1,
+  frozen: StrictBlindFrozenArtifactIdentityV1,
+  replicationSlot: string,
+): void {
+  if (
+    authorization.schemaVersion !==
+      STRICT_BLIND_EXECUTION_AUTHORIZATION_SCHEMA_V1 ||
+    authorization.authorizationId !==
+      "open-instrument-strict-blind-replication-series-v1-execution-authorization" ||
+    authorization.experimentId !== frozen.experimentId ||
+    authorization.preregistrationSha256 !== frozen.preregistrationSha256 ||
+    authorization.workerEnvelopeSha256 !== frozen.workerEnvelopeSha256 ||
+    JSON.stringify(authorization.authorizedCases) !==
+      JSON.stringify(["SBR-01", "SBR-02", "SBR-03"]) ||
+    authorization.authorizedCases.some((slot) => slot === replicationSlot) ===
+      false ||
+    authorization.sourceUniverseId !== frozen.sourcePolicyId ||
+    authorization.searchPolicyVersion !== frozen.searchPolicyVersion ||
+    authorization.realExecutionAuthorized !== true ||
+    authorization.providerCallsAllowed !== false ||
+    authorization.productionMutationAllowed !== false ||
+    authorization.oneShot !== true ||
+    hasForbiddenTargetFieldV1(authorization)
+  ) {
+    throw new Error("REAL_EXECUTION_AUTHORIZATION_INVALID");
+  }
+  const authorizedSlot = replicationSlot as keyof typeof authorization.payloadSha256;
+  if (authorization.payloadSha256[authorizedSlot] !== frozen.payloadSha256[replicationSlot]) {
+    throw new Error("REAL_EXECUTION_AUTHORIZATION_PAYLOAD_MISMATCH");
+  }
+}
+
+export function verifyStrictBlindExecutionAuthorizationV1(
+  authorization: StrictBlindExecutionAuthorizationV1,
+  frozenArtifacts: StrictBlindFrozenArtifactPathsV1,
+  replicationSlot: "SBR-01" | "SBR-02" | "SBR-03",
+): StrictBlindExecutionAuthorizationV1 {
+  const frozen = assertFrozenArtifactBytesV1(frozenArtifacts, replicationSlot);
+  assertStrictBlindExecutionAuthorizationV1(
+    authorization,
+    frozen,
+    replicationSlot,
+  );
+  for (const slot of ["SBR-01", "SBR-02", "SBR-03"] as const) {
+    const slotFrozen =
+      slot === replicationSlot
+        ? frozen
+        : assertFrozenArtifactBytesV1(frozenArtifacts, slot);
+    if (authorization.payloadSha256[slot] !== slotFrozen.payloadSha256[slot]) {
+      throw new Error("REAL_EXECUTION_AUTHORIZATION_PAYLOAD_MISMATCH");
+    }
+  }
+  return authorization;
+}
+
+type RunStrictBlindCaseCoreInputV1 = Readonly<{
+  mode: StrictBlindRunnerModeV1;
+  authorization?: StrictBlindExecutionAuthorizationV1;
+  caseOpaqueId: string;
+  replicationSlot: string;
+  frozenArtifacts: StrictBlindFrozenArtifactPathsV1;
+  structuralInput: Readonly<{ embryo: string; voicePath: readonly string[] }>;
+  durabilityStore: StrictBlindDurabilityStoreV1;
+  worker: (context: StrictBlindPreRevealContextV1) => void;
+  targetProvider: () => StrictBlindTargetRevealV1;
+  evaluateAfterReveal: (
+    input: StrictBlindPostRevealEvaluationInputV1,
+  ) => StrictBlindCorrespondenceEvaluationV1;
+}>;
+
+function runStrictBlindCaseCoreV1(
+  input: RunStrictBlindCaseCoreInputV1,
+): StrictBlindResultPackageV1 {
+  const frozen = assertFrozenArtifactBytesV1(
+    input.frozenArtifacts,
+    input.replicationSlot,
+  );
+  if (input.mode === "real") {
+    if (!input.authorization) throw new Error("REAL_EXECUTION_AUTHORIZATION_MISSING");
+    assertStrictBlindExecutionAuthorizationV1(
+      input.authorization,
+      frozen,
+      input.replicationSlot,
+    );
+  }
+  if (
+    input.structuralInput.embryo !== frozen.payloadEmbryo ||
+    JSON.stringify(input.structuralInput.voicePath) !==
+      JSON.stringify(frozen.payloadVoicePath)
+  ) {
+    throw new Error("STRUCTURAL_INPUT_PAYLOAD_MISMATCH");
+  }
+  const queries: StrictBlindSourceQueryV1[] = [];
+  const observations: StrictBlindSourceObservationV1[] = [];
+  const unavailableEvents: StrictBlindSourceUnavailableV1[] = [];
+  const decision: {
+    value: StrictBlindFunctionFreezeV1 | StrictBlindNullFreezeV1 | null;
+  } = { value: null };
+  const contamination = { contaminated: false, reasonCode: null as string | null };
+  const context = buildPreRevealContextV1(
+    input.caseOpaqueId,
+    frozen.payloadSha256[input.replicationSlot],
+    input.structuralInput,
+    frozen.sourceTraditionIds,
+    frozen.searchStages,
+    queries,
+    observations,
+    unavailableEvents,
+    decision,
+    contamination,
+  );
+  input.worker(context);
+  if (!decision.value) throw new Error("PRE_REVEAL_DECISION_MISSING");
+  const coveredTraditions = new Set([
+    ...queries.map((query) => query.sourceTraditionId),
+    ...unavailableEvents.map((event) => event.sourceTraditionId),
+  ]);
+  if (
+    frozen.sourceTraditionIds.some(
+      (sourceTraditionId) => !coveredTraditions.has(sourceTraditionId),
+    )
+  ) {
+    throw new Error("SOURCE_COVERAGE_INCOMPLETE");
+  }
+  const preRevealArtifact = Object.freeze({
+    schemaVersion: STRICT_BLIND_REPLICATION_RUNNER_SCHEMA_V1,
+    artifactType: "strict_blind_pre_reveal_canonical" as const,
+    replicationExperimentId: frozen.experimentId,
+    replicationSlot: input.replicationSlot,
+    sourcePolicyId: frozen.sourcePolicyId,
+    searchPolicyId: frozen.searchPolicyVersion,
+    caseOpaqueId: input.caseOpaqueId,
+    payloadSha256: frozen.payloadSha256[input.replicationSlot],
+    structuralInput: Object.freeze({
+      embryo: input.structuralInput.embryo,
+      voicePath: Object.freeze([...input.structuralInput.voicePath]),
+    }),
+    embryoOrder: Object.freeze([input.structuralInput.embryo]),
+    sourceQueries: Object.freeze([...queries]),
+    sourceObservations: Object.freeze([...observations]),
+    sourceUnavailableEvents: Object.freeze([...unavailableEvents]),
+    sourceQueryLog: Object.freeze([...queries]),
+    acceptedSourceFacts: Object.freeze([...observations]),
+    formRelationAnalysis: Object.freeze([]),
+    functionCandidates: Object.freeze(
+      decision.value?.kind === "FUNCTION" ? [decision.value] : [],
+    ),
+    alternativeFunctions: Object.freeze([]),
+    rejectedInterpretations: Object.freeze([]),
+    preRevealNullState:
+      decision.value?.kind === "NULL" ? decision.value : null,
+    evidenceReferences: Object.freeze(
+      observations.map((observation) => observation.sourceRecordId),
+    ),
+    truthHierarchy: ["FACT", "INFERENCE", "HYPOTHESIS", "UNKNOWN / NULL"] as const,
+    claimBoundaries: Object.freeze([
+      "research_only",
+      "no_production_evidence",
+      "no_runtime_authorization",
+      "no_historical_derivation_claim",
+      "no_cognacy_claim",
+      "no_borrowing_claim",
+      "no_language_superiority_claim",
+      "no_candidate_truth_claim",
+      "no_single_winner",
+      "user_decides",
+      "null_is_valid",
+    ]),
+    noSingleWinner: true as const,
+    userDecides: true as const,
+    freezeStatus: "FROZEN" as const,
+    createdBeforeTargetReveal: true as const,
+    blindnessAttestation: true as const,
+    frozenDecision: decision.value,
+    contamination: Object.freeze({ ...contamination }),
+    targetRevealStatus: "NOT_REQUESTED_AND_NOT_PERFORMED" as const,
+    revealGateStatus: "FORBIDDEN_UNTIL_DURABILITY_GATE" as const,
+    productionMutationState: "NONE" as const,
+  });
+  const preRevealBytes = canonicalJsonV1(preRevealArtifact);
+  const preRevealArtifactSha256 = sha256BytesV1(preRevealBytes);
+  const manifestBytes = canonicalJsonV1({
+    schemaVersion: STRICT_BLIND_REPLICATION_RUNNER_SCHEMA_V1,
+    caseOpaqueId: input.caseOpaqueId,
+    payloadSha256: preRevealArtifact.payloadSha256,
+    preRevealArtifactSha256,
+    primaryAndSecondaryMustMatchExactly: true,
+    targetRevealStatus: "NOT_REQUESTED_AND_NOT_PERFORMED",
+    revealGateStatus: "FORBIDDEN_UNTIL_DURABILITY_GATE",
+  });
+  input.durabilityStore.write({
+    primaryBytes: preRevealBytes,
+    secondaryBytes: preRevealBytes,
+    manifestBytes,
+  });
+  const durable = input.durabilityStore.read();
+  const durableManifest = JSON.parse(durable.manifestBytes.toString("utf8")) as {
+    caseOpaqueId?: string;
+    payloadSha256?: string;
+    preRevealArtifactSha256?: string;
+    primaryAndSecondaryMustMatchExactly?: boolean;
+    targetRevealStatus?: string;
+    revealGateStatus?: string;
+  };
+  const durability = {
+    primaryAndSecondaryMatch: durable.primaryBytes.equals(durable.secondaryBytes),
+    manifestMatches:
+      JSON.stringify(durableManifest) === JSON.stringify(JSON.parse(manifestBytes.toString("utf8"))),
+    hashMatches:
+      sha256BytesV1(durable.primaryBytes) === preRevealArtifactSha256 &&
+      sha256BytesV1(durable.secondaryBytes) === preRevealArtifactSha256,
+    passed: false,
+  };
+  durability.passed =
+    durability.primaryAndSecondaryMatch &&
+    durability.manifestMatches &&
+    durability.hashMatches &&
+    durableManifest.caseOpaqueId === input.caseOpaqueId &&
+    durableManifest.payloadSha256 === preRevealArtifact.payloadSha256 &&
+    durableManifest.preRevealArtifactSha256 === preRevealArtifactSha256 &&
+    durableManifest.primaryAndSecondaryMustMatchExactly === true &&
+    durableManifest.targetRevealStatus === "NOT_REQUESTED_AND_NOT_PERFORMED" &&
+    durableManifest.revealGateStatus === "FORBIDDEN_UNTIL_DURABILITY_GATE";
+  if (!durability.passed) throw new Error("DURABILITY_GATE_FAILED");
+  if (contamination.contaminated) {
+    return Object.freeze({
+      schemaVersion: STRICT_BLIND_REPLICATION_RUNNER_SCHEMA_V1,
+      mode: input.mode,
+      caseOpaqueId: input.caseOpaqueId,
+      payloadSha256: preRevealArtifact.payloadSha256,
+      preRevealArtifact,
+      preRevealArtifactSha256,
+      durability,
+      reveal: { allowed: false, targetRevealed: false },
+      postRevealEvaluation: null,
+      contamination: { ...contamination },
+      productionMutationState: "NONE",
+    });
+  }
+  const target = input.targetProvider();
+  const evaluation = input.evaluateAfterReveal({
+    targetWord: target.targetWord,
+    targetSenseId: target.targetSenseId,
+    targetSenseLabel: target.targetSenseLabel,
+    preRevealArtifact,
+  });
+  validatePostRevealEvaluationV1(evaluation);
+  return Object.freeze({
+    schemaVersion: STRICT_BLIND_REPLICATION_RUNNER_SCHEMA_V1,
+    mode: input.mode,
+    caseOpaqueId: input.caseOpaqueId,
+    payloadSha256: preRevealArtifact.payloadSha256,
+    preRevealArtifact,
+    preRevealArtifactSha256,
+    durability,
+    reveal: { allowed: true, targetRevealed: true },
+    postRevealEvaluation: evaluation,
+    contamination: { contaminated: false, reasonCode: null },
+    productionMutationState: "NONE",
+  });
+}
+
 export function runStrictBlindSyntheticCaseV1(
   input: RunSyntheticStrictBlindCaseInputV1,
 ): StrictBlindResultPackageV1 {
@@ -830,6 +1137,26 @@ export function runStrictBlindSyntheticCaseV1(
     postRevealEvaluation: evaluation,
     contamination: { contaminated: false, reasonCode: null },
     productionMutationState: "NONE",
+  });
+}
+
+export function runStrictBlindAuthorizedCaseV1(
+  input: RunAuthorizedStrictBlindCaseInputV1,
+): StrictBlindResultPackageV1 {
+  if (input.mode !== "real") {
+    throw new Error("REAL_EXECUTION_AUTHORIZATION_REQUIRED");
+  }
+  return runStrictBlindCaseCoreV1({
+    mode: "real",
+    authorization: input.authorization,
+    caseOpaqueId: input.caseOpaqueId,
+    replicationSlot: input.replicationSlot,
+    frozenArtifacts: input.frozenArtifacts,
+    structuralInput: input.structuralInput,
+    durabilityStore: input.durabilityStore,
+    worker: input.worker,
+    targetProvider: input.revealTarget,
+    evaluateAfterReveal: input.evaluateAfterReveal,
   });
 }
 

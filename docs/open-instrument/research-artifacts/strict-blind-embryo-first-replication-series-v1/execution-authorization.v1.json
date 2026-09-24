@@ -1,0 +1,19 @@
+{
+  "schemaVersion": "open-instrument.strict-blind-replication-execution-authorization.v1",
+  "authorizationId": "open-instrument-strict-blind-replication-series-v1-execution-authorization",
+  "experimentId": "open-instrument-strict-blind-embryo-first-replication-series-v1",
+  "preregistrationSha256": "ee1baa297a3155a0c0e29afe8c96cc909b7329d49cc1498c0e58cfecd32a4352",
+  "workerEnvelopeSha256": "4e9f3d567697a33230886fda7aee61c2d3f6a575aaa20bb06c957a6b537c2e6c",
+  "authorizedCases": ["SBR-01", "SBR-02", "SBR-03"],
+  "payloadSha256": {
+    "SBR-01": "093269e360f3a42348f5c09342b43562bf0313d3c5d92449f847ee4c7fbead08",
+    "SBR-02": "54e43efe8e498fc874730dcf6ef2f7b358eb9ca57a67d1e85516614ea102cdb8",
+    "SBR-03": "ca58b25ad84241634caf16ff24228d05d485be4b0d00b7536b28b2e49ff5b50d"
+  },
+  "sourceUniverseId": "open-instrument-m7-common-source-universe-v1",
+  "searchPolicyVersion": "open-instrument-m7-search-s0-s4-v1",
+  "realExecutionAuthorized": true,
+  "providerCallsAllowed": false,
+  "productionMutationAllowed": false,
+  "oneShot": true
+}

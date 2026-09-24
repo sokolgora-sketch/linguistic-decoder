@@ -1,11 +1,13 @@
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { createHash } from "node:crypto";
 import {
   InMemoryStrictBlindDurabilityStoreV1,
   buildStrictBlindReadinessReportV1,
   defaultStrictBlindArtifactPathsV1,
   runStrictBlindSyntheticCaseV1,
+  verifyStrictBlindExecutionAuthorizationV1,
   verifyStrictBlindFrozenArtifactsV1,
+  type StrictBlindExecutionAuthorizationV1,
 } from "../src/shared/openInstrument/strictBlindReplicationRunner.v1";
 
 function sha256(value: Buffer): string {
@@ -14,9 +16,18 @@ function sha256(value: Buffer): string {
 
 const root = process.cwd();
 const paths = defaultStrictBlindArtifactPathsV1(root);
+const executionRoot = `${root}/docs/open-instrument/research-artifacts/strict-blind-embryo-first-replication-series-v1`;
+const authorizationPath = `${executionRoot}/execution-authorization.v1.json`;
+const seriesResultPath = `${executionRoot}/execution-v1/series-result-package.v1.json`;
 const frozen01 = verifyStrictBlindFrozenArtifactsV1(paths, "SBR-01");
 const frozen02 = verifyStrictBlindFrozenArtifactsV1(paths, "SBR-02");
 const frozen03 = verifyStrictBlindFrozenArtifactsV1(paths, "SBR-03");
+const authorization = JSON.parse(
+  readFileSync(authorizationPath, "utf8"),
+) as StrictBlindExecutionAuthorizationV1;
+verifyStrictBlindExecutionAuthorizationV1(authorization, paths, "SBR-01");
+verifyStrictBlindExecutionAuthorizationV1(authorization, paths, "SBR-02");
+verifyStrictBlindExecutionAuthorizationV1(authorization, paths, "SBR-03");
 const baselinePath = "tests/fixtures/openInstrument/analysis-capability-baseline.v1.json";
 const baselineUnchanged =
   sha256(readFileSync(`${root}/${baselinePath}`)) ===
@@ -81,7 +92,7 @@ const report = buildStrictBlindReadinessReportV1({
 });
 console.log(JSON.stringify({
   ...report,
-  realSbrExecutionAuthorized: false,
-  sbrExecuted: false,
+  realSbrExecutionAuthorized: authorization.realExecutionAuthorized,
+  sbrExecuted: existsSync(seriesResultPath),
   baselinePath,
 }, null, 2));

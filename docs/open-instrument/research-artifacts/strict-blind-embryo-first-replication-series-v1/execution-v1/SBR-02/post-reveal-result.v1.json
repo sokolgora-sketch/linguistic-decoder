@@ -1,0 +1,320 @@
+{
+  "replicationSlot": "SBR-02",
+  "caseOpaqueId": "open-instrument-strict-blind-embryo-first-replication-series-v1.SBR-02.opaque",
+  "targetReveal": {
+    "targetWord": "synergy",
+    "targetSenseId": "cambridge.en.synergy.noun.combined-power-1",
+    "targetSenseLabel": "the combined power of a group of things when they are working together that is greater than the total power achieved by each working separately"
+  },
+  "result": {
+    "schemaVersion": "open-instrument.strict-blind-replication-runner.v1",
+    "mode": "real",
+    "caseOpaqueId": "open-instrument-strict-blind-embryo-first-replication-series-v1.SBR-02.opaque",
+    "payloadSha256": "54e43efe8e498fc874730dcf6ef2f7b358eb9ca57a67d1e85516614ea102cdb8",
+    "preRevealArtifact": {
+      "schemaVersion": "open-instrument.strict-blind-replication-runner.v1",
+      "artifactType": "strict_blind_pre_reveal_canonical",
+      "replicationExperimentId": "open-instrument-strict-blind-embryo-first-replication-series-v1",
+      "replicationSlot": "SBR-02",
+      "sourcePolicyId": "open-instrument-m7-common-source-universe-v1",
+      "searchPolicyId": "open-instrument-m7-search-s0-s4-v1",
+      "caseOpaqueId": "open-instrument-strict-blind-embryo-first-replication-series-v1.SBR-02.opaque",
+      "payloadSha256": "54e43efe8e498fc874730dcf6ef2f7b358eb9ca57a67d1e85516614ea102cdb8",
+      "structuralInput": {
+        "embryo": "YNE",
+        "voicePath": [
+          "Y",
+          "E"
+        ]
+      },
+      "embryoOrder": [
+        "YNE"
+      ],
+      "sourceQueries": [
+        {
+          "sourceTraditionId": "fjale.fjalor-shqip.v0_1",
+          "stage": "S0 exact embryo",
+          "queryForm": "YNE",
+          "formOrigin": "structural_embryo_or_authorized_transform"
+        },
+        {
+          "sourceTraditionId": "fjale.fjalor-shqip.v0_1",
+          "stage": "S1 identity-preserving normalization",
+          "queryForm": "yne",
+          "formOrigin": "structural_embryo_or_authorized_transform"
+        },
+        {
+          "sourceTraditionId": "fjale.fjalor-shqip.v0_1",
+          "stage": "S2 source-attested bounded morphology",
+          "queryForm": "YNE",
+          "formOrigin": "structural_embryo_or_authorized_transform"
+        },
+        {
+          "sourceTraditionId": "fjale.fjalor-shqip.v0_1",
+          "stage": "S3 source-attested dialect/history",
+          "queryForm": "YNE",
+          "formOrigin": "structural_embryo_or_authorized_transform"
+        },
+        {
+          "sourceTraditionId": "fjale.fjalor-shqip.v0_1",
+          "stage": "S4 authoritative reconstruction",
+          "queryForm": "YNE",
+          "formOrigin": "structural_embryo_or_authorized_transform"
+        },
+        {
+          "sourceTraditionId": "scaife.lewis-short.v0_1",
+          "stage": "S0 exact embryo",
+          "queryForm": "YNE",
+          "formOrigin": "structural_embryo_or_authorized_transform"
+        },
+        {
+          "sourceTraditionId": "scaife.lewis-short.v0_1",
+          "stage": "S1 identity-preserving normalization",
+          "queryForm": "yne",
+          "formOrigin": "structural_embryo_or_authorized_transform"
+        },
+        {
+          "sourceTraditionId": "scaife.lewis-short.v0_1",
+          "stage": "S2 source-attested bounded morphology",
+          "queryForm": "YNE",
+          "formOrigin": "structural_embryo_or_authorized_transform"
+        },
+        {
+          "sourceTraditionId": "scaife.lewis-short.v0_1",
+          "stage": "S3 source-attested dialect/history",
+          "queryForm": "YNE",
+          "formOrigin": "structural_embryo_or_authorized_transform"
+        },
+        {
+          "sourceTraditionId": "scaife.lewis-short.v0_1",
+          "stage": "S4 authoritative reconstruction",
+          "queryForm": "YNE",
+          "formOrigin": "structural_embryo_or_authorized_transform"
+        },
+        {
+          "sourceTraditionId": "scaife.middle-liddell.v0_1",
+          "stage": "S0 exact embryo",
+          "queryForm": "YNE",
+          "formOrigin": "structural_embryo_or_authorized_transform"
+        },
+        {
+          "sourceTraditionId": "scaife.middle-liddell.v0_1",
+          "stage": "S1 identity-preserving normalization",
+          "queryForm": "yne",
+          "formOrigin": "structural_embryo_or_authorized_transform"
+        },
+        {
+          "sourceTraditionId": "scaife.middle-liddell.v0_1",
+          "stage": "S2 source-attested bounded morphology",
+          "queryForm": "YNE",
+          "formOrigin": "structural_embryo_or_authorized_transform"
+        },
+        {
+          "sourceTraditionId": "scaife.middle-liddell.v0_1",
+          "stage": "S3 source-attested dialect/history",
+          "queryForm": "YNE",
+          "formOrigin": "structural_embryo_or_authorized_transform"
+        },
+        {
+          "sourceTraditionId": "scaife.middle-liddell.v0_1",
+          "stage": "S4 authoritative reconstruction",
+          "queryForm": "YNE",
+          "formOrigin": "structural_embryo_or_authorized_transform"
+        }
+      ],
+      "sourceObservations": [
+        {
+          "sourceTraditionId": "fjale.fjalor-shqip.v0_1",
+          "sourceRecordId": "fjale.fjalor-shqip.yne.v0_1",
+          "sourceForm": "YNË",
+          "gloss": "Që na përket neve; që ka të bëjë me ne.",
+          "locator": "https://fjale.al/yn%C3%AB",
+          "attestationTruth": "fact"
+        }
+      ],
+      "sourceUnavailableEvents": [],
+      "sourceQueryLog": [
+        {
+          "sourceTraditionId": "fjale.fjalor-shqip.v0_1",
+          "stage": "S0 exact embryo",
+          "queryForm": "YNE",
+          "formOrigin": "structural_embryo_or_authorized_transform"
+        },
+        {
+          "sourceTraditionId": "fjale.fjalor-shqip.v0_1",
+          "stage": "S1 identity-preserving normalization",
+          "queryForm": "yne",
+          "formOrigin": "structural_embryo_or_authorized_transform"
+        },
+        {
+          "sourceTraditionId": "fjale.fjalor-shqip.v0_1",
+          "stage": "S2 source-attested bounded morphology",
+          "queryForm": "YNE",
+          "formOrigin": "structural_embryo_or_authorized_transform"
+        },
+        {
+          "sourceTraditionId": "fjale.fjalor-shqip.v0_1",
+          "stage": "S3 source-attested dialect/history",
+          "queryForm": "YNE",
+          "formOrigin": "structural_embryo_or_authorized_transform"
+        },
+        {
+          "sourceTraditionId": "fjale.fjalor-shqip.v0_1",
+          "stage": "S4 authoritative reconstruction",
+          "queryForm": "YNE",
+          "formOrigin": "structural_embryo_or_authorized_transform"
+        },
+        {
+          "sourceTraditionId": "scaife.lewis-short.v0_1",
+          "stage": "S0 exact embryo",
+          "queryForm": "YNE",
+          "formOrigin": "structural_embryo_or_authorized_transform"
+        },
+        {
+          "sourceTraditionId": "scaife.lewis-short.v0_1",
+          "stage": "S1 identity-preserving normalization",
+          "queryForm": "yne",
+          "formOrigin": "structural_embryo_or_authorized_transform"
+        },
+        {
+          "sourceTraditionId": "scaife.lewis-short.v0_1",
+          "stage": "S2 source-attested bounded morphology",
+          "queryForm": "YNE",
+          "formOrigin": "structural_embryo_or_authorized_transform"
+        },
+        {
+          "sourceTraditionId": "scaife.lewis-short.v0_1",
+          "stage": "S3 source-attested dialect/history",
+          "queryForm": "YNE",
+          "formOrigin": "structural_embryo_or_authorized_transform"
+        },
+        {
+          "sourceTraditionId": "scaife.lewis-short.v0_1",
+          "stage": "S4 authoritative reconstruction",
+          "queryForm": "YNE",
+          "formOrigin": "structural_embryo_or_authorized_transform"
+        },
+        {
+          "sourceTraditionId": "scaife.middle-liddell.v0_1",
+          "stage": "S0 exact embryo",
+          "queryForm": "YNE",
+          "formOrigin": "structural_embryo_or_authorized_transform"
+        },
+        {
+          "sourceTraditionId": "scaife.middle-liddell.v0_1",
+          "stage": "S1 identity-preserving normalization",
+          "queryForm": "yne",
+          "formOrigin": "structural_embryo_or_authorized_transform"
+        },
+        {
+          "sourceTraditionId": "scaife.middle-liddell.v0_1",
+          "stage": "S2 source-attested bounded morphology",
+          "queryForm": "YNE",
+          "formOrigin": "structural_embryo_or_authorized_transform"
+        },
+        {
+          "sourceTraditionId": "scaife.middle-liddell.v0_1",
+          "stage": "S3 source-attested dialect/history",
+          "queryForm": "YNE",
+          "formOrigin": "structural_embryo_or_authorized_transform"
+        },
+        {
+          "sourceTraditionId": "scaife.middle-liddell.v0_1",
+          "stage": "S4 authoritative reconstruction",
+          "queryForm": "YNE",
+          "formOrigin": "structural_embryo_or_authorized_transform"
+        }
+      ],
+      "acceptedSourceFacts": [
+        {
+          "sourceTraditionId": "fjale.fjalor-shqip.v0_1",
+          "sourceRecordId": "fjale.fjalor-shqip.yne.v0_1",
+          "sourceForm": "YNË",
+          "gloss": "Që na përket neve; që ka të bëjë me ne.",
+          "locator": "https://fjale.al/yn%C3%AB",
+          "attestationTruth": "fact"
+        }
+      ],
+      "formRelationAnalysis": [],
+      "functionCandidates": [],
+      "alternativeFunctions": [],
+      "rejectedInterpretations": [],
+      "preRevealNullState": {
+        "kind": "NULL",
+        "reasonCode": "NO_BOUNDED_FUNCTION_AT_PRE_REVEAL_FREEZE"
+      },
+      "evidenceReferences": [
+        "fjale.fjalor-shqip.yne.v0_1"
+      ],
+      "truthHierarchy": [
+        "FACT",
+        "INFERENCE",
+        "HYPOTHESIS",
+        "UNKNOWN / NULL"
+      ],
+      "claimBoundaries": [
+        "research_only",
+        "no_production_evidence",
+        "no_runtime_authorization",
+        "no_historical_derivation_claim",
+        "no_cognacy_claim",
+        "no_borrowing_claim",
+        "no_language_superiority_claim",
+        "no_candidate_truth_claim",
+        "no_single_winner",
+        "user_decides",
+        "null_is_valid"
+      ],
+      "noSingleWinner": true,
+      "userDecides": true,
+      "freezeStatus": "FROZEN",
+      "createdBeforeTargetReveal": true,
+      "blindnessAttestation": true,
+      "frozenDecision": {
+        "kind": "NULL",
+        "reasonCode": "NO_BOUNDED_FUNCTION_AT_PRE_REVEAL_FREEZE"
+      },
+      "contamination": {
+        "contaminated": false,
+        "reasonCode": null
+      },
+      "targetRevealStatus": "NOT_REQUESTED_AND_NOT_PERFORMED",
+      "revealGateStatus": "FORBIDDEN_UNTIL_DURABILITY_GATE",
+      "productionMutationState": "NONE"
+    },
+    "preRevealArtifactSha256": "169fc77b95b682a03c850b8a9daf51880bba7be282d38090c1adceafc5c8956b",
+    "durability": {
+      "primaryAndSecondaryMatch": true,
+      "manifestMatches": true,
+      "hashMatches": true,
+      "passed": true
+    },
+    "reveal": {
+      "allowed": true,
+      "targetRevealed": true
+    },
+    "postRevealEvaluation": {
+      "classification": "FORM_RESEMBLANCE_ONLY",
+      "reasonCode": "SOURCE_FORM_OBSERVED_BUT_NO_TARGET_FUNCTIONAL_CORRESPONDENCE",
+      "targetBinding": "FAILED",
+      "functionalMechanism": null,
+      "evidenceBeyondGloss": false,
+      "structuralRelationStatus": "SEPARATE"
+    },
+    "contamination": {
+      "contaminated": false,
+      "reasonCode": null
+    },
+    "productionMutationState": "NONE"
+  },
+  "durabilityPaths": {
+    "primary": "execution-v1/SBR-02/pre-reveal.primary.json",
+    "secondary": "execution-v1/SBR-02/pre-reveal.secondary.json",
+    "manifest": "execution-v1/SBR-02/pre-reveal.manifest.json"
+  },
+  "durabilityHashes": {
+    "primary": "169fc77b95b682a03c850b8a9daf51880bba7be282d38090c1adceafc5c8956b",
+    "secondary": "169fc77b95b682a03c850b8a9daf51880bba7be282d38090c1adceafc5c8956b",
+    "manifest": "02eac56b911348aa6d8f83dd52855b287790889b3338333161c1d968b6d516c1"
+  }
+}
