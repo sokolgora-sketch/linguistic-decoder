@@ -81,12 +81,45 @@ describe("Open Instrument primary reading orientation card v0.1", () => {
     },
   );
 
+  it.each([
+    ["mother", "E → E", "O → E"],
+    ["rain", "A → Ë", "A → I"],
+  ])(
+    "labels the engine-selected and Heart-surface paths separately for %s",
+    async (word, primaryPath, doctrinePath) => {
+      const body = await analyze(word);
+
+      expect(body.primaryPath.voicePath.join(" → ")).toBe(primaryPath);
+      expect(body.doctrineReading.analyzedVoicePath.join(" → ")).toBe(doctrinePath);
+      expect(body.primaryPath.voicePath).not.toEqual(
+        body.doctrineReading.analyzedVoicePath,
+      );
+
+      render(<InstrumentPanel payload={body} />);
+
+      const orientation = screen.getByTestId("primary-reading-orientation-card");
+      expect(within(orientation).getByText("Engine-selected Voice path:")).toBeVisible();
+      expect(within(orientation).getByTestId("orientation-structure")).toHaveTextContent(
+        primaryPath,
+      );
+
+      const doctrine = screen.getByTestId("doctrine-reading-card");
+      expect(within(doctrine).getByTestId("doctrine-reading-path-label")).toHaveTextContent(
+        "Heart surface Voice path used for doctrine",
+      );
+      expect(within(doctrine).getByTestId("doctrine-reading-path")).toHaveTextContent(
+        doctrinePath,
+      );
+    },
+  );
+
   it("keeps structural absence distinct from evidence absence for 123", async () => {
     const body = await analyze("123");
     render(<InstrumentPanel payload={body} />);
 
     const card = screen.getByTestId("primary-reading-orientation-card");
-    expect(within(card).getByTestId("orientation-structure")).toHaveTextContent("Voice path: O");
+    expect(within(card).getByText("Engine-selected Voice path:")).toBeVisible();
+    expect(within(card).getByTestId("orientation-structure")).toHaveTextContent("O");
     expect(within(card).getByTestId("orientation-doctrine")).toHaveTextContent(
       "No doctrinal reading was emitted.",
     );
