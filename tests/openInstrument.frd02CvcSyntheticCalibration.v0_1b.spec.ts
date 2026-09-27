@@ -376,8 +376,14 @@ describe("FRD-02 CVC v0.1b synthetic analyzer / fixture adapter", () => {
   test("AR/AS/AT/AU/AV: seed binding uses all frozen identity inputs", () => {
     const base = canonicalSeedTupleV0_1B("N0", "0");
     expect(base).toBe(
-      "FRD02_CVC_STRUCTURAL_ZERO_NULL_V0_1|primary|amendedContractSha256|generatorContractSha256|analyzerContractSha256|N0|0|permutation-primary",
+      "FRD02_CVC_STRUCTURAL_ZERO_NULL_V0_1|primary|77038ccc5406da0f6970fab2c667ea131955057abc1907f0f59e61180e306129|571ef6f139442b086887fb847097aff13edb53dea835b64c97b0b1fbf46a7a8d|3cf7076b5f9685990891ad6333a89b75aa8823d977664f2c9bffe2364d63608e|N0|0|permutation-primary",
     );
+    expect(base).toContain(AMENDED_CONTRACT_SHA256_V0_1B);
+    expect(base).toContain(GENERATOR_CONTRACT_SHA256_V0_1B);
+    expect(base).toContain(ANALYZER_CONTRACT_SHA256_V0_1B);
+    expect(base).not.toContain("amendedContractSha256");
+    expect(base).not.toContain("generatorContractSha256");
+    expect(base).not.toContain("analyzerContractSha256");
     expect(seedWordsV0_1B("N0", "0")).toEqual(seedWordsV0_1B("N0", "0"));
     expect(seedWordsV0_1B("N0", "0")).not.toEqual(seedWordsV0_1B("N1", "0"));
     expect(seedWordsV0_1B("N0", "0")).not.toEqual(seedWordsV0_1B("N0", "1"));
@@ -393,6 +399,15 @@ describe("FRD-02 CVC v0.1b synthetic analyzer / fixture adapter", () => {
     expectValidationCode(() => canonicalSeedTupleV0_1B("N0", "0", "bad|stream"), "INVALID_PERMUTATION_STREAM_ID");
     const serialized = canonicalSeedTupleV0_1B("N0", "0");
     const digest = createHash("sha256").update(Buffer.from(serialized, "utf8")).digest();
+    expect(digest.toString("hex")).toBe(
+      "86fff04bc3a69ce12f760199bf170b5a51af72ca96d1b231619674187342ca8d",
+    );
+    expect(seedWordsV0_1B("N0", "0")).toEqual([
+      16257052112623566726n,
+      6488305799830533679n,
+      3581155099284778833n,
+      10217051766742357601n,
+    ]);
     expect(seedWordsV0_1B("N0", "0")).toEqual([
       digest.readBigUInt64LE(0),
       digest.readBigUInt64LE(8),

@@ -864,9 +864,9 @@ export function canonicalSeedTupleV0_1B(
   return [
     "FRD02_CVC_STRUCTURAL_ZERO_NULL_V0_1",
     "primary",
-    "amendedContractSha256",
-    "generatorContractSha256",
-    "analyzerContractSha256",
+    AMENDED_CONTRACT_SHA256_V0_1B,
+    GENERATOR_CONTRACT_SHA256_V0_1B,
+    ANALYZER_CONTRACT_SHA256_V0_1B,
     fixtureId,
     replicateId,
     permutationStreamId,
