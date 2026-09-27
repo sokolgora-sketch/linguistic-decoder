@@ -38,6 +38,30 @@ export type SpokenVowelNormalizationInputV0_1 = Readonly<{
   }>;
 }>;
 
+export type MovingNucleusMovementV0_1 =
+  | "observed"
+  | "not_observed"
+  | "unknown";
+
+export type MovingNucleusCanonicalizationStatusV0_1 =
+  | "not_authorized"
+  | "authorized"
+  | "unresolved"
+  | "unsupported";
+
+export type MovingNucleusObservationProvenanceV0_1 = Readonly<{
+  sourceId: string;
+  authority: string;
+  evidenceRefs: readonly string[];
+}>;
+
+export type MovingNucleusObservationV0_1 = Readonly<{
+  observedAnchors: readonly VowelVoice[] | null;
+  movement: MovingNucleusMovementV0_1;
+  observationProvenance: MovingNucleusObservationProvenanceV0_1 | null;
+  canonicalizationStatus: MovingNucleusCanonicalizationStatusV0_1;
+}>;
+
 export type SpokenVowelNormalizationNucleusV0_1 = Readonly<{
   kind:
     | "monophthong"
@@ -47,6 +71,7 @@ export type SpokenVowelNormalizationNucleusV0_1 = Readonly<{
     | "unsupported_or_ambiguous";
   ipaSegments: readonly string[];
   voice: VowelVoice | null;
+  movingObservation?: MovingNucleusObservationV0_1;
 }>;
 
 export type SpokenVowelNormalizationV0_1 = Readonly<{

@@ -1,5 +1,6 @@
 import {
   normalizeSpokenVowelsV0_1,
+  type SpokenVowelNormalizationNucleusV0_1,
   type SpokenVowelNormalizationInputV0_1,
 } from "@/shared/openInstrument/spokenVowelNormalization.v0_1";
 
@@ -177,4 +178,63 @@ test("spoken normalization never falls back to orthography", () => {
 
   expect(result.normalizedVoicePath).toBeNull();
   expect(result.reasonCode).toBe("AMBIGUOUS_NUCLEUS_SEGMENTATION");
+});
+
+test("moving observations are structurally distinct from sequential nuclei", () => {
+  const movingNucleus: SpokenVowelNormalizationNucleusV0_1 = {
+    kind: "unsupported_or_ambiguous",
+    ipaSegments: ["o", "ʊ"],
+    voice: null,
+    movingObservation: {
+      observedAnchors: ["O", "U"],
+      movement: "observed",
+      observationProvenance: {
+        sourceId: "synthetic.moving-nucleus.v0_1",
+        authority: "synthetic_structural_fixture",
+        evidenceRefs: ["synthetic.moving-nucleus.fixture.v0_1"],
+      },
+      canonicalizationStatus: "not_authorized",
+    },
+  };
+  const sequentialNuclei: SpokenVowelNormalizationNucleusV0_1[] = [
+    { kind: "monophthong", ipaSegments: ["o"], voice: "O" },
+    { kind: "monophthong", ipaSegments: ["ʊ"], voice: "U" },
+  ];
+
+  expect([movingNucleus]).toHaveLength(1);
+  expect(sequentialNuclei).toHaveLength(2);
+  expect(movingNucleus.movingObservation?.observedAnchors).toEqual(["O", "U"]);
+  expect(movingNucleus.voice).toBeNull();
+  expect({ nuclei: [movingNucleus], normalizedVoicePath: null }.normalizedVoicePath).toBeNull();
+  expect(sequentialNuclei.map((nucleus) => nucleus.voice)).toEqual(["O", "U"]);
+});
+
+test("moving observation provenance is distinct from pronunciation provenance", () => {
+  const result = normalizeSpokenVowelsV0_1(input("/stoʊn/"));
+  const movingNucleus: SpokenVowelNormalizationNucleusV0_1 = {
+    kind: "unsupported_or_ambiguous",
+    ipaSegments: ["o", "ʊ"],
+    voice: null,
+    movingObservation: {
+      observedAnchors: null,
+      movement: "unknown",
+      observationProvenance: null,
+      canonicalizationStatus: "unresolved",
+    },
+  };
+
+  expect(result.provenance).toEqual(input("/stoʊn/").provenance);
+  expect(movingNucleus.movingObservation?.observationProvenance).toBeNull();
+  expect(result.provenance).not.toHaveProperty("authority");
+  expect(result.provenance).not.toHaveProperty("evidenceRefs");
+});
+
+test("current adjacent-vowel Null output does not claim observed movement", () => {
+  for (const ipa of ["/stoʊn/", "/aɪ/"]) {
+    const result = normalizeSpokenVowelsV0_1(input(ipa));
+
+    expect(result.status).toBe("null");
+    expect(result.normalizedVoicePath).toBeNull();
+    expect(result.nuclei[0]?.movingObservation).toBeUndefined();
+  }
 });
