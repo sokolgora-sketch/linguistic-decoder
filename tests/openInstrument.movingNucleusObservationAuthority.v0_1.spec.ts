@@ -62,6 +62,23 @@ const voiceFamilyMappingAuthority = {
   claimScope: "fixture mapping scope",
 };
 
+const competingPhoneticAuthorities = [
+  {
+    claim: "phoneticAnchors" as const,
+    authority: {
+      authorityClass: "TRANSCRIPTION_ASSERTED" as const,
+      provenance: transcriptionProvenance,
+    },
+  },
+  {
+    claim: "phoneticAnchors" as const,
+    authority: {
+      authorityClass: "PHONOLOGICALLY_DOCUMENTED" as const,
+      provenance: phonologicalProvenance,
+    },
+  },
+];
+
 function record(
   overrides: Partial<MovingNucleusObservationAuthorityV0_1> = {},
 ): MovingNucleusObservationAuthorityV0_1 {
@@ -84,6 +101,7 @@ function record(
       voiceFamilyAnchors: null,
       canonicalization: null,
     },
+    competingAuthorities: [],
     reasonCodes: [],
     ...overrides,
   };
@@ -118,6 +136,95 @@ test("T1 accepts a transcriptional structure claim with explicit provenance", ()
   });
 
   expect(validateMovingNucleusObservationAuthorityV0_1(value).ok).toBe(true);
+});
+
+test("F1 rejects empty required evidence references", () => {
+  const result = validateMovingNucleusObservationAuthorityV0_1(record({
+    aggregateStatus: "SUPPORTED",
+    nucleusStructure: {
+      state: "ONE_NUCLEUS",
+      rawIpaSegments: ["o"],
+      explicitNotation: "single nucleus notation",
+    },
+    authorityByClaim: {
+      nucleusStructure: {
+        authorityClass: "TRANSCRIPTION_ASSERTED",
+        provenance: { ...transcriptionProvenance, evidenceRefs: [] },
+      },
+      movement: null,
+      phoneticAnchors: null,
+      voiceFamilyAnchors: null,
+      canonicalization: null,
+    },
+  }));
+
+  expect(result.ok).toBe(false);
+  if (!result.ok) expect(result.reasonCodes).toContain("CLAIM_SHAPE_INVALID");
+});
+
+test("F1 rejects empty required temporal alignment", () => {
+  const result = validateMovingNucleusObservationAuthorityV0_1(record({
+    movement: { state: "OBSERVED" },
+    authorityByClaim: {
+      nucleusStructure: null,
+      movement: {
+        authorityClass: "ACOUSTICALLY_OBSERVED",
+        provenance: { ...acousticProvenance, temporalAlignment: [] },
+      },
+      phoneticAnchors: null,
+      voiceFamilyAnchors: null,
+      canonicalization: null,
+    },
+  }));
+
+  expect(result.ok).toBe(false);
+  if (!result.ok) expect(result.reasonCodes).toContain("MEASUREMENT_PROVENANCE_MISSING");
+});
+
+test("F1 rejects empty required measured fields", () => {
+  const result = validateMovingNucleusObservationAuthorityV0_1(record({
+    movement: { state: "OBSERVED" },
+    authorityByClaim: {
+      nucleusStructure: null,
+      movement: {
+        authorityClass: "ACOUSTICALLY_OBSERVED",
+        provenance: {
+          ...acousticProvenance,
+          measuredFields: [],
+          temporalObservations: [
+            { coordinate: "0ms", measuredFields: [] },
+            { coordinate: "100ms", measuredFields: ["F2"] },
+          ],
+        },
+      },
+      phoneticAnchors: null,
+      voiceFamilyAnchors: null,
+      canonicalization: null,
+    },
+  }));
+
+  expect(result.ok).toBe(false);
+  if (!result.ok) expect(result.reasonCodes).toContain("MEASUREMENT_PROVENANCE_MISSING");
+});
+
+test("F1 permits empty limitations when required evidence content is present", () => {
+  const result = validateMovingNucleusObservationAuthorityV0_1(record({
+    aggregateStatus: "SUPPORTED",
+    nucleusStructure: {
+      state: "ONE_NUCLEUS",
+      rawIpaSegments: ["o"],
+      explicitNotation: "single nucleus notation",
+    },
+    authorityByClaim: {
+      nucleusStructure: { authorityClass: "TRANSCRIPTION_ASSERTED", provenance: transcriptionProvenance },
+      movement: null,
+      phoneticAnchors: null,
+      voiceFamilyAnchors: null,
+      canonicalization: null,
+    },
+  }));
+
+  expect(result.ok).toBe(true);
 });
 
 test("T2 plain IPA adjacency cannot authorize movement", () => {
@@ -219,6 +326,122 @@ test("T6 rejects failed acoustic QC", () => {
   if (!result.ok) expect(result.reasonCodes).toContain("MEASUREMENT_QC_FAILED");
 });
 
+test("F3 allows a stationary acoustic anchor without trajectory samples", () => {
+  const result = validateMovingNucleusObservationAuthorityV0_1(record({
+    aggregateStatus: "SUPPORTED",
+    phoneticAnchors: {
+      state: "SUPPORTED",
+      anchors: [{ kind: "acoustic_region", value: "O-family region", order: 0, evidenceRef: "fixture.acoustic:0" }],
+    },
+    authorityByClaim: {
+      nucleusStructure: null,
+      movement: null,
+      phoneticAnchors: {
+        authorityClass: "ACOUSTICALLY_OBSERVED",
+        provenance: { ...acousticProvenance, temporalObservations: [] },
+      },
+      voiceFamilyAnchors: null,
+      canonicalization: null,
+    },
+  }));
+
+  expect(result.ok).toBe(true);
+});
+
+test("F4 accepts positive NONE acoustic support", () => {
+  expect(validateMovingNucleusObservationAuthorityV0_1(record({
+    aggregateStatus: "SUPPORTED",
+    movement: { state: "OBSERVED" },
+    authorityByClaim: {
+      nucleusStructure: null,
+      movement: { authorityClass: "ACOUSTICALLY_OBSERVED", provenance: acousticProvenance },
+      phoneticAnchors: null,
+      voiceFamilyAnchors: null,
+      canonicalization: null,
+    },
+  })).ok).toBe(true);
+});
+
+test("F4 accepts positive CORRECTED acoustic support with traceability", () => {
+  expect(validateMovingNucleusObservationAuthorityV0_1(record({
+    aggregateStatus: "SUPPORTED",
+    movement: { state: "OBSERVED" },
+    authorityByClaim: {
+      nucleusStructure: null,
+      movement: {
+        authorityClass: "ACOUSTICALLY_OBSERVED",
+        provenance: { ...acousticProvenance, correctionExclusionState: "CORRECTED" },
+      },
+      phoneticAnchors: null,
+      voiceFamilyAnchors: null,
+      canonicalization: null,
+    },
+  })).ok).toBe(true);
+});
+
+test("F4 rejects CORRECTED acoustic support without traceability", () => {
+  const result = validateMovingNucleusObservationAuthorityV0_1(record({
+    aggregateStatus: "SUPPORTED",
+    movement: { state: "OBSERVED" },
+    authorityByClaim: {
+      nucleusStructure: null,
+      movement: {
+        authorityClass: "ACOUSTICALLY_OBSERVED",
+        provenance: { ...acousticProvenance, correctionExclusionState: "CORRECTED", settingsProvenance: null },
+      },
+      phoneticAnchors: null,
+      voiceFamilyAnchors: null,
+      canonicalization: null,
+    },
+  }));
+
+  expect(result.ok).toBe(false);
+  if (!result.ok) expect(result.reasonCodes).toContain("MEASUREMENT_PROVENANCE_MISSING");
+});
+
+test.each(["EXCLUDED", "UNRESOLVED"] as const)(
+  "F4 rejects positive %s acoustic support",
+  (correctionExclusionState) => {
+    const result = validateMovingNucleusObservationAuthorityV0_1(record({
+      aggregateStatus: "SUPPORTED",
+      movement: { state: "OBSERVED" },
+      authorityByClaim: {
+        nucleusStructure: null,
+        movement: {
+          authorityClass: "ACOUSTICALLY_OBSERVED",
+          provenance: { ...acousticProvenance, correctionExclusionState },
+        },
+        phoneticAnchors: null,
+        voiceFamilyAnchors: null,
+        canonicalization: null,
+      },
+    }));
+
+    expect(result.ok).toBe(false);
+    if (!result.ok) expect(result.reasonCodes).toContain("MEASUREMENT_PROVENANCE_MISSING");
+  },
+);
+
+test.each(["EXCLUDED", "UNRESOLVED"] as const)(
+  "F4 preserves non-positive %s acoustic provenance",
+  (correctionExclusionState) => {
+    const result = validateMovingNucleusObservationAuthorityV0_1(record({
+      authorityByClaim: {
+        nucleusStructure: null,
+        movement: {
+          authorityClass: "ACOUSTICALLY_OBSERVED",
+          provenance: { ...acousticProvenance, correctionExclusionState },
+        },
+        phoneticAnchors: null,
+        voiceFamilyAnchors: null,
+        canonicalization: null,
+      },
+    }));
+
+    expect(result.ok).toBe(true);
+  },
+);
+
 test("T7 preserves phonetic anchors without Voice-family mapping", () => {
   const value = record({
     aggregateStatus: "SUPPORTED",
@@ -258,11 +481,78 @@ test("T8 rejects Voice-family anchors without mapping authority", () => {
 test("T9 preserves scoped conflict without selecting a winner", () => {
   const value = record({
     aggregateStatus: "CONFLICTED",
+    phoneticAnchors: { state: "CONFLICTED", anchors: null },
+    competingAuthorities: competingPhoneticAuthorities,
     reasonCodes: ["SOURCE_SCOPE_CONFLICT"],
   });
 
-  expect(validateMovingNucleusObservationAuthorityV0_1(value).ok).toBe(true);
-  expect(value.authorityByClaim.voiceFamilyAnchors).toBeNull();
+  const result = validateMovingNucleusObservationAuthorityV0_1(value);
+  expect(result.ok).toBe(true);
+  if (!result.ok) return;
+
+  expect(result.value.competingAuthorities).toHaveLength(2);
+  expect(result.value.competingAuthorities.map((item) => item.authority.provenance.claimScope)).toEqual([
+    "fixture notation",
+    "fixture phonological analysis",
+  ]);
+  expect(result.value.competingAuthorities.map((item) => item.authority.provenance.evidenceRefs)).toEqual([
+    ["fixture.transcription:entry"],
+    ["fixture.phonology:entry"],
+  ]);
+  expect(result.value).not.toHaveProperty("winner");
+});
+
+test("F2 rejects a conflicted claim without competing authorities", () => {
+  const result = validateMovingNucleusObservationAuthorityV0_1(record({
+    aggregateStatus: "CONFLICTED",
+    phoneticAnchors: { state: "CONFLICTED", anchors: null },
+    reasonCodes: ["SOURCE_SCOPE_CONFLICT"],
+  }));
+
+  expect(result.ok).toBe(false);
+  if (!result.ok) expect(result.reasonCodes).toContain("SOURCE_SCOPE_CONFLICT");
+});
+
+test("F2 rejects a conflicted claim with only one competing authority", () => {
+  const result = validateMovingNucleusObservationAuthorityV0_1(record({
+    aggregateStatus: "CONFLICTED",
+    phoneticAnchors: { state: "CONFLICTED", anchors: null },
+    competingAuthorities: competingPhoneticAuthorities.slice(0, 1),
+    reasonCodes: ["SOURCE_SCOPE_CONFLICT"],
+  }));
+
+  expect(result.ok).toBe(false);
+  if (!result.ok) expect(result.reasonCodes).toContain("SOURCE_SCOPE_CONFLICT");
+});
+
+test("F2 rejects malformed competing authorities", () => {
+  const result = validateMovingNucleusObservationAuthorityV0_1(record({
+    aggregateStatus: "CONFLICTED",
+    phoneticAnchors: { state: "CONFLICTED", anchors: null },
+    competingAuthorities: [
+      { claim: "phoneticAnchors", authority: { malformed: true } },
+      competingPhoneticAuthorities[1],
+    ] as never,
+    reasonCodes: ["SOURCE_SCOPE_CONFLICT"],
+  }));
+
+  expect(result.ok).toBe(false);
+  if (!result.ok) expect(result.reasonCodes).toContain("CLAIM_SHAPE_INVALID");
+});
+
+test("F2 freezes an independent competing-authority copy", () => {
+  const value = record({
+    aggregateStatus: "CONFLICTED",
+    phoneticAnchors: { state: "CONFLICTED", anchors: null },
+    competingAuthorities: competingPhoneticAuthorities,
+    reasonCodes: ["SOURCE_SCOPE_CONFLICT"],
+  });
+  const result = validateMovingNucleusObservationAuthorityV0_1(value);
+  expect(result.ok).toBe(true);
+  if (!result.ok) return;
+
+  (value.competingAuthorities[0].authority.provenance as { claimScope: string }).claimScope = "mutated";
+  expect(result.value.competingAuthorities[0].authority.provenance.claimScope).toBe("fixture notation");
 });
 
 test("T10 observation cannot populate normalizedVoicePath", () => {
@@ -431,7 +721,10 @@ test("R7 malformed supplied authority fails for null phonetic anchors", () => {
     authorityByClaim: {
       nucleusStructure: null,
       movement: null,
-      phoneticAnchors: { authorityClass: "ACOUSTICALLY_OBSERVED", provenance: { ...acousticProvenance, temporalObservations: [] } },
+      phoneticAnchors: {
+        authorityClass: "ACOUSTICALLY_OBSERVED",
+        provenance: { ...acousticProvenance, measuredFields: [] },
+      },
       voiceFamilyAnchors: null,
       canonicalization: null,
     },
@@ -500,4 +793,39 @@ test("R11 also rejects supported aggregate status over conflicted Voice-family c
   }));
   expect(result.ok).toBe(false);
   if (!result.ok) expect(result.reasonCodes).toContain("SOURCE_SCOPE_CONFLICT");
+});
+
+test("F5 requires a positively supported component for SUPPORTED aggregate status", () => {
+  const result = validateMovingNucleusObservationAuthorityV0_1(record({
+    aggregateStatus: "SUPPORTED",
+  }));
+
+  expect(result.ok).toBe(false);
+  if (!result.ok) expect(result.reasonCodes).toContain("CLAIM_SHAPE_INVALID");
+});
+
+test("F5 requires an explicit conflicted component for CONFLICTED aggregate status", () => {
+  const result = validateMovingNucleusObservationAuthorityV0_1(record({
+    aggregateStatus: "CONFLICTED",
+    reasonCodes: ["SOURCE_SCOPE_CONFLICT"],
+  }));
+
+  expect(result.ok).toBe(false);
+  if (!result.ok) expect(result.reasonCodes).toContain("SOURCE_SCOPE_CONFLICT");
+});
+
+test("F5 permits supported and unresolved non-supporting dimensions together", () => {
+  const result = validateMovingNucleusObservationAuthorityV0_1(record({
+    aggregateStatus: "SUPPORTED",
+    movement: { state: "OBSERVED" },
+    authorityByClaim: {
+      nucleusStructure: null,
+      movement: { authorityClass: "PHONOLOGICALLY_DOCUMENTED", provenance: phonologicalProvenance },
+      phoneticAnchors: null,
+      voiceFamilyAnchors: null,
+      canonicalization: null,
+    },
+  }));
+
+  expect(result.ok).toBe(true);
 });

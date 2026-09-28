@@ -116,6 +116,19 @@ export type MovingNucleusVoiceFamilyMappingAuthorityV0_1 = Readonly<{
   claimScope: string;
 }>;
 
+export type MovingNucleusObservationClaimKeyV0_1 =
+  | "nucleusStructure"
+  | "movement"
+  | "phoneticAnchors"
+  | "voiceFamilyAnchors";
+
+export type MovingNucleusCompetingAuthorityRecordV0_1 = Readonly<{
+  claim: MovingNucleusObservationClaimKeyV0_1;
+  authority:
+    | MovingNucleusObservationClaimAuthorityV0_1
+    | MovingNucleusVoiceFamilyMappingAuthorityV0_1;
+}>;
+
 export type MovingNucleusObservationAuthorityByClaimV0_1 = Readonly<{
   nucleusStructure: MovingNucleusObservationClaimAuthorityV0_1 | null;
   movement: MovingNucleusObservationClaimAuthorityV0_1 | null;
@@ -158,6 +171,7 @@ export type MovingNucleusObservationAuthorityV0_1 = Readonly<{
   voiceFamilyAnchors: MovingNucleusVoiceFamilyAnchorsClaimV0_1;
   canonicalizationStatus: MovingNucleusCanonicalizationStatusV0_1;
   authorityByClaim: MovingNucleusObservationAuthorityByClaimV0_1;
+  competingAuthorities: readonly MovingNucleusCompetingAuthorityRecordV0_1[];
   reasonCodes: readonly MovingNucleusObservationAuthorityReasonCodeV0_1[];
 }>;
 
@@ -202,6 +216,7 @@ const TOP_LEVEL_KEYS_V0_1 = [
   "voiceFamilyAnchors",
   "canonicalizationStatus",
   "authorityByClaim",
+  "competingAuthorities",
   "reasonCodes",
 ] as const;
 
@@ -215,6 +230,10 @@ function isNonEmptyStringV0_1(value: unknown): value is string {
 
 function isStringArrayV0_1(value: unknown): value is readonly string[] {
   return Array.isArray(value) && value.every(isNonEmptyStringV0_1);
+}
+
+function isNonEmptyStringArrayV0_1(value: unknown): value is readonly string[] {
+  return isStringArrayV0_1(value) && value.length > 0;
 }
 
 function hasExactKeysV0_1(value: RecordV0_1, keys: readonly string[]): boolean {
@@ -269,7 +288,9 @@ function validateCommonProvenanceV0_1(
     reasons.add("CLAIM_SHAPE_INVALID");
   }
   if (!isNonEmptyStringV0_1(provenance.sourceId)) reasons.add("CLAIM_SHAPE_INVALID");
-  if (!isStringArrayV0_1(provenance.evidenceRefs)) reasons.add("CLAIM_SHAPE_INVALID");
+  if (!isNonEmptyStringArrayV0_1(provenance.evidenceRefs)) {
+    reasons.add("CLAIM_SHAPE_INVALID");
+  }
   if (!isNonEmptyStringV0_1(provenance.language)) reasons.add("CLAIM_SHAPE_INVALID");
   if (
     provenance.dialectOrDoculect !== null &&
@@ -283,9 +304,37 @@ function validateCommonProvenanceV0_1(
   return true;
 }
 
+type AuthorityValidationOptionsV0_1 = Readonly<{
+  claimKey: MovingNucleusObservationClaimKeyV0_1;
+  positiveSupport: boolean;
+}>;
+
+function validateVoiceFamilyMappingAuthorityV0_1(
+  mappingAuthority: unknown,
+  reasons: Set<MovingNucleusObservationAuthorityReasonCodeV0_1>,
+): void {
+  if (!isRecordV0_1(mappingAuthority)) {
+    reasons.add("VOICE_FAMILY_AUTHORITY_MISSING");
+    return;
+  }
+  if (mappingAuthority.authorityType !== "REVIEWED_OPEN_INSTRUMENT_MAPPING") {
+    reasons.add("VOICE_FAMILY_AUTHORITY_MISSING");
+  }
+  if (!isNonEmptyStringV0_1(mappingAuthority.mappingId)) {
+    reasons.add("VOICE_FAMILY_AUTHORITY_MISSING");
+  }
+  if (!isNonEmptyStringArrayV0_1(mappingAuthority.evidenceRefs)) {
+    reasons.add("VOICE_FAMILY_AUTHORITY_MISSING");
+  }
+  if (!isNonEmptyStringV0_1(mappingAuthority.claimScope)) {
+    reasons.add("VOICE_FAMILY_AUTHORITY_MISSING");
+  }
+}
+
 function validateAuthorityV0_1(
   authority: unknown,
   reasons: Set<MovingNucleusObservationAuthorityReasonCodeV0_1>,
+  options: AuthorityValidationOptionsV0_1,
 ): MovingNucleusObservationAuthorityClassV0_1 | null {
   if (!isRecordV0_1(authority) || !AUTHORITY_CLASSES_V0_1.has(authority.authorityClass as MovingNucleusObservationAuthorityClassV0_1)) {
     reasons.add("CLAIM_SHAPE_INVALID");
@@ -323,22 +372,28 @@ function validateAuthorityV0_1(
     if (requiredStrings.some((value) => !isNonEmptyStringV0_1(value))) {
       reasons.add("MEASUREMENT_PROVENANCE_MISSING");
     }
-    if (!isStringArrayV0_1(provenance.temporalAlignment)) {
+    if (!isNonEmptyStringArrayV0_1(provenance.temporalAlignment)) {
       reasons.add("MEASUREMENT_PROVENANCE_MISSING");
     }
     if (
       !Array.isArray(provenance.temporalObservations) ||
-      provenance.temporalObservations.length < 2 ||
       provenance.temporalObservations.some(
         (observation) =>
           !isRecordV0_1(observation) ||
           !isNonEmptyStringV0_1(observation.coordinate) ||
-          !isStringArrayV0_1(observation.measuredFields),
+          !isNonEmptyStringArrayV0_1(observation.measuredFields),
       )
     ) {
       reasons.add("MEASUREMENT_PROVENANCE_MISSING");
     }
-    if (!isStringArrayV0_1(provenance.measuredFields)) {
+    if (
+      options.claimKey === "movement" &&
+      (!Array.isArray(provenance.temporalObservations) ||
+        provenance.temporalObservations.length < 2)
+    ) {
+      reasons.add("MEASUREMENT_PROVENANCE_MISSING");
+    }
+    if (!isNonEmptyStringArrayV0_1(provenance.measuredFields)) {
       reasons.add("MEASUREMENT_PROVENANCE_MISSING");
     }
     if (
@@ -348,8 +403,28 @@ function validateAuthorityV0_1(
     ) {
       addClaimShapeReasonV0_1(reasons);
     }
-    if (provenance.qcState === "FAIL") reasons.add("MEASUREMENT_QC_FAILED");
-    if (provenance.qcState !== "PASS") reasons.add("MEASUREMENT_PROVENANCE_MISSING");
+    if (!["PASS", "FAIL", "UNRESOLVED"].includes(String(provenance.qcState))) {
+      addClaimShapeReasonV0_1(reasons);
+    }
+    if (options.positiveSupport && provenance.qcState === "FAIL") {
+      reasons.add("MEASUREMENT_QC_FAILED");
+    }
+    if (options.positiveSupport && provenance.qcState !== "PASS") {
+      reasons.add("MEASUREMENT_PROVENANCE_MISSING");
+    }
+    if (
+      options.positiveSupport &&
+      (provenance.correctionExclusionState === "EXCLUDED" ||
+        provenance.correctionExclusionState === "UNRESOLVED")
+    ) {
+      reasons.add("MEASUREMENT_PROVENANCE_MISSING");
+    }
+    if (
+      provenance.correctionExclusionState === "CORRECTED" &&
+      !isNonEmptyStringV0_1(provenance.settingsProvenance)
+    ) {
+      reasons.add("MEASUREMENT_PROVENANCE_MISSING");
+    }
     if (!isStringArrayV0_1(provenance.uncertaintyLimitations)) {
       reasons.add("MEASUREMENT_PROVENANCE_MISSING");
     }
@@ -385,7 +460,13 @@ function validateNucleusStructureV0_1(
     addClaimShapeReasonV0_1(reasons);
   }
 
-  const authorityClass = authority === null ? null : validateAuthorityV0_1(authority, reasons);
+  const authorityClass =
+    authority === null
+      ? null
+      : validateAuthorityV0_1(authority, reasons, {
+          claimKey: "nucleusStructure",
+          positiveSupport: supportedState,
+        });
   if (supportedState && authorityClass === null) {
     reasons.add("NUCLEUS_STRUCTURE_UNRESOLVED");
   }
@@ -413,7 +494,13 @@ function validateMovementV0_1(
     return;
   }
 
-  const authorityClass = authority === null ? null : validateAuthorityV0_1(authority, reasons);
+  const authorityClass =
+    authority === null
+      ? null
+      : validateAuthorityV0_1(authority, reasons, {
+          claimKey: "movement",
+          positiveSupport: value.state !== "UNKNOWN",
+        });
   if (value.state === "UNKNOWN") return;
 
   if (authorityClass === null || authorityClass === "TRANSCRIPTION_ASSERTED") {
@@ -431,7 +518,12 @@ function validatePhoneticAnchorsV0_1(
     return;
   }
 
-  if (authority !== null) validateAuthorityV0_1(authority, reasons);
+  if (authority !== null) {
+    validateAuthorityV0_1(authority, reasons, {
+      claimKey: "phoneticAnchors",
+      positiveSupport: value.state === "SUPPORTED",
+    });
+  }
 
   if (value.anchors === null) {
     if (value.state === "SUPPORTED") addClaimShapeReasonV0_1(reasons);
@@ -488,13 +580,112 @@ function validateVoiceFamilyAnchorsV0_1(
     if (!isNonEmptyStringV0_1(mappingAuthority.mappingId)) {
       reasons.add("VOICE_FAMILY_AUTHORITY_MISSING");
     }
-    if (!isStringArrayV0_1(mappingAuthority.evidenceRefs)) {
-      reasons.add("VOICE_FAMILY_AUTHORITY_MISSING");
+    validateVoiceFamilyMappingAuthorityV0_1(mappingAuthority, reasons);
+  }
+}
+
+function isObservationClaimKeyV0_1(
+  value: unknown,
+): value is MovingNucleusObservationClaimKeyV0_1 {
+  return [
+    "nucleusStructure",
+    "movement",
+    "phoneticAnchors",
+    "voiceFamilyAnchors",
+  ].includes(String(value));
+}
+
+function validateCompetingAuthoritiesV0_1(
+  value: unknown,
+  reasons: Set<MovingNucleusObservationAuthorityReasonCodeV0_1>,
+): Map<MovingNucleusObservationClaimKeyV0_1, number> {
+  const counts = new Map<MovingNucleusObservationClaimKeyV0_1, number>();
+  if (!Array.isArray(value)) {
+    addClaimShapeReasonV0_1(reasons);
+    return counts;
+  }
+
+  for (const record of value) {
+    if (!isRecordV0_1(record) || !hasExactKeysV0_1(record, ["claim", "authority"])) {
+      addClaimShapeReasonV0_1(reasons);
+      continue;
     }
-    if (!isNonEmptyStringV0_1(mappingAuthority.claimScope)) {
-      reasons.add("VOICE_FAMILY_AUTHORITY_MISSING");
+    if (!isObservationClaimKeyV0_1(record.claim)) {
+      addClaimShapeReasonV0_1(reasons);
+      continue;
+    }
+
+    counts.set(record.claim, (counts.get(record.claim) ?? 0) + 1);
+    if (record.claim === "voiceFamilyAnchors") {
+      validateVoiceFamilyMappingAuthorityV0_1(record.authority, reasons);
+    } else {
+      validateAuthorityV0_1(record.authority, reasons, {
+        claimKey: record.claim,
+        positiveSupport: false,
+      });
     }
   }
+
+  return counts;
+}
+
+function conflictedClaimKeysV0_1(
+  value: RecordV0_1,
+): readonly MovingNucleusObservationClaimKeyV0_1[] {
+  const conflicted: MovingNucleusObservationClaimKeyV0_1[] = [];
+  if (isRecordV0_1(value.phoneticAnchors) && value.phoneticAnchors.state === "CONFLICTED") {
+    conflicted.push("phoneticAnchors");
+  }
+  if (isRecordV0_1(value.voiceFamilyAnchors) && value.voiceFamilyAnchors.state === "CONFLICTED") {
+    conflicted.push("voiceFamilyAnchors");
+  }
+  return conflicted;
+}
+
+function hasPositiveComponentClaimV0_1(
+  value: RecordV0_1,
+  authorityByClaim: RecordV0_1 | null,
+): boolean {
+  if (authorityByClaim === null) return false;
+  const nucleusStructure = isRecordV0_1(value.nucleusStructure)
+    ? value.nucleusStructure
+    : null;
+  if (
+    nucleusStructure &&
+    (nucleusStructure.state === "ONE_NUCLEUS" ||
+      nucleusStructure.state === "SEQUENTIAL_NUCLEI") &&
+    authorityByClaim.nucleusStructure !== null
+  ) {
+    return true;
+  }
+
+  const movement = isRecordV0_1(value.movement) ? value.movement : null;
+  if (
+    movement &&
+    (movement.state === "OBSERVED" || movement.state === "NOT_OBSERVED") &&
+    authorityByClaim.movement !== null
+  ) {
+    return true;
+  }
+
+  const phoneticAnchors = isRecordV0_1(value.phoneticAnchors)
+    ? value.phoneticAnchors
+    : null;
+  if (
+    phoneticAnchors &&
+    phoneticAnchors.state === "SUPPORTED" &&
+    authorityByClaim.phoneticAnchors !== null
+  ) {
+    return true;
+  }
+
+  const voiceFamilyAnchors = isRecordV0_1(value.voiceFamilyAnchors)
+    ? value.voiceFamilyAnchors
+    : null;
+  return (
+    voiceFamilyAnchors?.state === "SUPPORTED" &&
+    authorityByClaim.voiceFamilyAnchors !== null
+  );
 }
 
 export function validateMovingNucleusObservationAuthorityV0_1(
@@ -544,6 +735,11 @@ export function validateMovingNucleusObservationAuthorityV0_1(
     reasons.add("CANONICALIZATION_NOT_AUTHORIZED");
   }
 
+  const competingAuthorityCounts = validateCompetingAuthoritiesV0_1(
+    value.competingAuthorities,
+    reasons,
+  );
+
   validateNucleusStructureV0_1(
     value.nucleusStructure,
     authorityByClaim?.nucleusStructure ?? null,
@@ -561,18 +757,29 @@ export function validateMovingNucleusObservationAuthorityV0_1(
     reasons,
   );
 
-  const hasConflictedClaim =
-    (isRecordV0_1(value.phoneticAnchors) &&
-      value.phoneticAnchors.state === "CONFLICTED") ||
-    (isRecordV0_1(value.voiceFamilyAnchors) &&
-      value.voiceFamilyAnchors.state === "CONFLICTED");
+  const conflictedClaimKeys = conflictedClaimKeysV0_1(value);
+  const hasConflictedClaim = conflictedClaimKeys.length > 0;
   if (value.aggregateStatus === "SUPPORTED" && hasConflictedClaim) {
     reasons.add("SOURCE_SCOPE_CONFLICT");
   }
 
+  for (const claimKey of conflictedClaimKeys) {
+    if ((competingAuthorityCounts.get(claimKey) ?? 0) < 2) {
+      reasons.add("SOURCE_SCOPE_CONFLICT");
+    }
+  }
+
+  if (
+    value.aggregateStatus === "SUPPORTED" &&
+    !hasPositiveComponentClaimV0_1(value, authorityByClaim)
+  ) {
+    addClaimShapeReasonV0_1(reasons);
+  }
+
   if (
     value.aggregateStatus === "CONFLICTED" &&
-    (!Array.isArray(value.reasonCodes) ||
+    (!hasConflictedClaim ||
+      !Array.isArray(value.reasonCodes) ||
       !value.reasonCodes.includes("SOURCE_SCOPE_CONFLICT"))
   ) {
     reasons.add("SOURCE_SCOPE_CONFLICT");
