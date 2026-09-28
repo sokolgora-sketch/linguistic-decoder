@@ -50,6 +50,6 @@ describe('VowelPathTimeline (v0.1)', () => {
     );
 
     expect(screen.getByText('NOT EMITTED')).toBeInTheDocument();
-    expect(screen.getByText('No detected voice path.')).toBeInTheDocument();
+    expect(screen.getByText('No engine-selected voice path.')).toBeInTheDocument();
   });
 });

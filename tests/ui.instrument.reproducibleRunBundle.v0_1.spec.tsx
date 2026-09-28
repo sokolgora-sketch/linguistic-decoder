@@ -472,7 +472,7 @@ describe("reproducible run bundle UI handoff v0.1", () => {
     expect(screen.getByText("study-embryo")).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole("tab", { name: "Roots / Meaning" }));
-    expect(screen.getAllByText("Functional").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("Candidate / structural spectrum").length).toBeGreaterThan(0);
     expect(screen.getAllByText("U-I").length).toBeGreaterThan(0);
     expect(global.fetch).not.toHaveBeenCalled();
   });

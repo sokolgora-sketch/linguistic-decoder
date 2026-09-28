@@ -65,7 +65,7 @@ function NormalizationRecord({
 
   return (
     <div className="mt-3 border-t border-neutral-800 pt-3">
-      <div className="text-sm text-neutral-300">Normalization record</div>
+      <div className="text-sm text-neutral-300">Normalization / transformation record</div>
       <div className="mt-1 space-y-1 break-words font-mono text-sm text-neutral-100">
         {steps.value.map((step, index) => (
           <div key={`${index}-${step}`}>{step}</div>
@@ -85,23 +85,27 @@ export function VowelPathTimeline(props: Props) {
   return (
     <div className="rounded-xl border border-neutral-700 bg-neutral-900/40 p-4">
       <div className="mb-3 flex items-center justify-between">
-        <div className="text-sm font-semibold text-neutral-100">Vowel Path Timeline (Detected vs Interpreted)</div>
+        <div className="text-sm font-semibold text-neutral-100">Voice Path Layers</div>
         <DeltaBadge delta={props.delta} />
       </div>
 
       {!detectedPresent ? (
-        <div className="text-sm text-neutral-400">No detected voice path.</div>
+        <div className="text-sm text-neutral-400">No engine-selected voice path.</div>
       ) : (
         <div className="mb-3 font-mono text-sm text-neutral-100">{formatPath(detected.value)}</div>
       )}
 
       <div className="space-y-2">
-        <PathRow label="Detected" maybe={detected} />
-        <PathRow label="Surface" maybe={surface} />
-        <PathRow label="Functional" maybe={functional} />
+        <PathRow label="Engine-selected analysis path" maybe={detected} />
+        <PathRow label="Heart surface / doctrine path" maybe={surface} />
+        <PathRow label="Candidate / structural path" maybe={functional} />
       </div>
 
       <NormalizationRecord steps={props.normalizationSteps} />
+
+      <div className="mt-3 text-xs leading-5 text-neutral-500">
+        These are separate analysis layers. Candidate / structural paths are not word-specific functional motivation.
+      </div>
 
       <div className="mt-3 text-xs text-neutral-500">source: telemetry VM</div>
     </div>

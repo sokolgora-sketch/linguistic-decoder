@@ -104,23 +104,23 @@ export default function MeaningPanel({ vm }: Props) {
 
   const functionalLine =
     isPresent<unknown[]>(functional) && Array.isArray(functional.value) && functional.value.length
-      ? `Functional path: ${formatArrowPath(functional.value)}.`
+      ? `Candidate / structural path: ${formatArrowPath(functional.value)}.`
       : asText(detection.voicePathFunctional)
-        ? `Functional path: ${asText(detection.voicePathFunctional)}.`
+        ? `Candidate / structural path: ${asText(detection.voicePathFunctional)}.`
         : null;
 
   const surfaceLine =
     isPresent<unknown[]>(surface) && Array.isArray(surface.value) && surface.value.length
-      ? `Surface path: ${formatArrowPath(surface.value)}.`
+      ? `Heart surface / doctrine path: ${formatArrowPath(surface.value)}.`
       : asText(detection.voicePathSurface)
-        ? `Surface path: ${asText(detection.voicePathSurface)}.`
+        ? `Heart surface / doctrine path: ${asText(detection.voicePathSurface)}.`
         : null;
 
   const detectedLine =
     isPresent<unknown[]>(detected) && Array.isArray(detected.value) && detected.value.length
-      ? `Voice path: ${formatArrowPath(detected.value)}.`
+      ? `Engine-selected analysis path: ${formatArrowPath(detected.value)}.`
       : asText(detection.voicePath)
-        ? `Voice path: ${asText(detection.voicePath)}.`
+        ? `Engine-selected analysis path: ${asText(detection.voicePath)}.`
         : null;
 
   const sentence = principles
@@ -141,7 +141,7 @@ export default function MeaningPanel({ vm }: Props) {
 
   // --- Evidence summary (truth posture) ---
   const evidenceLines = joinParts([
-    renderMaybeList('Normalization', evidence.normalizationSteps),
+    renderMaybeList('Normalization / transformation', evidence.normalizationSteps),
     renderMaybeList('Ops', evidence.ops),
     renderMaybeList('Signals', evidence.signals),
     renderMaybeList('Notes', evidence.notes),
@@ -174,7 +174,7 @@ export default function MeaningPanel({ vm }: Props) {
       </div>
 
       <div className="mt-3 text-[11px] leading-5 text-[#7d8ea3]">
-        Boundary: deterministic reading; no forced answer; not a historical-chain claim.
+        Boundary: deterministic reading; candidate / structural paths are not word-specific functional motivation; no forced answer; not a historical-chain claim.
       </div>
     </div>
   );

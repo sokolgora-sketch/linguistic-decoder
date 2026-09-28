@@ -56,15 +56,18 @@ export function VoicePathCompare({
   return (
     <div className="mt-2 space-y-1 text-xs text-slate-400">
       <div>
-        Voice path (surface):{" "}
+        Heart surface / doctrine path:{" "}
         {renderPOM(surface, (arr) => <span className="font-mono">{fmt(arr)}</span>)}
       </div>
       <div>
-        Voice path (functional):{" "}
+        Candidate / structural path:{" "}
         {renderPOM(functional, (arr) => <span className="font-mono">{fmt(arr)}</span>)}
       </div>
       <div>
         Delta: <DeltaBadge label={delta} />
+      </div>
+      <div className="text-slate-500">
+        Candidate / structural path is separate from word-specific functional motivation.
       </div>
     </div>
   );

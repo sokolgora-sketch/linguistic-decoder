@@ -86,7 +86,7 @@ describe("Open Instrument Overview vowel-path visibility v0.1", () => {
     const overview = screen.getByRole("tabpanel");
     const functionalCard = within(overview).getByTestId("functional-motivation-card");
     const timelineHeading = within(overview).getByText(
-      "Vowel Path Timeline (Detected vs Interpreted)",
+      "Voice Path Layers",
     );
     const timeline = timelineHeading.closest("div.rounded-xl");
 
@@ -97,9 +97,9 @@ describe("Open Instrument Overview vowel-path visibility v0.1", () => {
       "true",
     );
     expect(timelineHeading).toBeVisible();
-    expect(within(timeline!).getByText("Detected")).toBeVisible();
-    expect(within(timeline!).getByText("Surface")).toBeVisible();
-    expect(within(timeline!).getByText("Functional")).toBeVisible();
+    expect(within(timeline!).getByText("Engine-selected analysis path")).toBeVisible();
+    expect(within(timeline!).getByText("Heart surface / doctrine path")).toBeVisible();
+    expect(within(timeline!).getByText("Candidate / structural path")).toBeVisible();
     expect(within(timeline!).getByText("DIVERGE")).toBeVisible();
     expect(within(timeline!).getAllByText("U → Y").length).toBe(3);
     expect(within(timeline!).getByText("U → I")).toBeVisible();
@@ -117,10 +117,10 @@ describe("Open Instrument Overview vowel-path visibility v0.1", () => {
     const overview = screen.getByRole("tabpanel");
 
     expect(
-      within(overview).getByText("Vowel Path Timeline (Detected vs Interpreted)"),
+      within(overview).getByText("Voice Path Layers"),
     ).toBeVisible();
     expect(within(overview).getByText("NOT EMITTED")).toBeVisible();
-    expect(within(overview).getByText("No detected voice path.")).toBeVisible();
+    expect(within(overview).getByText("No engine-selected voice path.")).toBeVisible();
     expect(within(overview).getAllByText("not emitted").length).toBeGreaterThanOrEqual(3);
   });
 });

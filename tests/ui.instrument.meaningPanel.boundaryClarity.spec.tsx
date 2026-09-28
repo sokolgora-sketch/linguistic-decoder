@@ -31,6 +31,6 @@ describe("MeaningPanel boundary clarity", () => {
         /Human-readable deterministic reading for the current word\. It frames the readout as inspection output, not origin proof\./i
       )
     ).toBeInTheDocument();
-    expect(screen.getByText(/Boundary: deterministic reading; no forced answer; not a historical-chain claim\./i)).toBeInTheDocument();
+    expect(screen.getByText(/Boundary: deterministic reading; candidate \/ structural paths are not word-specific functional motivation; no forced answer; not a historical-chain claim\./i)).toBeInTheDocument();
   });
 });

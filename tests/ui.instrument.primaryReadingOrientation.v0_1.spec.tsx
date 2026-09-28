@@ -113,6 +113,36 @@ describe("Open Instrument primary reading orientation card v0.1", () => {
     },
   );
 
+  it.each([
+    ["damage", "A → E", "A → A → E", "A → Ë", "Reviewed functional motivation"],
+    ["mother", "E → E", "O → E", "E → E", "No supported word-specific functional motivation yet."],
+    ["stone", "O → E", "O → E", "O → E", "No supported word-specific functional motivation yet."],
+    ["father", "A → E", "A → E", "A → Ë", "Reviewed functional motivation"],
+    ["water", "A → E", "A → E", "A → E", "No supported word-specific functional motivation yet."],
+  ])(
+    "keeps path layers and word-specific authority separate for %s",
+    async (word, enginePath, surfacePath, candidatePath, functionalDepth) => {
+      const body = await analyze(word);
+      render(<InstrumentPanel payload={body} />);
+
+      const timeline = screen
+        .getAllByText("Voice Path Layers")[0]
+        .closest("div.rounded-xl");
+
+      expect(timeline).not.toBeNull();
+      expect(within(timeline!).getByText("Engine-selected analysis path")).toBeVisible();
+      expect(within(timeline!).getByText("Heart surface / doctrine path")).toBeVisible();
+      expect(within(timeline!).getByText("Candidate / structural path")).toBeVisible();
+      expect(within(timeline!).getAllByText(enginePath).length).toBeGreaterThan(0);
+      expect(within(timeline!).getAllByText(surfacePath).length).toBeGreaterThan(0);
+      expect(within(timeline!).getAllByText(candidatePath).length).toBeGreaterThan(0);
+
+      const depth = screen.getAllByTestId("word-specific-functional-depth")[0];
+      expect(within(depth).getByText(functionalDepth)).toBeVisible();
+      expect(screen.getAllByText(/candidate \/ structural paths are not word-specific functional motivation/i).length).toBeGreaterThan(0);
+    },
+  );
+
   it("keeps structural absence distinct from evidence absence for 123", async () => {
     const body = await analyze("123");
     render(<InstrumentPanel payload={body} />);
