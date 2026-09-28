@@ -79,7 +79,7 @@ export function EvidenceTraceCard({
         <TraceRow label="normalized form" value={`norm=${pomText(readout.normalizedWord, String)}`} />
         <TraceRow label="engine-selected path" value={`path=${vowelPathText(readout.voicePath)}`} />
         <TraceRow label="Heart surface / doctrine path" value={`surface=${vowelPathText(readout.voicePathSurface)}`} />
-        <TraceRow label="candidate / structural path" value={`candidate=${vowelPathText(readout.voicePathFunctional)}`} />
+        <TraceRow label="functional / normalization path" value={`functional=${vowelPathText(readout.voicePathFunctional)}`} />
         <TraceRow label="path delta" value={`delta=${readout.voicePathDelta}`} />
         <TraceRow label="candidate rows emitted" value={`rows=${rows.length}`} />
         <TraceRow label="candidate provenance kinds" value={`provenance=${sourceKindSummary(rows)}`} />
@@ -103,7 +103,7 @@ export function EvidenceTraceCard({
       </div>
 
       <div className="mt-4 rounded-[10px] border border-[#27313d] bg-[#0d1117] p-3 text-[11px] leading-5 text-[#7d8ea3]">
-        Boundary: VM field trace only; candidate / structural paths and normalization are separate from word-specific functional motivation; not a proof chain; no forced answer.
+        Boundary: VM field trace only; functional / normalization paths and candidate / structural paths are separate from word-specific functional motivation; not a proof chain; no forced answer.
       </div>
     </section>
   );

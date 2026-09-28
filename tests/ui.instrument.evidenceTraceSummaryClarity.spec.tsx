@@ -47,9 +47,9 @@ describe("EvidenceTraceCard summary clarity", () => {
     expect(screen.getByText("Ledger sources")).toBeInTheDocument();
     expect(screen.getByText("engine-selected path")).toBeInTheDocument();
     expect(screen.getByText("Heart surface / doctrine path")).toBeInTheDocument();
-    expect(screen.getByText("candidate / structural path")).toBeInTheDocument();
+    expect(screen.getByText("functional / normalization path")).toBeInTheDocument();
     expect(
-      screen.getByText(/candidate \/ structural paths and normalization are separate from word-specific functional motivation/i),
+      screen.getByText(/functional \/ normalization paths and candidate \/ structural paths are separate from word-specific functional motivation/i),
     ).toBeInTheDocument();
   });
 });
