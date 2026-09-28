@@ -95,6 +95,7 @@ export type MovingNucleusAcousticProvenanceV0_1 = Readonly<
     extractionMethod: string;
     softwareVersion: string | null;
     settingsProvenance: string | null;
+    correctionProvenance?: string | null;
     qcState: "PASS" | "FAIL" | "UNRESOLVED";
     correctionExclusionState: "NONE" | "CORRECTED" | "EXCLUDED" | "UNRESOLVED";
     uncertaintyLimitations: readonly string[];
@@ -420,8 +421,21 @@ function validateAuthorityV0_1(
       reasons.add("MEASUREMENT_PROVENANCE_MISSING");
     }
     if (
+      provenance.correctionProvenance !== undefined &&
+      provenance.correctionProvenance !== null &&
+      !isNonEmptyStringV0_1(provenance.correctionProvenance)
+    ) {
+      addClaimShapeReasonV0_1(reasons);
+    }
+    if (
       provenance.correctionExclusionState === "CORRECTED" &&
       !isNonEmptyStringV0_1(provenance.settingsProvenance)
+    ) {
+      reasons.add("MEASUREMENT_PROVENANCE_MISSING");
+    }
+    if (
+      provenance.correctionExclusionState === "CORRECTED" &&
+      !isNonEmptyStringV0_1(provenance.correctionProvenance)
     ) {
       reasons.add("MEASUREMENT_PROVENANCE_MISSING");
     }

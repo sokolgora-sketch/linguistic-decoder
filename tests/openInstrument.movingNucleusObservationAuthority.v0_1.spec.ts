@@ -50,6 +50,7 @@ const acousticProvenance = {
   extractionMethod: "fixture measurement method",
   softwareVersion: "fixture-software-v0.1",
   settingsProvenance: "fixture settings",
+  correctionProvenance: null,
   qcState: "PASS" as const,
   correctionExclusionState: "NONE" as const,
   uncertaintyLimitations: ["synthetic fixture only"],
@@ -370,7 +371,11 @@ test("F4 accepts positive CORRECTED acoustic support with traceability", () => {
       nucleusStructure: null,
       movement: {
         authorityClass: "ACOUSTICALLY_OBSERVED",
-        provenance: { ...acousticProvenance, correctionExclusionState: "CORRECTED" },
+        provenance: {
+          ...acousticProvenance,
+          correctionExclusionState: "CORRECTED",
+          correctionProvenance: "fixture.correction-record:1",
+        },
       },
       phoneticAnchors: null,
       voiceFamilyAnchors: null,
@@ -388,6 +393,141 @@ test("F4 rejects CORRECTED acoustic support without traceability", () => {
       movement: {
         authorityClass: "ACOUSTICALLY_OBSERVED",
         provenance: { ...acousticProvenance, correctionExclusionState: "CORRECTED", settingsProvenance: null },
+      },
+      phoneticAnchors: null,
+      voiceFamilyAnchors: null,
+      canonicalization: null,
+    },
+  }));
+
+  expect(result.ok).toBe(false);
+  if (!result.ok) expect(result.reasonCodes).toContain("MEASUREMENT_PROVENANCE_MISSING");
+});
+
+test("F4 rejects CORRECTED acoustic support with generic settings only", () => {
+  const result = validateMovingNucleusObservationAuthorityV0_1(record({
+    aggregateStatus: "SUPPORTED",
+    movement: { state: "OBSERVED" },
+    authorityByClaim: {
+      nucleusStructure: null,
+      movement: {
+        authorityClass: "ACOUSTICALLY_OBSERVED",
+        provenance: { ...acousticProvenance, correctionExclusionState: "CORRECTED" },
+      },
+      phoneticAnchors: null,
+      voiceFamilyAnchors: null,
+      canonicalization: null,
+    },
+  }));
+
+  expect(result.ok).toBe(false);
+  if (!result.ok) expect(result.reasonCodes).toContain("MEASUREMENT_PROVENANCE_MISSING");
+});
+
+test("F4 rejects CORRECTED acoustic support with generic evidence refs only", () => {
+  const result = validateMovingNucleusObservationAuthorityV0_1(record({
+    aggregateStatus: "SUPPORTED",
+    movement: { state: "OBSERVED" },
+    authorityByClaim: {
+      nucleusStructure: null,
+      movement: {
+        authorityClass: "ACOUSTICALLY_OBSERVED",
+        provenance: {
+          ...acousticProvenance,
+          correctionExclusionState: "CORRECTED",
+          evidenceRefs: ["fixture.correction-record:1"],
+        },
+      },
+      phoneticAnchors: null,
+      voiceFamilyAnchors: null,
+      canonicalization: null,
+    },
+  }));
+
+  expect(result.ok).toBe(false);
+  if (!result.ok) expect(result.reasonCodes).toContain("MEASUREMENT_PROVENANCE_MISSING");
+});
+
+test.each(["", "   "])("F4 rejects CORRECTED acoustic support with %p correction provenance", (correctionProvenance) => {
+  const result = validateMovingNucleusObservationAuthorityV0_1(record({
+    aggregateStatus: "SUPPORTED",
+    movement: { state: "OBSERVED" },
+    authorityByClaim: {
+      nucleusStructure: null,
+      movement: {
+        authorityClass: "ACOUSTICALLY_OBSERVED",
+        provenance: {
+          ...acousticProvenance,
+          correctionExclusionState: "CORRECTED",
+          correctionProvenance,
+        },
+      },
+      phoneticAnchors: null,
+      voiceFamilyAnchors: null,
+      canonicalization: null,
+    },
+  }));
+
+  expect(result.ok).toBe(false);
+  if (!result.ok) expect(result.reasonCodes).toContain("MEASUREMENT_PROVENANCE_MISSING");
+});
+
+test("F4 rejects malformed corrected provenance", () => {
+  const result = validateMovingNucleusObservationAuthorityV0_1(record({
+    aggregateStatus: "SUPPORTED",
+    movement: { state: "OBSERVED" },
+    authorityByClaim: {
+      nucleusStructure: null,
+      movement: {
+        authorityClass: "ACOUSTICALLY_OBSERVED",
+        provenance: {
+          ...acousticProvenance,
+          correctionExclusionState: "CORRECTED",
+          correctionProvenance: 42,
+        } as never,
+      },
+      phoneticAnchors: null,
+      voiceFamilyAnchors: null,
+      canonicalization: null,
+    },
+  }));
+
+  expect(result.ok).toBe(false);
+  if (!result.ok) expect(result.reasonCodes).toContain("CLAIM_SHAPE_INVALID");
+});
+
+test("F4 valid corrected support participates in aggregate SUPPORTED", () => {
+  const result = validateMovingNucleusObservationAuthorityV0_1(record({
+    aggregateStatus: "SUPPORTED",
+    movement: { state: "OBSERVED" },
+    authorityByClaim: {
+      nucleusStructure: null,
+      movement: {
+        authorityClass: "ACOUSTICALLY_OBSERVED",
+        provenance: {
+          ...acousticProvenance,
+          correctionExclusionState: "CORRECTED",
+          correctionProvenance: "fixture.correction-method:v0.1",
+        },
+      },
+      phoneticAnchors: null,
+      voiceFamilyAnchors: null,
+      canonicalization: null,
+    },
+  }));
+
+  expect(result.ok).toBe(true);
+});
+
+test("F4 invalid corrected support cannot participate in aggregate SUPPORTED", () => {
+  const result = validateMovingNucleusObservationAuthorityV0_1(record({
+    aggregateStatus: "SUPPORTED",
+    movement: { state: "OBSERVED" },
+    authorityByClaim: {
+      nucleusStructure: null,
+      movement: {
+        authorityClass: "ACOUSTICALLY_OBSERVED",
+        provenance: { ...acousticProvenance, correctionExclusionState: "CORRECTED" },
       },
       phoneticAnchors: null,
       voiceFamilyAnchors: null,
@@ -683,6 +823,42 @@ test("R3 and R4 caller mutation cannot alter the frozen result or anchor order",
     "first",
     "second",
   ]);
+});
+
+test("R12 corrected provenance is cloned and frozen with the returned value", () => {
+  const value = record({
+    aggregateStatus: "SUPPORTED",
+    movement: { state: "OBSERVED" },
+    authorityByClaim: {
+      nucleusStructure: null,
+      movement: {
+        authorityClass: "ACOUSTICALLY_OBSERVED",
+        provenance: {
+          ...acousticProvenance,
+          correctionExclusionState: "CORRECTED",
+          correctionProvenance: "fixture.correction-record:1",
+        },
+      },
+      phoneticAnchors: null,
+      voiceFamilyAnchors: null,
+      canonicalization: null,
+    },
+  });
+  const result = validateMovingNucleusObservationAuthorityV0_1(value);
+  expect(result.ok).toBe(true);
+  if (!result.ok) return;
+
+  const mutable = value as unknown as {
+    authorityByClaim: {
+      movement: { provenance: { correctionProvenance: string } };
+    };
+  };
+  mutable.authorityByClaim.movement.provenance.correctionProvenance = "changed";
+
+  expect(result.value.authorityByClaim.movement?.provenance).toHaveProperty(
+    "correctionProvenance",
+    "fixture.correction-record:1",
+  );
 });
 
 test("R5 malformed supplied authority fails for UNKNOWN movement", () => {
