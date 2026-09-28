@@ -5,6 +5,7 @@ import {
 } from "@/shared/ipa/ipaClassify.v0.1";
 import { extractCarrierVoicesFromIpaV0_1 } from "@/shared/vowels/extractCarrierVoicesFromIpa.v0.1";
 import type { VowelVoice } from "@/shared/vowels/vowelVoices.v0.1";
+import type { MovingNucleusObservationAuthorityV0_1 } from "./movingNucleusObservationAuthority.v0_1";
 
 export const SPOKEN_VOWEL_NORMALIZATION_SCHEMA_V0_1 =
   "open-instrument.spoken-vowel-normalization.v0_1" as const;
@@ -60,6 +61,7 @@ export type MovingNucleusObservationV0_1 = Readonly<{
   movement: MovingNucleusMovementV0_1;
   observationProvenance: MovingNucleusObservationProvenanceV0_1 | null;
   canonicalizationStatus: MovingNucleusCanonicalizationStatusV0_1;
+  authority?: MovingNucleusObservationAuthorityV0_1;
 }>;
 
 export type SpokenVowelNormalizationNucleusV0_1 = Readonly<{
