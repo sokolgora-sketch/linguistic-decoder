@@ -98,13 +98,13 @@ export function VowelPathTimeline(props: Props) {
       <div className="space-y-2">
         <PathRow label="Engine-selected analysis path" maybe={detected} />
         <PathRow label="Heart surface / doctrine path" maybe={surface} />
-        <PathRow label="Candidate / structural path" maybe={functional} />
+        <PathRow label="Functional / normalization path" maybe={functional} />
       </div>
 
       <NormalizationRecord steps={props.normalizationSteps} />
 
       <div className="mt-3 text-xs leading-5 text-neutral-500">
-        These are separate analysis layers. Candidate / structural paths are not word-specific functional motivation.
+        These are separate analysis layers. Functional / normalization paths and candidate / structural paths are separate from word-specific functional motivation.
       </div>
 
       <div className="mt-3 text-xs text-neutral-500">source: telemetry VM</div>

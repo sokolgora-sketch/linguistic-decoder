@@ -79,7 +79,7 @@ export function EvidenceTraceCard({
         <TraceRow label="normalized form" value={`norm=${pomText(readout.normalizedWord, String)}`} />
         <TraceRow label="engine-selected path" value={`path=${vowelPathText(readout.voicePath)}`} />
         <TraceRow label="Heart surface / doctrine path" value={`surface=${vowelPathText(readout.voicePathSurface)}`} />
-        <TraceRow label="functional / normalization path" value={`functional=${vowelPathText(readout.voicePathFunctional)}`} />
+        <TraceRow label="Functional / normalization path" value={`functional=${vowelPathText(readout.voicePathFunctional)}`} />
         <TraceRow label="path delta" value={`delta=${readout.voicePathDelta}`} />
         <TraceRow label="candidate rows emitted" value={`rows=${rows.length}`} />
         <TraceRow label="candidate provenance kinds" value={`provenance=${sourceKindSummary(rows)}`} />

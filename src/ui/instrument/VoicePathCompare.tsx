@@ -60,14 +60,14 @@ export function VoicePathCompare({
         {renderPOM(surface, (arr) => <span className="font-mono">{fmt(arr)}</span>)}
       </div>
       <div>
-        Candidate / structural path:{" "}
+        Functional / normalization path:{" "}
         {renderPOM(functional, (arr) => <span className="font-mono">{fmt(arr)}</span>)}
       </div>
       <div>
         Delta: <DeltaBadge label={delta} />
       </div>
       <div className="text-slate-500">
-        Candidate / structural path is separate from word-specific functional motivation.
+        Functional / normalization paths and candidate / structural paths are separate from word-specific functional motivation.
       </div>
     </div>
   );

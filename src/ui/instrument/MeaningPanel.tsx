@@ -104,9 +104,9 @@ export default function MeaningPanel({ vm }: Props) {
 
   const functionalLine =
     isPresent<unknown[]>(functional) && Array.isArray(functional.value) && functional.value.length
-      ? `Candidate / structural path: ${formatArrowPath(functional.value)}.`
+      ? `Functional / normalization path: ${formatArrowPath(functional.value)}.`
       : asText(detection.voicePathFunctional)
-        ? `Candidate / structural path: ${asText(detection.voicePathFunctional)}.`
+        ? `Functional / normalization path: ${asText(detection.voicePathFunctional)}.`
         : null;
 
   const surfaceLine =
@@ -174,7 +174,7 @@ export default function MeaningPanel({ vm }: Props) {
       </div>
 
       <div className="mt-3 text-[11px] leading-5 text-[#7d8ea3]">
-        Boundary: deterministic reading; candidate / structural paths are not word-specific functional motivation; no forced answer; not a historical-chain claim.
+        Boundary: deterministic reading; functional / normalization paths and candidate / structural paths are separate from word-specific functional motivation; no forced answer; not a historical-chain claim.
       </div>
     </div>
   );

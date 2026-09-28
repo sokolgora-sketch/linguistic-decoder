@@ -132,14 +132,14 @@ describe("Open Instrument primary reading orientation card v0.1", () => {
       expect(timeline).not.toBeNull();
       expect(within(timeline!).getByText("Engine-selected analysis path")).toBeVisible();
       expect(within(timeline!).getByText("Heart surface / doctrine path")).toBeVisible();
-      expect(within(timeline!).getByText("Candidate / structural path")).toBeVisible();
+      expect(within(timeline!).getByText("Functional / normalization path")).toBeVisible();
       expect(within(timeline!).getAllByText(enginePath).length).toBeGreaterThan(0);
       expect(within(timeline!).getAllByText(surfacePath).length).toBeGreaterThan(0);
       expect(within(timeline!).getAllByText(candidatePath).length).toBeGreaterThan(0);
 
       const depth = screen.getAllByTestId("word-specific-functional-depth")[0];
       expect(within(depth).getByText(functionalDepth)).toBeVisible();
-      expect(screen.getAllByText(/candidate \/ structural paths are not word-specific functional motivation/i).length).toBeGreaterThan(0);
+      expect(screen.getAllByText(/functional \/ normalization paths and candidate \/ structural paths are separate from word-specific functional motivation/i).length).toBeGreaterThan(0);
     },
   );
 

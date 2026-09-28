@@ -11,6 +11,7 @@ describe("MeaningPanel boundary clarity", () => {
             principlesPath: { kind: "present", value: ["Unity", "Insight"] },
             counts: { candidates: 2 },
             voicePathDelta: "SHIFT",
+            voicePathFunctional: { kind: "present", value: ["U", "I"] },
           },
           detection: {},
           evidence: {
@@ -31,6 +32,8 @@ describe("MeaningPanel boundary clarity", () => {
         /Human-readable deterministic reading for the current word\. It frames the readout as inspection output, not origin proof\./i
       )
     ).toBeInTheDocument();
-    expect(screen.getByText(/Boundary: deterministic reading; candidate \/ structural paths are not word-specific functional motivation; no forced answer; not a historical-chain claim\./i)).toBeInTheDocument();
+    expect(screen.getByText("Functional / normalization path: U → I.")).toBeInTheDocument();
+    expect(screen.queryByText(/Candidate \/ structural path: U → I/)).not.toBeInTheDocument();
+    expect(screen.getByText(/Boundary: deterministic reading; functional \/ normalization paths and candidate \/ structural paths are separate from word-specific functional motivation; no forced answer; not a historical-chain claim\./i)).toBeInTheDocument();
   });
 });

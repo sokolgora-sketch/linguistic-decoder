@@ -33,7 +33,7 @@ describe("Open Instrument path delta normalization context v0.1", () => {
     expect(timeline).not.toBeNull();
     expect(within(timeline!).getByText("Heart surface / doctrine path")).toBeVisible();
     expect(within(timeline!).getAllByText("U → Y").length).toBeGreaterThan(0);
-    expect(within(timeline!).getByText("Candidate / structural path")).toBeVisible();
+    expect(within(timeline!).getByText("Functional / normalization path")).toBeVisible();
     expect(within(timeline!).getAllByText("U → I").length).toBeGreaterThan(0);
     expect(within(timeline!).getByText("DIVERGE")).toBeVisible();
     expect(within(timeline!).getByText("Normalization / transformation record")).toBeVisible();
