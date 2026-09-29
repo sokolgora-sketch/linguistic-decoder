@@ -124,6 +124,31 @@ describe("Albanian pronunciation source contract v0.1", () => {
     });
   });
 
+  it("deep-freezes the exported contract and nested policy values", () => {
+    expect(Object.isFrozen(ALBANIAN_PRONUNCIATION_SOURCE_CONTRACT_V0_1)).toBe(
+      true,
+    );
+    expect(
+      Object.isFrozen(
+        ALBANIAN_PRONUNCIATION_SOURCE_CONTRACT_V0_1.sourceIdentity,
+      ),
+    ).toBe(true);
+    expect(
+      Object.isFrozen(ALBANIAN_PRONUNCIATION_SOURCE_CONTRACT_V0_1.scopeModel),
+    ).toBe(true);
+    expect(
+      Object.isFrozen(
+        ALBANIAN_PRONUNCIATION_SOURCE_CONTRACT_V0_1.licenseProvenance,
+      ),
+    ).toBe(true);
+    expect(
+      Object.isFrozen(
+        ALBANIAN_PRONUNCIATION_SOURCE_CONTRACT_V0_1.licenseProvenance
+          .wiktionaryTextLicenses,
+      ),
+    ).toBe(true);
+  });
+
   it("documents the contract-only boundary without runtime wiring", () => {
     expect(contractDoc).toContain("Status: `FROZEN_SOURCE_CONTRACT_ONLY`");
     expect(contractDoc).toContain("ORTHOGRAPHIC_PRONUNCIATION_AUTHORITY = NO");

@@ -1,3 +1,15 @@
+function deepFreeze<T>(value: T): T {
+  if (value === null || typeof value !== "object" || Object.isFrozen(value)) {
+    return value;
+  }
+
+  for (const child of Object.values(value as Record<string, unknown>)) {
+    deepFreeze(child);
+  }
+
+  return Object.freeze(value);
+}
+
 export const ALBANIAN_PRONUNCIATION_SOURCE_CONTRACT_ID_V0_1 =
   "OPEN_INSTRUMENT_ALBANIAN_PRONUNCIATION_SOURCE_CONTRACT_V0_1" as const;
 
@@ -27,7 +39,7 @@ export const ALBANIAN_PRONUNCIATION_SCOPE_VALUES_V0_1 = [
 export type AlbanianPronunciationScopeV0_1 =
   (typeof ALBANIAN_PRONUNCIATION_SCOPE_VALUES_V0_1)[number];
 
-export const ALBANIAN_PRONUNCIATION_SOURCE_LABELS_V0_1 = Object.freeze({
+export const ALBANIAN_PRONUNCIATION_SOURCE_LABELS_V0_1 = deepFreeze({
   STANDARD_EXPLICIT: ["standard", "Standard"],
   GHEG_EXPLICIT: ["Gheg"],
   TOSK_EXPLICIT: ["Tosk"],
@@ -45,7 +57,7 @@ export const ALBANIAN_PRONUNCIATION_SOURCE_LABELS_V0_1 = Object.freeze({
   AMBIGUOUS: ["regional", "dialectal"],
 } as const);
 
-export const ALBANIAN_PRONUNCIATION_SOURCE_ALLOWED_FIELDS_V0_1 = Object.freeze([
+export const ALBANIAN_PRONUNCIATION_SOURCE_ALLOWED_FIELDS_V0_1 = deepFreeze([
   "lexical_form",
   "language",
   "language_code",
@@ -59,7 +71,7 @@ export const ALBANIAN_PRONUNCIATION_SOURCE_ALLOWED_FIELDS_V0_1 = Object.freeze([
   "license_attribution_metadata",
 ] as const);
 
-export const ALBANIAN_PRONUNCIATION_SOURCE_EXCLUDED_FIELDS_V0_1 = Object.freeze([
+export const ALBANIAN_PRONUNCIATION_SOURCE_EXCLUDED_FIELDS_V0_1 = deepFreeze([
   "definitions",
   "glosses",
   "translations",
@@ -70,13 +82,13 @@ export const ALBANIAN_PRONUNCIATION_SOURCE_EXCLUDED_FIELDS_V0_1 = Object.freeze(
   "unrelated_dictionary_metadata",
 ] as const);
 
-export const ALBANIAN_PRONUNCIATION_NULL_REASON_CODES_V0_1 = Object.freeze([
+export const ALBANIAN_PRONUNCIATION_NULL_REASON_CODES_V0_1 = deepFreeze([
   "PRONUNCIATION_NOT_FOUND",
   "DIALECT_SCOPE_UNRESOLVED",
   "PRONUNCIATION_VARIANT_AMBIGUOUS",
 ] as const);
 
-export const ALBANIAN_PRONUNCIATION_VARIANT_POLICY_V0_1 = Object.freeze({
+export const ALBANIAN_PRONUNCIATION_VARIANT_POLICY_V0_1 = deepFreeze({
   oneIpaWithExplicitScope: "PRESERVE_SCOPED_PRONUNCIATION_CANDIDATE",
   multipleIpaWithSameExplicitScope: "PRESERVE_ALL_NO_WINNER",
   multipleIpaWithDifferentExplicitScopes: "PRESERVE_SEPARATE_SCOPED_CANDIDATES",
@@ -87,7 +99,7 @@ export const ALBANIAN_PRONUNCIATION_VARIANT_POLICY_V0_1 = Object.freeze({
   sourceLevelSingleWinnerSelection: "NO",
 } as const);
 
-export const ALBANIAN_PRONUNCIATION_SOURCE_CONTRACT_V0_1 = Object.freeze({
+export const ALBANIAN_PRONUNCIATION_SOURCE_CONTRACT_V0_1 = deepFreeze({
   contractId: ALBANIAN_PRONUNCIATION_SOURCE_CONTRACT_ID_V0_1,
   version: ALBANIAN_PRONUNCIATION_SOURCE_CONTRACT_VERSION_V0_1,
   status: "FROZEN_SOURCE_CONTRACT_ONLY",
