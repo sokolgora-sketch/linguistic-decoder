@@ -61,8 +61,8 @@ export type SevenVoiceCategoryFoldV0_1 = Readonly<{
     | "CENTRAL_CLOSE_TO_FRONT_CATEGORY"
     | "EXPLICIT_OPEN_BACK_UNROUNDED_EXCEPTION";
   rule: string;
-  outputCategory: SevenVoicePhonologicalCategoryV0_1;
-  outputVoice: VowelVoice;
+  outputCategory: SevenVoicePhonologicalCategoryV0_1 | null;
+  outputVoice: VowelVoice | null;
 }>;
 
 export const SEVEN_VOICE_CATEGORY_FOLDS_V0_1 = Object.freeze([
@@ -81,14 +81,14 @@ export const SEVEN_VOICE_CATEGORY_FOLDS_V0_1 = Object.freeze([
   Object.freeze({
     id: "BACK_HEIGHT_TO_BACK_CATEGORY",
     rule: "back vowels are quantized by height and rounding does not create another Voice",
-    outputCategory: "MID_BACK",
-    outputVoice: "O",
+    outputCategory: null,
+    outputVoice: null,
   }),
   Object.freeze({
     id: "CENTRAL_CLOSE_TO_FRONT_CATEGORY",
     rule: "close and near-close central unrounded qualities use HIGH_FRONT_UNROUNDED and central rounded qualities use HIGH_FRONT_ROUNDED",
-    outputCategory: "HIGH_FRONT_UNROUNDED",
-    outputVoice: "I",
+    outputCategory: null,
+    outputVoice: null,
   }),
   Object.freeze({
     id: "EXPLICIT_OPEN_BACK_UNROUNDED_EXCEPTION",
