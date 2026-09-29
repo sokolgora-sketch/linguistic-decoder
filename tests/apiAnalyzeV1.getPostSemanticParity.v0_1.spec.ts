@@ -109,18 +109,23 @@ function originClaimProjection(value: unknown): JsonObject {
 function projectSemanticResponse(value: unknown): JsonObject {
   const response = object(value, "analyze-v1 response");
   const status = object(response.analysisStatusV0_1, "analysis status");
-  const primaryPath = object(response.primaryPath, "primary path");
+  const primaryPath =
+    response.primaryPath == null
+      ? null
+      : object(response.primaryPath, "primary path");
   const evidence = object(response.evidence, "evidence");
 
   return {
     word: response.word,
     mode: response.mode,
     alphabet: response.alphabet,
-    primaryPath: {
-      voicePath: primaryPath.voicePath,
-      levelPath: primaryPath.levelPath,
-      ringPath: primaryPath.ringPath,
-    },
+    primaryPath: primaryPath
+      ? {
+          voicePath: primaryPath.voicePath,
+          levelPath: primaryPath.levelPath,
+          ringPath: primaryPath.ringPath,
+        }
+      : null,
     analysisStatusV0_1: status,
     candidates: array(response.candidates).map(candidateProjection),
     evidence: {
@@ -214,6 +219,7 @@ async function semanticPair(
 }
 
 function expectCanonicalPrimaryVoicePath(response: JsonObject): void {
+  if (response.primaryPath == null) return;
   const primaryPath = object(response.primaryPath, "primary path");
   const voicePath = array(primaryPath.voicePath);
 

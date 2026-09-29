@@ -52,7 +52,7 @@ export function DoctrineReadingCard({
         data-testid="doctrine-reading-path-label"
         className="mt-4 text-xs font-semibold uppercase tracking-[0.16em] text-violet-700 dark:text-violet-200"
       >
-        Heart surface Voice path used for doctrine:
+        Spoken / canonical Voice path used for doctrine:
       </div>
       <div
         data-testid="doctrine-reading-path"

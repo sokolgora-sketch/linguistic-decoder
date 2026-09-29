@@ -35,20 +35,19 @@ export function HeartInstrumentV1Section(props: { data: unknown }) {
 
   const basis = asString(rec.basisNfc) || asString(rec.basis) || "—";
   const surfaceVowels = asStringArray(rec.surfaceVowels) || [];
+  const spokenVowels = asStringArray(rec.canonicalSpokenVoicePath);
   const principlesPathRaw = asStringArray(rec.principlesPath) || [];
+  const spokenPrinciplesPathRaw = asStringArray(rec.spokenPrinciplesPath) || [];
   const principlesPath = normalizePrinciplesToLabels(principlesPathRaw);
+  const spokenPrinciplesPath = normalizePrinciplesToLabels(spokenPrinciplesPathRaw);
 
-  const math7 = isRecord(rec.math7) ? rec.math7 : isRecord(rec.surfaceMath7) ? rec.surfaceMath7 : null;
+  const math7 = isRecord(rec.spokenMath7) ? rec.spokenMath7 : null;
 
   const values1to7 = math7 ? asNumberArray(math7.values1to7) || [] : [];
 
-  // These come from the embedded math7 packet (surface-derived)
+  // These come from the embedded spoken-derived Math7 packet.
   const total1to7 = math7 ? asNumber((math7 as any).total1to7) : null;
   const totalMod7 = math7 ? asNumber((math7 as any).totalMod7) : null;
-
-  // Explicit surface totals on the packet (preferred if present)
-  const surfaceTotalMod7 = asNumber(rec.surfaceTotalMod7);
-  const surfaceTotal1to7 = asNumber(rec.surfaceTotal1to7);
 
   const wrapCount = math7 ? asNumber((math7 as any).wrapCount) : null;
   const jumps = math7 ? asNumberArray((math7 as any).jumps) || [] : [];
@@ -67,10 +66,10 @@ export function HeartInstrumentV1Section(props: { data: unknown }) {
 
       <div className="mt-4 grid gap-3 md:grid-cols-2">
         <div className="rounded-xl border border-white/10 bg-black/20 p-3">
-          <div className="text-xs text-gray-400">Surface vowels</div>
+          <div className="text-xs text-gray-400">Spoken / canonical Voice path</div>
           <div className="mt-1 flex flex-wrap gap-2">
-            {surfaceVowels.length ? (
-              surfaceVowels.map((v, i) => (
+            {spokenVowels?.length ? (
+              spokenVowels.map((v, i) => (
                 <span key={i} className="rounded-full border border-white/10 bg-white/10 px-2 py-0.5 text-xs">
                   {v}
                 </span>
@@ -79,31 +78,37 @@ export function HeartInstrumentV1Section(props: { data: unknown }) {
               <span className="text-gray-500">—</span>
             )}
           </div>
+          <div className="mt-2 text-xs text-gray-500">
+            Orthographic vowels (non-authoritative): {surfaceVowels.length ? surfaceVowels.join(" ") : "—"}
+          </div>
         </div>
 
         <div className="rounded-xl border border-white/10 bg-black/20 p-3">
-          <div className="text-xs text-gray-400">Principles path</div>
+          <div className="text-xs text-gray-400">Spoken principles path</div>
           <div className="mt-1">
-            {principlesPath.length ? (
-              <div className="text-sm">{principlesPath.join(" → ")}</div>
+            {spokenPrinciplesPath.length ? (
+              <div className="text-sm">{spokenPrinciplesPath.join(" → ")}</div>
             ) : (
               <span className="text-gray-500">—</span>
             )}
+          </div>
+          <div className="mt-2 text-xs text-gray-500">
+            Orthographic principles (compatibility only): {principlesPath.length ? principlesPath.join(" → ") : "—"}
           </div>
         </div>
       </div>
 
       <div className="mt-3 rounded-xl border border-white/10 bg-black/20 p-3">
-        <div className="text-xs text-gray-400">Math7 (surface-derived)</div>
+        <div className="text-xs text-gray-400">Math7 (spoken-derived)</div>
 
         <div className="mt-2 flex flex-wrap gap-x-6 gap-y-2 text-xs">
           <div>
-            <span className="text-gray-400">surfaceTotal1to7:</span>{" "}
-            <span className="text-gray-200">{surfaceTotal1to7 ?? total1to7 ?? "—"}</span>
+            <span className="text-gray-400">spokenTotal1to7:</span>{" "}
+            <span className="text-gray-200">{total1to7 ?? "—"}</span>
           </div>
           <div>
-            <span className="text-gray-400">surfaceTotalMod7:</span>{" "}
-            <span className="text-gray-200">{surfaceTotalMod7 ?? totalMod7 ?? "—"}</span>
+            <span className="text-gray-400">spokenTotalMod7:</span>{" "}
+            <span className="text-gray-200">{totalMod7 ?? "—"}</span>
           </div>
           <div>
             <span className="text-gray-400">wrapCount:</span>{" "}

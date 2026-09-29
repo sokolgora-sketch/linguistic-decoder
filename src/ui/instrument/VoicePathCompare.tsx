@@ -56,7 +56,7 @@ export function VoicePathCompare({
   return (
     <div className="mt-2 space-y-1 text-xs text-slate-400">
       <div>
-        Heart surface / doctrine path:{" "}
+        Orthographic vowel sequence (non-authoritative):{" "}
         {renderPOM(surface, (arr) => <span className="font-mono">{fmt(arr)}</span>)}
       </div>
       <div>

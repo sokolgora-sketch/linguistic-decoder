@@ -12,12 +12,23 @@ import {
 } from "./math7.core.v1";
 
 import { principlesPathFromVowels } from "./principles.core.v1";
+import type { VowelVoice } from "@/shared/vowels/vowelVoices.v0.1";
+import { resolveCmuDictPronunciationToVoiceV0_1 } from "@/shared/openInstrument/pronunciationToVoice.v0_1";
+import type { PronunciationToVoiceResultV0_1 } from "@/shared/openInstrument/pronunciationToVoice.v0_1";
 
 export type HeartInstrumentV1Packet = {
   basisNfc: string;
 
-  // what tests expect
+  // Compatibility surface: spelling-derived vowels remain explicitly
+  // orthographic and are not pronunciation authority.
   surfaceVowels: string[];
+  orthographicVowels: string[];
+
+  // Canonical spoken authority used by the route's Heart/Math7 projection.
+  canonicalSpokenVoicePath: readonly VowelVoice[] | null;
+  spokenPronunciation: PronunciationToVoiceResultV0_1;
+  spokenPrinciplesPath: string[];
+  spokenMath7: ReturnType<typeof computeMath7> | null;
 
   principlesPath: string[];
 
@@ -43,6 +54,18 @@ export function buildHeartInstrumentV1(basis: string): HeartInstrumentV1Packet {
   // strict vowel filter + NFC authority
   const surfaceVowels = extractSevenVowels(basisNfc);
 
+  const spokenPronunciation = resolveCmuDictPronunciationToVoiceV0_1(basisNfc);
+  const canonicalSpokenVoicePath = spokenPronunciation.canonicalSpokenVoicePath;
+  const spokenPrinciplesPath = canonicalSpokenVoicePath
+    ? principlesPathFromVowels(canonicalSpokenVoicePath as any)
+    : [];
+  const spokenValues1to7 = canonicalSpokenVoicePath
+    ? canonicalSpokenVoicePath.map((v) => value1to7(v as any))
+    : [];
+  const spokenMath7 = canonicalSpokenVoicePath
+    ? computeMath7(spokenValues1to7)
+    : null;
+
   // map vowels -> 1..7 ring values (public doctrine)
   const values1to7Arr = surfaceVowels.map((v) => value1to7(v as any));
 
@@ -55,6 +78,11 @@ export function buildHeartInstrumentV1(basis: string): HeartInstrumentV1Packet {
   return {
     basisNfc,
     surfaceVowels,
+    orthographicVowels: [...surfaceVowels],
+    canonicalSpokenVoicePath,
+    spokenPronunciation,
+    spokenPrinciplesPath,
+    spokenMath7,
     principlesPath,
 
     surfaceTotalMod7: math7.totalMod7,

@@ -138,7 +138,7 @@ export function PrimaryReadingOrientationCardV0_1({
 
       <dl className="mt-4 grid gap-3 text-[13px] leading-6 text-[#c6d0dc] sm:grid-cols-3">
         <div data-testid="orientation-structure">
-          <dt className="font-semibold text-[#8ea4ba]">Engine-selected Voice path:</dt>
+          <dt className="font-semibold text-[#8ea4ba]">Spoken / canonical Voice path:</dt>
           <dd>{orientation.structure}</dd>
         </div>
         <div data-testid="orientation-doctrine">

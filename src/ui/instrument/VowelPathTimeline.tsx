@@ -90,14 +90,14 @@ export function VowelPathTimeline(props: Props) {
       </div>
 
       {!detectedPresent ? (
-        <div className="text-sm text-neutral-400">No engine-selected voice path.</div>
+        <div className="text-sm text-neutral-400">No spoken / canonical Voice path.</div>
       ) : (
         <div className="mb-3 font-mono text-sm text-neutral-100">{formatPath(detected.value)}</div>
       )}
 
       <div className="space-y-2">
-        <PathRow label="Engine-selected analysis path" maybe={detected} />
-        <PathRow label="Heart surface / doctrine path" maybe={surface} />
+        <PathRow label="Spoken / canonical Voice path" maybe={detected} />
+        <PathRow label="Orthographic vowel sequence (non-authoritative)" maybe={surface} />
         <PathRow label="Functional / normalization path" maybe={functional} />
       </div>
 

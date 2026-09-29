@@ -97,11 +97,12 @@ describe("Open Instrument Overview vowel-path visibility v0.1", () => {
       "true",
     );
     expect(timelineHeading).toBeVisible();
-    expect(within(timeline!).getByText("Engine-selected analysis path")).toBeVisible();
-    expect(within(timeline!).getByText("Heart surface / doctrine path")).toBeVisible();
+    expect(within(timeline!).getByText("Spoken / canonical Voice path")).toBeVisible();
+    expect(within(timeline!).getByText("Orthographic vowel sequence (non-authoritative)")).toBeVisible();
     expect(within(timeline!).getByText("Functional / normalization path")).toBeVisible();
     expect(within(timeline!).getByText("DIVERGE")).toBeVisible();
-    expect(within(timeline!).getAllByText("U → Y").length).toBe(3);
+    expect(within(timeline!).getAllByText("Ë → I").length).toBe(2);
+    expect(within(timeline!).getByText("U → Y")).toBeVisible();
     expect(within(timeline!).getByText("U → I")).toBeVisible();
     expect(functionalCard.compareDocumentPosition(timelineHeading)).toBe(
       Node.DOCUMENT_POSITION_FOLLOWING,
@@ -120,7 +121,7 @@ describe("Open Instrument Overview vowel-path visibility v0.1", () => {
       within(overview).getByText("Voice Path Layers"),
     ).toBeVisible();
     expect(within(overview).getByText("NOT EMITTED")).toBeVisible();
-    expect(within(overview).getByText("No engine-selected voice path.")).toBeVisible();
+    expect(within(overview).getByText("No spoken / canonical Voice path.")).toBeVisible();
     expect(within(overview).getAllByText("not emitted").length).toBeGreaterThanOrEqual(3);
   });
 });

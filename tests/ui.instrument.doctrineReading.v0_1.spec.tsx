@@ -35,10 +35,10 @@ describe("Open Instrument Seven-Voices doctrine reading UI v0.1", () => {
     expect(vm.doctrineReading.value.analyzedVoicePath).toEqual(
       body.doctrineReading.analyzedVoicePath,
     );
-    expect(vm.doctrineReading.value.entries.map((entry) => entry.voice)).toEqual(["U", "Y"]);
+    expect(vm.doctrineReading.value.entries.map((entry) => entry.voice)).toEqual(["Ë", "I"]);
     expect(vm.doctrineReading.value.entries.map((entry) => entry.pathIndex)).toEqual([0, 1]);
     expect(vm.doctrineReading.value.level3WholePathReading).toMatchObject({
-      reading: "grounded depth with reflective exploration",
+      reading: "harmonious resolution with clear understanding",
       truthClassification: "inference",
     });
   });
@@ -52,31 +52,22 @@ describe("Open Instrument Seven-Voices doctrine reading UI v0.1", () => {
 
     const card = screen.getByTestId("doctrine-reading-card");
     expect(within(card).getByTestId("doctrine-reading-path")).toHaveTextContent(
-      "A → E",
+      "O → Ë",
     );
     expect(within(card).getByTestId("doctrine-level3-reading-text")).toHaveTextContent(
-      "initiating beginning with expanding growth",
+      "balanced mediation with harmonious resolution",
     );
     expect(within(card).getByTestId("doctrine-level3-reading-boundary")).toHaveTextContent(
       /Doctrine inference only.*not a lexical definition.*historical origin claim.*candidate proof.*winner selection/i,
     );
   });
 
-  it("renders the registered E to A reversal reading", async () => {
+  it("renders Null doctrine when no pronunciation entry exists", async () => {
     const body = await analyze("ea");
 
     render(<InstrumentPanel payload={body} />);
 
-    const card = screen.getByTestId("doctrine-reading-card");
-    expect(within(card).getByTestId("doctrine-reading-path")).toHaveTextContent(
-      "E → A",
-    );
-    expect(within(card).getByTestId("doctrine-level3-reading-text")).toHaveTextContent(
-      "expanding growth with initiating beginning",
-    );
-    expect(within(card).getByTestId("doctrine-level3-reading-boundary")).toHaveTextContent(
-      /Doctrine inference only.*not a lexical definition.*historical origin claim.*candidate proof.*winner selection/i,
-    );
+    expect(screen.queryByTestId("doctrine-reading-card")).not.toBeInTheDocument();
   });
 
   it("keeps absent, malformed, and structural Null doctrine states distinct", () => {
@@ -128,52 +119,49 @@ describe("Open Instrument Seven-Voices doctrine reading UI v0.1", () => {
     });
   });
 
-  it("renders doctrine reading for wind independently of Evidence Null", async () => {
+  it("keeps pronunciation Null distinct from Evidence Null for wind", async () => {
     const body = await analyze("wind");
     expect(body.analysisStatusV0_1.status).toBe("null_no_supported_candidate");
     expect(body.candidates).toEqual([]);
-    expect(body.doctrineReading).not.toBeNull();
-    expect(body.doctrineReading.level3WholePathReading).toBeUndefined();
+    expect(body.doctrineReading).toBeNull();
 
     render(<InstrumentPanel payload={body} />);
 
-    expect(screen.getByTestId("doctrine-reading-card")).toBeVisible();
-    expect(screen.getByText("Seven-Voices doctrinal reading")).toBeVisible();
-    expect(screen.getAllByText("No supported functional candidate yet.")).toHaveLength(2);
+    expect(screen.queryByTestId("doctrine-reading-card")).not.toBeInTheDocument();
   });
 
   it("preserves three repeated A entries for banana", async () => {
     const body = await analyze("banana");
-    expect(body.doctrineReading.analyzedVoicePath).toEqual(["A", "A", "A"]);
+    expect(body.doctrineReading.analyzedVoicePath).toEqual(["Ë", "A", "Ë"]);
     expect(body.doctrineReading.level3WholePathReading).toBeUndefined();
 
     render(<InstrumentPanel payload={body} />);
 
     const card = screen.getByTestId("doctrine-reading-card");
-    expect(within(card).getByTestId("doctrine-reading-path")).toHaveTextContent("A → A → A");
+    expect(within(card).getByTestId("doctrine-reading-path")).toHaveTextContent("Ë → A → Ë");
     const entries = within(card).getAllByTestId("doctrine-reading-entry");
     expect(entries).toHaveLength(3);
     expect(entries.map((entry) => entry.getAttribute("data-path-index"))).toEqual(["0", "1", "2"]);
-    expect(entries.map((entry) => entry.getAttribute("data-voice"))).toEqual(["A", "A", "A"]);
+    expect(entries.map((entry) => entry.getAttribute("data-voice"))).toEqual(["Ë", "A", "Ë"]);
   });
 
-  it("preserves multi-Voice input order, Y, boundaries, and existing candidate evidence", async () => {
+  it("preserves spoken Voice order and existing candidate evidence", async () => {
     const body = await analyze("study");
-    expect(body.doctrineReading.analyzedVoicePath).toEqual(["U", "Y"]);
+    expect(body.doctrineReading.analyzedVoicePath).toEqual(["Ë", "I"]);
 
     render(<InstrumentPanel payload={body} />);
 
     const card = screen.getByTestId("doctrine-reading-card");
     const entries = within(card).getAllByTestId("doctrine-reading-entry");
-    expect(entries.map((entry) => entry.getAttribute("data-voice"))).toEqual(["U", "Y"]);
+    expect(entries.map((entry) => entry.getAttribute("data-voice"))).toEqual(["Ë", "I"]);
     expect(within(card).getByTestId("doctrine-level3-reading-text")).toHaveTextContent(
-      "grounded depth with reflective exploration",
+      "harmonious resolution with clear understanding",
     );
     expect(within(card).getByTestId("doctrine-level3-reading-boundary")).toHaveTextContent(
       /Doctrine inference only.*not a lexical definition.*historical origin claim.*candidate proof.*winner selection/i,
     );
-    expect(within(card).getByText("Containment/Depth")).toBeInTheDocument();
-    expect(within(card).getByText("Reflection/Mirror")).toBeInTheDocument();
+    expect(within(card).getByText("Completion/Unit")).toBeInTheDocument();
+    expect(within(card).getByText("Direction/Focus")).toBeInTheDocument();
     expect(within(card).getByText("This is not a lexical definition, historical origin claim, candidate proof, or winner selection. User decides the final interpretation.")).toBeInTheDocument();
     expect(screen.getAllByText("Evidence: Reviewed")).toHaveLength(2);
   });

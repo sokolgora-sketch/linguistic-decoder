@@ -120,11 +120,11 @@ describe("word-specific functional depth runtime v0.1", () => {
       ["head", "sea", "water", "candle", "mountain"].map(apiAnalyze),
     );
 
-    expect(head.doctrineReading.analyzedVoicePath).toEqual(["E", "A"]);
-    expect(sea.doctrineReading.analyzedVoicePath).toEqual(["E", "A"]);
-    expect(water.doctrineReading.analyzedVoicePath).toEqual(["A", "E"]);
-    expect(candle.doctrineReading.analyzedVoicePath).toEqual(["A", "E"]);
-    expect(mountain.doctrineReading.analyzedVoicePath).toEqual(["O", "U", "A", "I"]);
+    expect(head.doctrineReading.analyzedVoicePath).toEqual(["E"]);
+    expect(sea.doctrineReading.analyzedVoicePath).toEqual(["I"]);
+    expect(water.doctrineReading.analyzedVoicePath).toEqual(["O", "Ë"]);
+    expect(candle.doctrineReading.analyzedVoicePath).toEqual(["A", "Ë"]);
+    expect(mountain.doctrineReading.analyzedVoicePath).toEqual(["A", "U", "Ë"]);
 
     for (const body of [head, sea, water, candle, mountain]) {
       expect(body.wordSpecificFunctionalDepth).toMatchObject({

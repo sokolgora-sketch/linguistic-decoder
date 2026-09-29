@@ -25,39 +25,39 @@ describe("Open Instrument primary reading orientation card v0.1", () => {
   it.each([
     [
       "study",
-      "U → Y",
-      "Doctrinal inference: grounded depth with reflective exploration",
+      "Ë → I",
+      "Doctrinal inference: harmonious resolution with clear understanding",
       "Reviewed functional evidence is available.",
     ],
     [
       "damage",
-      "A → E",
-      "the current whole-path Level-3 law applies only to exact two-distinct-Voice paths",
+      "No canonical Voice path was detected",
+      "No doctrinal reading was emitted.",
       "Reviewed functional evidence is available.",
     ],
     [
       "sea",
-      "E → A",
-      "Doctrinal inference: expanding growth with initiating beginning",
+      "I",
+      "Per-Voice doctrine is available",
       "A structural hypothesis is available",
     ],
     [
       "stone",
-      "O → E",
-      "Doctrinal inference: balanced mediation with expanding growth",
+      "O → U",
+      "Doctrinal inference: balanced mediation with grounded depth",
       "An exploratory candidate is available",
     ],
     [
       "rain",
-      "A → Ë",
-      "Doctrinal inference: initiating beginning with clear understanding",
+      "E → I",
+      "Doctrinal inference: expanding growth with clear understanding",
       "Lexical source evidence remains available separately",
     ],
     [
       "ea",
-      "E → A",
-      "Doctrinal inference: expanding growth with initiating beginning",
-      "No supported functional candidate is established",
+      "No canonical Voice path was detected",
+      "No doctrinal reading was emitted.",
+      "No structural Voice path was detected",
     ],
   ])(
     "summarizes the existing emitted state for %s without recomputing it",
@@ -82,46 +82,43 @@ describe("Open Instrument primary reading orientation card v0.1", () => {
   );
 
   it.each([
-    ["mother", "E → E", "O → E"],
-    ["rain", "A → Ë", "A → I"],
+    ["mother", "Ë → Ë"],
+    ["rain", "E → I"],
   ])(
-    "labels the engine-selected and Heart-surface paths separately for %s",
-    async (word, primaryPath, doctrinePath) => {
+    "labels the spoken canonical path separately from orthographic vowels for %s",
+    async (word, spokenPath) => {
       const body = await analyze(word);
 
-      expect(body.primaryPath.voicePath.join(" → ")).toBe(primaryPath);
-      expect(body.doctrineReading.analyzedVoicePath.join(" → ")).toBe(doctrinePath);
-      expect(body.primaryPath.voicePath).not.toEqual(
-        body.doctrineReading.analyzedVoicePath,
-      );
+      expect(body.primaryPath.voicePath.join(" → ")).toBe(spokenPath);
+      expect(body.doctrineReading.analyzedVoicePath.join(" → ")).toBe(spokenPath);
 
       render(<InstrumentPanel payload={body} />);
 
       const orientation = screen.getByTestId("primary-reading-orientation-card");
-      expect(within(orientation).getByText("Engine-selected Voice path:")).toBeVisible();
+      expect(within(orientation).getByText("Spoken / canonical Voice path:")).toBeVisible();
       expect(within(orientation).getByTestId("orientation-structure")).toHaveTextContent(
-        primaryPath,
+        spokenPath,
       );
 
       const doctrine = screen.getByTestId("doctrine-reading-card");
       expect(within(doctrine).getByTestId("doctrine-reading-path-label")).toHaveTextContent(
-        "Heart surface Voice path used for doctrine",
+        "Spoken / canonical Voice path used for doctrine",
       );
       expect(within(doctrine).getByTestId("doctrine-reading-path")).toHaveTextContent(
-        doctrinePath,
+        spokenPath,
       );
     },
   );
 
   it.each([
-    ["damage", "A → E", "A → A → E", "A → Ë", "Reviewed functional motivation"],
-    ["mother", "E → E", "O → E", "E → E", "No supported word-specific functional motivation yet."],
-    ["stone", "O → E", "O → E", "O → E", "No supported word-specific functional motivation yet."],
-    ["father", "A → E", "A → E", "A → Ë", "Reviewed functional motivation"],
-    ["water", "A → E", "A → E", "A → E", "No supported word-specific functional motivation yet."],
+    ["damage", "A → A → E", "Reviewed functional motivation"],
+    ["mother", "O → E", "No supported word-specific functional motivation yet."],
+    ["stone", "O → E", "No supported word-specific functional motivation yet."],
+    ["father", "A → E", "Reviewed functional motivation"],
+    ["water", "A → E", "No supported word-specific functional motivation yet."],
   ])(
     "keeps path layers and word-specific authority separate for %s",
-    async (word, enginePath, surfacePath, candidatePath, functionalDepth) => {
+    async (word, orthographicPath, functionalDepth) => {
       const body = await analyze(word);
       render(<InstrumentPanel payload={body} />);
 
@@ -130,12 +127,10 @@ describe("Open Instrument primary reading orientation card v0.1", () => {
         .closest("div.rounded-xl");
 
       expect(timeline).not.toBeNull();
-      expect(within(timeline!).getByText("Engine-selected analysis path")).toBeVisible();
-      expect(within(timeline!).getByText("Heart surface / doctrine path")).toBeVisible();
+      expect(within(timeline!).getByText("Spoken / canonical Voice path")).toBeVisible();
+      expect(within(timeline!).getByText("Orthographic vowel sequence (non-authoritative)")).toBeVisible();
       expect(within(timeline!).getByText("Functional / normalization path")).toBeVisible();
-      expect(within(timeline!).getAllByText(enginePath).length).toBeGreaterThan(0);
-      expect(within(timeline!).getAllByText(surfacePath).length).toBeGreaterThan(0);
-      expect(within(timeline!).getAllByText(candidatePath).length).toBeGreaterThan(0);
+      expect(within(timeline!).getAllByText(orthographicPath).length).toBeGreaterThan(0);
 
       const depth = screen.getAllByTestId("word-specific-functional-depth")[0];
       expect(within(depth).getByText(functionalDepth)).toBeVisible();
@@ -148,13 +143,13 @@ describe("Open Instrument primary reading orientation card v0.1", () => {
     render(<InstrumentPanel payload={body} />);
 
     const card = screen.getByTestId("primary-reading-orientation-card");
-    expect(within(card).getByText("Engine-selected Voice path:")).toBeVisible();
-    expect(within(card).getByTestId("orientation-structure")).toHaveTextContent("O");
+    expect(within(card).getByText("Spoken / canonical Voice path:")).toBeVisible();
+    expect(within(card).getByTestId("orientation-structure")).toHaveTextContent("No canonical Voice path was detected");
     expect(within(card).getByTestId("orientation-doctrine")).toHaveTextContent(
       "No doctrinal reading was emitted.",
     );
     expect(within(card).getByTestId("orientation-evidence")).toHaveTextContent(
-      "No supported functional candidate is established; structural and evidence states remain separate.",
+      "No structural Voice path was detected, so no structural reading is established.",
     );
   });
 

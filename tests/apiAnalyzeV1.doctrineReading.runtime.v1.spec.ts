@@ -36,16 +36,12 @@ function expectDoctrineBoundaries(reading: AnalyzeBody) {
 }
 
 describe("/api/analyze-v1 doctrine reading runtime projection v1", () => {
-  it("projects a single canonical surface Voice without candidate selection", async () => {
+  it("fails closed when pronunciation variants do not agree", async () => {
     const body = await analyze("a");
-    const reading = body.doctrineReading as AnalyzeBody;
 
     expect(body.heartInstrumentV1.surfaceVowels).toEqual(["A"]);
-    expect(reading.analyzedVoicePath).toEqual(["A"]);
-    expect(reading.entries).toEqual([
-      expect.objectContaining({ pathIndex: 0, voice: "A" }),
-    ]);
-    expectDoctrineBoundaries(reading);
+    expect(body.heartInstrumentV1.canonicalSpokenVoicePath).toBeNull();
+    expect(body.doctrineReading).toBeNull();
   });
 
   it("preserves the ordered multi-Voice surface path", async () => {
@@ -53,14 +49,14 @@ describe("/api/analyze-v1 doctrine reading runtime projection v1", () => {
     const reading = body.doctrineReading as AnalyzeBody;
 
     expect(body.heartInstrumentV1.surfaceVowels).toEqual(["U", "Y"]);
-    expect(reading.analyzedVoicePath).toEqual(["U", "Y"]);
+    expect(reading.analyzedVoicePath).toEqual(["Ë", "I"]);
     expect(reading.entries.map((entry: AnalyzeBody) => [entry.pathIndex, entry.voice])).toEqual([
-      [0, "U"],
-      [1, "Y"],
+      [0, "Ë"],
+      [1, "I"],
     ]);
     expect(reading.level3WholePathReading).toMatchObject({
-      analyzedVoicePath: ["U", "Y"],
-      reading: "grounded depth with reflective exploration",
+      analyzedVoicePath: ["Ë", "I"],
+      reading: "harmonious resolution with clear understanding",
       truthClassification: "inference",
       level: 3,
     });
@@ -76,18 +72,15 @@ describe("/api/analyze-v1 doctrine reading runtime projection v1", () => {
     const reading = withoutTargetSense.doctrineReading as AnalyzeBody;
 
     expect(withoutTargetSense.heartInstrumentV1.surfaceVowels).toEqual(["A", "E"]);
-    expect(reading.analyzedVoicePath).toEqual(["A", "E"]);
+    expect(reading.analyzedVoicePath).toEqual(["O", "Ë"]);
     expect(reading.level3WholePathReading).toMatchObject({
-      ruleId: "level3.generic-distinct-pair.v1",
-      analyzedVoicePath: ["A", "E"],
-      reading: "initiating beginning with expanding growth",
+      analyzedVoicePath: ["O", "Ë"],
+      reading: "balanced mediation with harmonious resolution",
       truthClassification: "inference",
       level: 3,
     });
     expectDoctrineBoundaries(reading);
-    expect(withoutTargetSense.doctrineReading).toEqual(
-      withTargetSense.doctrineReading,
-    );
+    expect(withoutTargetSense.doctrineReading).toEqual(withTargetSense.doctrineReading);
   });
 
   it("projects the E to A reversal without adding transition semantics", async () => {
@@ -95,19 +88,8 @@ describe("/api/analyze-v1 doctrine reading runtime projection v1", () => {
     const reading = body.doctrineReading as AnalyzeBody;
 
     expect(body.heartInstrumentV1.surfaceVowels).toEqual(["E", "A"]);
-    expect(reading.analyzedVoicePath).toEqual(["E", "A"]);
-    expect(reading.level3WholePathReading).toMatchObject({
-      ruleId: "level3.generic-distinct-pair.v1",
-      analyzedVoicePath: ["E", "A"],
-      reading: "expanding growth with initiating beginning",
-      truthClassification: "inference",
-      level: 3,
-      genericComposition: "AUTHORIZED",
-      level4TransitionSemantics: "NOT_AUTHORIZED",
-      userDecisionPosture: "user_decides",
-      noSingleWinner: true,
-    });
-    expectDoctrineBoundaries(reading);
+    expect(body.heartInstrumentV1.canonicalSpokenVoicePath).toBeNull();
+    expect(body.doctrineReading).toBeNull();
   });
 
   it("preserves repeated surface Voice positions as distinct entries", async () => {
@@ -115,25 +97,24 @@ describe("/api/analyze-v1 doctrine reading runtime projection v1", () => {
     const reading = body.doctrineReading as AnalyzeBody;
 
     expect(body.heartInstrumentV1.surfaceVowels).toEqual(["A", "A", "A"]);
-    expect(reading.analyzedVoicePath).toEqual(["A", "A", "A"]);
+    expect(reading.analyzedVoicePath).toEqual(["Ë", "A", "Ë"]);
     expect(reading.level3WholePathReading).toBeUndefined();
     expect(reading.entries.map((entry: AnalyzeBody) => [entry.pathIndex, entry.voice])).toEqual([
-      [0, "A"],
+      [0, "Ë"],
       [1, "A"],
-      [2, "A"],
+      [2, "Ë"],
     ]);
   });
 
-  it("keeps doctrine reading present beside a valid Null analysis", async () => {
+  it("keeps pronunciation Null distinct from a valid structural Null analysis", async () => {
     const body = await analyze("wind");
     const reading = body.doctrineReading as AnalyzeBody;
 
     expect(body.analysisStatusV0_1.status).toBe("null_no_supported_candidate");
     expect(body.heartInstrumentV1.surfaceVowels.length).toBeGreaterThan(0);
-    expect(reading).not.toBeNull();
+    expect(body.heartInstrumentV1.canonicalSpokenVoicePath).toBeNull();
+    expect(reading).toBeNull();
     expect(body.candidates).toEqual([]);
-    expect(reading.level3WholePathReading).toBeUndefined();
-    expectDoctrineBoundaries(reading);
   });
 
   it("keeps the U to Y proof reading independent of target-sense context", async () => {
@@ -143,9 +124,7 @@ describe("/api/analyze-v1 doctrine reading runtime projection v1", () => {
       "&targetSenseId=study.v1&targetSenseLabel=to%20study",
     );
 
-    expect(withoutTargetSense.doctrineReading.level3WholePathReading).toEqual(
-      withTargetSense.doctrineReading.level3WholePathReading,
-    );
+    expect(withoutTargetSense.doctrineReading).toEqual(withTargetSense.doctrineReading);
   });
 
   it("keeps the additive field inside the strict public contract", async () => {

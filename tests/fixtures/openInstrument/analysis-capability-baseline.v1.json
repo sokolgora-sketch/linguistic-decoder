@@ -33,14 +33,14 @@
     },
     "invariantFailures": [],
     "normalization": {
-      "casesWithRecords": 11,
-      "recordCount": 11
+      "casesWithRecords": 45,
+      "recordCount": 45
     },
     "nullCount": 29,
     "pathCoverage": {
       "delta": 57,
-      "detected": 57,
-      "functional": 57,
+      "detected": 51,
+      "functional": 52,
       "surface": 57
     },
     "repeatability": {
@@ -240,7 +240,7 @@
         "totalRefs": 1,
         "unresolvedRefs": 0
       },
-      "fingerprint": "fb8e24359e3d0459c2df38e30145e2a7b6385274c04c909e7555377f9abdd776",
+      "fingerprint": "cf259cea7fc4bdaf8c13ec91731284440e360a5357e0bcca7505950c666fabea",
       "invariants": {
         "claimBoundaryPreserved": true,
         "failures": [],
@@ -258,15 +258,22 @@
       "paths": {
         "delta": "DIVERGE",
         "detected": [
-          "U",
-          "Y"
+          "Ë",
+          "I"
         ],
         "functional": [
           "U",
           "I"
         ],
-        "normalizationRecordCount": 0,
-        "normalizationSteps": [],
+        "normalizationRecordCount": 1,
+        "normalizationSteps": [
+          {
+            "from": "UY",
+            "op": "vowel_normalize",
+            "reason": "functional_equivalence",
+            "to": "ËI"
+          }
+        ],
         "surface": [
           "U",
           "Y"
@@ -274,7 +281,7 @@
       },
       "repeatability": {
         "checked": true,
-        "repeatedFingerprint": "fb8e24359e3d0459c2df38e30145e2a7b6385274c04c909e7555377f9abdd776",
+        "repeatedFingerprint": "cf259cea7fc4bdaf8c13ec91731284440e360a5357e0bcca7505950c666fabea",
         "stable": true
       },
       "request": {
@@ -417,7 +424,7 @@
         "totalRefs": 1,
         "unresolvedRefs": 0
       },
-      "fingerprint": "57b2a3941f0efadfab95b8a988eb0baad0690811c622c8dfe9351c8964c5c995",
+      "fingerprint": "b6b64779ed89052a3ff71ba1d57221acf78e1f76f3d07bbc3062350473b4ff5c",
       "invariants": {
         "claimBoundaryPreserved": true,
         "failures": [],
@@ -434,23 +441,13 @@
       "nullResult": false,
       "paths": {
         "delta": "DIVERGE",
-        "detected": [
-          "A",
-          "E"
-        ],
+        "detected": null,
         "functional": [
           "A",
           "Ë"
         ],
-        "normalizationRecordCount": 1,
-        "normalizationSteps": [
-          {
-            "from": "AAE",
-            "op": "vowel_normalize",
-            "reason": "functional_equivalence",
-            "to": "AE"
-          }
-        ],
+        "normalizationRecordCount": 0,
+        "normalizationSteps": [],
         "surface": [
           "A",
           "A",
@@ -459,7 +456,7 @@
       },
       "repeatability": {
         "checked": true,
-        "repeatedFingerprint": "57b2a3941f0efadfab95b8a988eb0baad0690811c622c8dfe9351c8964c5c995",
+        "repeatedFingerprint": "b6b64779ed89052a3ff71ba1d57221acf78e1f76f3d07bbc3062350473b4ff5c",
         "stable": true
       },
       "request": {
@@ -585,7 +582,7 @@
         "totalRefs": 0,
         "unresolvedRefs": 0
       },
-      "fingerprint": "1c508b1f9fcebf1c038a75fc9980761c9cf8991887d5ac2c9255f35b1d2e06cb",
+      "fingerprint": "6a270bc35d5bc87f5ebce85883941a4db1b52f6dd5bdc46aa33d02a205750adf",
       "invariants": {
         "claimBoundaryPreserved": true,
         "failures": [],
@@ -601,19 +598,26 @@
       "normalizedWord": "mystery",
       "nullResult": false,
       "paths": {
-        "delta": "MATCH",
+        "delta": "DIVERGE",
         "detected": [
-          "Y",
-          "E",
-          "Y"
+          "I",
+          "Ë",
+          "I"
         ],
         "functional": [
-          "Y",
-          "E",
-          "Y"
+          "I",
+          "Ë",
+          "I"
         ],
-        "normalizationRecordCount": 0,
-        "normalizationSteps": [],
+        "normalizationRecordCount": 1,
+        "normalizationSteps": [
+          {
+            "from": "YEY",
+            "op": "vowel_normalize",
+            "reason": "functional_equivalence",
+            "to": "IËI"
+          }
+        ],
         "surface": [
           "Y",
           "E",
@@ -622,7 +626,7 @@
       },
       "repeatability": {
         "checked": true,
-        "repeatedFingerprint": "1c508b1f9fcebf1c038a75fc9980761c9cf8991887d5ac2c9255f35b1d2e06cb",
+        "repeatedFingerprint": "6a270bc35d5bc87f5ebce85883941a4db1b52f6dd5bdc46aa33d02a205750adf",
         "stable": true
       },
       "request": {
@@ -793,7 +797,7 @@
         "totalRefs": 2,
         "unresolvedRefs": 0
       },
-      "fingerprint": "2922d500cf0568e044017ba9bd77bfddf5405a896d70c83ca4bd4778205f06f6",
+      "fingerprint": "b3e689bae6cd6dc49cb5d886750c287735ba84c08c0c9e10d7e9d9f6e99431cc",
       "invariants": {
         "claimBoundaryPreserved": true,
         "failures": [],
@@ -809,17 +813,24 @@
       "normalizedWord": "water",
       "nullResult": false,
       "paths": {
-        "delta": "MATCH",
+        "delta": "DIVERGE",
         "detected": [
-          "A",
-          "E"
+          "O",
+          "Ë"
         ],
         "functional": [
-          "A",
-          "E"
+          "O",
+          "Ë"
         ],
-        "normalizationRecordCount": 0,
-        "normalizationSteps": [],
+        "normalizationRecordCount": 1,
+        "normalizationSteps": [
+          {
+            "from": "AE",
+            "op": "vowel_normalize",
+            "reason": "functional_equivalence",
+            "to": "OË"
+          }
+        ],
         "surface": [
           "A",
           "E"
@@ -827,7 +838,7 @@
       },
       "repeatability": {
         "checked": true,
-        "repeatedFingerprint": "2922d500cf0568e044017ba9bd77bfddf5405a896d70c83ca4bd4778205f06f6",
+        "repeatedFingerprint": "b3e689bae6cd6dc49cb5d886750c287735ba84c08c0c9e10d7e9d9f6e99431cc",
         "stable": true
       },
       "request": {
@@ -998,7 +1009,7 @@
         "totalRefs": 2,
         "unresolvedRefs": 0
       },
-      "fingerprint": "5d2cf16e2919d023cb28627696c5632d3dda02bb384fcb24d278d34976cf0c48",
+      "fingerprint": "e5e2efe06b612f5256a2578c0203b5332a663e4b40854cf69e62278e9b203736",
       "invariants": {
         "claimBoundaryPreserved": true,
         "failures": [],
@@ -1014,17 +1025,24 @@
       "normalizedWord": "candle",
       "nullResult": false,
       "paths": {
-        "delta": "MATCH",
+        "delta": "DIVERGE",
         "detected": [
           "A",
-          "E"
+          "Ë"
         ],
         "functional": [
           "A",
-          "E"
+          "Ë"
         ],
-        "normalizationRecordCount": 0,
-        "normalizationSteps": [],
+        "normalizationRecordCount": 1,
+        "normalizationSteps": [
+          {
+            "from": "AE",
+            "op": "vowel_normalize",
+            "reason": "functional_equivalence",
+            "to": "AË"
+          }
+        ],
         "surface": [
           "A",
           "E"
@@ -1032,7 +1050,7 @@
       },
       "repeatability": {
         "checked": true,
-        "repeatedFingerprint": "5d2cf16e2919d023cb28627696c5632d3dda02bb384fcb24d278d34976cf0c48",
+        "repeatedFingerprint": "e5e2efe06b612f5256a2578c0203b5332a663e4b40854cf69e62278e9b203736",
         "stable": true
       },
       "request": {
@@ -1219,7 +1237,7 @@
         "totalRefs": 2,
         "unresolvedRefs": 0
       },
-      "fingerprint": "5b7f2e53e316b10d5d3e29b722e2f8aeb9d91c15f0f146ce293b14baaa43a26a",
+      "fingerprint": "3def6266d68fe848218646fe2a02b95366d1357f3ba619989c04b7863174abd1",
       "invariants": {
         "claimBoundaryPreserved": true,
         "failures": [],
@@ -1235,17 +1253,24 @@
       "normalizedWord": "water",
       "nullResult": false,
       "paths": {
-        "delta": "MATCH",
+        "delta": "DIVERGE",
         "detected": [
-          "A",
-          "E"
+          "O",
+          "Ë"
         ],
         "functional": [
-          "A",
-          "E"
+          "O",
+          "Ë"
         ],
-        "normalizationRecordCount": 0,
-        "normalizationSteps": [],
+        "normalizationRecordCount": 1,
+        "normalizationSteps": [
+          {
+            "from": "AE",
+            "op": "vowel_normalize",
+            "reason": "functional_equivalence",
+            "to": "OË"
+          }
+        ],
         "surface": [
           "A",
           "E"
@@ -1253,7 +1278,7 @@
       },
       "repeatability": {
         "checked": true,
-        "repeatedFingerprint": "5b7f2e53e316b10d5d3e29b722e2f8aeb9d91c15f0f146ce293b14baaa43a26a",
+        "repeatedFingerprint": "3def6266d68fe848218646fe2a02b95366d1357f3ba619989c04b7863174abd1",
         "stable": true
       },
       "request": {
@@ -1307,7 +1332,7 @@
         "totalRefs": 0,
         "unresolvedRefs": 0
       },
-      "fingerprint": "b0d3c5544086a8f831e1e8bd2869184c673f57c11f981706458919193a31edc2",
+      "fingerprint": "626ae61791deaa46eeb718312d555ed28b5c6699d3c840b0acdd705cf08a659a",
       "invariants": {
         "claimBoundaryPreserved": true,
         "failures": [],
@@ -1323,13 +1348,9 @@
       "normalizedWord": "xyz",
       "nullResult": true,
       "paths": {
-        "delta": "MATCH",
-        "detected": [
-          "Y"
-        ],
-        "functional": [
-          "Y"
-        ],
+        "delta": "NOT_EMITTED",
+        "detected": null,
+        "functional": null,
         "normalizationRecordCount": 0,
         "normalizationSteps": [],
         "surface": [
@@ -1338,7 +1359,7 @@
       },
       "repeatability": {
         "checked": true,
-        "repeatedFingerprint": "b0d3c5544086a8f831e1e8bd2869184c673f57c11f981706458919193a31edc2",
+        "repeatedFingerprint": "626ae61791deaa46eeb718312d555ed28b5c6699d3c840b0acdd705cf08a659a",
         "stable": true
       },
       "request": {
@@ -1430,7 +1451,7 @@
         "totalRefs": 1,
         "unresolvedRefs": 0
       },
-      "fingerprint": "77ffacb428c3ba993fb9a9aa70032f605377cb4bbbda49d03a51521a0a8ad743",
+      "fingerprint": "6398324bc34029a57bc1545dcd824441af1786717526c48f86128fe328aa81e9",
       "invariants": {
         "claimBoundaryPreserved": true,
         "failures": [],
@@ -1448,12 +1469,12 @@
       "paths": {
         "delta": "DIVERGE",
         "detected": [
-          "A",
-          "Ë"
+          "E",
+          "I"
         ],
         "functional": [
-          "A",
-          "Ë"
+          "E",
+          "I"
         ],
         "normalizationRecordCount": 1,
         "normalizationSteps": [
@@ -1461,7 +1482,7 @@
             "from": "AI",
             "op": "vowel_normalize",
             "reason": "functional_equivalence",
-            "to": "AË"
+            "to": "EI"
           }
         ],
         "surface": [
@@ -1471,7 +1492,7 @@
       },
       "repeatability": {
         "checked": true,
-        "repeatedFingerprint": "77ffacb428c3ba993fb9a9aa70032f605377cb4bbbda49d03a51521a0a8ad743",
+        "repeatedFingerprint": "6398324bc34029a57bc1545dcd824441af1786717526c48f86128fe328aa81e9",
         "stable": true
       },
       "request": {
@@ -1601,7 +1622,7 @@
         "totalRefs": 1,
         "unresolvedRefs": 0
       },
-      "fingerprint": "95925050499a360f0232fc61cb933f3aa57d52488358d8f93859366b7c06364f",
+      "fingerprint": "2bc1bbcc1f1cde12f71e707635471d7228e501aade617a6ac688bff8a84c4a82",
       "invariants": {
         "claimBoundaryPreserved": true,
         "failures": [],
@@ -1617,17 +1638,24 @@
       "normalizedWord": "river",
       "nullResult": false,
       "paths": {
-        "delta": "MATCH",
+        "delta": "DIVERGE",
         "detected": [
           "I",
-          "E"
+          "Ë"
         ],
         "functional": [
           "I",
-          "E"
+          "Ë"
         ],
-        "normalizationRecordCount": 0,
-        "normalizationSteps": [],
+        "normalizationRecordCount": 1,
+        "normalizationSteps": [
+          {
+            "from": "IE",
+            "op": "vowel_normalize",
+            "reason": "functional_equivalence",
+            "to": "IË"
+          }
+        ],
         "surface": [
           "I",
           "E"
@@ -1635,7 +1663,7 @@
       },
       "repeatability": {
         "checked": true,
-        "repeatedFingerprint": "95925050499a360f0232fc61cb933f3aa57d52488358d8f93859366b7c06364f",
+        "repeatedFingerprint": "2bc1bbcc1f1cde12f71e707635471d7228e501aade617a6ac688bff8a84c4a82",
         "stable": true
       },
       "request": {
@@ -1802,7 +1830,7 @@
         "totalRefs": 1,
         "unresolvedRefs": 0
       },
-      "fingerprint": "a7f13f2f03072779830e1a8b7a70302ab06e68dc66aee2928a91c0471c199d5f",
+      "fingerprint": "6f66f4f168cd4a32eaf052d0bdac6cec4aafb00d86b9de0d30fb4ba491021383",
       "invariants": {
         "claimBoundaryPreserved": true,
         "failures": [],
@@ -1818,21 +1846,26 @@
       "normalizedWord": "mountain",
       "nullResult": false,
       "paths": {
-        "delta": "MATCH",
+        "delta": "DIVERGE",
         "detected": [
-          "O",
-          "U",
           "A",
-          "I"
+          "U",
+          "Ë"
         ],
         "functional": [
-          "O",
-          "U",
           "A",
-          "I"
+          "U",
+          "Ë"
         ],
-        "normalizationRecordCount": 0,
-        "normalizationSteps": [],
+        "normalizationRecordCount": 1,
+        "normalizationSteps": [
+          {
+            "from": "OUAI",
+            "op": "vowel_normalize",
+            "reason": "functional_equivalence",
+            "to": "AUË"
+          }
+        ],
         "surface": [
           "O",
           "U",
@@ -1842,7 +1875,7 @@
       },
       "repeatability": {
         "checked": true,
-        "repeatedFingerprint": "a7f13f2f03072779830e1a8b7a70302ab06e68dc66aee2928a91c0471c199d5f",
+        "repeatedFingerprint": "6f66f4f168cd4a32eaf052d0bdac6cec4aafb00d86b9de0d30fb4ba491021383",
         "stable": true
       },
       "request": {
@@ -1968,7 +2001,7 @@
         "totalRefs": 0,
         "unresolvedRefs": 0
       },
-      "fingerprint": "73f7d3df2506ef307b8bfaeed94965394f8530e75722c4048fdfb1c50334b962",
+      "fingerprint": "c5b3750a53038d0bfe74db07423c64308d6aaf106986ca5c15ef1a1625335de4",
       "invariants": {
         "claimBoundaryPreserved": true,
         "failures": [],
@@ -1984,17 +2017,24 @@
       "normalizedWord": "stone",
       "nullResult": false,
       "paths": {
-        "delta": "MATCH",
+        "delta": "DIVERGE",
         "detected": [
           "O",
-          "E"
+          "U"
         ],
         "functional": [
           "O",
-          "E"
+          "U"
         ],
-        "normalizationRecordCount": 0,
-        "normalizationSteps": [],
+        "normalizationRecordCount": 1,
+        "normalizationSteps": [
+          {
+            "from": "OE",
+            "op": "vowel_normalize",
+            "reason": "functional_equivalence",
+            "to": "OU"
+          }
+        ],
         "surface": [
           "O",
           "E"
@@ -2002,7 +2042,7 @@
       },
       "repeatability": {
         "checked": true,
-        "repeatedFingerprint": "73f7d3df2506ef307b8bfaeed94965394f8530e75722c4048fdfb1c50334b962",
+        "repeatedFingerprint": "c5b3750a53038d0bfe74db07423c64308d6aaf106986ca5c15ef1a1625335de4",
         "stable": true
       },
       "request": {
@@ -2173,7 +2213,7 @@
         "totalRefs": 2,
         "unresolvedRefs": 0
       },
-      "fingerprint": "86bd930bd7fd7a93a4f9c1fd4c96548918623f9b2ac994b7bcc7ad140f0e9a72",
+      "fingerprint": "f35833c72975151768e6f0f8f22fa0684a9661c244285cd4068706b78d8dd9b7",
       "invariants": {
         "claimBoundaryPreserved": true,
         "failures": [],
@@ -2191,10 +2231,10 @@
       "paths": {
         "delta": "DIVERGE",
         "detected": [
-          "E"
+          "I"
         ],
         "functional": [
-          "E"
+          "I"
         ],
         "normalizationRecordCount": 1,
         "normalizationSteps": [
@@ -2202,7 +2242,7 @@
             "from": "EE",
             "op": "vowel_normalize",
             "reason": "functional_equivalence",
-            "to": "E"
+            "to": "I"
           }
         ],
         "surface": [
@@ -2212,7 +2252,7 @@
       },
       "repeatability": {
         "checked": true,
-        "repeatedFingerprint": "86bd930bd7fd7a93a4f9c1fd4c96548918623f9b2ac994b7bcc7ad140f0e9a72",
+        "repeatedFingerprint": "f35833c72975151768e6f0f8f22fa0684a9661c244285cd4068706b78d8dd9b7",
         "stable": true
       },
       "request": {
@@ -2260,7 +2300,7 @@
         "totalRefs": 0,
         "unresolvedRefs": 0
       },
-      "fingerprint": "a00e32bb305d7e82292b09ff5e51ad1d596e966473836f5fca005c51249240b4",
+      "fingerprint": "b5ed75618f81005d1783d915846f4eb34d4f436df5a665e3b26846612ed54444",
       "invariants": {
         "claimBoundaryPreserved": true,
         "failures": [],
@@ -2276,13 +2316,9 @@
       "normalizedWord": "wind",
       "nullResult": true,
       "paths": {
-        "delta": "MATCH",
-        "detected": [
-          "I"
-        ],
-        "functional": [
-          "I"
-        ],
+        "delta": "NOT_EMITTED",
+        "detected": null,
+        "functional": null,
         "normalizationRecordCount": 0,
         "normalizationSteps": [],
         "surface": [
@@ -2291,7 +2327,7 @@
       },
       "repeatability": {
         "checked": true,
-        "repeatedFingerprint": "a00e32bb305d7e82292b09ff5e51ad1d596e966473836f5fca005c51249240b4",
+        "repeatedFingerprint": "b5ed75618f81005d1783d915846f4eb34d4f436df5a665e3b26846612ed54444",
         "stable": true
       },
       "request": {
@@ -2461,7 +2497,7 @@
         "totalRefs": 2,
         "unresolvedRefs": 0
       },
-      "fingerprint": "87318781a9a40d8d89225b81650a6049f153cf00a0f7b002637c3c7bd5addbfe",
+      "fingerprint": "c36c75ca4aa1fac19fca886f9c08c9d2ccf16064e28d7ef01e91e1933d089150",
       "invariants": {
         "claimBoundaryPreserved": true,
         "failures": [],
@@ -2477,17 +2513,22 @@
       "normalizedWord": "sea",
       "nullResult": false,
       "paths": {
-        "delta": "MATCH",
+        "delta": "DIVERGE",
         "detected": [
-          "E",
-          "A"
+          "I"
         ],
         "functional": [
-          "E",
-          "A"
+          "I"
         ],
-        "normalizationRecordCount": 0,
-        "normalizationSteps": [],
+        "normalizationRecordCount": 1,
+        "normalizationSteps": [
+          {
+            "from": "EA",
+            "op": "vowel_normalize",
+            "reason": "functional_equivalence",
+            "to": "I"
+          }
+        ],
         "surface": [
           "E",
           "A"
@@ -2495,7 +2536,7 @@
       },
       "repeatability": {
         "checked": true,
-        "repeatedFingerprint": "87318781a9a40d8d89225b81650a6049f153cf00a0f7b002637c3c7bd5addbfe",
+        "repeatedFingerprint": "c36c75ca4aa1fac19fca886f9c08c9d2ccf16064e28d7ef01e91e1933d089150",
         "stable": true
       },
       "request": {
@@ -2628,7 +2669,7 @@
         "totalRefs": 2,
         "unresolvedRefs": 0
       },
-      "fingerprint": "13854be507ce720cdfa1601cdc4ed67419543f0a45c89990ea9eced70e25ad57",
+      "fingerprint": "e0dc5b7df210f79be5c65aa791b2b88c28156f99f64885b258a44744796804f9",
       "invariants": {
         "claimBoundaryPreserved": true,
         "failures": [],
@@ -2644,22 +2685,31 @@
       "normalizedWord": "sky",
       "nullResult": true,
       "paths": {
-        "delta": "MATCH",
+        "delta": "DIVERGE",
         "detected": [
-          "Y"
+          "A",
+          "I"
         ],
         "functional": [
-          "Y"
+          "A",
+          "I"
         ],
-        "normalizationRecordCount": 0,
-        "normalizationSteps": [],
+        "normalizationRecordCount": 1,
+        "normalizationSteps": [
+          {
+            "from": "Y",
+            "op": "vowel_normalize",
+            "reason": "functional_equivalence",
+            "to": "AI"
+          }
+        ],
         "surface": [
           "Y"
         ]
       },
       "repeatability": {
         "checked": true,
-        "repeatedFingerprint": "13854be507ce720cdfa1601cdc4ed67419543f0a45c89990ea9eced70e25ad57",
+        "repeatedFingerprint": "e0dc5b7df210f79be5c65aa791b2b88c28156f99f64885b258a44744796804f9",
         "stable": true
       },
       "request": {
@@ -2830,7 +2880,7 @@
         "totalRefs": 2,
         "unresolvedRefs": 0
       },
-      "fingerprint": "6bd96e7238075bce2cc88e74007598184fcbfb0fcf80b97efb3801539a17ac04",
+      "fingerprint": "bc7daf860d7776c9570b4bf01ffb81355b48af3d5469bf0a96e155c3463703f6",
       "invariants": {
         "claimBoundaryPreserved": true,
         "failures": [],
@@ -2846,22 +2896,31 @@
       "normalizedWord": "snow",
       "nullResult": false,
       "paths": {
-        "delta": "MATCH",
+        "delta": "DIVERGE",
         "detected": [
-          "O"
+          "O",
+          "U"
         ],
         "functional": [
-          "O"
+          "O",
+          "U"
         ],
-        "normalizationRecordCount": 0,
-        "normalizationSteps": [],
+        "normalizationRecordCount": 1,
+        "normalizationSteps": [
+          {
+            "from": "O",
+            "op": "vowel_normalize",
+            "reason": "functional_equivalence",
+            "to": "OU"
+          }
+        ],
         "surface": [
           "O"
         ]
       },
       "repeatability": {
         "checked": true,
-        "repeatedFingerprint": "6bd96e7238075bce2cc88e74007598184fcbfb0fcf80b97efb3801539a17ac04",
+        "repeatedFingerprint": "bc7daf860d7776c9570b4bf01ffb81355b48af3d5469bf0a96e155c3463703f6",
         "stable": true
       },
       "request": {
@@ -3069,7 +3128,7 @@
         "totalRefs": 2,
         "unresolvedRefs": 0
       },
-      "fingerprint": "4e0ad6317de3cdfb19a953c92abbaa26be5d12d9a3b740505ff2e54ba3eb889c",
+      "fingerprint": "94924834cdc617a33e365b1a3f7bb0df3fd0600fa63d036359b97d072d3a77de",
       "invariants": {
         "claimBoundaryPreserved": true,
         "failures": [],
@@ -3085,17 +3144,24 @@
       "normalizedWord": "cloud",
       "nullResult": false,
       "paths": {
-        "delta": "MATCH",
+        "delta": "DIVERGE",
         "detected": [
-          "O",
+          "A",
           "U"
         ],
         "functional": [
-          "O",
+          "A",
           "U"
         ],
-        "normalizationRecordCount": 0,
-        "normalizationSteps": [],
+        "normalizationRecordCount": 1,
+        "normalizationSteps": [
+          {
+            "from": "OU",
+            "op": "vowel_normalize",
+            "reason": "functional_equivalence",
+            "to": "AU"
+          }
+        ],
         "surface": [
           "O",
           "U"
@@ -3103,7 +3169,7 @@
       },
       "repeatability": {
         "checked": true,
-        "repeatedFingerprint": "4e0ad6317de3cdfb19a953c92abbaa26be5d12d9a3b740505ff2e54ba3eb889c",
+        "repeatedFingerprint": "94924834cdc617a33e365b1a3f7bb0df3fd0600fa63d036359b97d072d3a77de",
         "stable": true
       },
       "request": {
@@ -3195,7 +3261,7 @@
         "totalRefs": 1,
         "unresolvedRefs": 0
       },
-      "fingerprint": "27d8582afe0a4e76961ab742a6aef7d9af0e05dbd504a716df37cc004f6c77ae",
+      "fingerprint": "aa9716587dca3a51e5c297c216caee2cc64c1dab9cfaaf926217b247fef6038c",
       "invariants": {
         "claimBoundaryPreserved": true,
         "failures": [],
@@ -3226,7 +3292,7 @@
       },
       "repeatability": {
         "checked": true,
-        "repeatedFingerprint": "27d8582afe0a4e76961ab742a6aef7d9af0e05dbd504a716df37cc004f6c77ae",
+        "repeatedFingerprint": "aa9716587dca3a51e5c297c216caee2cc64c1dab9cfaaf926217b247fef6038c",
         "stable": true
       },
       "request": {
@@ -3274,7 +3340,7 @@
         "totalRefs": 0,
         "unresolvedRefs": 0
       },
-      "fingerprint": "011004130032e975b45d19eebdfa17bb89ed60e152fadbbbdd25b4709ee11688",
+      "fingerprint": "ec5c0a02a6a9e25e91e9555ec52a47d05b270cbce9066b226ceb1a39637298d1",
       "invariants": {
         "claimBoundaryPreserved": true,
         "failures": [],
@@ -3290,17 +3356,22 @@
       "normalizedWord": "head",
       "nullResult": true,
       "paths": {
-        "delta": "MATCH",
+        "delta": "DIVERGE",
         "detected": [
-          "E",
-          "A"
+          "E"
         ],
         "functional": [
-          "E",
-          "A"
+          "E"
         ],
-        "normalizationRecordCount": 0,
-        "normalizationSteps": [],
+        "normalizationRecordCount": 1,
+        "normalizationSteps": [
+          {
+            "from": "EA",
+            "op": "vowel_normalize",
+            "reason": "functional_equivalence",
+            "to": "E"
+          }
+        ],
         "surface": [
           "E",
           "A"
@@ -3308,7 +3379,7 @@
       },
       "repeatability": {
         "checked": true,
-        "repeatedFingerprint": "011004130032e975b45d19eebdfa17bb89ed60e152fadbbbdd25b4709ee11688",
+        "repeatedFingerprint": "ec5c0a02a6a9e25e91e9555ec52a47d05b270cbce9066b226ceb1a39637298d1",
         "stable": true
       },
       "request": {
@@ -3441,7 +3512,7 @@
         "totalRefs": 2,
         "unresolvedRefs": 0
       },
-      "fingerprint": "af40284f054a41b76a20afd2784026bbc2621c0d504ea22dfe938a7d20c8aa38",
+      "fingerprint": "c4eeb0fc3033268c4c8d3a05ddeb213510e0fc1efa499e4b1c6e6fd937a0c27b",
       "invariants": {
         "claimBoundaryPreserved": true,
         "failures": [],
@@ -3457,17 +3528,22 @@
       "normalizedWord": "heart",
       "nullResult": true,
       "paths": {
-        "delta": "MATCH",
+        "delta": "DIVERGE",
         "detected": [
-          "E",
           "A"
         ],
         "functional": [
-          "E",
           "A"
         ],
-        "normalizationRecordCount": 0,
-        "normalizationSteps": [],
+        "normalizationRecordCount": 1,
+        "normalizationSteps": [
+          {
+            "from": "EA",
+            "op": "vowel_normalize",
+            "reason": "functional_equivalence",
+            "to": "A"
+          }
+        ],
         "surface": [
           "E",
           "A"
@@ -3475,7 +3551,7 @@
       },
       "repeatability": {
         "checked": true,
-        "repeatedFingerprint": "af40284f054a41b76a20afd2784026bbc2621c0d504ea22dfe938a7d20c8aa38",
+        "repeatedFingerprint": "c4eeb0fc3033268c4c8d3a05ddeb213510e0fc1efa499e4b1c6e6fd937a0c27b",
         "stable": true
       },
       "request": {
@@ -3642,7 +3718,7 @@
         "totalRefs": 1,
         "unresolvedRefs": 0
       },
-      "fingerprint": "87f35a1d29be0d54bb6b8a79fca16a177a61068a8721fb5a5cf7474e163c3f54",
+      "fingerprint": "80e4849da92f768b8bcc223cad1d7330a09b43cfe70f5c0fc79b1896dd292d37",
       "invariants": {
         "claimBoundaryPreserved": true,
         "failures": [],
@@ -3660,10 +3736,10 @@
       "paths": {
         "delta": "DIVERGE",
         "detected": [
-          "O"
+          "Ë"
         ],
         "functional": [
-          "O"
+          "Ë"
         ],
         "normalizationRecordCount": 1,
         "normalizationSteps": [
@@ -3671,7 +3747,7 @@
             "from": "OO",
             "op": "vowel_normalize",
             "reason": "functional_equivalence",
-            "to": "O"
+            "to": "Ë"
           }
         ],
         "surface": [
@@ -3681,7 +3757,7 @@
       },
       "repeatability": {
         "checked": true,
-        "repeatedFingerprint": "87f35a1d29be0d54bb6b8a79fca16a177a61068a8721fb5a5cf7474e163c3f54",
+        "repeatedFingerprint": "80e4849da92f768b8bcc223cad1d7330a09b43cfe70f5c0fc79b1896dd292d37",
         "stable": true
       },
       "request": {
@@ -3773,7 +3849,7 @@
         "totalRefs": 1,
         "unresolvedRefs": 0
       },
-      "fingerprint": "b6b6ff4126da75a5c65e21eedb7fa511c9814f030965acc2d71b98bdcd0e61c6",
+      "fingerprint": "d5eb79296f53be125db7e663f6cbf81df4a9c82aa50d92d10bad4e081d93b41d",
       "invariants": {
         "claimBoundaryPreserved": true,
         "failures": [],
@@ -3789,17 +3865,24 @@
       "normalizedWord": "bone",
       "nullResult": true,
       "paths": {
-        "delta": "MATCH",
+        "delta": "DIVERGE",
         "detected": [
           "O",
-          "E"
+          "U"
         ],
         "functional": [
           "O",
-          "E"
+          "U"
         ],
-        "normalizationRecordCount": 0,
-        "normalizationSteps": [],
+        "normalizationRecordCount": 1,
+        "normalizationSteps": [
+          {
+            "from": "OE",
+            "op": "vowel_normalize",
+            "reason": "functional_equivalence",
+            "to": "OU"
+          }
+        ],
         "surface": [
           "O",
           "E"
@@ -3807,7 +3890,7 @@
       },
       "repeatability": {
         "checked": true,
-        "repeatedFingerprint": "b6b6ff4126da75a5c65e21eedb7fa511c9814f030965acc2d71b98bdcd0e61c6",
+        "repeatedFingerprint": "d5eb79296f53be125db7e663f6cbf81df4a9c82aa50d92d10bad4e081d93b41d",
         "stable": true
       },
       "request": {
@@ -3978,7 +4061,7 @@
         "totalRefs": 2,
         "unresolvedRefs": 0
       },
-      "fingerprint": "588c5870f1496261f7e6c59371bd6759a9e26bd43da6e74d4187b0519a69002b",
+      "fingerprint": "60d9514e720e3bec4992d28d963f4d18aff9e7a9bf48d7b3e31d194b9291f001",
       "invariants": {
         "claimBoundaryPreserved": true,
         "failures": [],
@@ -4009,7 +4092,7 @@
       },
       "repeatability": {
         "checked": true,
-        "repeatedFingerprint": "588c5870f1496261f7e6c59371bd6759a9e26bd43da6e74d4187b0519a69002b",
+        "repeatedFingerprint": "60d9514e720e3bec4992d28d963f4d18aff9e7a9bf48d7b3e31d194b9291f001",
         "stable": true
       },
       "request": {
@@ -4057,7 +4140,7 @@
         "totalRefs": 0,
         "unresolvedRefs": 0
       },
-      "fingerprint": "90b3c0cf53f01b289ef8bac6470260fbdb0ac5f57c505a487e90ea50c44568ca",
+      "fingerprint": "57223dfaa528acba8aae81143e332d92ae4126335ab4f187b831050501079194",
       "invariants": {
         "claimBoundaryPreserved": true,
         "failures": [],
@@ -4073,17 +4156,24 @@
       "normalizedWord": "mouth",
       "nullResult": true,
       "paths": {
-        "delta": "MATCH",
+        "delta": "DIVERGE",
         "detected": [
-          "O",
+          "A",
           "U"
         ],
         "functional": [
-          "O",
+          "A",
           "U"
         ],
-        "normalizationRecordCount": 0,
-        "normalizationSteps": [],
+        "normalizationRecordCount": 1,
+        "normalizationSteps": [
+          {
+            "from": "OU",
+            "op": "vowel_normalize",
+            "reason": "functional_equivalence",
+            "to": "AU"
+          }
+        ],
         "surface": [
           "O",
           "U"
@@ -4091,7 +4181,7 @@
       },
       "repeatability": {
         "checked": true,
-        "repeatedFingerprint": "90b3c0cf53f01b289ef8bac6470260fbdb0ac5f57c505a487e90ea50c44568ca",
+        "repeatedFingerprint": "57223dfaa528acba8aae81143e332d92ae4126335ab4f187b831050501079194",
         "stable": true
       },
       "request": {
@@ -4183,7 +4273,7 @@
         "totalRefs": 1,
         "unresolvedRefs": 0
       },
-      "fingerprint": "bcfb452f9d261c8876c735a2531dd022883eada7d8193ecbfba376d7672dd5fe",
+      "fingerprint": "afba6f3cb010fbfa9a322148208dea517288399a7dc0661db53cb714cbc1e7dd",
       "invariants": {
         "claimBoundaryPreserved": true,
         "failures": [],
@@ -4199,17 +4289,22 @@
       "normalizedWord": "ear",
       "nullResult": true,
       "paths": {
-        "delta": "MATCH",
+        "delta": "DIVERGE",
         "detected": [
-          "E",
-          "A"
+          "I"
         ],
         "functional": [
-          "E",
-          "A"
+          "I"
         ],
-        "normalizationRecordCount": 0,
-        "normalizationSteps": [],
+        "normalizationRecordCount": 1,
+        "normalizationSteps": [
+          {
+            "from": "EA",
+            "op": "vowel_normalize",
+            "reason": "functional_equivalence",
+            "to": "I"
+          }
+        ],
         "surface": [
           "E",
           "A"
@@ -4217,7 +4312,7 @@
       },
       "repeatability": {
         "checked": true,
-        "repeatedFingerprint": "bcfb452f9d261c8876c735a2531dd022883eada7d8193ecbfba376d7672dd5fe",
+        "repeatedFingerprint": "afba6f3cb010fbfa9a322148208dea517288399a7dc0661db53cb714cbc1e7dd",
         "stable": true
       },
       "request": {
@@ -4309,7 +4404,7 @@
         "totalRefs": 1,
         "unresolvedRefs": 0
       },
-      "fingerprint": "615095de88600f4cd648273b1925648bb960fa05b1f2156e0320641d83db046b",
+      "fingerprint": "377746b7507697845fc5382df59f89c663fd04629c25c29db2f311af2dba9c80",
       "invariants": {
         "claimBoundaryPreserved": true,
         "failures": [],
@@ -4325,17 +4420,24 @@
       "normalizedWord": "nose",
       "nullResult": true,
       "paths": {
-        "delta": "MATCH",
+        "delta": "DIVERGE",
         "detected": [
           "O",
-          "E"
+          "U"
         ],
         "functional": [
           "O",
-          "E"
+          "U"
         ],
-        "normalizationRecordCount": 0,
-        "normalizationSteps": [],
+        "normalizationRecordCount": 1,
+        "normalizationSteps": [
+          {
+            "from": "OE",
+            "op": "vowel_normalize",
+            "reason": "functional_equivalence",
+            "to": "OU"
+          }
+        ],
         "surface": [
           "O",
           "E"
@@ -4343,7 +4445,7 @@
       },
       "repeatability": {
         "checked": true,
-        "repeatedFingerprint": "615095de88600f4cd648273b1925648bb960fa05b1f2156e0320641d83db046b",
+        "repeatedFingerprint": "377746b7507697845fc5382df59f89c663fd04629c25c29db2f311af2dba9c80",
         "stable": true
       },
       "request": {
@@ -4435,7 +4537,7 @@
         "totalRefs": 1,
         "unresolvedRefs": 0
       },
-      "fingerprint": "a6afdb5d06f42e87c5df92ab57199054f4db0611912b869d7c5a08771ff39e92",
+      "fingerprint": "8da05f8729474cb6003eb80a9dcfe5ff37f5f257c4fca87903c3fabb814a2413",
       "invariants": {
         "claimBoundaryPreserved": true,
         "failures": [],
@@ -4453,10 +4555,10 @@
       "paths": {
         "delta": "DIVERGE",
         "detected": [
-          "O"
+          "U"
         ],
         "functional": [
-          "O"
+          "U"
         ],
         "normalizationRecordCount": 1,
         "normalizationSteps": [
@@ -4464,7 +4566,7 @@
             "from": "OO",
             "op": "vowel_normalize",
             "reason": "functional_equivalence",
-            "to": "O"
+            "to": "U"
           }
         ],
         "surface": [
@@ -4474,7 +4576,7 @@
       },
       "repeatability": {
         "checked": true,
-        "repeatedFingerprint": "a6afdb5d06f42e87c5df92ab57199054f4db0611912b869d7c5a08771ff39e92",
+        "repeatedFingerprint": "8da05f8729474cb6003eb80a9dcfe5ff37f5f257c4fca87903c3fabb814a2413",
         "stable": true
       },
       "request": {
@@ -4566,7 +4668,7 @@
         "totalRefs": 1,
         "unresolvedRefs": 0
       },
-      "fingerprint": "142eabe90ec9cac6bf386e5b26260f2d2ba847303997d63f7715e0c965e1bd47",
+      "fingerprint": "1e03ca2c2ca3b2f842b545c9e36d4431ba79c9d12e168b62c8aec0538693c377",
       "invariants": {
         "claimBoundaryPreserved": true,
         "failures": [],
@@ -4582,22 +4684,29 @@
       "normalizedWord": "run",
       "nullResult": true,
       "paths": {
-        "delta": "MATCH",
+        "delta": "DIVERGE",
         "detected": [
-          "U"
+          "Ë"
         ],
         "functional": [
-          "U"
+          "Ë"
         ],
-        "normalizationRecordCount": 0,
-        "normalizationSteps": [],
+        "normalizationRecordCount": 1,
+        "normalizationSteps": [
+          {
+            "from": "U",
+            "op": "vowel_normalize",
+            "reason": "functional_equivalence",
+            "to": "Ë"
+          }
+        ],
         "surface": [
           "U"
         ]
       },
       "repeatability": {
         "checked": true,
-        "repeatedFingerprint": "142eabe90ec9cac6bf386e5b26260f2d2ba847303997d63f7715e0c965e1bd47",
+        "repeatedFingerprint": "1e03ca2c2ca3b2f842b545c9e36d4431ba79c9d12e168b62c8aec0538693c377",
         "stable": true
       },
       "request": {
@@ -4689,7 +4798,7 @@
         "totalRefs": 1,
         "unresolvedRefs": 0
       },
-      "fingerprint": "5ed326cc93618288c8a2d2c70c0c494fa0dbbd9b8126ce905916729e82d47ebe",
+      "fingerprint": "8516f5c26d5050185b044d370e2a2c68d950f8d643919f1f131f86d0d9ea283e",
       "invariants": {
         "claimBoundaryPreserved": true,
         "failures": [],
@@ -4705,13 +4814,9 @@
       "normalizedWord": "walk",
       "nullResult": true,
       "paths": {
-        "delta": "MATCH",
-        "detected": [
-          "A"
-        ],
-        "functional": [
-          "A"
-        ],
+        "delta": "NOT_EMITTED",
+        "detected": null,
+        "functional": null,
         "normalizationRecordCount": 0,
         "normalizationSteps": [],
         "surface": [
@@ -4720,7 +4825,7 @@
       },
       "repeatability": {
         "checked": true,
-        "repeatedFingerprint": "5ed326cc93618288c8a2d2c70c0c494fa0dbbd9b8126ce905916729e82d47ebe",
+        "repeatedFingerprint": "8516f5c26d5050185b044d370e2a2c68d950f8d643919f1f131f86d0d9ea283e",
         "stable": true
       },
       "request": {
@@ -4887,7 +4992,7 @@
         "totalRefs": 1,
         "unresolvedRefs": 0
       },
-      "fingerprint": "89380019133b099e63b95f2d84b0e14dbecf7fc8d7ef2d0d55e57fca8352959b",
+      "fingerprint": "23d0cc206618e56c2dafbb3d4b1811dd24097fa26dcd4516108291e52b110b4a",
       "invariants": {
         "claimBoundaryPreserved": true,
         "failures": [],
@@ -4903,17 +5008,22 @@
       "normalizedWord": "speak",
       "nullResult": false,
       "paths": {
-        "delta": "MATCH",
+        "delta": "DIVERGE",
         "detected": [
-          "E",
-          "A"
+          "I"
         ],
         "functional": [
-          "E",
-          "A"
+          "I"
         ],
-        "normalizationRecordCount": 0,
-        "normalizationSteps": [],
+        "normalizationRecordCount": 1,
+        "normalizationSteps": [
+          {
+            "from": "EA",
+            "op": "vowel_normalize",
+            "reason": "functional_equivalence",
+            "to": "I"
+          }
+        ],
         "surface": [
           "E",
           "A"
@@ -4921,7 +5031,7 @@
       },
       "repeatability": {
         "checked": true,
-        "repeatedFingerprint": "89380019133b099e63b95f2d84b0e14dbecf7fc8d7ef2d0d55e57fca8352959b",
+        "repeatedFingerprint": "23d0cc206618e56c2dafbb3d4b1811dd24097fa26dcd4516108291e52b110b4a",
         "stable": true
       },
       "request": {
@@ -4969,7 +5079,7 @@
         "totalRefs": 0,
         "unresolvedRefs": 0
       },
-      "fingerprint": "76efc2ae0b64dd08210ebe7bc84fc154ff81f7b801f584a00837c38e5a883a5e",
+      "fingerprint": "1e8bb76e412dfc57dddcf9a85ba0bb9b0d50933ac81fe1f0a72625f6778a15bb",
       "invariants": {
         "claimBoundaryPreserved": true,
         "failures": [],
@@ -4985,17 +5095,22 @@
       "normalizedWord": "hear",
       "nullResult": true,
       "paths": {
-        "delta": "MATCH",
+        "delta": "DIVERGE",
         "detected": [
-          "E",
-          "A"
+          "I"
         ],
         "functional": [
-          "E",
-          "A"
+          "I"
         ],
-        "normalizationRecordCount": 0,
-        "normalizationSteps": [],
+        "normalizationRecordCount": 1,
+        "normalizationSteps": [
+          {
+            "from": "EA",
+            "op": "vowel_normalize",
+            "reason": "functional_equivalence",
+            "to": "I"
+          }
+        ],
         "surface": [
           "E",
           "A"
@@ -5003,7 +5118,7 @@
       },
       "repeatability": {
         "checked": true,
-        "repeatedFingerprint": "76efc2ae0b64dd08210ebe7bc84fc154ff81f7b801f584a00837c38e5a883a5e",
+        "repeatedFingerprint": "1e8bb76e412dfc57dddcf9a85ba0bb9b0d50933ac81fe1f0a72625f6778a15bb",
         "stable": true
       },
       "request": {
@@ -5136,7 +5251,7 @@
         "totalRefs": 2,
         "unresolvedRefs": 0
       },
-      "fingerprint": "581dd712e9f23c57c4eab8a488801debb186487d9f5b1618df6a921ea6a5901c",
+      "fingerprint": "d218ad5064cd30c5cf92b16027b22e18eea6c9601fa35b4600570cec693eda9e",
       "invariants": {
         "claimBoundaryPreserved": true,
         "failures": [],
@@ -5152,17 +5267,22 @@
       "normalizedWord": "eat",
       "nullResult": true,
       "paths": {
-        "delta": "MATCH",
+        "delta": "DIVERGE",
         "detected": [
-          "E",
-          "A"
+          "I"
         ],
         "functional": [
-          "E",
-          "A"
+          "I"
         ],
-        "normalizationRecordCount": 0,
-        "normalizationSteps": [],
+        "normalizationRecordCount": 1,
+        "normalizationSteps": [
+          {
+            "from": "EA",
+            "op": "vowel_normalize",
+            "reason": "functional_equivalence",
+            "to": "I"
+          }
+        ],
         "surface": [
           "E",
           "A"
@@ -5170,7 +5290,7 @@
       },
       "repeatability": {
         "checked": true,
-        "repeatedFingerprint": "581dd712e9f23c57c4eab8a488801debb186487d9f5b1618df6a921ea6a5901c",
+        "repeatedFingerprint": "d218ad5064cd30c5cf92b16027b22e18eea6c9601fa35b4600570cec693eda9e",
         "stable": true
       },
       "request": {
@@ -5296,7 +5416,7 @@
         "totalRefs": 0,
         "unresolvedRefs": 0
       },
-      "fingerprint": "e6fa1bca3ea7607ec9a667279ff720be89101fd43232cb352f27553e7f74b1e5",
+      "fingerprint": "6d5c19e9948b880b0576f59e371da865efd9525bc762ba958948a51bedefa256",
       "invariants": {
         "claimBoundaryPreserved": true,
         "failures": [],
@@ -5327,7 +5447,7 @@
       },
       "repeatability": {
         "checked": true,
-        "repeatedFingerprint": "e6fa1bca3ea7607ec9a667279ff720be89101fd43232cb352f27553e7f74b1e5",
+        "repeatedFingerprint": "6d5c19e9948b880b0576f59e371da865efd9525bc762ba958948a51bedefa256",
         "stable": true
       },
       "request": {
@@ -5535,7 +5655,7 @@
         "totalRefs": 2,
         "unresolvedRefs": 0
       },
-      "fingerprint": "845e8881e363e71d79d7b506a8c8ebd8ab106a641c8ba311317940f913a4999d",
+      "fingerprint": "d9e4440558f5474cb3157b83a250ebc6237b4aab2f75fa63bbbf0dd0903c8e07",
       "invariants": {
         "claimBoundaryPreserved": true,
         "failures": [],
@@ -5553,10 +5673,10 @@
       "paths": {
         "delta": "DIVERGE",
         "detected": [
-          "E"
+          "I"
         ],
         "functional": [
-          "E"
+          "I"
         ],
         "normalizationRecordCount": 1,
         "normalizationSteps": [
@@ -5564,7 +5684,7 @@
             "from": "EE",
             "op": "vowel_normalize",
             "reason": "functional_equivalence",
-            "to": "E"
+            "to": "I"
           }
         ],
         "surface": [
@@ -5574,7 +5694,7 @@
       },
       "repeatability": {
         "checked": true,
-        "repeatedFingerprint": "845e8881e363e71d79d7b506a8c8ebd8ab106a641c8ba311317940f913a4999d",
+        "repeatedFingerprint": "d9e4440558f5474cb3157b83a250ebc6237b4aab2f75fa63bbbf0dd0903c8e07",
         "stable": true
       },
       "request": {
@@ -5707,7 +5827,7 @@
         "totalRefs": 2,
         "unresolvedRefs": 0
       },
-      "fingerprint": "7221863d5f7ed93af4eda304cfc5a3c9984d30947a977b6ea61287c1cb64e520",
+      "fingerprint": "f6216f4b514b276aef51401c8a57f45938f50ceef79858199c721e015605322a",
       "invariants": {
         "claimBoundaryPreserved": true,
         "failures": [],
@@ -5725,12 +5845,10 @@
       "paths": {
         "delta": "DIVERGE",
         "detected": [
-          "U",
-          "Ë"
+          "I"
         ],
         "functional": [
-          "U",
-          "Ë"
+          "I"
         ],
         "normalizationRecordCount": 1,
         "normalizationSteps": [
@@ -5738,7 +5856,7 @@
             "from": "UI",
             "op": "vowel_normalize",
             "reason": "functional_equivalence",
-            "to": "UË"
+            "to": "I"
           }
         ],
         "surface": [
@@ -5748,7 +5866,7 @@
       },
       "repeatability": {
         "checked": true,
-        "repeatedFingerprint": "7221863d5f7ed93af4eda304cfc5a3c9984d30947a977b6ea61287c1cb64e520",
+        "repeatedFingerprint": "f6216f4b514b276aef51401c8a57f45938f50ceef79858199c721e015605322a",
         "stable": true
       },
       "request": {
@@ -5956,7 +6074,7 @@
         "totalRefs": 2,
         "unresolvedRefs": 0
       },
-      "fingerprint": "2dd965edc5374be3b67f8c13e3acdcc7117997ae502c18e458495617ec7cb47c",
+      "fingerprint": "d9348a9bc28429d928cc023fac907f567fd43bcd4bd587d96744e41bd44583b1",
       "invariants": {
         "claimBoundaryPreserved": true,
         "failures": [],
@@ -5972,17 +6090,24 @@
       "normalizedWord": "break",
       "nullResult": false,
       "paths": {
-        "delta": "MATCH",
+        "delta": "DIVERGE",
         "detected": [
           "E",
-          "A"
+          "I"
         ],
         "functional": [
           "E",
-          "A"
+          "I"
         ],
-        "normalizationRecordCount": 0,
-        "normalizationSteps": [],
+        "normalizationRecordCount": 1,
+        "normalizationSteps": [
+          {
+            "from": "EA",
+            "op": "vowel_normalize",
+            "reason": "functional_equivalence",
+            "to": "EI"
+          }
+        ],
         "surface": [
           "E",
           "A"
@@ -5990,7 +6115,7 @@
       },
       "repeatability": {
         "checked": true,
-        "repeatedFingerprint": "2dd965edc5374be3b67f8c13e3acdcc7117997ae502c18e458495617ec7cb47c",
+        "repeatedFingerprint": "d9348a9bc28429d928cc023fac907f567fd43bcd4bd587d96744e41bd44583b1",
         "stable": true
       },
       "request": {
@@ -6123,7 +6248,7 @@
         "totalRefs": 2,
         "unresolvedRefs": 0
       },
-      "fingerprint": "e140c38540680a6d8fcf16827869885f7e6d64b5858fd990f1da5faa4be74f41",
+      "fingerprint": "ecf4095e2dd33c9461fe1c8c05d76294d346194fedd775214f7d22909ab48088",
       "invariants": {
         "claimBoundaryPreserved": true,
         "failures": [],
@@ -6139,15 +6264,9 @@
       "normalizedWord": "carry",
       "nullResult": true,
       "paths": {
-        "delta": "MATCH",
-        "detected": [
-          "A",
-          "Y"
-        ],
-        "functional": [
-          "A",
-          "Y"
-        ],
+        "delta": "NOT_EMITTED",
+        "detected": null,
+        "functional": null,
         "normalizationRecordCount": 0,
         "normalizationSteps": [],
         "surface": [
@@ -6157,7 +6276,7 @@
       },
       "repeatability": {
         "checked": true,
-        "repeatedFingerprint": "e140c38540680a6d8fcf16827869885f7e6d64b5858fd990f1da5faa4be74f41",
+        "repeatedFingerprint": "ecf4095e2dd33c9461fe1c8c05d76294d346194fedd775214f7d22909ab48088",
         "stable": true
       },
       "request": {
@@ -6287,7 +6406,7 @@
         "totalRefs": 1,
         "unresolvedRefs": 0
       },
-      "fingerprint": "4e43d55df3386e1b9d39f04fc20a3470dd3b337d3dff33ae6717588640de0128",
+      "fingerprint": "8ec6b7dc355cfbd9930988c968597ce0977e813f155117221e22ab9116bd0119",
       "invariants": {
         "claimBoundaryPreserved": true,
         "failures": [],
@@ -6318,7 +6437,7 @@
       },
       "repeatability": {
         "checked": true,
-        "repeatedFingerprint": "4e43d55df3386e1b9d39f04fc20a3470dd3b337d3dff33ae6717588640de0128",
+        "repeatedFingerprint": "8ec6b7dc355cfbd9930988c968597ce0977e813f155117221e22ab9116bd0119",
         "stable": true
       },
       "request": {
@@ -6366,7 +6485,7 @@
         "totalRefs": 0,
         "unresolvedRefs": 0
       },
-      "fingerprint": "15bbe8eae8ee0c076004701e95cf999ce47bf712fb49d0b4b5b0dd133ee5ed5b",
+      "fingerprint": "66f078cf5737bd5b748c17babeaab34f6695665664c98d23a4a19ec2f1e0f510",
       "invariants": {
         "claimBoundaryPreserved": true,
         "failures": [],
@@ -6382,17 +6501,24 @@
       "normalizedWord": "time",
       "nullResult": true,
       "paths": {
-        "delta": "MATCH",
+        "delta": "DIVERGE",
         "detected": [
-          "I",
-          "E"
+          "A",
+          "I"
         ],
         "functional": [
-          "I",
-          "E"
+          "A",
+          "I"
         ],
-        "normalizationRecordCount": 0,
-        "normalizationSteps": [],
+        "normalizationRecordCount": 1,
+        "normalizationSteps": [
+          {
+            "from": "IE",
+            "op": "vowel_normalize",
+            "reason": "functional_equivalence",
+            "to": "AI"
+          }
+        ],
         "surface": [
           "I",
           "E"
@@ -6400,7 +6526,7 @@
       },
       "repeatability": {
         "checked": true,
-        "repeatedFingerprint": "15bbe8eae8ee0c076004701e95cf999ce47bf712fb49d0b4b5b0dd133ee5ed5b",
+        "repeatedFingerprint": "66f078cf5737bd5b748c17babeaab34f6695665664c98d23a4a19ec2f1e0f510",
         "stable": true
       },
       "request": {
@@ -6492,7 +6618,7 @@
         "totalRefs": 1,
         "unresolvedRefs": 0
       },
-      "fingerprint": "e1585e831e6f4aaf878c1b6e9a90aa4337383ccf96a962696f74a6b4275a1bf1",
+      "fingerprint": "2549af4cff8e5dfec63cfa5d0cc00e2cba9d90c440094e58f67644bb0142b303",
       "invariants": {
         "claimBoundaryPreserved": true,
         "failures": [],
@@ -6508,17 +6634,24 @@
       "normalizedWord": "life",
       "nullResult": true,
       "paths": {
-        "delta": "MATCH",
+        "delta": "DIVERGE",
         "detected": [
-          "I",
-          "E"
+          "A",
+          "I"
         ],
         "functional": [
-          "I",
-          "E"
+          "A",
+          "I"
         ],
-        "normalizationRecordCount": 0,
-        "normalizationSteps": [],
+        "normalizationRecordCount": 1,
+        "normalizationSteps": [
+          {
+            "from": "IE",
+            "op": "vowel_normalize",
+            "reason": "functional_equivalence",
+            "to": "AI"
+          }
+        ],
         "surface": [
           "I",
           "E"
@@ -6526,7 +6659,7 @@
       },
       "repeatability": {
         "checked": true,
-        "repeatedFingerprint": "e1585e831e6f4aaf878c1b6e9a90aa4337383ccf96a962696f74a6b4275a1bf1",
+        "repeatedFingerprint": "2549af4cff8e5dfec63cfa5d0cc00e2cba9d90c440094e58f67644bb0142b303",
         "stable": true
       },
       "request": {
@@ -6574,7 +6707,7 @@
         "totalRefs": 0,
         "unresolvedRefs": 0
       },
-      "fingerprint": "405be37cc1b9e668b251fdf09222a6d0bcc846c4d5edbcee026b17ba3ae1a781",
+      "fingerprint": "e72d9c77be483211e16a84902f98de74105b0c7a585b7d638284966f7eda0de5",
       "invariants": {
         "claimBoundaryPreserved": true,
         "failures": [],
@@ -6590,17 +6723,22 @@
       "normalizedWord": "death",
       "nullResult": true,
       "paths": {
-        "delta": "MATCH",
+        "delta": "DIVERGE",
         "detected": [
-          "E",
-          "A"
+          "E"
         ],
         "functional": [
-          "E",
-          "A"
+          "E"
         ],
-        "normalizationRecordCount": 0,
-        "normalizationSteps": [],
+        "normalizationRecordCount": 1,
+        "normalizationSteps": [
+          {
+            "from": "EA",
+            "op": "vowel_normalize",
+            "reason": "functional_equivalence",
+            "to": "E"
+          }
+        ],
         "surface": [
           "E",
           "A"
@@ -6608,7 +6746,7 @@
       },
       "repeatability": {
         "checked": true,
-        "repeatedFingerprint": "405be37cc1b9e668b251fdf09222a6d0bcc846c4d5edbcee026b17ba3ae1a781",
+        "repeatedFingerprint": "e72d9c77be483211e16a84902f98de74105b0c7a585b7d638284966f7eda0de5",
         "stable": true
       },
       "request": {
@@ -6741,7 +6879,7 @@
         "totalRefs": 2,
         "unresolvedRefs": 0
       },
-      "fingerprint": "2e81aa125c03d144c5840ebc0d2a5e4b5f321a97f834ff99763bcebc02636e08",
+      "fingerprint": "56ef79caa0dce371d43fa664ed14ade6417da243e49a8555ad94072b19c15d4e",
       "invariants": {
         "claimBoundaryPreserved": true,
         "failures": [],
@@ -6757,22 +6895,31 @@
       "normalizedWord": "mind",
       "nullResult": true,
       "paths": {
-        "delta": "MATCH",
+        "delta": "DIVERGE",
         "detected": [
+          "A",
           "I"
         ],
         "functional": [
+          "A",
           "I"
         ],
-        "normalizationRecordCount": 0,
-        "normalizationSteps": [],
+        "normalizationRecordCount": 1,
+        "normalizationSteps": [
+          {
+            "from": "I",
+            "op": "vowel_normalize",
+            "reason": "functional_equivalence",
+            "to": "AI"
+          }
+        ],
         "surface": [
           "I"
         ]
       },
       "repeatability": {
         "checked": true,
-        "repeatedFingerprint": "2e81aa125c03d144c5840ebc0d2a5e4b5f321a97f834ff99763bcebc02636e08",
+        "repeatedFingerprint": "56ef79caa0dce371d43fa664ed14ade6417da243e49a8555ad94072b19c15d4e",
         "stable": true
       },
       "request": {
@@ -6902,7 +7049,7 @@
         "totalRefs": 1,
         "unresolvedRefs": 0
       },
-      "fingerprint": "e973bd4dd342e0f56c6c2cc4969e116736bc99a765f7ad4df7b0e63735a91323",
+      "fingerprint": "cafd5b77a4b37892381a51b9c799118a6b128540b47c51313afd9909328fee8c",
       "invariants": {
         "claimBoundaryPreserved": true,
         "failures": [],
@@ -6918,19 +7065,26 @@
       "normalizedWord": "memory",
       "nullResult": false,
       "paths": {
-        "delta": "MATCH",
+        "delta": "DIVERGE",
         "detected": [
           "E",
-          "O",
-          "Y"
+          "Ë",
+          "I"
         ],
         "functional": [
           "E",
-          "O",
-          "Y"
+          "Ë",
+          "I"
         ],
-        "normalizationRecordCount": 0,
-        "normalizationSteps": [],
+        "normalizationRecordCount": 1,
+        "normalizationSteps": [
+          {
+            "from": "EOY",
+            "op": "vowel_normalize",
+            "reason": "functional_equivalence",
+            "to": "EËI"
+          }
+        ],
         "surface": [
           "E",
           "O",
@@ -6939,7 +7093,7 @@
       },
       "repeatability": {
         "checked": true,
-        "repeatedFingerprint": "e973bd4dd342e0f56c6c2cc4969e116736bc99a765f7ad4df7b0e63735a91323",
+        "repeatedFingerprint": "cafd5b77a4b37892381a51b9c799118a6b128540b47c51313afd9909328fee8c",
         "stable": true
       },
       "request": {
@@ -7148,7 +7302,7 @@
         "totalRefs": 2,
         "unresolvedRefs": 0
       },
-      "fingerprint": "79927495e29d95bee842d13b33fd903b860b969a7fdae07a6a56c7620eb9e685",
+      "fingerprint": "0fb5ef717de1a05271b61cd3ae8c985174cdfe6609a39957a3a3629a2859ca31",
       "invariants": {
         "claimBoundaryPreserved": true,
         "failures": [],
@@ -7166,11 +7320,11 @@
       "paths": {
         "delta": "DIVERGE",
         "detected": [
-          "E",
+          "I",
           "Ë"
         ],
         "functional": [
-          "E",
+          "I",
           "Ë"
         ],
         "normalizationRecordCount": 1,
@@ -7179,7 +7333,7 @@
             "from": "EEO",
             "op": "vowel_normalize",
             "reason": "functional_equivalence",
-            "to": "EË"
+            "to": "IË"
           }
         ],
         "surface": [
@@ -7190,7 +7344,7 @@
       },
       "repeatability": {
         "checked": true,
-        "repeatedFingerprint": "79927495e29d95bee842d13b33fd903b860b969a7fdae07a6a56c7620eb9e685",
+        "repeatedFingerprint": "0fb5ef717de1a05271b61cd3ae8c985174cdfe6609a39957a3a3629a2859ca31",
         "stable": true
       },
       "request": {
@@ -7316,7 +7470,7 @@
         "totalRefs": 0,
         "unresolvedRefs": 0
       },
-      "fingerprint": "53917520645efc62676e36a65d757e73ff8e8035c4531441184c4f6c3bf9ce1a",
+      "fingerprint": "624ace4b3c06722acad83b4803d13d1dd7ad0c892b56e989c9f273f27db23c33",
       "invariants": {
         "claimBoundaryPreserved": true,
         "failures": [],
@@ -7332,17 +7486,9 @@
       "normalizedWord": "justice",
       "nullResult": false,
       "paths": {
-        "delta": "MATCH",
-        "detected": [
-          "U",
-          "I",
-          "E"
-        ],
-        "functional": [
-          "U",
-          "I",
-          "E"
-        ],
+        "delta": "NOT_EMITTED",
+        "detected": null,
+        "functional": null,
         "normalizationRecordCount": 0,
         "normalizationSteps": [],
         "surface": [
@@ -7353,7 +7499,7 @@
       },
       "repeatability": {
         "checked": true,
-        "repeatedFingerprint": "53917520645efc62676e36a65d757e73ff8e8035c4531441184c4f6c3bf9ce1a",
+        "repeatedFingerprint": "624ace4b3c06722acad83b4803d13d1dd7ad0c892b56e989c9f273f27db23c33",
         "stable": true
       },
       "request": {
@@ -7486,7 +7632,7 @@
         "totalRefs": 2,
         "unresolvedRefs": 0
       },
-      "fingerprint": "47263a350d2f7b3e8e69b2f32c12256790864ddccb76f91e6952501f69c755ca",
+      "fingerprint": "46e1ed0bda9a80a8b7f16fc127ea58b7dac14dc7c49b14c25904040c906437ac",
       "invariants": {
         "claimBoundaryPreserved": true,
         "failures": [],
@@ -7502,17 +7648,24 @@
       "normalizedWord": "order",
       "nullResult": true,
       "paths": {
-        "delta": "MATCH",
+        "delta": "DIVERGE",
         "detected": [
           "O",
-          "E"
+          "Ë"
         ],
         "functional": [
           "O",
-          "E"
+          "Ë"
         ],
-        "normalizationRecordCount": 0,
-        "normalizationSteps": [],
+        "normalizationRecordCount": 1,
+        "normalizationSteps": [
+          {
+            "from": "OE",
+            "op": "vowel_normalize",
+            "reason": "functional_equivalence",
+            "to": "OË"
+          }
+        ],
         "surface": [
           "O",
           "E"
@@ -7520,7 +7673,7 @@
       },
       "repeatability": {
         "checked": true,
-        "repeatedFingerprint": "47263a350d2f7b3e8e69b2f32c12256790864ddccb76f91e6952501f69c755ca",
+        "repeatedFingerprint": "46e1ed0bda9a80a8b7f16fc127ea58b7dac14dc7c49b14c25904040c906437ac",
         "stable": true
       },
       "request": {
@@ -7728,7 +7881,7 @@
         "totalRefs": 2,
         "unresolvedRefs": 0
       },
-      "fingerprint": "14473139abf044f3b7c8e74fbf751437ab83b1e54018f5401a3e648b8707b8ea",
+      "fingerprint": "ea36ffc734fe0c661e7c03c2d0f8b1e5a96172a6940249e99530e8a7ec367d4d",
       "invariants": {
         "claimBoundaryPreserved": true,
         "failures": [],
@@ -7744,17 +7897,24 @@
       "normalizedWord": "change",
       "nullResult": false,
       "paths": {
-        "delta": "MATCH",
+        "delta": "DIVERGE",
         "detected": [
-          "A",
-          "E"
+          "E",
+          "I"
         ],
         "functional": [
-          "A",
-          "E"
+          "E",
+          "I"
         ],
-        "normalizationRecordCount": 0,
-        "normalizationSteps": [],
+        "normalizationRecordCount": 1,
+        "normalizationSteps": [
+          {
+            "from": "AE",
+            "op": "vowel_normalize",
+            "reason": "functional_equivalence",
+            "to": "EI"
+          }
+        ],
         "surface": [
           "A",
           "E"
@@ -7762,7 +7922,7 @@
       },
       "repeatability": {
         "checked": true,
-        "repeatedFingerprint": "14473139abf044f3b7c8e74fbf751437ab83b1e54018f5401a3e648b8707b8ea",
+        "repeatedFingerprint": "ea36ffc734fe0c661e7c03c2d0f8b1e5a96172a6940249e99530e8a7ec367d4d",
         "stable": true
       },
       "request": {
@@ -7892,7 +8052,7 @@
         "totalRefs": 1,
         "unresolvedRefs": 0
       },
-      "fingerprint": "3790fa3b8101e7361323861e66ab1fcb3134820a1354ceddcb78c07d9b8a0c8e",
+      "fingerprint": "222157e1afa7a6c83a62b50c4986695744c141b59ba54646aa28d819eae1e536",
       "invariants": {
         "claimBoundaryPreserved": true,
         "failures": [],
@@ -7910,12 +8070,12 @@
       "paths": {
         "delta": "DIVERGE",
         "detected": [
-          "E",
-          "E"
+          "Ë",
+          "Ë"
         ],
         "functional": [
-          "E",
-          "E"
+          "Ë",
+          "Ë"
         ],
         "normalizationRecordCount": 1,
         "normalizationSteps": [
@@ -7923,7 +8083,7 @@
             "from": "OE",
             "op": "vowel_normalize",
             "reason": "functional_equivalence",
-            "to": "EE"
+            "to": "ËË"
           }
         ],
         "surface": [
@@ -7933,7 +8093,7 @@
       },
       "repeatability": {
         "checked": true,
-        "repeatedFingerprint": "3790fa3b8101e7361323861e66ab1fcb3134820a1354ceddcb78c07d9b8a0c8e",
+        "repeatedFingerprint": "222157e1afa7a6c83a62b50c4986695744c141b59ba54646aa28d819eae1e536",
         "stable": true
       },
       "request": {
@@ -8063,7 +8223,7 @@
         "totalRefs": 1,
         "unresolvedRefs": 0
       },
-      "fingerprint": "5edd4d03cfebac56e3880f00257dbdcee382dfdbdbc5004148609143aca22ba1",
+      "fingerprint": "a8b9c489ed730a56f636c80f2131c21b98f377d438441fbdcc8262f8abc832b8",
       "invariants": {
         "claimBoundaryPreserved": true,
         "failures": [],
@@ -8079,22 +8239,31 @@
       "normalizedWord": "child",
       "nullResult": false,
       "paths": {
-        "delta": "MATCH",
+        "delta": "DIVERGE",
         "detected": [
+          "A",
           "I"
         ],
         "functional": [
+          "A",
           "I"
         ],
-        "normalizationRecordCount": 0,
-        "normalizationSteps": [],
+        "normalizationRecordCount": 1,
+        "normalizationSteps": [
+          {
+            "from": "I",
+            "op": "vowel_normalize",
+            "reason": "functional_equivalence",
+            "to": "AI"
+          }
+        ],
         "surface": [
           "I"
         ]
       },
       "repeatability": {
         "checked": true,
-        "repeatedFingerprint": "5edd4d03cfebac56e3880f00257dbdcee382dfdbdbc5004148609143aca22ba1",
+        "repeatedFingerprint": "a8b9c489ed730a56f636c80f2131c21b98f377d438441fbdcc8262f8abc832b8",
         "stable": true
       },
       "request": {
@@ -8302,7 +8471,7 @@
         "totalRefs": 2,
         "unresolvedRefs": 0
       },
-      "fingerprint": "3ed0e64b940460ff488c8829a53ab5b0bd2d5a4b5696f3e2443068d8ce283199",
+      "fingerprint": "2a6a11dd0cd326f3d929706a8f953c8929a199bf5930cdc77242c292cb0bf6de",
       "invariants": {
         "claimBoundaryPreserved": true,
         "failures": [],
@@ -8320,10 +8489,10 @@
       "paths": {
         "delta": "DIVERGE",
         "detected": [
-          "I"
+          "E"
         ],
         "functional": [
-          "I"
+          "E"
         ],
         "normalizationRecordCount": 1,
         "normalizationSteps": [
@@ -8331,7 +8500,7 @@
             "from": "IE",
             "op": "vowel_normalize",
             "reason": "functional_equivalence",
-            "to": "I"
+            "to": "E"
           }
         ],
         "surface": [
@@ -8341,7 +8510,7 @@
       },
       "repeatability": {
         "checked": true,
-        "repeatedFingerprint": "3ed0e64b940460ff488c8829a53ab5b0bd2d5a4b5696f3e2443068d8ce283199",
+        "repeatedFingerprint": "2a6a11dd0cd326f3d929706a8f953c8929a199bf5930cdc77242c292cb0bf6de",
         "stable": true
       },
       "request": {
@@ -8389,7 +8558,7 @@
         "totalRefs": 0,
         "unresolvedRefs": 0
       },
-      "fingerprint": "937d055a2a63f043c12bb5037b3ef7408f60d40f47e2d7bf5eb110e207814f7b",
+      "fingerprint": "7e161d36e2e6c24913baf42605e3e4f99ef022584e77e5f5e8d95acc1018b8d3",
       "invariants": {
         "claimBoundaryPreserved": true,
         "failures": [],
@@ -8405,17 +8574,24 @@
       "normalizedWord": "home",
       "nullResult": true,
       "paths": {
-        "delta": "MATCH",
+        "delta": "DIVERGE",
         "detected": [
           "O",
-          "E"
+          "U"
         ],
         "functional": [
           "O",
-          "E"
+          "U"
         ],
-        "normalizationRecordCount": 0,
-        "normalizationSteps": [],
+        "normalizationRecordCount": 1,
+        "normalizationSteps": [
+          {
+            "from": "OE",
+            "op": "vowel_normalize",
+            "reason": "functional_equivalence",
+            "to": "OU"
+          }
+        ],
         "surface": [
           "O",
           "E"
@@ -8423,7 +8599,7 @@
       },
       "repeatability": {
         "checked": true,
-        "repeatedFingerprint": "937d055a2a63f043c12bb5037b3ef7408f60d40f47e2d7bf5eb110e207814f7b",
+        "repeatedFingerprint": "7e161d36e2e6c24913baf42605e3e4f99ef022584e77e5f5e8d95acc1018b8d3",
         "stable": true
       },
       "request": {
@@ -8471,7 +8647,7 @@
         "totalRefs": 0,
         "unresolvedRefs": 0
       },
-      "fingerprint": "570c77675b6be89adfaeaead309521ed71de4b8b1b015fd46252d896b6d3db0a",
+      "fingerprint": "1310d74efba6d5d9645be0963c1e060f462297d17eccf3495b0cf8987a58d8b7",
       "invariants": {
         "claimBoundaryPreserved": true,
         "failures": [],
@@ -8487,22 +8663,29 @@
       "normalizedWord": "work",
       "nullResult": true,
       "paths": {
-        "delta": "MATCH",
+        "delta": "DIVERGE",
         "detected": [
-          "O"
+          "Ë"
         ],
         "functional": [
-          "O"
+          "Ë"
         ],
-        "normalizationRecordCount": 0,
-        "normalizationSteps": [],
+        "normalizationRecordCount": 1,
+        "normalizationSteps": [
+          {
+            "from": "O",
+            "op": "vowel_normalize",
+            "reason": "functional_equivalence",
+            "to": "Ë"
+          }
+        ],
         "surface": [
           "O"
         ]
       },
       "repeatability": {
         "checked": true,
-        "repeatedFingerprint": "570c77675b6be89adfaeaead309521ed71de4b8b1b015fd46252d896b6d3db0a",
+        "repeatedFingerprint": "1310d74efba6d5d9645be0963c1e060f462297d17eccf3495b0cf8987a58d8b7",
         "stable": true
       },
       "request": {
@@ -8635,7 +8818,7 @@
         "totalRefs": 2,
         "unresolvedRefs": 0
       },
-      "fingerprint": "cbc8509d258c94a529179dc6ebfd5570376172f9a78fa9f374af0937907c67bb",
+      "fingerprint": "87d6103c04fe81b68af40b347f8f654ecd864eab77cd7614a88890df942c1c64",
       "invariants": {
         "claimBoundaryPreserved": true,
         "failures": [],
@@ -8651,22 +8834,29 @@
       "normalizedWord": "war",
       "nullResult": true,
       "paths": {
-        "delta": "MATCH",
+        "delta": "DIVERGE",
         "detected": [
-          "A"
+          "O"
         ],
         "functional": [
-          "A"
+          "O"
         ],
-        "normalizationRecordCount": 0,
-        "normalizationSteps": [],
+        "normalizationRecordCount": 1,
+        "normalizationSteps": [
+          {
+            "from": "A",
+            "op": "vowel_normalize",
+            "reason": "functional_equivalence",
+            "to": "O"
+          }
+        ],
         "surface": [
           "A"
         ]
       },
       "repeatability": {
         "checked": true,
-        "repeatedFingerprint": "cbc8509d258c94a529179dc6ebfd5570376172f9a78fa9f374af0937907c67bb",
+        "repeatedFingerprint": "87d6103c04fe81b68af40b347f8f654ecd864eab77cd7614a88890df942c1c64",
         "stable": true
       },
       "request": {
@@ -8758,7 +8948,7 @@
         "totalRefs": 1,
         "unresolvedRefs": 0
       },
-      "fingerprint": "1b141f9c9e994605243bd7acb160acf3eac30647ba6d1e328388473a0c1a021e",
+      "fingerprint": "0487924c0615c55ca1ba0e85d535cdeb19ff1d7c7f46b1bf9b765112a6f5242d",
       "invariants": {
         "claimBoundaryPreserved": true,
         "failures": [],
@@ -8774,19 +8964,22 @@
       "normalizedWord": "peace",
       "nullResult": true,
       "paths": {
-        "delta": "MATCH",
+        "delta": "DIVERGE",
         "detected": [
-          "E",
-          "A",
-          "E"
+          "I"
         ],
         "functional": [
-          "E",
-          "A",
-          "E"
+          "I"
         ],
-        "normalizationRecordCount": 0,
-        "normalizationSteps": [],
+        "normalizationRecordCount": 1,
+        "normalizationSteps": [
+          {
+            "from": "EAE",
+            "op": "vowel_normalize",
+            "reason": "functional_equivalence",
+            "to": "I"
+          }
+        ],
         "surface": [
           "E",
           "A",
@@ -8795,7 +8988,7 @@
       },
       "repeatability": {
         "checked": true,
-        "repeatedFingerprint": "1b141f9c9e994605243bd7acb160acf3eac30647ba6d1e328388473a0c1a021e",
+        "repeatedFingerprint": "0487924c0615c55ca1ba0e85d535cdeb19ff1d7c7f46b1bf9b765112a6f5242d",
         "stable": true
       },
       "request": {
@@ -8887,7 +9080,7 @@
         "totalRefs": 1,
         "unresolvedRefs": 0
       },
-      "fingerprint": "a79cf1527aa86574538071c6cec85ba26e17f83b6e7af64d3f5de3f78d7e8826",
+      "fingerprint": "d327753e44140f813bb6b07d6de7dc7cb6a11bce3cffc303e87cc5f2396cfc6d",
       "invariants": {
         "claimBoundaryPreserved": true,
         "failures": [],
@@ -8918,7 +9111,7 @@
       },
       "repeatability": {
         "checked": true,
-        "repeatedFingerprint": "a79cf1527aa86574538071c6cec85ba26e17f83b6e7af64d3f5de3f78d7e8826",
+        "repeatedFingerprint": "d327753e44140f813bb6b07d6de7dc7cb6a11bce3cffc303e87cc5f2396cfc6d",
         "stable": true
       },
       "request": {
@@ -9048,7 +9241,7 @@
         "totalRefs": 1,
         "unresolvedRefs": 0
       },
-      "fingerprint": "d6fc48a290165f8633b48911478f20e8a809ab8bee8e88f4ec38944105aabdbf",
+      "fingerprint": "e1e264a8a021097d4f089c90eed434829275e6451330f9d93e733f548a13870c",
       "invariants": {
         "claimBoundaryPreserved": true,
         "failures": [],
@@ -9066,12 +9259,12 @@
       "paths": {
         "delta": "DIVERGE",
         "detected": [
-          "A",
-          "A"
+          "U",
+          "Ë"
         ],
         "functional": [
-          "A",
-          "A"
+          "U",
+          "Ë"
         ],
         "normalizationRecordCount": 1,
         "normalizationSteps": [
@@ -9079,7 +9272,7 @@
             "from": "OA",
             "op": "vowel_normalize",
             "reason": "functional_equivalence",
-            "to": "AA"
+            "to": "UË"
           }
         ],
         "surface": [
@@ -9089,7 +9282,7 @@
       },
       "repeatability": {
         "checked": true,
-        "repeatedFingerprint": "d6fc48a290165f8633b48911478f20e8a809ab8bee8e88f4ec38944105aabdbf",
+        "repeatedFingerprint": "e1e264a8a021097d4f089c90eed434829275e6451330f9d93e733f548a13870c",
         "stable": true
       },
       "request": {
@@ -9222,7 +9415,7 @@
         "totalRefs": 2,
         "unresolvedRefs": 0
       },
-      "fingerprint": "f8d947357031fcda652901ccd1c5cbfe0ce39607bf61ff32c1c89e7b8a997c3d",
+      "fingerprint": "173ab70799394a42d15692969ab304b25b7f5bd503e9f00f7f8f0b3c104ab328",
       "invariants": {
         "claimBoundaryPreserved": true,
         "failures": [],
@@ -9253,7 +9446,7 @@
       },
       "repeatability": {
         "checked": true,
-        "repeatedFingerprint": "f8d947357031fcda652901ccd1c5cbfe0ce39607bf61ff32c1c89e7b8a997c3d",
+        "repeatedFingerprint": "173ab70799394a42d15692969ab304b25b7f5bd503e9f00f7f8f0b3c104ab328",
         "stable": true
       },
       "request": {

@@ -29,12 +29,18 @@ describe("/api/analyze-v1 evidence wiring (unit)", () => {
       expect(json.heartInstrumentV1.surfaceVowels).toEqual(["U", "Y"]);
 
       // Evidence must preserve canonical surface and authoritative Heart truth
-      expect(json.evidence.surfaceVowels).toEqual(["U", "Y"]);
+      expect(json.evidence.surfaceVowels).toEqual(["Ë", "I"]);
 expect(json.evidence.surfaceVowelsRaw).toEqual(json.heartInstrumentV1.surfaceVowels);
-expect(json.evidence.vowelPath).toEqual(["U", "Y"]);
+expect(json.evidence.vowelPath).toEqual(["Ë", "I"]);
 
-      // Canonical Y requires no authoritative normalization step
-      expect(json.evidence.normalizationSteps).toEqual([]);
+      expect(json.evidence.normalizationSteps).toEqual([
+        {
+          op: "vowel_normalize",
+          from: "UY",
+          to: "ËI",
+          reason: "functional_equivalence",
+        },
+      ]);
 
         // Must not be fallback
     const signals = json.evidence?.signals || [];

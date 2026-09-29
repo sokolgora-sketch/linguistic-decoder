@@ -94,30 +94,33 @@ export default function MathLensesCard({ result }: Props) {
                   <div className="text-muted-foreground">basisNfc</div>
                   <div className="font-mono">{fmt(heartInstrumentV1.basisNfc)}</div>
 
-                  <div className="text-muted-foreground">surfaceVowels</div>
-                  <div className="font-mono">{fmt(heartInstrumentV1.surfaceVowels)}</div>
+                  <div className="text-muted-foreground">canonicalSpokenVoicePath</div>
+                  <div className="font-mono">{fmt(heartInstrumentV1.canonicalSpokenVoicePath)}</div>
+
+                  <div className="text-muted-foreground">orthographicVowels</div>
+                  <div className="font-mono">{fmt(heartInstrumentV1.orthographicVowels ?? heartInstrumentV1.surfaceVowels)}</div>
 
                   <div className="text-muted-foreground">principlesPath</div>
-                  <div className="font-mono">{fmtPrinciplesPath(heartInstrumentV1.principlesPath)}</div>
+                  <div className="font-mono">{fmtPrinciplesPath(heartInstrumentV1.spokenPrinciplesPath ?? heartInstrumentV1.principlesPath)}</div>
 
                   <div className="text-muted-foreground">values1to7</div>
-                  <div className="font-mono">{fmt(heartInstrumentV1.values1to7)}</div>
+                  <div className="font-mono">{fmt(heartInstrumentV1.spokenMath7?.values1to7)}</div>
 
                   <div className="text-muted-foreground">surfaceTotal1to7</div>
                   <div className="font-mono">
-                    {fmt(heartInstrumentV1.surfaceTotal1to7 ?? heartInstrumentV1.math7?.total1to7)}
+                    {fmt(heartInstrumentV1.spokenMath7?.total1to7 ?? heartInstrumentV1.surfaceTotal1to7 ?? heartInstrumentV1.math7?.total1to7)}
                   </div>
 
                   <div className="text-muted-foreground">surfaceTotalMod7</div>
                   <div className="font-mono">
-                    {fmt(heartInstrumentV1.surfaceTotalMod7 ?? heartInstrumentV1.math7?.totalMod7)}
+                    {fmt(heartInstrumentV1.spokenMath7?.totalMod7 ?? heartInstrumentV1.surfaceTotalMod7 ?? heartInstrumentV1.math7?.totalMod7)}
                   </div>
 
                   <div className="text-muted-foreground">wrapCount</div>
-                  <div className="font-mono">{fmt(heartInstrumentV1.math7?.wrapCount)}</div>
+                  <div className="font-mono">{fmt(heartInstrumentV1.spokenMath7?.wrapCount ?? heartInstrumentV1.math7?.wrapCount)}</div>
 
                   <div className="text-muted-foreground">events</div>
-                  <div className="font-mono">{fmt(heartInstrumentV1.math7?.events)}</div>
+                  <div className="font-mono">{fmt(heartInstrumentV1.spokenMath7?.events ?? heartInstrumentV1.math7?.events)}</div>
                 </div>
               </div>
             )}
