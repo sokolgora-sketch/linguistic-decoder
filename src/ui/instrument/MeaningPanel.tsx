@@ -111,16 +111,16 @@ export default function MeaningPanel({ vm }: Props) {
 
   const surfaceLine =
     isPresent<unknown[]>(surface) && Array.isArray(surface.value) && surface.value.length
-      ? `Heart surface / doctrine path: ${formatArrowPath(surface.value)}.`
+      ? `Orthographic vowel sequence (non-authoritative): ${formatArrowPath(surface.value)}.`
       : asText(detection.voicePathSurface)
-        ? `Heart surface / doctrine path: ${asText(detection.voicePathSurface)}.`
+        ? `Orthographic vowel sequence (non-authoritative): ${asText(detection.voicePathSurface)}.`
         : null;
 
   const detectedLine =
     isPresent<unknown[]>(detected) && Array.isArray(detected.value) && detected.value.length
-      ? `Engine-selected analysis path: ${formatArrowPath(detected.value)}.`
+      ? `Spoken / canonical Voice path: ${formatArrowPath(detected.value)}.`
       : asText(detection.voicePath)
-        ? `Engine-selected analysis path: ${asText(detection.voicePath)}.`
+        ? `Spoken / canonical Voice path: ${asText(detection.voicePath)}.`
         : null;
 
   const sentence = principles

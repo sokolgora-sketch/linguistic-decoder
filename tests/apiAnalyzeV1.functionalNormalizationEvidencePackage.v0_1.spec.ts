@@ -45,7 +45,7 @@ describe(
   "Slice G raw evidence-package functional-path coherence v0.1",
   () => {
     test(
-      "memory keeps canonical E-O-Y while raw evidence package reports bounded functional E-O-I",
+      "memory exposes the pronunciation-backed path while normalization remains separate",
       async () => {
         const response =
           await GET(
@@ -67,8 +67,8 @@ describe(
           body.evidence.vowelPath,
         ).toEqual([
           "E",
-          "O",
-          "Y",
+          "Ë",
+          "I",
         ]);
 
         expect(
@@ -87,7 +87,7 @@ describe(
             .summary,
         ).toMatchObject({
           voicePath:
-            "E → O → Y",
+            "E → Ë → I",
           voicePathSurface:
             "E → O → Y",
           voicePathFunctional:
@@ -130,8 +130,8 @@ describe(
         expect(
           body.evidence.vowelPath,
         ).toEqual([
-          "U",
-          "Y",
+          "Ë",
+          "I",
         ]);
 
         expect(
@@ -140,7 +140,7 @@ describe(
             .summary,
         ).toMatchObject({
           voicePath:
-            "U → Y",
+            "Ë → I",
           voicePathSurface:
             "U → Y",
           voicePathFunctional:
@@ -244,10 +244,7 @@ describe(
 
         expect(
           body.evidence.vowelPath,
-        ).toEqual([
-          "U",
-          "Y",
-        ]);
+        ).toBeNull();
 
         const automaticCandidates =
           (

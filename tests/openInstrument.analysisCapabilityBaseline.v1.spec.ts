@@ -180,9 +180,9 @@ describe("Open Instrument analytical capability baseline v1", () => {
     });
     expect(baseline.aggregate.nullCount).toBe(29);
     expect(baseline.aggregate.pathCoverage).toEqual({
-      detected: 57,
+      detected: 51,
       surface: 57,
-      functional: 57,
+      functional: 52,
       delta: 57,
     });
     expect(baseline.aggregate.candidates).toEqual({
@@ -261,7 +261,7 @@ describe("Open Instrument analytical capability baseline v1", () => {
 
   test("study preserves run-level paths, delta, candidate order, and composition fields", () => {
     const item = caseById("canonical.study");
-    expect(item.paths.detected).toEqual(["U", "Y"]);
+    expect(item.paths.detected).toEqual(["Ë", "I"]);
     expect(item.paths.surface).toEqual(["U", "Y"]);
     expect(item.paths.functional).toEqual(["U", "I"]);
     expect(item.paths.delta).toBe("DIVERGE");
@@ -284,19 +284,12 @@ describe("Open Instrument analytical capability baseline v1", () => {
 
   test("damage preserves its emitted normalization record exactly", () => {
     const item = caseById("canonical.damage");
-    expect(item.paths.detected).toEqual(["A", "E"]);
+    expect(item.paths.detected).toBeNull();
     expect(item.paths.surface).toEqual(["A", "A", "E"]);
     expect(item.paths.functional).toEqual(["A", "Ë"]);
     expect(item.paths.delta).toBe("DIVERGE");
-    expect(item.paths.normalizationSteps).toEqual([
-      {
-        from: "AAE",
-        op: "vowel_normalize",
-        reason: "functional_equivalence",
-        to: "AE",
-      },
-    ]);
-    expect(item.paths.normalizationRecordCount).toBe(1);
+    expect(item.paths.normalizationSteps).toEqual([]);
+    expect(item.paths.normalizationRecordCount).toBe(0);
   });
 
   test("reviewed, research, target-sense, and Null dimensions remain distinct", () => {

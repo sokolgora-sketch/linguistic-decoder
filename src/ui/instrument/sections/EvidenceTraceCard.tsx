@@ -77,8 +77,8 @@ export function EvidenceTraceCard({
       <div className="mt-4 space-y-2 rounded-[10px] border border-[#27313d] bg-[#0d1117] p-3">
         <TraceRow label="input word" value={readout.word ? `word=${readout.word}` : "not emitted"} />
         <TraceRow label="normalized form" value={`norm=${pomText(readout.normalizedWord, String)}`} />
-        <TraceRow label="engine-selected path" value={`path=${vowelPathText(readout.voicePath)}`} />
-        <TraceRow label="Heart surface / doctrine path" value={`surface=${vowelPathText(readout.voicePathSurface)}`} />
+        <TraceRow label="Spoken / canonical Voice path" value={`path=${vowelPathText(readout.voicePath)}`} />
+        <TraceRow label="Orthographic vowel sequence (non-authoritative)" value={`orthographic=${vowelPathText(readout.voicePathSurface)}`} />
         <TraceRow label="Functional / normalization path" value={`functional=${vowelPathText(readout.voicePathFunctional)}`} />
         <TraceRow label="path delta" value={`delta=${readout.voicePathDelta}`} />
         <TraceRow label="candidate rows emitted" value={`rows=${rows.length}`} />

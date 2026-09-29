@@ -330,7 +330,7 @@ describe("analyze-v1 embryo-first candidate contract v0.1", () => {
 
     expect(
       summary.voicePath,
-    ).toBe("U → Y");
+    ).toBe("Ë → I");
 
     expect(
       summary.voicePathSurface,
@@ -403,7 +403,7 @@ describe("analyze-v1 embryo-first candidate contract v0.1", () => {
 
     expect(
       summary.voicePath,
-    ).toBe("U → Y");
+    ).toBe("Ë → I");
 
     expect(
       summary.voicePathSurface,

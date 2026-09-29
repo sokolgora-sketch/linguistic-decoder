@@ -125,7 +125,7 @@ export function ReadoutCard({
           <div className="text-xs font-semibold uppercase text-[#8ea4ba]">Detection</div>
           <div className="mt-2 text-sm font-mono text-[#d7dde7]">
             <div>
-              engine-selected analysis path:{" "}
+              Spoken / canonical Voice path:{" "}
               {renderPOM(
                 readout.voicePath,
                 (path) => (
@@ -163,7 +163,7 @@ export function ReadoutCard({
       </div>
 
       <div className="mt-4 rounded-[10px] border border-[#27313d] bg-[#0d1117] p-3 text-[11px] leading-5 text-[#7d8ea3]">
-        Boundary: deterministic readout only; engine-selected and candidate paths are not word-specific functional evidence; no origin proof; no forced answer.
+        Boundary: deterministic readout only; spoken/canonical and candidate paths are not word-specific functional evidence; no origin proof; no forced answer.
       </div>
     </div>
   );

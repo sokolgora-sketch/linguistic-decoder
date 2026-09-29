@@ -31,7 +31,7 @@ describe("Open Instrument path delta normalization context v0.1", () => {
       .closest("div.rounded-xl");
 
     expect(timeline).not.toBeNull();
-    expect(within(timeline!).getByText("Heart surface / doctrine path")).toBeVisible();
+    expect(within(timeline!).getByText("Spoken / canonical Voice path")).toBeVisible();
     expect(within(timeline!).getAllByText("U → Y").length).toBeGreaterThan(0);
     expect(within(timeline!).getByText("Functional / normalization path")).toBeVisible();
     expect(within(timeline!).getAllByText("U → I").length).toBeGreaterThan(0);
@@ -106,6 +106,6 @@ describe("Open Instrument path delta normalization context v0.1", () => {
 
     expect(screen.queryByText("Normalization / transformation record")).not.toBeInTheDocument();
     expect(screen.getByText("NOT EMITTED")).toBeVisible();
-    expect(screen.getByText("No engine-selected voice path.")).toBeVisible();
+    expect(screen.getByText("No spoken / canonical Voice path.")).toBeVisible();
   });
 });

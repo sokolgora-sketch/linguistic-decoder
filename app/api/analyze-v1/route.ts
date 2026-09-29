@@ -4,6 +4,7 @@ import { z } from "zod";
 import { runAnalysisDeterministic } from "@/lib/runAnalysisDeterministic";
 import type { Alphabet } from "@/shared/analysisResult.v1";
 import { enginePayloadToAnalysisResult } from "@/shared/analysisAdapter";
+import { computeMath7ForResult } from "@/engine/math7";
 import { discoverStructuralHypothesesV0_1 } from "@/shared/structuralHypothesisDiscovery.v0_1";
 import {
   buildSemanticAlignmentContextV0_1,
@@ -263,6 +264,86 @@ function buildSpectrumVM(surfaceVowels: unknown, functionalVowels: unknown) {
     surface: { kind: "present", value: surface },
     functional: { kind: "present", value: functional },
     delta,
+  };
+}
+
+function applyCanonicalSpokenVoicePathV0_1(
+  payload: any,
+  canonicalSpokenVoicePath: readonly string[] | null,
+): any {
+  const voicePath = canonicalSpokenVoicePath ? [...canonicalSpokenVoicePath] : [];
+  const basePrimaryPath =
+    payload?.primaryPath && typeof payload.primaryPath === "object"
+      ? payload.primaryPath
+      : {};
+
+  return {
+    ...payload,
+    primaryPath: {
+      ...basePrimaryPath,
+      voicePath,
+      ringPath: voicePath
+        .map(vowelToRingIndex)
+        .filter((value): value is number => value !== null),
+      // The legacy engine's level path describes the orthographic solve and
+      // cannot be reused as a spoken-pronunciation claim.
+      levelPath: [],
+      ops: ["spoken_pronunciation"],
+    },
+  };
+}
+
+function applyCanonicalSpokenVoiceAnalysisV0_1(
+  result: any,
+  canonicalSpokenVoicePath: readonly string[] | null,
+): any {
+  if (
+    !result ||
+    typeof result !== "object" ||
+    typeof result.word !== "string" ||
+    typeof result.sanitized !== "string" ||
+    typeof result.engineVersion !== "string" ||
+    typeof result.mode !== "string" ||
+    typeof result.alphabet !== "string"
+  ) {
+    return result;
+  }
+
+  const voicePath = canonicalSpokenVoicePath
+    ? [...canonicalSpokenVoicePath]
+    : [];
+  const spokenPayload = applyCanonicalSpokenVoicePathV0_1(
+    {
+      ...(result ?? {}),
+      primaryPath: {
+        voicePath,
+        ringPath: voicePath
+          .map(vowelToRingIndex)
+          .filter((value): value is number => value !== null),
+        levelPath: [],
+        ops: ["spoken_pronunciation"],
+      },
+    },
+    voicePath,
+  );
+  const spokenMath7 = computeMath7ForResult(spokenPayload);
+
+  return {
+    ...result,
+    ...(voicePath.length > 0
+      ? {
+          primaryPath: {
+            voicePath: voicePath.join("-"),
+            ringPath: spokenPayload.primaryPath.ringPath.join("-"),
+            levelPath: "",
+          },
+        }
+      : { primaryPath: undefined }),
+    heart: {
+      ...(result?.heart ?? {}),
+      math7: spokenMath7,
+      principlePath: spokenMath7.primary.principlesPath,
+    },
   };
 }
 
@@ -879,7 +960,7 @@ async function runAnalyzeV1Orchestration(
   try {
     const heartInstrumentV1 = buildHeartInstrumentV1(word);
     const doctrineProjection = projectDoctrineReadingV1(
-      heartInstrumentV1.surfaceVowels,
+      heartInstrumentV1.canonicalSpokenVoicePath,
     );
     if (!doctrineProjection.ok) {
       throw new Error(
@@ -887,10 +968,15 @@ async function runAnalyzeV1Orchestration(
       );
     }
 
-    const payload = await runAnalysisDeterministic(word, {
+    const rawPayload = await runAnalysisDeterministic(word, {
       mode: engineMode,
       alphabet: engineAlphabet,
     });
+    // Candidate/status authority is evaluated from the deterministic engine
+    // payload exactly as before. The canonical spoken path is projected only
+    // after that evaluation, so pronunciation provenance cannot change
+    // reviewed/candidate authorization semantics.
+    const payload = rawPayload;
     const semanticAlignmentByStructuralHypothesisId =
       await buildSemanticAlignmentMapV0_1({
         word,
@@ -915,7 +1001,10 @@ async function runAnalyzeV1Orchestration(
       brainCandidatesSeedFallback: seedFallbackEnabled,
     };
 
-    const out = enginePayloadToAnalysisResult(payload);
+    const out = applyCanonicalSpokenVoiceAnalysisV0_1(
+      enginePayloadToAnalysisResult(payload),
+      heartInstrumentV1.canonicalSpokenVoicePath,
+    );
     const ui = adaptAnalyzeV1ToUI(out as any);
 
     // EvidencePackage is optional and must never break /api/analyze-v1.
@@ -996,6 +1085,11 @@ async function runAnalyzeV1Orchestration(
     }
 
     const ensured = ensurePrimaryAndCandidatePaths(ui);
+    if (!heartInstrumentV1.canonicalSpokenVoicePath) {
+      // A missing bundled pronunciation is a valid Null. Do not let the
+      // legacy candidate fallback recreate an orthographic primary path.
+      delete (ensured as any).primaryPath;
+    }
     let evidence = buildEvidenceV1FromPayload(payload);
     evidence = backfillEvidenceMath7({
       evidence,
@@ -1019,18 +1113,17 @@ async function runAnalyzeV1Orchestration(
         : null;
 
       const functional = Array.isArray(
-        (out as any)?.heart?.math7?.primary?.vowels,
+        (heartInstrumentV1 as any)?.canonicalSpokenVoicePath,
       )
-        ? (out as any).heart.math7.primary.vowels
-        : Array.isArray((out as any)?.primaryPath?.voicePath)
-          ? (out as any).primaryPath.voicePath
-          : null;
+        ? (heartInstrumentV1 as any).canonicalSpokenVoicePath
+        : null;
 
       // Always emit vowelPath (null allowed)
       (evidence as any).vowelPath = functional ?? null;
 
       // Authoritative detected path for instrument UI/contract readers
       if (functional) (evidence as any).surfaceVowels = functional;
+      else (evidence as any).surfaceVowels = null;
 
       // Preserve true raw surface separately (never overwrite detected)
       if (surfaceRaw) (evidence as any).surfaceVowelsRaw = surfaceRaw;
