@@ -27,16 +27,16 @@ describe("Open Instrument path delta normalization context v0.1", () => {
 
     const overview = screen.getByRole("tabpanel");
     const timeline = within(overview)
-      .getByText("Vowel Path Timeline (Detected vs Interpreted)")
+      .getByText("Voice Path Layers")
       .closest("div.rounded-xl");
 
     expect(timeline).not.toBeNull();
-    expect(within(timeline!).getByText("Surface")).toBeVisible();
+    expect(within(timeline!).getByText("Heart surface / doctrine path")).toBeVisible();
     expect(within(timeline!).getAllByText("U → Y").length).toBeGreaterThan(0);
-    expect(within(timeline!).getByText("Functional")).toBeVisible();
+    expect(within(timeline!).getByText("Functional / normalization path")).toBeVisible();
     expect(within(timeline!).getAllByText("U → I").length).toBeGreaterThan(0);
     expect(within(timeline!).getByText("DIVERGE")).toBeVisible();
-    expect(within(timeline!).getByText("Normalization record")).toBeVisible();
+    expect(within(timeline!).getByText("Normalization / transformation record")).toBeVisible();
     expect(
       within(timeline!).getByText("UY → UI (functional_equivalence)"),
     ).toBeVisible();
@@ -47,7 +47,7 @@ describe("Open Instrument path delta normalization context v0.1", () => {
 
     const overview = screen.getByRole("tabpanel");
     const timeline = within(overview)
-      .getByText("Vowel Path Timeline (Detected vs Interpreted)")
+      .getByText("Voice Path Layers")
       .closest("div.rounded-xl");
 
     expect(timeline).not.toBeNull();
@@ -92,7 +92,7 @@ describe("Open Instrument path delta normalization context v0.1", () => {
       />,
     );
 
-    expect(screen.queryByText("Normalization record")).not.toBeInTheDocument();
+    expect(screen.queryByText("Normalization / transformation record")).not.toBeInTheDocument();
 
     rerender(
       <VowelPathTimeline
@@ -104,8 +104,8 @@ describe("Open Instrument path delta normalization context v0.1", () => {
       />,
     );
 
-    expect(screen.queryByText("Normalization record")).not.toBeInTheDocument();
+    expect(screen.queryByText("Normalization / transformation record")).not.toBeInTheDocument();
     expect(screen.getByText("NOT EMITTED")).toBeVisible();
-    expect(screen.getByText("No detected voice path.")).toBeVisible();
+    expect(screen.getByText("No engine-selected voice path.")).toBeVisible();
   });
 });

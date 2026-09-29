@@ -147,9 +147,13 @@ export function SevenPrinciplesSpectrumCard(props: { spectrum: unknown }) {
         {notEmitted ? <div className="text-xs text-[#8ea4ba]">not emitted</div> : null}
       </div>
 
+      <div className="mt-2 text-xs leading-5 text-[#8ea4ba]">
+        Spectrum context for the Heart surface and candidate / structural layers; not word-specific functional motivation.
+      </div>
+
       <div className="mt-3 space-y-2">
-        <SectionCard label="Surface" data={surface} />
-        <SectionCard label="Functional" data={functional} />
+        <SectionCard label="Heart surface / doctrine spectrum" data={surface} />
+        <SectionCard label="Candidate / structural spectrum" data={functional} />
       </div>
     </div>
   );

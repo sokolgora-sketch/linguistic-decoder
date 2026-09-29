@@ -17,7 +17,7 @@ describe('MeaningPanel (v1 minimal)', () => {
     expect(screen.getByText(/Principles:\s*Unity → Insight\./)).toBeInTheDocument();
     expect(screen.getByText(/Candidates:\s*2\./)).toBeInTheDocument();
     expect(screen.getByText(/Delta:\s*DIVERGE\./)).toBeInTheDocument();
-    expect(screen.getByText(/Functional path:\s*U-I\./)).toBeInTheDocument();
+    expect(screen.getByText(/Functional \/ normalization path:\s*U-I\./)).toBeInTheDocument();
   });
 
   it('renders a neutral fallback when telemetry is missing', () => {

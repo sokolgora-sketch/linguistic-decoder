@@ -45,5 +45,11 @@ describe("EvidenceTraceCard summary clarity", () => {
     expect(screen.getByText("candidate provenance kinds")).toBeInTheDocument();
     expect(screen.getByText("RootMap hypothesis")).toBeInTheDocument();
     expect(screen.getByText("Ledger sources")).toBeInTheDocument();
+    expect(screen.getByText("engine-selected path")).toBeInTheDocument();
+    expect(screen.getByText("Heart surface / doctrine path")).toBeInTheDocument();
+    expect(screen.getByText("Functional / normalization path")).toBeInTheDocument();
+    expect(
+      screen.getByText(/functional \/ normalization paths and candidate \/ structural paths are separate from word-specific functional motivation/i),
+    ).toBeInTheDocument();
   });
 });

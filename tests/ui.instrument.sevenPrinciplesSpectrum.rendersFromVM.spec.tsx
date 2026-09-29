@@ -40,7 +40,10 @@ describe("SevenPrinciplesSpectrumCard renders from VM", () => {
     );
 
     expect(screen.getByText("Seven Principles Spectrum")).toBeTruthy();
-    expect(screen.getByText("Surface")).toBeTruthy();
-    expect(screen.getByText("Functional")).toBeTruthy();
+    expect(screen.getByText("Heart surface / doctrine spectrum")).toBeTruthy();
+    expect(screen.getByText("Candidate / structural spectrum")).toBeTruthy();
+    expect(
+      screen.getByText(/not word-specific functional motivation/i),
+    ).toBeTruthy();
   });
 });
