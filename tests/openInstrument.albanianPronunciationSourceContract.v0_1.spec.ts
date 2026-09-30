@@ -10,6 +10,7 @@ import {
   ALBANIAN_PRONUNCIATION_SOURCE_CONTRACT_V0_1,
   ALBANIAN_PRONUNCIATION_SOURCE_EXCLUDED_FIELDS_V0_1,
   ALBANIAN_PRONUNCIATION_SOURCE_PROFILE_ID_V0_1,
+  ALBANIAN_PRONUNCIATION_PROFILE_QUALIFIER_VALUES_V0_1,
   ALBANIAN_PRONUNCIATION_VARIANT_POLICY_V0_1,
 } from "@/shared/openInstrument/albanianPronunciationSourceContract.v0_1";
 
@@ -48,6 +49,13 @@ describe("Albanian pronunciation source contract v0.1", () => {
     expect(
       ALBANIAN_PRONUNCIATION_CONTRACT_SCOPE_UNSPECIFIED_IS_NOT_STANDARD,
     ).toBe(true);
+    expect(ALBANIAN_PRONUNCIATION_PROFILE_QUALIFIER_VALUES_V0_1).toEqual([
+      "NORTHERN_TOSK_EXPLICIT",
+      "SOUTHERN_GHEG_EXPLICIT",
+    ]);
+    expect(
+      ALBANIAN_PRONUNCIATION_SOURCE_CONTRACT_V0_1.scopeModel.profileQualifierDerivation,
+    ).toBe("DIRECT_SOUND_TAG_CONJUNCTION_ONLY");
   });
 
   it("limits the source surface and excludes semantic/audio fields", () => {

@@ -1,6 +1,7 @@
 import {
   ALBANIAN_PRONUNCIATION_SCOPE_VALUES_V0_1,
   ALBANIAN_PRONUNCIATION_SOURCE_PROFILE_ID_V0_1,
+  type AlbanianPronunciationProfileQualifierV0_1,
   type AlbanianPronunciationScopeV0_1,
 } from "./albanianPronunciationSourceContract.v0_1";
 
@@ -134,6 +135,38 @@ export const ALBANIAN_PHONOLOGICAL_NUCLEUS_AUTHORITY_EVIDENCE_REFS_V0_1 =
     "CAMBRIDGE-BALKAN-LANGUAGES-PHONOLOGY",
   ] as const);
 
+export const ALBANIAN_PROFILE_EXPANSION_CATEGORY_RULES_V0_1 = deepFreeze({
+  NORTHERN_TOSK_EXPLICIT: {
+    phonemic: {
+      i: "HIGH_FRONT_UNROUNDED",
+      y: "HIGH_FRONT_ROUNDED",
+      u: "HIGH_BACK_ROUNDED",
+      e: "MID_FRONT_UNROUNDED",
+      "ɜ": "CENTRAL_MID",
+      "ɔ": "MID_BACK_ROUNDED",
+      a: "LOW_CENTRAL_OR_BACK",
+    },
+    phoneticRelations: {
+      ʏ: "HIGH_FRONT_ROUNDED",
+      ä: "LOW_CENTRAL_OR_BACK",
+      ɑ: "LOW_CENTRAL_OR_BACK",
+    },
+    authorityRef: "JIPA-NORTHERN-TOSK-ALBANIAN",
+  },
+  SOUTHERN_GHEG_EXPLICIT: {
+    phonemic: {
+      i: "HIGH_FRONT_UNROUNDED",
+      y: "HIGH_FRONT_ROUNDED",
+      u: "HIGH_BACK_ROUNDED",
+      e: "MID_FRONT_UNROUNDED",
+      o: "MID_BACK_ROUNDED",
+      a: "LOW_CENTRAL_OR_BACK",
+    },
+    phoneticRelations: {},
+    authorityRef: "PHON-2022-2025-SOUTHERN-GHEG-VOWELS",
+  },
+} as const);
+
 export const ALBANIAN_PHONOLOGICAL_NUCLEUS_AUTHORITY_CONTRACT_V0_1 =
   deepFreeze({
     contractId: ALBANIAN_PHONOLOGICAL_NUCLEUS_AUTHORITY_CONTRACT_ID_V0_1,
@@ -143,6 +176,11 @@ export const ALBANIAN_PHONOLOGICAL_NUCLEUS_AUTHORITY_CONTRACT_V0_1 =
     sourceDependency: {
       profileId: ALBANIAN_PRONUNCIATION_SOURCE_PROFILE_ID_V0_1,
       scopes: ALBANIAN_PRONUNCIATION_SCOPE_VALUES_V0_1,
+      exactProfileQualifiers: [
+        "NORTHERN_TOSK_EXPLICIT",
+        "SOUTHERN_GHEG_EXPLICIT",
+      ] as const satisfies readonly AlbanianPronunciationProfileQualifierV0_1[],
+      exactProfileQualifierDerivation: "DIRECT_SOUND_TAG_CONJUNCTION_ONLY",
       unspecifiedIsNotStandard: true,
       orthographicDialectInference: false,
       meaningDialectInference: false,
@@ -171,6 +209,7 @@ export const ALBANIAN_PHONOLOGICAL_NUCLEUS_AUTHORITY_CONTRACT_V0_1 =
       sourceIpaIsNotAutomaticCategory: true,
       profileSpecificInterpretationRequired: true,
       unsupportedSymbolsRemainUnresolved: true,
+      exactProfileExpansionRules: ALBANIAN_PROFILE_EXPANSION_CATEGORY_RULES_V0_1,
       reviewedObservations: {
         a: "profile-scoped core low-vowel evidence",
         ä: "phonetic realization evidence; not a universal category",

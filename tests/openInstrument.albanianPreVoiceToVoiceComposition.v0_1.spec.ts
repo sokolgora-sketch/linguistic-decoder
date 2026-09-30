@@ -20,6 +20,7 @@ function observation(
     rawIpa,
     sourceProfileId: "open-instrument.wiktionary-kaikki-albanian-ipa.v0_1",
     sourceScope: "STANDARD_EXPLICIT",
+    sourceProfileQualifier: null,
     sourceNotation: "IPA",
     notationKind: "UNSPECIFIED",
     directTags: ["standard"],

@@ -6,6 +6,7 @@ import {
   ALBANIAN_PRONUNCIATION_SOURCE_ARTIFACT_SHA256_V0_1,
   ALBANIAN_PRONUNCIATION_SOURCE_PROFILE_ID_V0_1,
   ALBANIAN_PRONUNCIATION_SOURCE_LABELS_V0_1,
+  type AlbanianPronunciationProfileQualifierV0_1,
   type AlbanianPronunciationScopeV0_1,
 } from "./albanianPronunciationSourceContract.v0_1";
 
@@ -47,6 +48,7 @@ export type AlbanianPronunciationSourceObservationV0_1 = Readonly<{
   rawIpa: string;
   sourceProfileId: typeof ALBANIAN_PRONUNCIATION_SOURCE_PROFILE_ID_V0_1;
   sourceScope: AlbanianPronunciationScopeV0_1;
+  sourceProfileQualifier: AlbanianPronunciationProfileQualifierV0_1 | null;
   sourceNotation: typeof ALBANIAN_PRONUNCIATION_SOURCE_NOTATION_V0_1;
   notationKind: "UNSPECIFIED";
   directTags: readonly string[];
@@ -226,6 +228,19 @@ function sourceScopeFromTagsV0_1(
   return [...scopes][0];
 }
 
+export function sourceProfileQualifierFromDirectTagsV0_1(
+  tags: readonly string[],
+): AlbanianPronunciationProfileQualifierV0_1 | null {
+  const tagSet = new Set(tags);
+  if (tagSet.has("Northern") && tagSet.has("Tosk")) {
+    return "NORTHERN_TOSK_EXPLICIT";
+  }
+  if (tagSet.has("Southern") && tagSet.has("Gheg")) {
+    return "SOUTHERN_GHEG_EXPLICIT";
+  }
+  return null;
+}
+
 function artifactVerificationV0_1(
   expected: ArtifactIdentityV0_1,
   bytes: Buffer,
@@ -331,6 +346,7 @@ function projectRowObservationsV0_1(
       rawIpa: sound.rawIpa,
       sourceProfileId: ALBANIAN_PRONUNCIATION_SOURCE_PROFILE_ID_V0_1,
       sourceScope: sourceScopeFromTagsV0_1(sound.tags),
+      sourceProfileQualifier: sourceProfileQualifierFromDirectTagsV0_1(sound.tags),
       sourceNotation: ALBANIAN_PRONUNCIATION_SOURCE_NOTATION_V0_1,
       notationKind: "UNSPECIFIED" as const,
       directTags: Object.freeze([...sound.tags]),
