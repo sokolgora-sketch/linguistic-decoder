@@ -9,8 +9,8 @@ import {
   type AlbanianPhonologicalNucleusReasonCodeV0_1,
 } from "./albanianPhonologicalNucleusAuthority.v0_1";
 import {
-  ALBANIAN_PRONUNCIATION_SOURCE_PROFILE_ID_V0_1,
-} from "./albanianPronunciationSourceContract.v0_1";
+  ALBANIAN_PROJECTABLE_SOURCE_PROFILE_IDS_V0_1,
+} from "./albanianPronunciationSourceProfiles.v0_1";
 import type { AlbanianPronunciationSourceObservationV0_1 } from "./albanianPronunciationSourceObservation.v0_1";
 
 export const ALBANIAN_PHONOLOGICAL_CATEGORY_PROJECTOR_SCHEMA_V0_1 =
@@ -52,6 +52,13 @@ export type AlbanianPhonologicalProjectorNucleusV0_1 = Readonly<{
   authorityRefs: readonly string[];
 }>;
 
+export type AlbanianPhonologicalCategoryProjectionInputV0_1 = Readonly<{
+  rawIpa: string;
+  sourceProfileId: string;
+  sourceScope: AlbanianPronunciationSourceObservationV0_1["sourceScope"];
+  sourceProfileQualifier: AlbanianPronunciationSourceObservationV0_1["sourceProfileQualifier"];
+}>;
+
 export type AlbanianPhonologicalCategoryProjectionV0_1 = Readonly<{
   schemaVersion: typeof ALBANIAN_PHONOLOGICAL_CATEGORY_PROJECTOR_SCHEMA_V0_1;
   projectorId: typeof ALBANIAN_PHONOLOGICAL_CATEGORY_PROJECTOR_ID_V0_1;
@@ -74,7 +81,7 @@ export type AlbanianPhonologicalCategoryProjectionV0_1 = Readonly<{
   categories: readonly (AlbanianPhonologicalCategoryV0_1 | null)[];
   reasonCodes: readonly AlbanianPhonologicalProjectorReasonCodeV0_1[];
   authorityRefs: readonly string[];
-  sourceObservation: AlbanianPronunciationSourceObservationV0_1;
+  sourceObservation: AlbanianPhonologicalCategoryProjectionInputV0_1;
 }>;
 
 const STANDARD_AUTHORITY_REF_V0_1 =
@@ -187,7 +194,7 @@ function categoryForNucleusV0_1(
 }> {
   const reasons = new Set<AlbanianPhonologicalProjectorReasonCodeV0_1>();
 
-  if (sourceProfileId !== ALBANIAN_PRONUNCIATION_SOURCE_PROFILE_ID_V0_1) {
+  if (!ALBANIAN_PROJECTABLE_SOURCE_PROFILE_IDS_V0_1.includes(sourceProfileId)) {
     reasons.add("PROFILE_AUTHORITY_MISSING");
   }
 
@@ -256,7 +263,7 @@ function deepFreezeProjectionV0_1<T>(value: T): T {
 }
 
 export function projectAlbanianPronunciationSourceObservationV0_1(
-  sourceObservation: AlbanianPronunciationSourceObservationV0_1,
+  sourceObservation: AlbanianPhonologicalCategoryProjectionInputV0_1,
 ): AlbanianPhonologicalCategoryProjectionV0_1 {
   const { notationKind, body } = notationFromRawIpaV0_1(sourceObservation.rawIpa);
   const features = featureSummaryV0_1(body);
@@ -333,7 +340,7 @@ export function projectAlbanianPronunciationSourceObservationV0_1(
 }
 
 export function projectAlbanianPronunciationSourceObservationsV0_1(
-  sourceObservations: readonly AlbanianPronunciationSourceObservationV0_1[],
+  sourceObservations: readonly AlbanianPhonologicalCategoryProjectionInputV0_1[],
 ): readonly AlbanianPhonologicalCategoryProjectionV0_1[] {
   return Object.freeze(
     sourceObservations.map((sourceObservation) =>
