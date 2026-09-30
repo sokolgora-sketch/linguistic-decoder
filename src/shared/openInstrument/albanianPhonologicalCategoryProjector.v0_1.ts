@@ -205,12 +205,13 @@ function categoryForNucleusV0_1(
   if (profileRules === null) {
     reasons.add("PROFILE_AUTHORITY_MISSING");
   }
-  if (hasUnsupportedCombiningMarksV0_1(segment)) {
+  const phonemicCategory = profileRules?.phonemic[segment.base] ?? null;
+  const normalizedRelationSymbol = segment.raw.normalize("NFC");
+  const phoneticCategory =
+    profileRules?.phoneticRelations[normalizedRelationSymbol] ?? null;
+  if (hasUnsupportedCombiningMarksV0_1(segment) && phoneticCategory === null) {
     reasons.add("SYMBOL_AUTHORITY_MISSING");
   }
-
-  const phonemicCategory = profileRules?.phonemic[segment.base] ?? null;
-  const phoneticCategory = profileRules?.phoneticRelations[segment.base] ?? null;
   const category =
     notationKind === "PHONEMIC"
       ? phonemicCategory
