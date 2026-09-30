@@ -9,6 +9,7 @@ import {
 import {
   readAlbanianPronunciationFixtureObservationsV0_1,
   readAlbanianPronunciationObservationsV0_1,
+  sourceProfileQualifierFromDirectTagsV0_1,
   verifyAlbanianPronunciationFixtureArtifactV0_1,
 } from "@/shared/openInstrument/albanianPronunciationSourceObservation.v0_1";
 
@@ -143,6 +144,17 @@ describe("Albanian pronunciation source observation adapter v0.1", () => {
       notes: ["southern Gheg, Kavajë"],
       sourceScope: "ALBANIAN_UNSPECIFIED",
     });
+  });
+
+  it("derives only explicitly conjunctive narrow profile qualifiers", () => {
+    expect(sourceProfileQualifierFromDirectTagsV0_1(["Northern", "Tosk"])).toBe(
+      "NORTHERN_TOSK_EXPLICIT",
+    );
+    expect(sourceProfileQualifierFromDirectTagsV0_1(["Gheg", "Southern"])).toBe(
+      "SOUTHERN_GHEG_EXPLICIT",
+    );
+    expect(sourceProfileQualifierFromDirectTagsV0_1(["Tosk"])).toBeNull();
+    expect(sourceProfileQualifierFromDirectTagsV0_1(["Southern"])).toBeNull();
   });
 
   it("distinguishes absent forms from forms without explicit IPA", () => {

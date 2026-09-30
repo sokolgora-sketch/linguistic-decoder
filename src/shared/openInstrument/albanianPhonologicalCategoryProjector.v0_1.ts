@@ -4,6 +4,7 @@ import type { IpaSegmentV0_1 } from "@/shared/ipa/ipaClassify.v0.1";
 import {
   ALBANIAN_PHONOLOGICAL_CATEGORY_VALUES_V0_1,
   ALBANIAN_PHONOLOGICAL_NUCLEUS_REASON_CODES_V0_1,
+  ALBANIAN_PROFILE_EXPANSION_CATEGORY_RULES_V0_1,
   type AlbanianPhonologicalCategoryV0_1,
   type AlbanianPhonologicalNucleusReasonCodeV0_1,
 } from "./albanianPhonologicalNucleusAuthority.v0_1";
@@ -91,6 +92,12 @@ const STANDARD_PHONEMIC_CATEGORY_BY_SYMBOL_V0_1: Readonly<
   a: "LOW_CENTRAL_OR_BACK",
 });
 
+type ProfileCategoryRulesV0_1 = Readonly<{
+  phonemic: Readonly<Record<string, AlbanianPhonologicalCategoryV0_1>>;
+  phoneticRelations: Readonly<Record<string, AlbanianPhonologicalCategoryV0_1>>;
+  authorityRef: string;
+}>;
+
 const CATEGORY_VALUES = new Set<string>(ALBANIAN_PHONOLOGICAL_CATEGORY_VALUES_V0_1);
 
 const LENGTH_MARKERS = new Map<string, AlbanianPhonologicalProjectorLengthV0_1>([
@@ -171,6 +178,7 @@ function categoryForNucleusV0_1(
   segment: IpaSegmentV0_1,
   sourceProfileId: string,
   sourceScope: AlbanianPronunciationSourceObservationV0_1["sourceScope"],
+  sourceProfileQualifier: AlbanianPronunciationSourceObservationV0_1["sourceProfileQualifier"],
   notationKind: AlbanianPhonologicalProjectorNotationV0_1,
 ): Readonly<{
   category: AlbanianPhonologicalCategoryV0_1 | null;
@@ -182,22 +190,50 @@ function categoryForNucleusV0_1(
   if (sourceProfileId !== ALBANIAN_PRONUNCIATION_SOURCE_PROFILE_ID_V0_1) {
     reasons.add("PROFILE_AUTHORITY_MISSING");
   }
-  if (sourceScope !== "STANDARD_EXPLICIT") {
+
+  const profileRules: ProfileCategoryRulesV0_1 | null =
+    sourceProfileQualifier === null
+      ? sourceScope === "STANDARD_EXPLICIT"
+        ? {
+            phonemic: STANDARD_PHONEMIC_CATEGORY_BY_SYMBOL_V0_1,
+            phoneticRelations: {},
+            authorityRef: STANDARD_AUTHORITY_REF_V0_1,
+          }
+        : null
+      : ALBANIAN_PROFILE_EXPANSION_CATEGORY_RULES_V0_1[sourceProfileQualifier];
+
+  if (profileRules === null) {
     reasons.add("PROFILE_AUTHORITY_MISSING");
-  }
-  if (notationKind !== "PHONEMIC") {
-    reasons.add(
-      notationKind === "UNSPECIFIED"
-        ? "NOTATION_AUTHORITY_MISSING"
-        : "PHONOLOGICAL_CATEGORY_UNRESOLVED",
-    );
   }
   if (hasUnsupportedCombiningMarksV0_1(segment)) {
     reasons.add("SYMBOL_AUTHORITY_MISSING");
   }
 
-  const category = STANDARD_PHONEMIC_CATEGORY_BY_SYMBOL_V0_1[segment.base] ?? null;
-  if (category === null) reasons.add("SYMBOL_AUTHORITY_MISSING");
+  const phonemicCategory = profileRules?.phonemic[segment.base] ?? null;
+  const phoneticCategory = profileRules?.phoneticRelations[segment.base] ?? null;
+  const category =
+    notationKind === "PHONEMIC"
+      ? phonemicCategory
+      : notationKind === "PHONETIC"
+        ? phoneticCategory
+        : null;
+
+  if (notationKind === "UNSPECIFIED") {
+    reasons.add("NOTATION_AUTHORITY_MISSING");
+  } else if (notationKind === "PHONETIC" && phoneticCategory === null) {
+    reasons.add("PHONOLOGICAL_CATEGORY_UNRESOLVED");
+  }
+
+  if (category === null) {
+    if (
+      notationKind === "PHONETIC" &&
+      (phonemicCategory !== null || phoneticCategory !== null)
+    ) {
+      reasons.add("PHONOLOGICAL_CATEGORY_UNRESOLVED");
+    } else {
+      reasons.add("SYMBOL_AUTHORITY_MISSING");
+    }
+  }
   if (category !== null && !CATEGORY_VALUES.has(category)) {
     reasons.add("PHONOLOGICAL_CATEGORY_UNRESOLVED");
   }
@@ -206,7 +242,7 @@ function categoryForNucleusV0_1(
   return Object.freeze({
     category: reasonCodes.length === 0 ? category : null,
     reasonCodes,
-    authorityRefs: reasonCodes.length === 0 ? [STANDARD_AUTHORITY_REF_V0_1] : [],
+    authorityRefs: reasonCodes.length === 0 ? [profileRules?.authorityRef ?? STANDARD_AUTHORITY_REF_V0_1] : [],
   });
 }
 
@@ -246,6 +282,7 @@ export function projectAlbanianPronunciationSourceObservationV0_1(
       segment,
       sourceObservation.sourceProfileId,
       sourceObservation.sourceScope,
+      sourceObservation.sourceProfileQualifier,
       notationKind,
     );
     const nucleusReasons = sortedReasons([
@@ -283,6 +320,7 @@ export function projectAlbanianPronunciationSourceObservationV0_1(
     notationKind,
     sourceProfileId: sourceObservation.sourceProfileId,
     sourceScope: sourceObservation.sourceScope,
+    sourceProfileQualifier: sourceObservation.sourceProfileQualifier,
     features,
     nucleusStructure,
     nuclei,

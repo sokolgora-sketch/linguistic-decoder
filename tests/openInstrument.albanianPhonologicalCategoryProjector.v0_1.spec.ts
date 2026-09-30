@@ -15,6 +15,7 @@ function observation(
     rawIpa,
     sourceProfileId: "open-instrument.wiktionary-kaikki-albanian-ipa.v0_1",
     sourceScope: "STANDARD_EXPLICIT",
+    sourceProfileQualifier: null,
     sourceNotation: "IPA",
     notationKind: "UNSPECIFIED",
     directTags: ["standard"],
@@ -63,6 +64,54 @@ describe("Albanian phonological category projector v0.1", () => {
     });
     expect(projectAlbanianPronunciationSourceObservationV0_1(observation("/a/"))).toMatchObject({
       categories: ["LOW_CENTRAL_OR_BACK"],
+    });
+  });
+
+  it("projects only the exact reviewed Northern-Tosk and Southern-Gheg qualifiers", () => {
+    const northernTosk = observation("/ɜ/", {
+      sourceScope: "ALBANIAN_UNSPECIFIED",
+      sourceProfileQualifier: "NORTHERN_TOSK_EXPLICIT",
+      directTags: ["Northern", "Tosk"],
+    });
+    expect(projectAlbanianPronunciationSourceObservationV0_1(northernTosk)).toMatchObject({
+      status: "SUPPORTED",
+      categories: ["CENTRAL_MID"],
+      authorityRefs: ["JIPA-NORTHERN-TOSK-ALBANIAN"],
+      sourceProfileQualifier: "NORTHERN_TOSK_EXPLICIT",
+    });
+
+    expect(
+      projectAlbanianPronunciationSourceObservationV0_1(
+        observation("[ʏ]", {
+          sourceScope: "ALBANIAN_UNSPECIFIED",
+          sourceProfileQualifier: "NORTHERN_TOSK_EXPLICIT",
+          directTags: ["Northern", "Tosk"],
+        }),
+      ),
+    ).toMatchObject({ status: "SUPPORTED", categories: ["HIGH_FRONT_ROUNDED"] });
+
+    expect(
+      projectAlbanianPronunciationSourceObservationV0_1(
+        observation("/u/", {
+          sourceScope: "ALBANIAN_UNSPECIFIED",
+          sourceProfileQualifier: "SOUTHERN_GHEG_EXPLICIT",
+          directTags: ["Gheg", "Southern"],
+        }),
+      ),
+    ).toMatchObject({ status: "SUPPORTED", categories: ["HIGH_BACK_ROUNDED"] });
+
+    expect(
+      projectAlbanianPronunciationSourceObservationV0_1(
+        observation("/ə/", {
+          sourceScope: "ALBANIAN_UNSPECIFIED",
+          sourceProfileQualifier: "SOUTHERN_GHEG_EXPLICIT",
+          directTags: ["Gheg", "Southern"],
+        }),
+      ),
+    ).toMatchObject({
+      status: "UNRESOLVED",
+      categories: [null],
+      reasonCodes: expect.arrayContaining(["SYMBOL_AUTHORITY_MISSING"]),
     });
   });
 

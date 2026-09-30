@@ -39,6 +39,14 @@ export const ALBANIAN_PRONUNCIATION_SCOPE_VALUES_V0_1 = [
 export type AlbanianPronunciationScopeV0_1 =
   (typeof ALBANIAN_PRONUNCIATION_SCOPE_VALUES_V0_1)[number];
 
+export const ALBANIAN_PRONUNCIATION_PROFILE_QUALIFIER_VALUES_V0_1 = [
+  "NORTHERN_TOSK_EXPLICIT",
+  "SOUTHERN_GHEG_EXPLICIT",
+] as const;
+
+export type AlbanianPronunciationProfileQualifierV0_1 =
+  (typeof ALBANIAN_PRONUNCIATION_PROFILE_QUALIFIER_VALUES_V0_1)[number];
+
 export const ALBANIAN_PRONUNCIATION_SOURCE_LABELS_V0_1 = deepFreeze({
   STANDARD_EXPLICIT: ["standard", "Standard"],
   GHEG_EXPLICIT: ["Gheg"],
@@ -128,6 +136,8 @@ export const ALBANIAN_PRONUNCIATION_SOURCE_CONTRACT_V0_1 = deepFreeze({
   },
   scopeModel: {
     values: ALBANIAN_PRONUNCIATION_SCOPE_VALUES_V0_1,
+    profileQualifiers: ALBANIAN_PRONUNCIATION_PROFILE_QUALIFIER_VALUES_V0_1,
+    profileQualifierDerivation: "DIRECT_SOUND_TAG_CONJUNCTION_ONLY",
     unlabelledPolicy: "ALBANIAN_UNSPECIFIED",
     unlabelledIsStandard: false,
     entryOrSenseScopePropagation: false,

@@ -107,6 +107,19 @@ Unlabelled IPA is `ALBANIAN_UNSPECIFIED`. The invariant is:
 ALBANIAN_UNSPECIFIED != STANDARD_EXPLICIT
 ```
 
+The adapter may additionally preserve one exact profile qualifier when the
+same pronunciation-level sound observation carries both direct labels in one
+of these reviewed conjunctions:
+
+```text
+Northern + Tosk -> NORTHERN_TOSK_EXPLICIT
+Southern + Gheg -> SOUTHERN_GHEG_EXPLICIT
+```
+
+This is direct sound-tag conjunction only. Notes, entry-level metadata,
+geography, spelling, and semantics do not create a qualifier. The qualifier
+does not widen generic `GHEG_EXPLICIT` or `TOSK_EXPLICIT` authority.
+
 Entry-level, sense-level, etymology-level, usage-level, or orthographic
 metadata must not be propagated to a pronunciation observation automatically.
 Dialect identity must not be inferred from spelling.
