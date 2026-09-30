@@ -10,6 +10,7 @@ import {
   readAlbanianPronunciationFixtureObservationsV0_1,
   readAlbanianPronunciationObservationsV0_1,
   sourceProfileQualifierFromDirectTagsV0_1,
+  sourceProfileQualifierFromSoundMetadataV0_1,
   verifyAlbanianPronunciationFixtureArtifactV0_1,
 } from "@/shared/openInstrument/albanianPronunciationSourceObservation.v0_1";
 
@@ -143,6 +144,7 @@ describe("Albanian pronunciation source observation adapter v0.1", () => {
       directTags: [],
       notes: ["southern Gheg, Kavajë"],
       sourceScope: "ALBANIAN_UNSPECIFIED",
+      sourceProfileQualifier: "SOUTHERN_GHEG_EXPLICIT",
     });
   });
 
@@ -155,6 +157,24 @@ describe("Albanian pronunciation source observation adapter v0.1", () => {
     );
     expect(sourceProfileQualifierFromDirectTagsV0_1(["Tosk"])).toBeNull();
     expect(sourceProfileQualifierFromDirectTagsV0_1(["Southern"])).toBeNull();
+  });
+
+  it("qualifies one exact reviewed Southern-Gheg sound note without promoting scope", () => {
+    expect(
+      sourceProfileQualifierFromSoundMetadataV0_1([], ["southern Gheg, Kavajë"]),
+    ).toBe("SOUTHERN_GHEG_EXPLICIT");
+    expect(
+      sourceProfileQualifierFromSoundMetadataV0_1(
+        ["often"],
+        ["southern Gheg, Kavajë"],
+      ),
+    ).toBeNull();
+    expect(
+      sourceProfileQualifierFromSoundMetadataV0_1([], ["southern Gheg, central Gheg"]),
+    ).toBeNull();
+    expect(
+      sourceProfileQualifierFromSoundMetadataV0_1([], ["standard, and some Tosk dialects"]),
+    ).toBeNull();
   });
 
   it("distinguishes absent forms from forms without explicit IPA", () => {
