@@ -5,6 +5,7 @@ import {
   ALBANIAN_PRONUNCIATION_SOURCE_ARTIFACT_BYTES_V0_1,
   ALBANIAN_PRONUNCIATION_SOURCE_ARTIFACT_SHA256_V0_1,
   ALBANIAN_PRONUNCIATION_SOURCE_PROFILE_ID_V0_1,
+  ALBANIAN_PRONUNCIATION_REVIEWED_SOUND_NOTE_QUALIFIERS_V0_1,
   ALBANIAN_PRONUNCIATION_SOURCE_LABELS_V0_1,
   type AlbanianPronunciationProfileQualifierV0_1,
   type AlbanianPronunciationScopeV0_1,
@@ -241,6 +242,25 @@ export function sourceProfileQualifierFromDirectTagsV0_1(
   return null;
 }
 
+export function sourceProfileQualifierFromSoundMetadataV0_1(
+  tags: readonly string[],
+  notes: readonly string[],
+): AlbanianPronunciationProfileQualifierV0_1 | null {
+  const directQualifier = sourceProfileQualifierFromDirectTagsV0_1(tags);
+  if (directQualifier !== null) return directQualifier;
+
+  // A note is admissible only as one exact reviewed sound-level label, with
+  // no direct tags that could conflict or require interpretation.
+  if (tags.length !== 0 || notes.length !== 1) return null;
+  const note = notes[0];
+  if (note === undefined) return null;
+  return (
+    ALBANIAN_PRONUNCIATION_REVIEWED_SOUND_NOTE_QUALIFIERS_V0_1[
+      note as keyof typeof ALBANIAN_PRONUNCIATION_REVIEWED_SOUND_NOTE_QUALIFIERS_V0_1
+    ] ?? null
+  );
+}
+
 function artifactVerificationV0_1(
   expected: ArtifactIdentityV0_1,
   bytes: Buffer,
@@ -346,7 +366,10 @@ function projectRowObservationsV0_1(
       rawIpa: sound.rawIpa,
       sourceProfileId: ALBANIAN_PRONUNCIATION_SOURCE_PROFILE_ID_V0_1,
       sourceScope: sourceScopeFromTagsV0_1(sound.tags),
-      sourceProfileQualifier: sourceProfileQualifierFromDirectTagsV0_1(sound.tags),
+      sourceProfileQualifier: sourceProfileQualifierFromSoundMetadataV0_1(
+        sound.tags,
+        sound.notes,
+      ),
       sourceNotation: ALBANIAN_PRONUNCIATION_SOURCE_NOTATION_V0_1,
       notationKind: "UNSPECIFIED" as const,
       directTags: Object.freeze([...sound.tags]),

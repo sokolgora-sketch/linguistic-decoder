@@ -109,16 +109,32 @@ ALBANIAN_UNSPECIFIED != STANDARD_EXPLICIT
 
 The adapter may additionally preserve one exact profile qualifier when the
 same pronunciation-level sound observation carries both direct labels in one
-of these reviewed conjunctions:
+of these reviewed conjunctions, or carries the one exact reviewed sound note
+listed below:
 
 ```text
 Northern + Tosk -> NORTHERN_TOSK_EXPLICIT
 Southern + Gheg -> SOUTHERN_GHEG_EXPLICIT
+
+`southern Gheg, Kavajë` -> `SOUTHERN_GHEG_EXPLICIT`
 ```
 
-This is direct sound-tag conjunction only. Notes, entry-level metadata,
-geography, spelling, and semantics do not create a qualifier. The qualifier
-does not widen generic `GHEG_EXPLICIT` or `TOSK_EXPLICIT` authority.
+The note rule is exact-string matching on one direct sound-level note and is
+valid only when that sound observation has no direct tags. It preserves the
+source scope as `ALBANIAN_UNSPECIFIED`; it does not infer profile from the
+place name `Kavajë`, and it does not create a generic geography rule. Other
+notes, entry-level metadata, geography, spelling, and semantics do not create
+a qualifier. The qualifier does not widen generic `GHEG_EXPLICIT` or
+`TOSK_EXPLICIT` authority.
+
+The phonological profile used by this qualifier is the existing reviewed
+Southern-Gheg authority: Riverin-Coutlée, Kapia, Cunha & Harrington, “Vowels
+in urban and rural Albanian: the case of the Southern Gheg dialect,”
+*Phonetica* 79(5), 2022, pp. 459–512,
+<https://doi.org/10.1515/phon-2022-2025>. This source-note rule does not claim
+that every Kavajë observation has one uniform realization; it only preserves
+the source's exact explicit Southern-Gheg qualification for the existing
+profile-scoped authority.
 
 Entry-level, sense-level, etymology-level, usage-level, or orthographic
 metadata must not be propagated to a pronunciation observation automatically.
