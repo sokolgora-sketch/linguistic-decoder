@@ -90,6 +90,22 @@ describe("Albanian phonological category projector v0.1", () => {
       ),
     ).toMatchObject({ status: "SUPPORTED", categories: ["HIGH_FRONT_ROUNDED"] });
 
+    for (const rawIpa of ["[ä]", "[ä]"]) {
+      expect(
+        projectAlbanianPronunciationSourceObservationV0_1(
+          observation(rawIpa, {
+            sourceScope: "ALBANIAN_UNSPECIFIED",
+            sourceProfileQualifier: "NORTHERN_TOSK_EXPLICIT",
+            directTags: ["Northern", "Tosk"],
+          }),
+        ),
+      ).toMatchObject({
+        status: "SUPPORTED",
+        categories: ["LOW_CENTRAL_OR_BACK"],
+        features: { nasalization: "NOT_RECORDED" },
+      });
+    }
+
     expect(
       projectAlbanianPronunciationSourceObservationV0_1(
         observation("/u/", {
