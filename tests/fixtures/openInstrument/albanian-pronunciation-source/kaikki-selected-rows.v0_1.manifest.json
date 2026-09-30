@@ -1,0 +1,15 @@
+{
+  "fixtureId": "open-instrument.albanian-pronunciation-source.selected-rows.v0_1",
+  "sourceProfileId": "open-instrument.wiktionary-kaikki-albanian-ipa.v0_1",
+  "sourceArtifact": {
+    "bytes": 67438755,
+    "sha256": "7bd411e2b3cdfd83b7f09af9700791c01e81f36224ec5134e118ff26e83d0aa0"
+  },
+  "fixtureArtifact": {
+    "path": "tests/fixtures/openInstrument/albanian-pronunciation-source/kaikki-selected-rows.v0_1.jsonl",
+    "bytes": 11027,
+    "sha256": "77e9c37819cee83874fb25d34c04505089bf4b6ec079f988952501a2bd15b2de"
+  },
+  "extractionRule": "Retain source-order physical JSONL lines 1, 2, 3, and 76 from the verified frozen artifact; preserve selected row bytes exactly and leave non-selected source line positions blank.",
+  "sourceLineNumbers": [1, 2, 3, 76]
+}
