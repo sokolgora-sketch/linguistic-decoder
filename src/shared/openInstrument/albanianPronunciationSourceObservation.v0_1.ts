@@ -31,12 +31,14 @@ type NonAuthoritativeFixtureProvenanceV0_1 = Readonly<{
 }>;
 
 export type AlbanianPronunciationSourceProvenanceV0_1 = Readonly<
-  | AuthoritativeProvenanceV0_1
-  | NonAuthoritativeFixtureProvenanceV0_1
-> & {
-  readArtifactSha256: string;
-  readArtifactBytes: number;
-};
+  (
+    | AuthoritativeProvenanceV0_1
+    | NonAuthoritativeFixtureProvenanceV0_1
+  ) & {
+    readArtifactSha256: string;
+    readArtifactBytes: number;
+  }
+>;
 
 export type AlbanianPronunciationSourceObservationV0_1 = Readonly<{
   schemaVersion: typeof ALBANIAN_PRONUNCIATION_SOURCE_OBSERVATION_SCHEMA_V0_1;
