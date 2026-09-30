@@ -14,6 +14,32 @@ export const ALBANIAN_PRONUNCIATION_SOURCE_OBSERVATION_SCHEMA_V0_1 =
 
 export const ALBANIAN_PRONUNCIATION_SOURCE_NOTATION_V0_1 = "IPA" as const;
 
+type AuthoritativeProvenanceV0_1 = Readonly<{
+  authority: "AUTHORITATIVE_FROZEN_SOURCE";
+  frozenArtifactSha256: typeof ALBANIAN_PRONUNCIATION_SOURCE_ARTIFACT_SHA256_V0_1;
+  frozenArtifactBytes: typeof ALBANIAN_PRONUNCIATION_SOURCE_ARTIFACT_BYTES_V0_1;
+  fixtureId: null;
+  extractionRule: null;
+}>;
+
+type NonAuthoritativeFixtureProvenanceV0_1 = Readonly<{
+  authority: "NON_AUTHORITATIVE_FIXTURE";
+  frozenArtifactSha256: null;
+  frozenArtifactBytes: null;
+  fixtureId: string;
+  extractionRule: string;
+}>;
+
+export type AlbanianPronunciationSourceProvenanceV0_1 = Readonly<
+  (
+    | AuthoritativeProvenanceV0_1
+    | NonAuthoritativeFixtureProvenanceV0_1
+  ) & {
+    readArtifactSha256: string;
+    readArtifactBytes: number;
+  }
+>;
+
 export type AlbanianPronunciationSourceObservationV0_1 = Readonly<{
   schemaVersion: typeof ALBANIAN_PRONUNCIATION_SOURCE_OBSERVATION_SCHEMA_V0_1;
   lexicalForm: string;
@@ -33,22 +59,20 @@ export type AlbanianPronunciationSourceObservationV0_1 = Readonly<{
     byteOffset: number;
     rowSha256: string;
   }>;
-  provenance: Readonly<{
-    frozenArtifactSha256: typeof ALBANIAN_PRONUNCIATION_SOURCE_ARTIFACT_SHA256_V0_1;
-    frozenArtifactBytes: typeof ALBANIAN_PRONUNCIATION_SOURCE_ARTIFACT_BYTES_V0_1;
-    readArtifactSha256: string;
-    readArtifactBytes: number;
-    fixtureId: string | null;
-    extractionRule: string | null;
-  }>;
+  provenance: AlbanianPronunciationSourceProvenanceV0_1;
 }>;
 
 export type AlbanianPronunciationSourceArtifactInputV0_1 = Readonly<{
   artifactPath: string;
-  expectedArtifactSha256?: string;
-  expectedArtifactBytes?: number;
-  fixtureId?: string | null;
-  extractionRule?: string | null;
+}>;
+
+export type AlbanianPronunciationSourceFixtureInputV0_1 = Readonly<{
+  artifactPath: string;
+  expectedArtifactSha256: string;
+  expectedArtifactBytes: number;
+  fixtureId: string;
+  extractionRule: string;
+  authority: "NON_AUTHORITATIVE_FIXTURE";
 }>;
 
 export type AlbanianPronunciationSourceArtifactVerificationV0_1 = Readonly<
@@ -62,6 +86,12 @@ export type AlbanianPronunciationSourceArtifactVerificationV0_1 = Readonly<
       reasonCode: "SOURCE_ARTIFACT_IDENTITY_MISMATCH";
       artifactSha256: string;
       artifactBytes: number;
+    }
+  | {
+      ok: false;
+      reasonCode: "SOURCE_ARTIFACT_READ_FAILURE";
+      artifactSha256: null;
+      artifactBytes: null;
     }
 >;
 
@@ -85,10 +115,21 @@ export type AlbanianPronunciationSourceLookupResultV0_1 = Readonly<
       normalizedLookupKey: string;
       outcome: Exclude<AlbanianPronunciationSourceLookupOutcomeV0_1, "DEFINED">;
       observations: readonly [];
-      reasonCode: "PRONUNCIATION_NOT_FOUND" | "SOURCE_ARTIFACT_IDENTITY_MISMATCH" | "SOURCE_ROW_INVALID";
+      reasonCode:
+        | "PRONUNCIATION_NOT_FOUND"
+        | "SOURCE_ARTIFACT_IDENTITY_MISMATCH"
+        | "SOURCE_ARTIFACT_READ_FAILURE"
+        | "SOURCE_ROW_INVALID";
       artifact: AlbanianPronunciationSourceArtifactVerificationV0_1;
     }
 >;
+
+type ArtifactIdentityV0_1 = Readonly<{
+  sha256: string;
+  bytes: number;
+}>;
+
+type ProvenanceSeedV0_1 = AuthoritativeProvenanceV0_1 | NonAuthoritativeFixtureProvenanceV0_1;
 
 type JsonRecordV0_1 = Record<string, unknown>;
 
@@ -138,6 +179,26 @@ function sha256V0_1(value: Buffer): string {
   return createHash("sha256").update(value).digest("hex");
 }
 
+function isFilesystemReadFailureV0_1(error: unknown): boolean {
+  return (
+    typeof error === "object" &&
+    error !== null &&
+    "code" in error &&
+    typeof (error as { code?: unknown }).code === "string"
+  );
+}
+
+function readArtifactBytesV0_1(
+  artifactPath: string,
+): { ok: true; bytes: Buffer } | { ok: false } {
+  try {
+    return { ok: true, bytes: readFileSync(artifactPath) };
+  } catch (error) {
+    if (isFilesystemReadFailureV0_1(error)) return { ok: false };
+    throw error;
+  }
+}
+
 function stringArrayV0_1(value: unknown): readonly string[] | null {
   if (value === undefined || value === null) return [];
   if (!Array.isArray(value) || !value.every((item) => typeof item === "string")) {
@@ -166,17 +227,13 @@ function sourceScopeFromTagsV0_1(
 }
 
 function artifactVerificationV0_1(
-  input: AlbanianPronunciationSourceArtifactInputV0_1,
+  expected: ArtifactIdentityV0_1,
   bytes: Buffer,
 ): AlbanianPronunciationSourceArtifactVerificationV0_1 {
   const artifactSha256 = sha256V0_1(bytes);
   const artifactBytes = bytes.byteLength;
-  const expectedArtifactSha256 =
-    input.expectedArtifactSha256 ?? ALBANIAN_PRONUNCIATION_SOURCE_ARTIFACT_SHA256_V0_1;
-  const expectedArtifactBytes =
-    input.expectedArtifactBytes ?? ALBANIAN_PRONUNCIATION_SOURCE_ARTIFACT_BYTES_V0_1;
 
-  if (artifactSha256 !== expectedArtifactSha256 || artifactBytes !== expectedArtifactBytes) {
+  if (artifactSha256 !== expected.sha256 || artifactBytes !== expected.bytes) {
     return {
       ok: false,
       reasonCode: "SOURCE_ARTIFACT_IDENTITY_MISMATCH",
@@ -225,7 +282,7 @@ function parseJsonlRowsV0_1(bytes: Buffer):
 
 function projectRowObservationsV0_1(
   row: ParsedSourceRowV0_1,
-  artifact: AlbanianPronunciationSourceArtifactInputV0_1,
+  provenanceSeed: ProvenanceSeedV0_1,
   verification: Extract<AlbanianPronunciationSourceArtifactVerificationV0_1, { ok: true }>,
   variantOrderOffset: number,
 ):
@@ -287,12 +344,9 @@ function projectRowObservationsV0_1(
         rowSha256,
       }),
       provenance: Object.freeze({
-        frozenArtifactSha256: ALBANIAN_PRONUNCIATION_SOURCE_ARTIFACT_SHA256_V0_1,
-        frozenArtifactBytes: ALBANIAN_PRONUNCIATION_SOURCE_ARTIFACT_BYTES_V0_1,
+        ...provenanceSeed,
         readArtifactSha256: verification.artifactSha256,
         readArtifactBytes: verification.artifactBytes,
-        fixtureId: artifact.fixtureId ?? null,
-        extractionRule: artifact.extractionRule ?? null,
       }),
     });
   });
@@ -303,17 +357,67 @@ function projectRowObservationsV0_1(
 export function verifyAlbanianPronunciationSourceArtifactV0_1(
   input: AlbanianPronunciationSourceArtifactInputV0_1,
 ): AlbanianPronunciationSourceArtifactVerificationV0_1 {
-  const bytes = readFileSync(input.artifactPath);
-  return artifactVerificationV0_1(input, bytes);
+  const read = readArtifactBytesV0_1(input.artifactPath);
+  if (!read.ok) {
+    return {
+      ok: false,
+      reasonCode: "SOURCE_ARTIFACT_READ_FAILURE",
+      artifactSha256: null,
+      artifactBytes: null,
+    };
+  }
+  return artifactVerificationV0_1(
+    {
+      sha256: ALBANIAN_PRONUNCIATION_SOURCE_ARTIFACT_SHA256_V0_1,
+      bytes: ALBANIAN_PRONUNCIATION_SOURCE_ARTIFACT_BYTES_V0_1,
+    },
+    read.bytes,
+  );
 }
 
-export function readAlbanianPronunciationObservationsV0_1(
+export function verifyAlbanianPronunciationFixtureArtifactV0_1(
+  input: AlbanianPronunciationSourceFixtureInputV0_1,
+): AlbanianPronunciationSourceArtifactVerificationV0_1 {
+  const read = readArtifactBytesV0_1(input.artifactPath);
+  if (!read.ok) {
+    return {
+      ok: false,
+      reasonCode: "SOURCE_ARTIFACT_READ_FAILURE",
+      artifactSha256: null,
+      artifactBytes: null,
+    };
+  }
+  return artifactVerificationV0_1(
+    { sha256: input.expectedArtifactSha256, bytes: input.expectedArtifactBytes },
+    read.bytes,
+  );
+}
+
+function readAlbanianPronunciationObservationsFromArtifactV0_1(
   lexicalForm: string,
-  input: AlbanianPronunciationSourceArtifactInputV0_1,
+  artifactPath: string,
+  expected: ArtifactIdentityV0_1,
+  provenanceSeed: ProvenanceSeedV0_1,
 ): AlbanianPronunciationSourceLookupResultV0_1 {
   const normalizedLookupKey = normalizeLookupKeyV0_1(lexicalForm);
-  const bytes = readFileSync(input.artifactPath);
-  const artifact = artifactVerificationV0_1(input, bytes);
+  const read = readArtifactBytesV0_1(artifactPath);
+  if (!read.ok) {
+    return {
+      status: "null",
+      normalizedLookupKey,
+      outcome: "ARTIFACT_INVALID",
+      observations: [],
+      reasonCode: "SOURCE_ARTIFACT_READ_FAILURE",
+      artifact: {
+        ok: false,
+        reasonCode: "SOURCE_ARTIFACT_READ_FAILURE",
+        artifactSha256: null,
+        artifactBytes: null,
+      },
+    };
+  }
+
+  const artifact = artifactVerificationV0_1(expected, read.bytes);
   if (!artifact.ok) {
     return {
       status: "null",
@@ -325,7 +429,7 @@ export function readAlbanianPronunciationObservationsV0_1(
     };
   }
 
-  const parsed = parseJsonlRowsV0_1(bytes);
+  const parsed = parseJsonlRowsV0_1(read.bytes);
   if (!parsed.ok) {
     return {
       status: "null",
@@ -343,7 +447,7 @@ export function readAlbanianPronunciationObservationsV0_1(
     if (normalizeLookupKeyV0_1(String(row.value.word ?? "")) !== normalizedLookupKey) continue;
     const projected = projectRowObservationsV0_1(
       row,
-      input,
+      provenanceSeed,
       artifact,
       observations.length,
     );
@@ -379,4 +483,43 @@ export function readAlbanianPronunciationObservationsV0_1(
     observations: Object.freeze(observations),
     artifact,
   };
+}
+
+export function readAlbanianPronunciationObservationsV0_1(
+  lexicalForm: string,
+  input: AlbanianPronunciationSourceArtifactInputV0_1,
+): AlbanianPronunciationSourceLookupResultV0_1 {
+  return readAlbanianPronunciationObservationsFromArtifactV0_1(
+    lexicalForm,
+    input.artifactPath,
+    {
+      sha256: ALBANIAN_PRONUNCIATION_SOURCE_ARTIFACT_SHA256_V0_1,
+      bytes: ALBANIAN_PRONUNCIATION_SOURCE_ARTIFACT_BYTES_V0_1,
+    },
+    {
+      authority: "AUTHORITATIVE_FROZEN_SOURCE",
+      frozenArtifactSha256: ALBANIAN_PRONUNCIATION_SOURCE_ARTIFACT_SHA256_V0_1,
+      frozenArtifactBytes: ALBANIAN_PRONUNCIATION_SOURCE_ARTIFACT_BYTES_V0_1,
+      fixtureId: null,
+      extractionRule: null,
+    },
+  );
+}
+
+export function readAlbanianPronunciationFixtureObservationsV0_1(
+  lexicalForm: string,
+  input: AlbanianPronunciationSourceFixtureInputV0_1,
+): AlbanianPronunciationSourceLookupResultV0_1 {
+  return readAlbanianPronunciationObservationsFromArtifactV0_1(
+    lexicalForm,
+    input.artifactPath,
+    { sha256: input.expectedArtifactSha256, bytes: input.expectedArtifactBytes },
+    {
+      authority: input.authority,
+      frozenArtifactSha256: null,
+      frozenArtifactBytes: null,
+      fixtureId: input.fixtureId,
+      extractionRule: input.extractionRule,
+    },
+  );
 }

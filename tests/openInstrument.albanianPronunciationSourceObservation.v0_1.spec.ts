@@ -7,8 +7,9 @@ import {
   type AlbanianPronunciationScopeV0_1,
 } from "@/shared/openInstrument/albanianPronunciationSourceContract.v0_1";
 import {
+  readAlbanianPronunciationFixtureObservationsV0_1,
   readAlbanianPronunciationObservationsV0_1,
-  verifyAlbanianPronunciationSourceArtifactV0_1,
+  verifyAlbanianPronunciationFixtureArtifactV0_1,
 } from "@/shared/openInstrument/albanianPronunciationSourceObservation.v0_1";
 
 const FIXTURE_PATH = join(
@@ -35,10 +36,11 @@ const fixtureInput = {
   expectedArtifactSha256: manifest.fixtureArtifact.sha256,
   fixtureId: manifest.fixtureId,
   extractionRule: manifest.extractionRule,
+  authority: "NON_AUTHORITATIVE_FIXTURE",
 } as const;
 
 function lookup(word: string) {
-  return readAlbanianPronunciationObservationsV0_1(word, fixtureInput);
+  return readAlbanianPronunciationFixtureObservationsV0_1(word, fixtureInput);
 }
 
 describe("Albanian pronunciation source observation adapter v0.1", () => {
@@ -52,7 +54,7 @@ describe("Albanian pronunciation source observation adapter v0.1", () => {
       ALBANIAN_PRONUNCIATION_SOURCE_PROFILE_ID_V0_1,
     );
     expect(manifest.sourceLineNumbers).toEqual([1, 2, 3, 76]);
-    expect(verifyAlbanianPronunciationSourceArtifactV0_1(fixtureInput)).toEqual({
+    expect(verifyAlbanianPronunciationFixtureArtifactV0_1(fixtureInput)).toEqual({
       ok: true,
       artifactSha256: manifest.fixtureArtifact.sha256,
       artifactBytes: manifest.fixtureArtifact.bytes,
@@ -84,6 +86,9 @@ describe("Albanian pronunciation source observation adapter v0.1", () => {
       readArtifactSha256: manifest.fixtureArtifact.sha256,
       readArtifactBytes: manifest.fixtureArtifact.bytes,
       fixtureId: manifest.fixtureId,
+      authority: "NON_AUTHORITATIVE_FIXTURE",
+      frozenArtifactSha256: null,
+      frozenArtifactBytes: null,
     });
     expect(Object.keys(result.observations[0])).not.toEqual(
       expect.arrayContaining([
@@ -155,15 +160,45 @@ describe("Albanian pronunciation source observation adapter v0.1", () => {
     });
   });
 
-  it("fails closed when the read artifact identity does not match", () => {
+  it("pins authoritative verification to the frozen contract identity", () => {
     expect(
       readAlbanianPronunciationObservationsV0_1("de", {
-        ...fixtureInput,
-        expectedArtifactSha256: "0".repeat(64),
-      }),
+        artifactPath: FIXTURE_PATH,
+        expectedArtifactSha256: fixtureInput.expectedArtifactSha256,
+        expectedArtifactBytes: fixtureInput.expectedArtifactBytes,
+      } as unknown as { artifactPath: string }),
     ).toMatchObject({
       status: "null",
       reasonCode: "SOURCE_ARTIFACT_IDENTITY_MISMATCH",
+      observations: [],
+    });
+  });
+
+  it("fails closed when an artifact is missing or unreadable", () => {
+    const missingArtifact = {
+      artifactPath: join(process.cwd(), "tests/fixtures/missing-source.jsonl"),
+    };
+
+    expect(() => readAlbanianPronunciationObservationsV0_1("de", missingArtifact)).not.toThrow();
+    expect(readAlbanianPronunciationObservationsV0_1("de", missingArtifact)).toMatchObject({
+      status: "null",
+      outcome: "ARTIFACT_INVALID",
+      reasonCode: "SOURCE_ARTIFACT_READ_FAILURE",
+      observations: [],
+      artifact: {
+        ok: false,
+        reasonCode: "SOURCE_ARTIFACT_READ_FAILURE",
+        artifactSha256: null,
+        artifactBytes: null,
+      },
+    });
+
+    expect(readAlbanianPronunciationObservationsV0_1("de", {
+      artifactPath: process.cwd(),
+    })).toMatchObject({
+      status: "null",
+      outcome: "ARTIFACT_INVALID",
+      reasonCode: "SOURCE_ARTIFACT_READ_FAILURE",
       observations: [],
     });
   });
