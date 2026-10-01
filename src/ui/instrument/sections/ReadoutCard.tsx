@@ -1,15 +1,23 @@
 "use client";
 
 import React from "react";
-import type { TelemetryReadout, PresentOrMissing, Vowel } from "../../telemetry/types";
+import type {
+  TelemetryReadout,
+  PresentOrMissing,
+  SpokenPronunciationProvenanceV0_1VM,
+  Vowel,
+} from "../../telemetry/types";
 import { VoicePathCompare } from "../VoicePathCompare";
 import { PhoneticIpaPanelV0_1 } from "./PhoneticIpaPanel.v0.1";
 
 function renderPOM<T>(
-  pom: PresentOrMissing<T>,
+  pom: PresentOrMissing<T> | undefined,
   renderValue: (v: T) => React.ReactNode,
   fallbackLabel = "Not emitted by engine (yet)."
 ) {
+  if (!pom) {
+    return <span className="text-slate-500">{fallbackLabel}</span>;
+  }
   if (pom.kind === "present") return renderValue(pom.value);
   return (
     <span className="text-slate-500">
@@ -48,6 +56,25 @@ function StatusChip({ label, tone = "neutral" }: { label: string; tone?: "green"
       {label}
     </span>
   );
+}
+
+function pronunciationVariantStatus(value: SpokenPronunciationProvenanceV0_1VM): string {
+  if (value.status === "defined") {
+    return value.variants.length === 1
+      ? "single variant accepted"
+      : `${value.variants.length} variants agree on the canonical path`;
+  }
+
+  if (value.reasonCode === "PRONUNCIATION_VARIANT_AMBIGUOUS") {
+    return `${value.variants.length} variants unresolved; no winner selected`;
+  }
+
+  if (!value.variants.length) return "no pronunciation variant";
+  return `${value.variants.length} variants; spoken path is Null`;
+}
+
+function spokenPathText(path: Vowel[] | null): string {
+  return path?.length ? path.join(" → ") : "Null";
 }
 
 export function ReadoutCard({
@@ -140,6 +167,46 @@ export function ReadoutCard({
             </div>
 
             <VoicePathCompare surface={readout.voicePathSurface} functional={readout.voicePathFunctional} />
+
+            <div
+              data-testid="spoken-pronunciation-provenance"
+              className="mt-3 rounded-[9px] border border-[#355a7a] bg-[#111a24] p-3 text-xs text-[#d7dde7]"
+            >
+              <div className="font-semibold uppercase tracking-[0.12em] text-[#8ea4ba]">
+                Spoken pronunciation authority
+              </div>
+              {renderPOM(
+                readout.spokenPronunciation,
+                (pronunciation) => (
+                  <div className="mt-2 space-y-1.5 font-mono">
+                    <div>source profile: {pronunciation.sourceProfileId}</div>
+                    <div>notation: {pronunciation.sourceNotation}</div>
+                    <div>source revision: {pronunciation.sourceRevision}</div>
+                    <div>variant status: {pronunciationVariantStatus(pronunciation)}</div>
+                    <div>
+                      pronunciation: {pronunciation.variants.length
+                        ? pronunciation.variants
+                            .map((variant) => `${variant.sourceForm}: ${variant.sourcePronunciation}`)
+                            .join(" | ")
+                        : "Null"}
+                    </div>
+                    {pronunciation.status === "null" ? (
+                      <div className="text-amber-200">
+                        spoken path: Null ({pronunciation.reasonCode ?? "reason not emitted"})
+                      </div>
+                    ) : (
+                      <div className="text-emerald-200">
+                        spoken path: {spokenPathText(readout.voicePath.kind === "present" ? readout.voicePath.value : null)}
+                      </div>
+                    )}
+                  </div>
+                ),
+                "Spoken pronunciation provenance not emitted"
+              )}
+              <div className="mt-2 text-[11px] leading-5 text-[#9fb1bf]">
+                This source establishes pronunciation evidence only. Orthographic vowels remain separate compatibility evidence and are not spoken authority.
+              </div>
+            </div>
 
             <div className="mt-3">
               principles: {renderPOM(readout.principlesPath, (arr) => <span>{arr.join(" → ")}</span>)}
