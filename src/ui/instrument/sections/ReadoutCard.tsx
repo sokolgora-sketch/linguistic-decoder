@@ -4,11 +4,15 @@ import React from "react";
 import type {
   TelemetryReadout,
   PresentOrMissing,
-  SpokenPronunciationProvenanceV0_1VM,
   Vowel,
 } from "../../telemetry/types";
 import { VoicePathCompare } from "../VoicePathCompare";
 import { PhoneticIpaPanelV0_1 } from "./PhoneticIpaPanel.v0.1";
+import {
+  pronunciationVariantStatusV0_1,
+  spokenPronunciationPathTextV0_1,
+  spokenPronunciationSourceTextV0_1,
+} from "@/ui/instrument/spokenPronunciationPresentation.v0_1";
 
 function renderPOM<T>(
   pom: PresentOrMissing<T> | undefined,
@@ -56,25 +60,6 @@ function StatusChip({ label, tone = "neutral" }: { label: string; tone?: "green"
       {label}
     </span>
   );
-}
-
-function pronunciationVariantStatus(value: SpokenPronunciationProvenanceV0_1VM): string {
-  if (value.status === "defined") {
-    return value.variants.length === 1
-      ? "single variant accepted"
-      : `${value.variants.length} variants agree on the canonical path`;
-  }
-
-  if (value.reasonCode === "PRONUNCIATION_VARIANT_AMBIGUOUS") {
-    return `${value.variants.length} variants unresolved; no winner selected`;
-  }
-
-  if (!value.variants.length) return "no pronunciation variant";
-  return `${value.variants.length} variants; spoken path is Null`;
-}
-
-function spokenPathText(path: Vowel[] | null): string {
-  return path?.length ? path.join(" → ") : "Null";
 }
 
 export function ReadoutCard({
@@ -182,21 +167,15 @@ export function ReadoutCard({
                     <div>source profile: {pronunciation.sourceProfileId}</div>
                     <div>notation: {pronunciation.sourceNotation}</div>
                     <div>source revision: {pronunciation.sourceRevision}</div>
-                    <div>variant status: {pronunciationVariantStatus(pronunciation)}</div>
-                    <div>
-                      pronunciation: {pronunciation.variants.length
-                        ? pronunciation.variants
-                            .map((variant) => `${variant.sourceForm}: ${variant.sourcePronunciation}`)
-                            .join(" | ")
-                        : "Null"}
-                    </div>
+                    <div>variant status: {pronunciationVariantStatusV0_1(pronunciation)}</div>
+                    <div>pronunciation: {spokenPronunciationSourceTextV0_1(pronunciation)}</div>
                     {pronunciation.status === "null" ? (
                       <div className="text-amber-200">
                         spoken path: Null ({pronunciation.reasonCode ?? "reason not emitted"})
                       </div>
                     ) : (
                       <div className="text-emerald-200">
-                        spoken path: {spokenPathText(readout.voicePath.kind === "present" ? readout.voicePath.value : null)}
+                        spoken path: {spokenPronunciationPathTextV0_1(readout.voicePath.kind === "present" ? readout.voicePath.value : null)}
                       </div>
                     )}
                   </div>

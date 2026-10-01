@@ -88,6 +88,16 @@ async function main(): Promise<void> {
     console.log("CURRENT_ANALYSIS_PROVENANCE=PASS");
     console.log(`ANALYZE_REQUESTS_AFTER_FRESH=${analyzeRequests}`);
 
+    const defaultSpokenPronunciationSurface = page.getByTestId("spoken-pronunciation-overview");
+    await defaultSpokenPronunciationSurface.waitFor({ state: "visible" });
+    await defaultSpokenPronunciationSurface.getByText("Spoken pronunciation", { exact: true }).waitFor({ state: "visible" });
+    await defaultSpokenPronunciationSurface.getByText(/authority used for canonical spoken analysis/i).waitFor({ state: "visible" });
+    await defaultSpokenPronunciationSurface.getByText(/canonical spoken Voice path:/i).waitFor({ state: "visible" });
+    await defaultSpokenPronunciationSurface.getByText(/Orthographic vowel sequence:/i).waitFor({ state: "visible" });
+    const deterministicDetailsBeforeExpansion = page.getByTestId("deterministic-details");
+    assert(await deterministicDetailsBeforeExpansion.getAttribute("open") === null, "Deterministic details should remain collapsed for the default provenance check.");
+    console.log("DEFAULT_SPOKEN_PRONUNCIATION_SURFACE=PASS");
+
     const deterministicDetails = page.getByTestId("deterministic-details");
     await deterministicDetails.locator("summary").click();
     const spokenPronunciationSurface = deterministicDetails.getByTestId("spoken-pronunciation-provenance");
