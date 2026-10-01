@@ -424,6 +424,11 @@ exports[`ui telemetry vm contract v0.1.1 (candidates evidence lists) adapts cand
         },
       },
     },
+    "spokenPronunciation": {
+      "kind": "missing",
+      "missing": "not_emitted",
+      "note": "heartInstrumentV1.spokenPronunciation",
+    },
     "status": "detected",
     "strictInput": {
       "kind": "present",

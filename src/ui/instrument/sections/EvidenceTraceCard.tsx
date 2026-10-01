@@ -40,6 +40,18 @@ function rootMapStatus(rootMap: PresentOrMissing<RootMapVM> | undefined): string
   return rootMap.kind === "present" ? "present" : "not emitted";
 }
 
+function spokenPronunciationStatus(readout: TelemetryReadout): string {
+  const pronunciation = readout.spokenPronunciation;
+  if (!pronunciation) return "not emitted";
+  if (pronunciation.kind === "missing") return "not emitted";
+  if (pronunciation.value.status === "defined") {
+    return pronunciation.value.variants.length === 1
+      ? "defined; single variant"
+      : `defined; ${pronunciation.value.variants.length} variants agree`;
+  }
+  return `Null; ${pronunciation.value.reasonCode ?? "reason not emitted"}`;
+}
+
 function TraceRow({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex items-baseline justify-between gap-3 rounded-[8px] border border-[#27313d] bg-[#0d1117] px-3 py-2">
@@ -78,6 +90,7 @@ export function EvidenceTraceCard({
         <TraceRow label="input word" value={readout.word ? `word=${readout.word}` : "not emitted"} />
         <TraceRow label="normalized form" value={`norm=${pomText(readout.normalizedWord, String)}`} />
         <TraceRow label="Spoken / canonical Voice path" value={`path=${vowelPathText(readout.voicePath)}`} />
+        <TraceRow label="Spoken pronunciation authority" value={spokenPronunciationStatus(readout)} />
         <TraceRow label="Orthographic vowel sequence (non-authoritative)" value={`orthographic=${vowelPathText(readout.voicePathSurface)}`} />
         <TraceRow label="Functional / normalization path" value={`functional=${vowelPathText(readout.voicePathFunctional)}`} />
         <TraceRow label="path delta" value={`delta=${readout.voicePathDelta}`} />

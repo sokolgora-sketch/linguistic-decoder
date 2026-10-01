@@ -23,6 +23,8 @@ import type {
   RootMapVM,
   Vowel,
   PhoneticIpaV0_1VM,
+  SpokenPronunciationProvenanceV0_1VM,
+  SpokenPronunciationVariantV0_1VM,
   ResonanceProfileV1VM,
 } from "../telemetry/types";
 import {
@@ -913,9 +915,115 @@ export function adaptAnalysisToTelemetryVM(raw: unknown): TelemetryViewModel {
 // This prevents a surface U-Y reading from masking a DeepRoot functional U-I
 // reading and falsely reporting MATCH.
 
-const hiRootValue = getField(payload, "heartInstrumentV1");
-const hiRoot = isRecord(hiRootValue) ? hiRootValue : null;
-const hiSurfaceArr = hiRoot ? asStringArray(hiRoot["surfaceVowels"]) : null;
+  const hiRootValue = getField(payload, "heartInstrumentV1");
+  const hiRoot = isRecord(hiRootValue) ? hiRootValue : null;
+  const hiSurfaceArr = hiRoot ? asStringArray(hiRoot["surfaceVowels"]) : null;
+
+  const spokenPronunciation: PresentOrMissing<SpokenPronunciationProvenanceV0_1VM> = (() => {
+    if (!hiRoot) return missing("not_emitted", "heartInstrumentV1.spokenPronunciation");
+
+    const rawPronunciation = hiRoot["spokenPronunciation"];
+    if (rawPronunciation == null) {
+      return missing("not_emitted", "heartInstrumentV1.spokenPronunciation");
+    }
+    if (!isRecord(rawPronunciation)) {
+      return missing("malformed", "heartInstrumentV1.spokenPronunciation expected object");
+    }
+
+    const status = rawPronunciation["status"];
+    if (status !== "defined" && status !== "null") {
+      return missing("malformed", "spokenPronunciation.status expected defined|null");
+    }
+
+    const reasonCode = rawPronunciation["reasonCode"];
+    if (reasonCode !== null && typeof reasonCode !== "string") {
+      return missing("malformed", "spokenPronunciation.reasonCode expected string|null");
+    }
+
+    const normalizedWord = rawPronunciation["normalizedWord"];
+    const sourceProfileId = rawPronunciation["sourceProfileId"];
+    const sourceNotation = rawPronunciation["sourceNotation"];
+    const sourceRevision = rawPronunciation["sourceRevision"];
+    const rawVariants = rawPronunciation["variants"];
+
+    if (typeof normalizedWord !== "string") {
+      return missing("malformed", "spokenPronunciation.normalizedWord expected string");
+    }
+    if (typeof sourceProfileId !== "string" || !sourceProfileId.trim()) {
+      return missing("malformed", "spokenPronunciation.sourceProfileId expected string");
+    }
+    if (typeof sourceNotation !== "string" || !sourceNotation.trim()) {
+      return missing("malformed", "spokenPronunciation.sourceNotation expected string");
+    }
+    if (typeof sourceRevision !== "string" || !sourceRevision.trim()) {
+      return missing("malformed", "spokenPronunciation.sourceRevision expected string");
+    }
+    if (!Array.isArray(rawVariants)) {
+      return missing("malformed", "spokenPronunciation.variants expected array");
+    }
+
+    const variants: SpokenPronunciationVariantV0_1VM[] = [];
+    for (const [index, rawVariantResult] of rawVariants.entries()) {
+      if (!isRecord(rawVariantResult)) {
+        return missing("malformed", `spokenPronunciation.variants[${index}] expected object`);
+      }
+
+      const rawVariant = rawVariantResult["variant"];
+      if (!isRecord(rawVariant)) {
+        return missing("malformed", `spokenPronunciation.variants[${index}].variant expected object`);
+      }
+
+      const sourceForm = rawVariant["sourceForm"];
+      const sourcePronunciation = rawVariant["sourcePronunciation"];
+      const variantId = rawVariant["variantId"];
+      const variantOrder = rawVariant["variantOrder"];
+      const rawCanonicalPath = rawVariantResult["canonicalVoicePath"];
+      const variantReasonCode = rawVariantResult["reasonCode"];
+
+      if (typeof sourceForm !== "string" || !sourceForm.trim()) {
+        return missing("malformed", `spokenPronunciation.variants[${index}].variant.sourceForm expected string`);
+      }
+      if (typeof sourcePronunciation !== "string" || !sourcePronunciation.trim()) {
+        return missing("malformed", `spokenPronunciation.variants[${index}].variant.sourcePronunciation expected string`);
+      }
+      if (typeof variantId !== "string" || !variantId.trim()) {
+        return missing("malformed", `spokenPronunciation.variants[${index}].variant.variantId expected string`);
+      }
+      if (typeof variantOrder !== "number" || !Number.isInteger(variantOrder)) {
+        return missing("malformed", `spokenPronunciation.variants[${index}].variant.variantOrder expected integer`);
+      }
+      if (variantReasonCode !== null && typeof variantReasonCode !== "string") {
+        return missing("malformed", `spokenPronunciation.variants[${index}].reasonCode expected string|null`);
+      }
+
+      let canonicalVoicePath: Vowel[] | null = null;
+      if (rawCanonicalPath !== null && rawCanonicalPath !== undefined) {
+        canonicalVoicePath = toVoiceParts(rawCanonicalPath);
+        if (!canonicalVoicePath) {
+          return missing("malformed", `spokenPronunciation.variants[${index}].canonicalVoicePath expected Voice[]|null`);
+        }
+      }
+
+      variants.push({
+        sourceForm,
+        sourcePronunciation,
+        variantId,
+        variantOrder,
+        canonicalVoicePath,
+        reasonCode: variantReasonCode,
+      });
+    }
+
+    return present({
+      status,
+      reasonCode,
+      normalizedWord,
+      sourceProfileId,
+      sourceNotation,
+      sourceRevision,
+      variants,
+    });
+  })();
 
 // Evidence may exist at root or mirrored in raw.evidence (adapter must not touch later bindings).
 const evRootEvidenceValue = getField(payload, "evidence");
@@ -2004,6 +2112,7 @@ const originClaimGates: OriginClaimGatesVM = {
         ? present(principlesPath)
         : missing("not_emitted", "heart.principlePath | heart.math7.primary.principlesPath"),
       phoneticIpaV0_1,
+      spokenPronunciation,
       status,
       counts: {
         candidates: candidates.length,

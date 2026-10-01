@@ -102,6 +102,25 @@ export type PhoneticIpaV0_1VM = {
   unmapped: string[];
 };
 
+export type SpokenPronunciationVariantV0_1VM = Readonly<{
+  sourceForm: string;
+  sourcePronunciation: string;
+  variantId: string;
+  variantOrder: number;
+  canonicalVoicePath: Vowel[] | null;
+  reasonCode: string | null;
+}>;
+
+export type SpokenPronunciationProvenanceV0_1VM = Readonly<{
+  status: "defined" | "null";
+  reasonCode: string | null;
+  normalizedWord: string;
+  sourceProfileId: string;
+  sourceNotation: string;
+  sourceRevision: string;
+  variants: SpokenPronunciationVariantV0_1VM[];
+}>;
+
 export interface TelemetryReadout {
   word: string;
   normalizedWord: PresentOrMissing<string>;
@@ -112,7 +131,8 @@ export interface TelemetryReadout {
   createdAt: PresentOrMissing<string>;
   principlesPath: PresentOrMissing<string[]>;
 
-    phoneticIpaV0_1: PresentOrMissing<PhoneticIpaV0_1VM>;
+  phoneticIpaV0_1: PresentOrMissing<PhoneticIpaV0_1VM>;
+  spokenPronunciation: PresentOrMissing<SpokenPronunciationProvenanceV0_1VM>;
 
 voicePath: PresentOrMissing<Vowel[]>;
   voicePathSurface?: PresentOrMissing<Vowel[]>;

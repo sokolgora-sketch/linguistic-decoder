@@ -88,6 +88,16 @@ async function main(): Promise<void> {
     console.log("CURRENT_ANALYSIS_PROVENANCE=PASS");
     console.log(`ANALYZE_REQUESTS_AFTER_FRESH=${analyzeRequests}`);
 
+    const deterministicDetails = page.getByTestId("deterministic-details");
+    await deterministicDetails.locator("summary").click();
+    const spokenPronunciationSurface = deterministicDetails.getByTestId("spoken-pronunciation-provenance");
+    await spokenPronunciationSurface.waitFor({ state: "visible" });
+    await spokenPronunciationSurface.getByText("Spoken pronunciation authority", { exact: true }).waitFor({ state: "visible" });
+    await spokenPronunciationSurface.getByText("notation: ARPABET", { exact: true }).waitFor({ state: "visible" });
+    await spokenPronunciationSurface.getByText("source profile: open-instrument.cmudict-arpabet-en-us.v0_1", { exact: true }).waitFor({ state: "visible" });
+    await deterministicDetails.getByText(/Orthographic vowel sequence \(non-authoritative\)/i).waitFor({ state: "visible" });
+    console.log("SPOKEN_PRONUNCIATION_PROVENANCE_SURFACE=PASS");
+
     await page.getByRole("tab", { name: "Evidence" }).click();
     const evidenceDownloadPromise = page.waitForEvent("download", { timeout: PAGE_TIMEOUT_MS });
     await page.getByRole("button", { name: "Download Evidence Package" }).click();
