@@ -1,0 +1,19 @@
+{
+  "manifestVersion": "open-instrument.artifact-hash-manifest.v0_1",
+  "contractId": "OPEN_INSTRUMENT_FRD02_CVC_V0_1B_P4_METHODOLOGY_V0_1",
+  "artifacts": [
+    {
+      "path": "docs/open-instrument/frd02-cvc-v0.1b-p4-methodology-freeze-v0.1.md",
+      "sha256": "798278dbe0d3077700300dd9ad0c531dab422d3a46a7f488fc274b00ba74d5c9",
+      "byteLength": 14885
+    },
+    {
+      "path": "docs/open-instrument/research-artifacts/frd02-cvc-v0.1b-p4-methodology-freeze-v0.1/preregistration.json",
+      "sha256": "168ed4803d2a33690e88caf2d9bd138c0f0cd96bebd25248c0e1e63ab2927bea",
+      "byteLength": 19105
+    }
+  ],
+  "testPath": "tests/openInstrument.frd02CvcP4Methodology.v0_1.spec.ts",
+  "p4RunnerImplemented": false,
+  "calibrationExecuted": false
+}

@@ -1,0 +1,203 @@
+{
+  "schemaVersion": "open-instrument.frd02-cvc-v0.1b-p4-methodology.v0_1",
+  "contractId": "OPEN_INSTRUMENT_FRD02_CVC_V0_1B_P4_METHODOLOGY_V0_1",
+  "version": "v0.1",
+  "status": "FROZEN_P4_METHODOLOGY_CALIBRATION_NOT_EXECUTED",
+  "title": "FRD-02 CVC v0.1b P4 Synthetic Calibration Methodology",
+  "repository": {
+    "identity": "sokolgora-sketch/linguistic-decoder",
+    "baselineMainSha": "7aa7da20478be67d688afd4c2c3337ada88f59ee"
+  },
+  "parentBindings": {
+    "parentContract": [
+      {
+        "path": "/tmp/open-instrument-frd02-cvc-experimental-contract-v0-1b-20260927.md",
+        "sha256": "3c6e2d64769d3138d47f50b5e758a40080a6b502a6c9c6cb9db30ce1a0b4de94",
+        "byteLength": 14074
+      },
+      {
+        "path": "/tmp/open-instrument-frd02-cvc-experimental-contract-v0-1b-20260927.json",
+        "sha256": "dbca018b9ccfbc5462c65993c5090cd864c5eff457eee38f10cfbd187224c563",
+        "byteLength": 14241
+      }
+    ],
+    "p3AmendmentSha256": "77038ccc5406da0f6970fab2c667ea131955057abc1907f0f59e61180e306129",
+    "generatorContractSha256": "571ef6f139442b086887fb847097aff13edb53dea835b64c97b0b1fbf46a7a8d",
+    "analyzerContractSha256": "3cf7076b5f9685990891ad6333a89b75aa8823d977664f2c9bffe2364d63608e"
+  },
+  "executionBoundary": {
+    "thisArtifactIs": "p4_methodology_preregistration_only",
+    "p4MethodologyFrozen": true,
+    "p4RunnerImplemented": false,
+    "calibrationExecuted": false,
+    "realDataExecutionAuthorized": false,
+    "semanticInterpretationAuthorized": false,
+    "productionAuthorityChanged": false,
+    "newP4ScientificChoicesRequiredBeforeImplementation": false
+  },
+  "inheritedParentRequirements": [
+    "CVC_FRAME",
+    "ORDERED_TWO_SIDED_CONFIGURATION",
+    "PARENT_CONDITIONING_CONTROL_STRUCTURE",
+    "STRUCTURAL_ZERO_MASK_C_L_NE_C_R",
+    "EXACT_GROUP_WEIGHTED_MARGINALS",
+    "EXACT_STRUCTURAL_ZERO_PROFILE_BIJECTION",
+    "EXACT_MATCHING_AND_COUNTING",
+    "UINT128_BIGINT_ARITHMETIC",
+    "EXISTING_GATE_A_SEMANTICS",
+    "EXISTING_STATISTIC",
+    "EXISTING_FINITE_NULL_BRANCHES",
+    "EXISTING_OUTCOME_HIERARCHY",
+    "NO_SEMANTICS",
+    "NO_LEXICAL_FUNCTION_CLAIM",
+    "NO_REAL_DATA_CLAIM",
+    "NO_PRODUCTION_CLAIM"
+  ],
+  "recordSchema": {
+    "requiredFields": [
+      "recordId",
+      "fixtureId",
+      "replicateId",
+      "independenceGroupId",
+      "C_L",
+      "V",
+      "C_R",
+      "P",
+      "stratumId",
+      "stableSlotId",
+      "tokenLengthClass",
+      "geometryClass",
+      "clusterAdjacent"
+    ],
+    "optionalFields": ["topology"],
+    "unauthorizedTruthFields": ["expectedOutcome", "expectedGate", "expectedPValue", "fixtureTruth"]
+  },
+  "strata": [
+    { "id": "S0", "voice": "V0", "position": "P0" },
+    { "id": "S1", "voice": "V1", "position": "P0" },
+    { "id": "S2", "voice": "V2", "position": "P0" },
+    { "id": "S3", "voice": "V3", "position": "P0" },
+    { "id": "S4", "voice": "V0", "position": "P1" },
+    { "id": "S5", "voice": "V0", "position": "P2" },
+    { "id": "S6", "voice": "V0", "position": "P3" },
+    { "id": "S7", "voice": "V4", "position": "P4" },
+    { "id": "S8", "voice": "V5", "position": "P5" },
+    { "id": "S9", "voice": "V6", "position": "P5" },
+    { "id": "S10", "voice": "V1", "position": "P2" },
+    { "id": "S11", "voice": "V2", "position": "P4" }
+  ],
+  "commonConstruction": {
+    "groupCount": 96,
+    "groupIdFormula": "g + zero-padded decimal group index width 3",
+    "oneRecordPerGroupStratum": true,
+    "recordIdFormula": "<fixtureId>-<replicateId>-<groupId>-<stratumId>-slot-0",
+    "stableSlotId": "slot-0",
+    "tokenLengthClass": "4-6",
+    "geometryClass": "shared",
+    "clusterAdjacentDefault": false,
+    "identityCycle": {
+      "cycle": "groupIndex mod 4",
+      "left": { "0": "L0", "1": "L0", "2": "L1", "3": "L1" },
+      "right": { "0": "R0", "1": "R0", "2": "R1", "3": "R1" }
+    }
+  },
+  "clusterAdjacent": {
+    "kind": "generated_truth_boolean",
+    "inputField": "clusterAdjacent",
+    "trueMeaning": "fixture recipe explicitly marks the record for adjacency exclusion",
+    "falseMeaning": "record is not in the synthetic adjacency exclusion set",
+    "noHeuristicDerivation": true,
+    "filterOrder": ["clusterAdjacent", "C_L_NE_C_R", "group_stratum_weighting", "Gate_A", "P2"],
+    "trueFixtures": ["C1", "E1"],
+    "allOtherFixturesDefaultFalse": true,
+    "affectsWeightingAfterFiltering": false,
+    "affectsGroupingAfterFiltering": false,
+    "empiricalLinguisticMeaning": false
+  },
+  "fixtureIds": [
+    "N0", "N1", "N2", "N3", "N4", "N5", "N6", "N7", "N8", "N9", "N10", "N11",
+    "N11_ORDERED", "N11_ORDER_DESTROYED", "N12", "N13", "E1", "E2", "E3",
+    "C0", "C1", "C2", "C3", "C4", "C5", "C6", "C7", "C8", "C9"
+  ],
+  "fixtures": [
+    { "id": "N0", "family": "neutral", "purpose": "balanced no-interaction baseline", "construction": "commonConstruction with orthogonal two-by-two identity cycle", "constructedTruth": "no ordered joint interaction", "expectedGateState": "PASS", "expectedP2State": "READY", "expectedOutcome": ["NULL"], "invalidatingCondition": "support outcome or invalid run" },
+    { "id": "N1", "family": "neutral", "purpose": "record-order invariance", "construction": "N0 records emitted in reverse record order before canonical sorting", "constructedTruth": "same as N0", "expectedGateState": "PASS", "expectedP2State": "READY", "expectedOutcome": ["NULL"], "invalidatingCondition": "digest differs from N0" },
+    { "id": "N2", "family": "neutral", "purpose": "group-order invariance", "construction": "N0 groups enumerated in reverse before canonical sorting", "constructedTruth": "same as N0", "expectedGateState": "PASS", "expectedP2State": "READY", "expectedOutcome": ["NULL"], "invalidatingCondition": "digest differs from N0" },
+    { "id": "N3", "family": "neutral", "purpose": "stratum-order invariance", "construction": "N0 strata emitted in reverse before canonical sorting", "constructedTruth": "same as N0", "expectedGateState": "PASS", "expectedP2State": "READY", "expectedOutcome": ["NULL"], "invalidatingCondition": "digest differs from N0" },
+    { "id": "N4", "family": "neutral", "purpose": "stable-slot ordering", "construction": "N0 stable-slot labels bijectively renamed without changing slot multiplicity", "constructedTruth": "same as N0", "expectedGateState": "PASS", "expectedP2State": "READY", "expectedOutcome": ["NULL"], "invalidatingCondition": "slot ordering is not canonical" },
+    { "id": "N5", "family": "neutral", "purpose": "geometry label invariance", "construction": "N0 geometry label replaced by one bijective label", "constructedTruth": "same as N0", "expectedGateState": "PASS", "expectedP2State": "READY", "expectedOutcome": ["NULL"], "invalidatingCondition": "geometry relabel changes result" },
+    { "id": "N6", "family": "neutral", "purpose": "token-length label invariance", "construction": "N0 token-length label replaced by one bijective label", "constructedTruth": "same as N0", "expectedGateState": "PASS", "expectedP2State": "READY", "expectedOutcome": ["NULL"], "invalidatingCondition": "token relabel changes result" },
+    { "id": "N7", "family": "neutral", "purpose": "topology representation control", "construction": "N0 with explicit neutral topology label", "constructedTruth": "same as N0", "expectedGateState": "PASS", "expectedP2State": "READY", "expectedOutcome": ["NULL"], "invalidatingCondition": "topology changes analyzer truth" },
+    { "id": "N8", "family": "neutral", "purpose": "left identity bijection", "construction": "N0 with L0/L1 bijectively exchanged", "constructedTruth": "same as N0", "expectedGateState": "PASS", "expectedP2State": "READY", "expectedOutcome": ["NULL"], "invalidatingCondition": "bijection changes outcome class" },
+    { "id": "N9", "family": "neutral", "purpose": "right identity bijection", "construction": "N0 with R0/R1 bijectively exchanged", "constructedTruth": "same as N0", "expectedGateState": "PASS", "expectedP2State": "READY", "expectedOutcome": ["NULL"], "invalidatingCondition": "bijection changes outcome class" },
+    { "id": "N10", "family": "neutral", "purpose": "balanced orthogonal identity cycle", "construction": "four-cycle with one R0/R1 observation for each left identity in every stratum", "constructedTruth": "no joint interaction", "expectedGateState": "PASS", "expectedP2State": "READY", "expectedOutcome": ["NULL"], "invalidatingCondition": "support outcome" },
+    { "id": "N11", "family": "neutral_pair", "purpose": "parent N11 pair container", "construction": "paired N11_ORDERED and N11_ORDER_DESTROYED only", "constructedTruth": "comparison control, not independently analyzed", "expectedGateState": "PASS", "expectedP2State": "READY", "expectedOutcome": ["CVC_CONFIGURATIONAL_SUPPORT", "NULL"], "invalidatingCondition": "pair is incomplete" },
+    { "id": "N11_ORDERED", "family": "positive_control", "purpose": "known ordered joint interaction", "construction": "commonConstruction with L0,L0,L1,L1 and R0,R0,R1,R1 per stratum", "constructedTruth": "positive ordered interaction", "expectedGateState": "PASS", "expectedP2State": "READY", "expectedOutcome": ["CVC_CONFIGURATIONAL_SUPPORT"], "invalidatingCondition": "not all eight replicates support" },
+    { "id": "N11_ORDER_DESTROYED", "family": "negative_pair_control", "purpose": "destroy ordered interaction while preserving marginals", "construction": "same records and marginals as ordered; right sequence R0,R1,R1,R0 per stratum", "constructedTruth": "ordered interaction destroyed", "expectedGateState": "PASS", "expectedP2State": "READY", "expectedOutcome": ["NULL", "INSUFFICIENT_EVIDENCE"], "invalidatingCondition": "any replicate classified as support" },
+    { "id": "N12", "family": "neutral_p2", "purpose": "exact-null exhaustive boundary", "construction": "profile generator targets exactly 10000 admissible null realizations", "constructedTruth": "no ordered interaction", "expectedGateState": "PASS", "expectedP2State": "EXHAUSTIVE", "expectedOutcome": ["NULL"], "invalidatingCondition": "branch is not EXHAUSTIVE" },
+    { "id": "N13", "family": "neutral_p2", "purpose": "exact-null Monte Carlo boundary", "construction": "profile generator targets exactly 10001 admissible null realizations", "constructedTruth": "no ordered interaction", "expectedGateState": "PASS", "expectedP2State": "MONTE_CARLO", "expectedOutcome": ["NULL"], "invalidatingCondition": "branch or draw count differs" },
+    { "id": "E1", "family": "edge", "purpose": "adjacency exclusion", "construction": "one marked record in an otherwise valid extra group", "constructedTruth": "marked row is excluded before masking", "expectedGateState": "PASS", "expectedP2State": "READY", "expectedOutcome": ["NULL"], "invalidatingCondition": "marked row changes retained baseline metrics" },
+    { "id": "E2", "family": "edge", "purpose": "only observed exact-null realization", "construction": "smallest valid profile with only observed admissible realization", "constructedTruth": "finite-null branch is unavailable", "expectedGateState": "PASS", "expectedP2State": "ONLY_OBSERVED_REALIZATION", "expectedOutcome": ["INSUFFICIENT_EVIDENCE"], "invalidatingCondition": "support outcome" },
+    { "id": "E3", "family": "edge", "purpose": "P2 resource/computational failure", "construction": "valid profile exceeding existing exact-count resource ceiling", "constructedTruth": "P2 cannot produce an exact null result under its frozen resource boundary", "expectedGateState": "PASS", "expectedP2State": "FAILURE", "expectedOutcome": ["INSUFFICIENT_EVIDENCE"], "invalidatingCondition": "resource failure is silently converted to support" },
+    { "id": "C0", "family": "failure_control", "purpose": "valid baseline", "construction": "N0 baseline", "constructedTruth": "no ordered interaction", "expectedGateState": "PASS", "expectedP2State": "READY", "expectedOutcome": ["NULL"], "invalidatingCondition": "support or invalid run" },
+    { "id": "C1", "family": "failure_control", "purpose": "cluster filtering", "construction": "one clusterAdjacent=true row plus valid baseline", "constructedTruth": "cluster row excluded before all later stages", "expectedGateState": "PASS", "expectedP2State": "READY", "expectedOutcome": ["NULL"], "invalidatingCondition": "row survives normalization" },
+    { "id": "C2", "family": "failure_control", "purpose": "structural-zero repeated frame", "construction": "one C_L=C_R row plus valid baseline", "constructedTruth": "repeated frame excluded after cluster filtering", "expectedGateState": "PASS", "expectedP2State": "READY", "expectedOutcome": ["NULL"], "invalidatingCondition": "repeated row survives or changes baseline" },
+    { "id": "C3", "family": "failure_control", "purpose": "minimum eligible groups", "construction": "79 eligible groups across all strata", "constructedTruth": "Gate A group minimum fails", "expectedGateState": "MINIMUM_ELIGIBLE_GROUPS_NOT_MET", "expectedP2State": "NOT_RUN", "expectedOutcome": ["INSUFFICIENT_EVIDENCE"], "invalidatingCondition": "P2 runs or support is emitted" },
+    { "id": "C4", "family": "failure_control", "purpose": "minimum V×P strata", "construction": "11 of 12 strata retained", "constructedTruth": "Gate A V×P stratum minimum fails", "expectedGateState": "MINIMUM_VXP_STRATA_NOT_MET", "expectedP2State": "NOT_RUN", "expectedOutcome": ["INSUFFICIENT_EVIDENCE"], "invalidatingCondition": "Gate A passes" },
+    { "id": "C5", "family": "failure_control", "purpose": "groups per stratum", "construction": "three groups in one included stratum", "constructedTruth": "Gate A per-stratum minimum fails", "expectedGateState": "MINIMUM_GROUPS_PER_STRATUM_NOT_MET", "expectedP2State": "NOT_RUN", "expectedOutcome": ["INSUFFICIENT_EVIDENCE"], "invalidatingCondition": "Gate A passes" },
+    { "id": "C6", "family": "failure_control", "purpose": "left/right identity diversity", "construction": "left-constant and right-constant subcases", "constructedTruth": "corresponding distinct-identity Gate A criterion fails", "expectedGateState": ["MINIMUM_DISTINCT_LEFT_IDENTITIES_NOT_MET", "MINIMUM_DISTINCT_RIGHT_IDENTITIES_NOT_MET"], "expectedP2State": "NOT_RUN", "expectedOutcome": ["INSUFFICIENT_EVIDENCE"], "invalidatingCondition": "Gate A passes" },
+    { "id": "C7", "family": "failure_control", "purpose": "Voice and position coverage", "construction": "missing-voice and missing-position subcases", "constructedTruth": "corresponding coverage Gate A criterion fails", "expectedGateState": ["VOICE_COVERAGE_MINIMUM_NOT_MET", "POSITION_COVERAGE_MINIMUM_NOT_MET"], "expectedP2State": "NOT_RUN", "expectedOutcome": ["INSUFFICIENT_EVIDENCE"], "invalidatingCondition": "Gate A passes" },
+    { "id": "C8", "family": "failure_control", "purpose": "sparsity and concentration", "construction": "rare-identity and concentrated-group subcases", "constructedTruth": "Gate A detects sparse or confounded structure", "expectedGateState": ["RARE_IDENTITY_SPARSE_THRESHOLD_EXCEEDED", "CONCENTRATION_CONFOUND_THRESHOLD_EXCEEDED"], "expectedP2State": "NOT_RUN", "expectedOutcome": ["SPARSE", "STRUCTURAL_BUT_CONFOUNDED"], "invalidatingCondition": "support outcome" },
+    { "id": "C9", "family": "failure_control", "purpose": "exchangeability minimum", "construction": "29-group exchangeability pool", "constructedTruth": "Gate A exchangeability minimum fails", "expectedGateState": "EXCHANGEABILITY_MINIMUM_NOT_MET", "expectedP2State": "NOT_RUN", "expectedOutcome": ["INSUFFICIENT_EVIDENCE"], "invalidatingCondition": "Gate A passes" }
+  ],
+  "positiveControl": {
+    "fixtureId": "N11_ORDERED",
+    "pairedDestroyedFixtureId": "N11_ORDER_DESTROYED",
+    "groupCount": 96,
+    "cycle": "groupIndex mod 4",
+    "leftSequence": ["L0", "L0", "L1", "L1"],
+    "orderedRightSequence": ["R0", "R0", "R1", "R1"],
+    "destroyedRightSequence": ["R0", "R1", "R1", "R0"],
+    "preserved": ["record_count", "group_ids", "strata", "V", "P", "left_marginals", "right_marginals", "weights", "eligibility", "Gate_A_inputs"],
+    "destroyed": ["ordered_left_right_cooccurrence"],
+    "expectedDirection": "statistic(N11_ORDERED) > statistic(N11_ORDER_DESTROYED)"
+  },
+  "replicateSchedule": {
+    "masterSeed": "FRD02_CVC_V0_1B_P4_MASTER_0",
+    "seedAuthority": "canonicalSeedTupleV0_1B(fixtureId, replicateId, permutation-primary) and seedWordsV0_1B",
+    "fixtureOrder": "fixtureIds array order",
+    "replicateIds": ["0", "1", "2", "3", "4", "5", "6", "7"],
+    "replicatesPerFixture": 8,
+    "totalEvaluations": 232,
+    "adaptiveReplication": false,
+    "replacementReplicates": false,
+    "resourceCeiling": { "maxFixtureReplicateEvaluations": 232, "existingP2LimitsRemainBinding": true, "monteCarloDraws": 10000 },
+    "invalidReplicate": "CALIBRATION_INVALID_AND_NO_REPLACEMENT",
+    "runtimeFailure": "CALIBRATION_INVALID_AND_AGGREGATE_INVALID"
+  },
+  "acceptance": {
+    "methodologyOutcomes": ["CALIBRATION_PASS", "CALIBRATION_FAIL", "CALIBRATION_INVALID"],
+    "perFixture": ["schema_valid", "identity_valid", "seed_valid", "expected_filtering", "expected_Gate_A_or_reason", "expected_P2_branch_or_reason", "expected_outcome_class", "no_forbidden_support"],
+    "positiveControl": { "orderedSupportReplicates": 8, "destroyedSupportReplicates": 0, "required": true },
+    "aggregate": ["all_232_valid", "all_C0_C9_pass", "all_neutral_controls_no_support", "N12_EXHAUSTIVE", "N13_MONTE_CARLO_10000_DRAWS", "N11_pair_acceptance", "replay_hashes_identical"],
+    "validUnexpectedOutcome": "CALIBRATION_FAIL",
+    "schemaSeedResourceRuntimeFailure": "CALIBRATION_INVALID",
+    "realHypothesisInterpretation": "NOT_AUTHORIZED"
+  },
+  "redesignRule": {
+    "immutableAfterExecutionBegins": ["fixture_definitions", "clusterAdjacent_truth", "seeds", "replicate_counts", "expected_outcomes", "thresholds", "serialization"],
+    "failureHandling": "do_not_silently_revise_or_rerun",
+    "newVersionRequiredForMethodologicalDefect": true,
+    "scientificallyInconvenientValidFailureRemainsFailure": true
+  },
+  "runnerContract": {
+    "input": "ordered fixture manifest plus replicate identity and existing SyntheticStructuralRecordV0_1B records",
+    "outputPerReplicate": ["fixtureId", "replicateId", "inputSha256", "seedTuple", "seedWords", "normalization", "gateA", "gateB", "statistic", "pValue", "outcome", "reason"],
+    "outputAggregate": ["contractId", "manifestSha256", "replicateResults", "acceptance", "calibrationOutcome"],
+    "serialization": "canonical JSON with contract-defined array order and UTF-8 byte ordering; no locale sorting",
+    "failureReasonCategories": ["FIXTURE_SCHEMA_INVALID", "FIXTURE_EXPECTATION_MISMATCH", "SEED_DERIVATION_MISMATCH", "OUTPUT_NONDETERMINISTIC", "RESOURCE_LIMIT_EXCEEDED", "RUNTIME_FAILURE", "HASH_MISMATCH"],
+    "manifestRequirements": ["human_contract_sha256", "machine_contract_sha256", "parent_hash_bindings", "fixture_order", "replicate_schedule", "input_and_output_hashes"]
+  },
+  "nonClaims": ["FRD02_SUPPORT", "FRD02_NULL", "CVC_CONFIGURATIONAL_SUPPORT_AS_REAL_DATA", "CONSONANT_FUNCTION", "LEXICAL_FUNCTION", "SEMANTICS", "HISTORICAL_ORIGIN", "PRODUCTION_AUTHORITY"],
+  "nextLane": "FRD02_P4_IMPLEMENTATION_AND_VALIDATION"
+}
