@@ -40,6 +40,7 @@ import { DeepRootHeartGateSummaryCard } from "./DeepRootHeartGateSummaryCard";
 import { EmbryoExpansionContextCardV0_1 } from "./sections/EmbryoExpansionContextCard.v0_1";
 import { DoctrineReadingCard } from "./sections/DoctrineReadingCard.v0.1";
 import { PrimaryReadingOrientationCardV0_1 } from "./sections/PrimaryReadingOrientationCard.v0_1";
+import { SpokenPronunciationOverviewCardV0_1 } from "./sections/SpokenPronunciationOverviewCard.v0_1";
 import { OriginClaimCard } from '@/components/OriginClaimCard';
 import { cn } from "@/lib/utils";
 import { safeText } from "./safeText";
@@ -539,6 +540,8 @@ export function InstrumentPanel(props: Props) {
                 delta={vm.readout.voicePathDelta}
                 normalizationSteps={vm.evidence?.normalizationSteps}
               />
+
+              <SpokenPronunciationOverviewCardV0_1 readout={vm.readout} />
 
               <details
                 data-testid="deterministic-details"
