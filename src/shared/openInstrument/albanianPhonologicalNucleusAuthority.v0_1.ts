@@ -147,6 +147,8 @@ export const ALBANIAN_PROFILE_EXPANSION_CATEGORY_RULES_V0_1 = deepFreeze({
       a: "LOW_CENTRAL_OR_BACK",
     },
     phoneticRelations: {
+      e: "MID_FRONT_UNROUNDED",
+      "ɔ": "MID_BACK_ROUNDED",
       ʏ: "HIGH_FRONT_ROUNDED",
       ä: "LOW_CENTRAL_OR_BACK",
       ɑ: "LOW_CENTRAL_OR_BACK",

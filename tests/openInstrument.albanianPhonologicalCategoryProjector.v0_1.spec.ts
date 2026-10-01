@@ -92,6 +92,25 @@ describe("Albanian phonological category projector v0.1", () => {
       ),
     ).toMatchObject({ status: "SUPPORTED", categories: ["HIGH_FRONT_ROUNDED"] });
 
+    for (const [rawIpa, category] of [
+      ["[e]", "MID_FRONT_UNROUNDED"],
+      ["[ɔ]", "MID_BACK_ROUNDED"],
+    ] as const) {
+      expect(
+        projectAlbanianPronunciationSourceObservationV0_1(
+          observation(rawIpa, {
+            sourceScope: "ALBANIAN_UNSPECIFIED",
+            sourceProfileQualifier: "NORTHERN_TOSK_EXPLICIT",
+            directTags: ["Northern", "Tosk"],
+          }),
+        ),
+      ).toMatchObject({
+        status: "SUPPORTED",
+        categories: [category],
+        authorityRefs: ["JIPA-NORTHERN-TOSK-ALBANIAN"],
+      });
+    }
+
     for (const rawIpa of ["[ä]", "[ä]"]) {
       expect(
         projectAlbanianPronunciationSourceObservationV0_1(
@@ -121,6 +140,20 @@ describe("Albanian phonological category projector v0.1", () => {
     expect(
       projectAlbanianPronunciationSourceObservationV0_1(
         observation("/ə/", {
+          sourceScope: "ALBANIAN_UNSPECIFIED",
+          sourceProfileQualifier: "SOUTHERN_GHEG_EXPLICIT",
+          directTags: ["Gheg", "Southern"],
+        }),
+      ),
+    ).toMatchObject({
+      status: "UNRESOLVED",
+      categories: [null],
+      reasonCodes: expect.arrayContaining(["SYMBOL_AUTHORITY_MISSING"]),
+    });
+
+    expect(
+      projectAlbanianPronunciationSourceObservationV0_1(
+        observation("[ɛ]", {
           sourceScope: "ALBANIAN_UNSPECIFIED",
           sourceProfileQualifier: "SOUTHERN_GHEG_EXPLICIT",
           directTags: ["Gheg", "Southern"],
