@@ -71,14 +71,17 @@ export function SpokenPronunciationOverviewCardV0_1({
                 <dd className="inline">{pronunciation.value.sourceNotation}</dd>
               </div>
               <div>
-                <dt className="inline text-[#8ea4ba]">revision: </dt>
-                <dd className="inline break-all">{pronunciation.value.sourceRevision}</dd>
-              </div>
-              <div>
                 <dt className="inline text-[#8ea4ba]">variant status: </dt>
                 <dd className="inline">{pronunciationVariantStatusV0_1(pronunciation.value)}</dd>
               </div>
             </dl>
+            <div
+              data-testid="spoken-pronunciation-revision"
+              className="mt-2 border-t border-[#27313d] pt-2 text-[10px] leading-4 text-[#7f8b99]"
+            >
+              <span className="mr-1 uppercase tracking-[0.08em]">Source revision:</span>
+              <span className="break-all font-mono">{pronunciation.value.sourceRevision}</span>
+            </div>
           </div>
 
           <div className="rounded-lg border border-[#27313d] bg-[#0d1117] p-3">

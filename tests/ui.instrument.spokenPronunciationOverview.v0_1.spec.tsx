@@ -24,6 +24,11 @@ describe("spoken pronunciation default Overview surface v0.1", () => {
     expect(within(overview).getByText(/stone: .*OW1/)).toBeVisible();
     expect(within(overview).getByText("open-instrument.cmudict-arpabet-en-us.v0_1")).toBeVisible();
     expect(within(overview).getByText("ARPABET")).toBeVisible();
+    const revision = within(overview).getByTestId("spoken-pronunciation-revision");
+    expect(revision).toBeVisible();
+    expect(revision).toHaveClass("text-[10px]", "text-[#7f8b99]");
+    expect(revision.closest("dl")).toBeNull();
+    expect(within(revision).getByText("74790861f652b15e4ac49015a90074ad62a27690")).toBeVisible();
     expect(within(overview).getByText("canonical spoken Voice path: O → U")).toBeVisible();
     expect(within(overview).getByText(/Orthographic vowel sequence:.*non-authoritative/i)).toBeVisible();
     expect(screen.getByTestId("deterministic-details")).not.toHaveAttribute("open");
