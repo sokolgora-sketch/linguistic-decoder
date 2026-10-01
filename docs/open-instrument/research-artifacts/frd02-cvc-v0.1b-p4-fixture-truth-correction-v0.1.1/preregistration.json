@@ -1,0 +1,94 @@
+{
+  "schemaVersion": "open-instrument.frd02-cvc-v0.1b-p4-fixture-truth-correction.v0_1_1",
+  "contractId": "OPEN_INSTRUMENT_FRD02_CVC_V0_1B_P4_FIXTURE_TRUTH_CORRECTION_V0_1_1",
+  "version": "v0.1.1",
+  "status": "FROZEN_P4_FIXTURE_TRUTH_CORRECTION_IMPLEMENTATION_NOT_EXECUTED",
+  "repository": {
+    "identity": "sokolgora-sketch/linguistic-decoder",
+    "historicalP4FreezeHumanSha256": "798278dbe0d3077700300dd9ad0c531dab422d3a46a7f488fc274b00ba74d5c9",
+    "historicalP4FreezeMachineSha256": "168ed4803d2a33690e88caf2d9bd138c0f0cd96bebd25248c0e1e63ab2927bea"
+  },
+  "provenance": {
+    "discoveredAfterHistoricalFreeze": true,
+    "discoveredBeforeP4Implementation": true,
+    "discoveredBeforeCalibration": true,
+    "calibrationResultExisted": false,
+    "realDataExecuted": false,
+    "semanticInterpretationOccurred": false,
+    "resultInformedTuning": false,
+    "correctionScope": "common_default_identity_construction_only"
+  },
+  "commonConstruction": {
+    "groupCount": 96,
+    "stratumCount": 12,
+    "cycle": "groupIndex mod 4",
+    "leftByCycle": { "0": "L0", "1": "L0", "2": "L1", "3": "L1" },
+    "rightByCycle": { "0": "R0", "1": "R1", "2": "R0", "3": "R1" },
+    "jointTablePerStratum": {
+      "L0": { "R0": 24, "R1": 24 },
+      "L1": { "R0": 24, "R1": 24 }
+    },
+    "truth": "NO_ORDERED_INTERACTION"
+  },
+  "n11": {
+    "ordered": {
+      "leftSequence": ["L0", "L0", "L1", "L1"],
+      "rightSequence": ["R0", "R0", "R1", "R1"],
+      "jointTablePerStratum": {
+        "L0": { "R0": 48, "R1": 0 },
+        "L1": { "R0": 0, "R1": 48 }
+      },
+      "truth": "KNOWN_ORDERED_JOINT_INTERACTION"
+    },
+    "destroyed": {
+      "leftSequence": ["L0", "L0", "L1", "L1"],
+      "rightSequence": ["R0", "R1", "R1", "R0"],
+      "jointTablePerStratum": {
+        "L0": { "R0": 24, "R1": 24 },
+        "L1": { "R0": 24, "R1": 24 }
+      },
+      "truth": "ORDERED_JOINT_INTERACTION_DESTROYED"
+    }
+  },
+  "preservedControls": {
+    "recordCountPerFixture": 1152,
+    "groupCount": 96,
+    "strata": 12,
+    "leftMarginalsPerStratum": { "L0": 48, "L1": 48 },
+    "rightMarginalsPerStratum": { "R0": 48, "R1": 48 },
+    "voicePositionCoverage": true,
+    "weights": "existing_group_stratum_weights",
+    "eligibility": "existing_parent_eligibility",
+    "structuralZero": "C_L_NE_C_R",
+    "geometryClass": "shared",
+    "tokenLengthClass": "4-6",
+    "gateAInputs": "preserved"
+  },
+  "fixtureImpact": {
+    "commonCorrected": ["N0", "N1", "N2", "N3", "N4", "N5", "N6", "N7", "N8", "N9", "N10", "E1", "C0", "C1", "C2", "C3", "C4", "C5", "C6", "C7", "C8", "C9"],
+    "constructionUnchanged": ["N11_ORDERED", "N11_ORDER_DESTROYED", "N12", "N13", "E2", "E3"],
+    "fixtureCount": 29,
+    "purposesChanged": false,
+    "expectedGateOrP2BehaviorChanged": false,
+    "allowedOutcomesChanged": false,
+    "invalidatingConditionsChanged": false
+  },
+  "frozenUnrelatedChoices": {
+    "clusterAdjacentChanged": false,
+    "replicatesPerFixture": 8,
+    "replicateIds": ["0", "1", "2", "3", "4", "5", "6", "7"],
+    "totalEvaluations": 232,
+    "seedConstructionChanged": false,
+    "acceptanceOutcomes": ["CALIBRATION_PASS", "CALIBRATION_FAIL", "CALIBRATION_INVALID"],
+    "adaptiveReplication": false,
+    "replacementReplicates": false
+  },
+  "implementationBoundary": {
+    "p4RunnerImplemented": false,
+    "calibrationExecuted": false,
+    "realDataExecutionAuthorized": false,
+    "semanticInterpretationAuthorized": false,
+    "productionAuthorityChanged": false,
+    "nextLane": "FRD02_P4_IMPLEMENTATION_AND_VALIDATION"
+  }
+}

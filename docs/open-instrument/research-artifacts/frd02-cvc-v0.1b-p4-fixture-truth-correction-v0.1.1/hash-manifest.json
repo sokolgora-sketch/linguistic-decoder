@@ -1,0 +1,20 @@
+{
+  "manifestVersion": "open-instrument.artifact-hash-manifest.v0_1",
+  "correctionContractId": "OPEN_INSTRUMENT_FRD02_CVC_V0_1B_P4_FIXTURE_TRUTH_CORRECTION_V0_1_1",
+  "supersededContractId": "OPEN_INSTRUMENT_FRD02_CVC_V0_1B_P4_METHODOLOGY_V0_1",
+  "artifacts": [
+    {
+      "path": "docs/open-instrument/frd02-cvc-v0.1b-p4-fixture-truth-correction-v0.1.1.md",
+      "sha256": "5bbe047ad867d97bbf231295d190b06b0e8a5d4159a3bdfea6cc38a758040182",
+      "byteLength": 4809
+    },
+    {
+      "path": "docs/open-instrument/research-artifacts/frd02-cvc-v0.1b-p4-fixture-truth-correction-v0.1.1/preregistration.json",
+      "sha256": "20b593af98ac51f7c962d42debcf5a7f03dfcbfb6c3d64c70d9a27c8c6fe7a96",
+      "byteLength": 3542
+    }
+  ],
+  "testPath": "tests/openInstrument.frd02CvcP4FixtureTruthCorrection.v0_1_1.spec.ts",
+  "p4RunnerImplemented": false,
+  "calibrationExecuted": false
+}
