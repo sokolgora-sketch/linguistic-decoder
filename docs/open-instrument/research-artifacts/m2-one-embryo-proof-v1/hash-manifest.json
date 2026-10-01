@@ -1,0 +1,22 @@
+{
+  "schemaVersion": "open-instrument.one-embryo-proof-m2-hash-manifest.v0.1",
+  "contractId": "OPEN_INSTRUMENT_ONE_EMBRYO_PROOF_V1_M2_PREREGISTRATION_V0_1",
+  "artifacts": [
+    {
+      "path": "README.md",
+      "sha256": "cb34a7f7b0f8789c5b81d57c1551c9409af0c3e5ddc56d4686dbd04881adf756",
+      "byteLength": 6588
+    },
+    {
+      "path": "preregistration.json",
+      "sha256": "28bfab132990c4f67313462d076e44db538927e8a132421b7af71aeccd428f93",
+      "byteLength": 12681
+    }
+  ],
+  "machineReadableSha256": "28bfab132990c4f67313462d076e44db538927e8a132421b7af71aeccd428f93",
+  "machineReadableByteLength": 12681,
+  "contractSha256": "cb34a7f7b0f8789c5b81d57c1551c9409af0c3e5ddc56d4686dbd04881adf756",
+  "contractByteLength": 6588,
+  "realTargetSelected": false,
+  "targetRevealed": false
+}

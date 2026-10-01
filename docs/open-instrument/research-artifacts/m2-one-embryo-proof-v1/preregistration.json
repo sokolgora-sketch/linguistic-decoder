@@ -1,0 +1,172 @@
+{
+  "schemaVersion": "open-instrument.one-embryo-proof-m2-preregistration.v0.1",
+  "contractId": "OPEN_INSTRUMENT_ONE_EMBRYO_PROOF_V1_M2_PREREGISTRATION_V0_1",
+  "version": "0.1",
+  "status": "FROZEN_PREREGISTRATION_CONTRACT_ONLY",
+  "executionAuthorized": false,
+  "realTargetSelected": false,
+  "realEmbryoSelected": false,
+  "realBlindPayloadCreated": false,
+  "realDiscoveryExecuted": false,
+  "targetRevealed": false,
+  "oneEmbryoOperationalDefinition": {
+    "singularObject": "one target-bound structural embryo proof case",
+    "fixedAt": "after deterministic target selection and structural discovery, before blind source research",
+    "selection": "exactly one eligible target case and exactly one structurally defensible embryo are bound to the case",
+    "ranking": "existing deterministic structural discovery order only; no semantic, source, or expected-correspondence ranking",
+    "completion": "the same frozen embryo, blind payload, pre-reveal function-or-Null, and later revealed sense are evaluated as one case",
+    "noSecondAttempt": "a Null, mismatch, or inaccessible source does not authorize a replacement target or embryo"
+  },
+  "targetPoolRule": {
+    "poolPopulation": "a future predeclared, reviewed candidate pool created from the existing target-sense authority policy",
+    "rulesOnlyInThisLane": true,
+    "eligible": [
+      "stable opaque candidate identity",
+      "one reviewable target sense or explicitly unresolved sense state",
+      "source locator and authority status pinned before selection",
+      "not present in the 57-case baseline",
+      "not a prior target, prior reveal, prior control, or prior research word",
+      "not already used by an embryo-first proof or replication lane"
+    ],
+    "excluded": [
+      "ambiguous target identity",
+      "unresolved or conflicting target sense when one sense is required",
+      "words used in prior research, control, baseline, or reveal artifacts",
+      "entries whose eligibility depends on embryo, source hit, translation, etymology, or expected function"
+    ],
+    "normalization": "NFC; trim; lowercase only for identity comparison; preserve source spelling and locator in the sealed selection record",
+    "deduplication": "stable source-profile identifier plus normalized lexical form plus authoritative sense identifier",
+    "populationNotEmbedded": true
+  },
+  "targetSelectionRule": {
+    "selectionAuthority": "deterministic ordering of opaque eligible candidate identifiers",
+    "orderingKey": "stable opaque candidate identifier assigned before structural discovery",
+    "tieBreak": "code-unit lexical order of the complete opaque identifier",
+    "selectionCount": 1,
+    "usesSemanticAttractiveness": false,
+    "usesExpectedFunction": false,
+    "usesEtymology": false,
+    "usesSourceHits": false,
+    "usesTranslation": false,
+    "usesManualPreference": false,
+    "randomness": "not used",
+    "realSelectionInThisLane": false
+  },
+  "targetSenseAuthority": {
+    "authorityClass": "reviewed target-sense authority already accepted by the project",
+    "binding": "one source sense identifier is sealed before blind research and is not chosen after viewing an embryo or source result",
+    "polysemy": "multiple senses remain separate candidates; one-sense proof requires one independently reviewable sense",
+    "conflict": "conflicting or unresolved sense authority yields Null or procedural invalidity according to the sealed record",
+    "blindVisibility": "target word, sense label, gloss, translation, and locator are reveal-only for the blind operator",
+    "selectionInThisLane": false
+  },
+  "structuralEmbryoRule": {
+    "authority": "existing structuralHypothesisDiscovery.v0_1 contract and validator",
+    "eligibility": "structurally defensible hypothesis with existing claim-boundary fields and provenance",
+    "selection": "choose the deterministic minimum eligible result using the existing structural order; if no defensible result exists, record structural Null",
+    "preserved": ["embryo", "voicePath", "reductionSteps", "expansionChain", "reasonCodes", "evidenceRefs", "hypothesisId"],
+    "immutableAfterFreeze": true,
+    "semanticResearchBeforeFreeze": false,
+    "realEmbryoInThisLane": false
+  },
+  "blindPayloadRule": {
+    "contains": ["opaque case identity", "frozen structural embryo", "structural fingerprint", "voice path", "source universe identifier", "search policy identifier", "stop rule identifier", "claim boundaries"],
+    "forbidden": ["target word", "target orthography", "target pronunciation", "target sense or gloss", "translation", "etymology", "historical target source", "functional evidence", "expected function", "post-reveal interpretation"],
+    "serialization": "canonical UTF-8 JSON with recursively sorted object keys, preserved array order, and one final LF in the persisted file",
+    "fingerprint": "SHA-256 of the exact persisted payload bytes",
+    "persistBeforeDiscovery": true,
+    "targetRevealStatus": "FORBIDDEN_UNTIL_REVEAL_GATE"
+  },
+  "sourceSearchUniverse": {
+    "sourceClasses": ["reviewed linguistic dictionary", "historical dictionary or corpus", "dialectal or vernacular source", "reconstructed-form source", "primary linguistic source"],
+    "authorityRequirement": "traceable locator, source identity, acquisition date or revision, and fact/inference/hypothesis/unknown classification",
+    "ordering": "the exact source list and class order are sealed before discovery",
+    "queryBoundary": "queries may use only the frozen structural embryo or an explicitly authorized identity-preserving transform",
+    "forbiddenQueries": ["target lookup", "target translation", "target semantic search", "target etymology", "post-hoc function search", "unlogged spelling mutation"],
+    "sourceAddition": "no new source tradition after the first blind query",
+    "duplicateHandling": "deduplicate by stable source record identity while preserving source order and provenance",
+    "noSearchInThisLane": true
+  },
+  "stopRule": {
+    "stopAfter": "all predeclared source traditions and bounded query stages have been attempted or explicitly recorded unavailable",
+    "inaccessibleSource": "record SOURCE_UNAVAILABLE and continue only within the frozen universe",
+    "noRetryExpansion": true,
+    "noTargetReplacement": true,
+    "noEmbryoReplacement": true,
+    "noSecondSearchAfterNull": true
+  },
+  "preRevealFunctionOrNullRule": {
+    "object": "the existing strict-blind pre-reveal function-candidate set or explicit Null freeze",
+    "freezeBeforeReveal": ["source query log", "source facts", "form relations", "function candidates", "truth levels", "alternatives", "rejections", "evidence references"],
+    "winnerPolicy": "no_single_winner",
+    "userDecisionPosture": "user_decides",
+    "nullIsValid": true,
+    "replacementAfterNull": false,
+    "materialized": true,
+    "hashPinned": true,
+    "immutableAfterFreeze": true
+  },
+  "revealGate": {
+    "required": ["all required pre-reveal artifacts present", "all artifact hashes and byte lengths verified", "hash chain verified", "search state complete", "pre-reveal function or Null frozen", "blindness check passed", "manual reveal authorization recorded"],
+    "failure": "REVEAL_AUTHORIZED=NO",
+    "revealInThisLane": false
+  },
+  "correspondenceGate": {
+    "comparison": "sealed pre-reveal function-or-Null versus independently authorized revealed target sense",
+    "scientificOutcomes": ["FUNCTIONAL_CORRESPONDENCE", "LEXICAL_EQUIVALENCE", "FORM_RESEMBLANCE_ONLY", "HISTORICAL_RELATION_ONLY", "INSUFFICIENT_CORRESPONDENCE", "NULL"],
+    "proceduralState": ["VALID_PROOF", "INVALID_PROOF"],
+    "noRetroactiveChange": true,
+    "noSingleWinner": true,
+    "userDecides": true,
+    "claimBoundary": "correspondence result is bounded to this case and does not promote origin, cognacy, borrowing, universality, production authority, or a canonical meaning map"
+  },
+  "outcomeClasses": {
+    "scientificNull": ["NULL", "INSUFFICIENT_CORRESPONDENCE"],
+    "proceduralInvalidity": ["INVALID_PROOF"],
+    "validProofRequires": "all pre-reveal artifacts plus the post-reveal correspondence result and verified hash chain"
+  },
+  "requiredPreRevealArtifacts": [
+    {"artifactId": "M2_PREREGISTRATION_CONTRACT", "stage": "M2", "createdBeforeReveal": true, "hashRequired": true, "immutableAfterFreeze": true, "containsTargetSemantics": false, "downstreamReference": "contractId and contract SHA"},
+    {"artifactId": "M2_TARGET_POOL_DEFINITION", "stage": "M2", "createdBeforeReveal": true, "hashRequired": true, "immutableAfterFreeze": true, "containsTargetSemantics": false, "downstreamReference": "pool definition SHA"},
+    {"artifactId": "M2_TARGET_SELECTION_RECORD", "stage": "M2", "createdBeforeReveal": true, "hashRequired": true, "immutableAfterFreeze": true, "containsTargetSemantics": true, "downstreamReference": "sealed target record hash; never passed to blind operator"},
+    {"artifactId": "M2_STRUCTURAL_EMBRYO_FREEZE", "stage": "M2", "createdBeforeReveal": true, "hashRequired": true, "immutableAfterFreeze": true, "containsTargetSemantics": false, "downstreamReference": "hypothesisId and embryo fingerprint"},
+    {"artifactId": "M2_BLIND_PAYLOAD", "stage": "M2", "createdBeforeReveal": true, "hashRequired": true, "immutableAfterFreeze": true, "containsTargetSemantics": false, "downstreamReference": "payload SHA"},
+    {"artifactId": "M3_PRE_REVEAL_DISCOVERY", "stage": "M3", "createdBeforeReveal": true, "hashRequired": true, "immutableAfterFreeze": true, "containsTargetSemantics": false, "downstreamReference": "source/search record SHA"},
+    {"artifactId": "M3_PRE_REVEAL_FUNCTION_OR_NULL", "stage": "M3", "createdBeforeReveal": true, "hashRequired": true, "immutableAfterFreeze": true, "containsTargetSemantics": false, "downstreamReference": "function-or-Null SHA"},
+    {"artifactId": "M3_PRE_REVEAL_HASH_MANIFEST", "stage": "M3", "createdBeforeReveal": true, "hashRequired": true, "immutableAfterFreeze": true, "containsTargetSemantics": false, "downstreamReference": "complete pre-reveal hash chain"}
+  ],
+  "requiredValidProofArtifacts": ["M2_PREREGISTRATION_CONTRACT", "M2_TARGET_POOL_DEFINITION", "M2_TARGET_SELECTION_RECORD", "M2_STRUCTURAL_EMBRYO_FREEZE", "M2_BLIND_PAYLOAD", "M3_PRE_REVEAL_DISCOVERY", "M3_PRE_REVEAL_FUNCTION_OR_NULL", "M3_PRE_REVEAL_HASH_MANIFEST", "M5_POST_REVEAL_CORRESPONDENCE_RESULT"],
+  "hashChain": {
+    "algorithm": "SHA-256",
+    "identity": "exact persisted UTF-8 bytes plus byte length",
+    "manifest": "each required artifact is listed by stable artifactId, path, byte length, and SHA-256; the manifest itself is hash-pinned",
+    "missingOrUnverifiable": "FAIL_CLOSED",
+    "reconstructionAfterReveal": false
+  },
+  "missingArtifactBehavior": "NO_REQUIRED_PRE_REVEAL_ARTIFACT -> NO_ADVANCE_TO_REVEAL",
+  "hashMismatchBehavior": "FAIL_CLOSED; do not regenerate, infer, or reconstruct bytes after reveal",
+  "blindnessModel": {
+    "visiblePreSelection": ["eligibility rules", "selection algorithm", "source and claim-boundary policy"],
+    "visiblePostSelectionPreReveal": ["opaque case identity", "frozen structural embryo", "blind payload", "source/search protocol", "controller integrity status"],
+    "revealOnly": ["target word", "target sense", "gloss", "translation", "target locator", "target pronunciation", "target-specific semantic evidence"],
+    "neverUsed": ["semantic attractiveness", "expected correspondence", "manual preference", "unlogged source shopping", "orthographic or etymological inference for structural selection"]
+  },
+  "semanticLeakageGuard": {
+    "blindOperatorIsolationRequired": true,
+    "forbiddenPayloadFields": ["targetWord", "targetSenseId", "targetSenseDefinition", "translation", "etymology", "expectedFunction", "postRevealInterpretation"],
+    "violation": "BLINDNESS_VIOLATION and reveal forbidden"
+  },
+  "claimBoundary": ["research_only", "non_production", "no_runtime_authorization", "no_universal_non_arbitrariness_claim", "no_universal_consonant_semantics", "no_historical_origin_claim", "no_cognacy_claim", "no_borrowing_claim", "no_language_superiority_claim", "no_canonical_consonant_meaning_map", "no_single_winner", "user_decides", "Null_does_not_establish_arbitrariness"],
+  "truthHierarchy": ["FACT", "INFERENCE", "HYPOTHESIS", "UNKNOWN / NULL"],
+  "protocolIntegrity": {
+    "sourceResearchPerformed": false,
+    "realTargetSelected": false,
+    "realEmbryoSelected": false,
+    "realBlindPayloadCreated": false,
+    "blindDiscoveryExecuted": false,
+    "targetRevealPerformed": false,
+    "productionEvidenceAdmitted": false,
+    "runtimeMutated": false,
+    "diachronicV0_2Activated": false
+  }
+}
