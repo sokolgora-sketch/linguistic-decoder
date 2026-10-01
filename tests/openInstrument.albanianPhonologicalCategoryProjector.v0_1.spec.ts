@@ -1,8 +1,10 @@
 import type { AlbanianPronunciationSourceObservationV0_1 } from "@/shared/openInstrument/albanianPronunciationSourceObservation.v0_1";
 import {
   ALBANIAN_PHONOLOGICAL_CATEGORY_PROJECTOR_ID_V0_1,
+  type AlbanianPhonologicalCategoryProjectionInputV0_1,
   projectAlbanianPronunciationSourceObservationV0_1,
 } from "@/shared/openInstrument/albanianPhonologicalCategoryProjector.v0_1";
+import { ALB_IPA_NORTHERN_TOSK_SOURCE_PROFILE_ID_V0_1 } from "@/shared/openInstrument/albanianPronunciationSourceProfiles.v0_1";
 
 function observation(
   rawIpa: string,
@@ -190,6 +192,53 @@ describe("Albanian phonological category projector v0.1", () => {
       reasonCodes: expect.arrayContaining(["SYMBOL_AUTHORITY_MISSING"]),
     });
     expect(projectAlbanianPronunciationSourceObservationV0_1(observation("[y]"))).toMatchObject({
+      status: "UNRESOLVED",
+      categories: [null],
+      reasonCodes: expect.arrayContaining(["PHONOLOGICAL_CATEGORY_UNRESOLVED"]),
+    });
+  });
+
+  it("binds profile identity to its authorized scope and qualifier tuple", () => {
+    const validNorthernTosk: AlbanianPhonologicalCategoryProjectionInputV0_1 = {
+      rawIpa: "/i/",
+      sourceProfileId: ALB_IPA_NORTHERN_TOSK_SOURCE_PROFILE_ID_V0_1,
+      sourceScope: "TOSK_EXPLICIT",
+      sourceProfileQualifier: "NORTHERN_TOSK_EXPLICIT",
+    };
+    expect(projectAlbanianPronunciationSourceObservationV0_1(validNorthernTosk)).toMatchObject({
+      status: "SUPPORTED",
+      categories: ["HIGH_FRONT_UNROUNDED"],
+    });
+
+    expect(
+      projectAlbanianPronunciationSourceObservationV0_1({
+        ...validNorthernTosk,
+        sourceScope: "STANDARD_EXPLICIT",
+        sourceProfileQualifier: null,
+      }),
+    ).toMatchObject({
+      status: "UNRESOLVED",
+      categories: [null],
+      reasonCodes: expect.arrayContaining(["PROFILE_AUTHORITY_MISSING"]),
+    });
+
+    expect(
+      projectAlbanianPronunciationSourceObservationV0_1({
+        ...validNorthernTosk,
+        sourceProfileQualifier: "SOUTHERN_GHEG_EXPLICIT",
+      }),
+    ).toMatchObject({
+      status: "UNRESOLVED",
+      categories: [null],
+      reasonCodes: expect.arrayContaining(["PROFILE_AUTHORITY_MISSING"]),
+    });
+
+    expect(
+      projectAlbanianPronunciationSourceObservationV0_1({
+        ...validNorthernTosk,
+        rawIpa: "[i]",
+      }),
+    ).toMatchObject({
       status: "UNRESOLVED",
       categories: [null],
       reasonCodes: expect.arrayContaining(["PHONOLOGICAL_CATEGORY_UNRESOLVED"]),

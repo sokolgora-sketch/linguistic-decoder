@@ -9,7 +9,7 @@ import {
   type AlbanianPhonologicalNucleusReasonCodeV0_1,
 } from "./albanianPhonologicalNucleusAuthority.v0_1";
 import {
-  ALBANIAN_PROJECTABLE_SOURCE_PROFILE_IDS_V0_1,
+  isAlbanianProjectableSourceProfileBindingAuthorizedV0_1,
 } from "./albanianPronunciationSourceProfiles.v0_1";
 import type { AlbanianPronunciationSourceObservationV0_1 } from "./albanianPronunciationSourceObservation.v0_1";
 
@@ -194,7 +194,13 @@ function categoryForNucleusV0_1(
 }> {
   const reasons = new Set<AlbanianPhonologicalProjectorReasonCodeV0_1>();
 
-  if (!ALBANIAN_PROJECTABLE_SOURCE_PROFILE_IDS_V0_1.includes(sourceProfileId)) {
+  if (
+    !isAlbanianProjectableSourceProfileBindingAuthorizedV0_1(
+      sourceProfileId,
+      sourceScope,
+      sourceProfileQualifier,
+    )
+  ) {
     reasons.add("PROFILE_AUTHORITY_MISSING");
   }
 
