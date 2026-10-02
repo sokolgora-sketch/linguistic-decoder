@@ -1,0 +1,47 @@
+{
+  "schemaVersion": "open-instrument.frd02-cvc-v0.1b-p4-c6-c7-c8-subcase-allocation-correction.v0_1",
+  "contractId": "OPEN_INSTRUMENT_FRD02_CVC_V0_1B_P4_C6_C7_C8_SUBCASE_ALLOCATION_CORRECTION_V0_1",
+  "version": "v0.1",
+  "status": "FROZEN_P4_C6_C7_C8_SUBCASE_ALLOCATION_AUTHORITY_IMPLEMENTATION_NOT_EXECUTED",
+  "provenance": {
+    "discoveredAfterP4ImplementationMerge": true,
+    "discoveredBeforeCalibration": true,
+    "calibrationResultExisted": false,
+    "realDataExecuted": false,
+    "semanticInterpretationOccurred": false,
+    "resultInformedTuning": false,
+    "scope": "replicate_id_to_existing_subcase_assignment_only"
+  },
+  "authorityBindings": {
+    "methodologyPath": "docs/open-instrument/frd02-cvc-v0.1b-p4-methodology-freeze-v0.1.md",
+    "fixtureCorrectionPath": "docs/open-instrument/frd02-cvc-v0.1b-p4-fixture-truth-correction-v0.1.1.md",
+    "p1P2CorrectionPath": "docs/open-instrument/frd02-cvc-v0.1b-p1-p2-exact-null-arithmetic-compatibility-correction-v0.1.md",
+    "implementationPath": "src/shared/openInstrument/frd02CvcP4Implementation.v0_1b.ts"
+  },
+  "subcases": {
+    "C6": { "A": "left-identity", "B": "right-identity" },
+    "C7": { "A": "missing-voice", "B": "missing-position" },
+    "C8": { "A": "concentration", "B": "rare-identity" }
+  },
+  "allocation": {
+    "replicateIds": ["0", "1", "2", "3", "4", "5", "6", "7"],
+    "subcaseAReplicateIds": ["0", "1", "2", "3"],
+    "subcaseBReplicateIds": ["4", "5", "6", "7"],
+    "representationPerSubcase": 4,
+    "function": "replicateId in {0,1,2,3} => A; replicateId in {4,5,6,7} => B",
+    "seedDerivationChanged": false,
+    "fixtureCount": 29,
+    "replicatesPerFixture": 8,
+    "totalEvaluations": 232,
+    "adaptiveReplication": false,
+    "replacementReplicates": false
+  },
+  "implementationBoundary": {
+    "authorityFrozenBeforeImplementation": true,
+    "allocationArtifactImmutableAfterImplementation": true,
+    "calibrationExecuted": false,
+    "calibrationResultCreated": false,
+    "realDataExecutionAuthorized": false,
+    "productionAuthorityChanged": false
+  }
+}
