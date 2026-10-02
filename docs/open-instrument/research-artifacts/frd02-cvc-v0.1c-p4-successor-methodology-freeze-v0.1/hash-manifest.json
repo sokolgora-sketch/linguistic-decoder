@@ -1,0 +1,28 @@
+{
+  "manifestVersion": "open-instrument.artifact-hash-manifest.v0_1",
+  "contractId": "OPEN_INSTRUMENT_FRD02_CVC_V0_1C_P4_METHODOLOGY_V0_1",
+  "artifacts": [
+    {
+      "path": "docs/open-instrument/frd02-cvc-v0.1c-p4-successor-methodology-freeze-v0.1.md",
+      "sha256": "3508bad0da2a8d4b598ce7984224740bd0f0fc86775dfe7adcffd9c90eb48c3f",
+      "byteLength": 17780
+    },
+    {
+      "path": "docs/open-instrument/research-artifacts/frd02-cvc-v0.1c-p4-successor-methodology-freeze-v0.1/preregistration.json",
+      "sha256": "923e1c3599637518311e0c0d435731d3df96b8b01b919fcea9247024e9d75b0f",
+      "byteLength": 15042
+    }
+  ],
+  "predecessorResult": {
+    "path": "docs/open-instrument/research-artifacts/frd02-cvc-v0.1b-p4-synthetic-calibration-v0.1/result.json",
+    "sha256": "20c1ad43e95a59912908334ad7fb2bf7f98765aa85b4f5a4f569ac1dea5fdf02",
+    "byteLength": 382231,
+    "modified": false,
+    "rerun": false
+  },
+  "testPath": "tests/openInstrument.frd02CvcP4V0_1cSuccessorFreeze.v0_1.spec.ts",
+  "successorImplementationStarted": false,
+  "successorCalibrationExecuted": false,
+  "realDataExecuted": false,
+  "productionChanged": false
+}
