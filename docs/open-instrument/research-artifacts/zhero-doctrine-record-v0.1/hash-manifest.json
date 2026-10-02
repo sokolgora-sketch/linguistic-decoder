@@ -1,0 +1,16 @@
+{
+  "manifestVersion": "open-instrument.artifact-hash-manifest.v0_1",
+  "contractId": "OPEN_INSTRUMENT_ZHERO_DOCTRINE_RECORD_V0_1",
+  "artifacts": [
+    {
+      "path": "docs/open-instrument/zhero-doctrine-record-v0.1.md",
+      "sha256": "b72c23d659d010b5c2a53058cc2f6223e0cbba9b32e351d17009b6545fc05f93",
+      "byteLength": 9562
+    }
+  ],
+  "artifactKind": "canonical-documentation-doctrine-record",
+  "documentationOnly": true,
+  "frozenContractsChanged": false,
+  "calibrationExecuted": false,
+  "realDataExecuted": false
+}
