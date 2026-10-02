@@ -29,6 +29,12 @@ export const P4_FIXTURE_CORRECTION_MACHINE_SHA256_V0_1_1 =
   "20b593af98ac51f7c962d42debcf5a7f03dfcbfb6c3d64c70d9a27c8c6fe7a96";
 export const P4_P1_P2_CORRECTION_MACHINE_SHA256_V0_1 =
   "ed81a8e85341a38d2b08b5a1b706c4699b9c3ad287dea048a70108ce7d436a47";
+export const P4_SUBCASE_ALLOCATION_CONTRACT_ID_V0_1 =
+  "OPEN_INSTRUMENT_FRD02_CVC_V0_1B_P4_C6_C7_C8_SUBCASE_ALLOCATION_CORRECTION_V0_1";
+export const P4_SUBCASE_ALLOCATION_HUMAN_SHA256_V0_1 =
+  "b63b88783b2df96c93b38fe891a616b2801dbef42d175c7d7a1bb88e6a365547";
+export const P4_SUBCASE_ALLOCATION_MACHINE_SHA256_V0_1 =
+  "4c94d32b5089c5ea74a0c8a5e74e60616b561241d12723c180fafb48838f3f4e";
 export const P4_MASTER_SEED_V0_1B = "FRD02_CVC_V0_1B_P4_MASTER_0";
 export const P4_REPLICATE_IDS_V0_1B = ["0", "1", "2", "3", "4", "5", "6", "7"] as const;
 export const P4_REPLICATES_PER_FIXTURE_V0_1B = P4_REPLICATE_IDS_V0_1B.length;
@@ -76,6 +82,7 @@ export type P4FixtureV0_1B = P4SingleFixtureV0_1B | P4PairFixtureV0_1B;
 export type P4ScheduleEntryV0_1B = Readonly<{
   fixtureId: (typeof FIXTURE_IDS_V0_1B)[number];
   replicateId: string;
+  subcase: P4FixtureSubcaseV0_1B;
   seedTuple: string;
   seedWords: readonly [string, string, string, string];
   constructionFingerprint: string;
@@ -380,7 +387,11 @@ function buildFixtureRecords(fixtureId: (typeof FIXTURE_IDS_V0_1B)[number], repl
   if (fixtureId === "C3") return commonRecords(fixtureId, replicateId, 79);
   if (fixtureId === "C4") return commonRecords(fixtureId, replicateId).filter((entry) => entry.stratumId !== "S11");
   if (fixtureId === "C5") return commonRecords(fixtureId, replicateId).filter((entry) => entry.stratumId !== "S0" || Number(entry.independenceGroupId.slice(1)) < 3);
-  if (fixtureId === "C6") return commonRecords(fixtureId, replicateId).map((entry) => ({ ...entry, C_L: "L0" }));
+  if (fixtureId === "C6") {
+    return subcase === "right"
+      ? commonRecords(fixtureId, replicateId).map((entry) => ({ ...entry, C_R: "R0" }))
+      : commonRecords(fixtureId, replicateId).map((entry) => ({ ...entry, C_L: "L0" }));
+  }
   if (fixtureId === "C7") {
     return subcase === "position"
       ? commonRecords(fixtureId, replicateId).filter((entry) => entry.stratumId !== "S4")
@@ -447,16 +458,26 @@ export function generateP4FixtureV0_1B(
   return { kind: "single", fixtureId, replicateId, records, constructionFingerprint: fingerprintRecords(records) };
 }
 
+function scheduledSubcaseV0_1B(
+  fixtureId: (typeof FIXTURE_IDS_V0_1B)[number],
+  replicateId: string,
+): P4FixtureSubcaseV0_1B {
+  if (fixtureId !== "C6" && fixtureId !== "C7" && fixtureId !== "C8") return "default";
+  return Number(replicateId) < 4 ? "default" : fixtureId === "C7" ? "position" : "right";
+}
+
 export function buildP4ScheduleV0_1B(): readonly P4ScheduleEntryV0_1B[] {
   const schedule: P4ScheduleEntryV0_1B[] = [];
   for (const fixtureId of FIXTURE_IDS_V0_1B) {
     for (const replicateId of P4_REPLICATE_IDS_V0_1B) {
-      const fixture = generateP4FixtureV0_1B(fixtureId, replicateId);
+      const subcase = scheduledSubcaseV0_1B(fixtureId, replicateId);
+      const fixture = generateP4FixtureV0_1B(fixtureId, replicateId, subcase);
       const seedTuple = canonicalSeedTupleV0_1B(fixtureId, replicateId, P4_PERMUTATION_STREAM_ID_V0_1B);
       const words = seedWordsV0_1B(fixtureId, replicateId, P4_PERMUTATION_STREAM_ID_V0_1B);
       schedule.push({
         fixtureId,
         replicateId,
+        subcase,
         seedTuple,
         seedWords: words.map((word) => word.toString()) as [string, string, string, string],
         constructionFingerprint: fixture.constructionFingerprint,
@@ -480,8 +501,10 @@ function summarizeAnalysis(
   const expectedWords = seedWordsV0_1B(fixture.fixtureId, fixture.replicateId, P4_PERMUTATION_STREAM_ID_V0_1B).map((word) => word.toString()) as [string, string, string, string];
   const actualWords = result.seedWords.map((word) => word.toString()) as [string, string, string, string];
   const seedValid = serializeP4CanonicalV0_1B(actualWords) === serializeP4CanonicalV0_1B(expectedWords);
+  const gateB = serializableGateB(result);
+  const resourceFailure = gateB?.status === "FAILURE" && gateB.domain === "RESOURCE";
   return {
-    valid: seedValid,
+    valid: seedValid && !resourceFailure,
     fixtureId: fixture.fixtureId,
     replicateId: fixture.replicateId,
     inputSha256,
@@ -494,12 +517,16 @@ function summarizeAnalysis(
       excludedRepeatedRecordIds: result.normalization.excludedRepeatedRecordIds,
     },
     gateA: { pass: result.gateA.pass, state: result.gateA.state, reason: result.gateA.reason },
-    gateB: serializableGateB(result),
+    gateB,
     statistic: result.statistic,
     pValue: result.pValue,
     outcome: result.state,
     reason: result.reason,
-    invalidReason: seedValid ? null : "SEED_DERIVATION_MISMATCH",
+    invalidReason: !seedValid
+      ? "SEED_DERIVATION_MISMATCH"
+      : resourceFailure
+        ? gateB.reason ?? "RESOURCE_LIMIT_EXCEEDED"
+        : null,
   };
 }
 
@@ -556,8 +583,64 @@ function expectedGateMatches(expectation: P4FixtureExpectationV0_1B, gate: P4Rep
 function expectedP2Matches(expectation: P4FixtureExpectationV0_1B, gate: P4ReplicateResultV0_1B["gateB"]): boolean {
   if (gate === null) return false;
   if (expectation.expectedP2 === "NOT_RUN") return gate.status === "NOT_RUN";
-  if (expectation.expectedP2 === "FAILURE") return gate.status === "FAILURE";
+  if (expectation.expectedP2 === "ONLY_OBSERVED_REALIZATION") {
+    return gate.status === "FAILURE"
+      && gate.reason === "ONLY_OBSERVED_REALIZATION"
+      && gate.domain === "FINITE_SCIENTIFIC";
+  }
+  if (expectation.expectedP2 === "FAILURE") {
+    return gate.status === "FAILURE"
+      && gate.reason === "EXACT_COUNT_RESOURCE_LIMIT_EXCEEDED"
+      && gate.domain === "RESOURCE";
+  }
   return gate.status === "READY" && gate.branch === expectation.expectedP2;
+}
+
+function hasExactReplicateIds(results: readonly { replicateId: string }[]): boolean {
+  return results.every((result, index) => result.replicateId === String(index));
+}
+
+function hasMatchingN11ReplicateIds(result: P4PairReplicateResultV0_1B): boolean {
+  return result.replicateId === result.ordered.replicateId && result.replicateId === result.destroyed.replicateId;
+}
+
+function expectedReplicateExpectationV0_1B(
+  fixtureId: string,
+  replicateId: string,
+): P4FixtureExpectationV0_1B {
+  const expectation = fixtureExpectationV0_1B(fixtureId);
+  if (fixtureId === "C6") {
+    return {
+      ...expectation,
+      expectedGate: Number(replicateId) < 4 ? "MINIMUM_DISTINCT_LEFT_IDENTITIES_NOT_MET" : "MINIMUM_DISTINCT_RIGHT_IDENTITIES_NOT_MET",
+      expectedOutcomes: ["INSUFFICIENT_EVIDENCE"],
+    };
+  }
+  if (fixtureId === "C7") {
+    return {
+      ...expectation,
+      expectedGate: Number(replicateId) < 4 ? "VOICE_COVERAGE_MINIMUM_NOT_MET" : "POSITION_COVERAGE_MINIMUM_NOT_MET",
+      expectedOutcomes: ["INSUFFICIENT_EVIDENCE"],
+    };
+  }
+  if (fixtureId === "C8") {
+    return {
+      ...expectation,
+      expectedGate: Number(replicateId) < 4 ? "CONCENTRATION_CONFOUND_THRESHOLD_EXCEEDED" : "RARE_IDENTITY_SPARSE_THRESHOLD_EXCEEDED",
+      expectedOutcomes: Number(replicateId) < 4 ? ["STRUCTURAL_BUT_CONFOUNDED"] : ["SPARSE"],
+    };
+  }
+  return expectation;
+}
+
+function matchesFrozenSubcaseV0_1B(result: P4ReplicateResultV0_1B): boolean {
+  if (result.fixtureId !== "C6" && result.fixtureId !== "C7" && result.fixtureId !== "C8") return true;
+  const fixtureId = result.fixtureId;
+  const expectedSubcase = scheduledSubcaseV0_1B(fixtureId, result.replicateId);
+  const expectedFixture = generateP4FixtureV0_1B(fixtureId, result.replicateId, expectedSubcase);
+  return expectedFixture.kind === "single"
+    && result.constructionFingerprint === expectedFixture.constructionFingerprint
+    && result.inputSha256 === expectedFixture.constructionFingerprint;
 }
 
 function singleAccepted(expectation: P4FixtureExpectationV0_1B, result: P4ReplicateResultV0_1B): boolean {
@@ -569,7 +652,7 @@ export function evaluateP4FixtureAcceptanceV0_1B(
   results: readonly P4ScheduledResultV0_1B[],
 ): P4FixtureAcceptanceV0_1B {
   const expectation = fixtureExpectationV0_1B(fixtureId);
-  if (results.length !== P4_REPLICATES_PER_FIXTURE_V0_1B) {
+  if (results.length !== P4_REPLICATES_PER_FIXTURE_V0_1B || !hasExactReplicateIds(results)) {
     return {
       fixtureId,
       outcome: "CALIBRATION_INVALID",
@@ -589,14 +672,14 @@ export function evaluateP4FixtureAcceptanceV0_1B(
     }
     if (result.fixtureId === "N11") {
       const pair = result as P4PairReplicateResultV0_1B;
-      if (!pair.valid) invalidReplicates += 1;
+      if (!pair.valid || !hasMatchingN11ReplicateIds(pair)) invalidReplicates += 1;
       else if (!singleAccepted(fixtureExpectationV0_1B("N11_ORDERED"), pair.ordered) || !singleAccepted(fixtureExpectationV0_1B("N11_ORDER_DESTROYED"), pair.destroyed)) unexpectedReplicates += 1;
       else validReplicates += 1;
       continue;
     }
     const single = result as P4ReplicateResultV0_1B;
     if (!single.valid) invalidReplicates += 1;
-    else if (!singleAccepted(expectation, single)) unexpectedReplicates += 1;
+    else if (!matchesFrozenSubcaseV0_1B(single) || !singleAccepted(expectedReplicateExpectationV0_1B(fixtureId, single.replicateId), single)) unexpectedReplicates += 1;
     else validReplicates += 1;
   }
   const outcome: P4MethodologyOutcomeV0_1B = invalidReplicates > 0 ? "CALIBRATION_INVALID" : unexpectedReplicates > 0 ? "CALIBRATION_FAIL" : "CALIBRATION_PASS";
@@ -606,7 +689,7 @@ export function evaluateP4FixtureAcceptanceV0_1B(
 export function evaluateP4N11PairAcceptanceV0_1B(
   results: readonly P4PairReplicateResultV0_1B[],
 ): P4FixtureAcceptanceV0_1B {
-  if (results.length !== P4_REPLICATES_PER_FIXTURE_V0_1B) {
+  if (results.length !== P4_REPLICATES_PER_FIXTURE_V0_1B || !hasExactReplicateIds(results)) {
     return {
       fixtureId: "N11",
       outcome: "CALIBRATION_INVALID",
@@ -619,7 +702,7 @@ export function evaluateP4N11PairAcceptanceV0_1B(
   let invalidReplicates = 0;
   let unexpectedReplicates = 0;
   for (const result of results) {
-    if (!result.valid) {
+    if (!result.valid || !hasMatchingN11ReplicateIds(result)) {
       invalidReplicates += 1;
       continue;
     }
@@ -637,7 +720,7 @@ export function runP4ScheduleV0_1B(): P4AggregateAcceptanceV0_1B {
   const schedule = buildP4ScheduleV0_1B();
   const byFixture = new Map<string, P4ScheduledResultV0_1B[]>();
   for (const entry of schedule) {
-    const result = runP4ReplicateV0_1B(generateP4FixtureV0_1B(entry.fixtureId, entry.replicateId));
+    const result = runP4ReplicateV0_1B(generateP4FixtureV0_1B(entry.fixtureId, entry.replicateId, entry.subcase));
     const existing = byFixture.get(entry.fixtureId) ?? [];
     existing.push(result);
     byFixture.set(entry.fixtureId, existing);
@@ -667,6 +750,9 @@ export function p4AuthorityBindingsV0_1B(): Readonly<Record<string, string>> {
     fixtureCorrectionContractId: P4_FIXTURE_CORRECTION_CONTRACT_ID_V0_1_1,
     fixtureCorrectionMachineSha256: P4_FIXTURE_CORRECTION_MACHINE_SHA256_V0_1_1,
     p1P2CorrectionMachineSha256: P4_P1_P2_CORRECTION_MACHINE_SHA256_V0_1,
+    subcaseAllocationContractId: P4_SUBCASE_ALLOCATION_CONTRACT_ID_V0_1,
+    subcaseAllocationHumanSha256: P4_SUBCASE_ALLOCATION_HUMAN_SHA256_V0_1,
+    subcaseAllocationMachineSha256: P4_SUBCASE_ALLOCATION_MACHINE_SHA256_V0_1,
     amendedContractSha256: AMENDED_CONTRACT_SHA256_V0_1B,
     generatorContractSha256: GENERATOR_CONTRACT_SHA256_V0_1B,
     analyzerContractSha256: ANALYZER_CONTRACT_SHA256_V0_1B,
