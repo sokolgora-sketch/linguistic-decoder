@@ -24,6 +24,9 @@ describe("spoken pronunciation default Overview surface v0.1", () => {
     expect(within(overview).getByText(/stone: .*OW1/)).toBeVisible();
     expect(within(overview).getByText("open-instrument.cmudict-arpabet-en-us.v0_1")).toBeVisible();
     expect(within(overview).getByText("ARPABET")).toBeVisible();
+    expect(within(overview).getByTestId("spoken-pronunciation-consonant-segments")).toHaveTextContent(
+      "Pronunciation consonant segments: S → T → N",
+    );
     const revision = within(overview).getByTestId("spoken-pronunciation-revision");
     expect(revision).toBeVisible();
     expect(revision).toHaveClass("text-[10px]", "text-[#7f8b99]");

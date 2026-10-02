@@ -102,6 +102,12 @@ export type PhoneticIpaV0_1VM = {
   unmapped: string[];
 };
 
+export type PronunciationConsonantSegmentV0_1VM = Readonly<{
+  segmentIndex: number;
+  sourceUnits: readonly string[];
+  kind: "consonant";
+}>;
+
 export type SpokenPronunciationVariantV0_1VM = Readonly<{
   sourceForm: string;
   sourcePronunciation: string;
@@ -109,6 +115,7 @@ export type SpokenPronunciationVariantV0_1VM = Readonly<{
   variantOrder: number;
   canonicalVoicePath: Vowel[] | null;
   reasonCode: string | null;
+  segments: PronunciationConsonantSegmentV0_1VM[];
 }>;
 
 export type SpokenPronunciationProvenanceV0_1VM = Readonly<{

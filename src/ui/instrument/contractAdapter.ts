@@ -23,6 +23,7 @@ import type {
   RootMapVM,
   Vowel,
   PhoneticIpaV0_1VM,
+  PronunciationConsonantSegmentV0_1VM,
   SpokenPronunciationProvenanceV0_1VM,
   SpokenPronunciationVariantV0_1VM,
   ResonanceProfileV1VM,
@@ -979,6 +980,7 @@ export function adaptAnalysisToTelemetryVM(raw: unknown): TelemetryViewModel {
       const variantOrder = rawVariant["variantOrder"];
       const rawCanonicalPath = rawVariantResult["canonicalVoicePath"];
       const variantReasonCode = rawVariantResult["reasonCode"];
+      const rawNormalizedSegments = rawVariantResult["normalizedSegments"];
 
       if (typeof sourceForm !== "string" || !sourceForm.trim()) {
         return missing("malformed", `spokenPronunciation.variants[${index}].variant.sourceForm expected string`);
@@ -1004,6 +1006,42 @@ export function adaptAnalysisToTelemetryVM(raw: unknown): TelemetryViewModel {
         }
       }
 
+      let segments: PronunciationConsonantSegmentV0_1VM[] = [];
+      if (status === "defined") {
+        if (!Array.isArray(rawNormalizedSegments)) {
+          return missing("malformed", `spokenPronunciation.variants[${index}].normalizedSegments expected array`);
+        }
+
+        for (const [segmentIndex, rawSegment] of rawNormalizedSegments.entries()) {
+          if (!isRecord(rawSegment)) {
+            return missing("malformed", `spokenPronunciation.variants[${index}].normalizedSegments[${segmentIndex}] expected object`);
+          }
+
+          const normalizedSegmentIndex = rawSegment["segmentIndex"];
+          const kind = rawSegment["kind"];
+          const sourceUnits = rawSegment["sourceUnits"];
+          if (typeof normalizedSegmentIndex !== "number" || !Number.isInteger(normalizedSegmentIndex)) {
+            return missing("malformed", `spokenPronunciation.variants[${index}].normalizedSegments[${segmentIndex}].segmentIndex expected integer`);
+          }
+          if (typeof kind !== "string") {
+            return missing("malformed", `spokenPronunciation.variants[${index}].normalizedSegments[${segmentIndex}].kind expected string`);
+          }
+          if (!Array.isArray(sourceUnits) || !sourceUnits.every((unit): unit is string => typeof unit === "string")) {
+            return missing("malformed", `spokenPronunciation.variants[${index}].normalizedSegments[${segmentIndex}].sourceUnits expected string[]`);
+          }
+
+          if (kind === "consonant") {
+            segments.push({
+              segmentIndex: normalizedSegmentIndex,
+              sourceUnits,
+              kind,
+            });
+          }
+        }
+
+        segments.sort((left, right) => left.segmentIndex - right.segmentIndex);
+      }
+
       variants.push({
         sourceForm,
         sourcePronunciation,
@@ -1011,6 +1049,7 @@ export function adaptAnalysisToTelemetryVM(raw: unknown): TelemetryViewModel {
         variantOrder,
         canonicalVoicePath,
         reasonCode: variantReasonCode,
+        segments,
       });
     }
 
