@@ -24,6 +24,12 @@ function pathText(value: PresentOrMissing<Vowel[]> | undefined): string {
   return presentOr(value, (path) => (path.length ? path.join(" → ") : "none"), "not emitted");
 }
 
+function consonantSegmentsText(segments: readonly { sourceUnits: readonly string[] }[]): string {
+  return segments.length
+    ? segments.map((segment) => segment.sourceUnits.join(" ")).join(" → ")
+    : "none";
+}
+
 export function SpokenPronunciationOverviewCardV0_1({
   readout,
 }: {
@@ -74,6 +80,19 @@ export function SpokenPronunciationOverviewCardV0_1({
                 <dt className="inline text-[#8ea4ba]">variant status: </dt>
                 <dd className="inline">{pronunciationVariantStatusV0_1(pronunciation.value)}</dd>
               </div>
+              {pronunciation.value.status === "defined" ? (
+                <div data-testid="spoken-pronunciation-consonant-segments">
+                  <dt className="inline text-[#8ea4ba]">Pronunciation consonant segments: </dt>
+                  <dd className="inline">
+                    {pronunciation.value.variants.map((variant) => (
+                      <span key={variant.variantId} className="mr-2 inline-block">
+                        {pronunciation.value.variants.length > 1 ? `variant ${variant.variantOrder + 1}: ` : ""}
+                        <span className="font-mono">{consonantSegmentsText(variant.segments)}</span>
+                      </span>
+                    ))}
+                  </dd>
+                </div>
+              ) : null}
             </dl>
             <div
               data-testid="spoken-pronunciation-revision"
