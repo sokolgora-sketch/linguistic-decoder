@@ -4,8 +4,10 @@ import {
   countExactNullV0_1B,
   enumerateExactNullAssignmentsV0_1B,
   ExactNullSignatureClassV0_1B,
+  parseExactNullCountV0_1B,
   safeDonorTypeIdentityV0_1B,
   sampleExactNullAssignmentV0_1B,
+  serializeExactNullCountV0_1B,
   Xoshiro256ssV0_1B,
 } from "../src/shared/openInstrument/frd02CvcExactNull.v0_1b";
 import { Uint128V0_1B } from "../src/shared/openInstrument/frd02CvcUint128.v0_1b";
@@ -61,6 +63,10 @@ function classFromMatrix(
 
 function complete(size: number): Matrix {
   return Array.from({ length: size }, () => Array.from({ length: size }, () => true));
+}
+
+function uniformProfiles(size: number): readonly (readonly string[])[] {
+  return Array.from({ length: size }, () => Array.from({ length: size }, () => "same"));
 }
 
 function diagonalForbidden(size: number): Matrix {
@@ -262,19 +268,32 @@ describe("FRD-02 CVC v0.1b exact structural-zero NULL", () => {
     expect(result).toMatchObject({ status: "FAILURE", reason: "EXACT_COUNT_RESOURCE_LIMIT_EXCEEDED" });
   });
 
-  test("T17: rejects a raw signature class larger than 30 without truncation", () => {
-    const result = countExactNullV0_1B([classFromMatrix(complete(31))]);
-    expect(result).toMatchObject({ status: "FAILURE", reason: "EXACT_COUNT_RESOURCE_LIMIT_EXCEEDED" });
+  test("T17: accepts a 31-member class when state and transition limits remain bounded", () => {
+    const result = countExactNullV0_1B([
+      classFromMatrix(complete(31), { profiles: uniformProfiles(31) }),
+    ]);
+    expect(result).toMatchObject({ status: "READY", branch: "MONTE_CARLO", totalCount: BigInt("8222838654177922817725562880000000") });
   });
 
-  test("T18: fixed-seed sampling is deterministic", () => {
+  test("T18: represents the frozen 96-member factorial exactly", () => {
+    const result = countExactNullV0_1B([
+      classFromMatrix(complete(96), { profiles: uniformProfiles(96) }),
+    ]);
+    expect(result).toMatchObject({
+      status: "READY",
+      branch: "MONTE_CARLO",
+      totalCount: BigInt("991677934870949689209571401541893801158183648651267795444376054838492222809091499987689476037000748982075094738965754305639874560000000000000000000000"),
+    });
+  });
+
+  test("T19: fixed-seed sampling is deterministic", () => {
     const first = sampleExactNullAssignmentV0_1B([classFromMatrix(complete(8))], new Xoshiro256ssV0_1B(SEED));
     const second = sampleExactNullAssignmentV0_1B([classFromMatrix(complete(8))], new Xoshiro256ssV0_1B(SEED));
     expect(first).toEqual(second);
     expect(first.status).toBe("READY");
   });
 
-  test("T19: bounded BigInt sampling supports a bound above 2^64", () => {
+  test("T20: bounded BigInt sampling supports a bound above 2^64", () => {
     const bound = (BigInt(1) << BigInt(64)) + BigInt(1);
     const first = boundedBigIntIndexV0_1B(new Xoshiro256ssV0_1B(SEED), bound);
     const second = boundedBigIntIndexV0_1B(new Xoshiro256ssV0_1B(SEED), bound);
@@ -283,19 +302,31 @@ describe("FRD-02 CVC v0.1b exact structural-zero NULL", () => {
     expect(first < bound).toBe(true);
   });
 
-  test("T20: P1 arithmetic failures propagate as integer failures", () => {
+  test("T21: exact-null counting no longer depends on legacy uint128 arithmetic", () => {
     const spy = jest.spyOn(Uint128V0_1B.prototype, "add").mockImplementation(() => {
       throw new RangeError("UINT128_OVERFLOW");
     });
     try {
-      const result = countExactNullV0_1B([classFromMatrix(complete(2))]);
-      expect(result).toMatchObject({ status: "FAILURE", reason: "INTEGER_OVERFLOW_OR_NONEXACT_COUNT" });
+      const result = countExactNullV0_1B([classFromMatrix(complete(6))]);
+      expect(result).toMatchObject({ status: "READY", branch: "EXHAUSTIVE", totalCount: BigInt(720) });
     } finally {
       spy.mockRestore();
     }
   });
 
-  test("validates malformed input without converting it to a scientific result", () => {
+  test("T22: canonical decimal count serialization is lossless", () => {
+    const values = [BigInt(0), BigInt(1), BigInt("265252859812191058636308480000000"), BigInt("8222838654177922817725562880000000"), BigInt("991677934870949689209571401541893801158183648651267795444376054838492222809091499987689476037000748982075094738965754305639874560000000000000000000000")];
+    for (const value of values) {
+      const serialized = serializeExactNullCountV0_1B(value);
+      expect(serialized).toMatch(/^(0|[1-9][0-9]*)$/);
+      expect(parseExactNullCountV0_1B(serialized)).toBe(value);
+    }
+    expect(() => parseExactNullCountV0_1B("01")).toThrow("NON_CANONICAL_EXACT_NULL_COUNT");
+    expect(() => parseExactNullCountV0_1B("1e3")).toThrow("NON_CANONICAL_EXACT_NULL_COUNT");
+    expect(() => parseExactNullCountV0_1B("+1")).toThrow("NON_CANONICAL_EXACT_NULL_COUNT");
+  });
+
+  test("T23: validates malformed input without converting it to a scientific result", () => {
     const input = classFromMatrix(complete(1));
     expect(() => countExactNullV0_1B([{ ...input, recipients: [input.recipients[0], input.recipients[0]] }])).toThrow(
       "DUPLICATE_RECIPIENT_ID",
