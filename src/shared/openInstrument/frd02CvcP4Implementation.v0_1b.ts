@@ -604,6 +604,45 @@ function hasMatchingN11ReplicateIds(result: P4PairReplicateResultV0_1B): boolean
   return result.replicateId === result.ordered.replicateId && result.replicateId === result.destroyed.replicateId;
 }
 
+function expectedReplicateExpectationV0_1B(
+  fixtureId: string,
+  replicateId: string,
+): P4FixtureExpectationV0_1B {
+  const expectation = fixtureExpectationV0_1B(fixtureId);
+  if (fixtureId === "C6") {
+    return {
+      ...expectation,
+      expectedGate: Number(replicateId) < 4 ? "MINIMUM_DISTINCT_LEFT_IDENTITIES_NOT_MET" : "MINIMUM_DISTINCT_RIGHT_IDENTITIES_NOT_MET",
+      expectedOutcomes: ["INSUFFICIENT_EVIDENCE"],
+    };
+  }
+  if (fixtureId === "C7") {
+    return {
+      ...expectation,
+      expectedGate: Number(replicateId) < 4 ? "VOICE_COVERAGE_MINIMUM_NOT_MET" : "POSITION_COVERAGE_MINIMUM_NOT_MET",
+      expectedOutcomes: ["INSUFFICIENT_EVIDENCE"],
+    };
+  }
+  if (fixtureId === "C8") {
+    return {
+      ...expectation,
+      expectedGate: Number(replicateId) < 4 ? "CONCENTRATION_CONFOUND_THRESHOLD_EXCEEDED" : "RARE_IDENTITY_SPARSE_THRESHOLD_EXCEEDED",
+      expectedOutcomes: Number(replicateId) < 4 ? ["STRUCTURAL_BUT_CONFOUNDED"] : ["SPARSE"],
+    };
+  }
+  return expectation;
+}
+
+function matchesFrozenSubcaseV0_1B(result: P4ReplicateResultV0_1B): boolean {
+  if (result.fixtureId !== "C6" && result.fixtureId !== "C7" && result.fixtureId !== "C8") return true;
+  const fixtureId = result.fixtureId;
+  const expectedSubcase = scheduledSubcaseV0_1B(fixtureId, result.replicateId);
+  const expectedFixture = generateP4FixtureV0_1B(fixtureId, result.replicateId, expectedSubcase);
+  return expectedFixture.kind === "single"
+    && result.constructionFingerprint === expectedFixture.constructionFingerprint
+    && result.inputSha256 === expectedFixture.constructionFingerprint;
+}
+
 function singleAccepted(expectation: P4FixtureExpectationV0_1B, result: P4ReplicateResultV0_1B): boolean {
   return result.valid && expectedGateMatches(expectation, result.gateA) && expectedP2Matches(expectation, result.gateB) && result.outcome !== null && expectation.expectedOutcomes.includes(result.outcome);
 }
@@ -640,7 +679,7 @@ export function evaluateP4FixtureAcceptanceV0_1B(
     }
     const single = result as P4ReplicateResultV0_1B;
     if (!single.valid) invalidReplicates += 1;
-    else if (!singleAccepted(expectation, single)) unexpectedReplicates += 1;
+    else if (!matchesFrozenSubcaseV0_1B(single) || !singleAccepted(expectedReplicateExpectationV0_1B(fixtureId, single.replicateId), single)) unexpectedReplicates += 1;
     else validReplicates += 1;
   }
   const outcome: P4MethodologyOutcomeV0_1B = invalidReplicates > 0 ? "CALIBRATION_INVALID" : unexpectedReplicates > 0 ? "CALIBRATION_FAIL" : "CALIBRATION_PASS";

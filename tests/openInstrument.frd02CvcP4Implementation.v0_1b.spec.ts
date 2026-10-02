@@ -107,6 +107,19 @@ describe("FRD-02 P4 implementation and validation", () => {
     }
   });
 
+  test("rejects C6/C7/C8 results that do not follow the frozen replicate subcases", () => {
+    for (const fixtureId of ["C6", "C7", "C8"] as const) {
+      const results = Array.from({ length: 8 }, (_, index) => {
+        const fixture = generateP4FixtureV0_1B(fixtureId, String(index), "default");
+        if (fixture.kind !== "single") throw new Error("EXPECTED_SINGLE_FIXTURE");
+        return runP4SingleReplicateV0_1B(fixture);
+      });
+      const acceptance = evaluateP4FixtureAcceptanceV0_1B(fixtureId, results);
+      expect(acceptance.outcome).toBe("CALIBRATION_FAIL");
+      expect(acceptance.unexpectedReplicates).toBeGreaterThan(0);
+    }
+  });
+
   test("keeps normalization and Gate A failure controls deterministic", () => {
     const c1 = generateP4FixtureV0_1B("C1", "0");
     const c2 = generateP4FixtureV0_1B("C2", "0");
