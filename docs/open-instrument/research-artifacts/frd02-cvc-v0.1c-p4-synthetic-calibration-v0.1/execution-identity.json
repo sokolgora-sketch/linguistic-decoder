@@ -1,0 +1,70 @@
+{
+  "experimentId": "OPEN_INSTRUMENT_FRD02_CVC_V0_1C_P4_SUCCESSOR",
+  "contractId": "OPEN_INSTRUMENT_FRD02_CVC_V0_1C_P4_METHODOLOGY_V0_1",
+  "scheduleVersion": "FRD02_CVC_V0_1C_P4_SCHEDULE_V0_1",
+  "fixtureVersion": "FRD02_CVC_V0_1C_P4_FIXTURE_CONSTRUCTION_V0_1",
+  "acceptanceVersion": "FRD02_CVC_V0_1C_P4_ACCEPTANCE_V0_1",
+  "masterSeed": "FRD02_CVC_V0_1B_P4_MASTER_0",
+  "permutationStreamId": "permutation-primary",
+  "replicateIds": [
+    "0",
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6",
+    "7"
+  ],
+  "fixtureCount": 29,
+  "replicatesPerFixture": 8,
+  "scheduleEntries": 232,
+  "scheduleBytes": 123799,
+  "scheduleSha256": "d1459ca6a2e653198d9bfd08d64648894c3f8bb93898e72f242be5c774a17cee",
+  "scheduleFirstEntry": {
+    "fixtureId": "N0",
+    "replicateId": "0",
+    "subcase": "default",
+    "seedTuple": "FRD02_CVC_STRUCTURAL_ZERO_NULL_V0_1|primary|77038ccc5406da0f6970fab2c667ea131955057abc1907f0f59e61180e306129|571ef6f139442b086887fb847097aff13edb53dea835b64c97b0b1fbf46a7a8d|3cf7076b5f9685990891ad6333a89b75aa8823d977664f2c9bffe2364d63608e|N0|0|permutation-primary",
+    "seedWords": [
+      "16257052112623566726",
+      "6488305799830533679",
+      "3581155099284778833",
+      "10217051766742357601"
+    ],
+    "constructionFingerprint": "d7ec8f8b8dd54b3414a0b88a6a4ee6ab330bfaf268467c18b88654cd6883f4a9"
+  },
+  "scheduleLastEntry": {
+    "fixtureId": "C9",
+    "replicateId": "7",
+    "subcase": "default",
+    "seedTuple": "FRD02_CVC_STRUCTURAL_ZERO_NULL_V0_1|primary|77038ccc5406da0f6970fab2c667ea131955057abc1907f0f59e61180e306129|571ef6f139442b086887fb847097aff13edb53dea835b64c97b0b1fbf46a7a8d|3cf7076b5f9685990891ad6333a89b75aa8823d977664f2c9bffe2364d63608e|C9|7|permutation-primary",
+    "seedWords": [
+      "11114083815776784091",
+      "14837953455892667064",
+      "1355341426466937160",
+      "5534336180376523420"
+    ],
+    "constructionFingerprint": "923108e6f5699e4e90a0d63bed58f963e655f3baa829cfee94529122dd1bf973"
+  },
+  "repositoryHead": "ae502995b2fc29d216f78684560b085804e7347c",
+  "executionBranch": "docs/open-instrument-frd02-p4-v0-1c-synthetic-calibration-execution",
+  "implementationSha256": "277d9091a07243e1da57ef8f7e802c65967673958d4ff4b9d6cbc23e25d7b2e1",
+  "executionWrapperPath": "scripts/openInstrumentFrd02P4V0_1cSyntheticCalibrationExecution.v0_1.ts",
+  "executionWrapperSha256": "8e853d47d1d5590416c17de814010825fa582da76cdd983c98aecce917c74218",
+  "authorityHashes": {
+    "humanContractSha256": "b6f58fdbcc38c3c5dc8238fec692c3d98b649018113e7540a972d03c558c40c6",
+    "machineContractSha256": "7862a9d9ece42692069240c47ab917520f3fb101ccbdf945860ebc24fa055743",
+    "authorityManifestSha256": "5bcf6cf9c07476e00715432d4b705025b3ba3722f2ac477d7e5c337676aab11e",
+    "predecessorResultSha256": "20c1ad43e95a59912908334ad7fb2bf7f98765aa85b4f5a4f569ac1dea5fdf02",
+    "doctrineSha256": "b72c23d659d010b5c2a53058cc2f6223e0cbba9b32e351d17009b6545fc05f93",
+    "p4HumanContractSha256": "798278dbe0d3077700300dd9ad0c531dab422d3a46a7f488fc274b00ba74d5c9",
+    "p4MachineContractSha256": "168ed4803d2a33690e88caf2d9bd138c0f0cd96bebd25248c0e1e63ab2927bea",
+    "fixtureCorrectionMachineSha256": "20b593af98ac51f7c962d42debcf5a7f03dfcbfb6c3d64c70d9a27c8c6fe7a96",
+    "p1P2CorrectionMachineSha256": "ed81a8e85341a38d2b08b5a1b706c4699b9c3ad287dea048a70108ce7d436a47",
+    "subcaseAllocationHumanSha256": "b63b88783b2df96c93b38fe891a616b2801dbef42d175c7d7a1bb88e6a365547",
+    "subcaseAllocationMachineSha256": "4c94d32b5089c5ea74a0c8a5e74e60616b561241d12723c180fafb48838f3f4e"
+  },
+  "executionAttemptMaximum": 1,
+  "createdAtUtc": "2026-10-02T12:21:43.294Z"
+}

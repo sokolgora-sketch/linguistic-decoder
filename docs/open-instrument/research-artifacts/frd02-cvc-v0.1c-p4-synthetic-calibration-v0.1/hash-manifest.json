@@ -1,0 +1,345 @@
+{
+  "manifestVersion": "open-instrument.artifact-hash-manifest.v0_1",
+  "contractId": "OPEN_INSTRUMENT_FRD02_CVC_V0_1C_P4_METHODOLOGY_V0_1",
+  "status": "AUTHORITATIVE_SYNTHETIC_CALIBRATION_RESULT_PRESERVED",
+  "calibrationExecuted": true,
+  "executionAttemptCount": 1,
+  "calibrationOutcome": "CALIBRATION_PASS",
+  "syntheticOnly": true,
+  "realDataExecuted": false,
+  "productionAuthorityChanged": false,
+  "repositoryBaseSha": "ae502995b2fc29d216f78684560b085804e7347c",
+  "executionBranch": "docs/open-instrument-frd02-p4-v0-1c-synthetic-calibration-execution",
+  "noRerun": true,
+  "artifacts": [
+    {
+      "path": "docs/open-instrument/research-artifacts/frd02-cvc-v0.1c-p4-synthetic-calibration-v0.1/result.json",
+      "sha256": "b912ae02bb8be01ba75475db068a3cffdd440eae166542cc944ce8fdabf2bf43",
+      "byteLength": 388590
+    },
+    {
+      "path": "docs/open-instrument/research-artifacts/frd02-cvc-v0.1c-p4-synthetic-calibration-v0.1/execution-identity.json",
+      "sha256": "6e9c4b2b6f9fbf8e9f0713720312689a7c4d11dafb996cb8fbf98a27adfe3557",
+      "byteLength": 3613
+    },
+    {
+      "path": "scripts/openInstrumentFrd02P4V0_1cSyntheticCalibrationExecution.v0_1.ts",
+      "sha256": "8e853d47d1d5590416c17de814010825fa582da76cdd983c98aecce917c74218",
+      "byteLength": 19815
+    },
+    {
+      "path": "src/shared/openInstrument/frd02CvcP4Implementation.v0_1c.ts",
+      "sha256": "277d9091a07243e1da57ef8f7e802c65967673958d4ff4b9d6cbc23e25d7b2e1",
+      "byteLength": 21412
+    },
+    {
+      "path": "docs/open-instrument/frd02-cvc-v0.1c-p4-successor-methodology-freeze-v0.1.md",
+      "sha256": "b6f58fdbcc38c3c5dc8238fec692c3d98b649018113e7540a972d03c558c40c6",
+      "byteLength": 18008
+    },
+    {
+      "path": "docs/open-instrument/research-artifacts/frd02-cvc-v0.1c-p4-successor-methodology-freeze-v0.1/preregistration.json",
+      "sha256": "7862a9d9ece42692069240c47ab917520f3fb101ccbdf945860ebc24fa055743",
+      "byteLength": 15087
+    },
+    {
+      "path": "docs/open-instrument/research-artifacts/frd02-cvc-v0.1c-p4-successor-methodology-freeze-v0.1/hash-manifest.json",
+      "sha256": "5bcf6cf9c07476e00715432d4b705025b3ba3722f2ac477d7e5c337676aab11e",
+      "byteLength": 1152
+    },
+    {
+      "path": "docs/open-instrument/zhero-doctrine-record-v0.1.md",
+      "sha256": "b72c23d659d010b5c2a53058cc2f6223e0cbba9b32e351d17009b6545fc05f93",
+      "byteLength": 9562
+    },
+    {
+      "path": "docs/open-instrument/research-artifacts/frd02-cvc-v0.1b-p4-synthetic-calibration-v0.1/result.json",
+      "sha256": "20c1ad43e95a59912908334ad7fb2bf7f98765aa85b4f5a4f569ac1dea5fdf02",
+      "byteLength": 382231
+    }
+  ],
+  "schedule": {
+    "size": 232,
+    "bytes": 123799,
+    "sha256": "d1459ca6a2e653198d9bfd08d64648894c3f8bb93898e72f242be5c774a17cee"
+  },
+  "acceptance": {
+    "outcome": "CALIBRATION_PASS",
+    "scheduleSize": 232,
+    "acceptedFixtureCount": 29,
+    "invalidResultCount": 0,
+    "expectedInvalidE3Replicates": 8,
+    "fixtureAcceptances": [
+      {
+        "fixtureId": "N0",
+        "outcome": "CALIBRATION_PASS",
+        "validReplicates": 8,
+        "invalidReplicates": 0,
+        "unexpectedReplicates": 0,
+        "expectedInvalidReplicates": 0,
+        "reason": null
+      },
+      {
+        "fixtureId": "N1",
+        "outcome": "CALIBRATION_PASS",
+        "validReplicates": 8,
+        "invalidReplicates": 0,
+        "unexpectedReplicates": 0,
+        "expectedInvalidReplicates": 0,
+        "reason": null
+      },
+      {
+        "fixtureId": "N2",
+        "outcome": "CALIBRATION_PASS",
+        "validReplicates": 8,
+        "invalidReplicates": 0,
+        "unexpectedReplicates": 0,
+        "expectedInvalidReplicates": 0,
+        "reason": null
+      },
+      {
+        "fixtureId": "N3",
+        "outcome": "CALIBRATION_PASS",
+        "validReplicates": 8,
+        "invalidReplicates": 0,
+        "unexpectedReplicates": 0,
+        "expectedInvalidReplicates": 0,
+        "reason": null
+      },
+      {
+        "fixtureId": "N4",
+        "outcome": "CALIBRATION_PASS",
+        "validReplicates": 8,
+        "invalidReplicates": 0,
+        "unexpectedReplicates": 0,
+        "expectedInvalidReplicates": 0,
+        "reason": null
+      },
+      {
+        "fixtureId": "N5",
+        "outcome": "CALIBRATION_PASS",
+        "validReplicates": 8,
+        "invalidReplicates": 0,
+        "unexpectedReplicates": 0,
+        "expectedInvalidReplicates": 0,
+        "reason": null
+      },
+      {
+        "fixtureId": "N6",
+        "outcome": "CALIBRATION_PASS",
+        "validReplicates": 8,
+        "invalidReplicates": 0,
+        "unexpectedReplicates": 0,
+        "expectedInvalidReplicates": 0,
+        "reason": null
+      },
+      {
+        "fixtureId": "N7",
+        "outcome": "CALIBRATION_PASS",
+        "validReplicates": 8,
+        "invalidReplicates": 0,
+        "unexpectedReplicates": 0,
+        "expectedInvalidReplicates": 0,
+        "reason": null
+      },
+      {
+        "fixtureId": "N8",
+        "outcome": "CALIBRATION_PASS",
+        "validReplicates": 8,
+        "invalidReplicates": 0,
+        "unexpectedReplicates": 0,
+        "expectedInvalidReplicates": 0,
+        "reason": null
+      },
+      {
+        "fixtureId": "N9",
+        "outcome": "CALIBRATION_PASS",
+        "validReplicates": 8,
+        "invalidReplicates": 0,
+        "unexpectedReplicates": 0,
+        "expectedInvalidReplicates": 0,
+        "reason": null
+      },
+      {
+        "fixtureId": "N10",
+        "outcome": "CALIBRATION_PASS",
+        "validReplicates": 8,
+        "invalidReplicates": 0,
+        "unexpectedReplicates": 0,
+        "expectedInvalidReplicates": 0,
+        "reason": null
+      },
+      {
+        "fixtureId": "N11",
+        "outcome": "CALIBRATION_PASS",
+        "validReplicates": 8,
+        "invalidReplicates": 0,
+        "unexpectedReplicates": 0,
+        "reason": null,
+        "expectedInvalidReplicates": 0
+      },
+      {
+        "fixtureId": "N11_ORDERED",
+        "outcome": "CALIBRATION_PASS",
+        "validReplicates": 8,
+        "invalidReplicates": 0,
+        "unexpectedReplicates": 0,
+        "expectedInvalidReplicates": 0,
+        "reason": null
+      },
+      {
+        "fixtureId": "N11_ORDER_DESTROYED",
+        "outcome": "CALIBRATION_PASS",
+        "validReplicates": 8,
+        "invalidReplicates": 0,
+        "unexpectedReplicates": 0,
+        "expectedInvalidReplicates": 0,
+        "reason": null
+      },
+      {
+        "fixtureId": "N12",
+        "outcome": "CALIBRATION_PASS",
+        "validReplicates": 8,
+        "invalidReplicates": 0,
+        "unexpectedReplicates": 0,
+        "expectedInvalidReplicates": 0,
+        "reason": null
+      },
+      {
+        "fixtureId": "N13",
+        "outcome": "CALIBRATION_PASS",
+        "validReplicates": 8,
+        "invalidReplicates": 0,
+        "unexpectedReplicates": 0,
+        "expectedInvalidReplicates": 0,
+        "reason": null
+      },
+      {
+        "fixtureId": "E1",
+        "outcome": "CALIBRATION_PASS",
+        "validReplicates": 8,
+        "invalidReplicates": 0,
+        "unexpectedReplicates": 0,
+        "expectedInvalidReplicates": 0,
+        "reason": null
+      },
+      {
+        "fixtureId": "E2",
+        "outcome": "CALIBRATION_PASS",
+        "validReplicates": 8,
+        "invalidReplicates": 0,
+        "unexpectedReplicates": 0,
+        "expectedInvalidReplicates": 0,
+        "reason": null
+      },
+      {
+        "fixtureId": "E3",
+        "outcome": "CALIBRATION_PASS",
+        "validReplicates": 0,
+        "invalidReplicates": 0,
+        "unexpectedReplicates": 0,
+        "expectedInvalidReplicates": 8,
+        "reason": null
+      },
+      {
+        "fixtureId": "C0",
+        "outcome": "CALIBRATION_PASS",
+        "validReplicates": 8,
+        "invalidReplicates": 0,
+        "unexpectedReplicates": 0,
+        "expectedInvalidReplicates": 0,
+        "reason": null
+      },
+      {
+        "fixtureId": "C1",
+        "outcome": "CALIBRATION_PASS",
+        "validReplicates": 8,
+        "invalidReplicates": 0,
+        "unexpectedReplicates": 0,
+        "expectedInvalidReplicates": 0,
+        "reason": null
+      },
+      {
+        "fixtureId": "C2",
+        "outcome": "CALIBRATION_PASS",
+        "validReplicates": 8,
+        "invalidReplicates": 0,
+        "unexpectedReplicates": 0,
+        "expectedInvalidReplicates": 0,
+        "reason": null
+      },
+      {
+        "fixtureId": "C3",
+        "outcome": "CALIBRATION_PASS",
+        "validReplicates": 8,
+        "invalidReplicates": 0,
+        "unexpectedReplicates": 0,
+        "expectedInvalidReplicates": 0,
+        "reason": null
+      },
+      {
+        "fixtureId": "C4",
+        "outcome": "CALIBRATION_PASS",
+        "validReplicates": 8,
+        "invalidReplicates": 0,
+        "unexpectedReplicates": 0,
+        "expectedInvalidReplicates": 0,
+        "reason": null
+      },
+      {
+        "fixtureId": "C5",
+        "outcome": "CALIBRATION_PASS",
+        "validReplicates": 8,
+        "invalidReplicates": 0,
+        "unexpectedReplicates": 0,
+        "expectedInvalidReplicates": 0,
+        "reason": null
+      },
+      {
+        "fixtureId": "C6",
+        "outcome": "CALIBRATION_PASS",
+        "validReplicates": 8,
+        "invalidReplicates": 0,
+        "unexpectedReplicates": 0,
+        "expectedInvalidReplicates": 0,
+        "reason": null
+      },
+      {
+        "fixtureId": "C7",
+        "outcome": "CALIBRATION_PASS",
+        "validReplicates": 8,
+        "invalidReplicates": 0,
+        "unexpectedReplicates": 0,
+        "expectedInvalidReplicates": 0,
+        "reason": null
+      },
+      {
+        "fixtureId": "C8",
+        "outcome": "CALIBRATION_PASS",
+        "validReplicates": 8,
+        "invalidReplicates": 0,
+        "unexpectedReplicates": 0,
+        "expectedInvalidReplicates": 0,
+        "reason": null
+      },
+      {
+        "fixtureId": "C9",
+        "outcome": "CALIBRATION_PASS",
+        "validReplicates": 8,
+        "invalidReplicates": 0,
+        "unexpectedReplicates": 0,
+        "expectedInvalidReplicates": 0,
+        "reason": null
+      }
+    ],
+    "reason": null
+  },
+  "scientificBoundary": {
+    "wholeZheroDoctrineTested": false,
+    "realLanguageTruthEstablished": false,
+    "lexicalMeaningEstablished": false,
+    "historicalClaimEstablished": false,
+    "albanianClaimEstablished": false,
+    "productionReadinessEstablished": false
+  }
+}
