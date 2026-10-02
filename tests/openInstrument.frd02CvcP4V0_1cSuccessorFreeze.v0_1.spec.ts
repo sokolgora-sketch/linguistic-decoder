@@ -35,6 +35,8 @@ describe("FRD-02 P4 v0.1c successor freeze", () => {
     expect(artifact.e3.scientificValidityDenominatorExcludesE3).toBe(true);
     expect(artifact.aggregateRule.expectedE3InvalidityExcludedFromAggregateInvalidity).toBe(true);
     expect(artifact.aggregateRule.outcomes).toEqual(["CALIBRATION_PASS", "CALIBRATION_FAIL", "CALIBRATION_INVALID"]);
+    expect(artifact.aggregateRule.fail).toContain("all 28 non-E3 results are valid");
+    expect(artifact.aggregateRule.fail).toContain("exact E3 expected-invalid pattern passes");
   });
 
   test("freezes C7 constructions that preserve all strata and reach coverage failures", () => {

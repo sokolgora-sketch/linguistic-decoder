@@ -199,7 +199,7 @@
   "aggregateRule": {
     "outcomes": ["CALIBRATION_PASS", "CALIBRATION_FAIL", "CALIBRATION_INVALID"],
     "pass": "all 28 non-E3 fixture acceptances pass AND exact E3 expected-invalid pattern passes AND schedule/identity/seed/hash/replay invariants pass",
-    "fail": "all evaluated results are valid AND at least one expected scientific/control outcome is unexpected",
+    "fail": "all 28 non-E3 results are valid AND exact E3 expected-invalid pattern passes AND at least one expected scientific/control outcome is unexpected",
     "invalid": "any schema/identity/seed/hash/runtime/unexpected-resource invalidity outside exact E3 expected pattern OR E3 pattern mismatch OR schedule/replay mismatch",
     "expectedE3InvalidityExcludedFromAggregateInvalidity": true,
     "expectedE3InvalidityExcludedFromSupportClaims": true,

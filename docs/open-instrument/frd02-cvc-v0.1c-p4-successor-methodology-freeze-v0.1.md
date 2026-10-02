@@ -136,7 +136,7 @@ The successor uses the existing three top-level outcomes:
 | Condition | Aggregate result |
 |---|---|
 | All 28 non-E3 fixtures are valid and satisfy their frozen acceptance rules; all 8 E3 replicates satisfy the exact expected-invalid pattern; schedule, seeds, hashes, replay, and control invariants are valid | `CALIBRATION_PASS` |
-| Every relevant result is valid but a fixture produces an unexpected valid scientific outcome, including an unexpected support result | `CALIBRATION_FAIL` |
+| All 28 non-E3 results are valid, the exact E3 expected-invalid pattern passes, and a fixture produces an unexpected scientific/control outcome, including an unexpected support result | `CALIBRATION_FAIL` |
 | Any schema/identity/seed/hash/runtime/resource invalidity outside the exact E3 expected pattern; missing/extra E3 replicates; an E3 Gate A/P2/outcome mismatch; schedule or replay mismatch | `CALIBRATION_INVALID` |
 | Any E3 expected resource failure is silently converted to support or otherwise treated as a positive result | `CALIBRATION_INVALID` and the control is rejected |
 
@@ -273,7 +273,8 @@ authority. No fixture is added, removed, renamed, or silently reinterpreted.
 | `E1` | existing cluster-adjacent control | existing PASS; Monte Carlo | existing limits | normalization/exclusion control | NO |
 | `E2` | existing observed-realization boundary | existing PASS; finite `ONLY_OBSERVED_REALIZATION` failure | existing limits | finite-null control | NO |
 | `E3` | existing valid resource-control construction; successor aggregate classification only | Gate A PASS; P2 expected RESOURCE failure | existing P1/P2 resource limits unchanged | expected-invalid resource control | YES |
-| `C0–C6` | existing failure-control constructions and frozen subcase allocation | existing declared Gate A failure; P2 NOT_RUN | existing limits | failure-mode controls | NO |
+| `C0–C2` | existing balanced/normalization control constructions | Gate A PASS; P2 MONTE_CARLO | existing limits | valid failure-mode controls | NO |
+| `C3–C6` | existing coverage/identity failure-control constructions and frozen subcase allocation | existing declared Gate A failure; P2 NOT_RUN | existing limits | Gate-A failure-mode controls | NO |
 | `C7` | successor partial-stratum-per-group construction above | coverage Gate A failure; P2 NOT_RUN | existing limits | missing-voice and missing-position controls | YES |
 | `C8` | existing concentration construction plus successor rare-identity replacement above | sparse/confounded Gate A failure; P2 NOT_RUN | existing limits | concentration and rare-identity controls | YES |
 | `C9` | existing exchangeability-pool construction | exchangeability Gate A failure; P2 NOT_RUN | existing limits | exchangeability control | NO |
