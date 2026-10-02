@@ -1,0 +1,35 @@
+{
+  "contractId": "OPEN_INSTRUMENT_FRD02_CVC_V0_1B_P1_P2_EXACT_NULL_ARITHMETIC_COMPATIBILITY_V0_1",
+  "version": "v0.1",
+  "status": "FROZEN_P1_P2_EXACT_NULL_ARITHMETIC_COMPATIBILITY_CORRECTION",
+  "humanArtifact": {
+    "path": "docs/open-instrument/frd02-cvc-v0.1b-p1-p2-exact-null-arithmetic-compatibility-correction-v0.1.md",
+    "bytes": 5494,
+    "sha256": "1120e1d22c3c0bbe75199425b8b987a74571bc237f762935980cc42e74890019"
+  },
+  "machineArtifact": {
+    "path": "docs/open-instrument/research-artifacts/frd02-cvc-v0.1b-p1-p2-exact-null-arithmetic-compatibility-v0.1/preregistration.json",
+    "bytes": 2305,
+    "sha256": "ed81a8e85341a38d2b08b5a1b706c4699b9c3ad287dea048a70108ce7d436a47"
+  },
+  "testPath": "tests/openInstrument.frd02CvcP1P2Compatibility.v0_1.spec.ts",
+  "p4Bindings": {
+    "methodologyPath": "docs/open-instrument/frd02-cvc-v0.1b-p4-methodology-freeze-v0.1.md",
+    "fixtureCorrectionPath": "docs/open-instrument/frd02-cvc-v0.1b-p4-fixture-truth-correction-v0.1.1.md",
+    "fixtureCorrectionMachinePath": "docs/open-instrument/research-artifacts/frd02-cvc-v0.1b-p4-fixture-truth-correction-v0.1.1/preregistration.json",
+    "p4Changed": false,
+    "calibrationExecuted": false
+  },
+  "invariants": {
+    "exactNullMathematicsChanged": false,
+    "matchingChanged": false,
+    "recurrenceChanged": false,
+    "weightingChanged": false,
+    "nullSetChanged": false,
+    "p3StatisticChanged": false,
+    "stateResourceLimitPreserved": true,
+    "transitionResourceLimitPreserved": true,
+    "productionChanged": false
+  },
+  "nextLane": "FRD02_P4_IMPLEMENTATION_AND_VALIDATION"
+}

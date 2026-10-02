@@ -1,0 +1,66 @@
+{
+  "contractId": "OPEN_INSTRUMENT_FRD02_CVC_V0_1B_P1_P2_EXACT_NULL_ARITHMETIC_COMPATIBILITY_V0_1",
+  "version": "v0.1",
+  "status": "FROZEN_P1_P2_EXACT_NULL_ARITHMETIC_COMPATIBILITY_CORRECTION",
+  "purpose": "Extend exact-count representation for frozen P4 raw signature classes without changing null mathematics or P4 fixture truth.",
+  "supersedes": {
+    "historicalActiveConstraint": "raw signature class size above 30 fails before exact counting because Uint128 capacity is treated as a resource limit",
+    "historicalImplementation": "src/shared/openInstrument/frd02CvcExactNull.v0_1b.ts"
+  },
+  "activeImplementation": {
+    "exactCountRepresentation": "JavaScript bigint",
+    "runtimeCountType": "bigint",
+    "rawSignatureClassMagnitudeGate": "none",
+    "persistentCountRepresentation": "canonical unsigned decimal string"
+  },
+  "preservedResourceGates": {
+    "maxExactStates": 1048576,
+    "maxExactTransitions": 16777216,
+    "resourceFailureReason": "EXACT_COUNT_RESOURCE_LIMIT_EXCEEDED"
+  },
+  "preservedMathematics": [
+    "admissible_null_realization_set",
+    "matching_semantics",
+    "graph_and_recurrence_semantics",
+    "forced_edge_reduction",
+    "component_factoring",
+    "weighting",
+    "finite_null_branch_thresholds",
+    "deterministic_sampling",
+    "p3_statistic",
+    "p4_fixture_truth"
+  ],
+  "compatibilityTargets": {
+    "p4RawClassSize": 96,
+    "existingLe30ResultsPreserved": true,
+    "p4FixturesAccounted": 29,
+    "p4RunnerImplemented": false,
+    "calibrationExecuted": false,
+    "realDataExecuted": false
+  },
+  "canonicalSerialization": {
+    "zero": "0",
+    "positivePattern": "^(0|[1-9][0-9]*)$",
+    "lossless": true,
+    "helpers": [
+      "serializeExactNullCountV0_1B",
+      "parseExactNullCountV0_1B"
+    ]
+  },
+  "nextLane": "FRD02_P4_IMPLEMENTATION_AND_VALIDATION",
+  "authorityBoundary": {
+    "productionChanged": false,
+    "apiChanged": false,
+    "chatChanged": false,
+    "p3SemanticsChanged": false,
+    "albanianChanged": false,
+    "oneEmbryoChanged": false,
+    "diachronicChanged": false,
+    "providerExecution": false
+  },
+  "testPaths": [
+    "tests/openInstrument.frd02CvcUint128.v0_1b.spec.ts",
+    "tests/openInstrument.frd02CvcExactNull.v0_1b.spec.ts",
+    "tests/openInstrument.frd02CvcP1P2Compatibility.v0_1.spec.ts"
+  ]
+}

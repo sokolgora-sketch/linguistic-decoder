@@ -1,16 +1,9 @@
-import {
-  UNCOMPUTED_V0_1B,
-  Uint128V0_1B,
-  ZERO_V0_1B,
-} from "./frd02CvcUint128.v0_1b";
-
 const BIGINT_ZERO = BigInt(0);
 const BIGINT_ONE = BigInt(1);
 const UINT64_BITS = 64;
 const UINT64_MODULUS = BIGINT_ONE << BigInt(UINT64_BITS);
 const UINT64_MASK = UINT64_MODULUS - BIGINT_ONE;
 
-export const MAX_RAW_SIGNATURE_CLASS_SIZE_V0_1B = 30;
 export const MAX_EXACT_STATES_V0_1B = 1_048_576;
 export const MAX_EXACT_TRANSITIONS_V0_1B = 16_777_216;
 
@@ -156,6 +149,25 @@ export class ExactNullSamplingErrorV0_1B extends RangeError {
   }
 }
 
+const CANONICAL_DECIMAL_V0_1B = /^(0|[1-9][0-9]*)$/;
+
+/**
+ * Canonical lossless representation for exact-null counts at persistence
+ * boundaries. Runtime results remain bigint values; JSON boundaries use this
+ * unsigned decimal form because JSON.stringify cannot serialize bigint.
+ */
+export function serializeExactNullCountV0_1B(value: bigint): string {
+  if (value < BIGINT_ZERO) throw new TypeError("NEGATIVE_EXACT_NULL_COUNT");
+  return value.toString(10);
+}
+
+export function parseExactNullCountV0_1B(value: string): bigint {
+  if (!CANONICAL_DECIMAL_V0_1B.test(value)) {
+    validationFailure("NON_CANONICAL_EXACT_NULL_COUNT");
+  }
+  return BigInt(value);
+}
+
 function validationFailure(code: string): never {
   throw new ExactNullValidationErrorV0_1B(code);
 }
@@ -265,8 +277,8 @@ type PreparedComponentV0_1B = {
   types: readonly DonorTypeV0_1B[];
   stateCount: number;
   transitionEstimate: number;
-  count?: Uint128V0_1B;
-  memo?: Uint32Array;
+  count?: bigint;
+  memo?: (bigint | undefined)[];
   strides?: readonly number[];
 };
 
@@ -675,12 +687,6 @@ function prepareInternalV0_1B(classes: readonly ExactNullSignatureClassV0_1B[]):
   let totalTransitionEstimate = 0;
 
   for (const normalized of normalizedClasses) {
-    if (normalized.recipients.length > MAX_RAW_SIGNATURE_CLASS_SIZE_V0_1B) {
-      return {
-        kind: "FAILURE",
-        result: computationalFailure("RESOURCE", "EXACT_COUNT_RESOURCE_LIMIT_EXCEEDED", "raw signature class size exceeds 30"),
-      };
-    }
     const graph = buildGraphV0_1B(normalized);
     if (!hasPerfectMatchingV0_1B(graph)) {
       return {
@@ -737,26 +743,20 @@ function prepareInternalV0_1B(classes: readonly ExactNullSignatureClassV0_1B[]):
   return { kind: "READY", plan: { classes: preparedClasses, totalStateEstimate, totalTransitionEstimate } };
 }
 
-function readMemoV0_1B(memo: Uint32Array, state: number): Uint128V0_1B {
-  const offset = state * 4;
-  return Uint128V0_1B.fromLimbs([memo[offset], memo[offset + 1], memo[offset + 2], memo[offset + 3]]);
+function readMemoV0_1B(memo: readonly (bigint | undefined)[], state: number): bigint | undefined {
+  return memo[state];
 }
 
-function writeMemoV0_1B(memo: Uint32Array, state: number, value: Uint128V0_1B): void {
-  const offset = state * 4;
-  const limbs = value.toUint32Array();
-  memo[offset] = limbs[0];
-  memo[offset + 1] = limbs[1];
-  memo[offset + 2] = limbs[2];
-  memo[offset + 3] = limbs[3];
+function writeMemoV0_1B(memo: (bigint | undefined)[], state: number, value: bigint): void {
+  memo[state] = value;
 }
 
-function componentCountAtStateV0_1B(component: PreparedComponentV0_1B, state: number): Uint128V0_1B {
+function componentCountAtStateV0_1B(component: PreparedComponentV0_1B, state: number): bigint {
   if (component.memo === undefined || component.strides === undefined) {
     throw new Error("EXACT_COUNTING_MEMO_NOT_INITIALIZED");
   }
   const cached = readMemoV0_1B(component.memo, state);
-  if (!cached.equals(UNCOMPUTED_V0_1B)) return cached;
+  if (cached !== undefined) return cached;
 
   const digits: number[] = [];
   let remainingState = state;
@@ -769,13 +769,12 @@ function componentCountAtStateV0_1B(component: PreparedComponentV0_1B, state: nu
     assigned += digit;
   }
   if (assigned === component.component.recipientIndices.length) {
-    const one = Uint128V0_1B.fromBigInt(BIGINT_ONE);
-    writeMemoV0_1B(component.memo, state, one);
-    return one;
+    writeMemoV0_1B(component.memo, state, BIGINT_ONE);
+    return BIGINT_ONE;
   }
 
   const recipientPosition = assigned;
-  let result = ZERO_V0_1B;
+  let result = BIGINT_ZERO;
   for (let typeIndex = 0; typeIndex < component.types.length; typeIndex += 1) {
     const type = component.types[typeIndex];
     const used = digits[typeIndex];
@@ -783,7 +782,7 @@ function componentCountAtStateV0_1B(component: PreparedComponentV0_1B, state: nu
     if (remaining <= 0 || !type.neighborLocalIndices.includes(recipientPosition)) continue;
     const nextState = state + (component.strides[typeIndex] ?? 0);
     const child = componentCountAtStateV0_1B(component, nextState);
-    result = result.add(child.multiplySmall(remaining));
+    result += child * BigInt(remaining);
   }
   writeMemoV0_1B(component.memo, state, result);
   return result;
@@ -798,7 +797,7 @@ function countPreparedPlanV0_1B(plan: PreparedPlanV0_1B): ExactNullCountResultV0
       const componentCounts: bigint[] = [];
       const componentDonorTypeCounts: number[] = [];
       for (const component of preparedClass.components) {
-        if (component.memo === undefined) component.memo = new Uint32Array(component.stateCount * 4).fill(0xffff_ffff);
+        if (component.memo === undefined) component.memo = new Array<bigint | undefined>(component.stateCount);
         if (component.strides === undefined) {
           const strides: number[] = [];
           let stride = 1;
@@ -810,10 +809,9 @@ function countPreparedPlanV0_1B(plan: PreparedPlanV0_1B): ExactNullCountResultV0
         }
         const count = componentCountAtStateV0_1B(component, 0);
         component.count = count;
-        const countBigInt = count.toBigInt();
-        componentCounts.push(countBigInt);
+        componentCounts.push(count);
         componentDonorTypeCounts.push(component.types.length);
-        classCount *= countBigInt;
+        classCount *= count;
       }
       preparedClass.count = classCount;
       preparedClass.componentCounts = componentCounts;
@@ -995,14 +993,14 @@ function sampleComponentV0_1B(component: PreparedComponentV0_1B, rng: Xoshiro256
   let state = 0;
   for (let recipientPosition = 0; recipientPosition < component.component.recipientIndices.length; recipientPosition += 1) {
     const total = componentCountAtStateV0_1B(component, state);
-    let draw = boundedBigIntIndexV0_1B(rng, total.toBigInt());
+    let draw = boundedBigIntIndexV0_1B(rng, total);
     let selectedType = -1;
     for (let typeIndex = 0; typeIndex < component.types.length; typeIndex += 1) {
       const type = component.types[typeIndex];
       const remaining = type.donorIndices.length - used[typeIndex];
       if (remaining <= 0 || !type.neighborLocalIndices.includes(recipientPosition)) continue;
       const child = componentCountAtStateV0_1B(component, state + (component.strides[typeIndex] ?? 0));
-      const weight = child.multiplySmall(remaining).toBigInt();
+      const weight = child * BigInt(remaining);
       if (draw < weight) {
         selectedType = typeIndex;
         break;
