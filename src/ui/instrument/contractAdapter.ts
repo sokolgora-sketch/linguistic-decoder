@@ -26,6 +26,7 @@ import type {
   PronunciationConsonantSegmentV0_1VM,
   SpokenPronunciationProvenanceV0_1VM,
   SpokenPronunciationVariantV0_1VM,
+  ZeroConsonantalStructuralCompositionV0_1VM,
   ResonanceProfileV1VM,
 } from "../telemetry/types";
 import {
@@ -354,6 +355,181 @@ function parseRootMapV1(v: unknown): ParseRootMapResult {
 
 function isRecord(v: unknown): v is Record<string, unknown> {
   return !!v && typeof v === "object" && !Array.isArray(v);
+}
+
+type ZeroConsonantalStructuralCompositionParseV0_1 =
+  | { ok: true; value: ZeroConsonantalStructuralCompositionV0_1VM | null }
+  | { ok: false; reason: string };
+
+type ZeroConsonantalStructuralCompositionExpectedV0_1 = Readonly<{
+  voicePath: readonly Vowel[] | null;
+  variantId: string;
+  variantOrder: number;
+  sourceProfileId: string;
+  sourceNotation: string;
+  sourceRevision: string;
+}>;
+
+function parseZeroConsonantalStructuralCompositionV0_1(
+  value: unknown,
+  expected: ZeroConsonantalStructuralCompositionExpectedV0_1,
+): ZeroConsonantalStructuralCompositionParseV0_1 {
+  if (value === undefined || value === null) return { ok: true, value: null };
+  if (!isRecord(value)) {
+    return { ok: false, reason: "zeroConsonantalStructuralComposition expected object|null" };
+  }
+
+  const schemaVersion = value["schemaVersion"];
+  const voicePath = value["voicePath"];
+  const variantId = value["variantId"];
+  const variantOrder = value["variantOrder"];
+  const sourceProfileId = value["sourceProfileId"];
+  const sourceNotation = value["sourceNotation"];
+  const sourceRevision = value["sourceRevision"];
+  const p = value["p"];
+  const i = value["i"];
+  const s = value["s"];
+  const d = value["d"];
+  const a = value["a"];
+  const r = value["r"];
+
+  if (schemaVersion !== "open-instrument.zero-consonantal-structural-composition.v0_1") {
+    return { ok: false, reason: "zeroConsonantalStructuralComposition.schemaVersion invalid" };
+  }
+  if (
+    typeof variantId !== "string" ||
+    !variantId.trim() ||
+    variantId !== expected.variantId
+  ) {
+    return { ok: false, reason: "zeroConsonantalStructuralComposition.variantId expected enclosing variant identity" };
+  }
+  if (
+    typeof variantOrder !== "number" ||
+    !Number.isInteger(variantOrder) ||
+    variantOrder < 0 ||
+    variantOrder !== expected.variantOrder
+  ) {
+    return { ok: false, reason: "zeroConsonantalStructuralComposition.variantOrder expected enclosing variant order" };
+  }
+  if (typeof sourceProfileId !== "string" || sourceProfileId !== expected.sourceProfileId) {
+    return { ok: false, reason: "zeroConsonantalStructuralComposition.sourceProfileId expected enclosing pronunciation profile" };
+  }
+  if (typeof sourceNotation !== "string" || sourceNotation !== expected.sourceNotation) {
+    return { ok: false, reason: "zeroConsonantalStructuralComposition.sourceNotation expected enclosing pronunciation notation" };
+  }
+  if (typeof sourceRevision !== "string" || sourceRevision !== expected.sourceRevision) {
+    return { ok: false, reason: "zeroConsonantalStructuralComposition.sourceRevision expected enclosing pronunciation revision" };
+  }
+
+  if (!Array.isArray(voicePath)) {
+    return { ok: false, reason: "zeroConsonantalStructuralComposition.voicePath expected Voice[]" };
+  }
+  const parsedVoicePath: Vowel[] = [];
+  for (const [index, rawVoice] of voicePath.entries()) {
+    if (typeof rawVoice !== "string") {
+      return { ok: false, reason: `zeroConsonantalStructuralComposition.voicePath[${index}] expected Voice` };
+    }
+    const parsedVoice = normalizeVowelChar(rawVoice);
+    if (!parsedVoice) {
+      return { ok: false, reason: `zeroConsonantalStructuralComposition.voicePath[${index}] expected Voice` };
+    }
+    parsedVoicePath.push(parsedVoice);
+  }
+  if (
+    expected.voicePath === null ||
+    parsedVoicePath.length !== expected.voicePath.length ||
+    parsedVoicePath.some((part, index) => part !== expected.voicePath?.[index])
+  ) {
+    return { ok: false, reason: "zeroConsonantalStructuralComposition.voicePath expected enclosing canonical Voice path" };
+  }
+
+  const nonNegativeIntegerArray = (candidate: unknown): number[] | null =>
+    Array.isArray(candidate) && candidate.every(
+      (item) => typeof item === "number" && Number.isInteger(item) && item >= 0,
+    )
+      ? candidate as number[]
+      : null;
+
+  const iValues = nonNegativeIntegerArray(i);
+  const dValues = nonNegativeIntegerArray(d);
+  if (typeof p !== "number" || !Number.isInteger(p) || p < 0) {
+    return { ok: false, reason: "zeroConsonantalStructuralComposition.p expected non-negative integer" };
+  }
+  if (iValues === null) {
+    return { ok: false, reason: "zeroConsonantalStructuralComposition.i expected integer[]" };
+  }
+  if (typeof s !== "number" || !Number.isInteger(s) || s < 0) {
+    return { ok: false, reason: "zeroConsonantalStructuralComposition.s expected non-negative integer" };
+  }
+  if (dValues === null) {
+    return { ok: false, reason: "zeroConsonantalStructuralComposition.d expected integer[]" };
+  }
+  if (
+    dValues.length !== iValues.length + 2 ||
+    dValues[0] !== p ||
+    dValues[dValues.length - 1] !== s ||
+    dValues.slice(1, -1).some((value, index) => value !== iValues[index])
+  ) {
+    return { ok: false, reason: "zeroConsonantalStructuralComposition.d inconsistent with P/I/S" };
+  }
+  if (typeof a !== "number" || !Number.isInteger(a)) {
+    return { ok: false, reason: "zeroConsonantalStructuralComposition.a expected integer" };
+  }
+  if (a !== p - s) {
+    return { ok: false, reason: "zeroConsonantalStructuralComposition.a inconsistent with P/S" };
+  }
+  if (!Array.isArray(r)) {
+    return { ok: false, reason: "zeroConsonantalStructuralComposition.r expected array" };
+  }
+
+  const recurrences: Array<ZeroConsonantalStructuralCompositionV0_1VM["r"][number]> = [];
+  for (const [index, rawRecurrence] of r.entries()) {
+    if (!isRecord(rawRecurrence)) {
+      return { ok: false, reason: `zeroConsonantalStructuralComposition.r[${index}] expected object` };
+    }
+    const identity = rawRecurrence["identity"];
+    const segmentIndices = rawRecurrence["segmentIndices"];
+    const occurrenceCount = rawRecurrence["occurrenceCount"];
+    const segmentIndexValues = nonNegativeIntegerArray(segmentIndices);
+    if (!Array.isArray(identity) || !identity.every((item) => typeof item === "string")) {
+      return { ok: false, reason: `zeroConsonantalStructuralComposition.r[${index}].identity expected string[]` };
+    }
+    if (segmentIndexValues === null) {
+      return { ok: false, reason: `zeroConsonantalStructuralComposition.r[${index}].segmentIndices expected integer[]` };
+    }
+    if (
+      typeof occurrenceCount !== "number" ||
+      !Number.isInteger(occurrenceCount) ||
+      occurrenceCount < 2 ||
+      occurrenceCount !== segmentIndexValues.length
+    ) {
+      return { ok: false, reason: `zeroConsonantalStructuralComposition.r[${index}].occurrenceCount invalid` };
+    }
+    recurrences.push({
+      identity,
+      segmentIndices: segmentIndexValues,
+      occurrenceCount,
+    });
+  }
+
+  return {
+    ok: true,
+    value: {
+      schemaVersion,
+      voicePath: parsedVoicePath,
+      variantId,
+      variantOrder,
+      sourceProfileId,
+      sourceNotation,
+      sourceRevision,
+      p,
+      i: iValues,
+      s,
+      d: dValues,
+      a,
+      r: recurrences,
+    },
+  };
 }
 
 function asString(v: unknown): string | null {
@@ -981,6 +1157,8 @@ export function adaptAnalysisToTelemetryVM(raw: unknown): TelemetryViewModel {
       const rawCanonicalPath = rawVariantResult["canonicalVoicePath"];
       const variantReasonCode = rawVariantResult["reasonCode"];
       const rawNormalizedSegments = rawVariantResult["normalizedSegments"];
+      const rawZeroConsonantalStructuralComposition =
+        rawVariantResult["zeroConsonantalStructuralComposition"];
 
       if (typeof sourceForm !== "string" || !sourceForm.trim()) {
         return missing("malformed", `spokenPronunciation.variants[${index}].variant.sourceForm expected string`);
@@ -1004,6 +1182,25 @@ export function adaptAnalysisToTelemetryVM(raw: unknown): TelemetryViewModel {
         if (!canonicalVoicePath) {
           return missing("malformed", `spokenPronunciation.variants[${index}].canonicalVoicePath expected Voice[]|null`);
         }
+      }
+
+      const zeroConsonantalStructuralComposition =
+        parseZeroConsonantalStructuralCompositionV0_1(
+          rawZeroConsonantalStructuralComposition,
+          {
+            voicePath: canonicalVoicePath,
+            variantId,
+            variantOrder,
+            sourceProfileId,
+            sourceNotation,
+            sourceRevision,
+          },
+        );
+      if (!zeroConsonantalStructuralComposition.ok) {
+        return missing(
+          "malformed",
+          `spokenPronunciation.variants[${index}].${zeroConsonantalStructuralComposition.reason}`,
+        );
       }
 
       let segments: PronunciationConsonantSegmentV0_1VM[] = [];
@@ -1050,6 +1247,7 @@ export function adaptAnalysisToTelemetryVM(raw: unknown): TelemetryViewModel {
         canonicalVoicePath,
         reasonCode: variantReasonCode,
         segments,
+        zeroConsonantalStructuralComposition: zeroConsonantalStructuralComposition.value,
       });
     }
 

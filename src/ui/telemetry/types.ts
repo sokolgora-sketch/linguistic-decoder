@@ -108,6 +108,28 @@ export type PronunciationConsonantSegmentV0_1VM = Readonly<{
   kind: "consonant";
 }>;
 
+export type ZeroConsonantalStructuralRecurrenceV0_1VM = Readonly<{
+  identity: readonly string[];
+  segmentIndices: readonly number[];
+  occurrenceCount: number;
+}>;
+
+export type ZeroConsonantalStructuralCompositionV0_1VM = Readonly<{
+  schemaVersion: "open-instrument.zero-consonantal-structural-composition.v0_1";
+  voicePath: Vowel[];
+  variantId: string;
+  variantOrder: number;
+  sourceProfileId: string;
+  sourceNotation: string;
+  sourceRevision: string;
+  p: number;
+  i: readonly number[];
+  s: number;
+  d: readonly number[];
+  a: number;
+  r: readonly ZeroConsonantalStructuralRecurrenceV0_1VM[];
+}>;
+
 export type SpokenPronunciationVariantV0_1VM = Readonly<{
   sourceForm: string;
   sourcePronunciation: string;
@@ -116,6 +138,7 @@ export type SpokenPronunciationVariantV0_1VM = Readonly<{
   canonicalVoicePath: Vowel[] | null;
   reasonCode: string | null;
   segments: PronunciationConsonantSegmentV0_1VM[];
+  zeroConsonantalStructuralComposition: ZeroConsonantalStructuralCompositionV0_1VM | null;
 }>;
 
 export type SpokenPronunciationProvenanceV0_1VM = Readonly<{

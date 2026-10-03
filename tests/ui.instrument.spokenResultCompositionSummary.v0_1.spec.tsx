@@ -27,6 +27,10 @@ describe("spoken result composition summary v0.1", () => {
     expect(within(compact).getByText("stone: S T OW1 N")).toBeVisible();
     expect(within(compact).getByText("S → T → N")).toBeVisible();
     expect(within(compact).getByText("canonical spoken Voice path: O → U")).toBeVisible();
+    expect(within(compact).getByText("Distribution D: 2 · 1")).toBeVisible();
+    expect(within(compact).getByText("Edge asymmetry A: +1")).toBeVisible();
+    expect(within(compact).getByText("Recurrence R: None")).toBeVisible();
+    expect(within(compact).getByText(/Claim level: ZË-RO structural interpretation/)).toBeVisible();
     const primary = screen.getByTestId("primary-reading-orientation-card");
     expect(primary.compareDocumentPosition(compact) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   });
@@ -38,7 +42,11 @@ describe("spoken result composition summary v0.1", () => {
     expect(within(compact).getByText("home: HH OW1 M")).toBeVisible();
     expect(within(compact).getByText("HH → M")).toBeVisible();
     expect(within(compact).getByText("canonical spoken Voice path: O → U")).toBeVisible();
+    expect(within(compact).getByText("Distribution D: 1 · 1")).toBeVisible();
+    expect(within(compact).getByText("Edge asymmetry A: 0")).toBeVisible();
     expect(within(compact).queryByText("S → T → N")).not.toBeInTheDocument();
+    expect(within(compact).queryByText("forward force")).not.toBeInTheDocument();
+    expect(within(compact).queryByText("semantic meaning")).not.toBeInTheDocument();
     expect(screen.getByText("Functional / candidate status")).toBeVisible();
     expect(screen.getByRole("heading", { name: "Null — no supported candidate" })).toBeVisible();
   });
@@ -50,7 +58,19 @@ describe("spoken result composition summary v0.1", () => {
     expect(within(compact).getByText("mother: M AH1 DH ER0")).toBeVisible();
     expect(within(compact).getByText("M → DH")).toBeVisible();
     expect(within(compact).getByText("canonical spoken Voice path: Ë → Ë")).toBeVisible();
+    expect(within(compact).getByText("Distribution D: 1 · 1 · 0")).toBeVisible();
+    expect(within(compact).getByText("Edge asymmetry A: +1")).toBeVisible();
     expect(screen.getByTestId("spoken-pronunciation-overview")).toBeVisible();
+  });
+
+  it("renders banana recurrence without assigning semantic meaning", async () => {
+    render(<InstrumentPanel payload={await analyze("banana")} />);
+
+    const compact = summary();
+    expect(within(compact).getByText("Distribution D: 1 · 1 · 1 · 0")).toBeVisible();
+    expect(within(compact).getByText("Edge asymmetry A: +1")).toBeVisible();
+    expect(within(compact).getByText("Recurrence R: N ×2")).toBeVisible();
+    expect(within(compact).getByText(/not linguistic or semantic authority/)).toBeVisible();
   });
 
   it("keeps pronunciation Null distinct from candidate Null without spelling fallback", async () => {
@@ -60,6 +80,7 @@ describe("spoken result composition summary v0.1", () => {
     expect(within(compact).getByText("Spoken pronunciation unavailable")).toBeVisible();
     expect(within(compact).getByText("canonical spoken Voice path: Null")).toBeVisible();
     expect(within(compact).queryByText("Pronunciation consonant segments")).not.toBeInTheDocument();
+    expect(within(compact).queryByTestId("zero-consonantal-structural-composition")).not.toBeInTheDocument();
     expect(screen.getByText("Functional / candidate status")).toBeVisible();
     expect(screen.getByTestId("spoken-pronunciation-overview")).toHaveTextContent(
       "reason: PRONUNCIATION_NOT_FOUND",

@@ -14,7 +14,27 @@ import {
 import { principlesPathFromVowels } from "./principles.core.v1";
 import type { VowelVoice } from "@/shared/vowels/vowelVoices.v0.1";
 import { resolveCmuDictPronunciationToVoiceV0_1 } from "@/shared/openInstrument/pronunciationToVoice.v0_1";
-import type { PronunciationToVoiceResultV0_1 } from "@/shared/openInstrument/pronunciationToVoice.v0_1";
+import type {
+  PronunciationToVoiceResultV0_1,
+  PronunciationVoiceVariantResultV0_1,
+} from "@/shared/openInstrument/pronunciationToVoice.v0_1";
+import {
+  deriveZeroConsonantalStructuralCompositionV0_1,
+  type ZeroConsonantalStructuralCompositionV0_1,
+} from "@/shared/openInstrument/zeroConsonantalStructuralComposition.v0_1";
+
+type HeartPronunciationVariantV0_1 = PronunciationVoiceVariantResultV0_1 &
+  Readonly<{
+    zeroConsonantalStructuralComposition: ZeroConsonantalStructuralCompositionV0_1 | null;
+  }>;
+
+type HeartSpokenPronunciationV0_1 = Omit<
+  PronunciationToVoiceResultV0_1,
+  "variants"
+> &
+  Readonly<{
+    variants: readonly HeartPronunciationVariantV0_1[];
+  }>;
 
 export type HeartInstrumentV1Packet = {
   basisNfc: string;
@@ -26,7 +46,7 @@ export type HeartInstrumentV1Packet = {
 
   // Canonical spoken authority used by the route's Heart/Math7 projection.
   canonicalSpokenVoicePath: readonly VowelVoice[] | null;
-  spokenPronunciation: PronunciationToVoiceResultV0_1;
+  spokenPronunciation: HeartSpokenPronunciationV0_1;
   spokenPrinciplesPath: string[];
   spokenMath7: ReturnType<typeof computeMath7> | null;
 
@@ -54,7 +74,15 @@ export function buildHeartInstrumentV1(basis: string): HeartInstrumentV1Packet {
   // strict vowel filter + NFC authority
   const surfaceVowels = extractSevenVowels(basisNfc);
 
-  const spokenPronunciation = resolveCmuDictPronunciationToVoiceV0_1(basisNfc);
+  const pronunciationResult = resolveCmuDictPronunciationToVoiceV0_1(basisNfc);
+  const spokenPronunciation: HeartSpokenPronunciationV0_1 = {
+    ...pronunciationResult,
+    variants: pronunciationResult.variants.map((variant) => ({
+      ...variant,
+      zeroConsonantalStructuralComposition:
+        deriveZeroConsonantalStructuralCompositionV0_1(variant),
+    })),
+  };
   const canonicalSpokenVoicePath = spokenPronunciation.canonicalSpokenVoicePath;
   const spokenPrinciplesPath = canonicalSpokenVoicePath
     ? principlesPathFromVowels(canonicalSpokenVoicePath as any)
