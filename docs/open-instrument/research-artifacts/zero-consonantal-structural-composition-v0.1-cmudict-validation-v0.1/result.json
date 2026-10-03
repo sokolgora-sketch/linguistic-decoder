@@ -1,0 +1,68 @@
+{
+  "schemaVersion": "open-instrument.zero-consonantal-structural-composition-cmudict-validation.v0_1",
+  "status": "INVALID_EXECUTION_PRESERVED",
+  "outcome": "INVALID_EXECUTION",
+  "population": {
+    "sourceId": "open-instrument.cmudict-arpabet-en-us.v0_1",
+    "sourceRevision": "74790861f652b15e4ac49015a90074ad62a27690",
+    "sourceNotation": "ARPABET",
+    "sourceSha256": "81917843c7f44ce2b094ac63873c2c7a4cf802040792c455ba3ca406891c3d22",
+    "sourceBytes": 3618488,
+    "lexicalFormsTotal": 126052,
+    "sourceVariantsTotal": 135166,
+    "eligibleVariants": 135136,
+    "nullOrIneligibleVariants": 30,
+    "nullReasonCounts": [
+      {
+        "reasonCode": "VOICE_FAMILY_AUTHORITY_MISSING",
+        "count": 8
+      },
+      {
+        "reasonCode": "ZC_NULL",
+        "count": 22
+      }
+    ]
+  },
+  "execution": {
+    "attemptCount": 1,
+    "authoritativeExecutionStarted": true,
+    "authoritativeExecutionCompleted": false,
+    "executedScientificEvaluations": 135136,
+    "aggregationStarted": true,
+    "observationsPersisted": false,
+    "executionStartUtc": null,
+    "executionEndUtc": null,
+    "preservedAtUtc": "2026-10-03T08:52:47.303Z",
+    "command": "npx tsx scripts/openInstrumentZeroConsonantalStructuralCompositionCmuDictValidation.v0_1.ts --execute",
+    "runnerPath": "scripts/openInstrumentZeroConsonantalStructuralCompositionCmuDictValidation.v0_1.ts",
+    "runnerSha256": "c2f0f1ef8f3bcb988a2d2a4d7afe94958e17ad1634104ee5262d97f88043400d",
+    "populationSpecPath": "docs/open-instrument/research-artifacts/zero-consonantal-structural-composition-v0.1-cmudict-validation-v0.1/population-spec.json",
+    "populationSpecSha256": "81248026f57cffb0c357a4e29e0cce4d3139adc1521eda89e72754783095ed44",
+    "repositoryHead": "797ea850544ca9ba1e15ce18aa43a082de76ea89",
+    "noRerun": true,
+    "adaptiveRerun": false,
+    "replacementReplicates": false,
+    "syntheticOnly": false,
+    "realDataExecuted": false,
+    "failure": {
+      "stage": "AGGREGATION",
+      "name": "RangeError",
+      "message": "Maximum call stack size exceeded",
+      "stack": "RangeError: Maximum call stack size exceeded\n    at numericSummaryV0_1 (src/shared/openInstrument/zeroConsonantalStructuralCompositionValidation.v0_1.ts:140:44)\n    at buildZeroConsonantalDistributionSummaryV0_1 (src/shared/openInstrument/zeroConsonantalStructuralCompositionValidation.v0_1.ts:222:8)\n    at execute (scripts/openInstrumentZeroConsonantalStructuralCompositionCmuDictValidation.v0_1.ts:440:25)"
+    }
+  },
+  "authority": {
+    "zcContractSha256": "1ee274253f2b6da3c29a9c9b4409c258e64a6d4121dcf48925464dac926a8e0c",
+    "configurationAuthoritySha256": "b4d24f1105af0b4a3a2a3275425f84a1499ddea77f0d307f5d175d8125ac502d",
+    "priorProductContractSha256": "14ab3a088f891b1aba079d5ef7f6c23a2c5883758c24a7976788dd9024dc99fc",
+    "implementationPath": "src/shared/openInstrument/zeroConsonantalStructuralComposition.v0_1.ts",
+    "implementationSha256": "450689bbc6e7bffc64d09b5a3029c00edf33bce209983efb83afe08efc3b875c",
+    "sourcePath": "src/data/openInstrument/pronunciation/cmudict.dict"
+  },
+  "claimBoundary": {
+    "semanticAnalysisPerformed": false,
+    "semanticInterpretation": "NOT_PERFORMED",
+    "lexicalMeaningUsed": false,
+    "productionReadinessEstablished": false
+  }
+}
