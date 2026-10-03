@@ -65,6 +65,10 @@ export function SpokenResultCompositionSummaryV0_1({
     pronunciation?.status === "defined" && readout.voicePath.kind === "present"
       ? readout.voicePath.value
       : null;
+  const hasStructuralComposition =
+    definedPronunciation?.variants.some(
+      (variant) => variant.zeroConsonantalStructuralComposition !== null,
+    ) ?? false;
 
   return (
     <section
@@ -142,12 +146,21 @@ export function SpokenResultCompositionSummaryV0_1({
                           <span className="font-mono">
                             Distribution D: {composition.d.join(" · ")}
                           </span>
+                          <div className="text-[11px] text-[#8f9baa]">
+                            Ordered consonant load: prefix → between source nuclei → suffix.
+                          </div>
                         </div>
                         <div>
                           Edge asymmetry A: {edgeAsymmetryTextV0_1(composition.a)}
+                          <div className="text-[11px] text-[#8f9baa]">
+                            Prefix load − suffix load; structural orientation only.
+                          </div>
                         </div>
                         <div>
                           Recurrence R: {recurrenceTextV0_1(composition)}
+                          <div className="text-[11px] text-[#8f9baa]">
+                            Repeated exact source consonant identity.
+                          </div>
                         </div>
                         <div className="text-[11px] text-[#8f9baa]">
                           Components P/I/S: {composition.p} / {composition.i.length ? composition.i.join(" · ") : "none"} / {composition.s}
@@ -160,6 +173,11 @@ export function SpokenResultCompositionSummaryV0_1({
                 );
               })}
             </div>
+            {hasStructuralComposition ? (
+              <p className="mt-2 text-[11px] leading-4 text-[#8f9baa]">
+                ZC summarizes structure; the source consonant sequence preserves exact identity and order.
+              </p>
+            ) : null}
             <p className="mt-2 text-[11px] leading-4 text-[#8f9baa]">
               Claim level: ZË-RO structural interpretation; not linguistic or semantic authority.
             </p>
