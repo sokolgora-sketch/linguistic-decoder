@@ -513,7 +513,7 @@ export function InstrumentPanel(props: Props) {
         <div className="space-y-4">
           <TabPanel id="overview" active={activeSection}>
             <div className="space-y-4">
-              <PrimaryReadingOrientationCardV0_1 vm={vm} />
+              <SpokenPronunciationOverviewCardV0_1 readout={vm.readout} />
 
               <SpokenResultCompositionSummaryV0_1 readout={vm.readout} />
 
@@ -530,6 +530,8 @@ export function InstrumentPanel(props: Props) {
                 />
               ) : null}
 
+              <PrimaryReadingOrientationCardV0_1 vm={vm} />
+
               <DoctrineReadingCard doctrineReading={vm.doctrineReading} />
 
               <EmbryoExpansionContextCardV0_1
@@ -545,8 +547,6 @@ export function InstrumentPanel(props: Props) {
                 delta={vm.readout.voicePathDelta}
                 normalizationSteps={vm.evidence?.normalizationSteps}
               />
-
-              <SpokenPronunciationOverviewCardV0_1 readout={vm.readout} />
 
               <details
                 data-testid="deterministic-details"

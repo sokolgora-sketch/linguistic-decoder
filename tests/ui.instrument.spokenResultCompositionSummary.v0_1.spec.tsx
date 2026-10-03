@@ -19,12 +19,17 @@ function summary() {
 }
 
 describe("spoken result composition summary v0.1", () => {
-  it("composes stone source pronunciation, consonants, and canonical path near the primary result", async () => {
+  it("composes stone's canonical path, Gamma, and ZC after its source authority", async () => {
     render(<InstrumentPanel payload={await analyze("stone")} />);
 
     const compact = summary();
     expect(compact).toBeVisible();
-    expect(within(compact).getByText("stone: S T OW1 N")).toBeVisible();
+    const source = screen.getByTestId("spoken-pronunciation-overview");
+    expect(within(source).getByText(/stone: .*OW1/)).toBeVisible();
+    expect(within(source).getByText("open-instrument.cmudict-arpabet-en-us.v0_1")).toBeVisible();
+    expect(within(source).getByText("ARPABET")).toBeVisible();
+    expect(within(source).queryByText("canonical spoken Voice path: O → U")).not.toBeInTheDocument();
+    expect(within(compact).getByText("Source consonant structure Γ")).toBeVisible();
     expect(within(compact).getByText("S → T → N")).toBeVisible();
     expect(within(compact).getByText("canonical spoken Voice path: O → U")).toBeVisible();
     expect(within(compact).getByText("Distribution D: 2 · 1")).toBeVisible();
@@ -35,15 +40,16 @@ describe("spoken result composition summary v0.1", () => {
     expect(within(compact).getByText("Repeated exact source consonant identity.")).toBeVisible();
     expect(within(compact).getByText("ZC summarizes structure; the source consonant sequence preserves exact identity and order.")).toBeVisible();
     expect(within(compact).getByText(/Claim level: ZË-RO structural interpretation/)).toBeVisible();
+    expect(source.compareDocumentPosition(compact) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     const primary = screen.getByTestId("primary-reading-orientation-card");
-    expect(primary.compareDocumentPosition(compact) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(compact.compareDocumentPosition(primary) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   });
 
   it("keeps home on the same Voice path with distinct source consonants", async () => {
     render(<InstrumentPanel payload={await analyze("home")} />);
 
     const compact = summary();
-    expect(within(compact).getByText("home: HH OW1 M")).toBeVisible();
+    expect(within(screen.getByTestId("spoken-pronunciation-overview")).getByText(/home: .*OW1 M/)).toBeVisible();
     expect(within(compact).getByText("HH → M")).toBeVisible();
     expect(within(compact).getByText("canonical spoken Voice path: O → U")).toBeVisible();
     expect(within(compact).getByText("Distribution D: 1 · 1")).toBeVisible();
@@ -63,7 +69,7 @@ describe("spoken result composition summary v0.1", () => {
     const make = render(<InstrumentPanel payload={await analyze("make")} />);
 
     const makeSummary = summary();
-    expect(within(makeSummary).getByText("make: M EY1 K")).toBeVisible();
+    expect(within(screen.getByTestId("spoken-pronunciation-overview")).getByText(/make: .*EY1 K/)).toBeVisible();
     expect(within(makeSummary).getByText("M → K")).toBeVisible();
     expect(within(makeSummary).getByText("canonical spoken Voice path: E → I")).toBeVisible();
     expect(within(makeSummary).getByText("Distribution D: 1 · 1")).toBeVisible();
@@ -74,7 +80,7 @@ describe("spoken result composition summary v0.1", () => {
     render(<InstrumentPanel payload={await analyze("name")} />);
 
     const nameSummary = summary();
-    expect(within(nameSummary).getByText("name: N EY1 M")).toBeVisible();
+    expect(within(screen.getByTestId("spoken-pronunciation-overview")).getByText(/name: .*EY1 M/)).toBeVisible();
     expect(within(nameSummary).getByText("N → M")).toBeVisible();
     expect(within(nameSummary).getByText("canonical spoken Voice path: E → I")).toBeVisible();
     expect(within(nameSummary).getByText("Distribution D: 1 · 1")).toBeVisible();
@@ -97,7 +103,7 @@ describe("spoken result composition summary v0.1", () => {
     render(<InstrumentPanel payload={await analyze("mother")} />);
 
     const compact = summary();
-    expect(within(compact).getByText("mother: M AH1 DH ER0")).toBeVisible();
+    expect(within(screen.getByTestId("spoken-pronunciation-overview")).getByText(/mother: .*AH1 DH ER0/)).toBeVisible();
     expect(within(compact).getByText("M → DH")).toBeVisible();
     expect(within(compact).getByText("canonical spoken Voice path: Ë → Ë")).toBeVisible();
     expect(within(compact).getByText("Distribution D: 1 · 1 · 0")).toBeVisible();
@@ -110,8 +116,10 @@ describe("spoken result composition summary v0.1", () => {
     render(<InstrumentPanel payload={await analyze("study")} />);
 
     const compact = summary();
+    expect(within(compact).getByText("Source consonant structure Γ")).toBeVisible();
     expect(within(compact).getByText("Distribution D: 2 · 1 · 0")).toBeVisible();
     expect(within(compact).getByText("Ordered consonant load: prefix → between source nuclei → suffix.")).toBeVisible();
+    expect(screen.getByRole("heading", { name: "Reviewed functional evidence" })).toBeVisible();
   });
 
   it("renders banana recurrence without assigning semantic meaning", async () => {
@@ -132,6 +140,7 @@ describe("spoken result composition summary v0.1", () => {
     const compact = summary();
     expect(within(compact).getByText("Spoken pronunciation unavailable")).toBeVisible();
     expect(within(compact).getByText("canonical spoken Voice path: Null")).toBeVisible();
+    expect(within(compact).getByText("reason: PRONUNCIATION_NOT_FOUND")).toBeVisible();
     expect(within(compact).queryByText("Pronunciation consonant segments")).not.toBeInTheDocument();
     expect(within(compact).queryByTestId("zero-consonantal-structural-composition")).not.toBeInTheDocument();
     expect(within(compact).queryByText("Ordered consonant load: prefix → between source nuclei → suffix.")).not.toBeInTheDocument();
@@ -140,7 +149,7 @@ describe("spoken result composition summary v0.1", () => {
     expect(within(compact).queryByText("Repeated exact source consonant identity.")).not.toBeInTheDocument();
     expect(within(compact).queryByText("ZC summarizes structure; the source consonant sequence preserves exact identity and order.")).not.toBeInTheDocument();
     expect(screen.getByText("Functional / candidate status")).toBeVisible();
-    expect(screen.getByTestId("spoken-pronunciation-overview")).toHaveTextContent(
+    expect(compact).toHaveTextContent(
       "reason: PRONUNCIATION_NOT_FOUND",
     );
     expect(
