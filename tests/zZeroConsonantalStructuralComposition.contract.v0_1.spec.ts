@@ -176,6 +176,12 @@ describe("ZË-RO consonantal structural composition rule v0.1", () => {
       "R preserves repeated exact consonant source identities",
     );
     expect(contract).toContain("If no consonant identity repeats, R = [].");
+    expect(contract).toContain(
+      "An unrecognized inline annotation, comment token, malformed",
+    );
+    expect(contract).toContain(
+      "ZC_v0_1 does not strip, split, or reinterpret such a token as a consonant.",
+    );
   });
 
   it("projects stone and home with the same Voice path but different ZC", () => {

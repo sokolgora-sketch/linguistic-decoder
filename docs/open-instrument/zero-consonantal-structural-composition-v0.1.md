@@ -51,6 +51,21 @@ No spelling, orthographic cluster, G2P result, semantic lookup, etymology,
 phonological equivalence class, research artifact, provider output, or FRD-02
 output is admissible input.
 
+### 2.1 Validity boundary for Γ
+
+Γ is valid for ZC_v0_1 only when the existing consonantal configuration
+authority has produced a defined configuration from authorized normalized
+pronunciation segments. This rule does not parse raw CMUdict rows or repair
+source loading. An unrecognized inline annotation, comment token, malformed
+source unit, or other token that the existing authority has not authorized as
+a pronunciation segment invalidates Γ for this rule and produces Null.
+
+ZC_v0_1 does not strip, split, or reinterpret such a token as a consonant.
+Future corpus validation must preserve this fail-closed boundary and report
+invalid/Null rows separately; it must not count annotation text as consonant
+load. Any alternate corpus eligibility rule requires a separately frozen
+authority and is outside this contract.
+
 ## 3. Formal rule
 
 ### P — PREFIX LOAD
