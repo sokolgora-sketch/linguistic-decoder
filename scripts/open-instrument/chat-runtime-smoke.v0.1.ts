@@ -91,7 +91,7 @@ async function main(): Promise<void> {
     const defaultSpokenPronunciationSurface = page.getByTestId("spoken-pronunciation-overview");
     await defaultSpokenPronunciationSurface.waitFor({ state: "visible" });
     await defaultSpokenPronunciationSurface.getByText("Spoken pronunciation", { exact: true }).waitFor({ state: "visible" });
-    await defaultSpokenPronunciationSurface.getByText(/authority used for canonical spoken analysis/i).waitFor({ state: "visible" });
+    await defaultSpokenPronunciationSurface.getByText(/pronunciation authority used for canonical analysis/i).waitFor({ state: "visible" });
     await defaultSpokenPronunciationSurface.getByText(/canonical spoken Voice path:/i).waitFor({ state: "visible" });
     await defaultSpokenPronunciationSurface.getByText(/Orthographic vowel sequence:/i).waitFor({ state: "visible" });
     const deterministicDetailsBeforeExpansion = page.getByTestId("deterministic-details");
