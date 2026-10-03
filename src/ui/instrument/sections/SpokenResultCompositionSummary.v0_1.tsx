@@ -159,6 +159,9 @@ export function SpokenResultCompositionSummaryV0_1({
                         <div className="text-[11px] text-[#8f9baa]">
                           Components P/I/S: {composition.p} / {composition.i.length ? composition.i.join(" · ") : "none"} / {composition.s}
                         </div>
+                        <div className="text-[11px] text-[#8f9baa]">
+                          P = prefix consonant load · I = ordered inter-nucleus consonant loads · S = suffix consonant load.
+                        </div>
                       </>
                     ) : (
                       <div>{variantLabel}ZË-RO structural composition: Null</div>

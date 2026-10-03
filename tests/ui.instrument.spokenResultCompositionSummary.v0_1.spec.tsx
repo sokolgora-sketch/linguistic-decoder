@@ -35,6 +35,8 @@ describe("spoken result composition summary v0.1", () => {
     expect(within(compact).getByText("Distribution D: 2 · 1")).toBeVisible();
     expect(within(compact).getByText("Edge asymmetry A: +1")).toBeVisible();
     expect(within(compact).getByText("Recurrence R: None")).toBeVisible();
+    expect(within(compact).getByText("Components P/I/S: 2 / none / 1")).toBeVisible();
+    expect(within(compact).getByText("P = prefix consonant load · I = ordered inter-nucleus consonant loads · S = suffix consonant load.")).toBeVisible();
     expect(within(compact).getByText("Ordered consonant load: prefix → suffix.")).toBeVisible();
     expect(within(compact).getByText("Prefix load − suffix load; structural orientation only.")).toBeVisible();
     expect(within(compact).getByText("Repeated exact source consonant identity.")).toBeVisible();
@@ -118,6 +120,8 @@ describe("spoken result composition summary v0.1", () => {
     const compact = summary();
     expect(within(compact).getByText("Source consonant structure Γ")).toBeVisible();
     expect(within(compact).getByText("Distribution D: 2 · 1 · 0")).toBeVisible();
+    expect(within(compact).getByText("Components P/I/S: 2 / 1 / 0")).toBeVisible();
+    expect(within(compact).getByText("P = prefix consonant load · I = ordered inter-nucleus consonant loads · S = suffix consonant load.")).toBeVisible();
     expect(within(compact).getByText("Ordered consonant load: prefix → between source nuclei → suffix.")).toBeVisible();
     expect(screen.getByRole("heading", { name: "Reviewed functional evidence" })).toBeVisible();
   });
@@ -147,6 +151,7 @@ describe("spoken result composition summary v0.1", () => {
     expect(within(compact).queryByText("Ordered consonant load: prefix → suffix.")).not.toBeInTheDocument();
     expect(within(compact).queryByText("Prefix load − suffix load; structural orientation only.")).not.toBeInTheDocument();
     expect(within(compact).queryByText("Repeated exact source consonant identity.")).not.toBeInTheDocument();
+    expect(within(compact).queryByText("P = prefix consonant load · I = ordered inter-nucleus consonant loads · S = suffix consonant load.")).not.toBeInTheDocument();
     expect(within(compact).queryByText("ZC summarizes structure; the source consonant sequence preserves exact identity and order.")).not.toBeInTheDocument();
     expect(screen.getByText("Functional / candidate status")).toBeVisible();
     expect(compact).toHaveTextContent(
