@@ -33,18 +33,20 @@ function StatusBoundaryNoticeV0_1() {
 export function AnalysisStatusCardV0_1({
   status,
   variant = "full",
+  scopeLabel = "Analysis status",
 }: {
   status: PresentOrMissing<AnalysisStatusV0_1VM>;
   variant?: AnalysisStatusCardVariantV0_1;
+  scopeLabel?: string;
 }) {
   if (status.kind !== "present") {
     return (
       <section
-        aria-label="Analysis status"
+        aria-label={scopeLabel}
         className="rounded-[12px] border border-[#3b434d] bg-[#171c22] p-4"
       >
         <div className="text-[12px] font-semibold uppercase tracking-[0.16em] text-[#aeb7c5]">
-          Analysis status
+          {scopeLabel}
         </div>
         <div className="mt-2 text-sm text-[#d7dce3]">
           Status not emitted.
@@ -58,12 +60,12 @@ export function AnalysisStatusCardV0_1({
   if (variant === "primary") {
     return (
       <section
-        aria-label="Primary analysis status"
+        aria-label={scopeLabel}
         data-testid="primary-analysis-status"
         className="rounded-[12px] border border-[#3b434d] bg-[#171c22] p-4"
       >
         <div className="text-[12px] font-semibold uppercase tracking-[0.16em] text-[#aeb7c5]">
-          Analysis status
+          {scopeLabel}
         </div>
         <h2 className="mt-2 text-base font-semibold text-[#f5f7fb]">
           {STATUS_LABELS[value.status]}
@@ -78,13 +80,13 @@ export function AnalysisStatusCardV0_1({
 
   return (
     <section
-      aria-label="Analysis status"
+      aria-label={scopeLabel}
       className="rounded-[12px] border border-[#3b434d] bg-[#171c22] p-4"
     >
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <div className="text-[12px] font-semibold uppercase tracking-[0.16em] text-[#aeb7c5]">
-            Analysis status
+            {scopeLabel}
           </div>
           <h3 className="mt-2 text-base font-semibold text-[#f5f7fb]">
             {STATUS_LABELS[value.status]}
