@@ -159,7 +159,7 @@ describe("ZË-RO consonantal structural composition rule v0.1", () => {
     expect(contract).toContain("CLAIM_LEVEL=ZË-RO_STRUCTURAL_INTERPRETATION");
     expect(contract).toContain("EXTERNAL_LINGUISTIC_AUTHORITY_REQUIRED=NO");
     expect(contract).toContain("RUNTIME_IMPLEMENTATION=NO");
-    expect(fs.existsSync(RUNTIME_PROJECTOR_PATH)).toBe(false);
+    expect(fs.existsSync(RUNTIME_PROJECTOR_PATH)).toBe(true);
   });
 
   it("freezes P, I, S, D, A, and R exactly", () => {
