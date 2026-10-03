@@ -147,7 +147,10 @@ export function SpokenResultCompositionSummaryV0_1({
                             Distribution D: {composition.d.join(" · ")}
                           </span>
                           <div className="text-[11px] text-[#8f9baa]">
-                            Ordered consonant load: prefix → between source nuclei → suffix.
+                            Ordered consonant load:{" "}
+                            {composition.i.length === 0
+                              ? "prefix → suffix."
+                              : "prefix → between source nuclei → suffix."}
                           </div>
                         </div>
                         <div>
