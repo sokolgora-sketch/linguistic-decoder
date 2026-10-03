@@ -73,4 +73,34 @@ describe("spoken pronunciation provenance surface v0.1", () => {
     expect(screen.getByText("spoken path: Null (PRONUNCIATION_NOT_FOUND)")).toBeInTheDocument();
     expect(screen.getByText(/Orthographic vowel sequence \(non-authoritative\)/i)).toBeInTheDocument();
   });
+
+  it("fails closed when ZC identity, provenance, or equations do not bind to the pronunciation variant", async () => {
+    const mutations = [
+      (composition: any) => {
+        composition.variantId = "copied-from-another-variant";
+      },
+      (composition: any) => {
+        composition.sourceRevision = "copied-from-another-revision";
+      },
+      (composition: any) => {
+        composition.d = [99];
+        composition.a = 7;
+      },
+    ];
+
+    for (const mutate of mutations) {
+      const raw = await analyze("stone");
+      const malformed = JSON.parse(JSON.stringify(raw)) as any;
+      mutate(
+        malformed.heartInstrumentV1.spokenPronunciation.variants[0]
+          .zeroConsonantalStructuralComposition,
+      );
+
+      const vm = adaptAnalysisToTelemetryVM(malformed);
+      expect(vm.readout.spokenPronunciation).toMatchObject({
+        kind: "missing",
+        missing: "malformed",
+      });
+    }
+  });
 });

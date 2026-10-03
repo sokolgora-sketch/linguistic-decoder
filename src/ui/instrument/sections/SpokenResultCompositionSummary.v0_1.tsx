@@ -2,6 +2,7 @@
 
 import type {
   SpokenPronunciationProvenanceV0_1VM,
+  ZeroConsonantalStructuralCompositionV0_1VM,
   TelemetryReadout,
 } from "@/ui/telemetry/types";
 import {
@@ -33,6 +34,20 @@ function presentPronunciation(
   pronunciation: TelemetryReadout["spokenPronunciation"],
 ) {
   return pronunciation?.kind === "present" ? pronunciation.value : null;
+}
+
+function edgeAsymmetryTextV0_1(value: number): string {
+  return value > 0 ? `+${value}` : String(value);
+}
+
+function recurrenceTextV0_1(
+  composition: ZeroConsonantalStructuralCompositionV0_1VM,
+): string {
+  return composition.r.length
+    ? composition.r
+        .map((recurrence) => `${recurrence.identity.join(" ")} ×${recurrence.occurrenceCount}`)
+        .join(" | ")
+    : "None";
 }
 
 export function SpokenResultCompositionSummaryV0_1({
@@ -101,6 +116,53 @@ export function SpokenResultCompositionSummaryV0_1({
             <div className="mt-2 font-mono text-sm text-emerald-200">
               canonical spoken Voice path: {spokenPronunciationPathTextV0_1(canonicalPath)}
             </div>
+          </div>
+
+          <div
+            data-testid="zero-consonantal-structural-composition"
+            className="rounded-lg border border-[#27313d] bg-[#0d1117] p-3 md:col-span-2"
+          >
+            <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#8ea4ba]">
+              ZË-RO structural composition
+            </div>
+            <div className="mt-2 space-y-2 text-xs text-[#d7dde7]">
+              {definedPronunciation.variants.map((variant) => {
+                const composition = variant.zeroConsonantalStructuralComposition;
+                const variantLabel =
+                  definedPronunciation.variants.length > 1
+                    ? `variant ${variant.variantOrder + 1}: `
+                    : "";
+
+                return (
+                  <div key={variant.variantId} className="space-y-1">
+                    {composition ? (
+                      <>
+                        <div>
+                          {variantLabel}
+                          <span className="font-mono">
+                            Distribution D: {composition.d.join(" · ")}
+                          </span>
+                        </div>
+                        <div>
+                          Edge asymmetry A: {edgeAsymmetryTextV0_1(composition.a)}
+                        </div>
+                        <div>
+                          Recurrence R: {recurrenceTextV0_1(composition)}
+                        </div>
+                        <div className="text-[11px] text-[#8f9baa]">
+                          Components P/I/S: {composition.p} / {composition.i.length ? composition.i.join(" · ") : "none"} / {composition.s}
+                        </div>
+                      </>
+                    ) : (
+                      <div>{variantLabel}ZË-RO structural composition: Null</div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+            <p className="mt-2 text-[11px] leading-4 text-[#8f9baa]">
+              Claim level: ZË-RO structural interpretation; not linguistic or semantic authority.
+            </p>
           </div>
         </div>
       ) : (
