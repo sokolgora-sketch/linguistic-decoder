@@ -5,6 +5,7 @@ import { render, screen, within } from "@testing-library/react";
 import { GET } from "../app/api/analyze-v1/route";
 import { adaptAnalysisToTelemetryVM } from "../src/ui/instrument/contractAdapter";
 import { SpokenPronunciationOverviewCardV0_1 } from "../src/ui/instrument/sections/SpokenPronunciationOverviewCard.v0_1";
+import { SpokenResultCompositionSummaryV0_1 } from "../src/ui/instrument/sections/SpokenResultCompositionSummary.v0_1";
 
 async function analyze(word: string): Promise<any> {
   const response = await GET({
@@ -76,12 +77,12 @@ describe("pronunciation-derived consonant segments v0.1", () => {
 
   test("renders source-faithful segments with the authorized label", async () => {
     const vm = adaptAnalysisToTelemetryVM(await analyze("mother"));
-    render(<SpokenPronunciationOverviewCardV0_1 readout={vm.readout} />);
+    render(<SpokenResultCompositionSummaryV0_1 readout={vm.readout} />);
 
-    const overview = screen.getByTestId("spoken-pronunciation-overview");
-    const segments = within(overview).getByTestId("spoken-pronunciation-consonant-segments");
-    expect(segments).toHaveTextContent("Pronunciation consonant segments: M → DH");
-    expect(segments).not.toHaveTextContent(/shade|meaning|function/i);
+    const summary = screen.getByTestId("spoken-result-composition-summary");
+    expect(within(summary).getByText("Source consonant structure Γ")).toBeVisible();
+    expect(within(summary).getByText("M → DH")).toBeVisible();
+    expect(summary).not.toHaveTextContent(/shade|meaning|function/i);
   });
 
   test("keeps pronunciation-not-found Null without spelling fallback", async () => {
@@ -89,8 +90,12 @@ describe("pronunciation-derived consonant segments v0.1", () => {
     render(<SpokenPronunciationOverviewCardV0_1 readout={vm.readout} />);
 
     const overview = screen.getByTestId("spoken-pronunciation-overview");
-    expect(within(overview).getByText("canonical spoken Voice path: Null")).toBeVisible();
-    expect(within(overview).getByText("reason: PRONUNCIATION_NOT_FOUND")).toBeVisible();
+    expect(within(overview).getByText("Spoken pronunciation unavailable.")).toBeVisible();
     expect(within(overview).queryByTestId("spoken-pronunciation-consonant-segments")).toBeNull();
+
+    render(<SpokenResultCompositionSummaryV0_1 readout={vm.readout} />);
+    const summary = screen.getByTestId("spoken-result-composition-summary");
+    expect(within(summary).getByText("canonical spoken Voice path: Null")).toBeVisible();
+    expect(within(summary).getByText("reason: PRONUNCIATION_NOT_FOUND")).toBeVisible();
   });
 });

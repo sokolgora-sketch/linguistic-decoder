@@ -5,6 +5,7 @@ import { render, screen, within } from "@testing-library/react";
 import { GET } from "../app/api/analyze-v1/route";
 import { InstrumentPanel } from "../src/ui/instrument/InstrumentPanel";
 import { SpokenPronunciationOverviewCardV0_1 } from "../src/ui/instrument/sections/SpokenPronunciationOverviewCard.v0_1";
+import { SpokenResultCompositionSummaryV0_1 } from "../src/ui/instrument/sections/SpokenResultCompositionSummary.v0_1";
 import type { TelemetryReadout } from "../src/ui/telemetry/types";
 
 async function analyze(word: string): Promise<any> {
@@ -24,15 +25,13 @@ describe("spoken pronunciation default Overview surface v0.1", () => {
     expect(within(overview).getByText(/stone: .*OW1/)).toBeVisible();
     expect(within(overview).getByText("open-instrument.cmudict-arpabet-en-us.v0_1")).toBeVisible();
     expect(within(overview).getByText("ARPABET")).toBeVisible();
-    expect(within(overview).getByTestId("spoken-pronunciation-consonant-segments")).toHaveTextContent(
-      "Pronunciation consonant segments: S → T → N",
-    );
+    expect(within(overview).queryByTestId("spoken-pronunciation-consonant-segments")).not.toBeInTheDocument();
     const revision = within(overview).getByTestId("spoken-pronunciation-revision");
     expect(revision).toBeVisible();
     expect(revision).toHaveClass("text-[10px]", "text-[#7f8b99]");
     expect(revision.closest("dl")).toBeNull();
     expect(within(revision).getByText("74790861f652b15e4ac49015a90074ad62a27690")).toBeVisible();
-    expect(within(overview).getByText("canonical spoken Voice path: O → U")).toBeVisible();
+    expect(within(overview).queryByText("canonical spoken Voice path: O → U")).not.toBeInTheDocument();
     expect(within(overview).getByText(/Orthographic vowel sequence:.*non-authoritative/i)).toBeVisible();
     expect(screen.getByTestId("deterministic-details")).not.toHaveAttribute("open");
   });
@@ -41,9 +40,14 @@ describe("spoken pronunciation default Overview surface v0.1", () => {
     render(<InstrumentPanel payload={await analyze("zzzzzz-v0-1-missing")} />);
 
     const overview = screen.getByTestId("spoken-pronunciation-overview");
-    expect(within(overview).getByText("canonical spoken Voice path: Null")).toBeVisible();
-    expect(within(overview).getByText("reason: PRONUNCIATION_NOT_FOUND")).toBeVisible();
+    expect(within(overview).getByText("Spoken pronunciation unavailable.")).toBeVisible();
     expect(within(overview).getByText(/non-authoritative compatibility evidence only/i)).toBeVisible();
+    expect(screen.getByTestId("spoken-result-composition-summary")).toHaveTextContent(
+      "canonical spoken Voice path: Null",
+    );
+    expect(screen.getByTestId("spoken-result-composition-summary")).toHaveTextContent(
+      "reason: PRONUNCIATION_NOT_FOUND",
+    );
   });
 
   it("does not choose a winner for ambiguous pronunciation variants", () => {
@@ -98,7 +102,12 @@ describe("spoken pronunciation default Overview surface v0.1", () => {
 
     const overview = screen.getByTestId("spoken-pronunciation-overview");
     expect(within(overview).getByText("2 variants unresolved; no winner selected")).toBeVisible();
-    expect(within(overview).getByText("canonical spoken Voice path: Null")).toBeVisible();
-    expect(within(overview).getByText("reason: PRONUNCIATION_VARIANT_AMBIGUOUS")).toBeVisible();
+    expect(within(overview).queryByText("canonical spoken Voice path: Null")).not.toBeInTheDocument();
+    expect(within(overview).queryByText("reason: PRONUNCIATION_VARIANT_AMBIGUOUS")).not.toBeInTheDocument();
+
+    render(<SpokenResultCompositionSummaryV0_1 readout={readout} />);
+    const summary = screen.getByTestId("spoken-result-composition-summary");
+    expect(within(summary).getByText("canonical spoken Voice path: Null")).toBeVisible();
+    expect(within(summary).getByText("reason: PRONUNCIATION_VARIANT_AMBIGUOUS")).toBeVisible();
   });
 });

@@ -7,7 +7,6 @@ import type {
 } from "@/ui/telemetry/types";
 import {
   spokenPronunciationPathTextV0_1,
-  spokenPronunciationSourceTextV0_1,
 } from "@/ui/instrument/spokenPronunciationPresentation.v0_1";
 
 function consonantSegmentsText(
@@ -79,10 +78,10 @@ export function SpokenResultCompositionSummaryV0_1({
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#8ea4ba]">
-            Spoken result
+            Canonical spoken result
           </div>
           <h2 className="mt-1 text-base font-semibold text-[#f5f7fb]">
-            Pronunciation to canonical Voice path
+            Voice path and consonant structure
           </h2>
         </div>
         <div className="rounded-full border border-[#355a7a] px-2.5 py-1 text-[11px] font-semibold text-[#cfe6ff]">
@@ -96,17 +95,9 @@ export function SpokenResultCompositionSummaryV0_1({
             <dl className="space-y-2">
               <div>
                 <dt className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#8ea4ba]">
-                  Pronunciation
+                  Source consonant structure Γ
                 </dt>
                 <dd className="mt-1 break-words font-mono text-sm text-[#f5f7fb]">
-                  {spokenPronunciationSourceTextV0_1(definedPronunciation)}
-                </dd>
-              </div>
-              <div>
-                <dt className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#8ea4ba]">
-                  Pronunciation consonant segments
-                </dt>
-                <dd className="mt-1 break-words font-mono text-sm text-[#d7dde7]">
                   {segments ?? "none"}
                 </dd>
               </div>
@@ -115,7 +106,7 @@ export function SpokenResultCompositionSummaryV0_1({
 
           <div className="rounded-lg border border-[#27313d] bg-[#0d1117] p-3">
             <div className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#8ea4ba]">
-              Canonical result
+              Canonical Voice path V
             </div>
             <div className="mt-2 font-mono text-sm text-emerald-200">
               canonical spoken Voice path: {spokenPronunciationPathTextV0_1(canonicalPath)}
@@ -193,12 +184,15 @@ export function SpokenResultCompositionSummaryV0_1({
               Spoken pronunciation unavailable
             </div>
             <div className="mt-2 text-xs leading-5">
-              No pronunciation-derived consonant sequence is emitted.
+              No pronunciation-derived consonant sequence or canonical Voice path is emitted.
+            </div>
+            <div className="mt-2 font-mono text-xs">
+              reason: {pronunciation?.reasonCode ?? "reason not emitted"}
             </div>
           </div>
           <div className="rounded-lg border border-[#4b3f2c] bg-[#18140e] p-3 text-[#f0ddb0]">
             <div className="text-[11px] font-semibold uppercase tracking-[0.12em]">
-              Canonical result
+              Canonical Voice path V
             </div>
             <div className="mt-2 font-mono text-sm">
               canonical spoken Voice path: Null
