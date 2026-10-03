@@ -1,0 +1,97 @@
+{
+  "manifestVersion": "open-instrument.artifact-hash-manifest.v0_1",
+  "status": "COMPLETED_RESULT_PRESERVED",
+  "attemptCount": 1,
+  "noRerun": true,
+  "realDataExecuted": false,
+  "predecessor": {
+    "resultSha256": "44d00ff40a06c1fe5273755e6cdebabe6322d7eb9cdb8e5b8a359ccafcdb1d10",
+    "manifestSha256": "274d0e357ceeeb8169e0922200abdddcd5fbd4be03f7cc7aac053c65a931cbe1"
+  },
+  "repair": {
+    "reason": "AGGREGATION_IMPLEMENTATION_SCALABILITY_DEFECT_REPAIRED",
+    "modulePath": "src/shared/openInstrument/zeroConsonantalStructuralCompositionValidation.v0_1b.ts",
+    "moduleSha256": "ec0386eb9c0283a49c31a3d314c66621481070a3367defbcf739529e2ef5efe9"
+  },
+  "repositoryHead": "98c1f36c8ff6b143d6f4c3de3d04c4db056dc7cf",
+  "resultArchive": {
+    "path": "docs/open-instrument/research-artifacts/zero-consonantal-structural-composition-v0.1-cmudict-validation-v0.1b/result.json.gz",
+    "compression": "gzip level 9, mtime 0",
+    "compressedSha256": "ce3d9c9ca3535176c169f45e076736af3cc254b415428d7201fd2a3f24d24f46",
+    "compressedByteLength": 11062103,
+    "uncompressedPath": "result.json",
+    "uncompressedSha256": "fda308cd65af409fd130c1c031f0b30f4230ab22064b3cd43d3a85b652377b2f",
+    "uncompressedByteLength": 459028403
+  },
+  "publicationArchive": {
+    "scriptPath": "scripts/openInstrumentZeroConsonantalStructuralCompositionCmuDictValidationArchive.v0_1b.ts",
+    "scriptSha256": "d76b2b9c37e458876907c348e45ca684fbcb39e92072fee8020d18e053e65983",
+    "command": "npx tsx scripts/openInstrumentZeroConsonantalStructuralCompositionCmuDictValidationArchive.v0_1b.ts docs/open-instrument/research-artifacts/zero-consonantal-structural-composition-v0.1-cmudict-validation-v0.1b/result.json docs/open-instrument/research-artifacts/zero-consonantal-structural-composition-v0.1-cmudict-validation-v0.1b/result.json.gz",
+    "compression": "gzip level 9, mtime 0",
+    "uncompressedSha256": "fda308cd65af409fd130c1c031f0b30f4230ab22064b3cd43d3a85b652377b2f",
+    "uncompressedByteLength": 459028403,
+    "compressedSha256": "ce3d9c9ca3535176c169f45e076736af3cc254b415428d7201fd2a3f24d24f46",
+    "compressedByteLength": 11062103
+  },
+  "artifacts": [
+    {
+      "path": "docs/open-instrument/research-artifacts/zero-consonantal-structural-composition-v0.1-cmudict-validation-v0.1b/population-spec.json",
+      "sha256": "81248026f57cffb0c357a4e29e0cce4d3139adc1521eda89e72754783095ed44",
+      "byteLength": 52494645
+    },
+    {
+      "path": "docs/open-instrument/research-artifacts/zero-consonantal-structural-composition-v0.1-cmudict-validation-v0.1b/result.json.gz",
+      "sha256": "ce3d9c9ca3535176c169f45e076736af3cc254b415428d7201fd2a3f24d24f46",
+      "byteLength": 11062103,
+      "uncompressedSha256": "fda308cd65af409fd130c1c031f0b30f4230ab22064b3cd43d3a85b652377b2f",
+      "uncompressedByteLength": 459028403
+    },
+    {
+      "path": "scripts/openInstrumentZeroConsonantalStructuralCompositionCmuDictValidationArchive.v0_1b.ts",
+      "sha256": "d76b2b9c37e458876907c348e45ca684fbcb39e92072fee8020d18e053e65983",
+      "byteLength": 893
+    },
+    {
+      "path": "scripts/openInstrumentZeroConsonantalStructuralCompositionCmuDictValidation.v0_1b.ts",
+      "sha256": "b876881fc3b1fb8090afb62e8f6e362ed7f9c3e65c2bed82c30e7c4189e86e2a",
+      "byteLength": 30001
+    },
+    {
+      "path": "src/shared/openInstrument/zeroConsonantalStructuralCompositionValidation.v0_1b.ts",
+      "sha256": "ec0386eb9c0283a49c31a3d314c66621481070a3367defbcf739529e2ef5efe9",
+      "byteLength": 12094
+    },
+    {
+      "path": "src/shared/openInstrument/zeroConsonantalStructuralComposition.v0_1.ts",
+      "sha256": "450689bbc6e7bffc64d09b5a3029c00edf33bce209983efb83afe08efc3b875c",
+      "byteLength": 8004
+    },
+    {
+      "path": "src/data/openInstrument/pronunciation/cmudict.dict",
+      "sha256": "81917843c7f44ce2b094ac63873c2c7a4cf802040792c455ba3ca406891c3d22",
+      "byteLength": 3618488
+    },
+    {
+      "path": "docs/open-instrument/research-artifacts/zero-consonantal-structural-composition-v0.1-cmudict-validation-v0.1/result.json",
+      "sha256": "44d00ff40a06c1fe5273755e6cdebabe6322d7eb9cdb8e5b8a359ccafcdb1d10",
+      "byteLength": 3286
+    },
+    {
+      "path": "docs/open-instrument/research-artifacts/zero-consonantal-structural-composition-v0.1-cmudict-validation-v0.1/hash-manifest.json",
+      "sha256": "274d0e357ceeeb8169e0922200abdddcd5fbd4be03f7cc7aac053c65a931cbe1",
+      "byteLength": 2900
+    }
+  ],
+  "frozenContracts": {
+    "zcContractSha256": "1ee274253f2b6da3c29a9c9b4409c258e64a6d4121dcf48925464dac926a8e0c",
+    "configurationAuthoritySha256": "b4d24f1105af0b4a3a2a3275425f84a1499ddea77f0d307f5d175d8125ac502d",
+    "priorProductContractSha256": "14ab3a088f891b1aba079d5ef7f6c23a2c5883758c24a7976788dd9024dc99fc"
+  },
+  "successorReason": "AGGREGATION_IMPLEMENTATION_SCALABILITY_DEFECT_REPAIRED",
+  "frd02": {
+    "actualSha256": "b912ae02bb8be01ba75475db068a3cffdd440eae166542cc944ce8fdabf2bf43",
+    "preservedManifestSha256": "b912ae02bb8be01ba75475db068a3cffdd440eae166542cc944ce8fdabf2bf43",
+    "historicalTypoValue": "b912ae02bb8be01ba75475df068a3cffdd440eae166542cc944ce8fdabf2bf43",
+    "manifestSha256": "dae5a6487dd89ea6ed797260cfd0d2c5fa6831fa377f808ec1a386857473dd2c"
+  }
+}
