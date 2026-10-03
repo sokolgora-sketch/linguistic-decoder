@@ -30,7 +30,7 @@ describe("spoken result composition summary v0.1", () => {
     expect(within(compact).getByText("Distribution D: 2 · 1")).toBeVisible();
     expect(within(compact).getByText("Edge asymmetry A: +1")).toBeVisible();
     expect(within(compact).getByText("Recurrence R: None")).toBeVisible();
-    expect(within(compact).getByText("Ordered consonant load: prefix → between source nuclei → suffix.")).toBeVisible();
+    expect(within(compact).getByText("Ordered consonant load: prefix → suffix.")).toBeVisible();
     expect(within(compact).getByText("Prefix load − suffix load; structural orientation only.")).toBeVisible();
     expect(within(compact).getByText("Repeated exact source consonant identity.")).toBeVisible();
     expect(within(compact).getByText("ZC summarizes structure; the source consonant sequence preserves exact identity and order.")).toBeVisible();
@@ -48,7 +48,7 @@ describe("spoken result composition summary v0.1", () => {
     expect(within(compact).getByText("canonical spoken Voice path: O → U")).toBeVisible();
     expect(within(compact).getByText("Distribution D: 1 · 1")).toBeVisible();
     expect(within(compact).getByText("Edge asymmetry A: 0")).toBeVisible();
-    expect(within(compact).getByText("Ordered consonant load: prefix → between source nuclei → suffix.")).toBeVisible();
+    expect(within(compact).getByText("Ordered consonant load: prefix → suffix.")).toBeVisible();
     expect(within(compact).getByText("Prefix load − suffix load; structural orientation only.")).toBeVisible();
     expect(within(compact).getByText("Repeated exact source consonant identity.")).toBeVisible();
     expect(within(compact).getByText("ZC summarizes structure; the source consonant sequence preserves exact identity and order.")).toBeVisible();
@@ -79,8 +79,18 @@ describe("spoken result composition summary v0.1", () => {
     expect(within(nameSummary).getByText("canonical spoken Voice path: E → I")).toBeVisible();
     expect(within(nameSummary).getByText("Distribution D: 1 · 1")).toBeVisible();
     expect(within(nameSummary).getByText("Edge asymmetry A: 0")).toBeVisible();
+    expect(within(nameSummary).getByText("Ordered consonant load: prefix → suffix.")).toBeVisible();
     expect(within(nameSummary).getByText("ZC summarizes structure; the source consonant sequence preserves exact identity and order.")).toBeVisible();
     expect(within(nameSummary).queryByText("M → K")).not.toBeInTheDocument();
+  });
+
+  it("uses the prefix-to-suffix explanation for cat's one-source-nucleus composition", async () => {
+    render(<InstrumentPanel payload={await analyze("cat")} />);
+
+    const compact = summary();
+    expect(within(compact).getByText("Distribution D: 1 · 1")).toBeVisible();
+    expect(within(compact).getByText("Ordered consonant load: prefix → suffix.")).toBeVisible();
+    expect(within(compact).queryByText("Ordered consonant load: prefix → between source nuclei → suffix.")).not.toBeInTheDocument();
   });
 
   it("preserves mother pronunciation-derived DH and the existing detailed provenance card", async () => {
@@ -92,7 +102,16 @@ describe("spoken result composition summary v0.1", () => {
     expect(within(compact).getByText("canonical spoken Voice path: Ë → Ë")).toBeVisible();
     expect(within(compact).getByText("Distribution D: 1 · 1 · 0")).toBeVisible();
     expect(within(compact).getByText("Edge asymmetry A: +1")).toBeVisible();
+    expect(within(compact).getByText("Ordered consonant load: prefix → between source nuclei → suffix.")).toBeVisible();
     expect(screen.getByTestId("spoken-pronunciation-overview")).toBeVisible();
+  });
+
+  it("keeps the between-source-nuclei explanation for study", async () => {
+    render(<InstrumentPanel payload={await analyze("study")} />);
+
+    const compact = summary();
+    expect(within(compact).getByText("Distribution D: 2 · 1 · 0")).toBeVisible();
+    expect(within(compact).getByText("Ordered consonant load: prefix → between source nuclei → suffix.")).toBeVisible();
   });
 
   it("renders banana recurrence without assigning semantic meaning", async () => {
@@ -102,6 +121,7 @@ describe("spoken result composition summary v0.1", () => {
     expect(within(compact).getByText("Distribution D: 1 · 1 · 1 · 0")).toBeVisible();
     expect(within(compact).getByText("Edge asymmetry A: +1")).toBeVisible();
     expect(within(compact).getByText("Recurrence R: N ×2")).toBeVisible();
+    expect(within(compact).getByText("Ordered consonant load: prefix → between source nuclei → suffix.")).toBeVisible();
     expect(within(compact).getByText("Repeated exact source consonant identity.")).toBeVisible();
     expect(within(compact).getByText(/not linguistic or semantic authority/)).toBeVisible();
   });
@@ -115,6 +135,7 @@ describe("spoken result composition summary v0.1", () => {
     expect(within(compact).queryByText("Pronunciation consonant segments")).not.toBeInTheDocument();
     expect(within(compact).queryByTestId("zero-consonantal-structural-composition")).not.toBeInTheDocument();
     expect(within(compact).queryByText("Ordered consonant load: prefix → between source nuclei → suffix.")).not.toBeInTheDocument();
+    expect(within(compact).queryByText("Ordered consonant load: prefix → suffix.")).not.toBeInTheDocument();
     expect(within(compact).queryByText("Prefix load − suffix load; structural orientation only.")).not.toBeInTheDocument();
     expect(within(compact).queryByText("Repeated exact source consonant identity.")).not.toBeInTheDocument();
     expect(within(compact).queryByText("ZC summarizes structure; the source consonant sequence preserves exact identity and order.")).not.toBeInTheDocument();
