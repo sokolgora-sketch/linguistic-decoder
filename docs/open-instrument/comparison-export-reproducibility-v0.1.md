@@ -111,11 +111,23 @@ RIGHT_SOURCE_RESULT=complete validated single-result reproducible bundle
 SOURCE_RESULT_MUTATION=FORBIDDEN
 ```
 
-The source bundles preserve the existing result fields, including input/result
-context, engine version, pronunciation authority, canonical Voice path,
-Heart/structural data, Gamma, ZC, evidence, candidates, functional status,
-claim boundaries, and existing Null values where present. No field is
-reinterpreted by this envelope.
+The source bundles preserve the existing result fields admitted by the
+single-result bundle schema, including input/result context, engine version,
+pronunciation authority, canonical Voice path, Heart/structural data, Gamma,
+ZC, evidence, candidates, claim boundaries, and existing Null values where
+present. No field is reinterpreted by this envelope.
+
+The current `open-instrument.reproducible-run-bundle.v0.1` result schema does
+not admit the VM-only `wordSpecificFunctionalDepth` field. Therefore this
+v0.1 comparison artifact must not claim to preserve a word-specific functional
+`VALUE` or its evidence references when importing/reopening current bundles.
+After trusted adaptation of those bundles, the existing comparison projection
+must deterministically represent those rows as `MISSING` unless the source
+bundle schema itself already supplies the field. The envelope must never
+synthesize that field, copy it from an unbundled VM, or accept a stored
+functional `VALUE` that recomputation from the validated bundles cannot
+produce. Adding that field to the single-result bundle is outside this
+contract and requires a separately versioned source-schema decision.
 
 The future implementation must recover each source result through the trusted
 existing adapter path before deriving a comparison projection. It must not
@@ -255,7 +267,8 @@ PRONUNCIATION_AUTHORITY=YES
 CANONICAL_VOICE_PATH_V=YES
 SOURCE_CONSONANT_STRUCTURE_GAMMA=YES
 ZC_P_I_S_D_A_R=YES
-FUNCTIONAL_AND_CANDIDATE_STATUS=YES
+FUNCTIONAL_AND_CANDIDATE_STATUS=SOURCE_SCHEMA_BOUNDED
+WORD_SPECIFIC_FUNCTIONAL_DEPTH_IN_CURRENT_V0_1_BUNDLE=NOT_REPRESENTABLE
 EVIDENCE_AND_PROVENANCE=YES
 VARIANT_ID_ORDER_AND_SOURCE_DATA=YES
 NULL_STATES_AND_REASONS=YES
@@ -413,8 +426,12 @@ The future implementation must preserve these deterministic controls:
 
 ### STUDY vs STONE
 
-- evidence and status remain side-specific;
-- reviewed evidence is not transferred; and
+- at the direct comparison-authority level, evidence and status remain
+  side-specific;
+- for this artifact envelope using the current v0.1 source-bundle schema,
+  `wordSpecificFunctionalDepth` rows are `MISSING` on recomputation unless
+  that source schema already contains the field;
+- reviewed evidence is never transferred or synthesized; and
 - no winner is selected.
 
 ### VALID vs PRONUNCIATION-NULL
