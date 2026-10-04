@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/select';
 import { InstrumentPanel } from '@/ui/instrument/InstrumentPanel';
 import { adaptAnalysisToTelemetryVM } from '@/ui/instrument/contractAdapter';
+import { projectRecentAnalysisResultsV0_1 } from '@/ui/instrument/recentAnalysisResults.v0_1';
 import { WordToWordStructuralAuthorityComparisonCard } from '@/ui/instrument/sections/WordToWordStructuralAuthorityComparisonCard.v0_1';
 import {
   ReproducibleRunBundleControls,
@@ -475,6 +476,10 @@ export default function ZroChatPage() {
     () => (latestInstrumentPayload ? adaptAnalysisToTelemetryVM(latestInstrumentPayload) : null),
     [latestInstrumentPayload],
   );
+  const recentAnalysisResults = React.useMemo(
+    () => projectRecentAnalysisResultsV0_1(messages, adaptAnalysisToTelemetryVM),
+    [messages],
+  );
 
   const displayedAnalysisSource: ReproducibleRunBundleDisplaySourceV0_1 =
     importedBundle
@@ -537,7 +542,10 @@ export default function ZroChatPage() {
           <OpenInstrumentEmptyState />
         )}
 
-        <WordToWordStructuralAuthorityComparisonCard current={latestInstrumentVm} />
+        <WordToWordStructuralAuthorityComparisonCard
+          current={latestInstrumentVm}
+          recentResults={recentAnalysisResults}
+        />
 
         {recurrenceResearch ? (
           <UiErrorBoundary label="CrossLanguageRecurrenceCard">

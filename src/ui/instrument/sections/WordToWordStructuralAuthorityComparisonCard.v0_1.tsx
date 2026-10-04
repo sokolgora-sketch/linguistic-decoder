@@ -2,6 +2,7 @@
 
 import React from "react";
 import type { TelemetryViewModel } from "@/ui/telemetry/types";
+import type { RecentAnalysisResultV0_1 } from "@/ui/instrument/recentAnalysisResults.v0_1";
 import {
   compareTelemetryViewModelsV0_1,
   type ComparisonProjectionV0_1,
@@ -16,6 +17,7 @@ type StoredResult = Readonly<{
 
 type Props = Readonly<{
   current: TelemetryViewModel | null;
+  recentResults?: readonly RecentAnalysisResultV0_1[];
 }>;
 
 function formatValue(value: unknown): string {
@@ -105,7 +107,7 @@ function ComparisonRows({ projection }: { projection: ComparisonProjectionV0_1 }
   );
 }
 
-export function WordToWordStructuralAuthorityComparisonCard({ current }: Props) {
+export function WordToWordStructuralAuthorityComparisonCard({ current, recentResults = [] }: Props) {
   const [left, setLeft] = React.useState<StoredResult | null>(null);
   const [right, setRight] = React.useState<StoredResult | null>(null);
 
@@ -118,6 +120,15 @@ export function WordToWordStructuralAuthorityComparisonCard({ current }: Props) 
   const setCurrent = (side: "left" | "right") => {
     if (!current) return;
     const result = { word: currentWord ?? "not emitted", vm: current };
+    if (side === "left") setLeft(result);
+    else setRight(result);
+  };
+
+  const setRecent = (side: "left" | "right", recent: RecentAnalysisResultV0_1) => {
+    const result = {
+      word: recent.vm.readout.word || "not emitted",
+      vm: recent.vm,
+    };
     if (side === "left") setLeft(result);
     else setRight(result);
   };
@@ -155,6 +166,47 @@ export function WordToWordStructuralAuthorityComparisonCard({ current }: Props) 
           </div>
         ) : null}
       </div>
+
+      {recentResults.length > 0 ? (
+        <details className="mt-4 rounded-lg border border-[#303a45] bg-[#10161e]" data-testid="recent-analysis-picker">
+          <summary className="cursor-pointer px-3 py-2 text-xs font-semibold text-[#cfe6ff]">
+            Recent analyses
+          </summary>
+          <div className="space-y-2 border-t border-[#303a45] p-3">
+            {recentResults.map((recent, index) => {
+              const word = recent.vm.readout.word || "not emitted";
+              const label = `${word} · recent #${index + 1}`;
+              return (
+                <div
+                  key={recent.id}
+                  className="flex flex-col gap-2 rounded border border-[#2c3540] bg-[#131b24] p-2 sm:flex-row sm:items-center sm:justify-between"
+                  data-testid={`recent-analysis-result-${index}`}
+                >
+                  <span className="break-words text-xs font-semibold text-[#d9e3ed]">{label}</span>
+                  <div className="flex shrink-0 gap-2">
+                    <button
+                      type="button"
+                      aria-label={`Use ${label} as LEFT`}
+                      onClick={() => setRecent("left", recent)}
+                      className="rounded border border-[#355a7a] px-2 py-1 text-[11px] font-semibold text-[#cfe6ff] hover:border-[#66809a]"
+                    >
+                      Use as LEFT
+                    </button>
+                    <button
+                      type="button"
+                      aria-label={`Use ${label} as RIGHT`}
+                      onClick={() => setRecent("right", recent)}
+                      className="rounded border border-[#355a7a] px-2 py-1 text-[11px] font-semibold text-[#cfe6ff] hover:border-[#66809a]"
+                    >
+                      Use as RIGHT
+                    </button>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </details>
+      ) : null}
 
       <div className="mt-4 grid gap-3 md:grid-cols-2">
         <ResultSlot label="LEFT" result={left} onClear={() => setLeft(null)} />
