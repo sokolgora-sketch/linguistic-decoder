@@ -154,7 +154,11 @@ export function WordToWordStructuralAuthorityComparisonCard({
     const result: StoredResult = {
       word: recent.vm.readout.word || "not emitted",
       vm: recent.vm,
-      source: { payload: recent.payload },
+      source: {
+        payload: recent.payload,
+        ipa: recent.ipa,
+        targetSenseLabel: recent.targetSenseLabel,
+      },
     };
     if (side === "left") setLeft(result);
     else setRight(result);

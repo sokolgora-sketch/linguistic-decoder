@@ -67,6 +67,8 @@ type Msg =
       result?: unknown;
       error?: string;
       instrumentPayload?: unknown | null;
+      ipa?: string;
+      targetSenseLabel?: string;
     };
 
 function uid() {
@@ -291,6 +293,8 @@ export default function ZroChatPage() {
                 text: '',
                 result: json ?? undefined,
                 instrumentPayload: json,
+                ipa: ipaTrim || undefined,
+                targetSenseLabel: targetSenseTrim || undefined,
               }
             : x
         )

@@ -28,6 +28,9 @@ describe("prior result comparison picker v0.1", () => {
         id: `assistant-${index}`,
         role: "assistant" as const,
         instrumentPayload: index % 2 === 0 ? stone : home,
+        ...(index === 1
+          ? { ipa: "stəʊn", targetSenseLabel: "stone (custom sense)" }
+          : {}),
       })),
       { id: "failed-assistant", role: "assistant" as const, instrumentPayload: null },
     ];
@@ -43,6 +46,9 @@ describe("prior result comparison picker v0.1", () => {
     expect(new Set(projected.map((entry) => entry.id)).size).toBe(
       MAX_RECENT_ANALYSIS_PICKER_RESULTS_V0_1,
     );
+    const retainedCustomRun = projected.find((entry) => entry.id === "assistant-1");
+    expect(retainedCustomRun?.ipa).toBe("stəʊn");
+    expect(retainedCustomRun?.targetSenseLabel).toBe("stone (custom sense)");
   });
 
   test("assigns distinct prior results to LEFT and RIGHT without rerunning analysis", async () => {
