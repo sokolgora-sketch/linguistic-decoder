@@ -12,6 +12,8 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { InstrumentPanel } from '@/ui/instrument/InstrumentPanel';
+import { adaptAnalysisToTelemetryVM } from '@/ui/instrument/contractAdapter';
+import { WordToWordStructuralAuthorityComparisonCard } from '@/ui/instrument/sections/WordToWordStructuralAuthorityComparisonCard.v0_1';
 import {
   ReproducibleRunBundleControls,
   type ReproducibleRunBundleDisplaySourceV0_1,
@@ -469,6 +471,10 @@ export default function ZroChatPage() {
     (latestAssistantMessage && 'instrumentPayload' in latestAssistantMessage
       ? latestAssistantMessage.instrumentPayload ?? null
       : null);
+  const latestInstrumentVm = React.useMemo(
+    () => (latestInstrumentPayload ? adaptAnalysisToTelemetryVM(latestInstrumentPayload) : null),
+    [latestInstrumentPayload],
+  );
 
   const displayedAnalysisSource: ReproducibleRunBundleDisplaySourceV0_1 =
     importedBundle
@@ -530,6 +536,8 @@ export default function ZroChatPage() {
         ) : (
           <OpenInstrumentEmptyState />
         )}
+
+        <WordToWordStructuralAuthorityComparisonCard current={latestInstrumentVm} />
 
         {recurrenceResearch ? (
           <UiErrorBoundary label="CrossLanguageRecurrenceCard">
