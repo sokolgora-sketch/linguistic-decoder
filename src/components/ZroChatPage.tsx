@@ -250,9 +250,9 @@ export default function ZroChatPage() {
           : `&alphabet=${encodeURIComponent(alphabet)}`;
       let providerExecutionQuery = "";
       try {
-        const providerExecution = new URLSearchParams(window.location.search).get(
-          "providerExecution",
-        );
+        const providerExecution = new URLSearchParams(window.location.search)
+          .get("providerExecution")
+          ?.trim();
         if (providerExecution === "disabled") {
           providerExecutionQuery = "&providerExecution=disabled";
         }
