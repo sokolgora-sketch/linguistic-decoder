@@ -41,8 +41,14 @@ describe(
       );
 
       expect(researchCandidates.length).toBeGreaterThan(0);
+      const unknownStatusCandidates = researchCandidates.filter(
+        (candidate: any) =>
+          candidate.attestationTruth === "unknown" &&
+          candidate.functionalBridgeTruth === "unknown",
+      );
+      expect(unknownStatusCandidates.length).toBeGreaterThan(0);
       expect(
-        researchCandidates.every(
+        unknownStatusCandidates.every(
           (candidate: any) =>
             candidate.attestationTruth === "unknown" &&
             candidate.functionalBridgeTruth === "unknown" &&

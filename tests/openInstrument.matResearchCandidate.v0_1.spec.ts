@@ -156,9 +156,9 @@ describe("Open Instrument MAT research candidate v0.1", () => {
     if (!admission.ok) throw new Error(admission.reasonCodes.join(", "));
     expect(admission.ok).toBe(true);
     expect(admission.dryRun).toMatchObject({
-      currentRowCount: 90,
+      currentRowCount: 94,
       incomingRowCount: 1,
-      resultRowCount: 91,
+      resultRowCount: 95,
       wouldChange: true,
       collisions: [],
     });

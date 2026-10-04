@@ -43,6 +43,13 @@ const EXPECTED_EVIDENCE_REFS: Record<string, string[]> = {
     "research.external.pokorny-er5-lrc.citation.v0_1",
     "research.external.logeion-eremos.citation.v0_1",
     "research.external.pokorny-er5-greek-reflex.citation.v0_1",
+    "research.external.albanian-shter-fjalori-online.citation.v0_1",
+    "research.external.albanian-shter-fjale.citation.v0_1",
+    "research.external.albanian-shterp-fjalori-online.citation.v0_1",
+    "research.external.albanian-shterp-fjale.citation.v0_1",
+    "research.external.albanian-shterpe-fjalori-online.citation.v0_1",
+    "research.external.albanian-shterpe-fjale.citation.v0_1",
+    "research.external.albanian-shterpezoj-fjale.citation.v0_1",
   ],
 };
 
@@ -398,6 +405,10 @@ describe("/api/analyze-v1 GET/POST semantic parity v0.1", () => {
       "logic-structural:sterile:erile:peel_left_consonant_frame+peel_left_consonant_frame",
       "research-functional:multi-source-functional:sterile:ER:research.external.pokorny-er5-loose-crumbly.v0_1",
       "research-functional:multi-source-functional:sterile:ER:research.external.greek-eremos-empty-devoid.v0_1",
+      "research-functional:multi-source-functional:sterile:SHTER:research.external.albanian-shter-depletion.v0_1",
+      "research-functional:multi-source-functional:sterile:SHTERP:research.external.albanian-shterp-barren.v0_1",
+      "research-functional:multi-source-functional:sterile:SHTERPË:research.external.albanian-shterpe-barren.v0_1",
+      "research-functional:multi-source-functional:sterile:SHTERPËZOJ:research.external.albanian-shterpezoj-sterilize.v0_1",
     ]);
   });
 

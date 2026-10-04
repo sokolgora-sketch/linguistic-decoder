@@ -297,6 +297,10 @@ describe(
             .researchHypothesisEmbryos,
         ).toEqual([
           "ER",
+          "SHTER",
+          "SHTERP",
+          "SHTERPË",
+          "SHTERPËZOJ",
         ]);
 
         render(
