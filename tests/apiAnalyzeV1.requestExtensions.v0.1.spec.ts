@@ -54,6 +54,7 @@ describe("/api/analyze-v1 request extensions v0.1", () => {
     expect(start).toBeGreaterThanOrEqual(0);
     expect(schemaBlock).toMatch(/targetSenseId\s*:/);
     expect(schemaBlock).toMatch(/targetSenseLabel\s*:/);
+    expect(schemaBlock).toMatch(/providerExecution\s*:/);
     expect(schemaBlock).toMatch(/opts\s*:/);
     expect(schemaBlock).toContain("brainCandidatesSeedFallback");
     expect(schemaBlock).toContain("seedBrainCandidates");

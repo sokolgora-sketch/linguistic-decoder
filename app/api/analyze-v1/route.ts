@@ -43,8 +43,9 @@ const BodySchema = z
     word: z.string().min(1).refine((value) => value.trim().length > 0),
     mode: z.string().optional(),
     alphabet: z.string().optional(),
-      ipa: z.string().optional(),
-      language: z.string().optional(),
+    ipa: z.string().optional(),
+    language: z.string().optional(),
+    providerExecution: z.string().optional(),
     // Named extensions remain permissive; route-level guards preserve legacy behavior.
     targetSenseId: z.unknown().optional(),
     targetSenseLabel: z.unknown().optional(),
@@ -61,13 +62,15 @@ const BodySchema = z
   .passthrough();
 
 type AnalyzeV1Mode = "strict" | "open";
+type AnalyzeV1ProviderExecution = "automatic" | "disabled";
 
 type AnalyzeV1InvalidRequestReasonV0_1 =
   | "MALFORMED_JSON"
   | "INVALID_REQUEST_BODY"
   | "MISSING_WORD"
   | "INVALID_MODE"
-  | "INVALID_ALPHABET";
+  | "INVALID_ALPHABET"
+  | "INVALID_PROVIDER_EXECUTION";
 
 function invalidRequestResponseV0_1(
   error: string,
@@ -105,6 +108,27 @@ function normalizeModeV0_1(value: unknown): NormalizedModeV0_1 {
   const normalized = value.trim();
   if (!normalized) return { ok: true, value: undefined };
   if (normalized === "strict" || normalized === "open") {
+    return { ok: true, value: normalized };
+  }
+
+  return { ok: false };
+}
+
+type NormalizedProviderExecutionV0_1 =
+  | { ok: true; value: AnalyzeV1ProviderExecution }
+  | { ok: false };
+
+function normalizeProviderExecutionV0_1(
+  value: unknown,
+): NormalizedProviderExecutionV0_1 {
+  if (value === undefined || value === null) {
+    return { ok: true, value: "automatic" };
+  }
+  if (typeof value !== "string") return { ok: false };
+
+  const normalized = value.trim();
+  if (!normalized) return { ok: true, value: "automatic" };
+  if (normalized === "automatic" || normalized === "disabled") {
     return { ok: true, value: normalized };
   }
 
@@ -153,8 +177,13 @@ async function buildSemanticAlignmentMapV0_1(input: {
   word: string;
   targetSenseId: string;
   targetSenseLabel: string;
+  providerExecution: AnalyzeV1ProviderExecution;
 }): Promise<Record<string, unknown>> {
-  if (!input.targetSenseId || !input.targetSenseLabel) return {};
+  if (
+    input.providerExecution === "disabled" ||
+    !input.targetSenseId ||
+    !input.targetSenseLabel
+  ) return {};
 
   const assessments: Record<string, unknown> = {};
   for (const structuralHypothesis of discoverStructuralHypothesesV0_1(input.word)) {
@@ -841,6 +870,8 @@ async function applyAutomaticFunctionalVoiceNormalizationV0_1(
       string;
     manualLanguageHint:
       string;
+    providerExecution:
+      AnalyzeV1ProviderExecution;
   },
 ): Promise<void> {
   const {
@@ -849,6 +880,7 @@ async function applyAutomaticFunctionalVoiceNormalizationV0_1(
     mode,
     ipa,
     manualLanguageHint,
+    providerExecution,
   } = args;
 
   if (
@@ -878,6 +910,7 @@ async function applyAutomaticFunctionalVoiceNormalizationV0_1(
       manualLanguageHint:
         manualLanguageHint ||
         null,
+      providerExecution,
     });
 
   // Always expose the bounded pronunciation stage result.
@@ -932,6 +965,7 @@ type AnalyzeV1OrchestrationInput = {
   language: string;
   targetSenseId: string;
   targetSenseLabel: string;
+  providerExecution: AnalyzeV1ProviderExecution;
   seedFallbackEnabled: boolean;
   gatesOn: boolean | null;
   preserveMalformedEvidencePackageFallback: boolean;
@@ -952,6 +986,7 @@ async function runAnalyzeV1Orchestration(
     language,
     targetSenseId,
     targetSenseLabel,
+    providerExecution,
     seedFallbackEnabled,
     gatesOn,
     preserveMalformedEvidencePackageFallback,
@@ -982,6 +1017,7 @@ async function runAnalyzeV1Orchestration(
         word,
         targetSenseId,
         targetSenseLabel,
+        providerExecution,
       });
 
     // Attach request-ish inputs so downstream (OriginClaim) can see seedFallbackEnabled.
@@ -1206,6 +1242,7 @@ async function runAnalyzeV1Orchestration(
       mode: normalizationMode,
       ipa,
       manualLanguageHint: language,
+      providerExecution,
     });
 
     refreshEvidencePackageAfterFunctionalNormalizationV0_1({
@@ -1220,6 +1257,7 @@ async function runAnalyzeV1Orchestration(
         word,
         mode: normalizationMode,
         analysis: final,
+        providerExecution,
       });
 
     const automaticFunctionalProposalVerificationV0_1 =
@@ -1273,7 +1311,11 @@ async function runAnalyzeV1Orchestration(
         automaticFunctionalProposalV0_1.status ===
           "skipped_real_provider_not_ready" ||
         automaticFunctionalProposalV0_1.status ===
-          "skipped_functional_path_unavailable"
+          "skipped_functional_path_unavailable" ||
+        (
+          providerExecution === "disabled" &&
+          automaticFunctionalProposalV0_1.status === "skipped_disabled"
+        )
       )
     ) {
       (final as any).automaticFunctionalProposalV0_1 =
@@ -1339,6 +1381,7 @@ export async function POST(req: Request) {
     language: languageRaw,
     targetSenseId: targetSenseIdRaw,
     targetSenseLabel: targetSenseLabelRaw,
+    providerExecution: providerExecutionRaw,
   } = parsed.data;
 
   const ipa =
@@ -1380,6 +1423,17 @@ export async function POST(req: Request) {
   }
   const alphabetParsed = normalizedAlphabet.value;
 
+  const normalizedProviderExecution = normalizeProviderExecutionV0_1(
+    providerExecutionRaw,
+  );
+  if (!normalizedProviderExecution.ok) {
+    return invalidRequestResponseV0_1(
+      'Invalid "providerExecution". Expected: "automatic" or "disabled".',
+      "INVALID_PROVIDER_EXECUTION",
+    );
+  }
+  const providerExecution = normalizedProviderExecution.value;
+
 
 
     // Seed fallback flag (BRAIN-0.2)
@@ -1415,6 +1469,7 @@ export async function POST(req: Request) {
     language,
     targetSenseId,
     targetSenseLabel,
+    providerExecution,
     seedFallbackEnabled,
     gatesOn,
     preserveMalformedEvidencePackageFallback: false,
@@ -1438,6 +1493,8 @@ export async function GET(req: Request) {
       (url.searchParams.get("targetSenseId") ?? "").trim();
     const targetSenseLabel =
       (url.searchParams.get("targetSenseLabel") ?? "").trim();
+    const providerExecutionRaw =
+      url.searchParams.get("providerExecution") ?? "";
     const targetSenseId =
       targetSenseIdRaw || deriveTargetSenseIdV0_1(targetSenseLabel);
 // Seed fallback flag (BRAIN-0.2)
@@ -1470,6 +1527,17 @@ if (!word) {
   }
   const alphabetParsed = normalizedAlphabet.value;
 
+  const normalizedProviderExecution = normalizeProviderExecutionV0_1(
+    providerExecutionRaw,
+  );
+  if (!normalizedProviderExecution.ok) {
+    return invalidRequestResponseV0_1(
+      'Invalid "providerExecution". Expected: "automatic" or "disabled".',
+      "INVALID_PROVIDER_EXECUTION",
+    );
+  }
+  const providerExecution = normalizedProviderExecution.value;
+
   return runAnalyzeV1Orchestration({
     word,
     engineMode: modeParsed,
@@ -1482,6 +1550,7 @@ if (!word) {
     language,
     targetSenseId,
     targetSenseLabel,
+    providerExecution,
     seedFallbackEnabled,
     gatesOn,
     preserveMalformedEvidencePackageFallback: true,
