@@ -248,7 +248,18 @@ export default function ZroChatPage() {
         alphabet === "auto"
           ? ""
           : `&alphabet=${encodeURIComponent(alphabet)}`;
-      const url = `/api/analyze-v1?word=${encodeURIComponent(w)}&mode=${encodeURIComponent(mode)}${alphabetQuery}${ipaTrim ? `&ipa=${encodeURIComponent(ipaTrim)}` : ""}${targetSenseTrim ? `&targetSenseLabel=${encodeURIComponent(targetSenseTrim)}` : ""}`;
+      let providerExecutionQuery = "";
+      try {
+        const providerExecution = new URLSearchParams(window.location.search)
+          .get("providerExecution")
+          ?.trim();
+        if (providerExecution === "disabled") {
+          providerExecutionQuery = "&providerExecution=disabled";
+        }
+      } catch {
+        // Preserve the normal request when the browser location is unavailable.
+      }
+      const url = `/api/analyze-v1?word=${encodeURIComponent(w)}&mode=${encodeURIComponent(mode)}${alphabetQuery}${providerExecutionQuery}${ipaTrim ? `&ipa=${encodeURIComponent(ipaTrim)}` : ""}${targetSenseTrim ? `&targetSenseLabel=${encodeURIComponent(targetSenseTrim)}` : ""}`;
       const res = await fetch(url, { method: 'GET' });
       const json: unknown =
         typeof res.json === 'function' ? await res.json() : null;

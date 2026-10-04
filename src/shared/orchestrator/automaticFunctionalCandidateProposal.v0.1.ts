@@ -86,6 +86,7 @@ export type RunAutomaticFunctionalCandidateProposalReqV0_1 = {
   word: string;
   mode?: "strict" | "open";
   analysis: unknown;
+  providerExecution?: "automatic" | "disabled";
 };
 
 export type RunAutomaticFunctionalCandidateProposalOptionsV0_1 = {
@@ -752,6 +753,13 @@ export async function runAutomaticFunctionalCandidateProposalV0_1(
 
   const mode =
     normalizedMode(req.mode);
+
+  if (req.providerExecution === "disabled") {
+    return skippedResult(
+      "skipped_disabled",
+      null,
+    );
+  }
 
   const resolution =
     resolveProviderV0_1(options);

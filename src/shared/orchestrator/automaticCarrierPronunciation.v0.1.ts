@@ -268,6 +268,9 @@ export async function runAutomaticCarrierPronunciationV0_1(
     mode:
       | "strict"
       | "open";
+    providerExecution?:
+      | "automatic"
+      | "disabled";
     manualIpa?:
       string | null;
     manualLanguageHint?:
@@ -293,6 +296,19 @@ export async function runAutomaticCarrierPronunciationV0_1(
         ),
       ipa:
         manualIpa,
+      error: null,
+    });
+  }
+
+  if (input.providerExecution === "disabled") {
+    return result({
+      attempted: false,
+      status:
+        "skipped_disabled",
+      provider: null,
+      localOnly: true,
+      language: null,
+      ipa: null,
       error: null,
     });
   }

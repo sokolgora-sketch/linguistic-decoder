@@ -86,6 +86,27 @@ describe('Analyze keyboard interactions', () => {
     });
   });
 
+  it('forwards a padded provider-free query value to Analyze V1', async () => {
+    window.history.pushState({}, '', '/chat?providerExecution=%20disabled%20');
+
+    render(<ZroChatPage />);
+
+    fireEvent.change(screen.getByLabelText('Word'), { target: { value: 'study' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Analyze' }));
+
+    await waitFor(() => {
+      expect(countAnalyzeV1Fetches()).toBe(1);
+    });
+
+    const [request] = (global.fetch as jest.Mock).mock.calls.find(([input]) =>
+      String(input).includes('/api/analyze-v1?'),
+    ) ?? [];
+    const requestUrl = new URL(String(request), 'http://localhost');
+    expect(requestUrl.searchParams.get('providerExecution')).toBe('disabled');
+
+    window.history.pushState({}, '', '/chat');
+  });
+
   it('sends selected mode and alphabet values to Analyze V1', async () => {
     (global.fetch as jest.Mock).mockResolvedValueOnce({
       ok: true,
