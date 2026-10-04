@@ -2423,3 +2423,7 @@ function pomStringListFromEvidenceField(
 
   return present(mapped);
 }
+
+export function adaptComparisonSourceResultToTelemetryVMV0_1(raw: unknown): TelemetryViewModel {
+  return adaptAnalysisToTelemetryVM(raw);
+}

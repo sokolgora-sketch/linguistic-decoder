@@ -544,6 +544,12 @@ export default function ZroChatPage() {
 
         <WordToWordStructuralAuthorityComparisonCard
           current={latestInstrumentVm}
+          currentPayload={latestInstrumentPayload}
+          currentBundle={importedBundle}
+          currentInput={{
+            ipa: lastRun?.ipa,
+            targetSenseLabel: lastRun?.targetSenseLabel,
+          }}
           recentResults={recentAnalysisResults}
         />
 

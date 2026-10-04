@@ -3,20 +3,31 @@
 import React from "react";
 import type { TelemetryViewModel } from "@/ui/telemetry/types";
 import type { RecentAnalysisResultV0_1 } from "@/ui/instrument/recentAnalysisResults.v0_1";
+import { adaptComparisonSourceResultToTelemetryVMV0_1 } from "@/ui/telemetry/contractAdapter";
+import type { ReproducibleRunBundleV0_1 } from "@/shared/openInstrument/reproducibleRunBundle.v0_1";
 import {
   compareTelemetryViewModelsV0_1,
   type ComparisonProjectionV0_1,
   type ComparisonSideV0_1,
 } from "@/ui/instrument/wordToWordComparison.v0_1";
+import {
+  ComparisonExportReproducibilityControlsV0_1,
+  type ComparisonExportSideInputV0_1,
+} from "@/ui/instrument/ComparisonExportReproducibilityControls.v0_1";
+import type { ComparisonExportArtifactV0_1 } from "@/ui/instrument/comparisonExportReproducibility.v0_1";
 import { MT } from "@/ui/typography/marketingType.v0.1";
 
 type StoredResult = Readonly<{
   word: string;
   vm: TelemetryViewModel;
+  source: ComparisonExportSideInputV0_1;
 }>;
 
 type Props = Readonly<{
   current: TelemetryViewModel | null;
+  currentPayload?: unknown | null;
+  currentBundle?: ReproducibleRunBundleV0_1 | null;
+  currentInput?: Readonly<{ ipa?: string; targetSenseLabel?: string }>;
   recentResults?: readonly RecentAnalysisResultV0_1[];
 }>;
 
@@ -107,7 +118,13 @@ function ComparisonRows({ projection }: { projection: ComparisonProjectionV0_1 }
   );
 }
 
-export function WordToWordStructuralAuthorityComparisonCard({ current, recentResults = [] }: Props) {
+export function WordToWordStructuralAuthorityComparisonCard({
+  current,
+  currentPayload = null,
+  currentBundle = null,
+  currentInput,
+  recentResults = [],
+}: Props) {
   const [left, setLeft] = React.useState<StoredResult | null>(null);
   const [right, setRight] = React.useState<StoredResult | null>(null);
 
@@ -119,18 +136,41 @@ export function WordToWordStructuralAuthorityComparisonCard({ current, recentRes
   const currentWord = current?.readout.word ?? null;
   const setCurrent = (side: "left" | "right") => {
     if (!current) return;
-    const result = { word: currentWord ?? "not emitted", vm: current };
+    const result: StoredResult = {
+      word: currentWord ?? "not emitted",
+      vm: current,
+      source: {
+        payload: currentPayload,
+        bundle: currentBundle,
+        ipa: currentInput?.ipa,
+        targetSenseLabel: currentInput?.targetSenseLabel,
+      },
+    };
     if (side === "left") setLeft(result);
     else setRight(result);
   };
 
   const setRecent = (side: "left" | "right", recent: RecentAnalysisResultV0_1) => {
-    const result = {
+    const result: StoredResult = {
       word: recent.vm.readout.word || "not emitted",
       vm: recent.vm,
+      source: { payload: recent.payload },
     };
     if (side === "left") setLeft(result);
     else setRight(result);
+  };
+
+  const handleImportedArtifact = (artifact: ComparisonExportArtifactV0_1) => {
+    setLeft({
+      word: artifact.left.result.word,
+      vm: adaptComparisonSourceResultToTelemetryVMV0_1(artifact.left.result),
+      source: { bundle: artifact.left },
+    });
+    setRight({
+      word: artifact.right.result.word,
+      vm: adaptComparisonSourceResultToTelemetryVMV0_1(artifact.right.result),
+      source: { bundle: artifact.right },
+    });
   };
 
   return (
@@ -228,6 +268,12 @@ export function WordToWordStructuralAuthorityComparisonCard({ current, recentRes
           Analyze and assign two results to compare their exact structural and authority fields.
         </div>
       )}
+
+      <ComparisonExportReproducibilityControlsV0_1
+        left={left?.source ?? null}
+        right={right?.source ?? null}
+        onImport={handleImportedArtifact}
+      />
     </section>
   );
 }

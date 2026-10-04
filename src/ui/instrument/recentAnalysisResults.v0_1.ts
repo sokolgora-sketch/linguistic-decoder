@@ -11,6 +11,7 @@ export type RecentAnalysisMessageV0_1 = Readonly<{
 export type RecentAnalysisResultV0_1 = Readonly<{
   id: string;
   vm: TelemetryViewModel;
+  payload: unknown;
 }>;
 
 export type RecentAnalysisAdapterV0_1 = (raw: unknown) => TelemetryViewModel;
@@ -37,5 +38,6 @@ export function projectRecentAnalysisResultsV0_1(
     .map((message) => ({
       id: message.id,
       vm: adapt(message.instrumentPayload),
+      payload: message.instrumentPayload,
     }));
 }

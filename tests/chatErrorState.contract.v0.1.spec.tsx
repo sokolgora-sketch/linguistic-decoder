@@ -69,7 +69,10 @@ describe("/chat error-state contract", () => {
     fireEvent.change(screen.getByLabelText("Word"), { target: { value: "study" } });
     fireEvent.click(screen.getByRole("button", { name: "Analyze" }));
 
-    expect(screen.getByRole("button")).toHaveAttribute("aria-busy", "true");
+    expect(screen.getByRole("button", { name: "Analyzing…" })).toHaveAttribute(
+      "aria-busy",
+      "true",
+    );
 
     await screen.findByText("Engine error.");
     await waitFor(() => {
@@ -88,7 +91,10 @@ describe("/chat error-state contract", () => {
     fireEvent.change(screen.getByLabelText("Word"), { target: { value: "study" } });
     fireEvent.click(screen.getByRole("button", { name: "Analyze" }));
 
-    expect(screen.getByRole("button")).toHaveAttribute("aria-busy", "true");
+    expect(screen.getByRole("button", { name: "Analyzing…" })).toHaveAttribute(
+      "aria-busy",
+      "true",
+    );
 
     await screen.findByText("Network error.");
     await waitFor(() => {
