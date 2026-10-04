@@ -6,11 +6,16 @@ export type RecentAnalysisMessageV0_1 = Readonly<{
   id: string;
   role: "user" | "assistant";
   instrumentPayload?: unknown | null;
+  ipa?: string;
+  targetSenseLabel?: string;
 }>;
 
 export type RecentAnalysisResultV0_1 = Readonly<{
   id: string;
   vm: TelemetryViewModel;
+  payload: unknown;
+  ipa?: string;
+  targetSenseLabel?: string;
 }>;
 
 export type RecentAnalysisAdapterV0_1 = (raw: unknown) => TelemetryViewModel;
@@ -37,5 +42,8 @@ export function projectRecentAnalysisResultsV0_1(
     .map((message) => ({
       id: message.id,
       vm: adapt(message.instrumentPayload),
+      payload: message.instrumentPayload,
+      ipa: message.ipa,
+      targetSenseLabel: message.targetSenseLabel,
     }));
 }
