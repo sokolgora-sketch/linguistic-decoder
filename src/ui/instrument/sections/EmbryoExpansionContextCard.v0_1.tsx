@@ -1638,9 +1638,9 @@ export function EmbryoExpansionContextCardV0_1({
             token,
             gloss,
             state,
-          }) => (
+          }, index) => (
             <div
-              key={token}
+              key={`${token}-${index}`}
               className="rounded-lg border border-slate-300 bg-white/70 p-3 dark:border-slate-700 dark:bg-black/20"
             >
               <div className="flex flex-wrap items-center justify-between gap-2">

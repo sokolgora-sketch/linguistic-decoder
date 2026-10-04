@@ -190,6 +190,46 @@ describe(
       ).not.toBeInTheDocument();
     });
 
+    it("renders repeated ordered components without duplicate React keys", async () => {
+      const response = await GET(
+        new Request(
+          "http://localhost/api/analyze-v1?word=mathematics&mode=strict&providerExecution=disabled",
+        ),
+      );
+
+      expect(response.status).toBe(200);
+
+      const body = await response.json();
+      const vm = adaptAnalysisToTelemetryVM(body);
+      const consoleError = jest
+        .spyOn(console, "error")
+        .mockImplementation(() => undefined);
+
+      try {
+        render(<EmbryoExpansionContextCardV0_1 vm={vm} />);
+
+        const card = screen.getByTestId("functional-motivation-card");
+        const componentTokens = Array.from(
+          card.querySelectorAll(
+            "div.font-mono.text-base.font-semibold",
+          ),
+        ).map((node) => node.textContent?.trim());
+
+        expect(componentTokens).toEqual(["A", "E", "A"]);
+        expect(consoleError.mock.calls).not.toEqual(
+          expect.arrayContaining([
+            expect.arrayContaining([
+              expect.stringContaining(
+                "Encountered two children with the same key",
+              ),
+            ]),
+          ]),
+        );
+      } finally {
+        consoleError.mockRestore();
+      }
+    });
+
     it("keeps the true Structural Null fallback when no hypothesis exists", async () => {
       const body = await analyzeV1("xyz");
       const vm = adaptAnalysisToTelemetryVM(body);
