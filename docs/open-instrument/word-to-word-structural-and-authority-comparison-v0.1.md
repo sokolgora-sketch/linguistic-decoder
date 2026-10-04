@@ -260,6 +260,161 @@ R [] vs []             = EQUAL
 
 No fuzzy equality is permitted.
 
+### 6.1 Per-side source state
+
+Every comparison row preserves the state of each ordered side independently:
+
+```text
+LEFT_STATE=<state>
+RIGHT_STATE=<state>
+RELATION=<coarse relation>
+```
+
+The state vocabulary is:
+
+```text
+VALUE
+NULL
+MISSING
+EMPTY_VALID
+UNSUPPORTED
+NOT_APPLICABLE
+```
+
+`VALUE` means that the authoritative upstream field supplies a valid
+non-empty value. Numeric, string, and boolean zero-like values remain `VALUE`
+when they are valid source values. `EMPTY_VALID` is reserved for a valid empty
+ordered collection, such as `[]`, when the authoritative upstream field and
+its type support that distinction. It is not converted to `NULL` or
+`MISSING`. A valid scalar value, including a scalar whose content is empty only
+when the upstream contract explicitly treats it as a value, remains `VALUE`.
+
+`NULL` means the authoritative upstream field explicitly reports Null.
+`MISSING` means the field is absent. `UNSUPPORTED` and `NOT_APPLICABLE` mean
+the authoritative upstream source explicitly reports those states. The
+comparison must not manufacture one state from another. If an upstream field
+does not expose a distinction, the implementation records only the state that
+the upstream contract actually provides.
+
+If the authoritative upstream source exposes an existing Null `reasonCode` or
+reason, it is preserved as side-specific metadata:
+
+```text
+LEFT_REASON=<existing reason or absent>
+RIGHT_REASON=<existing reason or absent>
+```
+
+No new reason code is introduced. Different Null reasons remain
+distinguishable even when the coarse relation is `BOTH_NULL`.
+
+### 6.2 Total coarse-relation derivation
+
+The five coarse relations remain bounded. They are derived only after the
+per-side states have been preserved:
+
+1. If both sides are comparable source states (`VALUE` or `EMPTY_VALID`),
+   compare their exact source values. Exact equality yields `EQUAL`; exact
+   inequality yields `DIFFERENT`.
+2. If only `LEFT_STATE` is comparable, the relation is `LEFT_ONLY`.
+3. If only `RIGHT_STATE` is comparable, the relation is `RIGHT_ONLY`.
+4. If neither side is comparable, the relation is `BOTH_NULL`.
+
+`BOTH_NULL` is a coarse relation meaning that neither side supplies a
+comparable source value. It does not collapse the preserved per-side states:
+`NULL`, `MISSING`, `UNSUPPORTED`, and `NOT_APPLICABLE` remain distinct in
+`LEFT_STATE` and `RIGHT_STATE`, and any existing side-specific Null reasons
+remain distinct in `LEFT_REASON` and `RIGHT_REASON`.
+
+This rule is total for every state pair and does not require a larger relation
+algebra. In particular:
+
+```text
+VALUE          vs VALUE          -> EQUAL or DIFFERENT by exact value
+VALUE          vs MISSING        -> LEFT_ONLY
+MISSING        vs VALUE          -> RIGHT_ONLY
+MISSING        vs MISSING        -> BOTH_NULL
+NULL           vs NULL           -> BOTH_NULL
+NULL           vs MISSING        -> BOTH_NULL
+MISSING        vs NULL           -> BOTH_NULL
+EMPTY_VALID    vs EMPTY_VALID    -> EQUAL by exact empty value
+EMPTY_VALID    vs VALUE          -> DIFFERENT by exact value
+VALUE          vs EMPTY_VALID    -> DIFFERENT by exact value
+UNSUPPORTED    vs UNSUPPORTED    -> BOTH_NULL
+NOT_APPLICABLE vs NOT_APPLICABLE -> BOTH_NULL
+UNSUPPORTED    vs NOT_APPLICABLE -> BOTH_NULL
+NOT_APPLICABLE vs UNSUPPORTED    -> BOTH_NULL
+```
+
+The same rule applies to all other combinations. A valid empty collection is
+never treated as unavailable merely because the other side is empty,
+unsupported, Null, or missing.
+
+### 6.3 Null, missing, and unavailable controls
+
+The following controls are normative:
+
+```text
+LEFT_STATE=VALUE
+RIGHT_STATE=VALUE
+same exact value
+RELATION=EQUAL
+
+LEFT_STATE=VALUE
+RIGHT_STATE=VALUE
+different exact values
+RELATION=DIFFERENT
+
+LEFT_STATE=VALUE
+RIGHT_STATE=MISSING
+RELATION=LEFT_ONLY
+
+LEFT_STATE=MISSING
+RIGHT_STATE=VALUE
+RELATION=RIGHT_ONLY
+
+LEFT_STATE=MISSING
+RIGHT_STATE=MISSING
+RELATION=BOTH_NULL
+
+LEFT_STATE=NULL
+RIGHT_STATE=NULL
+same reason
+RELATION=BOTH_NULL
+LEFT_REASON and RIGHT_REASON preserved
+
+LEFT_STATE=NULL
+RIGHT_STATE=NULL
+different reasons
+RELATION=BOTH_NULL
+LEFT_REASON and RIGHT_REASON preserved independently
+
+LEFT_STATE=NULL
+RIGHT_STATE=MISSING
+RELATION=BOTH_NULL
+LEFT_STATE and RIGHT_STATE preserved independently
+
+LEFT_STATE=MISSING
+RIGHT_STATE=NULL
+RELATION=BOTH_NULL
+LEFT_STATE and RIGHT_STATE preserved independently
+
+LEFT_STATE=EMPTY_VALID
+RIGHT_STATE=EMPTY_VALID
+exact empty values
+RELATION=EQUAL
+
+LEFT_STATE=UNSUPPORTED
+RIGHT_STATE=NOT_APPLICABLE
+RELATION=BOTH_NULL
+LEFT_STATE and RIGHT_STATE preserved independently
+```
+
+```text
+FIVE_STATE_RELATION_ALGEBRA_INSUFFICIENT=NO
+PER_SIDE_STATE_PRESERVATION=REQUIRED
+RELATION_DERIVATION_TOTAL=YES
+```
+
 ## 7. Null and unavailable behavior
 
 Null is a valid comparison outcome. The projection must preserve each side’s
