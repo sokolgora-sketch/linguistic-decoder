@@ -4025,6 +4025,63 @@
       "languageSuperiorityClaim": "not_claimed",
       "candidateTruthClaim": "not_claimed",
       "userDecisionPosture": "user_decides"
+    },
+    {
+      "registryVersion": "open-instrument.multi-source-functional-research-evidence-registry.v0_1",
+      "researchEvidenceId": "research.external.albanian-mat-measure.v0_1",
+      "embryo": "MAT",
+      "evidenceFamily": "lexical_dictionary",
+      "language": "Albanian",
+      "form": "mat",
+      "gloss": "measure / to measure (attested form; lemma mas)",
+      "embryoRelation": "exact_form",
+      "relationOperationIds": [],
+      "attestationTruth": "fact",
+      "sourceStatus": "research_candidate",
+      "citations": [
+        {
+          "citationId": "research.external.albanian-mat-fjalori-online.citation.v0_1",
+          "sourceTitle": "Fjalor i Madh i Gjuhës Shqipe 2026 — MAT (MAS)",
+          "sourceAuthorOrEditor": "Akademia e Shkencave e Shqipërisë",
+          "sourcePublisherOrHost": "Fjalori Online",
+          "sourceDateOrVersion": "indexed entry; direct page access unavailable during current verification",
+          "sourceUrlOrArchiveRef": "https://fjalori.online/?mode=exact&search=mat",
+          "entryLocator": "exact search for mat; entry heading MAT (MAS), verb, sense 1",
+          "sourceHashOrArchiveHash": null,
+          "attestedForm": "mat",
+          "attestedGloss": "measure-related verb/form",
+          "provenanceGroupId": "fjalori.online.albanian-mat.v0_1"
+        },
+        {
+          "citationId": "research.external.albanian-mas-kaikki.citation.v0_1",
+          "sourceTitle": "mas meaning in Albanian",
+          "sourceAuthorOrEditor": "Wiktionary contributors",
+          "sourcePublisherOrHost": "Kaikki.org",
+          "sourceDateOrVersion": "crawled 2026-07",
+          "sourceUrlOrArchiveRef": "https://kaikki.org/dictionary/Albanian/meaning/m/ma/mas.html",
+          "entryLocator": "Albanian > Verb > mas; IPA [mas]; Forms: mat [alternative]; sense 1: to measure",
+          "sourceHashOrArchiveHash": null,
+          "attestedForm": "mat",
+          "attestedGloss": "to measure (alternative form of verb mas)",
+          "provenanceGroupId": "kaikki.wiktionary.albanian-mas.v0_1"
+        }
+      ],
+      "functionalHypotheses": [
+        {
+          "targetWord": "mathematics",
+          "targetSenseId": "mathematics-sense",
+          "semanticBridge": "An independently attested Albanian measure-related lexical form may motivate a research-only functional comparison with mathematics; this does not assert morphology, historical derivation, or semantic identity.",
+          "functionalBridgeTruth": "hypothesis",
+          "claimBoundary": "functional_hypothesis_only",
+          "evidenceBasis": "functional_correspondence"
+        }
+      ],
+      "historicalOriginClaim": "not_claimed",
+      "historicalTransmissionClaim": "not_claimed",
+      "winnerClaim": "not_claimed",
+      "languageSuperiorityClaim": "not_claimed",
+      "candidateTruthClaim": "not_claimed",
+      "userDecisionPosture": "user_decides"
     }
   ]
 }

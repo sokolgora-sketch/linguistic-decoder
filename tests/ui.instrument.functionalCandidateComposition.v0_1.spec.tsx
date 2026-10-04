@@ -193,7 +193,7 @@ describe(
     it("renders repeated ordered components without duplicate React keys", async () => {
       const response = await GET(
         new Request(
-          "http://localhost/api/analyze-v1?word=mathematics&mode=strict&providerExecution=disabled",
+          "http://localhost/api/analyze-v1?word=cooperate&mode=strict&providerExecution=disabled",
         ),
       );
 
@@ -215,7 +215,7 @@ describe(
           ),
         ).map((node) => node.textContent?.trim());
 
-        expect(componentTokens).toEqual(["A", "E", "A"]);
+        expect(componentTokens).toEqual(["O", "O", "E"]);
         expect(consoleError.mock.calls).not.toEqual(
           expect.arrayContaining([
             expect.arrayContaining([
