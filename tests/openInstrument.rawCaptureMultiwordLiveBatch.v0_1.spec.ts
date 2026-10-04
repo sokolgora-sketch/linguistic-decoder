@@ -233,7 +233,7 @@ describe("Open Instrument raw-capture multiword live batch v0.1", () => {
     }
 
     expect(compiledRows).toHaveLength(8);
-    expect(catalog.rows).toHaveLength(93);
+    expect(catalog.rows).toHaveLength(94);
   });
 
   it("keeps raw capture judgment-free and protects controls", async () => {

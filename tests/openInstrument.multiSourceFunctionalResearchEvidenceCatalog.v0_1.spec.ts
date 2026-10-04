@@ -313,8 +313,8 @@ describe(
             >;
           };
 
-        expect(loaded).toHaveLength(90);
-        expect(raw.rows).toHaveLength(93);
+        expect(loaded).toHaveLength(91);
+        expect(raw.rows).toHaveLength(94);
 
         const unsafeStatus =
           JSON.parse(
@@ -532,8 +532,8 @@ describe(
           catalogVersion: string;
           rows: Array<Record<string, unknown>>;
         };
-        expect(loaded).toHaveLength(90);
-        expect(raw.rows).toHaveLength(93);
+        expect(loaded).toHaveLength(91);
+        expect(raw.rows).toHaveLength(94);
         expect(loaded[0]?.functionalHypotheses[0]).not.toHaveProperty("targetSenseId");
         expect(loaded[0]?.citations[0]).not.toHaveProperty("provenanceGroupId");
 
@@ -546,7 +546,7 @@ describe(
         hypothesis.targetSenseId = "target-sense-a";
 
         const parsed = (parse as (value: unknown) => Array<Record<string, unknown>>)(enriched);
-        expect(parsed).toHaveLength(90);
+        expect(parsed).toHaveLength(91);
         expect(parsed[0]?.citations[0]).toMatchObject({
           provenanceGroupId: "source-family-a",
         });
