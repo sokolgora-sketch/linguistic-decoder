@@ -155,9 +155,9 @@ describe("Open Instrument research catalog admission v0.1", () => {
     expect(admission.ok).toBe(true);
     if (!admission.ok) throw new Error(admission.reasonCodes.join(", "));
     expect(admission.dryRun).toMatchObject({
-      currentRowCount: 89,
+      currentRowCount: 93,
       incomingRowCount: 2,
-      resultRowCount: 91,
+      resultRowCount: 95,
       wouldChange: true,
       collisions: [],
     });

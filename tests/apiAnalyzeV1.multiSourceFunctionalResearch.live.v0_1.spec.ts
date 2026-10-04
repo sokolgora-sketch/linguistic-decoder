@@ -57,7 +57,7 @@ describe(
   "/api/analyze-v1 multi-source functional research runtime v0.1",
   () => {
     it(
-      "layers the two admissible ER research witnesses onto STERILE without removing deterministic structural hypotheses",
+      "layers ER and Albanian research witnesses onto STERILE without removing deterministic structural hypotheses",
       async () => {
         const body =
           await analyze(
@@ -71,7 +71,7 @@ describe(
 
         expect(
           research,
-        ).toHaveLength(2);
+        ).toHaveLength(6);
 
         expect(
           research.map(
@@ -81,6 +81,10 @@ describe(
         ).toEqual([
           "research.external.pokorny-er5-loose-crumbly.v0_1",
           "research.external.greek-eremos-empty-devoid.v0_1",
+          "research.external.albanian-shter-depletion.v0_1",
+          "research.external.albanian-shterp-barren.v0_1",
+          "research.external.albanian-shterpe-barren.v0_1",
+          "research.external.albanian-shterpezoj-sterilize.v0_1",
         ]);
 
         expect(
@@ -91,6 +95,10 @@ describe(
         ).toEqual([
           "ER",
           "ER",
+          "SHTER",
+          "SHTERP",
+          "SHTERPË",
+          "SHTERPËZOJ",
         ]);
 
         for (
@@ -186,6 +194,10 @@ describe(
             .researchHypothesisEmbryos,
         ).toEqual([
           "ER",
+          "SHTER",
+          "SHTERP",
+          "SHTERPË",
+          "SHTERPËZOJ",
         ]);
 
         expect(

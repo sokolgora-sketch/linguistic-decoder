@@ -229,7 +229,7 @@ describe(
 
                 expect(
           loaded,
-        ).toHaveLength(91);
+        ).toHaveLength(95);
 
         const ak =
           loaded.find(
@@ -396,7 +396,7 @@ describe(
     );
 
     it(
-      "does not disturb the existing bounded STERILE/ER research family",
+      "preserves the existing bounded ER research family alongside Albanian sterile witnesses",
       async () => {
         const body =
           await analyze(
@@ -415,6 +415,10 @@ describe(
             ?.researchHypothesisEmbryos,
         ).toEqual([
           "ER",
+          "SHTER",
+          "SHTERP",
+          "SHTERPË",
+          "SHTERPËZOJ",
         ]);
 
         const research =
@@ -438,6 +442,10 @@ describe(
         ).toEqual([
           "research.external.pokorny-er5-loose-crumbly.v0_1",
           "research.external.greek-eremos-empty-devoid.v0_1",
+          "research.external.albanian-shter-depletion.v0_1",
+          "research.external.albanian-shterp-barren.v0_1",
+          "research.external.albanian-shterpe-barren.v0_1",
+          "research.external.albanian-shterpezoj-sterilize.v0_1",
         ]);
 
         expect(

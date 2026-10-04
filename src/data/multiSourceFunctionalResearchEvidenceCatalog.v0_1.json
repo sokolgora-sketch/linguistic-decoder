@@ -4082,6 +4082,217 @@
       "languageSuperiorityClaim": "not_claimed",
       "candidateTruthClaim": "not_claimed",
       "userDecisionPosture": "user_decides"
+    },
+    {
+      "registryVersion": "open-instrument.multi-source-functional-research-evidence-registry.v0_1",
+      "researchEvidenceId": "research.external.albanian-shter-depletion.v0_1",
+      "embryo": "SHTER",
+      "evidenceFamily": "lexical_dictionary",
+      "language": "Albanian",
+      "form": "shter",
+      "gloss": "dry up; run dry; become depleted or exhausted; cease; weaken",
+      "embryoRelation": "exact_form",
+      "relationOperationIds": [],
+      "attestationTruth": "fact",
+      "sourceStatus": "research_candidate",
+      "citations": [
+        {
+          "citationId": "research.external.albanian-shter-fjalori-online.citation.v0_1",
+          "sourceTitle": "Fjalor i Madh i Gjuhës Shqipe 2026 — SHTER",
+          "sourceAuthorOrEditor": "Akademia e Shkencave e Shqipërisë",
+          "sourcePublisherOrHost": "Fjalori Online",
+          "sourceDateOrVersion": "public entry verified in the preceding sterile Albanian evidence lane; accessed 2026-10-04",
+          "sourceUrlOrArchiveRef": "https://www.fjalori.online/?mode=exact&search=shter",
+          "entryLocator": "exact search for SHTER; verb senses 1-5",
+          "sourceHashOrArchiveHash": null,
+          "attestedForm": "shter",
+          "attestedGloss": "dry up; diminish or cease; end; drain strength",
+          "provenanceGroupId": "fjalori.online.albanian-shter.v0_1"
+        },
+        {
+          "citationId": "research.external.albanian-shter-fjale.citation.v0_1",
+          "sourceTitle": "FJALË — Shter",
+          "sourceAuthorOrEditor": null,
+          "sourcePublisherOrHost": "FJALË — Fjalor Shqip",
+          "sourceDateOrVersion": "public entry verified in the preceding sterile Albanian evidence lane; accessed 2026-10-04",
+          "sourceUrlOrArchiveRef": "https://fjale.al/shter",
+          "entryLocator": "SHTER jokal.; verb senses 1-5",
+          "sourceHashOrArchiveHash": null,
+          "attestedForm": "shter",
+          "attestedGloss": "dry up; run out; end; exhaust or weaken",
+          "provenanceGroupId": "fjale.fjalor-shqip.albanian-shter.v0_1"
+        }
+      ],
+      "functionalHypotheses": [
+        {
+          "targetWord": "sterile",
+          "semanticBridge": "Albanian shter evidence for drying up, depletion, exhaustion, cessation, or weakening may motivate a research-only functional comparison with sterile as reduced productive capacity; this does not assert morphology, historical derivation, or semantic identity.",
+          "functionalBridgeTruth": "hypothesis",
+          "claimBoundary": "functional_hypothesis_only",
+          "evidenceBasis": "functional_correspondence"
+        }
+      ],
+      "historicalOriginClaim": "not_claimed",
+      "historicalTransmissionClaim": "not_claimed",
+      "winnerClaim": "not_claimed",
+      "languageSuperiorityClaim": "not_claimed",
+      "candidateTruthClaim": "not_claimed",
+      "userDecisionPosture": "user_decides"
+    },
+    {
+      "registryVersion": "open-instrument.multi-source-functional-research-evidence-registry.v0_1",
+      "researchEvidenceId": "research.external.albanian-shterp-barren.v0_1",
+      "embryo": "SHTERP",
+      "evidenceFamily": "lexical_dictionary",
+      "language": "Albanian",
+      "form": "shterp",
+      "gloss": "barren; non-reproductive; non-producing; unfruitful",
+      "embryoRelation": "exact_form",
+      "relationOperationIds": [],
+      "attestationTruth": "fact",
+      "sourceStatus": "research_candidate",
+      "citations": [
+        {
+          "citationId": "research.external.albanian-shterp-fjalori-online.citation.v0_1",
+          "sourceTitle": "Fjalor i Madh i Gjuhës Shqipe 2026 — SHTERP / SHTERPË",
+          "sourceAuthorOrEditor": "Akademia e Shkencave e Shqipërisë",
+          "sourcePublisherOrHost": "Fjalori Online",
+          "sourceDateOrVersion": "public entry verified in the preceding sterile Albanian evidence lane; accessed 2026-10-04",
+          "sourceUrlOrArchiveRef": "https://www.fjalori.online/?mode=exact&search=shterp%C3%AB",
+          "entryLocator": "exact search for SHTERPË; SHTERP adjective senses 1-5 and related family",
+          "sourceHashOrArchiveHash": null,
+          "attestedForm": "shterp",
+          "attestedGloss": "barren; non-reproductive; non-producing; unfruitful",
+          "provenanceGroupId": "fjalori.online.albanian-shterp.v0_1"
+        },
+        {
+          "citationId": "research.external.albanian-shterp-fjale.citation.v0_1",
+          "sourceTitle": "FJALË — Shterp",
+          "sourceAuthorOrEditor": null,
+          "sourcePublisherOrHost": "FJALË — Fjalor Shqip",
+          "sourceDateOrVersion": "public entry verified in the preceding sterile Albanian evidence lane; accessed 2026-10-04",
+          "sourceUrlOrArchiveRef": "https://fjale.al/shterp",
+          "entryLocator": "SHTERP; adjective senses 1-5 and related noun",
+          "sourceHashOrArchiveHash": null,
+          "attestedForm": "shterp",
+          "attestedGloss": "barren; non-reproductive; non-producing; unfruitful",
+          "provenanceGroupId": "fjale.fjalor-shqip.albanian-shterp.v0_1"
+        }
+      ],
+      "functionalHypotheses": [
+        {
+          "targetWord": "sterile",
+          "semanticBridge": "Albanian shterp evidence for barren, non-reproductive, non-producing, or unfruitful states may motivate a research-only functional comparison with sterile; this does not assert morphology, historical derivation, or semantic identity.",
+          "functionalBridgeTruth": "hypothesis",
+          "claimBoundary": "functional_hypothesis_only",
+          "evidenceBasis": "functional_correspondence"
+        }
+      ],
+      "historicalOriginClaim": "not_claimed",
+      "historicalTransmissionClaim": "not_claimed",
+      "winnerClaim": "not_claimed",
+      "languageSuperiorityClaim": "not_claimed",
+      "candidateTruthClaim": "not_claimed",
+      "userDecisionPosture": "user_decides"
+    },
+    {
+      "registryVersion": "open-instrument.multi-source-functional-research-evidence-registry.v0_1",
+      "researchEvidenceId": "research.external.albanian-shterpe-barren.v0_1",
+      "embryo": "SHTERPË",
+      "evidenceFamily": "lexical_dictionary",
+      "language": "Albanian",
+      "form": "shterpë",
+      "gloss": "barren; non-reproductive livestock or other being",
+      "embryoRelation": "exact_form",
+      "relationOperationIds": [],
+      "attestationTruth": "fact",
+      "sourceStatus": "research_candidate",
+      "citations": [
+        {
+          "citationId": "research.external.albanian-shterpe-fjalori-online.citation.v0_1",
+          "sourceTitle": "Fjalor i Madh i Gjuhës Shqipe 2026 — SHTERP / SHTERPË",
+          "sourceAuthorOrEditor": "Akademia e Shkencave e Shqipërisë",
+          "sourcePublisherOrHost": "Fjalori Online",
+          "sourceDateOrVersion": "public entry verified in the preceding sterile Albanian evidence lane; accessed 2026-10-04",
+          "sourceUrlOrArchiveRef": "https://www.fjalori.online/?mode=exact&search=shterp%C3%AB",
+          "entryLocator": "exact search for SHTERPË; noun entry",
+          "sourceHashOrArchiveHash": null,
+          "attestedForm": "shterpë",
+          "attestedGloss": "barren livestock or other non-reproductive being",
+          "provenanceGroupId": "fjalori.online.albanian-shterp.v0_1"
+        },
+        {
+          "citationId": "research.external.albanian-shterpe-fjale.citation.v0_1",
+          "sourceTitle": "FJALË — Shterp",
+          "sourceAuthorOrEditor": null,
+          "sourcePublisherOrHost": "FJALË — Fjalor Shqip",
+          "sourceDateOrVersion": "public entry verified in the preceding sterile Albanian evidence lane; accessed 2026-10-04",
+          "sourceUrlOrArchiveRef": "https://fjale.al/shterp",
+          "entryLocator": "SHTERPË-related noun entry; non-reproductive livestock",
+          "sourceHashOrArchiveHash": null,
+          "attestedForm": "shterpë",
+          "attestedGloss": "barren livestock or other non-reproductive being",
+          "provenanceGroupId": "fjale.fjalor-shqip.albanian-shterp.v0_1"
+        }
+      ],
+      "functionalHypotheses": [
+        {
+          "targetWord": "sterile",
+          "semanticBridge": "Albanian shterpë evidence for a barren or non-reproductive being may motivate a research-only functional comparison with sterile; this does not assert morphology, historical derivation, or semantic identity.",
+          "functionalBridgeTruth": "hypothesis",
+          "claimBoundary": "functional_hypothesis_only",
+          "evidenceBasis": "functional_correspondence"
+        }
+      ],
+      "historicalOriginClaim": "not_claimed",
+      "historicalTransmissionClaim": "not_claimed",
+      "winnerClaim": "not_claimed",
+      "languageSuperiorityClaim": "not_claimed",
+      "candidateTruthClaim": "not_claimed",
+      "userDecisionPosture": "user_decides"
+    },
+    {
+      "registryVersion": "open-instrument.multi-source-functional-research-evidence-registry.v0_1",
+      "researchEvidenceId": "research.external.albanian-shterpezoj-sterilize.v0_1",
+      "embryo": "SHTERPËZOJ",
+      "evidenceFamily": "lexical_dictionary",
+      "language": "Albanian",
+      "form": "shterpëzoj",
+      "gloss": "make barren; remove reproductive capacity; sterilize",
+      "embryoRelation": "exact_form",
+      "relationOperationIds": [],
+      "attestationTruth": "fact",
+      "sourceStatus": "research_candidate",
+      "citations": [
+        {
+          "citationId": "research.external.albanian-shterpezoj-fjale.citation.v0_1",
+          "sourceTitle": "FJALË — Shterpëzoj",
+          "sourceAuthorOrEditor": null,
+          "sourcePublisherOrHost": "FJALË — Fjalor Shqip",
+          "sourceDateOrVersion": "public entry verified in the preceding sterile Albanian evidence lane; accessed 2026-10-04",
+          "sourceUrlOrArchiveRef": "https://fjale.al/shterp%C3%ABzoj",
+          "entryLocator": "SHTERPËZOJ; transitive definition",
+          "sourceHashOrArchiveHash": null,
+          "attestedForm": "shterpëzoj",
+          "attestedGloss": "remove reproductive ability; make barren; sterilize",
+          "provenanceGroupId": "fjale.fjalor-shqip.albanian-shterpezoj.v0_1"
+        }
+      ],
+      "functionalHypotheses": [
+        {
+          "targetWord": "sterile",
+          "semanticBridge": "Albanian shterpëzoj evidence for making barren, removing reproductive capacity, or sterilizing may motivate a research-only functional comparison with sterile; this does not assert morphology, historical derivation, or semantic identity.",
+          "functionalBridgeTruth": "hypothesis",
+          "claimBoundary": "functional_hypothesis_only",
+          "evidenceBasis": "functional_correspondence"
+        }
+      ],
+      "historicalOriginClaim": "not_claimed",
+      "historicalTransmissionClaim": "not_claimed",
+      "winnerClaim": "not_claimed",
+      "languageSuperiorityClaim": "not_claimed",
+      "candidateTruthClaim": "not_claimed",
+      "userDecisionPosture": "user_decides"
     }
   ]
 }
