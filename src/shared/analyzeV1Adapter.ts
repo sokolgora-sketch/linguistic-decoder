@@ -241,7 +241,10 @@ function adaptCandidate(rawCandidate: RawCandidate): CandidateUI {
   const gloss = typeof rawCandidate?.gloss === "string" ? rawCandidate.gloss : undefined;
 
   const status =
-    rawCandidate?.status === "pass" || rawCandidate?.status === "fail" || rawCandidate?.status === "unknown"
+    rawCandidate?.status === "pass" ||
+    rawCandidate?.status === "fail" ||
+    rawCandidate?.status === "experimental" ||
+    rawCandidate?.status === "unknown"
       ? rawCandidate.status
       : "unknown";
 

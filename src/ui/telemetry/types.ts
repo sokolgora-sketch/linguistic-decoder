@@ -209,7 +209,7 @@ export interface CandidateRowVM {
 
   // Candidate evaluation metadata is presentation-only. Invalid values are
   // rejected at the raw-payload boundary rather than reinterpreted as truth.
-  status?: PresentOrMissing<"pass" | "fail" | "unknown">;
+  status?: PresentOrMissing<"pass" | "fail" | "experimental" | "unknown">;
   confidenceTag?: PresentOrMissing<string>;
   fitTag?: PresentOrMissing<string>;
 

@@ -11,7 +11,7 @@ function candidate(overrides: Record<string, unknown> = {}) {
 }
 
 describe("Open Instrument candidate metadata boundary v0.1", () => {
-  test.each(["pass", "fail", "unknown"] as const)(
+  test.each(["pass", "fail", "experimental", "unknown"] as const)(
     "preserves supported status %s through the VM and UI model",
     (status) => {
       const vm = adaptAnalysisToTelemetryVM({
@@ -89,7 +89,7 @@ describe("Open Instrument candidate metadata boundary v0.1", () => {
     expect(vm.candidates[0].status).toEqual({
       kind: "missing",
       missing: "malformed",
-      note: "candidate.status expected pass | fail | unknown",
+      note: "candidate.status expected pass | fail | experimental | unknown",
     });
     expect(vm.candidates[0].confidenceTag).toEqual({
       kind: "missing",

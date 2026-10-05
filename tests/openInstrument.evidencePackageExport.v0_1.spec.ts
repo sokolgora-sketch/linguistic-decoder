@@ -253,6 +253,19 @@ describe("Open Instrument evidence package export contract v0.1", () => {
     expect(result.value.analysisStatusV0_1?.userDecisionPosture).toBe("user_decides");
   });
 
+  it("preserves experimental candidate status in the evidence export", () => {
+    const vm = makeVm();
+    vm.candidates[1].status = present("experimental");
+
+    const result = buildEvidencePackageExportV0_1(vm, ledgerModel);
+
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+
+    expect(result.value.candidates[1]?.status).toBe("experimental");
+    expect(validateEvidencePackageExportV0_1(result.value)).toEqual({ ok: true });
+  });
+
   it("fails closed on nested forbidden data", () => {
     const result = buildEvidencePackageExportV0_1(makeVm(), ledgerModel);
     expect(result.ok).toBe(true);
@@ -270,7 +283,7 @@ describe("Open Instrument evidence package export contract v0.1", () => {
     expect(validation.ok).toBe(false);
   });
 
-  it("rejects an invalid candidate status instead of reclassifying it", () => {
+  it("rejects an unsupported candidate status instead of reclassifying it", () => {
     const result = buildEvidencePackageExportV0_1(makeVm(), ledgerModel);
     expect(result.ok).toBe(true);
     if (!result.ok) return;
@@ -278,7 +291,7 @@ describe("Open Instrument evidence package export contract v0.1", () => {
     const malformed = {
       ...result.value,
       candidates: result.value.candidates.map((candidate, index) =>
-        index === 0 ? { ...candidate, status: "experimental" } : candidate,
+        index === 0 ? { ...candidate, status: "unsupported" } : candidate,
       ),
     };
 
