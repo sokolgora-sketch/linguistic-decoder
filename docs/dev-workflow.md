@@ -44,17 +44,29 @@ Escalation is based on uncertainty and risk, not task size. Do not make subscrip
 Use this loop for Open Instrument work:
 
 1. Inspect repository truth.
-2. Identify a measured milestone capability gap.
-3. Define the smallest safe lane.
+2. Determine the smallest justified scope from the current implementation,
+   contracts, tests, and documentation.
+3. Identify a measured milestone capability gap when the lane changes
+   analytical or product behavior.
 4. Execute the bounded Codex inspection or implementation.
-5. Run focused tests.
-6. Run the appropriate repository gate.
-7. Produce an exact evidence report.
-8. Review the evidence in ChatGPT.
-9. Open or merge a PR only when explicitly justified and authorized.
-10. Remeasure capability when the lane changes analytical behavior.
-11. Update DF_BRAIN after a confirmed significant merge when appropriate.
-12. Select the next lane from measured evidence.
+5. Run focused tests first, then the required typechecks, gates, and build
+   for the changed scope.
+6. Inspect the final diff and verify the changed-file boundary.
+7. Commit and push the reviewed branch.
+8. Open the PR only when the lane explicitly authorizes publication.
+9. Poll required CI until it reaches a terminal state; pending CI is not a
+   reason to stop the lifecycle.
+10. Inspect substantive review findings and review threads. Fix only
+    justified in-scope findings, rerun affected validation, and explicitly
+    resolve addressed threads when the tooling permits it.
+11. Verify required checks are green, substantive review findings are
+    resolved, and the PR is mergeable before merging.
+12. Sync local `main` and prove post-merge repository truth.
+13. Reconcile the relevant Linear record when the project uses Linear.
+14. Update DF_BRAIN locally after a confirmed significant merge when the
+    standing workflow authorizes it; report remote state separately.
+15. Produce an exact evidence report and select the next lane from measured
+    evidence.
 
 PRs are delivery mechanisms. Measured Open Instrument capability is the objective. Do not select the next task merely because another PR can be created.
 
@@ -99,6 +111,15 @@ Use `npm run gate:quick` for quick validation when a build is not required. Use 
 
 Never claim PASS, build success, CI success, or gate success without actual output. Do not encode transient test counts in this durable workflow.
 
+For the current repository command surface, the normal pre-merge sequence is
+focused validation, `npm run gate:quick`, and `npm run build` when the lane
+requires production-build coverage. `npm run gate` is the combined full gate
+when that broader command is appropriate. Inspect `package.json` and the
+current CI workflows before relying on any command or historical test count.
+Documentation-only changes still require consistency, path/link, and any
+repository documentation validation that actually exists; do not run
+unrelated expensive suites only for ceremony.
+
 ## 8. Merge authorization
 
 A task may merge only when that task explicitly authorizes merging that specific PR. General instructions such as "finish the task" do not authorize a merge.
@@ -114,7 +135,17 @@ Before an authorized merge, verify the applicable:
 - mergeability;
 - expected-head protection.
 
-Do not merge unresolved or failing work.
+Required checks must be terminal and green, and substantive review findings
+must be resolved. When a review finding is addressed, explicitly resolve its
+thread when GitHub tooling permits it; if the tooling cannot resolve a thread,
+report that limitation rather than claiming resolution. Do not merge
+unresolved or failing work.
+
+Pending CI is not a genuine blocker. Return to the user/DF only for an
+authentication or permission failure, required human approval, an
+infrastructure failure that cannot safely be worked around, an incompatible
+concurrent repository change, a substantive product/scientific/semantic
+decision requiring authority, or an unsafe/ambiguous repository state.
 
 ## 9. Completion evidence
 
@@ -141,6 +172,14 @@ RESULT=PASS/FAIL
 ```
 
 A technical PASS does not automatically mean analytical capability improved. For documentation or process-only work, `capabilityDelta=NONE_DOCS_ONLY` and `baselineDelta=NONE` are valid truthful values.
+
+Completion evidence must distinguish performed actions from planned actions.
+Do not claim CI, review resolution, merge, Linear reconciliation, DF_BRAIN
+update, remote push, or post-merge synchronization unless each was actually
+verified. A normal merged-lane report should include the final branch, HEAD,
+`origin/main`, divergence, worktree, changed files, validation, commit, PR,
+CI, review-thread state, mergeability, merge SHA, protected state, Linear
+mutation, and DF_BRAIN local/remote state.
 
 ## 10. Bounded unattended work
 
@@ -169,8 +208,26 @@ Preserve the repository's canonical rules for Seven Voices `A E I O U Y Ë`, can
 
 The owning constitutional and contract documents remain authoritative. This workflow does not create new analytical semantics.
 
-## 13. DF_BRAIN and protected state
+## 13. Post-merge proof, Linear, and DF_BRAIN
 
-DF_BRAIN is a continuity record for confirmed project history. Update it only after confirmed significant merges or milestones when appropriate, and never record speculative accomplishments. Protected JO state must remain unchanged unless a task explicitly authorizes a protected-state operation.
+After a confirmed merge, synchronize local `main` and verify the branch,
+HEAD, `origin/main`, divergence, and worktree before calling the lane complete.
+If Linear is part of the project, inspect the existing project/issue/milestone
+record and reconcile that existing record rather than creating duplicates. If
+Linear is unavailable or no relevant authority can be identified, report the
+limitation.
 
-Provider or model execution remains authorization-bound. A documentation or inspection task must not execute providers or models.
+DF_BRAIN is a continuity record for confirmed project history. Inspect its
+current project/log state before updating it; update only after confirmed
+significant merges or milestones when the standing workflow authorizes the
+local record update; never record speculative accomplishments; and preserve
+unrelated dirty work. Authorization to update a local DF_BRAIN record does
+not by itself authorize a remote push. A DF_BRAIN remote push requires
+separate explicit authorization unless a current authoritative instruction
+demonstrably provides it. Report whether the local update was committed and
+whether any remote push occurred.
+
+Protected JO state must remain unchanged unless a task explicitly authorizes a
+protected-state operation. Provider or model execution remains
+authorization-bound. A documentation or inspection task must not execute
+providers or models.
