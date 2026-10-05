@@ -49,7 +49,10 @@ This workflow preserves:
 - inspection-first and stop-on-mismatch discipline;
 - bounded model escalation and unattended work;
 - explicit merge authorization;
+- terminal CI and review-thread verification before merge;
+- post-merge synchronization and proof;
 - capability-delta reporting;
+- Linear reconciliation and DF_BRAIN local/remote-state reporting;
 - protected-state and provider boundaries.
 
 It does not replace the Constitution, Reality Guide, Engine Contract Freeze, Recovery Playbook, or lane-specific Open Instrument runbooks.
