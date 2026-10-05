@@ -5,6 +5,7 @@ import {
   PERMUTATIONS,
   PERMUTATION_STREAM_NAME,
   SplitMix64,
+  compareCodePoint,
   stableJson,
 } from "../scripts/openInstrumentFunctionalManifestationExperimentV0_1";
 
@@ -28,5 +29,18 @@ describe("functional manifestation experiment v0.1 execution boundary", () => {
       second.nextUnit(),
       second.nextUnit(),
     ]);
+  });
+
+  it("uses locale-independent code-point ordering for execution keys", () => {
+    const keys = ["O→U", "O", "A→Ë", "ä", "a", "!", "Z", "z"];
+    const expected = [...keys].sort();
+    const localeCompare = jest.spyOn(String.prototype, "localeCompare");
+
+    expect([...keys].sort(compareCodePoint)).toEqual(expected);
+    expect(stableJson({ "O→U": 1, "ä": 2, a: 3, "!": 4 })).toBe(
+      '{"!":4,"O→U":1,"a":3,"ä":2}',
+    );
+    expect(localeCompare).not.toHaveBeenCalled();
+    localeCompare.mockRestore();
   });
 });

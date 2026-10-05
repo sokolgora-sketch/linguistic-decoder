@@ -110,6 +110,10 @@ type Statistic = {
   totalUnits: number;
 };
 
+function compareCodePoint(left: string, right: string): number {
+  return left < right ? -1 : left > right ? 1 : 0;
+}
+
 function stableJson(value: unknown): string {
   if (Array.isArray(value)) {
     return `[${value.map((item) => stableJson(item)).join(",")}]`;
@@ -117,7 +121,7 @@ function stableJson(value: unknown): string {
   if (value && typeof value === "object") {
     const record = value as Record<string, unknown>;
     return `{${Object.keys(record)
-      .sort()
+      .sort(compareCodePoint)
       .map((key) => `${JSON.stringify(key)}:${stableJson(record[key])}`)
       .join(",")}}`;
   }
@@ -217,7 +221,7 @@ function buildUnits(stageA: StageAArtifact, structural: StructuralArtifact): {
     if (voiceKeys.size !== 1 || form.directPropertyIds.length === 0) continue;
 
     const observation = observations[0];
-    const directPropertyIds = [...new Set(form.directPropertyIds)].sort();
+    const directPropertyIds = [...new Set(form.directPropertyIds)].sort(compareCodePoint);
     units.push({
       formKey,
       voiceKey: stableJson(observation.voicePath),
@@ -232,7 +236,7 @@ function buildUnits(stageA: StageAArtifact, structural: StructuralArtifact): {
   }
 
   return {
-    units: units.sort((left, right) => left.formKey.localeCompare(right.formKey)),
+    units: units.sort((left, right) => compareCodePoint(left.formKey, right.formKey)),
     sourceMatchedForms: [...stageForms.values()].filter(
       (form) => form.sourcePresentOutcomeUnresolvedUnitCount >= 0,
     ).length,
@@ -258,10 +262,10 @@ function candidateBlocks(units: Unit[]): Block[] {
       );
       return group.length >= 2 && propertySignatures.size >= 2;
     })
-    .sort(([left], [right]) => left.localeCompare(right))
+    .sort(([left], [right]) => compareCodePoint(left, right))
     .map(([key, rows]) => ({
       key,
-      rows: rows.sort((left, right) => left.formKey.localeCompare(right.formKey)),
+      rows: rows.sort((left, right) => compareCodePoint(left.formKey, right.formKey)),
     }));
 }
 
@@ -754,4 +758,4 @@ if (process.argv.includes("--execute")) {
   executeExperiment();
 }
 
-export { SplitMix64, stableJson };
+export { SplitMix64, compareCodePoint, stableJson };
