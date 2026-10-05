@@ -77,6 +77,7 @@ type Unit = {
   voiceKey: string;
   gamma: string;
   zc: string;
+  propertySignature: string;
   outcome: string;
 };
 
@@ -222,6 +223,7 @@ function buildUnits(stageA: StageAArtifact, structural: StructuralArtifact): {
       voiceKey: stableJson(observation.voicePath),
       gamma: observation.gammaSignature,
       zc: stableJson(observation.zc),
+      propertySignature: stableJson({ directPropertyIds }),
       outcome: stableJson({
         directPropertyIds,
         unresolvedEvidence: form.sourcePresentOutcomeUnresolvedUnitCount > 0,
@@ -252,7 +254,7 @@ function candidateBlocks(units: Unit[]): Block[] {
   return [...allGroups.entries()]
     .filter(([, group]) => {
       const propertySignatures = new Set(
-        group.map((unit) => unit.outcome),
+        group.map((unit) => unit.propertySignature),
       );
       return group.length >= 2 && propertySignatures.size >= 2;
     })
