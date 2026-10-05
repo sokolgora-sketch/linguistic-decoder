@@ -508,7 +508,7 @@ export function normalizeFunctionalOutcomeMatchingTextV0_1(
   return text
     .normalize("NFC")
     .toLocaleLowerCase("en-US")
-    .replace(/[^\p{L}\p{N}]+/gu, " ")
+    .replace(/[^\p{L}\p{Nd}]+/gu, " ")
     .replace(/ +/gu, " ")
     .trim();
 }

@@ -185,6 +185,12 @@ describe("functional outcome normalization and adjudication contract v0.1", () =
     expect(normalizeFunctionalOutcomeMatchingTextV0_1("Cafe\u0301\tGROWTH.")).toBe(
       "café growth",
     );
+    expect(normalizeFunctionalOutcomeMatchingTextV0_1("growth½stability")).toBe(
+      "growth stability",
+    );
+    expect(normalizeFunctionalOutcomeMatchingTextV0_1("growth2stability")).toBe(
+      "growth2stability",
+    );
     expect(findExactCanonicalPropertyMatchesV0_1(sourceWithGlosses(["GROWTH."]))).toEqual([
       expect.objectContaining({ propertyId: "growth", outcome: "DIRECT_MATCH" }),
     ]);
