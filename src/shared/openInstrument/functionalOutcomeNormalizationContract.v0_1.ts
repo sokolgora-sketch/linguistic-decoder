@@ -387,7 +387,12 @@ function hasForbiddenInputKeyV0_1(
 }
 
 function validExampleV0_1(value: unknown): value is EnglishLexicalSenseExampleV0_1 {
-  if (!isRecordV0_1(value) || !isTextV0_1(value.text)) return false;
+  if (!isRecordV0_1(value)) return false;
+  const hasText = value.text !== undefined;
+  const hasRef = value.ref !== undefined;
+  if (!hasText && !hasRef) return false;
+  if (hasText && !isTextV0_1(value.text)) return false;
+  if (hasRef && !isTextV0_1(value.ref)) return false;
   if (value.bold_text_offsets !== undefined) {
     if (
       !Array.isArray(value.bold_text_offsets) ||

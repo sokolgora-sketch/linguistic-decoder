@@ -87,6 +87,17 @@ describe("functional outcome normalization and adjudication contract v0.1", () =
     });
   });
 
+  it("accepts citation-only source examples without treating them as matching text", () => {
+    const input = sourceWithGlosses(["A hard substance"], {
+      examples: [{ ref: "Dictionary citation", type: "quotation" }],
+    });
+    expect(validateFunctionalOutcomeNormalizationInputV0_1(input)).toEqual({
+      ok: true,
+      input,
+    });
+    expect(findExactCanonicalPropertyMatchesV0_1(input)).toEqual([]);
+  });
+
   it("rejects structural, target, and provider inputs at the boundary", () => {
     const invalid = {
       ...sourceSense,

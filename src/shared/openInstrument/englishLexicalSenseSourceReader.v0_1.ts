@@ -8,7 +8,7 @@ import {
   validateEnglishLexicalSenseSourceArtifactIdentityV0_1,
 } from "@/shared/openInstrument/englishLexicalSenseSourceContract.v0_1";
 import { createHash } from "node:crypto";
-import { createReadStream } from "node:fs";
+import { open, type FileHandle } from "node:fs/promises";
 
 export const ENGLISH_LEXICAL_SENSE_SOURCE_READER_VERSION_V0_1 =
   "open-instrument.english-kaikki-hash-bound-source-reader.v0_1" as const;
@@ -243,7 +243,7 @@ function projectRecord(
 }
 
 async function hashArtifactV0_1(
-  path: string,
+  fileHandle: FileHandle,
   chunkSize?: number,
 ): Promise<
   | { ok: true; byteLength: number; sha256: string }
@@ -252,7 +252,11 @@ async function hashArtifactV0_1(
   try {
     const hash = createHash("sha256");
     let byteLength = 0;
-    for await (const chunk of createReadStream(path, { highWaterMark: chunkSize })) {
+    for await (const chunk of fileHandle.createReadStream({
+      autoClose: false,
+      highWaterMark: chunkSize,
+      start: 0,
+    })) {
       const bytes = Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk);
       byteLength += bytes.length;
       hash.update(bytes);
@@ -268,52 +272,65 @@ async function hashArtifactV0_1(
 export async function readEnglishLexicalSenseSourceV0_1(
   options: EnglishLexicalSenseSourceReaderOptionsV0_1,
 ): Promise<EnglishLexicalSenseSourceReaderResultV0_1> {
-  const identity = await hashArtifactV0_1(options.path, options.chunkSize);
-  if (!identity.ok) return identity;
-
-  const identityCheck = validateEnglishLexicalSenseSourceArtifactIdentityV0_1(identity);
-  if (!identityCheck.ok) {
-    return failure("SOURCE_IDENTITY_MISMATCH", {
-      expected: identityCheck.expected,
-      observed: identityCheck.observed,
+  let fileHandle: FileHandle;
+  try {
+    fileHandle = await open(options.path, "r");
+  } catch (error) {
+    return failure("SOURCE_FILE_UNAVAILABLE", {
+      message: error instanceof Error ? error.message : String(error),
     });
   }
 
-  let recordsRead = 0;
   let byteOffset = 0;
-  let pending: Buffer[] = [];
-  let pendingBytes = 0;
-
-  const consume = async (recordBytes: Buffer, recordOffset: number) => {
-    if (recordBytes.length === 0) {
-      return failure("SOURCE_RECORD_EMPTY", { byteOffset: recordOffset });
-    }
-
-    const parsed = parseEnglishLexicalSenseSourceRecordV0_1(recordBytes);
-    if (!parsed.ok) {
-      return failure(parsed.reasonCode, {
-        sourceRecordOrdinal: recordsRead + 1,
-        byteOffset: recordOffset,
-        message: parsed.message,
-      });
-    }
-
-    try {
-      await options.onRecord(parsed.record, recordsRead + 1);
-    } catch (error) {
-      return failure("SOURCE_RECORD_CONSUMER_FAILED", {
-        sourceRecordOrdinal: recordsRead + 1,
-        byteOffset: recordOffset,
-        message: error instanceof Error ? error.message : String(error),
-      });
-    }
-    recordsRead += 1;
-    return null;
-  };
-
   try {
-    for await (const chunk of createReadStream(options.path, {
+    // Hash and parse through one open descriptor. An atomic path replacement
+    // cannot change the identity-bound bytes seen by the second pass.
+    const identity = await hashArtifactV0_1(fileHandle, options.chunkSize);
+    if (!identity.ok) return identity;
+
+    const identityCheck = validateEnglishLexicalSenseSourceArtifactIdentityV0_1(identity);
+    if (!identityCheck.ok) {
+      return failure("SOURCE_IDENTITY_MISMATCH", {
+        expected: identityCheck.expected,
+        observed: identityCheck.observed,
+      });
+    }
+
+    let recordsRead = 0;
+    let pending: Buffer[] = [];
+    let pendingBytes = 0;
+
+    const consume = async (recordBytes: Buffer, recordOffset: number) => {
+      if (recordBytes.length === 0) {
+        return failure("SOURCE_RECORD_EMPTY", { byteOffset: recordOffset });
+      }
+
+      const parsed = parseEnglishLexicalSenseSourceRecordV0_1(recordBytes);
+      if (!parsed.ok) {
+        return failure(parsed.reasonCode, {
+          sourceRecordOrdinal: recordsRead + 1,
+          byteOffset: recordOffset,
+          message: parsed.message,
+        });
+      }
+
+      try {
+        await options.onRecord(parsed.record, recordsRead + 1);
+      } catch (error) {
+        return failure("SOURCE_RECORD_CONSUMER_FAILED", {
+          sourceRecordOrdinal: recordsRead + 1,
+          byteOffset: recordOffset,
+          message: error instanceof Error ? error.message : String(error),
+        });
+      }
+      recordsRead += 1;
+      return null;
+    };
+
+    for await (const chunk of fileHandle.createReadStream({
+      autoClose: false,
       highWaterMark: options.chunkSize,
+      start: 0,
     })) {
       const bytes = Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk);
       let segmentStart = 0;
@@ -340,17 +357,18 @@ export async function readEnglishLexicalSenseSourceV0_1(
       const result = await consume(Buffer.concat(pending, pendingBytes), byteOffset - pendingBytes);
       if (result) return result;
     }
+    return Object.freeze({
+      ok: true,
+      recordsRead,
+      byteLength: identity.byteLength,
+      sha256: identity.sha256,
+    });
   } catch (error) {
     return failure("SOURCE_FILE_UNAVAILABLE", {
       byteOffset,
       message: error instanceof Error ? error.message : String(error),
     });
+  } finally {
+    await fileHandle.close();
   }
-
-  return Object.freeze({
-    ok: true,
-    recordsRead,
-    byteLength: identity.byteLength,
-    sha256: identity.sha256,
-  });
 }
