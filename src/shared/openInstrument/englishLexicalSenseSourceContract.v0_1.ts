@@ -81,7 +81,8 @@ export const ENGLISH_LEXICAL_SENSE_SOURCE_EXCLUDED_FIELDS_V0_1 = deepFreeze([
 ] as const);
 
 export type EnglishLexicalSenseExampleV0_1 = Readonly<{
-  text: string;
+  text?: string;
+  ref?: string;
   bold_text_offsets?: readonly (readonly [number, number])[];
   type?: string;
 }>;
