@@ -53,7 +53,39 @@ The normalization rule is `EXACT_CANONICAL_PROPERTY_TERM_ONLY`: no synonym
 expansion, translation, embedding, model inference, metaphor, or evaluator
 intuition. A source sense may preserve multiple property observations.
 
-## 4. Input and output
+## 4. Exact matching operator
+
+Automatic matching inspects `senses[].glosses` only. Tags, raw tags, examples,
+POS, and source form remain preserved source/provenance/context fields but do
+not generate an automatic `DIRECT_MATCH`.
+
+Each canonical property term is derived mechanically from its exact frozen
+property ID by replacing every underscore with one ASCII space. No other term
+rewrite, alias, synonym, translation, stemming, or lemmatization is allowed.
+
+The same text normalization is applied to gloss text and canonical property
+terms: Unicode NFC normalization; locale-independent English/en-US lowercase;
+replacement of every maximal run of non-Unicode-letter/non-Unicode-decimal
+digit characters with one ASCII space; collapse of ASCII whitespace runs; and
+trim. Punctuation and hyphens therefore form token boundaries. Diacritics are
+not stripped and text is not transliterated.
+
+Matching is `NORMALIZED_CONTIGUOUS_WHOLE_TOKEN_SEQUENCE`. A single-token term
+must equal a complete normalized token; a multi-token term must occur as the
+complete ordered contiguous token sequence. Substring matching is forbidden.
+
+Every gloss is inspected independently. Multiple exact property matches are
+all preserved, and repeated support for one property preserves every evidence
+reference. No primary property, ranking, merge, or winner is selected.
+
+If at least one exact canonical property term occurs, the operator emits
+`DIRECT_MATCH` observations for all matching properties. If usable gloss text
+contains no exact term, the source unit remains source-present and unresolved
+with `NO_EXACT_CANONICAL_PROPERTY_TERM`; this is not `CONTRADICTION` or
+semantic `NO_MATCH`. If no usable gloss text exists, the reason is
+`SOURCE_TEXT_INSUFFICIENT`. `SOURCE_NOT_FOUND` remains distinct.
+
+## 5. Input and output
 
 The typed input contains only the admitted #2090 source fields plus the
 hash-bound source-record identity needed to distinguish duplicate records:
@@ -79,7 +111,7 @@ references, `user_decides`, and `noSingleWinner`. It distinguishes:
 source text, unresolved sense ambiguity, conflicting evidence, and missing
 authorized information. It is a valid Null outcome.
 
-## 5. Adjudication boundary
+## 6. Adjudication boundary
 
 The deterministic layer preserves source identity, source order, source text,
 and multiplicity. Human review, when separately performed, may adjudicate only
@@ -97,7 +129,7 @@ status, human provenance, Null, and disagreement. Its target binding and
 doctrine `voicePath` are deliberately not imported into this source-only
 contract.
 
-## 6. Firewalls
+## 7. Firewalls
 
 This contract does not authorize:
 
@@ -113,7 +145,7 @@ This contract does not authorize:
 It is not a population runner and does not bundle the 3.3 GB source artifact.
 No derived semantic slice is created here.
 
-## 7. Freeze declaration
+## 8. Freeze declaration
 
 The source-only normalization boundary is frozen as a contract. A future
 population projection lane must separately materialize source records, apply

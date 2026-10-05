@@ -2,10 +2,15 @@ import {
   FUNCTIONAL_OUTCOME_NORMALIZATION_CONTRACT_ID_V0_1,
   FUNCTIONAL_OUTCOME_NORMALIZATION_CONTRACT_V0_1,
   FUNCTIONAL_OUTCOME_NORMALIZATION_PROPERTY_IDS_V0_1,
+  FUNCTIONAL_OUTCOME_NORMALIZATION_REASON_CODES_V0_1,
   FUNCTIONAL_OUTCOME_NORMALIZATION_SCHEMA_V0_1,
   FUNCTIONAL_OUTCOME_NORMALIZATION_SOURCE_ARTIFACT_SHA256_V0_1,
   FUNCTIONAL_OUTCOME_NORMALIZATION_SOURCE_PROFILE_V0_1,
   FUNCTIONAL_OUTCOME_NORMALIZATION_UNIT_OF_ANALYSIS_V0_1,
+  canonicalPropertyIdToMatchingTermV0_1,
+  evaluateFunctionalOutcomeMatchingV0_1,
+  findExactCanonicalPropertyMatchesV0_1,
+  normalizeFunctionalOutcomeMatchingTextV0_1,
   validateFunctionalOutcomeNormalizationInputV0_1,
   type FunctionalOutcomeSourceSenseInputV0_1,
 } from "@/shared/openInstrument/functionalOutcomeNormalizationContract.v0_1";
@@ -23,7 +28,7 @@ const sourceSense: FunctionalOutcomeSourceSenseInputV0_1 = {
   sourceArtifactSha256: FUNCTIONAL_OUTCOME_NORMALIZATION_SOURCE_ARTIFACT_SHA256_V0_1,
   sourceRecordId: "line-0000001",
   sourceRecordOrdinal: 1,
-  sourceForm: "stone",
+  sourceForm: "sample",
   language: "English",
   languageCode: "en",
   pos: "noun",
@@ -34,6 +39,20 @@ const sourceSense: FunctionalOutcomeSourceSenseInputV0_1 = {
   rawTags: [],
   examples: [{ text: "A stone" }],
 };
+
+function sourceWithGlosses(
+  glosses: readonly string[],
+  overrides: Partial<FunctionalOutcomeSourceSenseInputV0_1> = {},
+): FunctionalOutcomeSourceSenseInputV0_1 {
+  return {
+    ...sourceSense,
+    glosses,
+    tags: [],
+    rawTags: [],
+    examples: [],
+    ...overrides,
+  };
+}
 
 describe("functional outcome normalization and adjudication contract v0.1", () => {
   it("freezes identity, source binding, unit, and existing property vocabulary", () => {
@@ -50,6 +69,15 @@ describe("functional outcome normalization and adjudication contract v0.1", () =
     expect(FUNCTIONAL_OUTCOME_NORMALIZATION_CONTRACT_V0_1.normalizationRule).toBe(
       "EXACT_CANONICAL_PROPERTY_TERM_ONLY",
     );
+    expect(FUNCTIONAL_OUTCOME_NORMALIZATION_CONTRACT_V0_1.matchingOperator).toMatchObject({
+      fieldScope: "GLOSSES_ONLY",
+      propertyTermRule: "PROPERTY_ID_UNDERSCORE_TO_ASCII_SPACE_ONLY",
+      matchGranularity: "NORMALIZED_CONTIGUOUS_WHOLE_TOKEN_SEQUENCE",
+      multiplePropertyMatches: "PRESERVE_ALL",
+      multipleGlosses: "INSPECT_EACH_GLOSS_PRESERVE_ALL_EVIDENCE",
+      zeroExactMatch: "SOURCE_PRESENT_NO_EXACT_MATCH_UNRESOLVED",
+      insufficientGlossText: "SOURCE_TEXT_INSUFFICIENT",
+    });
   });
 
   it("accepts only the hash-bound source/sense input shape", () => {
@@ -132,5 +160,120 @@ describe("functional outcome normalization and adjudication contract v0.1", () =
       historicalOriginAuthority: "NO",
       ipaToVoiceAuthority: "NO",
     });
+  });
+
+  it("matches glosses only and excludes tags, raw tags, and examples", () => {
+    const input = sourceWithGlosses([], {
+      tags: ["growth"],
+      rawTags: ["growth"],
+      examples: [{ text: "growth" }],
+    });
+    expect(findExactCanonicalPropertyMatchesV0_1(input)).toEqual([]);
+  });
+
+  it("derives every canonical term only by replacing underscores with ASCII spaces", () => {
+    expect(canonicalPropertyIdToMatchingTermV0_1("growth")).toBe("growth");
+    expect(canonicalPropertyIdToMatchingTermV0_1("learning_from_experience")).toBe(
+      "learning from experience",
+    );
+    expect(canonicalPropertyIdToMatchingTermV0_1("emotional_interiority")).toBe(
+      "emotional interiority",
+    );
+  });
+
+  it("normalizes NFC, case, punctuation, and whitespace deterministically", () => {
+    expect(normalizeFunctionalOutcomeMatchingTextV0_1("Cafe\u0301\tGROWTH.")).toBe(
+      "café growth",
+    );
+    expect(normalizeFunctionalOutcomeMatchingTextV0_1("growth½stability")).toBe(
+      "growth stability",
+    );
+    expect(normalizeFunctionalOutcomeMatchingTextV0_1("growth2stability")).toBe(
+      "growth2stability",
+    );
+    expect(findExactCanonicalPropertyMatchesV0_1(sourceWithGlosses(["GROWTH."]))).toEqual([
+      expect.objectContaining({ propertyId: "growth", outcome: "DIRECT_MATCH" }),
+    ]);
+    expect(findExactCanonicalPropertyMatchesV0_1(sourceWithGlosses(["growth-related"]))).toEqual([
+      expect.objectContaining({ propertyId: "growth", outcome: "DIRECT_MATCH" }),
+    ]);
+  });
+
+  it("requires whole-token equality and rejects substring matches", () => {
+    expect(findExactCanonicalPropertyMatchesV0_1(
+      sourceWithGlosses(["growths overgrowth regrowth"]),
+    )).toEqual([]);
+  });
+
+  it("requires an ordered contiguous token sequence for multi-token properties", () => {
+    expect(findExactCanonicalPropertyMatchesV0_1(
+      sourceWithGlosses(["learning from experience"]),
+    )).toEqual([
+      expect.objectContaining({ propertyId: "learning_from_experience" }),
+    ]);
+    expect(findExactCanonicalPropertyMatchesV0_1(
+      sourceWithGlosses(["learning through long practical experience"]),
+    )).toEqual([]);
+  });
+
+  it("preserves all exact properties without ranking or choosing a primary property", () => {
+    const outcomes = findExactCanonicalPropertyMatchesV0_1(
+      sourceWithGlosses(["growth and stability"]),
+    );
+    expect(outcomes.map((outcome) => outcome.propertyId)).toEqual([
+      "growth",
+      "stability",
+    ]);
+    expect(outcomes.every((outcome) => outcome.outcome === "DIRECT_MATCH")).toBe(true);
+  });
+
+  it("inspects every gloss and preserves duplicate evidence references", () => {
+    const outcomes = findExactCanonicalPropertyMatchesV0_1(
+      sourceWithGlosses(["growth", "growth growth"]),
+    );
+    expect(outcomes).toHaveLength(1);
+    expect(outcomes[0].propertyId).toBe("growth");
+    expect(outcomes[0].evidenceRefs).toHaveLength(3);
+    expect(outcomes[0].evidenceRefs.map((ref) => ref.locator)).toEqual([
+      "glosses[0].tokens[0..0]",
+      "glosses[1].tokens[0..0]",
+      "glosses[1].tokens[1..1]",
+    ]);
+  });
+
+  it("keeps zero exact matches unresolved rather than calling them contradiction", () => {
+    const evaluation = evaluateFunctionalOutcomeMatchingV0_1(
+      sourceWithGlosses(["a neutral description"]),
+    );
+    expect(evaluation).toEqual({
+      outcomes: [],
+      reasonCode: "NO_EXACT_CANONICAL_PROPERTY_TERM",
+    });
+    expect(evaluation.outcomes.some((outcome) => outcome.outcome === "CONTRADICTION")).toBe(
+      false,
+    );
+  });
+
+  it("keeps insufficient gloss text distinct from source-present zero-match", () => {
+    expect(evaluateFunctionalOutcomeMatchingV0_1(sourceWithGlosses([]))).toEqual({
+      outcomes: [],
+      reasonCode: "SOURCE_TEXT_INSUFFICIENT",
+    });
+    expect(evaluateFunctionalOutcomeMatchingV0_1(sourceWithGlosses(["ordinary text"])))
+      .toEqual({ outcomes: [], reasonCode: "NO_EXACT_CANONICAL_PROPERTY_TERM" });
+    expect(FUNCTIONAL_OUTCOME_NORMALIZATION_REASON_CODES_V0_1).toContain(
+      "NO_EXACT_CANONICAL_PROPERTY_TERM",
+    );
+  });
+
+  it("uses the same canonical-ID pipeline uniformly for all 44 property IDs", () => {
+    for (const propertyId of FUNCTIONAL_OUTCOME_NORMALIZATION_PROPERTY_IDS_V0_1) {
+      const canonicalTerm = canonicalPropertyIdToMatchingTermV0_1(propertyId);
+      expect(canonicalTerm).toBe(propertyId.replace(/_/gu, " "));
+      const outcomes = findExactCanonicalPropertyMatchesV0_1(
+        sourceWithGlosses([canonicalTerm]),
+      );
+      expect(outcomes.map((outcome) => outcome.propertyId)).toEqual([propertyId]);
+    }
   });
 });

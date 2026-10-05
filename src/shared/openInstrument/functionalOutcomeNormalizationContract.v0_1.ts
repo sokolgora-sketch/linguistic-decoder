@@ -165,6 +165,7 @@ export type FunctionalOutcomeNormalizationReasonCodeV0_1 =
   | "LEXICAL_SENSE_SOURCE_NOT_FOUND"
   | "SOURCE_PRESENT_OUTCOME_UNRESOLVED"
   | "SOURCE_TEXT_INSUFFICIENT"
+  | "NO_EXACT_CANONICAL_PROPERTY_TERM"
   | "UNRESOLVED_SENSE_AMBIGUITY"
   | "INSUFFICIENT_AUTHORIZED_INFORMATION"
   | "OUTCOME_CONFLICTING_EVIDENCE"
@@ -209,6 +210,7 @@ export const FUNCTIONAL_OUTCOME_NORMALIZATION_REASON_CODES_V0_1 = Object.freeze(
   "LEXICAL_SENSE_SOURCE_NOT_FOUND",
   "SOURCE_PRESENT_OUTCOME_UNRESOLVED",
   "SOURCE_TEXT_INSUFFICIENT",
+  "NO_EXACT_CANONICAL_PROPERTY_TERM",
   "UNRESOLVED_SENSE_AMBIGUITY",
   "INSUFFICIENT_AUTHORIZED_INFORMATION",
   "OUTCOME_CONFLICTING_EVIDENCE",
@@ -232,6 +234,23 @@ export const FUNCTIONAL_OUTCOME_NORMALIZATION_CONTRACT_V0_1 = Object.freeze({
   propertyVocabulary: "EXISTING_DOCTRINE_FUNCTIONAL_PROPERTY_IDS_ONLY",
   propertyOutcomeVocabulary: FUNCTIONAL_OUTCOME_NORMALIZATION_PROPERTY_OUTCOMES_V0_1,
   normalizationRule: "EXACT_CANONICAL_PROPERTY_TERM_ONLY",
+  matchingOperator: {
+    fieldScope: "GLOSSES_ONLY",
+    propertyTermRule: "PROPERTY_ID_UNDERSCORE_TO_ASCII_SPACE_ONLY",
+    textNormalization:
+      "NFC_THEN_EN_US_LOWERCASE_THEN_NON_LETTER_DIGIT_RUN_TO_ASCII_SPACE_THEN_COLLAPSE_AND_TRIM",
+    matchGranularity: "NORMALIZED_CONTIGUOUS_WHOLE_TOKEN_SEQUENCE",
+    punctuationHandling: "NON_LETTER_DIGIT_RUN_IS_TOKEN_BOUNDARY",
+    substringMatching: false,
+    stemming: false,
+    lemmatization: false,
+    synonymExpansion: false,
+    semanticInference: false,
+    multiplePropertyMatches: "PRESERVE_ALL",
+    multipleGlosses: "INSPECT_EACH_GLOSS_PRESERVE_ALL_EVIDENCE",
+    zeroExactMatch: "SOURCE_PRESENT_NO_EXACT_MATCH_UNRESOLVED",
+    insufficientGlossText: "SOURCE_TEXT_INSUFFICIENT",
+  },
   multiplicity: {
     sourceRecordsPreserved: true,
     posRecordsPreserved: true,
@@ -475,4 +494,119 @@ export function validateFunctionalOutcomeNormalizationInputV0_1(
   if (uniqueReasons.length > 0) return { ok: false, reasonCodes: uniqueReasons };
 
   return { ok: true, input: value as FunctionalOutcomeNormalizationInputV0_1 };
+}
+
+export function canonicalPropertyIdToMatchingTermV0_1(
+  propertyId: FunctionalOutcomePropertyIdV0_1,
+): string {
+  return propertyId.replace(/_/gu, " ");
+}
+
+export function normalizeFunctionalOutcomeMatchingTextV0_1(
+  text: string,
+): string {
+  return text
+    .normalize("NFC")
+    .toLocaleLowerCase("en-US")
+    .replace(/[^\p{L}\p{Nd}]+/gu, " ")
+    .replace(/ +/gu, " ")
+    .trim();
+}
+
+type NormalizedGlossTokensV0_1 = Readonly<{
+  glossIndex: number;
+  sourceText: string;
+  tokens: readonly string[];
+}>;
+
+function normalizedGlossTokensV0_1(
+  sourceText: string,
+  glossIndex: number,
+): NormalizedGlossTokensV0_1 {
+  const normalizedText = normalizeFunctionalOutcomeMatchingTextV0_1(sourceText);
+  return {
+    glossIndex,
+    sourceText,
+    tokens: normalizedText.length === 0 ? [] : normalizedText.split(" "),
+  };
+}
+
+function hasExactTokenSequenceV0_1(
+  haystack: readonly string[],
+  needle: readonly string[],
+  start: number,
+): boolean {
+  return needle.every((token, offset) => haystack[start + offset] === token);
+}
+
+export function findExactCanonicalPropertyMatchesV0_1(
+  input: FunctionalOutcomeSourceSenseInputV0_1,
+): readonly FunctionalOutcomeObservationV0_1[] {
+  const normalizedGlosses = input.glosses.map(normalizedGlossTokensV0_1);
+
+  return FUNCTIONAL_OUTCOME_NORMALIZATION_PROPERTY_IDS_V0_1.flatMap(
+    (propertyId) => {
+      const propertyTokens = normalizeFunctionalOutcomeMatchingTextV0_1(
+        canonicalPropertyIdToMatchingTermV0_1(propertyId),
+      ).split(" ");
+      const evidenceRefs: FunctionalOutcomeEvidenceRefV0_1[] = [];
+
+      for (const gloss of normalizedGlosses) {
+        for (
+          let start = 0;
+          start <= gloss.tokens.length - propertyTokens.length;
+          start += 1
+        ) {
+          if (!hasExactTokenSequenceV0_1(gloss.tokens, propertyTokens, start)) {
+            continue;
+          }
+          const end = start + propertyTokens.length - 1;
+          evidenceRefs.push({
+            sourceRecordId: input.sourceRecordId,
+            senseId: input.senseId,
+            locator: `glosses[${gloss.glossIndex}].tokens[${start}..${end}]`,
+            evidenceText: gloss.sourceText,
+          });
+        }
+      }
+
+      return evidenceRefs.length === 0
+        ? []
+        : [{
+            propertyId,
+            outcome: "DIRECT_MATCH",
+            evidenceRefs,
+          }];
+    },
+  );
+}
+
+export type FunctionalOutcomeMatchingEvaluationV0_1 = Readonly<{
+  outcomes: readonly FunctionalOutcomeObservationV0_1[];
+  reasonCode:
+    | "SOURCE_TEXT_INSUFFICIENT"
+    | "NO_EXACT_CANONICAL_PROPERTY_TERM"
+    | null;
+}>;
+
+export function evaluateFunctionalOutcomeMatchingV0_1(
+  input: FunctionalOutcomeSourceSenseInputV0_1,
+): FunctionalOutcomeMatchingEvaluationV0_1 {
+  const usableGlosses = input.glosses.some(
+    (gloss) => normalizeFunctionalOutcomeMatchingTextV0_1(gloss).length > 0,
+  );
+  if (!usableGlosses) {
+    return {
+      outcomes: [],
+      reasonCode: "SOURCE_TEXT_INSUFFICIENT",
+    };
+  }
+
+  const outcomes = findExactCanonicalPropertyMatchesV0_1(input);
+  return {
+    outcomes,
+    reasonCode: outcomes.length === 0
+      ? "NO_EXACT_CANONICAL_PROPERTY_TERM"
+      : null,
+  };
 }
