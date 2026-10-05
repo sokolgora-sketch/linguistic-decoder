@@ -660,10 +660,12 @@ function parseWordSpecificFunctionalDepthV0_1(
     : missing("malformed", "wordSpecificFunctionalDepth contract");
 }
 
-type CandidateStatus = "pass" | "fail" | "unknown";
+type CandidateStatus = "pass" | "fail" | "experimental" | "unknown";
 
 function parseCandidateStatus(v: unknown): CandidateStatus | null {
-  return v === "pass" || v === "fail" || v === "unknown" ? v : null;
+  return v === "pass" || v === "fail" || v === "experimental" || v === "unknown"
+    ? v
+    : null;
 }
 
 function parseOptionalCandidateString(
@@ -1667,7 +1669,10 @@ const normalizationSteps =
       const status = statusWasEmitted
           ? candidateStatus
           ? present<CandidateStatus>(candidateStatus)
-          : missing<CandidateStatus>("malformed", "candidate.status expected pass | fail | unknown")
+          : missing<CandidateStatus>(
+              "malformed",
+              "candidate.status expected pass | fail | experimental | unknown",
+            )
         : undefined;
       const confidenceTag = parseOptionalCandidateString(rec, "confidenceTag");
       const fitTag = parseOptionalCandidateString(rec, "fitTag");

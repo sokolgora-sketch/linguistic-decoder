@@ -84,7 +84,7 @@ export interface CandidateUI {
   vowelPath?: string;
   decomposition?: string[];
   gloss?: string;
-  status?: "pass" | "fail" | "unknown";
+  status?: "pass" | "fail" | "experimental" | "unknown";
   confidenceTag?: string;
   fitTag?: string;
   sourceKind?: string;
