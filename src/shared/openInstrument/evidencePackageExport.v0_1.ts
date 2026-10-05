@@ -31,7 +31,7 @@ export const EVIDENCE_PACKAGE_EXPORT_FORBIDDEN_KEYS_V0_1 = [
 ] as const;
 
 const vowel = z.enum(["A", "E", "I", "O", "U", "Y", "Ë"]);
-const candidateStatus = z.enum(["pass", "fail", "unknown"]);
+const candidateStatus = z.enum(["pass", "fail", "experimental", "unknown"]);
 const voicePathDelta = z.enum(["MATCH", "SHIFT", "DIVERGE", "NOT_EMITTED"]);
 const count = z.number().finite().int().nonnegative();
 
