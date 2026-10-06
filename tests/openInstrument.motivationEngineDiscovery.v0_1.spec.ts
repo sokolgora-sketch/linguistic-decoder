@@ -35,6 +35,23 @@ describe("Motivation Engine Discovery first vertical v0.1", () => {
     expect(result.candidates.every((candidate) => candidate.noSingleWinner)).toBe(true);
     expect(result.candidates.every((candidate) => candidate.userDecisionPosture === "user_decides")).toBe(true);
     expect(result.candidates.every((candidate) => candidate.candidateStatus === "experimental")).toBe(true);
+
+    const di = result.candidates.find((candidate) => candidate.candidateEmbryo === "DI");
+    expect(di?.structuralComparison).toMatchObject({
+      matchClassification: "STRUCTURAL_MOTIVATION_CANDIDATE",
+      presentationClassification: "STRUCTURAL_MOTIVATION",
+      matchedQuery: "DI",
+      inputRepresentationKind: "production_spoken",
+      candidateRepresentationKind: "orthographic_profile_derived",
+      representationCompatibility: "CROSS_REPRESENTATION",
+      voiceRelationship: "NOT_COMPARABLE_ACROSS_REPRESENTATIONS",
+      consonantalCarrierRelationship: "INPUT_CARRIER_CONTEXT_ONLY",
+    });
+    expect(di?.structuralComparison.inputVoicePath.length).toBeGreaterThan(0);
+    expect(di?.structuralComparison.candidateVoicePath).toEqual(["I"]);
+    expect(di?.structuralComparison.candidateConsonantalStructure).toBeNull();
+    expect(di?.structuralComparison.authorizedOperationIds).toContain("y_to_i");
+    expect(di?.functionalInterpretation.statement).toBeNull();
   });
 
   it("uses the same generic retrieval for a previously unprepared positive input", async () => {
@@ -92,6 +109,31 @@ describe("Motivation Engine Discovery first vertical v0.1", () => {
       candidate.candidateForm === "zemër" &&
       candidate.sourceFact.sourceId === "research.external.albanian-zemer-heart.scale50.v0_1",
     )).toBe(true);
+    const self = result.candidates.find((candidate) => candidate.candidateForm === "zemër");
+    expect(self?.structuralComparison.matchClassification).toBe("EXACT_LEXICAL_SELF_MATCH");
+    expect(self?.structuralComparison.presentationClassification).toBe("LEXICAL_ENTRY_CONFIRMATION");
+    expect(self?.structuralComparison.inputRepresentationKind).toBe("albanian_profile");
+    expect(self?.structuralComparison.candidateRepresentationKind).toBe("orthographic_profile_derived");
+    expect(self?.structuralComparison.voiceRelationship).toBe("NOT_COMPARABLE_ACROSS_REPRESENTATIONS");
+    expect(self?.structuralComparison.candidateConsonantalStructure).toBeNull();
+    expect(self?.structuralComparison.matchReason).toContain("lexical entry confirmation");
+  });
+
+  it("does not classify a cross-language homograph as lexical self-match", async () => {
+    const word = "di";
+    const heart = buildHeartInstrumentV1(word);
+    const result = buildMotivationEngineDiscoveryV0_1({
+      word,
+      inputLanguage: "en",
+      inputProfile: heart.spokenPronunciation.sourceProfileId,
+      analysis: await analysisFor(word),
+      heart,
+    });
+
+    const albanianWitness = result.candidates.find((candidate) => candidate.candidateForm === "di");
+    expect(albanianWitness).toBeDefined();
+    expect(albanianWitness?.structuralComparison.matchClassification).toBe("STRUCTURAL_MOTIVATION_CANDIDATE");
+    expect(albanianWitness?.structuralComparison.presentationClassification).toBe("STRUCTURAL_MOTIVATION");
   });
 
   it("retrieves an independently selected Albanian lexical record through the same generic substrate", async () => {
@@ -130,5 +172,21 @@ describe("Motivation Engine Discovery first vertical v0.1", () => {
     expect(result.sourceFact.representation).toBe("albanian_profile");
     expect(result.derivedStructure.gamma.status).toBe("profile_derived");
     expect(result.derivedStructure.zeroConsonantalStructuralComposition.status).toBe("NULL");
+  });
+
+  it("keeps the comparison word-independent and preserves a valid Null control", async () => {
+    const word = "learning";
+    const heart = buildHeartInstrumentV1(word);
+    const result = buildMotivationEngineDiscoveryV0_1({
+      word,
+      inputLanguage: "en",
+      inputProfile: heart.spokenPronunciation.sourceProfileId,
+      analysis: await analysisFor(word),
+      heart,
+    });
+
+    expect(result.status).toBe("NO_MATCHES");
+    expect(result.candidates).toEqual([]);
+    expect(JSON.stringify(result)).not.toMatch(/study|zemër|candidate ===/i);
   });
 });

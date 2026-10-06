@@ -920,11 +920,23 @@ function parseMotivationDiscoveryV0_1(
 
   const candidates: MotivationDiscoveryCandidateV0_1VM[] = [];
   for (const candidate of value.candidates) {
-    if (!isRecord(candidate) || !isRecord(candidate.sourceFact) || !isRecord(candidate.derivedStructure) || !isRecord(candidate.functionalInterpretation)) {
+    if (!isRecord(candidate) || !isRecord(candidate.sourceFact) || !isRecord(candidate.derivedStructure) || !isRecord(candidate.structuralComparison) || !isRecord(candidate.functionalInterpretation)) {
       return missing("malformed", "motivationDiscoveryV0_1 candidate invalid");
     }
     const source = candidate.sourceFact;
     const structure = candidate.derivedStructure;
+    const comparison = candidate.structuralComparison;
+    const inputConsonantal = isRecord(comparison.inputConsonantalStructure)
+      ? comparison.inputConsonantalStructure
+      : null;
+    const candidateConsonantalValue = comparison.candidateConsonantalStructure;
+    const candidateConsonantal = candidateConsonantalValue === null
+      ? null
+      : isRecord(candidateConsonantalValue)
+        ? candidateConsonantalValue
+        : null;
+    const candidateConsonantalMalformed =
+      candidateConsonantalValue !== null && !isRecord(candidateConsonantalValue);
     const interpretation = candidate.functionalInterpretation;
     if (
       typeof candidate.candidateId !== "string" ||
@@ -941,6 +953,51 @@ function parseMotivationDiscoveryV0_1(
       !isStringArray(structure.carrierForms) ||
       !isStringArray(structure.operationIds) ||
       typeof structure.minRootId !== "string" ||
+      (comparison.matchClassification !== "STRUCTURAL_MOTIVATION_CANDIDATE" &&
+        comparison.matchClassification !== "EXACT_LEXICAL_SELF_MATCH") ||
+      (comparison.presentationClassification !== "STRUCTURAL_MOTIVATION" &&
+        comparison.presentationClassification !== "LEXICAL_ENTRY_CONFIRMATION") ||
+      typeof comparison.matchedQuery !== "string" ||
+      (comparison.inputRepresentationKind !== "production_spoken" &&
+        comparison.inputRepresentationKind !== "albanian_profile" &&
+        comparison.inputRepresentationKind !== "orthographic_profile_derived" &&
+        comparison.inputRepresentationKind !== "unknown") ||
+      (comparison.candidateRepresentationKind !== "production_spoken" &&
+        comparison.candidateRepresentationKind !== "albanian_profile" &&
+        comparison.candidateRepresentationKind !== "orthographic_profile_derived" &&
+        comparison.candidateRepresentationKind !== "unknown") ||
+      (comparison.representationCompatibility !== "SAME_REPRESENTATION" &&
+        comparison.representationCompatibility !== "CROSS_REPRESENTATION" &&
+        comparison.representationCompatibility !== "NOT_COMPARABLE_ACROSS_REPRESENTATIONS" &&
+        comparison.representationCompatibility !== "UNKNOWN") ||
+      !isStringArray(comparison.inputVoicePath) ||
+      !isStringArray(comparison.candidateVoicePath) ||
+      (comparison.voiceRelationship !== "EXACT_ORDERED_VOICE_MATCH" &&
+        comparison.voiceRelationship !== "PARTIAL_ORDERED_VOICE_MATCH" &&
+        comparison.voiceRelationship !== "EMBRYO_VOICE_MATCH" &&
+        comparison.voiceRelationship !== "NO_AUTHORIZED_VOICE_RELATION" &&
+        comparison.voiceRelationship !== "NOT_COMPARABLE_ACROSS_REPRESENTATIONS" &&
+        comparison.voiceRelationship !== "UNKNOWN") ||
+      !inputConsonantal ||
+      (inputConsonantal.gamma !== null && !isStringArray(inputConsonantal.gamma)) ||
+      (inputConsonantal.zeroConsonantalStructuralComposition !== null &&
+        !Array.isArray(inputConsonantal.zeroConsonantalStructuralComposition)) ||
+      typeof inputConsonantal.minRootId !== "string" ||
+      !isStringArray(inputConsonantal.protoRoots) ||
+      !isStringArray(inputConsonantal.carrierForms) ||
+      !isStringArray(inputConsonantal.operationIds) ||
+      candidateConsonantalMalformed ||
+      (candidateConsonantal !== null &&
+        (candidateConsonantal.gamma !== null && !isStringArray(candidateConsonantal.gamma) ||
+          (candidateConsonantal.zeroConsonantalStructuralComposition !== null &&
+            !Array.isArray(candidateConsonantal.zeroConsonantalStructuralComposition)))) ||
+      (comparison.consonantalCarrierRelationship !== "INPUT_CARRIER_CONTEXT_ONLY" &&
+        comparison.consonantalCarrierRelationship !== "UNRESOLVED") ||
+      !isStringArray(comparison.expansionOrCompositionChain) ||
+      !isStringArray(comparison.authorizedOperationIds) ||
+      !isStringArray(comparison.reasonCodes) ||
+      !isStringArray(comparison.unresolvedFields) ||
+      typeof comparison.matchReason !== "string" ||
       interpretation.truthClassification !== "hypothesis" ||
       (interpretation.statement !== null && typeof interpretation.statement !== "string") ||
       candidate.candidateStatus !== "experimental" ||

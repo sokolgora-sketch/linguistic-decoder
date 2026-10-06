@@ -362,6 +362,35 @@ export type MotivationDiscoveryCandidateV0_1VM = Readonly<{
     carrierForms: string[];
     operationIds: string[];
   }>;
+  structuralComparison: Readonly<{
+    matchClassification: "STRUCTURAL_MOTIVATION_CANDIDATE" | "EXACT_LEXICAL_SELF_MATCH";
+    presentationClassification: "STRUCTURAL_MOTIVATION" | "LEXICAL_ENTRY_CONFIRMATION";
+    matchedQuery: string;
+    inputRepresentationKind: "production_spoken" | "albanian_profile" | "orthographic_profile_derived" | "unknown";
+    candidateRepresentationKind: "production_spoken" | "albanian_profile" | "orthographic_profile_derived" | "unknown";
+    representationCompatibility: "SAME_REPRESENTATION" | "CROSS_REPRESENTATION" | "NOT_COMPARABLE_ACROSS_REPRESENTATIONS" | "UNKNOWN";
+    inputVoicePath: string[];
+    candidateVoicePath: string[];
+    voiceRelationship: "EXACT_ORDERED_VOICE_MATCH" | "PARTIAL_ORDERED_VOICE_MATCH" | "EMBRYO_VOICE_MATCH" | "NO_AUTHORIZED_VOICE_RELATION" | "NOT_COMPARABLE_ACROSS_REPRESENTATIONS" | "UNKNOWN";
+    inputConsonantalStructure: Readonly<{
+      gamma: string[] | null;
+      zeroConsonantalStructuralComposition: unknown[] | null;
+      minRootId: string;
+      protoRoots: string[];
+      carrierForms: string[];
+      operationIds: string[];
+    }>;
+    candidateConsonantalStructure: Readonly<{
+      gamma: string[] | null;
+      zeroConsonantalStructuralComposition: unknown[] | null;
+    }> | null;
+    consonantalCarrierRelationship: "INPUT_CARRIER_CONTEXT_ONLY" | "UNRESOLVED";
+    expansionOrCompositionChain: string[];
+    authorizedOperationIds: string[];
+    reasonCodes: string[];
+    unresolvedFields: string[];
+    matchReason: string;
+  }>;
   functionalInterpretation: Readonly<{
     truthClassification: "hypothesis";
     statement: string | null;

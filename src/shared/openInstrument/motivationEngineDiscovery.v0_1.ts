@@ -15,6 +15,60 @@ import type { HeartInstrumentV1 } from "@/v1/heartInstrument.v1";
 export const MOTIVATION_ENGINE_DISCOVERY_SCHEMA_V0_1 =
   "open-instrument.motivation-engine-discovery.v0_1" as const;
 
+export type MotivationRepresentationKindV0_1 =
+  | "production_spoken"
+  | "albanian_profile"
+  | "orthographic_profile_derived"
+  | "unknown";
+
+export type MotivationRepresentationCompatibilityV0_1 =
+  | "SAME_REPRESENTATION"
+  | "CROSS_REPRESENTATION"
+  | "NOT_COMPARABLE_ACROSS_REPRESENTATIONS"
+  | "UNKNOWN";
+
+export type MotivationStructuralComparisonV0_1 = Readonly<{
+  matchClassification:
+    | "STRUCTURAL_MOTIVATION_CANDIDATE"
+    | "EXACT_LEXICAL_SELF_MATCH";
+  presentationClassification:
+    | "STRUCTURAL_MOTIVATION"
+    | "LEXICAL_ENTRY_CONFIRMATION";
+  matchedQuery: string;
+  inputRepresentationKind: MotivationRepresentationKindV0_1;
+  candidateRepresentationKind: MotivationRepresentationKindV0_1;
+  representationCompatibility: MotivationRepresentationCompatibilityV0_1;
+  inputVoicePath: readonly string[];
+  candidateVoicePath: readonly string[];
+  voiceRelationship:
+    | "EXACT_ORDERED_VOICE_MATCH"
+    | "PARTIAL_ORDERED_VOICE_MATCH"
+    | "EMBRYO_VOICE_MATCH"
+    | "NO_AUTHORIZED_VOICE_RELATION"
+    | "NOT_COMPARABLE_ACROSS_REPRESENTATIONS"
+    | "UNKNOWN";
+  inputConsonantalStructure: Readonly<{
+    gamma: readonly string[] | null;
+    zeroConsonantalStructuralComposition: readonly unknown[] | null;
+    minRootId: string;
+    protoRoots: readonly string[];
+    carrierForms: readonly string[];
+    operationIds: readonly string[];
+  }>;
+  candidateConsonantalStructure: Readonly<{
+    gamma: readonly string[] | null;
+    zeroConsonantalStructuralComposition: readonly unknown[] | null;
+  }> | null;
+  consonantalCarrierRelationship:
+    | "INPUT_CARRIER_CONTEXT_ONLY"
+    | "UNRESOLVED";
+  expansionOrCompositionChain: readonly string[];
+  authorizedOperationIds: readonly string[];
+  reasonCodes: readonly string[];
+  unresolvedFields: readonly string[];
+  matchReason: string;
+}>;
+
 export type MotivationEngineDiscoveryCandidateV0_1 = Readonly<{
   candidateId: string;
   candidateLanguage: string;
@@ -36,6 +90,7 @@ export type MotivationEngineDiscoveryCandidateV0_1 = Readonly<{
     carrierForms: readonly string[];
     operationIds: readonly string[];
   }>;
+  structuralComparison: MotivationStructuralComparisonV0_1;
   functionalInterpretation: Readonly<{
     truthClassification: "hypothesis";
     statement: string | null;
@@ -205,14 +260,106 @@ function math7Summary(analysis: AnalyzeWordResultV1, heart: HeartInstrumentV1) {
 }
 
 type CandidateMatchContextV0_1 = Readonly<{
+  queryForm: string;
   minRootId: string;
   protoRoots: readonly string[];
   carrierForms: readonly string[];
   operationIds: readonly string[];
+  expansionOrCompositionChain: readonly string[];
+  reasonCodes: readonly string[];
 }>;
+
+function normalizedLexicalFormV0_1(value: string): string {
+  return value.normalize("NFC").trim().toLocaleLowerCase("en-US");
+}
+
+function normalizedLanguageV0_1(value: string): string {
+  const normalized = value.normalize("NFC").trim().toLocaleLowerCase("en-US");
+  if (normalized === "sq" || normalized === "albanian") return "sq";
+  if (normalized === "en" || normalized === "english") return "en";
+  return normalized;
+}
+
+function buildStructuralComparisonV0_1(
+  word: string,
+  inputLanguage: string,
+  inputRepresentationKind: MotivationRepresentationKindV0_1,
+  inputVoicePath: readonly string[],
+  inputGamma: readonly string[] | null,
+  inputZeroConsonantalStructuralComposition: readonly unknown[] | null,
+  matchContext: CandidateMatchContextV0_1,
+  candidateVoicePath: readonly string[],
+  witness: GenericFunctionalWitnessV1,
+): MotivationStructuralComparisonV0_1 {
+  const selfMatch =
+    normalizedLanguageV0_1(inputLanguage) === normalizedLanguageV0_1(witness.language) &&
+    normalizedLexicalFormV0_1(word) ===
+    normalizedLexicalFormV0_1(witness.sourceForm);
+  const representationCompatibility =
+    inputRepresentationKind === "unknown"
+      ? "UNKNOWN" as const
+      : "CROSS_REPRESENTATION" as const;
+  const unresolvedFields = [
+    "CANDIDATE_CONSONANTAL_STRUCTURE_NOT_AUTHORIZED",
+    "CANDIDATE_ZERO_CONSONANTAL_STRUCTURE_NOT_AUTHORIZED",
+    ...(inputRepresentationKind === "unknown"
+      ? ["INPUT_REPRESENTATION_UNKNOWN"]
+      : []),
+  ];
+
+  return {
+    matchClassification: selfMatch
+      ? "EXACT_LEXICAL_SELF_MATCH"
+      : "STRUCTURAL_MOTIVATION_CANDIDATE",
+    presentationClassification: selfMatch
+      ? "LEXICAL_ENTRY_CONFIRMATION"
+      : "STRUCTURAL_MOTIVATION",
+    matchedQuery: witness.queryForm,
+    inputRepresentationKind,
+    candidateRepresentationKind: "orthographic_profile_derived",
+    representationCompatibility,
+    inputVoicePath: [...inputVoicePath],
+    candidateVoicePath: [...candidateVoicePath],
+    voiceRelationship: inputRepresentationKind === "unknown"
+      ? "UNKNOWN"
+      : "NOT_COMPARABLE_ACROSS_REPRESENTATIONS",
+    inputConsonantalStructure: {
+      gamma: inputGamma ? [...inputGamma] : null,
+      zeroConsonantalStructuralComposition:
+        inputZeroConsonantalStructuralComposition
+          ? [...inputZeroConsonantalStructuralComposition]
+          : null,
+      minRootId: matchContext.minRootId,
+      protoRoots: [...matchContext.protoRoots],
+      carrierForms: [...matchContext.carrierForms],
+      operationIds: [...matchContext.operationIds],
+    },
+    candidateConsonantalStructure: null,
+    consonantalCarrierRelationship:
+      matchContext.protoRoots.length || matchContext.carrierForms.length ||
+      matchContext.operationIds.length
+        ? "INPUT_CARRIER_CONTEXT_ONLY"
+        : "UNRESOLVED",
+    expansionOrCompositionChain: [...matchContext.expansionOrCompositionChain],
+    authorizedOperationIds: [...new Set([
+      ...matchContext.operationIds,
+      ...witness.relationOperationIds,
+    ])].sort(compareText),
+    reasonCodes: [...matchContext.reasonCodes],
+    unresolvedFields,
+    matchReason: selfMatch
+      ? "Input lexical form matches a source-attested lexical record; this is lexical entry confirmation, not a cross-form structural motivation claim."
+      : `Input structural analysis produced the ${witness.queryForm} embryo; the Albanian lexical substrate contains the source-attested ${witness.sourceForm} record.`,
+  };
+}
 
 function buildCandidate(
   word: string,
+  inputLanguage: string,
+  inputRepresentationKind: MotivationRepresentationKindV0_1,
+  inputVoicePath: readonly string[],
+  inputGamma: readonly string[] | null,
+  inputZeroConsonantalStructuralComposition: readonly unknown[] | null,
   matchContext: CandidateMatchContextV0_1,
   witness: GenericFunctionalWitnessV1,
 ): MotivationEngineDiscoveryCandidateV0_1 {
@@ -237,6 +384,17 @@ function buildCandidate(
       carrierForms: [...matchContext.carrierForms],
       operationIds: [...matchContext.operationIds],
     },
+    structuralComparison: buildStructuralComparisonV0_1(
+      word,
+      inputLanguage,
+      inputRepresentationKind,
+      inputVoicePath,
+      inputGamma,
+      inputZeroConsonantalStructuralComposition,
+      matchContext,
+      extractSevenVowelsFromString(witness.sourceForm),
+      witness,
+    ),
     functionalInterpretation: {
       truthClassification: "hypothesis",
       // Generic witness discovery does not evaluate a target-bound semantic
@@ -256,6 +414,7 @@ function matchContextsV0_1(
     hypothesisId: string;
     embryo: string;
     expansionChain: readonly string[];
+    reasonCodes: readonly string[];
   }>[],
 ) {
   const contexts: Array<Readonly<{
@@ -281,10 +440,13 @@ function matchContextsV0_1(
         queryForm: protoRoot,
         voicePath,
         matchContext: {
+          queryForm: protoRoot,
           minRootId: root.id,
           protoRoots: root.protoRoots,
           carrierForms: root.carriers.map((carrier) => carrier.carrierForm),
           operationIds,
+          expansionOrCompositionChain: [],
+          reasonCodes: [],
         },
       });
     }
@@ -302,10 +464,13 @@ function matchContextsV0_1(
         queryForm: normalizedQueryForm,
         voicePath,
         matchContext: {
+          queryForm: normalizedQueryForm,
           minRootId: hypothesis.hypothesisId,
           protoRoots: [hypothesis.embryo],
           carrierForms: [],
           operationIds: [],
+          expansionOrCompositionChain: [...hypothesis.expansionChain],
+          reasonCodes: [...hypothesis.reasonCodes],
         },
       });
     }
@@ -351,6 +516,20 @@ export function buildMotivationEngineDiscoveryV0_1(input: {
     : isAlbanianProfile
       ? "albanian_profile" as const
       : "unknown" as const;
+  const inputRepresentationKind: MotivationRepresentationKindV0_1 =
+    spokenPath?.length
+      ? "production_spoken"
+      : isAlbanianProfile
+        ? "albanian_profile"
+        : "unknown";
+  const inputGamma = spokenPath?.length
+    ? spokenGamma(input.heart).orderedUnits
+    : isAlbanianProfile
+      ? profileDerivedGamma(input.analysis).orderedUnits
+      : null;
+  const inputZeroConsonantalStructuralComposition = spokenPath?.length
+    ? spokenZc(input.heart).variants
+    : null;
   const structuralHypotheses = discoverStructuralHypothesesV0_1(word).map((hypothesis) => ({
     hypothesisId: hypothesis.hypothesisId,
     embryo: hypothesis.embryo,
@@ -375,7 +554,19 @@ export function buildMotivationEngineDiscoveryV0_1(input: {
       const key = `${witness.queryForm}:${witness.sourceId}`;
       if (seenCandidateKeys.has(key)) continue;
       seenCandidateKeys.add(key);
-      candidates.push(buildCandidate(word, context.matchContext, witness));
+      candidates.push(buildCandidate(
+        word,
+        input.inputLanguage,
+        inputRepresentationKind,
+        voicePath,
+        inputGamma,
+        inputZeroConsonantalStructuralComposition,
+        {
+          ...context.matchContext,
+          queryForm: context.matchContext.queryForm,
+        },
+        witness,
+      ));
     }
   }
 

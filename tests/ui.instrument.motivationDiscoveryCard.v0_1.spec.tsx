@@ -52,6 +52,35 @@ function model(overrides: Partial<MotivationDiscoveryV0_1VM> = {}): MotivationDi
         carrierForms: ["shtu", "di"],
         operationIds: ["y_to_i"],
       },
+      structuralComparison: {
+        matchClassification: "STRUCTURAL_MOTIVATION_CANDIDATE",
+        presentationClassification: "STRUCTURAL_MOTIVATION",
+        matchedQuery: "DI",
+        inputRepresentationKind: "production_spoken",
+        candidateRepresentationKind: "orthographic_profile_derived",
+        representationCompatibility: "CROSS_REPRESENTATION",
+        inputVoicePath: ["Ë", "I"],
+        candidateVoicePath: ["I"],
+        voiceRelationship: "NOT_COMPARABLE_ACROSS_REPRESENTATIONS",
+        inputConsonantalStructure: {
+          gamma: ["S", "T", "D"],
+          zeroConsonantalStructuralComposition: [{ p: 2 }],
+          minRootId: "study:SHTU+DI:1",
+          protoRoots: ["SHTU", "DI"],
+          carrierForms: ["shtu", "di"],
+          operationIds: ["y_to_i"],
+        },
+        candidateConsonantalStructure: null,
+        consonantalCarrierRelationship: "INPUT_CARRIER_CONTEXT_ONLY",
+        expansionOrCompositionChain: [],
+        authorizedOperationIds: ["y_to_i"],
+        reasonCodes: [],
+        unresolvedFields: [
+          "CANDIDATE_CONSONANTAL_STRUCTURE_NOT_AUTHORIZED",
+          "CANDIDATE_ZERO_CONSONANTAL_STRUCTURE_NOT_AUTHORIZED",
+        ],
+        matchReason: "Input structural analysis produced the DI embryo; the Albanian lexical substrate contains the source-attested di record.",
+      },
       functionalInterpretation: {
         truthClassification: "hypothesis",
         statement: "knowledge can motivate study and learning functionally",
@@ -82,6 +111,10 @@ describe("Motivation Discovery Lab presentation v0.1", () => {
     expect(screen.getByText(/DISCOVERY_ORTHOGRAPHIC_PROFILE/)).toBeInTheDocument();
     expect(screen.getByText(/lexical source: https:\/\/example\.invalid\/di/)).toBeInTheDocument();
     expect(screen.getByText("Generic structural match")).toBeInTheDocument();
+    expect(screen.getByTestId("motivation-structural-comparison")).toBeInTheDocument();
+    expect(screen.getByText(/structural motivation candidate/i)).toBeInTheDocument();
+    expect(screen.getByText("CROSS_REPRESENTATION")).toBeInTheDocument();
+    expect(screen.getByText("NOT_COMPARABLE_ACROSS_REPRESENTATIONS")).toBeInTheDocument();
     expect(screen.getByText(/no target-word mapping/)).toBeInTheDocument();
     expect(screen.getByText("ZË-RO INTERPRETATION / HYPOTHESIS")).toBeInTheDocument();
     expect(screen.getByText(/reviewed\.external\.di\.knowledge\.candidate\.v0_1 · fact/)).toBeInTheDocument();
@@ -116,11 +149,60 @@ describe("Motivation Discovery Lab presentation v0.1", () => {
     expect(screen.queryByTestId("motivation-discovery-candidate")).not.toBeInTheDocument();
   });
 
+  it("separates an exact lexical self-match from a structural motivation candidate", () => {
+    const value = model({
+      inputWord: "zemër",
+      inputLanguage: "sq",
+      inputProfile: "albanian",
+      sourceFact: {
+        layer: "SOURCE_FACT",
+        language: "sq",
+        profile: "albanian",
+        representation: "albanian_profile",
+        sourceStatus: "explicit_profile_binding_without_spoken_authority",
+        authorityBoundary: "Albanian Discovery profile only",
+      },
+      candidates: [{
+        ...model().candidates[0],
+        candidateForm: "zemër",
+        candidateLanguage: "sq",
+        candidateEmbryo: "ZEMËR",
+        structuralComparison: {
+          ...model().candidates[0].structuralComparison,
+          matchClassification: "EXACT_LEXICAL_SELF_MATCH",
+          presentationClassification: "LEXICAL_ENTRY_CONFIRMATION",
+          matchedQuery: "ZEMËR",
+          inputRepresentationKind: "albanian_profile",
+          inputVoicePath: ["E", "Ë"],
+          voiceRelationship: "NOT_COMPARABLE_ACROSS_REPRESENTATIONS",
+          matchReason: "Input lexical form matches a source-attested lexical record; this is lexical entry confirmation, not a cross-form structural motivation claim.",
+        },
+      }],
+    });
+
+    render(<MotivationDiscoveryCardV0_1 discovery={{ kind: "present", value }} />);
+    expect(screen.getAllByText(/lexical entry confirmation/i).length).toBeGreaterThan(0);
+    expect(screen.getByText(/not a cross-form structural motivation claim/)).toBeInTheDocument();
+  });
+
   it("fails closed when a nested Math7 field is incomplete", () => {
     const malformed = model() as unknown as Record<string, unknown>;
     const derived = malformed.derivedStructure as Record<string, unknown>;
     const math7 = derived.math7 as Record<string, unknown>;
     delete math7.principlesPath;
+
+    const vm = adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: malformed });
+    expect(vm.motivationDiscoveryV0_1).toMatchObject({
+      kind: "missing",
+      missing: "malformed",
+    });
+  });
+
+  it("fails closed when candidate consonantal structure is malformed", () => {
+    const malformed = model() as unknown as Record<string, unknown>;
+    const candidate = (malformed.candidates as Array<Record<string, unknown>>)[0];
+    const comparison = candidate.structuralComparison as Record<string, unknown>;
+    comparison.candidateConsonantalStructure = "malformed";
 
     const vm = adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: malformed });
     expect(vm.motivationDiscoveryV0_1).toMatchObject({
