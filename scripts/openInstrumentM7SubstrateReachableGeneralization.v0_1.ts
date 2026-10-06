@@ -27,6 +27,7 @@ const PRIMARY_PATH = join(ARTIFACT_DIRECTORY, "primary-selection.json");
 const SAMPLE_PATH = join(ARTIFACT_DIRECTORY, "reachable-sample.json");
 const RESULT_PATH = join(ARTIFACT_DIRECTORY, "result.json");
 const MANIFEST_PATH = join(ARTIFACT_DIRECTORY, "hash-manifest.json");
+const PHASE_B_ATTEMPT_PATH = join(ARTIFACT_DIRECTORY, "phase-b-attempt.json");
 const POPULATION_SPEC_PATH = join(
   ROOT,
   "docs/open-instrument/research-artifacts/zero-consonantal-structural-composition-v0.1-cmudict-validation-v0.1b/population-spec.json",
@@ -328,6 +329,10 @@ export function classifyReachabilityForWordV0_1(word: string): Readonly<{
 }
 
 export function buildEligibilitySnapshotV0_1(sampleSize = SAMPLE_SIZE) {
+  const existingPhaseAArtifacts = [ELIGIBILITY_PATH, SAMPLE_PATH, PRIMARY_PATH].filter(readFileExists);
+  if (existingPhaseAArtifacts.length > 0) {
+    throw new Error("M7_PHASE_A_ARTIFACTS_ALREADY_EXISTS_NO_RERUN");
+  }
   const procedure = validateFrozenProcedure();
   const population = preparedPopulation();
   const cases: JsonRecord[] = [];
@@ -494,7 +499,8 @@ function compactCandidate(candidate: ReturnType<typeof buildMotivationEngineDisc
   };
 }
 
-function evaluateCase(word: string): JsonRecord {
+function evaluateCase(entry: ReachableInput): Promise<JsonRecord> {
+  const word = entry.input;
   const heart = buildHeartInstrumentV1(word);
   return runAnalysisDeterministic(word, { mode: "strict", alphabet: "auto" }).then((payload) => {
     const analysis = enginePayloadToAnalysisResult(payload);
@@ -523,7 +529,7 @@ function evaluateCase(word: string): JsonRecord {
       gamma: discovery.derivedStructure.gamma,
       zc: discovery.derivedStructure.zeroConsonantalStructuralComposition,
       structuralHypotheses: discovery.derivedStructure.structuralHypotheses,
-      genericQueryKeys: discovery.derivedStructure.structuralHypotheses.flatMap((hypothesis) => hypothesis.expansionChain),
+      genericQueryKeys: [...entry.genericQueryKeys],
       status: discovery.status,
       candidateCount: candidates.length,
       candidates,
@@ -539,18 +545,32 @@ function evaluateCase(word: string): JsonRecord {
 }
 
 async function evaluateSubstrate(): Promise<void> {
-  if (readFileExists(RESULT_PATH) || readFileExists(MANIFEST_PATH)) {
+  if (readFileExists(RESULT_PATH) || readFileExists(MANIFEST_PATH) || readFileExists(PHASE_B_ATTEMPT_PATH)) {
     throw new Error("M7_SUCCESSOR_RESULT_ALREADY_EXISTS_NO_RERUN");
   }
   const frozen = validateFrozenReachabilityArtifacts();
+  const attempt = {
+    schemaVersion: "open-instrument.m7-substrate-reachable-generalization-phase-b-attempt.v0.1",
+    status: "RUNNING",
+    attempt: 1,
+    procedurePath: "docs/open-instrument/research-artifacts/m7-substrate-reachable-generalization-v0.1/procedure.json",
+    procedureSha256: sha256File(PROCEDURE_PATH),
+    samplePath: "docs/open-instrument/research-artifacts/m7-substrate-reachable-generalization-v0.1/reachable-sample.json",
+    sampleSha256: sha256File(SAMPLE_PATH),
+    sampleSize: frozen.entries.length,
+    noRerun: true,
+    realDataExecuted: false,
+    providerExecution: false,
+  };
+  writeJson(PHASE_B_ATTEMPT_PATH, attempt);
   const entries = frozen.entries;
   const cases: JsonRecord[] = [];
   for (const entry of entries) {
-    cases.push(await evaluateCase(entry.input));
+    cases.push(await evaluateCase(entry));
   }
   const positiveCases = cases.flatMap((entry) =>
     entry.classification === "GENERIC_CROSS_FORM_POSITIVE"
-      ? [{ input: entry.input, candidates: entry.crossFormCandidates }]
+      ? [{ input: entry.input, genericQueryKeys: entry.genericQueryKeys, candidates: entry.crossFormCandidates }]
       : [],
   );
   const result = {
@@ -621,6 +641,7 @@ async function evaluateSubstrate(): Promise<void> {
       providerExecution: false,
       realDataExecuted: false,
     },
+    phaseBAttemptPath: "docs/open-instrument/research-artifacts/m7-substrate-reachable-generalization-v0.1/phase-b-attempt.json",
     integrity: {
       engineUnchanged: true,
       substrateUnchanged: true,
@@ -633,6 +654,11 @@ async function evaluateSubstrate(): Promise<void> {
       userDecisionPosture: "user_decides",
     },
   };
+  writeJson(PHASE_B_ATTEMPT_PATH, {
+    ...attempt,
+    status: "COMPLETED",
+    resultPath: "docs/open-instrument/research-artifacts/m7-substrate-reachable-generalization-v0.1/result.json",
+  });
   writeJson(RESULT_PATH, result);
   const manifest = {
     schemaVersion: "open-instrument.m7-substrate-reachable-generalization-hash-manifest.v0.1",
@@ -644,6 +670,7 @@ async function evaluateSubstrate(): Promise<void> {
       PRIMARY_PATH,
       SAMPLE_PATH,
       RESULT_PATH,
+      PHASE_B_ATTEMPT_PATH,
     ].map((path) => ({
       path: path.slice(`${ROOT}/`.length),
       bytes: readFileSync(path).byteLength,
@@ -675,6 +702,116 @@ async function evaluateSubstrate(): Promise<void> {
   }, null, 2)}\n`);
 }
 
+function repairResultMetadataWithoutScientificRerun(): void {
+  const frozen = validateFrozenReachabilityArtifacts();
+  const result = readJson<JsonRecord>(RESULT_PATH);
+  const manifest = readJson<JsonRecord>(MANIFEST_PATH);
+  const sample = result.sample as JsonRecord;
+  const cases = sample.cases as readonly JsonRecord[];
+  assertEqual(cases.length, frozen.entries.length, "result/sample case alignment");
+  const existingRepair = (result.serializationRepair as JsonRecord | undefined) ?? {};
+  const existingManifestRepair = (manifest.metadataRepair as JsonRecord | undefined) ?? {};
+  const currentResultSha256BeforeRepair = sha256File(RESULT_PATH);
+  const resultSha256BeforeRepair = typeof existingRepair.preRepairResultSha256 === "string"
+    ? existingRepair.preRepairResultSha256
+    : currentResultSha256BeforeRepair;
+  const manifestSha256BeforeRepair = typeof existingRepair.preRepairManifestSha256 === "string"
+    ? existingRepair.preRepairManifestSha256
+    : typeof existingManifestRepair.preRepairManifestSha256 === "string"
+      ? existingManifestRepair.preRepairManifestSha256
+      : sha256File(MANIFEST_PATH);
+  const repairClass = "SERIALIZATION_ONLY";
+  const repairReason =
+    "pre-substrate generic query keys existed in frozen Phase A but were omitted from evaluated-result serialization.";
+  const repairInputs = new Set(["ata", "ate", "ati", "atom"]);
+  const repairedCases = cases.map((entry, index) =>
+    entry.classification === "GENERIC_CROSS_FORM_POSITIVE" && repairInputs.has(String(entry.input))
+      ? {
+          ...entry,
+          genericQueryKeys: [...frozen.entries[index]!.genericQueryKeys],
+        }
+      : entry,
+  );
+  const positiveCases = repairedCases.flatMap((entry) =>
+    entry.classification === "GENERIC_CROSS_FORM_POSITIVE"
+      ? [{
+          input: entry.input,
+          genericQueryKeys: entry.genericQueryKeys,
+          candidates: entry.crossFormCandidates,
+        }]
+      : [],
+  );
+  const repairedResult = {
+    ...result,
+    sample: {
+      ...sample,
+      cases: repairedCases,
+      positiveCases,
+    },
+    serializationRepair: {
+      repairClass,
+      repairReason,
+      preRepairResultSha256: resultSha256BeforeRepair,
+      preRepairManifestSha256: manifestSha256BeforeRepair,
+      appliedAfterExecution: true,
+      scientificResultChanged: false,
+      scientificReexecution: false,
+      changedFields: ["sample.cases[].genericQueryKeys", "sample.positiveCases[].genericQueryKeys"],
+      source: "frozen Phase A reachable-sample.json",
+    },
+  };
+  writeJson(RESULT_PATH, repairedResult);
+  const attempt = {
+    schemaVersion: "open-instrument.m7-substrate-reachable-generalization-phase-b-attempt.v0.1",
+    status: "COMPLETED_POST_EXECUTION_METADATA_REPAIR",
+    attempt: 1,
+    resultPath: "docs/open-instrument/research-artifacts/m7-substrate-reachable-generalization-v0.1/result.json",
+    resultSha256BeforeRepair,
+    currentResultSha256BeforeRepair,
+    resultSha256AfterRepair: sha256File(RESULT_PATH),
+    preRepairManifestSha256: manifestSha256BeforeRepair,
+    repairClass,
+    repairReason,
+    noRerun: true,
+    scientificResultChanged: false,
+    scientificReexecution: false,
+    realDataExecuted: false,
+    providerExecution: false,
+    preExecutionReservationAvailable: false,
+  };
+  writeJson(PHASE_B_ATTEMPT_PATH, attempt);
+  const artifacts = (manifest.artifacts as readonly JsonRecord[]).filter((artifact) =>
+    artifact.path !== "docs/open-instrument/research-artifacts/m7-substrate-reachable-generalization-v0.1/result.json" &&
+    artifact.path !== "docs/open-instrument/research-artifacts/m7-substrate-reachable-generalization-v0.1/phase-b-attempt.json",
+  );
+  writeJson(MANIFEST_PATH, {
+    ...manifest,
+    artifacts: [
+      ...artifacts,
+      {
+        path: "docs/open-instrument/research-artifacts/m7-substrate-reachable-generalization-v0.1/result.json",
+        bytes: readFileSync(RESULT_PATH).byteLength,
+        sha256: sha256File(RESULT_PATH),
+      },
+      {
+        path: "docs/open-instrument/research-artifacts/m7-substrate-reachable-generalization-v0.1/phase-b-attempt.json",
+        bytes: readFileSync(PHASE_B_ATTEMPT_PATH).byteLength,
+        sha256: sha256File(PHASE_B_ATTEMPT_PATH),
+      },
+    ],
+    metadataRepair: {
+      repairClass,
+      repairReason,
+      preRepairResultSha256: resultSha256BeforeRepair,
+      preRepairManifestSha256: manifestSha256BeforeRepair,
+      appliedAfterExecution: true,
+      scientificResultChanged: false,
+      scientificReexecution: false,
+      resultSha256BeforeRepair,
+    },
+  });
+}
+
 function readFileExists(path: string): boolean {
   try {
     readFileSync(path);
@@ -694,11 +831,22 @@ function validateResultArtifacts(): void {
   const counts = sample.counts as JsonRecord;
   assertEqual(counts.sampleSize, SAMPLE_SIZE, "successor result sample size");
   assertEqual((sample.cases as readonly unknown[]).length, SAMPLE_SIZE, "successor result case count");
+  const resultCases = sample.cases as readonly JsonRecord[];
+  if (resultCases.some((entry) => !Array.isArray(entry.genericQueryKeys))) {
+    throw new Error("M7_RESULT_QUERY_KEYS_MISSING");
+  }
+  const positiveCases = sample.positiveCases as readonly JsonRecord[];
+  if (positiveCases.some((entry) => !Array.isArray(entry.genericQueryKeys) || entry.genericQueryKeys.length === 0)) {
+    throw new Error("M7_POSITIVE_RESULT_QUERY_KEYS_MISSING");
+  }
   assertEqual((result.execution as JsonRecord).phaseAExecutionAttempts, 1, "phase A attempt count");
   assertEqual((result.execution as JsonRecord).phaseBExecutionAttempts, 1, "phase B attempt count");
   assertEqual((result.execution as JsonRecord).noRerun, true, "successor no-rerun binding");
   assertEqual((result.execution as JsonRecord).substrateResponseUsedForEligibility, false, "eligibility response boundary");
   const artifacts = manifest.artifacts as readonly { path: string; bytes: number; sha256: string }[];
+  if (!artifacts.some((artifact) => artifact.path.endsWith("/phase-b-attempt.json"))) {
+    throw new Error("M7_PHASE_B_ATTEMPT_ARTIFACT_MISSING");
+  }
   for (const artifact of artifacts) {
     const path = join(ROOT, artifact.path);
     assertEqual(readFileSync(path).byteLength, artifact.bytes, `manifest bytes ${artifact.path}`);
@@ -731,6 +879,8 @@ async function main(): Promise<void> {
     await evaluateSubstrate();
   } else if (process.argv.includes("--validate")) {
     validateResultArtifacts();
+  } else if (process.argv.includes("--repair-result-metadata")) {
+    repairResultMetadataWithoutScientificRerun();
   }
 }
 

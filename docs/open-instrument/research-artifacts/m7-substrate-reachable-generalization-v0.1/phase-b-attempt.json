@@ -1,0 +1,18 @@
+{
+  "schemaVersion": "open-instrument.m7-substrate-reachable-generalization-phase-b-attempt.v0.1",
+  "status": "COMPLETED_POST_EXECUTION_METADATA_REPAIR",
+  "attempt": 1,
+  "resultPath": "docs/open-instrument/research-artifacts/m7-substrate-reachable-generalization-v0.1/result.json",
+  "resultSha256BeforeRepair": "013c361f8148d6c057cc62191977332513faafcf0a2d20c66b2a6e4dcdd90e05",
+  "currentResultSha256BeforeRepair": "411178ed01f6d0c5d4a4b6af4821bb3d5e9ebe6c299cdcc7b24101823727b5d3",
+  "resultSha256AfterRepair": "411178ed01f6d0c5d4a4b6af4821bb3d5e9ebe6c299cdcc7b24101823727b5d3",
+  "preRepairManifestSha256": "cf9b4cd3a2b0f5250a33feec2a5fd7541b18f453077a27b8f193148c6555237b",
+  "repairClass": "SERIALIZATION_ONLY",
+  "repairReason": "pre-substrate generic query keys existed in frozen Phase A but were omitted from evaluated-result serialization.",
+  "noRerun": true,
+  "scientificResultChanged": false,
+  "scientificReexecution": false,
+  "realDataExecuted": false,
+  "providerExecution": false,
+  "preExecutionReservationAvailable": false
+}

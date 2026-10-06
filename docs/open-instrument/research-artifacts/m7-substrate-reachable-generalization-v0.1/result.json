@@ -273,7 +273,9 @@
           "reason": null
         },
         "structuralHypotheses": [],
-        "genericQueryKeys": [],
+        "genericQueryKeys": [
+          "AT"
+        ],
         "status": "MATCHES_FOUND",
         "candidateCount": 1,
         "candidates": [
@@ -381,7 +383,9 @@
           "reason": null
         },
         "structuralHypotheses": [],
-        "genericQueryKeys": [],
+        "genericQueryKeys": [
+          "AT"
+        ],
         "status": "MATCHES_FOUND",
         "candidateCount": 1,
         "candidates": [
@@ -500,7 +504,9 @@
           "reason": null
         },
         "structuralHypotheses": [],
-        "genericQueryKeys": [],
+        "genericQueryKeys": [
+          "AT"
+        ],
         "status": "MATCHES_FOUND",
         "candidateCount": 1,
         "candidates": [
@@ -612,7 +618,9 @@
           "reason": null
         },
         "structuralHypotheses": [],
-        "genericQueryKeys": [],
+        "genericQueryKeys": [
+          "AT"
+        ],
         "status": "MATCHES_FOUND",
         "candidateCount": 1,
         "candidates": [
@@ -49455,6 +49463,9 @@
     "positiveCases": [
       {
         "input": "ata",
+        "genericQueryKeys": [
+          "AT"
+        ],
         "candidates": [
           {
             "candidateId": "motivation-discovery:ata:ata:AT:0:reviewed.external.albanian-at.father.candidate.v0_1",
@@ -49484,6 +49495,9 @@
       },
       {
         "input": "ate",
+        "genericQueryKeys": [
+          "AT"
+        ],
         "candidates": [
           {
             "candidateId": "motivation-discovery:ate:ate:AT:0:reviewed.external.albanian-at.father.candidate.v0_1",
@@ -49513,6 +49527,9 @@
       },
       {
         "input": "ati",
+        "genericQueryKeys": [
+          "AT"
+        ],
         "candidates": [
           {
             "candidateId": "motivation-discovery:ati:ati:AT:0:reviewed.external.albanian-at.father.candidate.v0_1",
@@ -49542,6 +49559,9 @@
       },
       {
         "input": "atom",
+        "genericQueryKeys": [
+          "AT"
+        ],
         "candidates": [
           {
             "candidateId": "motivation-discovery:atom:atom:AT+M:0:reviewed.external.albanian-at.father.candidate.v0_1",
@@ -49601,5 +49621,19 @@
     "noRanking": true,
     "noSingleWinner": true,
     "userDecisionPosture": "user_decides"
+  },
+  "serializationRepair": {
+    "repairClass": "SERIALIZATION_ONLY",
+    "repairReason": "pre-substrate generic query keys existed in frozen Phase A but were omitted from evaluated-result serialization.",
+    "preRepairResultSha256": "013c361f8148d6c057cc62191977332513faafcf0a2d20c66b2a6e4dcdd90e05",
+    "preRepairManifestSha256": "cf9b4cd3a2b0f5250a33feec2a5fd7541b18f453077a27b8f193148c6555237b",
+    "appliedAfterExecution": true,
+    "scientificResultChanged": false,
+    "scientificReexecution": false,
+    "changedFields": [
+      "sample.cases[].genericQueryKeys",
+      "sample.positiveCases[].genericQueryKeys"
+    ],
+    "source": "frozen Phase A reachable-sample.json"
   }
 }

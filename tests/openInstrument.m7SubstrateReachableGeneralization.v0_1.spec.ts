@@ -95,7 +95,7 @@ describe("M7 substrate-reachable generalization correction v0.1", () => {
           invalidCases: number;
           engineOrAuthorityFailures: number;
         };
-        positiveCases: Array<{ input: string }>;
+        positiveCases: Array<{ input: string; genericQueryKeys: string[]; candidates: Array<{ candidateId: string }> }>;
       };
       execution: {
         phaseAExecutionAttempts: number;
@@ -121,6 +121,18 @@ describe("M7 substrate-reachable generalization correction v0.1", () => {
       "ati",
       "atom",
     ]);
+    expect(result.sample.positiveCases.map((entry) => entry.genericQueryKeys)).toEqual([
+      ["AT"],
+      ["AT"],
+      ["AT"],
+      ["AT"],
+    ]);
+    expect(result.sample.positiveCases.map((entry) => entry.candidates.map((candidate) => candidate.candidateId))).toEqual([
+      ["motivation-discovery:ata:ata:AT:0:reviewed.external.albanian-at.father.candidate.v0_1"],
+      ["motivation-discovery:ate:ate:AT:0:reviewed.external.albanian-at.father.candidate.v0_1"],
+      ["motivation-discovery:ati:ati:AT:0:reviewed.external.albanian-at.father.candidate.v0_1"],
+      ["motivation-discovery:atom:atom:AT+M:0:reviewed.external.albanian-at.father.candidate.v0_1"],
+    ]);
     expect(result.execution).toMatchObject({
       phaseAExecutionAttempts: 1,
       phaseBExecutionAttempts: 1,
@@ -129,7 +141,81 @@ describe("M7 substrate-reachable generalization correction v0.1", () => {
       realDataExecuted: false,
     });
     expect(sha256(resultPath)).toBe(
-      "013c361f8148d6c057cc62191977332513faafcf0a2d20c66b2a6e4dcdd90e05",
+      "411178ed01f6d0c5d4a4b6af4821bb3d5e9ebe6c299cdcc7b24101823727b5d3",
+    );
+  });
+
+  it("binds repaired result query keys to the frozen Phase A sample", () => {
+    const sample = JSON.parse(
+      readFileSync(join(SUCCESSOR_DIRECTORY, "reachable-sample.json"), "utf8"),
+    ) as { entries: Array<{ input: string; genericQueryKeys: string[] }> };
+    const result = JSON.parse(
+      readFileSync(join(SUCCESSOR_DIRECTORY, "result.json"), "utf8"),
+    ) as {
+      sample: {
+        cases: Array<{ input: string; classification?: string; genericQueryKeys: string[] }>;
+        counts: { sampleSize: number; crossFormPositiveCases: number; selfMatchOnlyCases: number; substrateNoMatchCases: number };
+      };
+      primary: { input: string; resultClass: string };
+      serializationRepair: {
+        repairClass: string;
+        preRepairResultSha256: string;
+        preRepairManifestSha256: string;
+        scientificResultChanged: boolean;
+        scientificReexecution: boolean;
+      };
+    };
+    const attempt = JSON.parse(
+      readFileSync(join(SUCCESSOR_DIRECTORY, "phase-b-attempt.json"), "utf8"),
+    ) as {
+      status: string;
+      attempt: number;
+      noRerun: boolean;
+      scientificResultChanged: boolean;
+      scientificReexecution: boolean;
+      realDataExecuted: boolean;
+    };
+    const phaseAKeys = new Map(sample.entries.map((entry) => [entry.input, entry.genericQueryKeys]));
+    const positiveCases = result.sample.cases.filter((entry) => entry.classification === "GENERIC_CROSS_FORM_POSITIVE");
+
+    expect(result.sample.cases.map((entry) => entry.input)).toEqual(sample.entries.map((entry) => entry.input));
+    expect(positiveCases).toHaveLength(4);
+    for (const entry of positiveCases) {
+      expect(entry.genericQueryKeys).toEqual(phaseAKeys.get(entry.input));
+    }
+    expect(result.sample.counts).toMatchObject({
+      sampleSize: 512,
+      crossFormPositiveCases: 4,
+      selfMatchOnlyCases: 0,
+      substrateNoMatchCases: 508,
+    });
+    expect(result.primary).toMatchObject({
+      input: "aiello",
+      resultClass: "SUBSTRATE_NO_MATCH",
+    });
+    expect(result.serializationRepair).toEqual(expect.objectContaining({
+      repairClass: "SERIALIZATION_ONLY",
+      preRepairResultSha256: "013c361f8148d6c057cc62191977332513faafcf0a2d20c66b2a6e4dcdd90e05",
+      preRepairManifestSha256: "cf9b4cd3a2b0f5250a33feec2a5fd7541b18f453077a27b8f193148c6555237b",
+      scientificResultChanged: false,
+      scientificReexecution: false,
+    }));
+    expect(attempt).toMatchObject({
+      status: "COMPLETED_POST_EXECUTION_METADATA_REPAIR",
+      attempt: 1,
+      noRerun: true,
+      scientificResultChanged: false,
+      scientificReexecution: false,
+      realDataExecuted: false,
+    });
+
+    const source = readFileSync(
+      join(ROOT, "scripts/openInstrumentM7SubstrateReachableGeneralization.v0_1.ts"),
+      "utf8",
+    );
+    expect(source).toContain("genericQueryKeys: [...entry.genericQueryKeys]");
+    expect(source).not.toContain(
+      "genericQueryKeys: discovery.derivedStructure.structuralHypotheses.flatMap((hypothesis) => hypothesis.expansionChain)",
     );
   });
 });
