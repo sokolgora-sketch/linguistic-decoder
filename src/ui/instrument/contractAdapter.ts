@@ -929,11 +929,14 @@ function parseMotivationDiscoveryV0_1(
     const inputConsonantal = isRecord(comparison.inputConsonantalStructure)
       ? comparison.inputConsonantalStructure
       : null;
-    const candidateConsonantal = comparison.candidateConsonantalStructure === null
+    const candidateConsonantalValue = comparison.candidateConsonantalStructure;
+    const candidateConsonantal = candidateConsonantalValue === null
       ? null
-      : isRecord(comparison.candidateConsonantalStructure)
-        ? comparison.candidateConsonantalStructure
+      : isRecord(candidateConsonantalValue)
+        ? candidateConsonantalValue
         : null;
+    const candidateConsonantalMalformed =
+      candidateConsonantalValue !== null && !isRecord(candidateConsonantalValue);
     const interpretation = candidate.functionalInterpretation;
     if (
       typeof candidate.candidateId !== "string" ||
@@ -983,6 +986,7 @@ function parseMotivationDiscoveryV0_1(
       !isStringArray(inputConsonantal.protoRoots) ||
       !isStringArray(inputConsonantal.carrierForms) ||
       !isStringArray(inputConsonantal.operationIds) ||
+      candidateConsonantalMalformed ||
       (candidateConsonantal !== null &&
         (candidateConsonantal.gamma !== null && !isStringArray(candidateConsonantal.gamma) ||
           (candidateConsonantal.zeroConsonantalStructuralComposition !== null &&

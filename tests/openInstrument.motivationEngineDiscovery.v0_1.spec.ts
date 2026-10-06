@@ -119,6 +119,23 @@ describe("Motivation Engine Discovery first vertical v0.1", () => {
     expect(self?.structuralComparison.matchReason).toContain("lexical entry confirmation");
   });
 
+  it("does not classify a cross-language homograph as lexical self-match", async () => {
+    const word = "di";
+    const heart = buildHeartInstrumentV1(word);
+    const result = buildMotivationEngineDiscoveryV0_1({
+      word,
+      inputLanguage: "en",
+      inputProfile: heart.spokenPronunciation.sourceProfileId,
+      analysis: await analysisFor(word),
+      heart,
+    });
+
+    const albanianWitness = result.candidates.find((candidate) => candidate.candidateForm === "di");
+    expect(albanianWitness).toBeDefined();
+    expect(albanianWitness?.structuralComparison.matchClassification).toBe("STRUCTURAL_MOTIVATION_CANDIDATE");
+    expect(albanianWitness?.structuralComparison.presentationClassification).toBe("STRUCTURAL_MOTIVATION");
+  });
+
   it("retrieves an independently selected Albanian lexical record through the same generic substrate", async () => {
     const word = "gjak";
     const heart = buildHeartInstrumentV1(word);

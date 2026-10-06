@@ -197,4 +197,17 @@ describe("Motivation Discovery Lab presentation v0.1", () => {
       missing: "malformed",
     });
   });
+
+  it("fails closed when candidate consonantal structure is malformed", () => {
+    const malformed = model() as unknown as Record<string, unknown>;
+    const candidate = (malformed.candidates as Array<Record<string, unknown>>)[0];
+    const comparison = candidate.structuralComparison as Record<string, unknown>;
+    comparison.candidateConsonantalStructure = "malformed";
+
+    const vm = adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: malformed });
+    expect(vm.motivationDiscoveryV0_1).toMatchObject({
+      kind: "missing",
+      missing: "malformed",
+    });
+  });
 });

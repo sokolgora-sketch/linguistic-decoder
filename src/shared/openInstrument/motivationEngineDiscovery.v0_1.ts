@@ -273,8 +273,16 @@ function normalizedLexicalFormV0_1(value: string): string {
   return value.normalize("NFC").trim().toLocaleLowerCase("en-US");
 }
 
+function normalizedLanguageV0_1(value: string): string {
+  const normalized = value.normalize("NFC").trim().toLocaleLowerCase("en-US");
+  if (normalized === "sq" || normalized === "albanian") return "sq";
+  if (normalized === "en" || normalized === "english") return "en";
+  return normalized;
+}
+
 function buildStructuralComparisonV0_1(
   word: string,
+  inputLanguage: string,
   inputRepresentationKind: MotivationRepresentationKindV0_1,
   inputVoicePath: readonly string[],
   inputGamma: readonly string[] | null,
@@ -284,6 +292,7 @@ function buildStructuralComparisonV0_1(
   witness: GenericFunctionalWitnessV1,
 ): MotivationStructuralComparisonV0_1 {
   const selfMatch =
+    normalizedLanguageV0_1(inputLanguage) === normalizedLanguageV0_1(witness.language) &&
     normalizedLexicalFormV0_1(word) ===
     normalizedLexicalFormV0_1(witness.sourceForm);
   const representationCompatibility =
@@ -346,6 +355,7 @@ function buildStructuralComparisonV0_1(
 
 function buildCandidate(
   word: string,
+  inputLanguage: string,
   inputRepresentationKind: MotivationRepresentationKindV0_1,
   inputVoicePath: readonly string[],
   inputGamma: readonly string[] | null,
@@ -376,6 +386,7 @@ function buildCandidate(
     },
     structuralComparison: buildStructuralComparisonV0_1(
       word,
+      inputLanguage,
       inputRepresentationKind,
       inputVoicePath,
       inputGamma,
@@ -545,6 +556,7 @@ export function buildMotivationEngineDiscoveryV0_1(input: {
       seenCandidateKeys.add(key);
       candidates.push(buildCandidate(
         word,
+        input.inputLanguage,
         inputRepresentationKind,
         voicePath,
         inputGamma,
