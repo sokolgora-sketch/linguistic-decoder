@@ -23,6 +23,9 @@ function zcText(value: unknown): string {
 }
 
 function Candidate({ candidate }: { candidate: MotivationDiscoveryCandidateV0_1VM }) {
+  const comparison = candidate.structuralComparison;
+  const inputStructure = comparison.inputConsonantalStructure;
+  const candidateStructure = comparison.candidateConsonantalStructure;
   return (
     <article
       data-testid="motivation-discovery-candidate"
@@ -38,6 +41,11 @@ function Candidate({ candidate }: { candidate: MotivationDiscoveryCandidateV0_1V
               {candidate.candidateStatus}
             </span>
             <span className="text-xs text-[#9fb1bf]">{candidate.candidateLanguage}</span>
+            <span className="rounded-full border border-[#3f5368] bg-[#10161c] px-2 py-0.5 font-mono text-[10px] uppercase text-[#b8cce0]">
+              {comparison.presentationClassification === "LEXICAL_ENTRY_CONFIRMATION"
+                ? "lexical entry confirmation"
+                : "structural motivation candidate"}
+            </span>
           </div>
           <div className="mt-1 text-xs text-[#c5ced8]">
             {candidate.candidateGloss} · match key / embryo {candidate.candidateEmbryo}
@@ -72,6 +80,43 @@ function Candidate({ candidate }: { candidate: MotivationDiscoveryCandidateV0_1V
           </dd>
         </div>
       </dl>
+
+      <div
+        data-testid="motivation-structural-comparison"
+        className="mt-3 rounded-md border border-[#3e4b59] bg-[#10161c] p-2.5 text-xs leading-5 text-[#d7dde7]"
+      >
+        <div className="font-semibold text-[#f0ddb0]">WHY THIS CANDIDATE</div>
+        <div className="mt-1 text-[#c5ced8]">{comparison.matchReason}</div>
+        <dl className="mt-2 grid gap-x-3 gap-y-1 sm:grid-cols-2">
+          <div><dt className="text-[#8ea4ba]">Matched embryo / query</dt><dd className="font-mono">{comparison.matchedQuery}</dd></div>
+          <div><dt className="text-[#8ea4ba]">Representation compatibility</dt><dd className="font-mono">{comparison.representationCompatibility}</dd></div>
+          <div><dt className="text-[#8ea4ba]">Input representation</dt><dd className="font-mono">{comparison.inputRepresentationKind}</dd></div>
+          <div><dt className="text-[#8ea4ba]">Candidate representation</dt><dd className="font-mono">{comparison.candidateRepresentationKind}</dd></div>
+          <div><dt className="text-[#8ea4ba]">Input Voice / nucleus</dt><dd className="font-mono">{pathText(comparison.inputVoicePath)}</dd></div>
+          <div><dt className="text-[#8ea4ba]">Candidate Voice / nucleus</dt><dd className="font-mono">{pathText(comparison.candidateVoicePath)}</dd></div>
+          <div><dt className="text-[#8ea4ba]">Voice relationship</dt><dd className="font-mono">{comparison.voiceRelationship}</dd></div>
+          <div><dt className="text-[#8ea4ba]">Carrier relationship</dt><dd className="font-mono">{comparison.consonantalCarrierRelationship}</dd></div>
+        </dl>
+        <div className="mt-2 grid gap-2 sm:grid-cols-2">
+          <div>
+            <div className="text-[#8ea4ba]">Input carrier / consonantal context</div>
+            <div className="font-mono">roots {inputStructure.protoRoots.join(" + ") || "Null"}</div>
+            <div className="font-mono">carriers {inputStructure.carrierForms.join(" + ") || "Null"}</div>
+            <div className="font-mono">Γ {inputStructure.gamma?.join(" → ") || "Null"}</div>
+          </div>
+          <div>
+            <div className="text-[#8ea4ba]">Candidate consonantal structure</div>
+            <div className="font-mono">{candidateStructure ? "present" : "Null · not authorized"}</div>
+          </div>
+        </div>
+        <div className="mt-2 text-[#9fb1bf]">
+          Expansion / composition: {comparison.expansionOrCompositionChain.join(" → ") || "not emitted"}
+          <br />
+          Authorized operations: {comparison.authorizedOperationIds.join(", ") || "none"}
+          <br />
+          Unresolved: {comparison.unresolvedFields.join(", ") || "none"}
+        </div>
+      </div>
 
       <div className="mt-3 rounded-md border border-[#4b3f2c] bg-[#18140e] p-2.5 text-xs leading-5 text-[#f0ddb0]">
         <span className="font-semibold">Functional interpretation / hypothesis:</span>{" "}
