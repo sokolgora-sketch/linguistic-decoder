@@ -1,0 +1,120 @@
+{
+  "schemaVersion": "open-instrument.m7-substrate-reachable-generalization-procedure.v0.1",
+  "status": "FROZEN_BEFORE_EXECUTION",
+  "procedureId": "open-instrument-m7-substrate-reachable-generalization-v0.1",
+  "purpose": "Measure current Albanian substrate retrieval coverage only among independently ordered English inputs that reach the unchanged generic query-generation boundary.",
+  "originalM7Boundary": {
+    "procedurePath": "docs/open-instrument/research-artifacts/m7-novel-input-generalization-v0.1/selection-procedure.json",
+    "procedureSha256": "de0363366f854230b178011c36a52818add15664f57a7241105bdbc6fb9b8eb7",
+    "primarySelectionPath": "docs/open-instrument/research-artifacts/m7-novel-input-generalization-v0.1/primary-selection.json",
+    "primarySelectionSha256": "c402b51ab936e29967dc5f53b2b43da541e1399513a5eb70890677ea52b53d23",
+    "primaryResultPath": "docs/open-instrument/research-artifacts/m7-novel-input-generalization-v0.1/primary-result.json",
+    "primaryResultSha256": "cacbb9dbc9b12a785063b4506f5ad05a52a0e402b7cb99a35e51ea5819f8b841",
+    "coverageResultPath": "docs/open-instrument/research-artifacts/m7-novel-input-generalization-v0.1/result.json",
+    "coverageResultSha256": "ea109f02539b80baf03b5d7491385aac3a4067045513e630911d4f2f0c7e98d6",
+    "originalPrimary": "a",
+    "originalClassification": "VALID_GENERIC_NULL",
+    "originalReason": "PRONUNCIATION_VARIANT_AMBIGUOUS"
+  },
+  "inputPopulation": {
+    "authority": "existing frozen bundled CMUdict eligible pronunciation population",
+    "sourceProfileId": "open-instrument.cmudict-arpabet-en-us.v0_1",
+    "sourceRevision": "74790861f652b15e4ac49015a90074ad62a27690",
+    "sourceNotation": "ARPABET",
+    "sourcePath": "src/data/openInstrument/pronunciation/cmudict.dict",
+    "sourceSha256": "81917843c7f44ce2b094ac63873c2c7a4cf802040792c455ba3ca406891c3d22",
+    "sourceBytes": 3618488,
+    "populationSpecPath": "docs/open-instrument/research-artifacts/zero-consonantal-structural-composition-v0.1-cmudict-validation-v0.1b/population-spec.json",
+    "populationSpecSha256": "81248026f57cffb0c357a4e29e0cce4d3139adc1521eda89e72754783095ed44",
+    "populationEligibility": "Use lexical words having at least one existing population-spec entry with eligibility=ELIGIBLE. Normalize, deduplicate, and order exactly as the original M7 selection procedure. No substrate response is consulted during reachability eligibility."
+  },
+  "preparedWordExclusion": {
+    "rule": "Reuse the original M7 prepared-word exclusion set and its existing ASCII-alphabetic substrate-record-form exclusion behavior.",
+    "sourceProcedurePath": "docs/open-instrument/research-artifacts/m7-novel-input-generalization-v0.1/selection-procedure.json",
+    "explicitExclusionCount": 84,
+    "sourceRecordFormsAlsoExcludedWhenASCIIAlphabetic": true
+  },
+  "ordering": {
+    "stableKey": "normalized lexical word",
+    "normalization": "NFC, trim, lower-case with the existing English CMUdict normalization convention",
+    "comparison": "Unicode code-point ascending comparison",
+    "deduplication": "one item per normalized lexical word"
+  },
+  "substrateReachableEligibility": {
+    "rule": [
+      "authorized usable production pronunciation/profile is defined",
+      "canonical spoken Voice path is non-null and non-empty",
+      "existing structural hypothesis/DeepRoot query-generation machinery produces structural state",
+      "at least one existing generic query key is generated before substrate response lookup"
+    ],
+    "excludedBeforeQueryResponse": [
+      "pronunciation ambiguity",
+      "missing pronunciation/profile authority",
+      "missing canonical spoken path",
+      "missing structural state",
+      "missing generic query key"
+    ],
+    "responseIndependent": true,
+    "substrateResponseInspected": false,
+    "candidateCountInspected": false,
+    "candidateFormInspected": false,
+    "candidateGlossInspected": false,
+    "semanticAttractivenessInspected": false
+  },
+  "engineIdentity": {
+    "repositoryHead": "969e31927b0e9047e7354f2439d23f417e10e908",
+    "retrievalPath": "src/shared/openInstrument/motivationEngineDiscovery.v0_1.ts",
+    "retrievalSha256": "e0ae5d74daf894db64380a2e04b0043e83bb756f2dba3109f5b01e6b1d5b67b0",
+    "structuralPath": "src/shared/structuralHypothesisDiscovery.v0_1.ts",
+    "structuralSha256": "96fba8363df8b3d59caf6d7dc9ac9ad88007d15432bec4b647b83484a25555db",
+    "genericQueryPath": "src/shared/openInstrument/genericFunctionalWitnessDiscovery.v1.ts",
+    "genericQuerySha256": "d8ecde88cb241010ffd3464852ff814bf745a4dfcd0ce3743966b8af078ed0a3"
+  },
+  "substrateIdentity": {
+    "version": "albanian-generic-lexical-substrate.v0_1",
+    "recordCount": 55,
+    "fingerprintMethod": "sha256(JSON.stringify(getAlbanianLexicalSubstrateRecordsV0_1()))",
+    "fingerprint": "3db9f039c12b0b3d51a9d64361909403baf4224c92c3ff237f7e9d49aabedcbb"
+  },
+  "sample": {
+    "size": 512,
+    "population": "first 512 substrate-reachable inputs in the frozen prepared ordered population",
+    "stoppingRule": "stop Phase A after 512 reachable inputs; record raw ordered population entries inspected",
+    "substrateEvaluation": "evaluate all frozen reachable sample entries",
+    "adaptiveSelection": false,
+    "candidateBehaviorUsedForSelection": false,
+    "sampleFrozenBeforeSubstrateEvaluation": true
+  },
+  "phaseBoundary": {
+    "phaseA": "pronunciation/profile, structural reachability, and generic query-key generation only",
+    "phaseB": "query the unchanged 55-record Albanian substrate after the reachable sample is serialized",
+    "eligibilityEndsAtQueryGeneration": true
+  },
+  "classificationRules": {
+    "phaseA": [
+      "UPSTREAM_PRONUNCIATION_NULL",
+      "UPSTREAM_STRUCTURAL_NULL",
+      "SUBSTRATE_REACHABLE"
+    ],
+    "phaseB": [
+      "GENERIC_CROSS_FORM_POSITIVE",
+      "EXACT_SELF_MATCH_ONLY",
+      "SUBSTRATE_NO_MATCH"
+    ],
+    "functionalEvidenceRequiredForStructuralPositive": false,
+    "winnerSelection": false,
+    "noSingleWinner": true,
+    "userDecisionPosture": "user_decides"
+  },
+  "forbiddenSelectionInputs": [
+    "substrate response",
+    "candidate count",
+    "candidate form",
+    "candidate gloss",
+    "semantic attractiveness",
+    "functional status",
+    "expected positive result",
+    "manual lexical preference",
+    "input-to-candidate special case"
+  ]
+}
