@@ -56,19 +56,6 @@ function citationAttestationIsUsableV0_1(
   );
 }
 
-function citationsAgreeOnAttestationV0_1(
-  citations: readonly MultiSourceFunctionalResearchEvidenceRowV0_1["citations"][number][],
-  selector: (citation: MultiSourceFunctionalResearchEvidenceRowV0_1["citations"][number]) => string,
-): boolean {
-  const values = citations.map((citation) => nonEmptyTextV0_1(selector(citation)));
-  const first = values[0];
-
-  return Boolean(
-    first &&
-      values.every((value) => value !== null && value === first),
-  );
-}
-
 function canonicalQueryKeyV0_1(value: string): string {
   return value.normalize("NFC").trim().toLocaleUpperCase("en-US");
 }
@@ -86,12 +73,14 @@ function projectResearchRowV0_1(
   const citations = [...row.citations].sort((left, right) =>
     compareTextV0_1(left.citationId, right.citationId),
   );
+  // The registry row is the source unit. Citation glosses may be faithful
+  // paraphrases, so wording differences alone do not authorize dropping the
+  // row or inventing a semantic conflict adjudicator. Select the stable first
+  // citation for the single-record value and preserve every citation ref.
   const citation = citations[0];
   if (
     !citation ||
-    !citations.every(citationAttestationIsUsableV0_1) ||
-    !citationsAgreeOnAttestationV0_1(citations, (candidate) => candidate.attestedForm) ||
-    !citationsAgreeOnAttestationV0_1(citations, (candidate) => candidate.attestedGloss)
+    !citations.every(citationAttestationIsUsableV0_1)
   ) {
     return null;
   }

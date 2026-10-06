@@ -39,9 +39,9 @@ describe("bounded Albanian lexical substrate v0.1", () => {
       embryoRelation: "exact_form",
     });
 
-    expect(records).toHaveLength(53);
-    expect(records.some((record) => record.sourceId === "research.external.albanian-mat-measure.v0_1")).toBe(false);
-    expect(records.some((record) => record.sourceId === "research.external.albanian-shter-depletion.v0_1")).toBe(false);
+    expect(records).toHaveLength(55);
+    expect(records.some((record) => record.sourceId === "research.external.albanian-mat-measure.v0_1")).toBe(true);
+    expect(records.some((record) => record.sourceId === "research.external.albanian-shter-depletion.v0_1")).toBe(true);
     expect(records.some((record) => record.sourceId === "research.external.albanian-shterp-barren.v0_1")).toBe(true);
     expect(records.some((record) => record.sourceId === "research.external.albanian-shterpe-barren.v0_1")).toBe(true);
 
@@ -54,12 +54,16 @@ describe("bounded Albanian lexical substrate v0.1", () => {
     for (const record of records.filter((candidate) => candidate.sourceStatus === "research_candidate")) {
       const row = researchRows.get(record.sourceId);
       expect(row).toBeDefined();
-      expect(row?.citations).toEqual(expect.arrayContaining([
-        expect.objectContaining({
-          attestedForm: record.sourceForm,
-          attestedGloss: record.gloss,
-        }),
-      ]));
+      const citation = [...(row?.citations ?? [])].sort((left, right) =>
+        left.citationId.localeCompare(right.citationId),
+      )[0];
+      expect(citation).toMatchObject({
+        attestedForm: record.sourceForm,
+        attestedGloss: record.gloss,
+      });
+      expect(record.citationRefs).toEqual(
+        row?.citations.map((candidate) => candidate.citationId).sort(),
+      );
     }
 
     const serialized = JSON.stringify(records);
