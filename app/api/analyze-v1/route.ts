@@ -37,6 +37,9 @@ import { AnalyzeWordResultV1ContractSchema } from "@/shared/analyzeWordResult.v1
 // ✅ Heart Instrument v1 (stable sub-object)
 import { buildHeartInstrumentV1 } from "@/v1/heartInstrument.v1";
 import { projectDoctrineReadingV1 } from "@/shared/openInstrument/doctrineReadingContract.v1";
+import {
+  buildMotivationEngineDiscoveryV0_1,
+} from "@/shared/openInstrument/motivationEngineDiscovery.v0_1";
 
 const BodySchema = z
   .object({
@@ -1330,6 +1333,31 @@ async function runAnalyzeV1Orchestration(
     ) {
       (final as any).automaticFunctionalProposalVerificationV0_1 =
         automaticFunctionalProposalVerificationV0_1;
+    }
+
+    // Additive Discovery Lab projection. This is deliberately attached after
+    // the production candidate/status pipeline so exploratory source matches
+    // cannot change canonical English analysis semantics or status authority.
+    if (final && typeof final === "object") {
+      const discoveryInputLanguage =
+        language || (payloadAlphabet === "albanian"
+          ? "sq"
+          : heartInstrumentV1.spokenPronunciation.status === "defined"
+            ? "en"
+            : "unknown");
+      const discoveryInputProfile =
+        payloadAlphabet === "albanian"
+          ? "albanian"
+          : heartInstrumentV1.spokenPronunciation.sourceProfileId || payloadAlphabet;
+
+      (final as any).motivationDiscoveryV0_1 =
+        buildMotivationEngineDiscoveryV0_1({
+          word,
+          inputLanguage: discoveryInputLanguage,
+          inputProfile: discoveryInputProfile,
+          analysis: final as any,
+          heart: heartInstrumentV1,
+        });
     }
 
     return NextResponse.json(final);

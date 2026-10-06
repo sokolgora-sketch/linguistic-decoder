@@ -24,6 +24,7 @@ const volatileTimestampFieldNameSet = new Set(volatileTimestampFieldNames);
 // while the baseline continues to fingerprint structural/status/evidence
 // behavior only.
 export const presentationOnlyFieldNames = Object.freeze([
+  "motivationDiscoveryV0_1",
   "wordSpecificFunctionalDepth",
 ]);
 

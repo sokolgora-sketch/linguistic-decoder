@@ -2,9 +2,23 @@
 
 Milestone ID: `OPEN_INSTRUMENT_MOTIVATION_ENGINE_DISCOVERY_LAB_V0_1`
 
-Status: `MILESTONE_DEFINED_IMPLEMENTATION_NOT_STARTED`
+Status: `IMPLEMENTATION_STARTED`
 
 Date defined: 2026-10-06
+
+## Current implementation stage
+
+The first bounded vertical slice has started on the implementation branch.
+It folds the existing M0/M1/M2 machinery and the minimum M3 composition seam
+into an additive Discovery projection: Albanian-profile input can reach the
+language-aware path, generic English retrieval can query reviewed Albanian
+source rows, and the default `/chat` surface can label source facts, derived
+structure, hypotheses, and Null outcomes. The slice preserves the existing
+production canonical path and does not promote Albanian research evidence to
+production pronunciation authority.
+
+This is progress, not milestone completion. The full M3/M4/M5/M6 sequence,
+broader language coverage, and final Discovery Lab closure remain open.
 
 This document is a durable planning boundary. It defines the next bounded
 implementation sequence; it does not implement or authorize production
@@ -342,11 +356,11 @@ token only after all required stages and validation are complete:
 
 `OPEN_INSTRUMENT_MOTIVATION_ENGINE_DISCOVERY_LAB_V0_1_DONE`
 
-This document does **not** mark that token complete. At definition time:
+This document does **not** mark that token complete. At the current implementation stage:
 
 ```text
 MILESTONE_DEFINED=YES
-IMPLEMENTATION_STARTED=NO
+IMPLEMENTATION_STARTED=YES
 IMPLEMENTATION_COMPLETE=NO
 DISCOVERY_LAB_SHIPPED=NO
 MOTIVATION_ENGINE_SHIPPED=NO
@@ -407,8 +421,9 @@ no DF_BRAIN remote push is implied.
 milestone definition only.
 
 ```text
-STATUS=MILESTONE_DEFINED_IMPLEMENTATION_NOT_STARTED
+STATUS=IMPLEMENTATION_STARTED
 PRODUCTION_BEHAVIOR_CHANGED=NO
+FIRST_VERTICAL_SLICE=IN_PROGRESS
 RESEARCH_EXECUTED=NO
 PROVIDER_EXECUTED=NO
 NEW_SOURCE_AUTHORITY_CREATED=NO
