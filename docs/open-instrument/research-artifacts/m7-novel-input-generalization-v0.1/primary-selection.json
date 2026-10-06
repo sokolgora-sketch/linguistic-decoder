@@ -1,0 +1,25 @@
+{
+  "schemaVersion": "open-instrument.m7-novel-input-generalization-primary-selection.v0.1",
+  "status": "FROZEN_BEFORE_RESULT_INSPECTION",
+  "procedureId": "open-instrument-m7-novel-input-generalization-v0.1",
+  "procedurePath": "docs/open-instrument/research-artifacts/m7-novel-input-generalization-v0.1/selection-procedure.json",
+  "procedureSha256": "9c6264dba0742150d3e9143a52f4ba85d74fe41c3261c0a4ac1b5eb31bbf4e95",
+  "selectionExecution": {
+    "engineBaseHead": "52ff041d5b0d03d9c787c6d5d759438de273cea4",
+    "procedureFreezeCommit": "01346928",
+    "inputPopulationAuthority": "existing frozen bundled CMUdict eligible pronunciation population",
+    "eligiblePopulationCount": 117473,
+    "excludedPopulationCount": 84,
+    "orderingRule": "normalized lexical word, Unicode code-point ascending",
+    "selectionPosition": 1,
+    "selectionUsesCandidateBehavior": false
+  },
+  "primaryNovelInput": {
+    "input": "a",
+    "language": "en",
+    "profile": "open-instrument.cmudict-arpabet-en-us.v0_1",
+    "eligibility": "first eligible alphabetic normalized lexical word after frozen exclusions",
+    "previouslyPrepared": false,
+    "selectedBeforeResultInspection": true
+  }
+}
