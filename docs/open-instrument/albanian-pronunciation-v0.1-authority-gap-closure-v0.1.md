@@ -1,6 +1,6 @@
 # Open Instrument — Albanian Pronunciation v0.1 Authority-Gap / Frozen-Artifact Closure
 
-Status: `ALBANIAN_PRONUNCIATION_V0_1=RESEARCH_AUTHORITY_RETAINED_ARTIFACT_UNAVAILABLE`.
+Status: `ALBANIAN_PRONUNCIATION_V0_1=RESEARCH_AUTHORITY_RETAINED_ARTIFACT_UNAVAILABLE_WITHIN_CHECKED_SCOPE`.
 
 This is a docs-only closure record. It preserves the operational result of an
 exact frozen-artifact reacquisition attempt. It does not modify the frozen
@@ -44,6 +44,11 @@ fail closed with `SOURCE_ARTIFACT_IDENTITY_MISMATCH`. No claim is made about
 which records or fields differ, and no metadata-only or semantic-equivalence
 claim is made.
 
+The checked availability scope was the repository (which does not bundle the
+complete artifact) and this single live-locator fetch. This record does not
+establish global unavailability: no archive, backup, or other authorized store
+was searched or found in this lane.
+
 ## Native-profile coverage boundary
 
 Coverage against the frozen v0.1 artifact remains `UNKNOWN / NOT TESTABLE`.
@@ -62,7 +67,8 @@ has changed semantically, or that Albanian pronunciation support is impossible.
 ```text
 ALBANIAN_PRONUNCIATION_V0_1=RESEARCH_CONTRACT_VALID
 FROZEN_IDENTITY_VALID=YES
-COMPLETE_FROZEN_ARTIFACT_CURRENTLY_AVAILABLE=NO
+COMPLETE_FROZEN_ARTIFACT_CURRENTLY_UNAVAILABLE_IN_CHECKED_SCOPE=YES
+COMPLETE_FROZEN_ARTIFACT_AVAILABILITY_OUTSIDE_CHECKED_SCOPE=UNKNOWN
 LIVE_LOCATOR_RETURNS_DIFFERENT_IDENTITY=YES
 MISMATCH_CAUSE_UNKNOWN=YES
 NATIVE_PROFILE_COVERAGE=UNKNOWN_NOT_TESTABLE
@@ -95,7 +101,7 @@ authority/artifact chain.
 
 ```text
 CLOSURE_ACTION=DOCS_ONLY_CLOSURE
-EXACT_FROZEN_ARTIFACT_REACQUISITION=BLOCKED_BY_IDENTITY_MISMATCH
+EXACT_FROZEN_ARTIFACT_REACQUISITION=BLOCKED_BY_IDENTITY_MISMATCH_AT_CHECKED_LIVE_LOCATOR
 ALBANIAN_V0_2_CREATED=NO
 ARCHIVE_SEARCH_STARTED=NO
 CROSS_LANGUAGE_EXPERIMENT_STARTED=NO
