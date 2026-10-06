@@ -112,20 +112,54 @@ describe("Motivation Discovery Lab presentation v0.1", () => {
 
     expect(screen.getByTestId("motivation-discovery-card")).toBeInTheDocument();
     expect(screen.getByText("SOURCE FACT")).toBeInTheDocument();
-    expect(screen.getByText(/DISCOVERY_ORTHOGRAPHIC_PROFILE/)).toBeInTheDocument();
+    expect(screen.getByText(/orthographic\/profile-derived Discovery representation/)).toBeInTheDocument();
     expect(screen.getByText(/lexical source: https:\/\/example\.invalid\/di/)).toBeInTheDocument();
-    expect(screen.getByText("Lexical source fact")).toBeInTheDocument();
+    expect(screen.getByText("Source fact")).toBeInTheDocument();
     expect(screen.getByTestId("motivation-structural-comparison")).toBeInTheDocument();
-    expect(screen.getByText("STRUCTURAL MOTIVATION")).toBeInTheDocument();
+    expect(screen.getByText("WHY THIS CANDIDATE")).toBeInTheDocument();
     expect(screen.getByText(/structural motivation candidate/i)).toBeInTheDocument();
     expect(screen.getByText("CROSS_REPRESENTATION")).toBeInTheDocument();
     expect(screen.getByText("NOT_COMPARABLE_ACROSS_REPRESENTATIONS")).toBeInTheDocument();
     expect(screen.getByText(/no target-word mapping/)).toBeInTheDocument();
     expect(screen.getByText("FUNCTIONAL MOTIVATION")).toBeInTheDocument();
-    expect(screen.getByText("REVIEWED_HYPOTHESIS")).toBeInTheDocument();
-    expect(screen.getByText(/reviewed\.external\.di\.knowledge\.candidate\.v0_1 · fact/)).toBeInTheDocument();
-    expect(screen.getByText("user decides")).toBeInTheDocument();
+    expect(screen.getByText("Reviewed functional hypothesis")).toBeInTheDocument();
+    expect(screen.getByText("reviewed.external.di.knowledge.candidate.v0_1")).toBeInTheDocument();
+    expect(screen.getByText("No single winner · You decide")).toBeInTheDocument();
+    expect(screen.getByTestId("motivation-candidate-details")).toBeInTheDocument();
     expect(screen.getByText(/No single winner/)).toBeInTheDocument();
+  });
+
+  it("keeps candidate summaries human-readable while preserving technical details", () => {
+    const di = model().candidates[0];
+    const da = {
+      ...di,
+      candidateId: "discovery:study:da",
+      candidateForm: "da",
+      candidateGloss: "to split, cut, divide",
+      candidateEmbryo: "DA",
+      functionalInterpretation: {
+        status: "UNKNOWN_OR_NULL" as const,
+        truthClassification: "unknown_or_null" as const,
+        statement: null,
+        evidenceKind: "none" as const,
+        evidenceRefs: [],
+        reason: "INSUFFICIENT_FUNCTIONAL_EVIDENCE",
+      },
+    };
+
+    render(<MotivationDiscoveryCardV0_1 discovery={{ kind: "present", value: model({ candidates: [di, da] }) }} />);
+
+    expect(screen.getByText("2 candidates")).toBeInTheDocument();
+    expect(screen.getByText("da")).toBeInTheDocument();
+    expect(screen.getByText("to split, cut, divide")).toBeInTheDocument();
+    expect(screen.getAllByText("WHY THIS CANDIDATE")).toHaveLength(2);
+    expect(screen.getAllByText("Functional motivation unknown")).toHaveLength(1);
+    expect(screen.getByText("No reviewed functional evidence currently supports this bridge.")).toBeInTheDocument();
+    expect(screen.getByText("No single winner · You decide")).toBeInTheDocument();
+
+    const structural = screen.getAllByText("WHY THIS CANDIDATE")[0];
+    const functional = screen.getAllByText("FUNCTIONAL MOTIVATION")[0];
+    expect(structural.compareDocumentPosition(functional) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   });
 
   it("shows a valid Null instead of inventing a candidate", () => {
@@ -150,7 +184,7 @@ describe("Motivation Discovery Lab presentation v0.1", () => {
       />,
     );
 
-    expect(screen.getByText("UNKNOWN / NULL")).toBeInTheDocument();
+    expect(screen.getByText("NO SUPPORTED MOTIVATION CANDIDATE YET")).toBeInTheDocument();
     expect(screen.getByText("NO_GENERIC_AUTHORIZED_SOURCE_WITNESS")).toBeInTheDocument();
     expect(screen.queryByTestId("motivation-discovery-candidate")).not.toBeInTheDocument();
   });
@@ -197,6 +231,7 @@ describe("Motivation Discovery Lab presentation v0.1", () => {
     render(<MotivationDiscoveryCardV0_1 discovery={{ kind: "present", value }} />);
     expect(screen.getAllByText(/lexical entry confirmation/i).length).toBeGreaterThan(0);
     expect(screen.getByText(/not a cross-form structural motivation claim/)).toBeInTheDocument();
+    expect(screen.getByText("Not applicable to an exact lexical self-match")).toBeInTheDocument();
   });
 
   it("fails closed when a nested Math7 field is incomplete", () => {
