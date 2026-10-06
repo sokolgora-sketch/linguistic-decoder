@@ -59,33 +59,15 @@ function Candidate({ candidate }: { candidate: MotivationDiscoveryCandidateV0_1V
         </span>
       </div>
 
-      <dl className="mt-3 grid gap-2 text-xs sm:grid-cols-2">
-        <div>
-          <dt className="text-[#8ea4ba]">Source fact</dt>
-          <dd className="mt-1 break-words font-mono text-[#d7dde7]">
-            {candidate.sourceFact.sourceId} · {candidate.sourceFact.attestationTruth} · {candidate.sourceFact.sourceStatus}
-          </dd>
-          <dd className="mt-1 break-words text-[10px] text-[#9fb1bf]">
-            lexical source: {candidate.sourceFact.sourceUrlOrArchiveRef ?? "unavailable"}
-            {candidate.sourceFact.entryLocator ? ` · ${candidate.sourceFact.entryLocator}` : ""}
-          </dd>
-        </div>
-        <div>
-          <dt className="text-[#8ea4ba]">Generic structural match</dt>
-          <dd className="mt-1 break-words font-mono text-[#d7dde7]">
-            {candidate.derivedStructure.protoRoots.join(" + ")} · {candidate.derivedStructure.operationIds.join(", ") || "none"}
-          </dd>
-          <dd className="mt-1 text-[10px] text-[#9fb1bf]">
-            deterministic embryo/source-row lookup; no target-word mapping
-          </dd>
-        </div>
-      </dl>
-
       <div
         data-testid="motivation-structural-comparison"
         className="mt-3 rounded-md border border-[#3e4b59] bg-[#10161c] p-2.5 text-xs leading-5 text-[#d7dde7]"
       >
-        <div className="font-semibold text-[#f0ddb0]">WHY THIS CANDIDATE</div>
+        <div className="font-semibold text-[#f0ddb0]">
+          {comparison.presentationClassification === "LEXICAL_ENTRY_CONFIRMATION"
+            ? "LEXICAL ENTRY CONFIRMATION"
+            : "STRUCTURAL MOTIVATION"}
+        </div>
         <div className="mt-1 text-[#c5ced8]">{comparison.matchReason}</div>
         <dl className="mt-2 grid gap-x-3 gap-y-1 sm:grid-cols-2">
           <div><dt className="text-[#8ea4ba]">Matched embryo / query</dt><dd className="font-mono">{comparison.matchedQuery}</dd></div>
@@ -118,13 +100,49 @@ function Candidate({ candidate }: { candidate: MotivationDiscoveryCandidateV0_1V
         </div>
       </div>
 
-      <div className="mt-3 rounded-md border border-[#4b3f2c] bg-[#18140e] p-2.5 text-xs leading-5 text-[#f0ddb0]">
-        <span className="font-semibold">Functional interpretation / hypothesis:</span>{" "}
-        {candidate.functionalInterpretation.statement ?? "not supplied"}
+      <dl className="mt-3 grid gap-2 text-xs sm:grid-cols-2">
+        <div>
+          <dt className="text-[#8ea4ba]">Lexical source fact</dt>
+          <dd className="mt-1 break-words font-mono text-[#d7dde7]">
+            {candidate.sourceFact.sourceId} · {candidate.sourceFact.attestationTruth} · {candidate.sourceFact.sourceStatus}
+          </dd>
+          <dd className="mt-1 break-words text-[10px] text-[#9fb1bf]">
+            lexical source: {candidate.sourceFact.sourceUrlOrArchiveRef ?? "unavailable"}
+            {candidate.sourceFact.entryLocator ? ` · ${candidate.sourceFact.entryLocator}` : ""}
+          </dd>
+        </div>
+        <div>
+          <dt className="text-[#8ea4ba]">Source-backed gloss</dt>
+          <dd className="mt-1 break-words text-[#d7dde7]">{candidate.candidateForm} · {candidate.candidateGloss}</dd>
+          <dd className="mt-1 text-[10px] text-[#9fb1bf]">
+            deterministic embryo/source-row lookup; no target-word mapping
+          </dd>
+        </div>
+      </dl>
+
+      <div
+        data-testid="motivation-functional-interpretation"
+        className="mt-3 rounded-md border border-[#4b3f2c] bg-[#18140e] p-2.5 text-xs leading-5 text-[#f0ddb0]"
+      >
+        <div className="font-semibold">FUNCTIONAL MOTIVATION</div>
+        <div className="mt-1 font-mono text-[10px] uppercase tracking-[0.08em]">
+          {candidate.functionalInterpretation.status}
+        </div>
+        <div className="mt-1">
+          {candidate.functionalInterpretation.statement ??
+            candidate.functionalInterpretation.reason ??
+            "not supplied"}
+        </div>
+        <div className="mt-2 text-[10px] text-[#d5c28f]">
+          Truth class: {candidate.functionalInterpretation.truthClassification} · evidence: {candidate.functionalInterpretation.evidenceKind}
+          {candidate.functionalInterpretation.evidenceRefs.length > 0
+            ? ` · refs: ${candidate.functionalInterpretation.evidenceRefs.join(", ")}`
+            : ""}
+        </div>
       </div>
 
       <div className="mt-2 break-words text-[10px] leading-4 text-[#7f8b99]">
-        Evidence: {candidate.sourceFact.evidenceRefs.join(", ") || "none"}. Historical relation: not claimed. No single winner.
+        Historical relation: not claimed. User decides. No single winner.
       </div>
     </article>
   );

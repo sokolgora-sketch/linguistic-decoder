@@ -51,7 +51,28 @@ describe("Motivation Engine Discovery first vertical v0.1", () => {
     expect(di?.structuralComparison.candidateVoicePath).toEqual(["I"]);
     expect(di?.structuralComparison.candidateConsonantalStructure).toBeNull();
     expect(di?.structuralComparison.authorizedOperationIds).toContain("y_to_i");
-    expect(di?.functionalInterpretation.statement).toBeNull();
+    expect(di?.functionalInterpretation).toMatchObject({
+      status: "REVIEWED_HYPOTHESIS",
+      truthClassification: "hypothesis",
+      evidenceKind: "reviewed_functional_evidence",
+      statement: "knowledge can motivate study and learning functionally without making a historical-origin claim",
+    });
+    expect(di?.functionalInterpretation.evidenceRefs).toContain(
+      "reviewed.external.di.knowledge.candidate.citation.v0_1",
+    );
+    const da = result.candidates.find((candidate) => candidate.candidateEmbryo === "DA");
+    expect(da?.functionalInterpretation).toMatchObject({
+      status: "UNKNOWN_OR_NULL",
+      truthClassification: "unknown_or_null",
+      statement: null,
+      evidenceKind: "none",
+      reason: "INSUFFICIENT_FUNCTIONAL_EVIDENCE",
+    });
+    expect(da?.functionalInterpretation.evidenceRefs).toEqual([]);
+    expect(di?.structuralComparison.matchReason).toContain("SHTU + DI");
+    expect(di?.structuralComparison.matchReason).toContain("carrier forms: shtu + di");
+    expect(di?.structuralComparison.matchReason).toContain("authorized operations:");
+    expect(di?.structuralComparison.matchReason).toContain("y_to_i");
   });
 
   it("uses the same generic retrieval for a previously unprepared positive input", async () => {
@@ -117,6 +138,12 @@ describe("Motivation Engine Discovery first vertical v0.1", () => {
     expect(self?.structuralComparison.voiceRelationship).toBe("NOT_COMPARABLE_ACROSS_REPRESENTATIONS");
     expect(self?.structuralComparison.candidateConsonantalStructure).toBeNull();
     expect(self?.structuralComparison.matchReason).toContain("lexical entry confirmation");
+    expect(self?.functionalInterpretation).toMatchObject({
+      status: "NOT_APPLICABLE_SELF_MATCH",
+      truthClassification: "unknown_or_null",
+      statement: null,
+      reason: "LEXICAL_SELF_MATCH_NOT_FUNCTIONAL_MOTIVATION",
+    });
   });
 
   it("does not classify a cross-language homograph as lexical self-match", async () => {

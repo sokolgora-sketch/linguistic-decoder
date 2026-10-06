@@ -392,8 +392,12 @@ export type MotivationDiscoveryCandidateV0_1VM = Readonly<{
     matchReason: string;
   }>;
   functionalInterpretation: Readonly<{
-    truthClassification: "hypothesis";
+    status: "REVIEWED_HYPOTHESIS" | "GENERATED_BOUNDED_HYPOTHESIS" | "NOT_APPLICABLE_SELF_MATCH" | "UNKNOWN_OR_NULL";
+    truthClassification: "hypothesis" | "unknown_or_null";
     statement: string | null;
+    evidenceKind: "reviewed_functional_evidence" | "lexical_gloss_plus_structural_match" | "none";
+    evidenceRefs: string[];
+    reason: string | null;
   }>;
   candidateStatus: "experimental";
   historicalRelation: "not_claimed";
