@@ -40,7 +40,10 @@ function Candidate({ candidate }: { candidate: MotivationDiscoveryCandidateV0_1V
             <span className="text-xs text-[#9fb1bf]">{candidate.candidateLanguage}</span>
           </div>
           <div className="mt-1 text-xs text-[#c5ced8]">
-            {candidate.candidateGloss} · embryo {candidate.candidateEmbryo} · Voice {pathText(candidate.candidateVoicePath)}
+            {candidate.candidateGloss} · match key / embryo {candidate.candidateEmbryo}
+          </div>
+          <div className="mt-1 text-[10px] text-[#8ea4ba]">
+            DISCOVERY_ORTHOGRAPHIC_PROFILE · Voice structure {pathText(candidate.candidateVoicePath)} · not spoken pronunciation
           </div>
         </div>
         <span className="text-[10px] uppercase tracking-[0.14em] text-[#8ea4ba]">
@@ -52,13 +55,20 @@ function Candidate({ candidate }: { candidate: MotivationDiscoveryCandidateV0_1V
         <div>
           <dt className="text-[#8ea4ba]">Source fact</dt>
           <dd className="mt-1 break-words font-mono text-[#d7dde7]">
-            {candidate.sourceFact.sourceId} · {candidate.sourceFact.attestationTruth}
+            {candidate.sourceFact.sourceId} · {candidate.sourceFact.attestationTruth} · {candidate.sourceFact.sourceStatus}
+          </dd>
+          <dd className="mt-1 break-words text-[10px] text-[#9fb1bf]">
+            lexical source: {candidate.sourceFact.sourceUrlOrArchiveRef ?? "unavailable"}
+            {candidate.sourceFact.entryLocator ? ` · ${candidate.sourceFact.entryLocator}` : ""}
           </dd>
         </div>
         <div>
-          <dt className="text-[#8ea4ba]">Derived relation</dt>
+          <dt className="text-[#8ea4ba]">Generic structural match</dt>
           <dd className="mt-1 break-words font-mono text-[#d7dde7]">
             {candidate.derivedStructure.protoRoots.join(" + ")} · {candidate.derivedStructure.operationIds.join(", ") || "none"}
+          </dd>
+          <dd className="mt-1 text-[10px] text-[#9fb1bf]">
+            deterministic embryo/source-row lookup; no target-word mapping
           </dd>
         </div>
       </dl>

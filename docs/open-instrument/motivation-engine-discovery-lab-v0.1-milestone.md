@@ -20,6 +20,34 @@ production pronunciation authority.
 This is progress, not milestone completion. The full M3/M4/M5/M6 sequence,
 broader language coverage, and final Discovery Lab closure remain open.
 
+## Bounded M1/M3 lexical-substrate slice
+
+The bounded Albanian M1/M3 implementation slice now projects source-attested
+Albanian lexical facts from the existing typed research catalog and reviewed
+lexical registry into the generic witness query seam. Retrieval is keyed by
+deterministic embryo/structural-expansion values rather than the current input
+word, so the reviewed DI row remains retrievable without a STUDY-specific
+mapping and source-backed `zemër`/`gjak` records can be surfaced when their
+existing structural keys qualify. Target words, semantic bridges, functional
+hypotheses, historical claims, and winner claims are not projected into the
+substrate.
+
+The candidate surface labels candidate Voice extraction as an orthographic /
+profile-derived Discovery representation, not spoken pronunciation, and keeps
+source facts, deterministic structure, interpretation/hypothesis, and Null
+outcomes separate. The existing reviewed registry remains a source-status
+enrichment boundary; it is no longer the only runtime candidate population for
+the Albanian Discovery slice.
+
+```text
+M1_BOUNDED_ALBANIAN_LEXICAL_SUBSTRATE=IMPLEMENTED
+M3_GENERIC_ALBANIAN_RETRIEVAL=IMPLEMENTED
+M4_STRUCTURAL_MOTIVATION_ANALYSIS=NOT_STARTED
+M5_FUNCTIONAL_MOTIVATION_INTERPRETATION=NOT_STARTED
+ALBANIAN_PROMOTED_TO_PRODUCTION=NO
+MILESTONE_DONE=NO
+```
+
 This document is a durable planning boundary. It defines the next bounded
 implementation sequence; it does not implement or authorize production
 behavior by itself.
