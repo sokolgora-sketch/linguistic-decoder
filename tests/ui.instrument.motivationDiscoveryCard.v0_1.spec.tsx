@@ -1,4 +1,5 @@
 import { render, screen } from "@testing-library/react";
+import { adaptAnalysisToTelemetryVM } from "@/ui/instrument/contractAdapter";
 import { MotivationDiscoveryCardV0_1 } from "@/ui/instrument/sections/MotivationDiscoveryCard.v0_1";
 import type { MotivationDiscoveryV0_1VM } from "@/ui/telemetry/types";
 
@@ -110,5 +111,18 @@ describe("Motivation Discovery Lab presentation v0.1", () => {
     expect(screen.getByText("UNKNOWN / NULL")).toBeInTheDocument();
     expect(screen.getByText("NO_GENERIC_AUTHORIZED_SOURCE_WITNESS")).toBeInTheDocument();
     expect(screen.queryByTestId("motivation-discovery-candidate")).not.toBeInTheDocument();
+  });
+
+  it("fails closed when a nested Math7 field is incomplete", () => {
+    const malformed = model() as unknown as Record<string, unknown>;
+    const derived = malformed.derivedStructure as Record<string, unknown>;
+    const math7 = derived.math7 as Record<string, unknown>;
+    delete math7.principlesPath;
+
+    const vm = adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: malformed });
+    expect(vm.motivationDiscoveryV0_1).toMatchObject({
+      kind: "missing",
+      missing: "malformed",
+    });
   });
 });

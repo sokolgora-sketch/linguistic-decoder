@@ -886,6 +886,8 @@ function parseMotivationDiscoveryV0_1(
   const zc = isRecord(derived.zeroConsonantalStructuralComposition)
     ? derived.zeroConsonantalStructuralComposition
     : null;
+  const isStringArray = (value: unknown): value is string[] =>
+    Array.isArray(value) && value.every((item) => typeof item === "string");
 
   if (
     (sourceFact.layer !== "SOURCE_FACT") ||
@@ -897,7 +899,7 @@ function parseMotivationDiscoveryV0_1(
     typeof sourceFact.sourceStatus !== "string" ||
     typeof sourceFact.authorityBoundary !== "string" ||
     derived.layer !== "DERIVED_STRUCTURE" ||
-    !Array.isArray(derived.voicePath) ||
+    !isStringArray(derived.voicePath) ||
     (derived.voicePathSource !== "production_spoken" &&
       derived.voicePathSource !== "albanian_profile" &&
       derived.voicePathSource !== "unknown") ||
@@ -905,8 +907,11 @@ function parseMotivationDiscoveryV0_1(
     !gamma ||
     !zc ||
     !Array.isArray(derived.structuralHypotheses) ||
+    (math7.basis !== null && typeof math7.basis !== "string") ||
+    (math7.totalMod7 !== null && typeof math7.totalMod7 !== "number") ||
+    !isStringArray(math7.principlesPath) ||
     (gamma.status !== "source_pronunciation" && gamma.status !== "profile_derived" && gamma.status !== "NULL") ||
-    !Array.isArray(gamma.orderedUnits) ||
+    !isStringArray(gamma.orderedUnits) ||
     (zc.status !== "source_pronunciation" && zc.status !== "NULL") ||
     !Array.isArray(zc.variants)
   ) {
@@ -927,14 +932,14 @@ function parseMotivationDiscoveryV0_1(
       typeof candidate.candidateForm !== "string" ||
       typeof candidate.candidateGloss !== "string" ||
       typeof candidate.candidateEmbryo !== "string" ||
-      !Array.isArray(candidate.candidateVoicePath) ||
+      !isStringArray(candidate.candidateVoicePath) ||
       typeof source.sourceId !== "string" ||
       typeof source.sourceStatus !== "string" ||
       typeof source.attestationTruth !== "string" ||
-      !Array.isArray(source.evidenceRefs) ||
-      !Array.isArray(structure.protoRoots) ||
-      !Array.isArray(structure.carrierForms) ||
-      !Array.isArray(structure.operationIds) ||
+      !isStringArray(source.evidenceRefs) ||
+      !isStringArray(structure.protoRoots) ||
+      !isStringArray(structure.carrierForms) ||
+      !isStringArray(structure.operationIds) ||
       typeof structure.minRootId !== "string" ||
       interpretation.truthClassification !== "hypothesis" ||
       (interpretation.statement !== null && typeof interpretation.statement !== "string") ||
@@ -1131,6 +1136,8 @@ export function adaptAnalysisToTelemetryVM(raw: unknown): TelemetryViewModel {
     getField(payload, "wordSpecificFunctionalDepth"),
   );
   const motivationDiscoveryV0_1 = parseMotivationDiscoveryV0_1(payload);
+  const motivationDiscoveryFieldEmitted =
+    isRecord(payload) && Object.prototype.hasOwnProperty.call(payload, "motivationDiscoveryV0_1");
 
   const vp = pickVoicePaths(payload);
 
@@ -2468,7 +2475,9 @@ const originClaimGates: OriginClaimGatesVM = {
     ...(wordSpecificFunctionalDepth.kind === "missing"
       ? {}
       : { wordSpecificFunctionalDepth }),
-    ...(motivationDiscoveryV0_1.kind === "missing"
+    ...(motivationDiscoveryFieldEmitted
+      ? { motivationDiscoveryV0_1 }
+      : motivationDiscoveryV0_1.kind === "missing"
       ? {}
       : { motivationDiscoveryV0_1 }),
     evidence: {

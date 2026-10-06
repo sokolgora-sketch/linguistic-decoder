@@ -10,9 +10,6 @@ import {
 import {
   createReviewedExternalLexiconWitnessAdapterV0_1,
 } from "@/shared/openInstrument/reviewedExternalLexiconWitnessAdapter.v0_1";
-import {
-  getReviewedExternalLexiconProductionSourceRowsV0_1,
-} from "@/shared/reviewedExternalLexiconSourceRowRegistry.v0_1";
 import type { HeartInstrumentV1 } from "@/v1/heartInstrument.v1";
 
 export const MOTIVATION_ENGINE_DISCOVERY_SCHEMA_V0_1 =
@@ -207,18 +204,11 @@ function math7Summary(analysis: AnalyzeWordResultV1, heart: HeartInstrumentV1) {
   };
 }
 
-function rowForSourceId(sourceId: string) {
-  return getReviewedExternalLexiconProductionSourceRowsV0_1().find(
-    (row) => row.sourceId === sourceId,
-  ) ?? null;
-}
-
 function buildCandidate(
   word: string,
   root: ReturnType<typeof stableUniqueRoots>[number],
   witness: GenericFunctionalWitnessV1,
 ): MotivationEngineDiscoveryCandidateV0_1 {
-  const sourceRow = rowForSourceId(witness.sourceId);
   const operationIds = root.carriers
     .filter((carrier) => root.protoRoots.includes(carrier.protoRootId))
     .flatMap((carrier) => carrier.ops)
@@ -247,7 +237,9 @@ function buildCandidate(
     },
     functionalInterpretation: {
       truthClassification: "hypothesis",
-      statement: sourceRow?.semanticBridge ?? null,
+      // Generic witness discovery does not evaluate a target-bound semantic
+      // correspondence. Keep target-specific bridges out of this layer.
+      statement: null,
     },
     candidateStatus: "experimental",
     historicalRelation: "not_claimed",
@@ -270,7 +262,9 @@ export function buildMotivationEngineDiscoveryV0_1(input: {
 }): MotivationEngineDiscoveryV0_1 {
   const word = input.word.normalize("NFC").trim();
   const isAlbanianProfile = input.inputProfile === "albanian" || input.inputLanguage === "sq";
-  const spokenPath = input.heart.canonicalSpokenVoicePath;
+  const spokenPath = isAlbanianProfile
+    ? null
+    : input.heart.canonicalSpokenVoicePath;
   const profilePath = asRecord(input.analysis.primaryPath)?.voicePath;
   const fallbackVoicePath = Array.isArray(profilePath)
     ? profilePath.filter((value): value is string => typeof value === "string")

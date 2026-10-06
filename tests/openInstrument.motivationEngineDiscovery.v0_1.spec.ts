@@ -88,4 +88,23 @@ describe("Motivation Engine Discovery first vertical v0.1", () => {
     expect(result.derivedStructure.gamma.status).toBe("profile_derived");
     expect(result.derivedStructure.zeroConsonantalStructuralComposition.status).toBe("NULL");
   });
+
+  it("does not reuse an English Heart path for an explicitly Albanian input", async () => {
+    const word = "study";
+    const heart = buildHeartInstrumentV1(word);
+    expect(heart.canonicalSpokenVoicePath?.length).toBeGreaterThan(0);
+
+    const result = buildMotivationEngineDiscoveryV0_1({
+      word,
+      inputLanguage: "sq",
+      inputProfile: "albanian",
+      analysis: await analysisFor(word, "albanian"),
+      heart,
+    });
+
+    expect(result.derivedStructure.voicePathSource).toBe("albanian_profile");
+    expect(result.sourceFact.representation).toBe("albanian_profile");
+    expect(result.derivedStructure.gamma.status).toBe("profile_derived");
+    expect(result.derivedStructure.zeroConsonantalStructuralComposition.status).toBe("NULL");
+  });
 });
