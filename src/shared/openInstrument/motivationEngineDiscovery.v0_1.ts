@@ -453,19 +453,6 @@ function buildFunctionalInterpretationV0_1(
     };
   }
 
-  const sourceForm = witness.sourceForm.trim();
-  const gloss = witness.gloss.trim();
-  if (sourceForm && gloss) {
-    return {
-      status: "GENERATED_BOUNDED_HYPOTHESIS" as const,
-      truthClassification: "hypothesis" as const,
-      statement: `Because structural analysis produced candidate embryo ${witness.queryForm} and the source attests ${sourceForm} as "${gloss}", that lexical function is presented as a ZË-RO functional motivation hypothesis for the input.`,
-      evidenceKind: "lexical_gloss_plus_structural_match" as const,
-      evidenceRefs: [...witness.citationRefs].sort(compareText),
-      reason: null,
-    };
-  }
-
   return {
     status: "UNKNOWN_OR_NULL" as const,
     truthClassification: "unknown_or_null" as const,

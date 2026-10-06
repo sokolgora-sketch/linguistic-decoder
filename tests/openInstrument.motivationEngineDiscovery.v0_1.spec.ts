@@ -61,10 +61,14 @@ describe("Motivation Engine Discovery first vertical v0.1", () => {
       "reviewed.external.di.knowledge.candidate.citation.v0_1",
     );
     const da = result.candidates.find((candidate) => candidate.candidateEmbryo === "DA");
-    expect(da?.functionalInterpretation.status).toBe("GENERATED_BOUNDED_HYPOTHESIS");
-    expect(da?.functionalInterpretation.evidenceKind).toBe("lexical_gloss_plus_structural_match");
-    expect(da?.functionalInterpretation.statement).toContain("to split, cut, divide");
-    expect(da?.functionalInterpretation.statement).not.toContain("damage");
+    expect(da?.functionalInterpretation).toMatchObject({
+      status: "UNKNOWN_OR_NULL",
+      truthClassification: "unknown_or_null",
+      statement: null,
+      evidenceKind: "none",
+      reason: "INSUFFICIENT_FUNCTIONAL_EVIDENCE",
+    });
+    expect(da?.functionalInterpretation.evidenceRefs).toEqual([]);
     expect(di?.structuralComparison.matchReason).toContain("SHTU + DI");
     expect(di?.structuralComparison.matchReason).toContain("carrier forms: shtu + di");
     expect(di?.structuralComparison.matchReason).toContain("authorized operations:");
