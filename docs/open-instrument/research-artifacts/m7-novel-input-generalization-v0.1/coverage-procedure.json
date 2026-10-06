@@ -1,0 +1,31 @@
+{
+  "schemaVersion": "open-instrument.m7-novel-input-generalization-coverage-procedure.v0.1",
+  "procedureId": "open-instrument-m7-novel-input-generalization-coverage-v0.1",
+  "status": "FROZEN_BEFORE_COVERAGE_RUN",
+  "purpose": "Assess bounded current-substrate positive coverage after the sealed primary Null without selecting or substituting a target.",
+  "primaryResultBoundary": "The primary selection and result remain immutable. Coverage is a separate deterministic assessment and cannot replace the primary test.",
+  "sample": {
+    "size": 512,
+    "population": "The ordered eligible normalized lexical-word population produced by the frozen M7 selection procedure after the same usability and prepared-word exclusions.",
+    "ordering": "normalized lexical word, Unicode code-point ascending",
+    "evaluateAllEntries": true,
+    "stoppingRule": "none",
+    "adaptiveSelection": false,
+    "candidateBehaviorUsedForSampleSelection": false
+  },
+  "outcomes": [
+    "GENERIC_POSITIVE_RETRIEVAL",
+    "VALID_GENERIC_NULL",
+    "INVALID_TEST_INPUT",
+    "ENGINE_OR_AUTHORITY_FAILURE"
+  ],
+  "frozenBindings": {
+    "selectionProcedurePath": "docs/open-instrument/research-artifacts/m7-novel-input-generalization-v0.1/selection-procedure.json",
+    "selectionProcedureSha256": "9c6264dba0742150d3e9143a52f4ba85d74fe41c3261c0a4ac1b5eb31bbf4e95",
+    "primarySelectionPath": "docs/open-instrument/research-artifacts/m7-novel-input-generalization-v0.1/primary-selection.json",
+    "primarySelectionSha256": "ca9b439096831129434d119980d5f0fd018a3d7f352c0cb8581051effc91511f",
+    "engineBaseHead": "52ff041d5b0d03d9c787c6d5d759438de273cea4",
+    "substrateRecordCount": 55,
+    "substrateFingerprint": "3db9f039c12b0b3d51a9d64361909403baf4224c92c3ff237f7e9d49aabedcbb"
+  }
+}
