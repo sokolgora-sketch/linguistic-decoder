@@ -2,18 +2,34 @@
 
 Milestone ID: `OPEN_INSTRUMENT_MOTIVATION_ENGINE_DISCOVERY_LAB_V0_1`
 
-Status: `IMPLEMENTATION_STARTED`
+Status: `MILESTONE_COMPLETE_BOUNDED_DISCOVERY_ONLY`
 
 Date defined: 2026-10-06
+Closure reconciled: 2026-10-06
 
-## Verified stage after M8
+## Verified final closure state after M9
 
-The M8 multilingual expansion seam is complete: the generic Motivation Engine
-can compose the existing Albanian adapter with one independently bounded Latin
-source adapter backed by the frozen Lewis & Short records. Latin lexical facts
-and provenance remain source-only; pronunciation, spoken Voice, Gamma, ZC,
-functional interpretation, historical relation, and winner claims remain
-Null or unclaimed where authority is absent. M9 closure has not started.
+M0 through M8 are complete and independently reconciled against the merged
+repository history, implementation seams, tests, and durable research
+artifacts. M9 is a documentation-only closure reconciliation: it records the
+bounded Motivation Engine / Discovery Lab result already present in the
+repository and does not add a new capability, source, experiment, or
+production authority.
+
+The final bounded result includes the generic structural and functional
+discovery path, the preserved M7 positive and valid-Null evidence, and the M8
+Latin lexical-substrate seam. M7's successor artifact preserves a 512-input
+substrate-reachable sample with four cross-form positives and valid Nulls for
+the remaining substrate-unmatched inputs; M7's original novel-input result
+remains a valid generic Null caused by pronunciation ambiguity. Latin remains
+source-only lexical evidence backed by the existing Lewis & Short records;
+pronunciation, spoken Voice, Gamma, ZC, functional interpretation, historical
+relation, and winner claims remain Null or unclaimed where authority is absent.
+
+Albanian research inputs remain bounded research evidence and are not
+promoted to production pronunciation or `/api/analyze-v1` authority. The
+One-Embryo target-sense dependency remains blocked and Diachronic v0.2 remains
+inactive.
 
 ```text
 M0=COMPLETE
@@ -25,8 +41,13 @@ M5=COMPLETE
 M6=COMPLETE
 M7=COMPLETE
 M8=COMPLETE
-M9=NOT_STARTED
-MILESTONE_DONE=NO
+M9=COMPLETE
+MILESTONE_DONE=YES
+CLOSURE_DOCUMENTATION_ONLY=YES
+PRODUCTION_AUTHORITY_PROMOTED=NO
+DOCTRINE_PROVEN=NO
+HISTORICAL_ORIGIN_PROVEN=NO
+UNIVERSAL_LANGUAGE_COVERAGE=NO
 ```
 
 ## Historical initial implementation stage
@@ -43,10 +64,15 @@ structure, hypotheses, and Null outcomes. The slice preserves the existing
 production canonical path and does not promote Albanian research evidence to
 production pronunciation authority.
 
-This is progress, not milestone completion. The full M3/M4/M5/M6 sequence,
-broader language coverage, and final Discovery Lab closure remain open.
+This was progress at the time of the snapshot, not milestone completion. The
+later M3/M4/M5/M6 sequence, M7/M8 evidence, and final M9 closure are recorded
+above.
 
-## Bounded M1/M3 lexical-substrate slice
+## Historical bounded M1/M3 lexical-substrate slice
+
+This section preserves the intermediate M1/M3 implementation snapshot. Its
+`MILESTONE_DONE=NO` value is historical and is superseded by the verified M9
+closure state above.
 
 The bounded Albanian M1/M3 implementation slice now projects source-attested
 Albanian lexical facts from the existing typed research catalog and reviewed
@@ -403,21 +429,19 @@ This milestone does not:
 - add a dataset, source contract, or runtime implementation in this
   documentation-only milestone.
 
-## Definition of done
+## Definition of done and closure boundary
 
-The future implementation sequence may use the following conceptual closure
-token only after all required stages and validation are complete:
-
-`OPEN_INSTRUMENT_MOTIVATION_ENGINE_DISCOVERY_LAB_V0_1_DONE`
-
-This document does **not** mark that token complete. At the current implementation stage:
+The required stages and validation are complete. The current closure
+declaration appears in the dedicated section below. The closure token does not
+claim doctrine proof, historical origin, universal language coverage, or
+production promotion of research evidence.
 
 ```text
 MILESTONE_DEFINED=YES
 IMPLEMENTATION_STARTED=YES
-IMPLEMENTATION_COMPLETE=NO
-DISCOVERY_LAB_SHIPPED=NO
-MOTIVATION_ENGINE_SHIPPED=NO
+IMPLEMENTATION_COMPLETE=YES
+DISCOVERY_LAB_SHIPPED=YES
+MOTIVATION_ENGINE_SHIPPED=YES
 DOCTRINE_PROVEN=NO
 HISTORICAL_ORIGIN_PROVEN=NO
 ```
@@ -431,8 +455,10 @@ scope.
 
 This document is the repository-side milestone definition. The canonical
 planning object is one Linear milestone under the existing Open Instrument
-project, if created during the authorized lifecycle. Its initial state is
-`MILESTONE_DEFINED`; it must explicitly say `IMPLEMENTATION_NOT_STARTED`.
+project, if created during the authorized lifecycle. Its initial state was
+`MILESTONE_DEFINED`; it explicitly said `IMPLEMENTATION_NOT_STARTED`. That
+initial planning state is historical; the current state is the final M9
+closure recorded above.
 
 The existing historical embryo-first functional-motivation milestone remains
 closed/superseded for its original scope. This milestone reuses its truth
@@ -469,7 +495,30 @@ research result. DF_BRAIN is updated only after a confirmed repository merge,
 using its standing local-update authority, preserving unrelated dirty state;
 no DF_BRAIN remote push is implied.
 
-## Freeze declaration
+## Current closure declaration
+
+The M0–M8 implementation and evidence sequence is complete. M9 records that
+closure only; it does not authorize additional implementation, research
+execution, provider execution, or production promotion.
+
+`OPEN_INSTRUMENT_MOTIVATION_ENGINE_DISCOVERY_LAB_V0_1_DONE`
+
+```text
+STATUS=MILESTONE_COMPLETE_BOUNDED_DISCOVERY_ONLY
+MILESTONE_DONE=YES
+PRODUCTION_BEHAVIOR_CHANGED=NO
+RESEARCH_EXECUTED=NO
+PROVIDER_EXECUTED=NO
+NEW_SOURCE_AUTHORITY_CREATED=NO
+ALBANIAN_PROMOTED_TO_PRODUCTION=NO
+ONE_EMBRYO_RESTARTED=NO
+DIACHRONIC_V0_2_ACTIVATED=NO
+```
+
+## Historical freeze declaration
+
+The following block is retained as the pre-implementation freeze snapshot. It
+is historical context, not the current milestone status.
 
 `OPEN_INSTRUMENT_MOTIVATION_ENGINE_DISCOVERY_LAB_V0_1` is a bounded roadmap and
 milestone definition only.
