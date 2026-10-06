@@ -5,7 +5,7 @@ Milestone ID: `OPEN_INSTRUMENT_MOTIVATION_ENGINE_DISCOVERY_LAB_V0_1`
 Status: `MILESTONE_COMPLETE_BOUNDED_DISCOVERY_ONLY`
 
 Date defined: 2026-10-06
-Closure reconciled: 2026-10-07
+Closure reconciled: 2026-10-06
 
 ## Verified final closure state after M9
 
