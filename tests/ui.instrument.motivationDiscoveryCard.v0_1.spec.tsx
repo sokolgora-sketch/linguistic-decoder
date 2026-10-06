@@ -1,4 +1,5 @@
 import { render, screen } from "@testing-library/react";
+import { GET } from "../app/api/analyze-v1/route";
 import { adaptAnalysisToTelemetryVM } from "@/ui/instrument/contractAdapter";
 import { MotivationDiscoveryCardV0_1 } from "@/ui/instrument/sections/MotivationDiscoveryCard.v0_1";
 import type { MotivationDiscoveryV0_1VM } from "@/ui/telemetry/types";
@@ -107,6 +108,23 @@ function model(overrides: Partial<MotivationDiscoveryV0_1VM> = {}): MotivationDi
 }
 
 describe("Motivation Discovery Lab presentation v0.1", () => {
+  it("shows a Latin source candidate with an explicit lexical-only boundary", async () => {
+    const response = await GET(
+      new Request("http://localhost/api/analyze-v1?word=bamoar&mode=strict&alphabet=auto"),
+    );
+    const vm = adaptAnalysisToTelemetryVM(await response.json());
+
+    render(<MotivationDiscoveryCardV0_1 discovery={vm.motivationDiscoveryV0_1} />);
+
+    expect(screen.getByText("amo")).toBeInTheDocument();
+    expect(screen.getByText("Latin")).toBeInTheDocument();
+    expect(screen.getByText("to like, to love")).toBeInTheDocument();
+    expect(screen.getByText(/Candidate pronunciation and spoken Voice path are Null/)).toBeInTheDocument();
+    expect(screen.getByText(/orthographic_profile_derived/)).toBeInTheDocument();
+    expect(screen.getByText("Functional motivation unknown")).toBeInTheDocument();
+    expect(screen.getByText("No single winner · You decide")).toBeInTheDocument();
+  });
+
   it("shows fact, derived structure, hypothesis, status, and provenance without a winner", () => {
     render(<MotivationDiscoveryCardV0_1 discovery={{ kind: "present", value: model() }} />);
 

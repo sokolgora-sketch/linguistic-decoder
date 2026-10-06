@@ -6,7 +6,33 @@ Status: `IMPLEMENTATION_STARTED`
 
 Date defined: 2026-10-06
 
-## Current implementation stage
+## Verified stage after M8
+
+The M8 multilingual expansion seam is complete: the generic Motivation Engine
+can compose the existing Albanian adapter with one independently bounded Latin
+source adapter backed by the frozen Lewis & Short records. Latin lexical facts
+and provenance remain source-only; pronunciation, spoken Voice, Gamma, ZC,
+functional interpretation, historical relation, and winner claims remain
+Null or unclaimed where authority is absent. M9 closure has not started.
+
+```text
+M0=COMPLETE
+M1=COMPLETE
+M2=COMPLETE
+M3=COMPLETE
+M4=COMPLETE
+M5=COMPLETE
+M6=COMPLETE
+M7=COMPLETE
+M8=COMPLETE
+M9=NOT_STARTED
+MILESTONE_DONE=NO
+```
+
+## Historical initial implementation stage
+
+The following stage note records the initial M1/M3 slice and is retained as
+historical context. The current verified stage is recorded above.
 
 The first bounded vertical slice has started on the implementation branch.
 It folds the existing M0/M1/M2 machinery and the minimum M3 composition seam

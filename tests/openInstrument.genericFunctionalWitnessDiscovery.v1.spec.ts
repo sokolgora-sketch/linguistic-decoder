@@ -97,7 +97,7 @@ describe("generic functional witness discovery v1", () => {
         sourceRecord({
           sourceId: "alpha.er.v0_1",
           language: "Gheg",
-          sourceForm: "ër",
+          sourceForm: "er",
         }),
       ]),
     ]);
@@ -106,6 +106,8 @@ describe("generic functional witness discovery v1", () => {
       "alpha.er.v0_1",
       "zeta.er.v0_1",
     ]);
+    expect(result.matches.map((match) => match.sourceForm)).toEqual(["er", "er"]);
+    expect(result.matches.map((match) => match.language)).toEqual(["Gheg", "Tosk"]);
     expect(result.matches.every((match) => match.winnerClaim === "NOT_CLAIMED")).toBe(
       true,
     );
