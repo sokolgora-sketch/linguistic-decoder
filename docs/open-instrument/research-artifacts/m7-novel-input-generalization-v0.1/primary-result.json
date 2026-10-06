@@ -1,0 +1,62 @@
+{
+  "schemaVersion": "open-instrument.m7-novel-input-generalization-primary-result.v0.1",
+  "status": "PRESERVED_BEFORE_COVERAGE_ASSESSMENT",
+  "procedureId": "open-instrument-m7-novel-input-generalization-v0.1",
+  "primarySelectionPath": "docs/open-instrument/research-artifacts/m7-novel-input-generalization-v0.1/primary-selection.json",
+  "primarySelectionSha256": "ca9b439096831129434d119980d5f0fd018a3d7f352c0cb8581051effc91511f",
+  "input": {
+    "word": "a",
+    "language": "en",
+    "profile": "open-instrument.cmudict-arpabet-en-us.v0_1",
+    "selectedBeforeResultInspection": true
+  },
+  "classification": "VALID_GENERIC_NULL",
+  "pronunciationOrProfileStatus": {
+    "status": "null",
+    "reasonCode": "PRONUNCIATION_VARIANT_AMBIGUOUS",
+    "observedVariantCount": 2,
+    "canonicalSpokenVoicePath": null,
+    "sourceAuthority": "bundled CMUdict-derived ARPAbet production pronunciation authority"
+  },
+  "derivedStructure": {
+    "math7": {
+      "basis": "A",
+      "totalMod7": 0,
+      "principlesPath": ["TRUTH"]
+    },
+    "gamma": {
+      "status": "NULL",
+      "orderedUnits": [],
+      "reason": "SPOKEN_PRONUNCIATION_UNAVAILABLE"
+    },
+    "zeroConsonantalStructuralComposition": {
+      "status": "NULL",
+      "variants": [],
+      "reason": "NO_AUTHORIZED_SPOKEN_VARIANT_FOR_DISCOVERY_INPUT"
+    },
+    "structuralHypotheses": [],
+    "genericQueryKeys": []
+  },
+  "discovery": {
+    "status": "NO_MATCHES",
+    "candidateCount": 0,
+    "candidates": [],
+    "functionalStatuses": [],
+    "historicalRelations": [],
+    "unknownOrNullReason": "NO_GENERIC_AUTHORIZED_SOURCE_WITNESS",
+    "interpretationStatus": "UNKNOWN_OR_NULL",
+    "noSingleWinner": true,
+    "userDecisionPosture": "user_decides"
+  },
+  "execution": {
+    "engineBaseHead": "52ff041d5b0d03d9c787c6d5d759438de273cea4",
+    "selectionFreezeCommit": "01346928",
+    "primarySelectionFreezeCommit": "de541fb5",
+    "authoritativePrimaryExecutionCount": 1,
+    "candidateBehaviorUsedForSelection": false,
+    "engineChangedAfterSelection": false,
+    "substrateChangedAfterSelection": false,
+    "retrievalChangedAfterSelection": false,
+    "resultSubstitution": false
+  }
+}

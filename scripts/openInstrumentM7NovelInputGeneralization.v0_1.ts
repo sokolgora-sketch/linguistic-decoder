@@ -99,7 +99,7 @@ function readProcedureV0_1(): SelectionProcedureV0_1 {
   return procedure;
 }
 
-export function selectPrimaryNovelInputV0_1(): M7SelectionV0_1 {
+export function getOrderedEligibleNovelInputsV0_1(): readonly string[] {
   const procedure = readProcedureV0_1();
   const population = JSON.parse(readFileSync(POPULATION_SPEC_PATH, "utf8")) as PopulationSpecV0_1;
   const substrateWords = new Set(
@@ -116,12 +116,25 @@ export function selectPrimaryNovelInputV0_1(): M7SelectionV0_1 {
       .filter((word) => /^[a-z]+$/u.test(word)),
   )].sort(compareCodePoint);
   const available = eligibleWords.filter((word) => !excluded.has(word));
-  const input = available[0];
+  return Object.freeze(available);
+}
+
+export function selectPrimaryNovelInputV0_1(): M7SelectionV0_1 {
+  const procedure = readProcedureV0_1();
+  const eligibleWords = getOrderedEligibleNovelInputsV0_1();
+  const population = JSON.parse(readFileSync(POPULATION_SPEC_PATH, "utf8")) as PopulationSpecV0_1;
+  const eligiblePopulationCount = new Set(
+    population.population.entries
+      .filter((entry) => entry.eligibility === "ELIGIBLE")
+      .map((entry) => normalizeWord(entry.lexicalWord))
+      .filter((word) => /^[a-z]+$/u.test(word)),
+  ).size;
+  const input = eligibleWords[0];
   if (!input) throw new Error("M7_NO_ELIGIBLE_NOVEL_INPUT");
   return Object.freeze({
     input,
-    eligiblePopulationCount: eligibleWords.length,
-    excludedPopulationCount: eligibleWords.length - available.length,
+    eligiblePopulationCount,
+    excludedPopulationCount: eligiblePopulationCount - eligibleWords.length,
     selectionPosition: 1,
     selectionUsesCandidateBehavior: false,
     procedurePath: "docs/open-instrument/research-artifacts/m7-novel-input-generalization-v0.1/selection-procedure.json",
