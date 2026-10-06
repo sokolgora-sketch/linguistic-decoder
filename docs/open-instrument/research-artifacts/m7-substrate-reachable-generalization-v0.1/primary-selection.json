@@ -1,0 +1,58 @@
+{
+  "schemaVersion": "open-instrument.m7-substrate-reachable-generalization-primary-selection.v0.1",
+  "status": "FROZEN_BEFORE_SUBSTRATE_LOOKUP",
+  "procedureId": "open-instrument-m7-substrate-reachable-generalization-v0.1",
+  "procedureSha256": "2b7ecf4b1b0b7e3f2ced15a0a92381316206711b3392676b22e81e6481ed81cb",
+  "eligibilityPath": "docs/open-instrument/research-artifacts/m7-substrate-reachable-generalization-v0.1/eligibility.json",
+  "eligibilitySha256": "837e0411898db9a7dd4348ebe24d0d1f05fe1daa801ae3969b2d3289b3bb4f26",
+  "samplePath": "docs/open-instrument/research-artifacts/m7-substrate-reachable-generalization-v0.1/reachable-sample.json",
+  "sampleSha256": "7c991d806086569f9434f07f0a60ea0d8ec225434fa87050ed6c79d04f738255",
+  "primary": {
+    "input": "aiello",
+    "rawPopulationPosition": 1720,
+    "preparedPopulationPosition": 1719,
+    "reachablePopulationPosition": 1,
+    "pronunciationStatus": "defined",
+    "pronunciationReason": null,
+    "profile": "open-instrument.cmudict-arpabet-en-us.v0_1",
+    "voicePath": [
+      "A",
+      "I",
+      "E",
+      "O",
+      "U"
+    ],
+    "gamma": [
+      "L"
+    ],
+    "zcVariantCount": 1,
+    "structuralHypotheses": [
+      {
+        "hypothesisId": "logic-structural:aiello:aie:peel_right_consonant_led_expansion",
+        "embryo": "AIE",
+        "expansionChain": [
+          "AIE",
+          "AIELLO"
+        ],
+        "reasonCodes": [
+          "structural_reduction_applied",
+          "structural_containment_preserved",
+          "deterministic_operation_authorized",
+          "terminal_structural_hypothesis_reached",
+          "voice_path_recorded",
+          "independent_meaning_unknown",
+          "lexical_attestation_not_required_for_discovery",
+          "historical_origin_not_claimed",
+          "candidate_truth_not_claimed",
+          "production_promotion_not_claimed",
+          "minimum_defensible_embryo_reached"
+        ]
+      }
+    ],
+    "genericQueryKeys": [
+      "AIE",
+      "AIELLO"
+    ]
+  },
+  "selectedBeforeSubstrateLookup": true
+}

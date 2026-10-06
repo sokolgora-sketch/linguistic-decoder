@@ -1,0 +1,62 @@
+{
+  "schemaVersion": "open-instrument.m7-substrate-reachable-generalization-hash-manifest.v0.1",
+  "status": "FROZEN_RESULT_BINDINGS",
+  "repositoryHead": "969e31927b0e9047e7354f2439d23f417e10e908",
+  "artifacts": [
+    {
+      "path": "docs/open-instrument/research-artifacts/m7-substrate-reachable-generalization-v0.1/procedure.json",
+      "bytes": 6349,
+      "sha256": "2b7ecf4b1b0b7e3f2ced15a0a92381316206711b3392676b22e81e6481ed81cb"
+    },
+    {
+      "path": "docs/open-instrument/research-artifacts/m7-substrate-reachable-generalization-v0.1/eligibility.json",
+      "bytes": 2028449,
+      "sha256": "837e0411898db9a7dd4348ebe24d0d1f05fe1daa801ae3969b2d3289b3bb4f26"
+    },
+    {
+      "path": "docs/open-instrument/research-artifacts/m7-substrate-reachable-generalization-v0.1/primary-selection.json",
+      "bytes": 2043,
+      "sha256": "9f6b6e7edc7416ea720b21f5c55154d2bf2c622283e49e0afe7dc276e77269cd"
+    },
+    {
+      "path": "docs/open-instrument/research-artifacts/m7-substrate-reachable-generalization-v0.1/reachable-sample.json",
+      "bytes": 762638,
+      "sha256": "7c991d806086569f9434f07f0a60ea0d8ec225434fa87050ed6c79d04f738255"
+    },
+    {
+      "path": "docs/open-instrument/research-artifacts/m7-substrate-reachable-generalization-v0.1/result.json",
+      "bytes": 1496986,
+      "sha256": "411178ed01f6d0c5d4a4b6af4821bb3d5e9ebe6c299cdcc7b24101823727b5d3"
+    },
+    {
+      "path": "docs/open-instrument/research-artifacts/m7-substrate-reachable-generalization-v0.1/phase-b-attempt.json",
+      "bytes": 1049,
+      "sha256": "37bc9a362a5073834f7690eb3a76c688b3a873ac014c58402c785b8a531f8f1c"
+    }
+  ],
+  "execution": {
+    "phaseAExecutionAttempts": 1,
+    "phaseBExecutionAttempts": 1,
+    "noRerun": true,
+    "realDataExecuted": false,
+    "providerExecution": false
+  },
+  "authority": {
+    "sourceSha256": "81917843c7f44ce2b094ac63873c2c7a4cf802040792c455ba3ca406891c3d22",
+    "populationSpecSha256": "81248026f57cffb0c357a4e29e0cce4d3139adc1521eda89e72754783095ed44",
+    "substrateFingerprint": "3db9f039c12b0b3d51a9d64361909403baf4224c92c3ff237f7e9d49aabedcbb",
+    "retrievalSha256": "e0ae5d74daf894db64380a2e04b0043e83bb756f2dba3109f5b01e6b1d5b67b0",
+    "structuralSha256": "96fba8363df8b3d59caf6d7dc9ac9ad88007d15432bec4b647b83484a25555db",
+    "genericQuerySha256": "d8ecde88cb241010ffd3464852ff814bf745a4dfcd0ce3743966b8af078ed0a3"
+  },
+  "metadataRepair": {
+    "repairClass": "SERIALIZATION_ONLY",
+    "repairReason": "pre-substrate generic query keys existed in frozen Phase A but were omitted from evaluated-result serialization.",
+    "preRepairResultSha256": "013c361f8148d6c057cc62191977332513faafcf0a2d20c66b2a6e4dcdd90e05",
+    "preRepairManifestSha256": "cf9b4cd3a2b0f5250a33feec2a5fd7541b18f453077a27b8f193148c6555237b",
+    "appliedAfterExecution": true,
+    "scientificResultChanged": false,
+    "scientificReexecution": false,
+    "resultSha256BeforeRepair": "013c361f8148d6c057cc62191977332513faafcf0a2d20c66b2a6e4dcdd90e05"
+  }
+}
