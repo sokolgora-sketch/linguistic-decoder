@@ -76,6 +76,21 @@ describe("bounded Albanian lexical substrate v0.1", () => {
     });
   });
 
+  it("canonicalizes lowercase catalog keys without changing the attested form", () => {
+    const result = queryGenericFunctionalWitnessesV1(
+      query("REND"),
+      [createAlbanianLexicalSubstrateWitnessAdapterV0_1()],
+    );
+
+    expect(result.status).toBe("MATCHES_FOUND");
+    expect(result.matches).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        queryForm: "REND",
+        sourceForm: "rend",
+      }),
+    ]));
+  });
+
   it("preserves an explicit Null for an unsupported substrate key", () => {
     const result = queryGenericFunctionalWitnessesV1(
       query("ZZ"),

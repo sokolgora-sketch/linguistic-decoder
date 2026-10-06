@@ -41,6 +41,10 @@ function nonEmptyTextV0_1(value: string | null | undefined): string | null {
   return text || null;
 }
 
+function canonicalQueryKeyV0_1(value: string): string {
+  return value.normalize("NFC").trim().toLocaleUpperCase("en-US");
+}
+
 function projectResearchRowV0_1(
   row: MultiSourceFunctionalResearchEvidenceRowV0_1,
 ): GenericFunctionalWitnessSourceRecordV1 | null {
@@ -58,7 +62,7 @@ function projectResearchRowV0_1(
   if (!citation) return null;
 
   return {
-    queryForm: row.embryo,
+    queryForm: canonicalQueryKeyV0_1(row.embryo),
     sourceId: row.researchEvidenceId,
     evidenceFamily: row.evidenceFamily,
     language: row.language,
@@ -115,7 +119,7 @@ function projectReviewedRowV0_1(
   }
 
   return {
-    queryForm: row.embryo,
+    queryForm: canonicalQueryKeyV0_1(row.embryo),
     sourceId: row.sourceId,
     evidenceFamily: "lexical_dictionary",
     language: row.candidateLanguage,
@@ -186,7 +190,9 @@ export function createAlbanianLexicalSubstrateWitnessAdapterV0_1():
       GenericFunctionalWitnessSourceAdapterResultV1 {
       return {
         ok: true,
-        records: records.filter((record) => record.queryForm === input.embryo),
+        records: records.filter(
+          (record) => record.queryForm === canonicalQueryKeyV0_1(input.embryo),
+        ),
       };
     },
   });
