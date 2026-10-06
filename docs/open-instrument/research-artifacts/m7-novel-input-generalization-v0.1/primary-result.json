@@ -3,7 +3,7 @@
   "status": "PRESERVED_BEFORE_COVERAGE_ASSESSMENT",
   "procedureId": "open-instrument-m7-novel-input-generalization-v0.1",
   "primarySelectionPath": "docs/open-instrument/research-artifacts/m7-novel-input-generalization-v0.1/primary-selection.json",
-  "primarySelectionSha256": "ca9b439096831129434d119980d5f0fd018a3d7f352c0cb8581051effc91511f",
+  "primarySelectionSha256": "c402b51ab936e29967dc5f53b2b43da541e1399513a5eb70890677ea52b53d23",
   "input": {
     "word": "a",
     "language": "en",

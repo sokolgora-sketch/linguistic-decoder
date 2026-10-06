@@ -16,7 +16,7 @@
   },
   "coverageProcedure": {
     "path": "docs/open-instrument/research-artifacts/m7-novel-input-generalization-v0.1/coverage-procedure.json",
-    "sha256": "2b9789b9ad7d5b6f381fd1cc4193d3395e34c0b1975f1ed45f757da06e2d7061",
+    "sha256": "dab99e763eaea51f224b89c50f408df006d963e1fb1117eedae67fc541ddf1c2",
     "sampleSize": 512,
     "stoppingRule": "none",
     "adaptiveSelection": false,
@@ -24,7 +24,7 @@
   },
   "primaryResult": {
     "path": "docs/open-instrument/research-artifacts/m7-novel-input-generalization-v0.1/primary-result.json",
-    "sha256": "ebe9ebbcd98c938d6361f2c4b0c66d0787a2ca915f0d78285c468a4939cc0289",
+    "sha256": "cacbb9dbc9b12a785063b4506f5ad05a52a0e402b7cb99a35e51ea5819f8b841",
     "input": "a",
     "classification": "VALID_GENERIC_NULL",
     "preservedWithoutRerun": true
