@@ -41,6 +41,21 @@ function nonEmptyTextV0_1(value: string | null | undefined): string | null {
   return text || null;
 }
 
+function citationAttestationIsUsableV0_1(
+  citation: MultiSourceFunctionalResearchEvidenceRowV0_1["citations"][number],
+): boolean {
+  return Boolean(
+    nonEmptyTextV0_1(citation.citationId) &&
+      nonEmptyTextV0_1(citation.sourceTitle) &&
+      nonEmptyTextV0_1(citation.sourcePublisherOrHost) &&
+      nonEmptyTextV0_1(citation.sourceDateOrVersion) &&
+      nonEmptyTextV0_1(citation.sourceUrlOrArchiveRef) &&
+      nonEmptyTextV0_1(citation.entryLocator) &&
+      nonEmptyTextV0_1(citation.attestedForm) &&
+      nonEmptyTextV0_1(citation.attestedGloss),
+  );
+}
+
 function canonicalQueryKeyV0_1(value: string): string {
   return value.normalize("NFC").trim().toLocaleUpperCase("en-US");
 }
@@ -58,8 +73,21 @@ function projectResearchRowV0_1(
   const citations = [...row.citations].sort((left, right) =>
     compareTextV0_1(left.citationId, right.citationId),
   );
+  // The registry row is the source unit. Citation glosses may be faithful
+  // paraphrases, so wording differences alone do not authorize dropping the
+  // row or inventing a semantic conflict adjudicator. Select the stable first
+  // citation for the single-record value and preserve every citation ref.
   const citation = citations[0];
-  if (!citation) return null;
+  if (
+    !citation ||
+    !citations.every(citationAttestationIsUsableV0_1)
+  ) {
+    return null;
+  }
+
+  const sourceForm = nonEmptyTextV0_1(citation.attestedForm);
+  const gloss = nonEmptyTextV0_1(citation.attestedGloss);
+  if (!sourceForm || !gloss) return null;
 
   return {
     queryForm: canonicalQueryKeyV0_1(row.embryo),
@@ -67,9 +95,9 @@ function projectResearchRowV0_1(
     evidenceFamily: row.evidenceFamily,
     language: row.language,
     languageVariety: null,
-    sourceForm: row.form,
+    sourceForm,
     sourceFormNormalization: "EXACT_PRESERVED",
-    gloss: row.gloss,
+    gloss,
     citationRefs: citations.map((candidate) => candidate.citationId),
     embryoRelation: row.embryoRelation,
     relationOperationIds: [...row.relationOperationIds].sort(compareTextV0_1),
