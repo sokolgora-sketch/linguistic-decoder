@@ -10,6 +10,12 @@ import {
 import {
   createAlbanianLexicalSubstrateWitnessAdapterV0_1,
 } from "@/shared/openInstrument/albanianLexicalSubstrate.v0_1";
+import {
+  discoverCanonicalOperatorCandidatesV0_1,
+} from "@/shared/canonicalOperatorDiscovery.v0_1";
+import {
+  getReviewedExternalLexiconProductionSourceRowsV0_1,
+} from "@/shared/reviewedExternalLexiconSourceRowRegistry.v0_1";
 import type { HeartInstrumentV1 } from "@/v1/heartInstrument.v1";
 
 export const MOTIVATION_ENGINE_DISCOVERY_SCHEMA_V0_1 =
@@ -26,6 +32,17 @@ export type MotivationRepresentationCompatibilityV0_1 =
   | "CROSS_REPRESENTATION"
   | "NOT_COMPARABLE_ACROSS_REPRESENTATIONS"
   | "UNKNOWN";
+
+export type MotivationFunctionalInterpretationStatusV0_1 =
+  | "REVIEWED_HYPOTHESIS"
+  | "GENERATED_BOUNDED_HYPOTHESIS"
+  | "NOT_APPLICABLE_SELF_MATCH"
+  | "UNKNOWN_OR_NULL";
+
+export type MotivationFunctionalInterpretationEvidenceKindV0_1 =
+  | "reviewed_functional_evidence"
+  | "lexical_gloss_plus_structural_match"
+  | "none";
 
 export type MotivationStructuralComparisonV0_1 = Readonly<{
   matchClassification:
@@ -92,8 +109,12 @@ export type MotivationEngineDiscoveryCandidateV0_1 = Readonly<{
   }>;
   structuralComparison: MotivationStructuralComparisonV0_1;
   functionalInterpretation: Readonly<{
-    truthClassification: "hypothesis";
+    status: MotivationFunctionalInterpretationStatusV0_1;
+    truthClassification: "hypothesis" | "unknown_or_null";
     statement: string | null;
+    evidenceKind: MotivationFunctionalInterpretationEvidenceKindV0_1;
+    evidenceRefs: readonly string[];
+    reason: string | null;
   }>;
   candidateStatus: "experimental";
   historicalRelation: "not_claimed";
@@ -280,6 +301,30 @@ function normalizedLanguageV0_1(value: string): string {
   return normalized;
 }
 
+function buildStructuralReasonV0_1(
+  comparison: Omit<MotivationStructuralComparisonV0_1, "matchReason">,
+  selfMatch: boolean,
+): string {
+  if (selfMatch) {
+    return "Input lexical form matches a source-attested lexical record; this is lexical entry confirmation, not a cross-form structural motivation claim.";
+  }
+
+  const roots = comparison.inputConsonantalStructure.protoRoots;
+  const carriers = comparison.inputConsonantalStructure.carrierForms;
+  const operations = comparison.authorizedOperationIds;
+  const context = roots.length > 0
+    ? `${roots.join(" + ")} root context`
+    : "the available structural context";
+  const carrierText = carriers.length > 0
+    ? `; carrier form${carriers.length === 1 ? "" : "s"}: ${carriers.join(" + ")}`
+    : "";
+  const operationText = operations.length > 0
+    ? `; authorized operation${operations.length === 1 ? "" : "s"}: ${operations.join(", ")}`
+    : "";
+
+  return `Structural analysis produced the ${comparison.matchedQuery} embryo within the ${context}${carrierText}${operationText}.`;
+}
+
 function buildStructuralComparisonV0_1(
   word: string,
   inputLanguage: string,
@@ -307,7 +352,7 @@ function buildStructuralComparisonV0_1(
       : []),
   ];
 
-  return {
+  const comparison: MotivationStructuralComparisonV0_1 = {
     matchClassification: selfMatch
       ? "EXACT_LEXICAL_SELF_MATCH"
       : "STRUCTURAL_MOTIVATION_CANDIDATE",
@@ -347,9 +392,87 @@ function buildStructuralComparisonV0_1(
     ])].sort(compareText),
     reasonCodes: [...matchContext.reasonCodes],
     unresolvedFields,
-    matchReason: selfMatch
-      ? "Input lexical form matches a source-attested lexical record; this is lexical entry confirmation, not a cross-form structural motivation claim."
-      : `Input structural analysis produced the ${witness.queryForm} embryo; the Albanian lexical substrate contains the source-attested ${witness.sourceForm} record.`,
+    matchReason: "",
+  };
+
+  return {
+    ...comparison,
+    matchReason: buildStructuralReasonV0_1(comparison, selfMatch),
+  };
+}
+
+function reviewedFunctionalEvidenceV0_1(
+  word: string,
+  witness: GenericFunctionalWitnessV1,
+) {
+  const targetAuthorized = discoverCanonicalOperatorCandidatesV0_1(word).some(
+    (candidate) =>
+      candidate.operatorId === witness.queryForm.trim().toUpperCase() &&
+      candidate.sourceId === witness.sourceId &&
+      candidate.reviewedEvidenceEligible,
+  );
+
+  if (!targetAuthorized) return null;
+
+  return getReviewedExternalLexiconProductionSourceRowsV0_1().find(
+    (row) =>
+      row.sourceId === witness.sourceId &&
+      row.embryo.trim().toUpperCase() === witness.queryForm.trim().toUpperCase() &&
+      Boolean(row.semanticBridge),
+  ) ?? null;
+}
+
+function buildFunctionalInterpretationV0_1(
+  word: string,
+  witness: GenericFunctionalWitnessV1,
+  comparison: MotivationStructuralComparisonV0_1,
+) {
+  if (comparison.matchClassification === "EXACT_LEXICAL_SELF_MATCH") {
+    return {
+      status: "NOT_APPLICABLE_SELF_MATCH" as const,
+      truthClassification: "unknown_or_null" as const,
+      statement: null,
+      evidenceKind: "none" as const,
+      evidenceRefs: [],
+      reason: "LEXICAL_SELF_MATCH_NOT_FUNCTIONAL_MOTIVATION",
+    };
+  }
+
+  const reviewed = reviewedFunctionalEvidenceV0_1(word, witness);
+  if (reviewed?.semanticBridge) {
+    return {
+      status: "REVIEWED_HYPOTHESIS" as const,
+      truthClassification: "hypothesis" as const,
+      statement: reviewed.semanticBridge,
+      evidenceKind: "reviewed_functional_evidence" as const,
+      evidenceRefs: reviewed.externalCitations
+        .filter((citation) => citation.citationStatus === "reviewed_accepted")
+        .map((citation) => citation.citationId)
+        .sort(compareText),
+      reason: null,
+    };
+  }
+
+  const sourceForm = witness.sourceForm.trim();
+  const gloss = witness.gloss.trim();
+  if (sourceForm && gloss) {
+    return {
+      status: "GENERATED_BOUNDED_HYPOTHESIS" as const,
+      truthClassification: "hypothesis" as const,
+      statement: `Because structural analysis produced candidate embryo ${witness.queryForm} and the source attests ${sourceForm} as "${gloss}", that lexical function is presented as a ZË-RO functional motivation hypothesis for the input.`,
+      evidenceKind: "lexical_gloss_plus_structural_match" as const,
+      evidenceRefs: [...witness.citationRefs].sort(compareText),
+      reason: null,
+    };
+  }
+
+  return {
+    status: "UNKNOWN_OR_NULL" as const,
+    truthClassification: "unknown_or_null" as const,
+    statement: null,
+    evidenceKind: "none" as const,
+    evidenceRefs: [],
+    reason: "INSUFFICIENT_FUNCTIONAL_EVIDENCE",
   };
 }
 
@@ -363,6 +486,18 @@ function buildCandidate(
   matchContext: CandidateMatchContextV0_1,
   witness: GenericFunctionalWitnessV1,
 ): MotivationEngineDiscoveryCandidateV0_1 {
+  const structuralComparison = buildStructuralComparisonV0_1(
+    word,
+    inputLanguage,
+    inputRepresentationKind,
+    inputVoicePath,
+    inputGamma,
+    inputZeroConsonantalStructuralComposition,
+    matchContext,
+    extractSevenVowelsFromString(witness.sourceForm),
+    witness,
+  );
+
   return {
     candidateId: `motivation-discovery:${word}:${matchContext.minRootId}:${witness.sourceId}`,
     candidateLanguage: witness.language,
@@ -384,23 +519,12 @@ function buildCandidate(
       carrierForms: [...matchContext.carrierForms],
       operationIds: [...matchContext.operationIds],
     },
-    structuralComparison: buildStructuralComparisonV0_1(
+    structuralComparison,
+    functionalInterpretation: buildFunctionalInterpretationV0_1(
       word,
-      inputLanguage,
-      inputRepresentationKind,
-      inputVoicePath,
-      inputGamma,
-      inputZeroConsonantalStructuralComposition,
-      matchContext,
-      extractSevenVowelsFromString(witness.sourceForm),
       witness,
+      structuralComparison,
     ),
-    functionalInterpretation: {
-      truthClassification: "hypothesis",
-      // Generic witness discovery does not evaluate a target-bound semantic
-      // correspondence. Keep target-specific bridges out of this layer.
-      statement: null,
-    },
     candidateStatus: "experimental",
     historicalRelation: "not_claimed",
     userDecisionPosture: "user_decides",

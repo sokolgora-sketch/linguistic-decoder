@@ -82,8 +82,12 @@ function model(overrides: Partial<MotivationDiscoveryV0_1VM> = {}): MotivationDi
         matchReason: "Input structural analysis produced the DI embryo; the Albanian lexical substrate contains the source-attested di record.",
       },
       functionalInterpretation: {
+        status: "REVIEWED_HYPOTHESIS",
         truthClassification: "hypothesis",
         statement: "knowledge can motivate study and learning functionally",
+        evidenceKind: "reviewed_functional_evidence",
+        evidenceRefs: ["reviewed.external.di.knowledge.candidate.citation.v0_1"],
+        reason: null,
       },
       candidateStatus: "experimental",
       historicalRelation: "not_claimed",
@@ -110,13 +114,15 @@ describe("Motivation Discovery Lab presentation v0.1", () => {
     expect(screen.getByText("SOURCE FACT")).toBeInTheDocument();
     expect(screen.getByText(/DISCOVERY_ORTHOGRAPHIC_PROFILE/)).toBeInTheDocument();
     expect(screen.getByText(/lexical source: https:\/\/example\.invalid\/di/)).toBeInTheDocument();
-    expect(screen.getByText("Generic structural match")).toBeInTheDocument();
+    expect(screen.getByText("Lexical source fact")).toBeInTheDocument();
     expect(screen.getByTestId("motivation-structural-comparison")).toBeInTheDocument();
+    expect(screen.getByText("STRUCTURAL MOTIVATION")).toBeInTheDocument();
     expect(screen.getByText(/structural motivation candidate/i)).toBeInTheDocument();
     expect(screen.getByText("CROSS_REPRESENTATION")).toBeInTheDocument();
     expect(screen.getByText("NOT_COMPARABLE_ACROSS_REPRESENTATIONS")).toBeInTheDocument();
     expect(screen.getByText(/no target-word mapping/)).toBeInTheDocument();
-    expect(screen.getByText("ZË-RO INTERPRETATION / HYPOTHESIS")).toBeInTheDocument();
+    expect(screen.getByText("FUNCTIONAL MOTIVATION")).toBeInTheDocument();
+    expect(screen.getByText("REVIEWED_HYPOTHESIS")).toBeInTheDocument();
     expect(screen.getByText(/reviewed\.external\.di\.knowledge\.candidate\.v0_1 · fact/)).toBeInTheDocument();
     expect(screen.getByText("user decides")).toBeInTheDocument();
     expect(screen.getByText(/No single winner/)).toBeInTheDocument();
@@ -176,6 +182,14 @@ describe("Motivation Discovery Lab presentation v0.1", () => {
           inputVoicePath: ["E", "Ë"],
           voiceRelationship: "NOT_COMPARABLE_ACROSS_REPRESENTATIONS",
           matchReason: "Input lexical form matches a source-attested lexical record; this is lexical entry confirmation, not a cross-form structural motivation claim.",
+        },
+        functionalInterpretation: {
+          status: "NOT_APPLICABLE_SELF_MATCH",
+          truthClassification: "unknown_or_null",
+          statement: null,
+          evidenceKind: "none",
+          evidenceRefs: [],
+          reason: "LEXICAL_SELF_MATCH_NOT_FUNCTIONAL_MOTIVATION",
         },
       }],
     });

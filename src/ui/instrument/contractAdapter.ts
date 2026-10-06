@@ -998,8 +998,18 @@ function parseMotivationDiscoveryV0_1(
       !isStringArray(comparison.reasonCodes) ||
       !isStringArray(comparison.unresolvedFields) ||
       typeof comparison.matchReason !== "string" ||
-      interpretation.truthClassification !== "hypothesis" ||
+      (interpretation.status !== "REVIEWED_HYPOTHESIS" &&
+        interpretation.status !== "GENERATED_BOUNDED_HYPOTHESIS" &&
+        interpretation.status !== "NOT_APPLICABLE_SELF_MATCH" &&
+        interpretation.status !== "UNKNOWN_OR_NULL") ||
+      (interpretation.truthClassification !== "hypothesis" &&
+        interpretation.truthClassification !== "unknown_or_null") ||
       (interpretation.statement !== null && typeof interpretation.statement !== "string") ||
+      (interpretation.evidenceKind !== "reviewed_functional_evidence" &&
+        interpretation.evidenceKind !== "lexical_gloss_plus_structural_match" &&
+        interpretation.evidenceKind !== "none") ||
+      !isStringArray(interpretation.evidenceRefs) ||
+      (interpretation.reason !== null && typeof interpretation.reason !== "string") ||
       candidate.candidateStatus !== "experimental" ||
       candidate.historicalRelation !== "not_claimed" ||
       candidate.userDecisionPosture !== "user_decides" ||
