@@ -67,7 +67,7 @@
     },
     "genericQueryIdentity": {
       "path": "src/shared/openInstrument/genericFunctionalWitnessDiscovery.v1.ts",
-      "sha256": "d8ecde88cb241010ffd3464852ff814bf745a4dfcd0ce3746b8af078ed0a3"
+      "sha256": "d8ecde88cb241010ffd3464852ff814bf745a4dfcd0ce3743966b8af078ed0a3"
     }
   },
   "forbiddenSelectionInputs": [

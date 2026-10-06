@@ -21,7 +21,7 @@
   ],
   "frozenBindings": {
     "selectionProcedurePath": "docs/open-instrument/research-artifacts/m7-novel-input-generalization-v0.1/selection-procedure.json",
-    "selectionProcedureSha256": "9c6264dba0742150d3e9143a52f4ba85d74fe41c3261c0a4ac1b5eb31bbf4e95",
+    "selectionProcedureSha256": "de0363366f854230b178011c36a52818add15664f57a7241105bdbc6fb9b8eb7",
     "primarySelectionPath": "docs/open-instrument/research-artifacts/m7-novel-input-generalization-v0.1/primary-selection.json",
     "primarySelectionSha256": "ca9b439096831129434d119980d5f0fd018a3d7f352c0cb8581051effc91511f",
     "engineBaseHead": "52ff041d5b0d03d9c787c6d5d759438de273cea4",

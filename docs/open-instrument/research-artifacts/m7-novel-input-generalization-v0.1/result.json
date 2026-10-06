@@ -11,12 +11,12 @@
   },
   "selectionProcedure": {
     "path": "docs/open-instrument/research-artifacts/m7-novel-input-generalization-v0.1/selection-procedure.json",
-    "sha256": "9c6264dba0742150d3e9143a52f4ba85d74fe41c3261c0a4ac1b5eb31bbf4e95",
+    "sha256": "de0363366f854230b178011c36a52818add15664f57a7241105bdbc6fb9b8eb7",
     "selectionUsesCandidateBehavior": false
   },
   "coverageProcedure": {
     "path": "docs/open-instrument/research-artifacts/m7-novel-input-generalization-v0.1/coverage-procedure.json",
-    "sha256": "5dd8a73904ab44646cbb2b6a247d3fd333bc0a5457b3a5bdfe0ed6583a06a3b4",
+    "sha256": "2b9789b9ad7d5b6f381fd1cc4193d3395e34c0b1975f1ed45f757da06e2d7061",
     "sampleSize": 512,
     "stoppingRule": "none",
     "adaptiveSelection": false,

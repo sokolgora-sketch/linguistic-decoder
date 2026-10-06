@@ -8,6 +8,9 @@ import {
   buildMotivationEngineDiscoveryV0_1,
 } from "@/shared/openInstrument/motivationEngineDiscovery.v0_1";
 import {
+  getAlbanianLexicalSubstrateRecordsV0_1,
+} from "@/shared/openInstrument/albanianLexicalSubstrate.v0_1";
+import {
   getOrderedEligibleNovelInputsV0_1,
   selectPrimaryNovelInputV0_1,
 } from "./openInstrumentM7NovelInputGeneralization.v0_1";
@@ -36,6 +39,18 @@ const POPULATION_SPEC_PATH = join(
 const SOURCE_PATH = join(
   REPOSITORY_ROOT,
   "src/data/openInstrument/pronunciation/cmudict.dict",
+);
+const RETRIEVAL_PATH = join(
+  REPOSITORY_ROOT,
+  "src/shared/openInstrument/motivationEngineDiscovery.v0_1.ts",
+);
+const STRUCTURAL_PATH = join(
+  REPOSITORY_ROOT,
+  "src/shared/structuralHypothesisDiscovery.v0_1.ts",
+);
+const GENERIC_QUERY_PATH = join(
+  REPOSITORY_ROOT,
+  "src/shared/openInstrument/genericFunctionalWitnessDiscovery.v1.ts",
 );
 const RESULT_PATH = join(
   REPOSITORY_ROOT,
@@ -71,6 +86,10 @@ function readJson<T>(path: string): T {
 
 function sha256File(path: string): string {
   return createHash("sha256").update(readFileSync(path)).digest("hex");
+}
+
+function sha256Text(value: string): string {
+  return createHash("sha256").update(value, "utf8").digest("hex");
 }
 
 function normalizeWord(value: string): string {
@@ -111,6 +130,60 @@ function validateFrozenInputs(): {
   const procedure = readJson<Record<string, unknown>>(PROCEDURE_PATH);
   const coverage = readJson<CoverageProcedureV0_1>(COVERAGE_PATH);
   const primary = readJson<PrimaryResultV0_1>(PRIMARY_RESULT_PATH);
+  const frozenContext = (procedure as {
+    frozenContext?: {
+      engineHead?: unknown;
+      substrateVersion?: unknown;
+      substrateRecordCount?: unknown;
+      substrateFingerprint?: unknown;
+      retrievalIdentity?: { path?: unknown; sha256?: unknown };
+      structuralIdentity?: { path?: unknown; sha256?: unknown };
+      genericQueryIdentity?: { path?: unknown; sha256?: unknown };
+    };
+  }).frozenContext;
+  if (!frozenContext) throw new Error("M7_FROZEN_CONTEXT_MISSING");
+  if (frozenContext.engineHead !== "52ff041d5b0d03d9c787c6d5d759438de273cea4") {
+    throw new Error("M7_ENGINE_BASE_HEAD_MISMATCH");
+  }
+  const sourceIdentities = [
+    {
+      label: "retrieval",
+      path: RETRIEVAL_PATH,
+      declaredPath: frozenContext.retrievalIdentity?.path,
+      declaredSha256: frozenContext.retrievalIdentity?.sha256,
+    },
+    {
+      label: "structural",
+      path: STRUCTURAL_PATH,
+      declaredPath: frozenContext.structuralIdentity?.path,
+      declaredSha256: frozenContext.structuralIdentity?.sha256,
+    },
+    {
+      label: "generic-query",
+      path: GENERIC_QUERY_PATH,
+      declaredPath: frozenContext.genericQueryIdentity?.path,
+      declaredSha256: frozenContext.genericQueryIdentity?.sha256,
+    },
+  ] as const;
+  for (const identity of sourceIdentities) {
+    const relativePath = identity.path.slice(`${REPOSITORY_ROOT}/`.length);
+    if (identity.declaredPath !== relativePath) {
+      throw new Error(`M7_${identity.label.toUpperCase()}_PATH_MISMATCH`);
+    }
+    if (identity.declaredSha256 !== sha256File(identity.path)) {
+      throw new Error(`M7_${identity.label.toUpperCase()}_SHA256_MISMATCH`);
+    }
+  }
+  const substrate = getAlbanianLexicalSubstrateRecordsV0_1();
+  if (frozenContext.substrateVersion !== "albanian-generic-lexical-substrate.v0_1") {
+    throw new Error("M7_SUBSTRATE_VERSION_MISMATCH");
+  }
+  if (frozenContext.substrateRecordCount !== substrate.length) {
+    throw new Error("M7_SUBSTRATE_RECORD_COUNT_MISMATCH");
+  }
+  if (frozenContext.substrateFingerprint !== sha256Text(JSON.stringify(substrate))) {
+    throw new Error("M7_SUBSTRATE_FINGERPRINT_MISMATCH");
+  }
   const selection = selectPrimaryNovelInputV0_1();
   const orderedInputs = getOrderedEligibleNovelInputsV0_1();
 

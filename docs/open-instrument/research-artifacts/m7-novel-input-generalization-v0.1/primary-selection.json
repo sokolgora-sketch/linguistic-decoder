@@ -3,7 +3,7 @@
   "status": "FROZEN_BEFORE_RESULT_INSPECTION",
   "procedureId": "open-instrument-m7-novel-input-generalization-v0.1",
   "procedurePath": "docs/open-instrument/research-artifacts/m7-novel-input-generalization-v0.1/selection-procedure.json",
-  "procedureSha256": "9c6264dba0742150d3e9143a52f4ba85d74fe41c3261c0a4ac1b5eb31bbf4e95",
+  "procedureSha256": "de0363366f854230b178011c36a52818add15664f57a7241105bdbc6fb9b8eb7",
   "selectionExecution": {
     "engineBaseHead": "52ff041d5b0d03d9c787c6d5d759438de273cea4",
     "procedureFreezeCommit": "01346928",
