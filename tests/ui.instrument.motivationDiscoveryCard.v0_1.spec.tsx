@@ -112,6 +112,7 @@ describe("Motivation Discovery Lab presentation v0.1", () => {
 
     expect(screen.getByTestId("motivation-discovery-card")).toBeInTheDocument();
     expect(screen.getByText("SOURCE FACT")).toBeInTheDocument();
+    expect(screen.getByText(/source: production_spoken · profile: open-instrument\.cmudict-arpabet-en-us\.v0_1/)).toBeInTheDocument();
     expect(screen.getByText(/orthographic\/profile-derived Discovery representation/)).toBeInTheDocument();
     expect(screen.getByText(/lexical source: https:\/\/example\.invalid\/di/)).toBeInTheDocument();
     expect(screen.getByText("Source fact")).toBeInTheDocument();

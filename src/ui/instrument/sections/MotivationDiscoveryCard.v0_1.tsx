@@ -248,7 +248,9 @@ export function MotivationDiscoveryCardV0_1({
         <div className="rounded-lg border border-[#303843] bg-[#10161c] p-3 text-xs leading-5 text-[#c5ced8] sm:min-w-[12rem]">
           <div className="font-semibold uppercase tracking-[0.12em] text-[#8ea4ba]">VOICE PATH</div>
           <div className="mt-1 font-mono text-base text-[#f5f7fb]">{pathText(value.derivedStructure.voicePath)}</div>
-          <div className="mt-1 text-[10px] text-[#7f8b99]">derived structure</div>
+          <div className="mt-1 break-words text-[10px] text-[#7f8b99]">
+            source: {value.derivedStructure.voicePathSource} · profile: {value.inputProfile}
+          </div>
         </div>
       </div>
 
