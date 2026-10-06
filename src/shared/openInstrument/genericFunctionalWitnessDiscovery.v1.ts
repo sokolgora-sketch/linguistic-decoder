@@ -67,6 +67,12 @@ export type GenericFunctionalWitnessSourceAdapterResultV1 =
 
 export type GenericFunctionalWitnessSourceAdapterV1 = Readonly<{
   adapterId: string;
+  /**
+   * A source adapter may explicitly keep candidate Voice extraction Null when
+   * its source records contain lexical facts but no authorized pronunciation.
+   * Omission preserves the legacy source-form extraction behavior.
+   */
+  candidateVoicePathPolicy?: "SOURCE_FORM_EXTRACTED" | "NULL_UNAUTHORIZED";
   query: (
     input: GenericFunctionalWitnessQueryV1,
   ) => GenericFunctionalWitnessSourceAdapterResultV1;
@@ -89,6 +95,7 @@ export type GenericFunctionalWitnessV1 = Readonly<{
   sourceStatus: MultiSourceFunctionalResearchSourceStatusV0_1;
   sourceAuthorityStatus?: "reviewed_accepted";
   sourceProvenance?: GenericFunctionalWitnessSourceProvenanceV1;
+  candidateVoicePathPolicy?: "SOURCE_FORM_EXTRACTED" | "NULL_UNAUTHORIZED";
   sourceAttestation: "SOURCE_RECORD_ONLY";
   functionalCorrespondence: "NOT_EVALUATED";
   targetMeaning: "NOT_CLAIMED";
@@ -326,11 +333,11 @@ function encodeWitnessIdPartV1(value: string): string {
 }
 
 function buildWitnessV1(
-  adapterId: string,
+  adapter: GenericFunctionalWitnessSourceAdapterV1,
   record: GenericFunctionalWitnessSourceRecordV1,
 ): GenericFunctionalWitnessV1 {
   return {
-    witnessId: `generic-functional-witness:${encodeWitnessIdPartV1(adapterId)}:${encodeWitnessIdPartV1(record.sourceId)}`,
+    witnessId: `generic-functional-witness:${encodeWitnessIdPartV1(adapter.adapterId)}:${encodeWitnessIdPartV1(record.sourceId)}`,
     queryForm: record.queryForm,
     sourceId: record.sourceId,
     evidenceFamily: record.evidenceFamily,
@@ -355,6 +362,9 @@ function buildWitnessV1(
             ...record.sourceProvenance,
           },
         }
+      : {}),
+    ...(adapter.candidateVoicePathPolicy
+      ? { candidateVoicePathPolicy: adapter.candidateVoicePathPolicy }
       : {}),
     sourceAttestation: "SOURCE_RECORD_ONLY",
     functionalCorrespondence: "NOT_EVALUATED",
@@ -433,7 +443,7 @@ export function queryGenericFunctionalWitnessesV1(
       compareTextV1(left.sourceId, right.sourceId),
     );
     for (const record of records) {
-      const witness = buildWitnessV1(adapter.adapterId, record);
+      const witness = buildWitnessV1(adapter, record);
       if (seenWitnessIds.has(witness.witnessId)) continue;
       seenWitnessIds.add(witness.witnessId);
       matches.push(witness);

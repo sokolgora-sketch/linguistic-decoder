@@ -4,6 +4,12 @@ import { enginePayloadToAnalysisResult } from "@/shared/analysisAdapter";
 import {
   buildMotivationEngineDiscoveryV0_1,
 } from "@/shared/openInstrument/motivationEngineDiscovery.v0_1";
+import {
+  createAlbanianLexicalSubstrateWitnessAdapterV0_1,
+} from "@/shared/openInstrument/albanianLexicalSubstrate.v0_1";
+import {
+  createLatinLexicalSubstrateWitnessAdapterV0_1,
+} from "@/shared/openInstrument/latinLexicalSubstrate.v0_1";
 
 async function analysisFor(word: string, alphabet = "auto") {
   const payload = await runAnalysisDeterministic(word, {
@@ -215,5 +221,81 @@ describe("Motivation Engine Discovery first vertical v0.1", () => {
     expect(result.status).toBe("NO_MATCHES");
     expect(result.candidates).toEqual([]);
     expect(JSON.stringify(result)).not.toMatch(/study|zemër|candidate ===/i);
+  });
+
+  it("composes a pre-existing Latin source through the same generic seam", async () => {
+    const word = "bamoar";
+    const heart = buildHeartInstrumentV1(word);
+    const result = buildMotivationEngineDiscoveryV0_1({
+      word,
+      inputLanguage: "en",
+      inputProfile: heart.spokenPronunciation.sourceProfileId,
+      analysis: await analysisFor(word),
+      heart,
+      sourceAdapters: [
+        createAlbanianLexicalSubstrateWitnessAdapterV0_1(),
+        createLatinLexicalSubstrateWitnessAdapterV0_1(),
+      ],
+    });
+
+    const latin = result.candidates.find(
+      (candidate) => candidate.candidateLanguage === "Latin",
+    );
+    expect(result.status).toBe("MATCHES_FOUND");
+    expect(latin).toMatchObject({
+      candidateForm: "amo",
+      candidateGloss: "to like, to love",
+      candidateEmbryo: "AMO",
+      candidateVoicePath: [],
+      functionalInterpretation: {
+        status: "UNKNOWN_OR_NULL",
+        statement: null,
+        evidenceKind: "none",
+        reason: "INSUFFICIENT_FUNCTIONAL_EVIDENCE",
+      },
+      historicalRelation: "not_claimed",
+      userDecisionPosture: "user_decides",
+      noSingleWinner: true,
+    });
+    expect(latin?.sourceFact.sourceId).toBe("research.external.latin-amo-love.v0_1");
+    expect(latin?.sourceFact.evidenceRefs).toContain(
+      "research.external.lewis-short-amo-love.citation.v0_1",
+    );
+    expect(latin?.sourceFact.sourceUrlOrArchiveRef).toContain("atlas.perseus.tufts.edu");
+    expect(latin?.structuralComparison.candidateRepresentationKind).toBe(
+      "orthographic_profile_derived",
+    );
+    expect(latin?.structuralComparison.candidateVoicePath).toEqual([]);
+    expect(latin?.structuralComparison.candidateConsonantalStructure).toBeNull();
+    expect(latin?.structuralComparison.voiceRelationship).toBe("UNKNOWN");
+    expect(latin?.structuralComparison.matchReason).toContain("AMO");
+    expect(result.candidates.every((candidate) => candidate.noSingleWinner)).toBe(true);
+  });
+
+  it("keeps the Latin adapter source-bound and deterministic", () => {
+    const adapter = createLatinLexicalSubstrateWitnessAdapterV0_1();
+    const query = {
+      schemaVersion: "open-instrument.generic-functional-witness-discovery.v1" as const,
+      embryo: "AMO",
+      voicePath: ["A", "O"] as const,
+      queryNormalization: "EXACT_NFC" as const,
+    };
+    const first = adapter.query(query);
+    const second = adapter.query(query);
+
+    expect(adapter.adapterId).toBe("latin-generic-lexical-substrate.v0_1");
+    expect(first).toEqual(second);
+    expect(first).toMatchObject({
+      ok: true,
+      records: [
+        {
+          language: "Latin",
+          sourceForm: "amo",
+          gloss: "to like, to love",
+          sourceStatus: "research_candidate",
+        },
+      ],
+    });
+    expect(JSON.stringify(first)).not.toMatch(/targetWord|semanticBridge|historicalOriginClaim|winnerClaim/);
   });
 });

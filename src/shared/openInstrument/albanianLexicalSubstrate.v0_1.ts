@@ -214,6 +214,7 @@ export function createAlbanianLexicalSubstrateWitnessAdapterV0_1():
 
   return Object.freeze({
     adapterId: ALBANIAN_LEXICAL_SUBSTRATE_ADAPTER_ID_V0_1,
+    candidateVoicePathPolicy: "SOURCE_FORM_EXTRACTED" as const,
     query(input: GenericFunctionalWitnessQueryV1):
       GenericFunctionalWitnessSourceAdapterResultV1 {
       return {

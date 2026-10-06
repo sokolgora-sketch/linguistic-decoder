@@ -69,6 +69,12 @@ function representationBoundary(candidate: MotivationDiscoveryCandidateV0_1VM): 
     comparison.representationCompatibility !== "CROSS_REPRESENTATION" &&
     comparison.voiceRelationship !== "NOT_COMPARABLE_ACROSS_REPRESENTATIONS"
   ) {
+    if (
+      comparison.candidateRepresentationKind === "orthographic_profile_derived" &&
+      comparison.candidateVoicePath.length === 0
+    ) {
+      return "Candidate pronunciation and spoken Voice path are Null: this source supplies lexical form/gloss only. The displayed candidate representation is not spoken authority.";
+    }
     return null;
   }
   return `Voice comparison is limited: the input uses ${representationLabel(comparison.inputRepresentationKind)} while this candidate currently uses ${representationLabel(comparison.candidateRepresentationKind)}.`;

@@ -11,6 +11,12 @@ import {
   createAlbanianLexicalSubstrateWitnessAdapterV0_1,
 } from "@/shared/openInstrument/albanianLexicalSubstrate.v0_1";
 import {
+  createLatinLexicalSubstrateWitnessAdapterV0_1,
+} from "@/shared/openInstrument/latinLexicalSubstrate.v0_1";
+import type {
+  GenericFunctionalWitnessSourceAdapterV1,
+} from "@/shared/openInstrument/genericFunctionalWitnessDiscovery.v1";
+import {
   discoverCanonicalOperatorCandidatesV0_1,
 } from "@/shared/canonicalOperatorDiscovery.v0_1";
 import {
@@ -473,6 +479,10 @@ function buildCandidate(
   matchContext: CandidateMatchContextV0_1,
   witness: GenericFunctionalWitnessV1,
 ): MotivationEngineDiscoveryCandidateV0_1 {
+  const candidateVoicePath = witness.candidateVoicePathPolicy ===
+    "NULL_UNAUTHORIZED"
+    ? []
+    : [...extractSevenVowelsFromString(witness.sourceForm)];
   const structuralComparison = buildStructuralComparisonV0_1(
     word,
     inputLanguage,
@@ -481,7 +491,7 @@ function buildCandidate(
     inputGamma,
     inputZeroConsonantalStructuralComposition,
     matchContext,
-    extractSevenVowelsFromString(witness.sourceForm),
+    candidateVoicePath,
     witness,
   );
 
@@ -491,7 +501,7 @@ function buildCandidate(
     candidateForm: witness.sourceForm,
     candidateGloss: witness.gloss,
     candidateEmbryo: witness.queryForm,
-    candidateVoicePath: [...extractSevenVowelsFromString(witness.sourceForm)],
+    candidateVoicePath,
     sourceFact: {
       sourceId: witness.sourceId,
       sourceStatus: witness.sourceAuthorityStatus ?? witness.sourceStatus,
@@ -606,6 +616,7 @@ export function buildMotivationEngineDiscoveryV0_1(input: {
   inputProfile: string;
   analysis: AnalyzeWordResultV1;
   heart: HeartInstrumentV1;
+  sourceAdapters?: readonly GenericFunctionalWitnessSourceAdapterV1[];
 }): MotivationEngineDiscoveryV0_1 {
   const word = input.word.normalize("NFC").trim();
   const isAlbanianProfile = input.inputProfile === "albanian" || input.inputLanguage === "sq";
@@ -650,6 +661,10 @@ export function buildMotivationEngineDiscoveryV0_1(input: {
 
   const candidates: MotivationEngineDiscoveryCandidateV0_1[] = [];
   const seenCandidateKeys = new Set<string>();
+  const sourceAdapters = input.sourceAdapters ?? [
+    createAlbanianLexicalSubstrateWitnessAdapterV0_1(),
+    createLatinLexicalSubstrateWitnessAdapterV0_1(),
+  ];
   for (const context of matchContextsV0_1(word, structuralHypotheses)) {
     const discovery = queryGenericFunctionalWitnessesV1(
       {
@@ -658,7 +673,7 @@ export function buildMotivationEngineDiscoveryV0_1(input: {
         voicePath: context.voicePath,
         queryNormalization: "EXACT_NFC",
       },
-      [createAlbanianLexicalSubstrateWitnessAdapterV0_1()],
+      sourceAdapters,
     );
 
     for (const witness of discovery.matches) {
