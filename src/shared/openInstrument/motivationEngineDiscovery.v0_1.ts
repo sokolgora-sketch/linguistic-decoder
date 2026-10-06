@@ -8,8 +8,8 @@ import {
   type GenericFunctionalWitnessV1,
 } from "@/shared/openInstrument/genericFunctionalWitnessDiscovery.v1";
 import {
-  createReviewedExternalLexiconWitnessAdapterV0_1,
-} from "@/shared/openInstrument/reviewedExternalLexiconWitnessAdapter.v0_1";
+  createAlbanianLexicalSubstrateWitnessAdapterV0_1,
+} from "@/shared/openInstrument/albanianLexicalSubstrate.v0_1";
 import type { HeartInstrumentV1 } from "@/v1/heartInstrument.v1";
 
 export const MOTIVATION_ENGINE_DISCOVERY_SCHEMA_V0_1 =
@@ -204,18 +204,20 @@ function math7Summary(analysis: AnalyzeWordResultV1, heart: HeartInstrumentV1) {
   };
 }
 
+type CandidateMatchContextV0_1 = Readonly<{
+  minRootId: string;
+  protoRoots: readonly string[];
+  carrierForms: readonly string[];
+  operationIds: readonly string[];
+}>;
+
 function buildCandidate(
   word: string,
-  root: ReturnType<typeof stableUniqueRoots>[number],
+  matchContext: CandidateMatchContextV0_1,
   witness: GenericFunctionalWitnessV1,
 ): MotivationEngineDiscoveryCandidateV0_1 {
-  const operationIds = root.carriers
-    .filter((carrier) => root.protoRoots.includes(carrier.protoRootId))
-    .flatMap((carrier) => carrier.ops)
-    .sort(compareText);
-
   return {
-    candidateId: `motivation-discovery:${word}:${root.id}:${witness.sourceId}`,
+    candidateId: `motivation-discovery:${word}:${matchContext.minRootId}:${witness.sourceId}`,
     candidateLanguage: witness.language,
     candidateForm: witness.sourceForm,
     candidateGloss: witness.gloss,
@@ -230,10 +232,10 @@ function buildCandidate(
       entryLocator: witness.sourceProvenance?.entryLocator ?? null,
     },
     derivedStructure: {
-      minRootId: root.id,
-      protoRoots: [...root.protoRoots],
-      carrierForms: root.carriers.map((carrier) => carrier.carrierForm),
-      operationIds,
+      minRootId: matchContext.minRootId,
+      protoRoots: [...matchContext.protoRoots],
+      carrierForms: [...matchContext.carrierForms],
+      operationIds: [...matchContext.operationIds],
     },
     functionalInterpretation: {
       truthClassification: "hypothesis",
@@ -246,6 +248,75 @@ function buildCandidate(
     userDecisionPosture: "user_decides",
     noSingleWinner: true,
   };
+}
+
+function matchContextsV0_1(
+  word: string,
+  structuralHypotheses: readonly Readonly<{
+    hypothesisId: string;
+    embryo: string;
+    expansionChain: readonly string[];
+  }>[],
+) {
+  const contexts: Array<Readonly<{
+    queryForm: string;
+    voicePath: readonly string[];
+    matchContext: CandidateMatchContextV0_1;
+  }>> = [];
+  const seen = new Set<string>();
+
+  for (const root of stableUniqueRoots(word)) {
+    const operationIds = root.carriers
+      .filter((carrier) => root.protoRoots.includes(carrier.protoRootId))
+      .flatMap((carrier) => carrier.ops)
+      .sort(compareText);
+
+    for (const protoRoot of root.protoRoots) {
+      const voicePath = extractSevenVowelsFromString(protoRoot);
+      if (voicePath.length === 0) continue;
+      const key = `root:${root.id}:${protoRoot}`;
+      if (seen.has(key)) continue;
+      seen.add(key);
+      contexts.push({
+        queryForm: protoRoot,
+        voicePath,
+        matchContext: {
+          minRootId: root.id,
+          protoRoots: root.protoRoots,
+          carrierForms: root.carriers.map((carrier) => carrier.carrierForm),
+          operationIds,
+        },
+      });
+    }
+  }
+
+  for (const hypothesis of structuralHypotheses) {
+    for (const queryForm of hypothesis.expansionChain) {
+      const normalizedQueryForm = queryForm.normalize("NFC").trim();
+      const voicePath = extractSevenVowelsFromString(normalizedQueryForm);
+      if (!normalizedQueryForm || voicePath.length === 0) continue;
+      const key = `hypothesis:${hypothesis.hypothesisId}:${normalizedQueryForm}`;
+      if (seen.has(key)) continue;
+      seen.add(key);
+      contexts.push({
+        queryForm: normalizedQueryForm,
+        voicePath,
+        matchContext: {
+          minRootId: hypothesis.hypothesisId,
+          protoRoots: [hypothesis.embryo],
+          carrierForms: [],
+          operationIds: [],
+        },
+      });
+    }
+  }
+
+  return contexts.sort((left, right) =>
+    compareText(
+      `${left.queryForm}:${left.matchContext.minRootId}`,
+      `${right.queryForm}:${right.matchContext.minRootId}`,
+    ),
+  );
 }
 
 /**
@@ -289,27 +360,22 @@ export function buildMotivationEngineDiscoveryV0_1(input: {
 
   const candidates: MotivationEngineDiscoveryCandidateV0_1[] = [];
   const seenCandidateKeys = new Set<string>();
-  for (const root of stableUniqueRoots(word)) {
-    for (const protoRoot of root.protoRoots) {
-      const candidateVoicePath = extractSevenVowelsFromString(protoRoot);
-      if (candidateVoicePath.length === 0) continue;
+  for (const context of matchContextsV0_1(word, structuralHypotheses)) {
+    const discovery = queryGenericFunctionalWitnessesV1(
+      {
+        schemaVersion: GENERIC_FUNCTIONAL_WITNESS_DISCOVERY_SCHEMA_V1,
+        embryo: context.queryForm,
+        voicePath: context.voicePath,
+        queryNormalization: "EXACT_NFC",
+      },
+      [createAlbanianLexicalSubstrateWitnessAdapterV0_1()],
+    );
 
-      const discovery = queryGenericFunctionalWitnessesV1(
-        {
-          schemaVersion: GENERIC_FUNCTIONAL_WITNESS_DISCOVERY_SCHEMA_V1,
-          embryo: protoRoot,
-          voicePath: candidateVoicePath,
-          queryNormalization: "EXACT_NFC",
-        },
-        [createReviewedExternalLexiconWitnessAdapterV0_1()],
-      );
-
-      for (const witness of discovery.matches) {
-        const key = `${root.id}:${witness.sourceId}`;
-        if (seenCandidateKeys.has(key)) continue;
-        seenCandidateKeys.add(key);
-        candidates.push(buildCandidate(word, root, witness));
-      }
+    for (const witness of discovery.matches) {
+      const key = `${witness.queryForm}:${witness.sourceId}`;
+      if (seenCandidateKeys.has(key)) continue;
+      seenCandidateKeys.add(key);
+      candidates.push(buildCandidate(word, context.matchContext, witness));
     }
   }
 

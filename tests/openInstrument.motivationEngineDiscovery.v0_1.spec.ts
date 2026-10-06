@@ -87,6 +87,30 @@ describe("Motivation Engine Discovery first vertical v0.1", () => {
     expect(result.derivedStructure.structuralHypotheses[0]?.embryo).toBe("EM");
     expect(result.derivedStructure.gamma.status).toBe("profile_derived");
     expect(result.derivedStructure.zeroConsonantalStructuralComposition.status).toBe("NULL");
+    expect(result.status).toBe("MATCHES_FOUND");
+    expect(result.candidates.some((candidate) =>
+      candidate.candidateForm === "zemër" &&
+      candidate.sourceFact.sourceId === "research.external.albanian-zemer-heart.scale50.v0_1",
+    )).toBe(true);
+  });
+
+  it("retrieves an independently selected Albanian lexical record through the same generic substrate", async () => {
+    const word = "gjak";
+    const heart = buildHeartInstrumentV1(word);
+    const result = buildMotivationEngineDiscoveryV0_1({
+      word,
+      inputLanguage: "sq",
+      inputProfile: "albanian",
+      analysis: await analysisFor(word, "albanian"),
+      heart,
+    });
+
+    expect(result.candidates.some((candidate) =>
+      candidate.candidateForm === "gjak" &&
+      candidate.sourceFact.sourceId === "research.external.albanian-gjak-blood.scale50.v0_1",
+    )).toBe(true);
+    expect(result.candidates.every((candidate) => candidate.noSingleWinner)).toBe(true);
+    expect(result.userDecisionPosture).toBe("user_decides");
   });
 
   it("does not reuse an English Heart path for an explicitly Albanian input", async () => {

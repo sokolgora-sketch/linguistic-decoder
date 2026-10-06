@@ -79,9 +79,12 @@ describe("Motivation Discovery Lab presentation v0.1", () => {
 
     expect(screen.getByTestId("motivation-discovery-card")).toBeInTheDocument();
     expect(screen.getByText("SOURCE FACT")).toBeInTheDocument();
-    expect(screen.getByText("DERIVED STRUCTURE · Voice path")).toBeInTheDocument();
+    expect(screen.getByText(/DISCOVERY_ORTHOGRAPHIC_PROFILE/)).toBeInTheDocument();
+    expect(screen.getByText(/lexical source: https:\/\/example\.invalid\/di/)).toBeInTheDocument();
+    expect(screen.getByText("Generic structural match")).toBeInTheDocument();
+    expect(screen.getByText(/no target-word mapping/)).toBeInTheDocument();
     expect(screen.getByText("ZË-RO INTERPRETATION / HYPOTHESIS")).toBeInTheDocument();
-    expect(screen.getByText("reviewed.external.di.knowledge.candidate.v0_1 · fact")).toBeInTheDocument();
+    expect(screen.getByText(/reviewed\.external\.di\.knowledge\.candidate\.v0_1 · fact/)).toBeInTheDocument();
     expect(screen.getByText("user decides")).toBeInTheDocument();
     expect(screen.getByText(/No single winner/)).toBeInTheDocument();
   });
