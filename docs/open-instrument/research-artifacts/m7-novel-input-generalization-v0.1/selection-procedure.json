@@ -1,0 +1,85 @@
+{
+  "schemaVersion": "open-instrument.m7-novel-input-generalization-selection-procedure.v0.1",
+  "procedureId": "open-instrument-m7-novel-input-generalization-v0.1",
+  "status": "FROZEN_BEFORE_PRIMARY_SELECTION",
+  "purpose": "Select one previously unprepared supported English input without inspecting Albanian candidate behavior.",
+  "inputPopulation": {
+    "authority": "existing frozen bundled CMUdict eligible pronunciation population",
+    "sourceProfileId": "open-instrument.cmudict-arpabet-en-us.v0_1",
+    "sourceRevision": "74790861f652b15e4ac49015a90074ad62a27690",
+    "sourceNotation": "ARPABET",
+    "sourcePath": "src/data/openInstrument/pronunciation/cmudict.dict",
+    "sourceSha256": "81917843c7f44ce2b094ac63873c2c7a4cf802040792c455ba3ca406891c3d22",
+    "sourceBytes": 3618488,
+    "populationSpecPath": "docs/open-instrument/research-artifacts/zero-consonantal-structural-composition-v0.1-cmudict-validation-v0.1b/population-spec.json",
+    "populationSpecSha256": "81248026f57cffb0c357a4e29e0cce4d3139adc1521eda89e72754783095ed44",
+    "populationEligibility": "Use lexical words having at least one existing population-spec entry with eligibility=ELIGIBLE. The frozen population-spec eligibility is source-variant resolution through pronunciation-to-Voice plus non-null ZC composition; no Discovery candidate query is consulted."
+  },
+  "normalizationAndEligibility": {
+    "normalization": "NFC, trim, lower-case with the existing English CMUdict normalization convention.",
+    "usableInputRule": "Retain only normalized lexical words matching /^[a-z]+$/u.",
+    "deduplication": "One population item per normalized lexical word; source variants do not create duplicate selection items.",
+    "invalidEntryRule": "Exclude punctuation, apostrophes, digits, periods, and other non-ASCII-letter lexical forms before ordering.",
+    "selectionUsesCandidateBehavior": false
+  },
+  "preparedWordExclusion": {
+    "rule": "Exclude words materially used as M1-M6 analysis targets, fixtures, canonical examples, research targets, structural or functional proof inputs, friction-probe inputs, or known regression/acceptance inputs. Ordinary prose in unrelated documents is not itself an exclusion.",
+    "inspectionScope": [
+      "docs/open-instrument/motivation-engine-discovery-lab-v0.1-milestone.md",
+      "tests/openInstrument.motivationEngineDiscovery.v0_1.spec.ts",
+      "tests/ui.instrument.motivationDiscoveryCard.v0_1.spec.tsx",
+      "tests/ui.instrument.functionalCandidateComposition.v0_1.spec.tsx",
+      "tests/openInstrument.scale50.*.spec.ts",
+      "src/shared/openInstrument/functionalRoleComparativeEvaluationCorpus.v0_1.ts",
+      "tests/openInstrument.pronunciationToVoice.v0_1.spec.ts",
+      "tests/openInstrument.authoritativePrimaryPath.v0_1.spec.ts",
+      "DF_BRAIN/projects/zero/zero.md M1-M6 entries",
+      "DF_BRAIN/log/2026-10.md M1-M6 entries"
+    ],
+    "excludedWords": [
+      "abandon", "at", "banana", "balance", "blood", "bone", "break", "build", "candle", "carry", "cat", "change", "child", "cloud", "comic", "damage", "data", "death", "dij", "di", "drink", "eat", "ear", "father", "first", "foot", "freedom", "friend", "gjak", "hand", "head", "hear", "heart", "home", "justice", "king", "learning", "life", "make", "man", "mat", "mathematics", "memory", "mind", "mode", "mother", "mountain", "mouth", "name", "nose", "order", "peace", "project", "rain", "research", "river", "run", "sea", "second", "shter", "shterp", "sleep", "sky", "snow", "speak", "start", "sterile", "stone", "studies", "study", "support", "synthetic", "time", "tree", "truth", "unicode", "water", "walk", "war", "wind", "woman", "work", "xyz", "zemër"
+    ],
+    "exclusionCount": 84,
+    "sourceRecordFormsAlsoExcludedWhenASCIIAlphabetic": true
+  },
+  "ordering": {
+    "stableKey": "normalized lexical word",
+    "comparison": "Unicode code-point ascending comparison of normalized lexical words",
+    "tieBreak": "none after lexical-word deduplication"
+  },
+  "selection": {
+    "rule": "Select the first eligible normalized lexical word after normalization, usability filtering, deduplication, and prepared-word exclusion.",
+    "primaryCount": 1,
+    "coverageAssessment": "Not part of primary selection. Any later coverage assessment must be separately frozen before execution."
+  },
+  "frozenContext": {
+    "engineHead": "52ff041d5b0d03d9c787c6d5d759438de273cea4",
+    "substrateVersion": "albanian-generic-lexical-substrate.v0_1",
+    "substrateRecordCount": 55,
+    "substrateFingerprint": "3db9f039c12b0b3d51a9d64361909403baf4224c92c3ff237f7e9d49aabedcbb",
+    "retrievalIdentity": {
+      "path": "src/shared/openInstrument/motivationEngineDiscovery.v0_1.ts",
+      "sha256": "e0ae5d74daf894db64380a2e04b0043e83bb756f2dba3109f5b01e6b1d5b67b0"
+    },
+    "structuralIdentity": {
+      "path": "src/shared/structuralHypothesisDiscovery.v0_1.ts",
+      "sha256": "96fba8363df8b3d59caf6d7dc9ac9ad88007d15432bec4b647b83484a25555db"
+    },
+    "genericQueryIdentity": {
+      "path": "src/shared/openInstrument/genericFunctionalWitnessDiscovery.v1.ts",
+      "sha256": "d8ecde88cb241010ffd3464852ff814bf745a4dfcd0ce3743966b8af078ed0a3"
+    }
+  },
+  "forbiddenSelectionInputs": [
+    "candidate count",
+    "Albanian substrate overlap",
+    "embryo match",
+    "Voice path",
+    "Gamma",
+    "ZC",
+    "semantic gloss",
+    "expected functional attractiveness",
+    "known result",
+    "human preference"
+  ]
+}

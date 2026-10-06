@@ -1,0 +1,53 @@
+{
+  "schemaVersion": "open-instrument.m7-novel-input-generalization-hash-manifest.v0.1",
+  "status": "RESULT_PRESERVED_NO_RERUN",
+  "artifacts": [
+    {
+      "id": "selection-procedure",
+      "path": "docs/open-instrument/research-artifacts/m7-novel-input-generalization-v0.1/selection-procedure.json",
+      "bytes": 5449,
+      "sha256": "de0363366f854230b178011c36a52818add15664f57a7241105bdbc6fb9b8eb7"
+    },
+    {
+      "id": "primary-selection",
+      "path": "docs/open-instrument/research-artifacts/m7-novel-input-generalization-v0.1/primary-selection.json",
+      "bytes": 1188,
+      "sha256": "c402b51ab936e29967dc5f53b2b43da541e1399513a5eb70890677ea52b53d23"
+    },
+    {
+      "id": "coverage-procedure",
+      "path": "docs/open-instrument/research-artifacts/m7-novel-input-generalization-v0.1/coverage-procedure.json",
+      "bytes": 1777,
+      "sha256": "2b9789b9ad7d5b6f381fd1cc4193d3395e34c0b1975f1ed45f757da06e2d7061"
+    },
+    {
+      "id": "primary-result",
+      "path": "docs/open-instrument/research-artifacts/m7-novel-input-generalization-v0.1/primary-result.json",
+      "bytes": 2168,
+      "sha256": "ebe9ebbcd98c938d6361f2c4b0c66d0787a2ca915f0d78285c468a4939cc0289"
+    },
+    {
+      "id": "coverage-result",
+      "path": "docs/open-instrument/research-artifacts/m7-novel-input-generalization-v0.1/result.json",
+      "bytes": 665343,
+      "sha256": "24ca60a5d5dd8eeb0b0faecf3d8d84fdfdec108bbc93e2c63202734c962c2f08"
+    }
+  ],
+  "bindings": {
+    "cmudictPath": "src/data/openInstrument/pronunciation/cmudict.dict",
+    "cmudictSha256": "81917843c7f44ce2b094ac63873c2c7a4cf802040792c455ba3ca406891c3d22",
+    "populationSpecSha256": "81248026f57cffb0c357a4e29e0cce4d3139adc1521eda89e72754783095ed44",
+    "engineBaseHead": "52ff041d5b0d03d9c787c6d5d759438de273cea4",
+    "executionRepositoryHead": "4f6502c5474ac2311268355de51915233ea7fe8c",
+    "substrateVersion": "albanian-generic-lexical-substrate.v0_1",
+    "substrateRecordCount": 55,
+    "substrateFingerprint": "3db9f039c12b0b3d51a9d64361909403baf4224c92c3ff237f7e9d49aabedcbb",
+    "coverageSampleSize": 512,
+    "coverageExecutionAttempts": 1,
+    "primaryExecutionAttempts": 1,
+    "noRerun": true,
+    "providerExecuted": false,
+    "substrateMutated": false,
+    "retrievalMutated": false
+  }
+}
