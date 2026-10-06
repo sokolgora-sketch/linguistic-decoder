@@ -41,6 +41,34 @@ function nonEmptyTextV0_1(value: string | null | undefined): string | null {
   return text || null;
 }
 
+function citationAttestationIsUsableV0_1(
+  citation: MultiSourceFunctionalResearchEvidenceRowV0_1["citations"][number],
+): boolean {
+  return Boolean(
+    nonEmptyTextV0_1(citation.citationId) &&
+      nonEmptyTextV0_1(citation.sourceTitle) &&
+      nonEmptyTextV0_1(citation.sourcePublisherOrHost) &&
+      nonEmptyTextV0_1(citation.sourceDateOrVersion) &&
+      nonEmptyTextV0_1(citation.sourceUrlOrArchiveRef) &&
+      nonEmptyTextV0_1(citation.entryLocator) &&
+      nonEmptyTextV0_1(citation.attestedForm) &&
+      nonEmptyTextV0_1(citation.attestedGloss),
+  );
+}
+
+function citationsAgreeOnAttestationV0_1(
+  citations: readonly MultiSourceFunctionalResearchEvidenceRowV0_1["citations"][number][],
+  selector: (citation: MultiSourceFunctionalResearchEvidenceRowV0_1["citations"][number]) => string,
+): boolean {
+  const values = citations.map((citation) => nonEmptyTextV0_1(selector(citation)));
+  const first = values[0];
+
+  return Boolean(
+    first &&
+      values.every((value) => value !== null && value === first),
+  );
+}
+
 function canonicalQueryKeyV0_1(value: string): string {
   return value.normalize("NFC").trim().toLocaleUpperCase("en-US");
 }
@@ -59,7 +87,18 @@ function projectResearchRowV0_1(
     compareTextV0_1(left.citationId, right.citationId),
   );
   const citation = citations[0];
-  if (!citation) return null;
+  if (
+    !citation ||
+    !citations.every(citationAttestationIsUsableV0_1) ||
+    !citationsAgreeOnAttestationV0_1(citations, (candidate) => candidate.attestedForm) ||
+    !citationsAgreeOnAttestationV0_1(citations, (candidate) => candidate.attestedGloss)
+  ) {
+    return null;
+  }
+
+  const sourceForm = nonEmptyTextV0_1(citation.attestedForm);
+  const gloss = nonEmptyTextV0_1(citation.attestedGloss);
+  if (!sourceForm || !gloss) return null;
 
   return {
     queryForm: canonicalQueryKeyV0_1(row.embryo),
@@ -67,9 +106,9 @@ function projectResearchRowV0_1(
     evidenceFamily: row.evidenceFamily,
     language: row.language,
     languageVariety: null,
-    sourceForm: row.form,
+    sourceForm,
     sourceFormNormalization: "EXACT_PRESERVED",
-    gloss: row.gloss,
+    gloss,
     citationRefs: citations.map((candidate) => candidate.citationId),
     embryoRelation: row.embryoRelation,
     relationOperationIds: [...row.relationOperationIds].sort(compareTextV0_1),

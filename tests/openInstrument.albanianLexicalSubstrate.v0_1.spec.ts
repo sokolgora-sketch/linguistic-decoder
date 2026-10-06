@@ -2,6 +2,7 @@ import {
   createAlbanianLexicalSubstrateWitnessAdapterV0_1,
   getAlbanianLexicalSubstrateRecordsV0_1,
 } from "@/shared/openInstrument/albanianLexicalSubstrate.v0_1";
+import { loadMultiSourceFunctionalResearchEvidenceCatalogV0_1 } from "@/shared/multiSourceFunctionalResearchEvidenceCatalog.v0_1";
 import {
   GENERIC_FUNCTIONAL_WITNESS_DISCOVERY_SCHEMA_V1,
   queryGenericFunctionalWitnessesV1,
@@ -32,9 +33,34 @@ describe("bounded Albanian lexical substrate v0.1", () => {
     expect(zemer).toMatchObject({
       queryForm: "ZEMËR",
       language: "Albanian",
-      gloss: "heart; central organ of the circulatory system",
+      gloss: "heart; central organ of the circulatory system in humans and animals",
       sourceStatus: "research_candidate",
+      sourceForm: "zemër",
+      embryoRelation: "exact_form",
     });
+
+    expect(records).toHaveLength(53);
+    expect(records.some((record) => record.sourceId === "research.external.albanian-mat-measure.v0_1")).toBe(false);
+    expect(records.some((record) => record.sourceId === "research.external.albanian-shter-depletion.v0_1")).toBe(false);
+    expect(records.some((record) => record.sourceId === "research.external.albanian-shterp-barren.v0_1")).toBe(true);
+    expect(records.some((record) => record.sourceId === "research.external.albanian-shterpe-barren.v0_1")).toBe(true);
+
+    const researchRows = new Map(
+      loadMultiSourceFunctionalResearchEvidenceCatalogV0_1().map((row) => [
+        row.researchEvidenceId,
+        row,
+      ]),
+    );
+    for (const record of records.filter((candidate) => candidate.sourceStatus === "research_candidate")) {
+      const row = researchRows.get(record.sourceId);
+      expect(row).toBeDefined();
+      expect(row?.citations).toEqual(expect.arrayContaining([
+        expect.objectContaining({
+          attestedForm: record.sourceForm,
+          attestedGloss: record.gloss,
+        }),
+      ]));
+    }
 
     const serialized = JSON.stringify(records);
     expect(serialized).not.toContain("targetWord");
@@ -71,6 +97,7 @@ describe("bounded Albanian lexical substrate v0.1", () => {
     expect(result.matches[0]).toMatchObject({
       queryForm: "ZEMËR",
       sourceForm: "zemër",
+      gloss: "heart; central organ of the circulatory system in humans and animals",
       language: "Albanian",
       sourceStatus: "research_candidate",
     });
