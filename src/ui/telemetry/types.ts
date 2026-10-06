@@ -340,6 +340,91 @@ export type AnalysisStatusV0_1VM = {
   claimBoundary: AnalysisStatusClaimBoundaryV0_1VM;
   userDecisionPosture: "user_decides";
 };
+
+export type MotivationDiscoveryCandidateV0_1VM = Readonly<{
+  candidateId: string;
+  candidateLanguage: string;
+  candidateForm: string;
+  candidateGloss: string;
+  candidateEmbryo: string;
+  candidateVoicePath: string[];
+  sourceFact: Readonly<{
+    sourceId: string;
+    sourceStatus: string;
+    attestationTruth: string;
+    evidenceRefs: string[];
+    sourceUrlOrArchiveRef: string | null;
+    entryLocator: string | null;
+  }>;
+  derivedStructure: Readonly<{
+    minRootId: string;
+    protoRoots: string[];
+    carrierForms: string[];
+    operationIds: string[];
+  }>;
+  functionalInterpretation: Readonly<{
+    truthClassification: "hypothesis";
+    statement: string | null;
+  }>;
+  candidateStatus: "experimental";
+  historicalRelation: "not_claimed";
+  userDecisionPosture: "user_decides";
+  noSingleWinner: true;
+}>;
+
+export type MotivationDiscoveryV0_1VM = Readonly<{
+  schemaVersion: "open-instrument.motivation-engine-discovery.v0_1";
+  status: "MATCHES_FOUND" | "NO_MATCHES";
+  inputWord: string;
+  inputLanguage: string;
+  inputProfile: string;
+  sourceFact: Readonly<{
+    layer: "SOURCE_FACT";
+    language: string;
+    profile: string;
+    representation: "production_spoken" | "albanian_profile" | "unknown";
+    sourceStatus: string;
+    authorityBoundary: string;
+  }>;
+  derivedStructure: Readonly<{
+    layer: "DERIVED_STRUCTURE";
+    voicePath: string[];
+    voicePathSource: "production_spoken" | "albanian_profile" | "unknown";
+    math7: Readonly<{
+      basis: string | null;
+      totalMod7: number | null;
+      principlesPath: string[];
+    }>;
+    gamma: Readonly<{
+      status: "source_pronunciation" | "profile_derived" | "NULL";
+      orderedUnits: string[];
+      reason: string | null;
+    }>;
+    zeroConsonantalStructuralComposition: Readonly<{
+      status: "source_pronunciation" | "NULL";
+      variants: unknown[];
+      reason: string | null;
+    }>;
+    structuralHypotheses: Array<Readonly<{
+      hypothesisId: string;
+      embryo: string;
+      expansionChain: string[];
+      reasonCodes: string[];
+    }>>;
+  }>;
+  candidates: MotivationDiscoveryCandidateV0_1VM[];
+  interpretation: Readonly<{
+    layer: "ZË-RO_INTERPRETATION_OR_HYPOTHESIS";
+    status: "hypothesis" | "UNKNOWN_OR_NULL";
+    note: string;
+  }>;
+  unknownOrNull: Readonly<{
+    layer: "UNKNOWN_OR_NULL";
+    reason: string | null;
+  }>;
+  userDecisionPosture: "user_decides";
+  noSingleWinner: true;
+}>;
 export interface TelemetryViewModel {
   readout: TelemetryReadout;
   doctrineReading: PresentOrMissing<DoctrineReadingVM | null>;
@@ -356,4 +441,5 @@ export interface TelemetryViewModel {
   raw: unknown;
 
   analysisStatusV0_1?: PresentOrMissing<AnalysisStatusV0_1VM>;
+  motivationDiscoveryV0_1?: PresentOrMissing<MotivationDiscoveryV0_1VM>;
 }

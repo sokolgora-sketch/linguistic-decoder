@@ -28,6 +28,8 @@ import type {
   SpokenPronunciationVariantV0_1VM,
   ZeroConsonantalStructuralCompositionV0_1VM,
   ResonanceProfileV1VM,
+  MotivationDiscoveryV0_1VM,
+  MotivationDiscoveryCandidateV0_1VM,
 } from "../telemetry/types";
 import {
   DOCTRINE_READING_COMPOSITION_MODE_V1,
@@ -853,6 +855,102 @@ function getField(obj: unknown, key: string): unknown {
   return isRecord(obj) ? obj[key] : undefined;
 }
 
+function parseMotivationDiscoveryV0_1(
+  raw: unknown,
+): PresentOrMissing<MotivationDiscoveryV0_1VM> {
+  const value = getField(raw, "motivationDiscoveryV0_1");
+  if (value == null) return missing("not_emitted", "motivationDiscoveryV0_1");
+  if (!isRecord(value)) return missing("malformed", "motivationDiscoveryV0_1 expected object");
+
+  if (
+    value.schemaVersion !== "open-instrument.motivation-engine-discovery.v0_1" ||
+    (value.status !== "MATCHES_FOUND" && value.status !== "NO_MATCHES") ||
+    typeof value.inputWord !== "string" ||
+    typeof value.inputLanguage !== "string" ||
+    typeof value.inputProfile !== "string" ||
+    !isRecord(value.sourceFact) ||
+    !isRecord(value.derivedStructure) ||
+    !Array.isArray(value.candidates) ||
+    !isRecord(value.interpretation) ||
+    !isRecord(value.unknownOrNull) ||
+    value.userDecisionPosture !== "user_decides" ||
+    value.noSingleWinner !== true
+  ) {
+    return missing("malformed", "motivationDiscoveryV0_1 shape invalid");
+  }
+
+  const sourceFact = value.sourceFact;
+  const derived = value.derivedStructure;
+  const math7 = isRecord(derived.math7) ? derived.math7 : null;
+  const gamma = isRecord(derived.gamma) ? derived.gamma : null;
+  const zc = isRecord(derived.zeroConsonantalStructuralComposition)
+    ? derived.zeroConsonantalStructuralComposition
+    : null;
+
+  if (
+    (sourceFact.layer !== "SOURCE_FACT") ||
+    typeof sourceFact.language !== "string" ||
+    typeof sourceFact.profile !== "string" ||
+    (sourceFact.representation !== "production_spoken" &&
+      sourceFact.representation !== "albanian_profile" &&
+      sourceFact.representation !== "unknown") ||
+    typeof sourceFact.sourceStatus !== "string" ||
+    typeof sourceFact.authorityBoundary !== "string" ||
+    derived.layer !== "DERIVED_STRUCTURE" ||
+    !Array.isArray(derived.voicePath) ||
+    (derived.voicePathSource !== "production_spoken" &&
+      derived.voicePathSource !== "albanian_profile" &&
+      derived.voicePathSource !== "unknown") ||
+    !math7 ||
+    !gamma ||
+    !zc ||
+    !Array.isArray(derived.structuralHypotheses) ||
+    (gamma.status !== "source_pronunciation" && gamma.status !== "profile_derived" && gamma.status !== "NULL") ||
+    !Array.isArray(gamma.orderedUnits) ||
+    (zc.status !== "source_pronunciation" && zc.status !== "NULL") ||
+    !Array.isArray(zc.variants)
+  ) {
+    return missing("malformed", "motivationDiscoveryV0_1 derived structure invalid");
+  }
+
+  const candidates: MotivationDiscoveryCandidateV0_1VM[] = [];
+  for (const candidate of value.candidates) {
+    if (!isRecord(candidate) || !isRecord(candidate.sourceFact) || !isRecord(candidate.derivedStructure) || !isRecord(candidate.functionalInterpretation)) {
+      return missing("malformed", "motivationDiscoveryV0_1 candidate invalid");
+    }
+    const source = candidate.sourceFact;
+    const structure = candidate.derivedStructure;
+    const interpretation = candidate.functionalInterpretation;
+    if (
+      typeof candidate.candidateId !== "string" ||
+      typeof candidate.candidateLanguage !== "string" ||
+      typeof candidate.candidateForm !== "string" ||
+      typeof candidate.candidateGloss !== "string" ||
+      typeof candidate.candidateEmbryo !== "string" ||
+      !Array.isArray(candidate.candidateVoicePath) ||
+      typeof source.sourceId !== "string" ||
+      typeof source.sourceStatus !== "string" ||
+      typeof source.attestationTruth !== "string" ||
+      !Array.isArray(source.evidenceRefs) ||
+      !Array.isArray(structure.protoRoots) ||
+      !Array.isArray(structure.carrierForms) ||
+      !Array.isArray(structure.operationIds) ||
+      typeof structure.minRootId !== "string" ||
+      interpretation.truthClassification !== "hypothesis" ||
+      (interpretation.statement !== null && typeof interpretation.statement !== "string") ||
+      candidate.candidateStatus !== "experimental" ||
+      candidate.historicalRelation !== "not_claimed" ||
+      candidate.userDecisionPosture !== "user_decides" ||
+      candidate.noSingleWinner !== true
+    ) {
+      return missing("malformed", "motivationDiscoveryV0_1 candidate fields invalid");
+    }
+    candidates.push(candidate as MotivationDiscoveryCandidateV0_1VM);
+  }
+
+  return present(value as unknown as MotivationDiscoveryV0_1VM);
+}
+
 function pickVoicePaths(payload: unknown): { detected: string | null; surface: string | null; functional: string | null } {
   // detected (primary)
   const primaryPathValue = getField(payload, "primaryPath");
@@ -1032,6 +1130,7 @@ export function adaptAnalysisToTelemetryVM(raw: unknown): TelemetryViewModel {
   const wordSpecificFunctionalDepth = parseWordSpecificFunctionalDepthV0_1(
     getField(payload, "wordSpecificFunctionalDepth"),
   );
+  const motivationDiscoveryV0_1 = parseMotivationDiscoveryV0_1(payload);
 
   const vp = pickVoicePaths(payload);
 
@@ -2369,6 +2468,9 @@ const originClaimGates: OriginClaimGatesVM = {
     ...(wordSpecificFunctionalDepth.kind === "missing"
       ? {}
       : { wordSpecificFunctionalDepth }),
+    ...(motivationDiscoveryV0_1.kind === "missing"
+      ? {}
+      : { motivationDiscoveryV0_1 }),
     evidence: {
       normalizationSteps: pomStringListFromEvidenceField(evidence, "normalizationSteps"),
       ops: pomStringListFromEvidenceField(evidence, "ops"),

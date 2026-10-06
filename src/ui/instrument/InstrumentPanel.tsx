@@ -42,6 +42,7 @@ import { DoctrineReadingCard } from "./sections/DoctrineReadingCard.v0.1";
 import { PrimaryReadingOrientationCardV0_1 } from "./sections/PrimaryReadingOrientationCard.v0_1";
 import { SpokenPronunciationOverviewCardV0_1 } from "./sections/SpokenPronunciationOverviewCard.v0_1";
 import { SpokenResultCompositionSummaryV0_1 } from "./sections/SpokenResultCompositionSummary.v0_1";
+import { MotivationDiscoveryCardV0_1 } from "./sections/MotivationDiscoveryCard.v0_1";
 import { OriginClaimCard } from '@/components/OriginClaimCard';
 import { cn } from "@/lib/utils";
 import { safeText } from "./safeText";
@@ -516,6 +517,10 @@ export function InstrumentPanel(props: Props) {
               <SpokenPronunciationOverviewCardV0_1 readout={vm.readout} />
 
               <SpokenResultCompositionSummaryV0_1 readout={vm.readout} />
+
+              <MotivationDiscoveryCardV0_1
+                discovery={vm.motivationDiscoveryV0_1}
+              />
 
               {primaryNullStatus ? (
                 <AnalysisStatusCardV0_1
