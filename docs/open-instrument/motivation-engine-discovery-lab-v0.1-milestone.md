@@ -190,6 +190,13 @@ The study and DI regression gate is valid only when the result comes through
 generic retrieval. A registry entry, word-specific shortcut, or reviewed row
 alone is not a passing demonstration of the engine.
 
+Milestone closure requires at least one independently selected, generic
+positive retrieval case whose qualifying source records are not a special-case
+mapping for the input. A separate previously unprepared input may validly
+produce `UNKNOWN / NULL` when its frozen authority does not qualify; that Null
+case remains required evidence of fail-closed behavior and may not substitute
+for the generic positive case.
+
 At least one supported Albanian input must enter the pipeline during the
 implementation lane. The milestone does not require forcing `ZEMËR` or any
 other preselected word to produce a positive result.
@@ -202,6 +209,8 @@ Lab candidate must be able to preserve:
 
 ```text
 inputWord
+inputLanguage
+inputSourceProfile / inputAuthorityBinding
 candidateLanguage
 candidateForm
 candidatePronunciationOrPhonology
@@ -214,14 +223,21 @@ inputGamma / candidateGamma where authorized
 inputConsonants / candidateConsonants where authorized
 compatibilityOrRelation
 functionalInterpretation
-truthStatus
+attestationTruthStatus
+functionalBridgeTruthStatus
 historicalRelation
-status
+candidateStatus
 reasonCodes
 unresolvedFields
 userDecisionPosture=user_decides
 originClaim=not_claimed unless separately authorized
 ```
+
+The input language and source/profile authority binding are required at the
+request or result boundary; the bare input spelling must never be the only
+language discriminator. Attestation truth and functional-bridge truth remain
+separate because a factual source attestation can support only a hypothesis
+about the functional bridge.
 
 These are planning requirements, not permission to add a schema in this
 documentation lane. Existing types must be reused where they already express
