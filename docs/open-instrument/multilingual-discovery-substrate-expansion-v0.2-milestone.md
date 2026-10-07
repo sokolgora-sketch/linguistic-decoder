@@ -3,11 +3,17 @@
 ## Milestone identity
 
 - `MILESTONE_ID=OPEN_INSTRUMENT_MULTILINGUAL_DISCOVERY_SUBSTRATE_EXPANSION_V0_2`
-- `STATUS=MILESTONE_DEFINED`
-- `IMPLEMENTATION_STARTED=NO`
+- `STATUS=MILESTONE_ACTIVE`
+- `IMPLEMENTATION_STARTED=YES`
 - `DATA_ACQUIRED=NO`
 - `DATA_IMPORTED=NO`
 - `PRODUCTION_PROMOTION=NO`
+- `S0=COMPLETE`
+- `S1=NOT_STARTED`
+- `S0_ARTIFACT=docs/open-instrument/research-artifacts/multilingual-discovery-substrate-v0.2-s0-baseline-freeze-v0.1/baseline.json`
+- `S0_ARTIFACT_SHA256=0aebfd6d022a5e2d94bacd181702a7174a57a21d010bc7f5956771b1c4d90325`
+- `S0_MANIFEST=docs/open-instrument/research-artifacts/multilingual-discovery-substrate-v0.2-s0-baseline-freeze-v0.1/hash-manifest.json`
+- `S0_MANIFEST_SHA256=46dbbc28d68bc4eaa485c123867a9e06cadd5a80ae3c36660da5410e8eebf20c`
 
 This milestone follows the closed Motivation Engine / Discovery Lab v0.1
 milestone, including its M7 generic generalization, M8 multilingual seam, M9
@@ -420,6 +426,6 @@ DF_BRAIN has no authorized remote push in this milestone.
 
 ## Explicit next action
 
-`NEXT_ACTION=BEGIN_V0_2_BASELINE_FREEZE`
+`NEXT_ACTION=BEGIN_V0_2_EXISTING_CATALOG_PROJECTION`
 
 This action is not executed by the milestone-definition lane.
