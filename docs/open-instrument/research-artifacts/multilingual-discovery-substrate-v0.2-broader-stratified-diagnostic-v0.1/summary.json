@@ -1,0 +1,123 @@
+{
+  "schemaVersion": "open-instrument.multilingual-discovery-substrate-expansion-broader-stratified-diagnostic-v0.1.summary",
+  "status": "COMPLETED_RESULT_PRESERVED",
+  "experimentId": "open-instrument.multilingual-discovery-substrate-expansion-v0.2.broader-stratified-diagnostic.v0.1",
+  "procedureId": "open-instrument.multilingual-discovery-substrate-expansion-v0.2.broader-stratified-diagnostic-procedure.v0.1",
+  "authoritativeAttempts": 1,
+  "sampleInputCount": 1024,
+  "sampleIdentitySha256": "5fa453b1a6b7ad6dbc965080d6b47d48d54c4a4c7961813e13d6cae25a010dc3",
+  "validInputCount": 688,
+  "invalidOrUnreachableInputCount": 336,
+  "invalidReasonCounts": {
+    "NO_GENERIC_QUERY_KEYS": 285,
+    "PRONUNCIATION_UNUSABLE:PRONUNCIATION_VARIANT_AMBIGUOUS": 51
+  },
+  "metrics": {
+    "inputCount": 1024,
+    "validInputCount": 688,
+    "invalidOrUnreachableInputCount": 336,
+    "totalQueryKeyOccurrences": 2563,
+    "distinctQueryKeys": 2469,
+    "distinctSubstrateKeysReached": 4,
+    "distinctAlbanianKeysReached": 4,
+    "distinctLatinKeysReached": 0,
+    "distinctAsciiLatinKeysReached": 0,
+    "distinctDiacriticLatinKeysReached": 0,
+    "generatedKeysWithAnySubstrateRecord": 4,
+    "generatedKeysWithNoSubstrateRecord": 2465,
+    "generatedKeySubstrateCoverageRate": 0.0016200891049007696,
+    "substrateKeyReachabilityRate": 0.05263157894736842,
+    "albanianSubstrateKeyReachabilityRate": 0.07272727272727272,
+    "latinSubstrateKeyReachabilityRate": 0,
+    "asciiLatinSubstrateKeyReachabilityRate": 0,
+    "inputsWithAnySubstrateIntersection": 8,
+    "inputsWithAlbanianIntersection": 8,
+    "inputsWithLatinIntersection": 0,
+    "multipleSubstrateKeyInputs": 1,
+    "reachedKeys": [
+      "ART",
+      "AT",
+      "MAT",
+      "RE"
+    ],
+    "reachedAlbanianKeys": [
+      "ART",
+      "AT",
+      "MAT",
+      "RE"
+    ],
+    "reachedLatinKeys": [],
+    "reachedAsciiLatinKeys": [],
+    "reachedDiacriticLatinKeys": [],
+    "reachedKeyDetails": [
+      {
+        "key": "ART",
+        "language": "Albanian",
+        "inputCount": 3,
+        "inputs": [
+          "bartolo",
+          "spartan",
+          "startups"
+        ],
+        "sourceRecordIds": [
+          "research.external.open-instrument-research-evidence-packet-v0-1.art-creative-artistic-activity-v0-1.verified-source-capture-fjale-fjalor-shqip-v0-1-art-m-sense-1-art-v0-1"
+        ]
+      },
+      {
+        "key": "AT",
+        "language": "Albanian",
+        "inputCount": 1,
+        "inputs": [
+          "matias"
+        ],
+        "sourceRecordIds": [
+          "reviewed.external.albanian-at.father.candidate.v0_1"
+        ]
+      },
+      {
+        "key": "MAT",
+        "language": "Albanian",
+        "inputCount": 1,
+        "inputs": [
+          "matias"
+        ],
+        "sourceRecordIds": [
+          "research.external.albanian-mat-measure.v0_1"
+        ]
+      },
+      {
+        "key": "RE",
+        "language": "Albanian",
+        "inputCount": 4,
+        "inputs": [
+          "create",
+          "freeny",
+          "grecko",
+          "wreak"
+        ],
+        "sourceRecordIds": [
+          "research.external.open-instrument-research-evidence-packet-v0-1.cloud-physical-atmospheric-v0-1.verified-source-capture-fjale-fjalor-shqip-v0-1-re-i-f-sense-1-re-v0-1"
+        ]
+      }
+    ]
+  },
+  "interpretationClass": "CLASS_B_BROADER_SAMPLE_REVEALS_ADDITIONAL_EXISTING_SUBSTRATE_KEYS_BUT_NO_LATIN",
+  "s3Comparison": {
+    "sampleSize": 512,
+    "distinctQueryKeys": 1085,
+    "substrateKeysReached": 1,
+    "substrateKeysReachedList": [
+      "AT"
+    ],
+    "latinKeysReached": 0,
+    "generatedKeySubstrateCoverageRate": 0.0009216589861751152,
+    "substrateKeyReachabilityRate": 0.013157894736842105,
+    "descriptiveOnly": true
+  },
+  "rawResultArtifact": "docs/open-instrument/research-artifacts/multilingual-discovery-substrate-v0.2-broader-stratified-diagnostic-v0.1/results.json",
+  "rawResultSha256": "51019087d2199f8506267c3e6a4fbdb8824962641a6ed49abaa7e2c7bcc59ee6",
+  "noRerun": true,
+  "realDataExecuted": false,
+  "providerExecution": false,
+  "postResultNextAction": "REVIEW_BROADER_STRATIFIED_DIAGNOSTIC_RESULT_AND_DECIDE_SUBSTRATE_ARCHITECTURE"
+}

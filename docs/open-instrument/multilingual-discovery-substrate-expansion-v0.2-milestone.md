@@ -460,11 +460,7 @@ additive broader diagnostic rather than reopening S3 or acquiring a source.
 
 `POST_S3_DECISION_AUDIT=COMPLETE`
 
-`BROADER_STRATIFIED_DIAGNOSTIC=DEFINED_NOT_EXECUTED`
-
 `BROADER_STRATIFIED_DIAGNOSTIC_PROCEDURE=docs/open-instrument/research-artifacts/multilingual-discovery-substrate-v0.2-broader-stratified-diagnostic-procedure-v0.1/procedure.json`
-
-`BROADER_STRATIFIED_DIAGNOSTIC_ATTEMPTS=0`
 
 The procedure freezes a deterministic 1024-input equal-ordinal-stratum sample
 over the existing prepared eligible population. Its preparation uses the
@@ -477,8 +473,55 @@ remains not started and the milestone remains active. No new source, language,
 pronunciation authority, production authority, or matching behavior is
 authorized by this definition.
 
+## Broader stratified diagnostic result
+
+The predeclared broader diagnostic was executed exactly once under the frozen
+procedure. The result is preserved as a bounded synthetic diagnostic, not as a
+new source-acquisition or production-authority result.
+
+`BROADER_STRATIFIED_DIAGNOSTIC=COMPLETE_RESULT_PRESERVED`
+
+`BROADER_STRATIFIED_DIAGNOSTIC_AUTHORITATIVE_ATTEMPTS=1`
+
+`BROADER_STRATIFIED_DIAGNOSTIC_SAMPLE_SIZE=1024`
+
+`BROADER_STRATIFIED_DIAGNOSTIC_SAMPLE_IDENTITY_SHA256=5fa453b1a6b7ad6dbc965080d6b47d48d54c4a4c7961813e13d6cae25a010dc3`
+
+`BROADER_STRATIFIED_DIAGNOSTIC_VALID_INPUTS=688`
+
+`BROADER_STRATIFIED_DIAGNOSTIC_INVALID_OR_UNREACHABLE_INPUTS=336`
+
+`BROADER_STRATIFIED_DIAGNOSTIC_DISTINCT_QUERY_KEYS=2469`
+
+`BROADER_STRATIFIED_DIAGNOSTIC_DISTINCT_SUBSTRATE_KEYS_REACHED=4`
+
+`BROADER_STRATIFIED_DIAGNOSTIC_ALBANIAN_KEYS_REACHED=4`
+
+`BROADER_STRATIFIED_DIAGNOSTIC_LATIN_KEYS_REACHED=0`
+
+`BROADER_STRATIFIED_DIAGNOSTIC_INTERPRETATION=CLASS_B_BROADER_SAMPLE_REVEALS_ADDITIONAL_EXISTING_SUBSTRATE_KEYS_BUT_NO_LATIN`
+
+`BROADER_STRATIFIED_DIAGNOSTIC_SAMPLE_ARTIFACT=docs/open-instrument/research-artifacts/multilingual-discovery-substrate-v0.2-broader-stratified-diagnostic-v0.1/sample.json`
+
+`BROADER_STRATIFIED_DIAGNOSTIC_SAMPLE_SHA256=20bd7e0f93629d8c1c87dfa76c1b1f1b9bfeb763dc44905bced2f91341179ffd`
+
+`BROADER_STRATIFIED_DIAGNOSTIC_RESULT_ARTIFACT=docs/open-instrument/research-artifacts/multilingual-discovery-substrate-v0.2-broader-stratified-diagnostic-v0.1/results.json`
+
+`BROADER_STRATIFIED_DIAGNOSTIC_RESULT_SHA256=51019087d2199f8506267c3e6a4fbdb8824962641a6ed49abaa7e2c7bcc59ee6`
+
+`BROADER_STRATIFIED_DIAGNOSTIC_SUMMARY_SHA256=ef245127223957dc82dbd743543c31eded442253e61622bd4f6111610b9fbbbf`
+
+`BROADER_STRATIFIED_DIAGNOSTIC_MANIFEST=docs/open-instrument/research-artifacts/multilingual-discovery-substrate-v0.2-broader-stratified-diagnostic-v0.1/hash-manifest.json`
+
+`BROADER_STRATIFIED_DIAGNOSTIC_MANIFEST_SHA256=41df36151de521353a2b2ea1ce178e3bb4a3aafe022cace01aa32c9baa2f657c`
+
+`S3_RERUN=NO`
+
+`S4=NOT_STARTED`
+
 ## Explicit next action
 
-`NEXT_ACTION=EXECUTE_PREDECLARED_BROADER_STRATIFIED_DIAGNOSTIC`
+`NEXT_ACTION=REVIEW_BROADER_STRATIFIED_DIAGNOSTIC_RESULT_AND_DECIDE_SUBSTRATE_ARCHITECTURE`
 
-This action is not executed by the definition lane.
+This result does not authorize an architecture decision, new source/language,
+S4, or another diagnostic execution.
