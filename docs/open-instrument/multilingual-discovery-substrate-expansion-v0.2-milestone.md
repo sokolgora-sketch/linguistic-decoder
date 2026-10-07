@@ -32,6 +32,11 @@
 - `S3_RESULT_SHA256=b703051f8d6020548f93dc9a6591b22278f467bb0c521871b31aafb47be4ca03`
 - `S3_SUMMARY_SHA256=1985db5f7d8d7fd59c6ca741f30d1814ffa469f95c141ff7e9aef109da11ebea`
 - `S4=NOT_STARTED`
+- `RETRIEVAL_KEY_AUTHORITY_DEFINITION=COMPLETE`
+- `RETRIEVAL_KEY_PROCEDURE_STATUS=DEFINED_NOT_EXECUTED`
+- `RETRIEVAL_KEY_AUTHORITATIVE_ATTEMPTS=0`
+- `RETRIEVAL_KEY_PROCEDURE=docs/open-instrument/research-artifacts/multilingual-discovery-substrate-v0.2-retrieval-key-authority-and-reachability-v0.1/procedure.json`
+- `RETRIEVAL_KEY_MANIFEST=docs/open-instrument/research-artifacts/multilingual-discovery-substrate-v0.2-retrieval-key-authority-and-reachability-v0.1/hash-manifest.json`
 - `S2_VALIDATION_ARTIFACT=docs/open-instrument/research-artifacts/multilingual-discovery-substrate-v0.2-s2-authority-truth-validation-v0.1/validation.json`
 - `S2_VALIDATION_ARTIFACT_SHA256=6dd24ea7074aa73f2060c40afb254370a79270a8ce0db8f273bec5b332792fae`
 - `S2_VALIDATION_MANIFEST=docs/open-instrument/research-artifacts/multilingual-discovery-substrate-v0.2-s2-authority-truth-validation-v0.1/hash-manifest.json`
@@ -519,9 +524,38 @@ new source-acquisition or production-authority result.
 
 `S4=NOT_STARTED`
 
+## Retrieval-key authority and reachability definition
+
+The broader diagnostic result was reviewed without rerunning S3 or the broader
+diagnostic. The smallest next definition is a paired, one-attempt,
+whole-prepared-population retrieval-key authority and reachability procedure.
+It separates exact source-display identity from a conditional retrieval-key
+representation while retaining exact equality, source/citation/provenance,
+valid Null, `no_single_winner`, and `user_decides`. It does not authorize
+runtime canonicalization, source acquisition, a new language, or S4.
+
+`RETRIEVAL_KEY_AUTHORITY_AND_REACHABILITY_DEFINITION=COMPLETE`
+
+`RETRIEVAL_KEY_DEFINITION_DOCUMENT=docs/open-instrument/retrieval-key-authority-and-reachability-v0.1.md`
+
+`RETRIEVAL_KEY_PROCEDURE=docs/open-instrument/research-artifacts/multilingual-discovery-substrate-v0.2-retrieval-key-authority-and-reachability-v0.1/procedure.json`
+
+`RETRIEVAL_KEY_PROCEDURE_STATUS=DEFINED_NOT_EXECUTED`
+
+`RETRIEVAL_KEY_AUTHORITATIVE_ATTEMPTS=0`
+
+`RETRIEVAL_KEY_RUNTIME_CANONICALIZATION_AUTHORIZED=NO`
+
+`S3_RESULT_UNCHANGED=YES`
+
+`BROADER_DIAGNOSTIC_RESULT_UNCHANGED=YES`
+
+`S4=NOT_STARTED`
+
 ## Explicit next action
 
-`NEXT_ACTION=REVIEW_BROADER_STRATIFIED_DIAGNOSTIC_RESULT_AND_DECIDE_SUBSTRATE_ARCHITECTURE`
+`NEXT_ACTION=EXECUTE_FROZEN_RETRIEVAL_KEY_REACHABILITY_PROCEDURE`
 
-This result does not authorize an architecture decision, new source/language,
-S4, or another diagnostic execution.
+The next action is separately authorized only when its own execution lane is
+opened. This definition lane does not execute it, create a result artifact, or
+close v0.2.

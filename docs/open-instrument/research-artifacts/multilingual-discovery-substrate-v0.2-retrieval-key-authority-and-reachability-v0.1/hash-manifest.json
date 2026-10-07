@@ -1,0 +1,49 @@
+{
+  "schemaVersion": "open-instrument.multilingual-discovery-substrate-v0.2-retrieval-key-authority-and-reachability-hash-manifest.v0.1",
+  "status": "DEFINED_NOT_EXECUTED",
+  "procedureId": "open-instrument.multilingual-discovery-substrate-v0.2.retrieval-key-authority-and-reachability.v0.1",
+  "repositoryBaselineHead": "0abf2ee7371773db65679cf5a50040de9887e94a",
+  "artifacts": [
+    {
+      "path": "docs/open-instrument/research-artifacts/multilingual-discovery-substrate-v0.2-retrieval-key-authority-and-reachability-v0.1/procedure.json",
+      "bytes": 27037,
+      "sha256": "ca37610e3018b438d0a382146e7200b48811ee000db23dfc4ad515024a2ca100"
+    }
+  ],
+  "implementationAuthority": [
+    {"path":"src/shared/openInstrument/multilingualDiscoverySubstrateS3.v0_2.ts","sha256":"dd4a01e61c0e37846a0416242b347f499ed135e608eecf446a58bc83da079220"},
+    {"path":"src/shared/structuralHypothesisDiscovery.v0_1.ts","sha256":"96fba8363df8b3d59caf6d7dc9ac9ad88007d15432bec4b647b83484a25555db"},
+    {"path":"src/shared/openInstrument/genericFunctionalWitnessSourceAcquisition.v1.ts","sha256":"f49ff4f0b877887b466002ce465feb58adbb07204cc6560c3caaa0364d95a0a0"},
+    {"path":"src/shared/openInstrument/genericFunctionalWitnessDiscovery.v1.ts","sha256":"4922763e28950cb86a21009412ecd97d110f2f8d84cf514aae9b7d9689253050"},
+    {"path":"src/shared/openInstrument/multilingualDiscoverySubstrateS1.v0_2.ts","sha256":"8f65b688ca6c3e7a4a130c478c2c6ec3abbb6b6875db742fd9666b4ced5b61d3"}
+  ],
+  "inputAuthority": [
+    {"path":"src/data/openInstrument/pronunciation/cmudict.dict","sha256":"81917843c7f44ce2b094ac63873c2c7a4cf802040792c455ba3ca406891c3d22"},
+    {"path":"docs/open-instrument/research-artifacts/zero-consonantal-structural-composition-v0.1-cmudict-validation-v0.1b/population-spec.json","sha256":"81248026f57cffb0c357a4e29e0cce4d3139adc1521eda89e72754783095ed44"},
+    {"path":"docs/open-instrument/research-artifacts/m7-novel-input-generalization-v0.1/selection-procedure.json","sha256":"de0363366f854230b178011c36a52818add15664f57a7241105bdbc6fb9b8eb7"},
+    {"path":"docs/open-instrument/research-artifacts/multilingual-discovery-substrate-v0.2-s0-baseline-freeze-v0.1/baseline.json","sha256":"52fd4865fd3a0eb2067ea460af7d75024948de5c56cbcc8ce9936361a591a58e"},
+    {"path":"docs/open-instrument/research-artifacts/multilingual-discovery-substrate-v0.2-s3-independent-coverage-evaluation-v0.1/paired-results.json","sha256":"b703051f8d6020548f93dc9a6591b22278f467bb0c521871b31aafb47be4ca03"},
+    {"path":"docs/open-instrument/research-artifacts/multilingual-discovery-substrate-v0.2-broader-stratified-diagnostic-v0.1/results.json","sha256":"51019087d2199f8506267c3e6a4fbdb8824962641a6ed49abaa7e2c7bcc59ee6"}
+  ],
+  "substrate": {
+    "total": 76,
+    "albanian": 55,
+    "latin": 21,
+    "other": 0,
+    "fingerprint": "1c4714a1d9a7550c1c037b4ce62ca85e9ff24966f2e8d447c038bce001b45d81"
+  },
+  "execution": {
+    "authoritativeAttempts": 0,
+    "authoritativeAttemptsMax": 1,
+    "resultArtifactCreated": false,
+    "s3Rerun": false,
+    "broaderDiagnosticRerun": false,
+    "s4Started": false,
+    "realDataExecuted": false,
+    "providerExecution": false,
+    "runtimeChanged": false,
+    "matchingChanged": false,
+    "sourceAcquisition": false,
+    "newLanguage": false
+  }
+}
