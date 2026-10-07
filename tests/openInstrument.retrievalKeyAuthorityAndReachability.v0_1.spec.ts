@@ -235,6 +235,9 @@ describe("retrieval-key authority and reachability definition v0.1", () => {
     expect(population.explicitExclusionWords).toHaveLength(84);
     expect(population.inheritedSubstrateExclusionWords).toHaveLength(31);
     expect(population.combinedExclusionWords).toHaveLength(109);
+    expect(population.explicitExclusionWords).toEqual([...population.explicitExclusionWords].sort());
+    expect(population.inheritedSubstrateExclusionWords).toEqual([...population.inheritedSubstrateExclusionWords].sort());
+    expect(population.combinedExclusionWords).toEqual([...population.combinedExclusionWords].sort());
     expect(new Set([
       ...population.explicitExclusionWords,
       ...population.inheritedSubstrateExclusionWords,
