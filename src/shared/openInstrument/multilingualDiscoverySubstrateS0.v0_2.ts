@@ -11,8 +11,8 @@ import {
   getAlbanianLexicalSubstrateRecordsV0_1,
 } from "./albanianLexicalSubstrate.v0_1";
 import {
-  getLatinLexicalSubstrateRecordsV0_1,
-} from "./latinLexicalSubstrate.v0_1";
+  loadGenericFunctionalWitnessSourceDatasetV1,
+} from "./genericFunctionalWitnessSourceAcquisition.v1";
 import {
   MULTI_SOURCE_FUNCTIONAL_RESEARCH_EVIDENCE_CATALOG_VERSION_V0_1,
 } from "../multiSourceFunctionalResearchEvidenceCatalog.v0_1";
@@ -503,9 +503,14 @@ function evaluationProcedureV0_2(
 export function buildMultilingualDiscoverySubstrateS0BaselineV0_2(options: {
   repositoryBaselineHead: string;
 }): MultilingualDiscoverySubstrateS0BaselineV0_2 {
+  // S0 is the immutable pre-S1 baseline. Read the two original Latin records
+  // from the frozen generic source dataset rather than from the live Latin
+  // adapter, which is intentionally expanded by S1.
+  const baseLatinRecords = loadGenericFunctionalWitnessSourceDatasetV1().records
+    .filter((record) => record.language === "Latin");
   const directRecords = [
     ...getAlbanianLexicalSubstrateRecordsV0_1(),
-    ...getLatinLexicalSubstrateRecordsV0_1(),
+    ...baseLatinRecords,
   ]
     .map(directRecordSnapshotV0_2)
     .sort((left, right) => compareTextV0_2(left.recordId, right.recordId));

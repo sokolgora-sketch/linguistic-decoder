@@ -11,8 +11,8 @@ import {
   createAlbanianLexicalSubstrateWitnessAdapterV0_1,
 } from "@/shared/openInstrument/albanianLexicalSubstrate.v0_1";
 import {
-  createLatinLexicalSubstrateWitnessAdapterV0_1,
-} from "@/shared/openInstrument/latinLexicalSubstrate.v0_1";
+  createMultilingualDiscoverySubstrateS1LatinWitnessAdapterV0_2,
+} from "@/shared/openInstrument/multilingualDiscoverySubstrateS1.v0_2";
 import type {
   GenericFunctionalWitnessSourceAdapterV1,
 } from "@/shared/openInstrument/genericFunctionalWitnessDiscovery.v1";
@@ -663,7 +663,7 @@ export function buildMotivationEngineDiscoveryV0_1(input: {
   const seenCandidateKeys = new Set<string>();
   const sourceAdapters = input.sourceAdapters ?? [
     createAlbanianLexicalSubstrateWitnessAdapterV0_1(),
-    createLatinLexicalSubstrateWitnessAdapterV0_1(),
+    createMultilingualDiscoverySubstrateS1LatinWitnessAdapterV0_2(),
   ];
   for (const context of matchContextsV0_1(word, structuralHypotheses)) {
     const discovery = queryGenericFunctionalWitnessesV1(
