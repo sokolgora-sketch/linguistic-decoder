@@ -540,9 +540,9 @@ runtime canonicalization, source acquisition, a new language, or S4.
 
 `RETRIEVAL_KEY_PROCEDURE=docs/open-instrument/research-artifacts/multilingual-discovery-substrate-v0.2-retrieval-key-authority-and-reachability-v0.1/procedure.json`
 
-`RETRIEVAL_KEY_PROCEDURE_STATUS=DEFINED_NOT_EXECUTED`
+`RETRIEVAL_KEY_PROCEDURE_STATUS=COMPLETE`
 
-`RETRIEVAL_KEY_AUTHORITATIVE_ATTEMPTS=0`
+`RETRIEVAL_KEY_AUTHORITATIVE_ATTEMPTS=1`
 
 `RETRIEVAL_KEY_RUNTIME_CANONICALIZATION_AUTHORIZED=NO`
 
@@ -552,10 +552,49 @@ runtime canonicalization, source acquisition, a new language, or S4.
 
 `S4=NOT_STARTED`
 
+## Retrieval-key authority and reachability execution
+
+The frozen procedure was executed exactly once. The authority gate derived
+mechanically from the frozen evidence as `INSUFFICIENT_EVIDENCE`; Arm A was
+not executed after the authority gate terminated the reachability procedure,
+and Arm B was `NOT_AUTHORIZED`. No hypothetical reachability metrics were
+created.
+
+`RETRIEVAL_KEY_EXECUTION_STATUS=COMPLETE`
+
+`RETRIEVAL_KEY_AUTHORITY_GATE=INSUFFICIENT_EVIDENCE`
+
+`RETRIEVAL_KEY_ARM_A_STATUS=NOT_EXECUTED_AUTHORITY_GATE_TERMINATED`
+
+`RETRIEVAL_KEY_ARM_B_STATUS=NOT_AUTHORIZED`
+
+`RETRIEVAL_KEY_ARM_B_EXECUTED=NO`
+
+`RETRIEVAL_KEY_INTERPRETATION_CLASS=CLASS_E_OPERATOR_NOT_AUTHORIZED_OR_NOT_SCIENTIFICALLY_DEFENSIBLE`
+
+`RETRIEVAL_KEY_CANONICALIZATION_HYPOTHESIS=CLOSED_UNSUPPORTED_BY_FROZEN_AUTHORITY`
+
+`RETRIEVAL_KEY_RESULT=docs/open-instrument/research-artifacts/multilingual-discovery-substrate-v0.2-retrieval-key-authority-and-reachability-execution-v0.1/result.json`
+
+`RETRIEVAL_KEY_RESULT_SHA256=43828f3dee6fe3d86a6cb673cfe600826222f1c776563798fb2d00b71e9f7188`
+
+`RETRIEVAL_KEY_RESULT_MANIFEST=docs/open-instrument/research-artifacts/multilingual-discovery-substrate-v0.2-retrieval-key-authority-and-reachability-execution-v0.1/hash-manifest.json`
+
+`RETRIEVAL_KEY_RESULT_MANIFEST_SHA256=6be8afee402f79b6c827d85900676784cc7eac00a02c3cf4505ba0f738ec2d27`
+
+`RETRIEVAL_KEY_SCIENTIFIC_RERUN=NO`
+
+`S3_RESULT_UNCHANGED=YES`
+
+`BROADER_DIAGNOSTIC_RESULT_UNCHANGED=YES`
+
+`S4=NOT_STARTED`
+
 ## Explicit next action
 
-`NEXT_ACTION=EXECUTE_FROZEN_RETRIEVAL_KEY_REACHABILITY_PROCEDURE`
+`NEXT_ACTION=REVIEW_V0_2_SUBSTRATE_SOURCE_ARCHITECTURE_AFTER_CLASS_E`
 
-The next action is separately authorized only when its own execution lane is
-opened. This definition lane does not execute it, create a result artifact, or
-close v0.2.
+The canonicalization hypothesis is closed for this frozen procedure. This does
+not establish that canonicalization would fail or succeed in a future
+authorized procedure. The v0.2 milestone remains active/incomplete and S4 is
+not started.

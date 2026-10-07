@@ -1,0 +1,107 @@
+{
+  "schemaVersion": "open-instrument.multilingual-discovery-substrate-v0.2.retrieval-key-authority-and-reachability-execution-result.v0.1",
+  "status": "PROCEDURE_EXECUTED",
+  "procedureId": "open-instrument.multilingual-discovery-substrate-v0.2.retrieval-key-authority-and-reachability.v0.1",
+  "procedureSha256": "353f036165c1efeaecd9d0485cd485eb18094afe67d1fc451ecd725ae8c20879",
+  "procedureManifestSha256": "436b0c92306102ca3df8d59098916b08e93404d7b9809069e0abffa72dce8b16",
+  "repositoryStartingHead": "e43a994e14e33aefa4459ba042f47b42dcb79385",
+  "repositoryExecutionHead": "e43a994e14e33aefa4459ba042f47b42dcb79385",
+  "authoritativeAttemptsBefore": 0,
+  "authoritativeAttempts": 1,
+  "authoritativeAttemptsMax": 1,
+  "noRerun": true,
+  "syntheticOnly": true,
+  "realDataExecuted": false,
+  "providerExecution": false,
+  "sourceAcquisition": false,
+  "sourceReattestation": false,
+  "authorityGate": {
+    "decision": "INSUFFICIENT_EVIDENCE",
+    "currentEvidence": {
+      "explicitSourceTraditionAuthorization": false,
+      "explicitSourceTraditionProhibition": false,
+      "operatorCoverage": "PASS",
+      "sourceTruthInvariants": "PASS",
+      "collisionPolicyFrozen": "PASS",
+      "currentDecision": "INSUFFICIENT_EVIDENCE"
+    },
+    "postFreezeEvidenceMayChangeDecision": false,
+    "decisionMustBeReboundByNewProcedureVersion": true,
+    "derivedFromFrozenProcedureOnly": true
+  },
+  "operator": {
+    "operatorId": "open-instrument.retrieval-key-canonicalization.latin-scholarly-quantity.v0.1",
+    "selectedOption": "OPTION_2",
+    "status": "PROPOSED_NOT_AUTHORIZED_FOR_RUNTIME",
+    "runtimeAuthorized": false
+  },
+  "latinTestSet": {
+    "recordCount": 21,
+    "currentAsciiCount": 13,
+    "currentDiacriticCount": 8,
+    "identitySha256": "78889ebe16df9575221d30c1b4be434aecc2eeb1db0588dde7d1b9a56138dc0b",
+    "sourceRecordsChanged": false,
+    "citationsChanged": false,
+    "provenanceChanged": false
+  },
+  "arms": {
+    "ARM_A": {
+      "status": "NOT_EXECUTED_AUTHORITY_GATE_TERMINATED",
+      "representation": "CURRENT_UPPERCASE_NFC_IDENTITY",
+      "scientificReachabilityExecuted": false,
+      "reachabilityMetrics": null
+    },
+    "ARM_B": {
+      "status": "NOT_AUTHORIZED",
+      "scientificReachabilityExecuted": false,
+      "reachabilityMetrics": null,
+      "reason": "AUTHORITY_GATE_INSUFFICIENT_EVIDENCE"
+    }
+  },
+  "interpretation": {
+    "class": "CLASS_E_OPERATOR_NOT_AUTHORIZED_OR_NOT_SCIENTIFICALLY_DEFENSIBLE",
+    "definition": "OPERATOR_NOT_AUTHORIZED_OR_NOT_SCIENTIFICALLY_DEFENSIBLE",
+    "canonicalizationHypothesisStatus": "CLOSED_UNSUPPORTED_BY_FROZEN_AUTHORITY",
+    "established": [
+      "The frozen evidence does not authorize the candidate Latin retrieval-key operator.",
+      "Arm B was not scientifically executed.",
+      "Current runtime retrieval and matching remain unchanged."
+    ],
+    "notEstablished": [
+      "Canonicalization would fail to increase Latin reachability.",
+      "Canonicalization would succeed.",
+      "Latin is linguistically irrelevant.",
+      "Any historical, functional, semantic, pronunciation, or etymological claim."
+    ]
+  },
+  "integrity": {
+    "sourceFormMutated": false,
+    "citationMutated": false,
+    "glossMutated": false,
+    "attestationMutated": false,
+    "provenanceMutated": false,
+    "queryGenerationChanged": false,
+    "normalizationChanged": false,
+    "matchingChanged": false,
+    "newSource": false,
+    "newLanguage": false,
+    "s3Rerun": false,
+    "broaderDiagnosticRerun": false,
+    "s4Started": false
+  },
+  "priorResults": {
+    "s3ResultSha256": "b703051f8d6020548f93dc9a6591b22278f467bb0c521871b31aafb47be4ca03",
+    "broaderResultSha256": "51019087d2199f8506267c3e6a4fbdb8824962641a6ed49abaa7e2c7bcc59ee6"
+  },
+  "nextAction": "REVIEW_V0_2_SUBSTRATE_SOURCE_ARCHITECTURE_AFTER_CLASS_E",
+  "postResultDeterministicRepair": {
+    "kind": "SERIALIZATION_METADATA_ONLY",
+    "fields": [
+      "latinTestSet.currentAsciiCount",
+      "latinTestSet.currentDiacriticCount"
+    ],
+    "scientificProcedureReexecuted": false,
+    "armAReexecuted": false,
+    "armBReexecuted": false
+  }
+}
