@@ -20,7 +20,12 @@
 - `S1_CATALOG_DERIVATION_SHA256=bf7f9592b6123fc2d634af7616415fdedf317469ba1e3ca9f654a0e4dc4ce265`
 - `S1_SOURCE_RECORD_PROJECTION_PATH=src/shared/openInstrument/multilingualDiscoverySubstrateS1.v0_2.ts`
 - `S1_SOURCE_RECORD_PROJECTION_SHA256=8f65b688ca6c3e7a4a130c478c2c6ec3abbb6b6875db742fd9666b4ced5b61d3`
-- `S2=NOT_STARTED`
+- `S2=COMPLETE`
+- `S3=NOT_STARTED`
+- `S2_VALIDATION_ARTIFACT=docs/open-instrument/research-artifacts/multilingual-discovery-substrate-v0.2-s2-authority-truth-validation-v0.1/validation.json`
+- `S2_VALIDATION_ARTIFACT_SHA256=6dd24ea7074aa73f2060c40afb254370a79270a8ce0db8f273bec5b332792fae`
+- `S2_VALIDATION_MANIFEST=docs/open-instrument/research-artifacts/multilingual-discovery-substrate-v0.2-s2-authority-truth-validation-v0.1/hash-manifest.json`
+- `S2_VALIDATION_MANIFEST_SHA256=8a8976b5cbd3586ea76661e3f5f93beb4fcceab8a16fb627e2678bd9dacf0234`
 - `S0_ARTIFACT=docs/open-instrument/research-artifacts/multilingual-discovery-substrate-v0.2-s0-baseline-freeze-v0.1/baseline.json`
 - `S0_ARTIFACT_SHA256=52fd4865fd3a0eb2067ea460af7d75024948de5c56cbcc8ce9936361a591a58e`
 - `S0_MANIFEST=docs/open-instrument/research-artifacts/multilingual-discovery-substrate-v0.2-s0-baseline-freeze-v0.1/hash-manifest.json`
@@ -436,6 +441,6 @@ DF_BRAIN has no authorized remote push in this milestone.
 
 ## Explicit next action
 
-`NEXT_ACTION=BEGIN_V0_2_AUTHORITY_TRUTH_BOUNDARY_VALIDATION`
+`NEXT_ACTION=BEGIN_V0_2_INDEPENDENT_COVERAGE_EVALUATION`
 
-This action is not executed by the S1 projection lane.
+This action is not executed by the S2 validation lane.

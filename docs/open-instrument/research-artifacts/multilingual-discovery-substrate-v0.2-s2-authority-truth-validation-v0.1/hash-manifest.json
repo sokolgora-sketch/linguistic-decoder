@@ -1,0 +1,53 @@
+{
+  "schemaVersion": "open-instrument.multilingual-discovery-substrate-expansion-s2-hash-manifest.v0.1",
+  "status": "FROZEN_S2_AUTHORITY_TRUTH_VALIDATION",
+  "procedureId": "open-instrument.multilingual-discovery-substrate-expansion-v0.2.s2-authority-truth-validation.v0.1",
+  "repositoryS1Merge": "614e98b960a8c76122f78bc5ef13ec242e0560ec",
+  "artifacts": [
+    {
+      "path": "docs/open-instrument/research-artifacts/multilingual-discovery-substrate-v0.2-s2-authority-truth-validation-v0.1/validation.json",
+      "bytes": 12648,
+      "sha256": "6dd24ea7074aa73f2060c40afb254370a79270a8ce0db8f273bec5b332792fae"
+    }
+  ],
+  "inputs": [
+    {
+      "path": "docs/open-instrument/research-artifacts/multilingual-discovery-substrate-v0.2-s0-baseline-freeze-v0.1/baseline.json",
+      "sha256": "52fd4865fd3a0eb2067ea460af7d75024948de5c56cbcc8ce9936361a591a58e"
+    },
+    {
+      "path": "docs/open-instrument/research-artifacts/multilingual-discovery-substrate-v0.2-s0-baseline-freeze-v0.1/hash-manifest.json",
+      "sha256": "38d57de7082b4d719b76aa5cf34e177c5e0d811a1a11341bba9535fafcbf764f"
+    },
+    {
+      "path": "src/shared/openInstrument/multilingualDiscoverySubstrateS1.v0_2.ts",
+      "sha256": "8f65b688ca6c3e7a4a130c478c2c6ec3abbb6b6875db742fd9666b4ced5b61d3"
+    },
+    {
+      "path": "src/shared/openInstrument/multilingualDiscoverySubstrateS0.v0_2.ts",
+      "sha256": "bf7f9592b6123fc2d634af7616415fdedf317469ba1e3ca9f654a0e4dc4ce265"
+    },
+    {
+      "path": "src/shared/openInstrument/motivationEngineDiscovery.v0_1.ts",
+      "sha256": "febe40af34ae4e60f6a1ffa91e63a36e4e2c04748b1d5cfae4ba53f7195e45de"
+    },
+    {
+      "path": "src/data/openInstrument/multiSourceFunctionalResearchEvidenceCatalog.v0_1.json",
+      "sha256": "65ce90cc72395e0c5c777cba6d26cd8636f4dd9e4e1b0b7efb27025a2d154dc8"
+    },
+    {
+      "path": "src/data/openInstrument/genericFunctionalWitnessSourceRecords.v1.json",
+      "sha256": "5a6aaf7742033d62d183e960841dbb4a06c4950070b4f5b655da7a5a4671ddde"
+    },
+    {
+      "path": "docs/open-instrument/reviewed-source-tradition-authority-policy-v1.md",
+      "sha256": "8c9361834a8aa0055cb08b0284e7ebbccd8653b58c199e36832bbf1c990dc826"
+    }
+  ],
+  "execution": {
+    "s2Validation": "deterministic_repository_input_reconstruction",
+    "expandedResultsInspected": false,
+    "s3EvaluationExecuted": false,
+    "coverageDeltaComputed": false
+  }
+}

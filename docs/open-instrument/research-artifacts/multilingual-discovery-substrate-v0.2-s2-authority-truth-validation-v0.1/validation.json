@@ -1,0 +1,193 @@
+{
+  "schemaVersion": "open-instrument.multilingual-discovery-substrate-expansion-s2-validation.v0.1",
+  "procedureId": "open-instrument.multilingual-discovery-substrate-expansion-v0.2.s2-authority-truth-validation.v0.1",
+  "status": "S2_AUTHORITY_TRUTH_VALIDATION_PASS",
+  "repositoryS1Merge": "614e98b960a8c76122f78bc5ef13ec242e0560ec",
+  "authorityIdentities": {
+    "s0ArtifactSha256": "52fd4865fd3a0eb2067ea460af7d75024948de5c56cbcc8ce9936361a591a58e",
+    "s0ManifestSha256": "38d57de7082b4d719b76aa5cf34e177c5e0d811a1a11341bba9535fafcbf764f",
+    "s1ProjectionSha256": "8f65b688ca6c3e7a4a130c478c2c6ec3abbb6b6875db742fd9666b4ced5b61d3",
+    "s1CatalogDerivationSha256": "bf7f9592b6123fc2d634af7616415fdedf317469ba1e3ca9f654a0e4dc4ce265",
+    "s1RuntimeCompositionSha256": "febe40af34ae4e60f6a1ffa91e63a36e4e2c04748b1d5cfae4ba53f7195e45de",
+    "identitiesMatch": true
+  },
+  "postS1Substrate": {
+    "total": 76,
+    "languageCounts": {
+      "Albanian": 55,
+      "Latin": 21
+    },
+    "catalogProjectedAlbanian": 52,
+    "separatelyReviewedAlbanian": 3,
+    "preS1Latin": 2,
+    "s1IncrementalLatin": 19,
+    "uniqueNormalizedForms": 76,
+    "uniqueQueryKeys": 76,
+    "duplicateNormalizedForms": [],
+    "queryKeyCollisions": [],
+    "fingerprint": "1c4714a1d9a7550c1c037b4ce62ca85e9ff24966f2e8d447c038bce001b45d81"
+  },
+  "s1RowAuthorityValidation": {
+    "expected": 19,
+    "validated": 19,
+    "sourceAttested": 19,
+    "admissionPass": 19,
+    "researchOnly": 19,
+    "provenanceComplete": 19,
+    "citationComplete": 19,
+    "authorityDefects": [],
+    "sourceRecordIds": [
+      "research.external.latin-libertas-freedom.scale50.cohortG.v0_1",
+      "research.external.latin-vir-man.scale50.cohortG.v0_1",
+      "research.external.open-instrument-research-evidence-packet-v0-1.art-creative-artistic-activity-v0-1.verified-source-capture-scaife-lewis-short-v0-1-headword-ars-art-sense-entry-text-beginning-skill-in-producing-any-material-form-ars-v0-1",
+      "research.external.open-instrument-research-evidence-packet-v0-1.blue-blue-color-v0-1.verified-source-capture-scaife-lewis-short-v0-1-headword-caer-l-us-blue-sense-entry-text-beginning-dark-colored-dark-blue-caer-l-us-v0-1",
+      "research.external.open-instrument-research-evidence-packet-v0-1.bread-physical-baked-food-v0-1.verified-source-capture-scaife-lewis-short-v0-1-headword-p-nis-bread-sense-entry-text-beginning-bread-p-nis-v0-1",
+      "research.external.open-instrument-research-evidence-packet-v0-1.break-physical-break-damage-source-review-v0-1.verified-source-capture-scaife-lewis-short-v0-1-headword-frango-physical-break-sense-entry-text-beginning-to-break-break-in-pieces-frango-v0-1",
+      "research.external.open-instrument-research-evidence-packet-v0-1.change-alteration-v0-1.lewis-short-mutatio",
+      "research.external.open-instrument-research-evidence-packet-v0-1.cloud-physical-atmospheric-v0-1.verified-source-capture-scaife-lewis-short-v0-1-headword-nimbus-cloud-in-general-entry-text-beginning-a-cloud-in-general-nimbus-v0-1",
+      "research.external.open-instrument-research-evidence-packet-v0-1.friend-close-person-v0-1.verified-source-capture-scaife-lewis-short-v0-1-headword-familiaris-friendly-friend-sense-entry-text-beginning-familiar-intimate-friendly-familiaris-v0-1",
+      "research.external.open-instrument-research-evidence-packet-v0-1.hope-mental-desired-expectation-v0-1.verified-source-capture-scaife-lewis-short-v0-1-headword-spes-hope-sense-entry-text-beginning-expectation-of-something-desired-sp-s-v0-1",
+      "research.external.open-instrument-research-evidence-packet-v0-1.order-lexical-arrangement-v0-1.lewis-short-ordo",
+      "research.external.open-instrument-research-evidence-packet-v0-1.sea-physical-saltwater-body-v0-1.verified-source-capture-scaife-lewis-short-v0-1-headword-mare-sea-sense-entry-text-beginning-sea-mare-v0-1",
+      "research.external.open-instrument-research-evidence-packet-v0-1.skin-physical-body-covering-v0-1.verified-source-capture-scaife-lewis-short-v0-1-headword-pellis-skin-hide-sense-entry-text-beginning-skin-hide-pellis-v0-1",
+      "research.external.open-instrument-research-evidence-packet-v0-1.sleep-physical-sleep-state-v0-1.verified-source-capture-scaife-lewis-short-v0-1-headword-somnus-sleep-sense-entry-text-beginning-sleep-somnus-v0-1",
+      "research.external.open-instrument-research-evidence-packet-v0-1.snow-physical-precipitation-v0-1.verified-source-capture-scaife-lewis-short-v0-1-headword-nix-snow-sense-entry-text-beginning-snow-nix-v0-1",
+      "research.external.open-instrument-research-evidence-packet-v0-1.star-astronomical-star-v0-1.verified-source-capture-scaife-lewis-short-v0-1-headword-stella-star-sense-entry-text-beginning-a-star-stella-v0-1",
+      "research.external.open-instrument-research-evidence-packet-v0-1.tree-physical-plant-v0-1.verified-source-capture-scaife-lewis-short-v0-1-headword-arbor-general-tree-sense-entry-text-beginning-a-tree-arbor-v0-1",
+      "research.external.open-instrument-research-evidence-packet-v0-1.vision-visual-appearance-or-vision-v0-1.verified-source-capture-scaife-lewis-short-v0-1-headword-v-s-o-vision-sense-entry-text-beginning-sight-vision-v-s-o-v0-1",
+      "research.external.open-instrument-research-evidence-packet-v0-1.water-physical-liquid-v0-1.verified-source-capture-scaife-lewis-short-v0-1-headword-qua-general-water-sense-entry-text-beginning-water-in-its-most-gen-signif-qua-v0-1"
+    ],
+    "citationIds": [
+      "change.lewis-short.mutatio.v0_1",
+      "open-instrument.source-record.capture.scaife-lewis-short-v0-1.headword-arbor-general-tree-sense-entry-text-beginning-a-tree.arbor.v0_1.citation.v0_1",
+      "open-instrument.source-record.capture.scaife-lewis-short-v0-1.headword-ars-art-sense-entry-text-beginning-skill-in-producing-any-material-form.ars.v0_1.citation.v0_1",
+      "open-instrument.source-record.capture.scaife-lewis-short-v0-1.headword-caer-l-us-blue-sense-entry-text-beginning-dark-colored-dark-blue.caer-l-us.v0_1.citation.v0_1",
+      "open-instrument.source-record.capture.scaife-lewis-short-v0-1.headword-familiaris-friendly-friend-sense-entry-text-beginning-familiar-intimate-friendly.familiaris.v0_1.citation.v0_1",
+      "open-instrument.source-record.capture.scaife-lewis-short-v0-1.headword-frango-physical-break-sense-entry-text-beginning-to-break-break-in-pieces.frango.v0_1.citation.v0_1",
+      "open-instrument.source-record.capture.scaife-lewis-short-v0-1.headword-mare-sea-sense-entry-text-beginning-sea.mare.v0_1.citation.v0_1",
+      "open-instrument.source-record.capture.scaife-lewis-short-v0-1.headword-nimbus-cloud-in-general-entry-text-beginning-a-cloud-in-general.nimbus.v0_1.citation.v0_1",
+      "open-instrument.source-record.capture.scaife-lewis-short-v0-1.headword-nix-snow-sense-entry-text-beginning-snow.nix.v0_1.citation.v0_1",
+      "open-instrument.source-record.capture.scaife-lewis-short-v0-1.headword-p-nis-bread-sense-entry-text-beginning-bread.p-nis.v0_1.citation.v0_1",
+      "open-instrument.source-record.capture.scaife-lewis-short-v0-1.headword-pellis-skin-hide-sense-entry-text-beginning-skin-hide.pellis.v0_1.citation.v0_1",
+      "open-instrument.source-record.capture.scaife-lewis-short-v0-1.headword-qua-general-water-sense-entry-text-beginning-water-in-its-most-gen-signif.qua.v0_1.citation.v0_1",
+      "open-instrument.source-record.capture.scaife-lewis-short-v0-1.headword-somnus-sleep-sense-entry-text-beginning-sleep.somnus.v0_1.citation.v0_1",
+      "open-instrument.source-record.capture.scaife-lewis-short-v0-1.headword-spes-hope-sense-entry-text-beginning-expectation-of-something-desired.sp-s.v0_1.citation.v0_1",
+      "open-instrument.source-record.capture.scaife-lewis-short-v0-1.headword-stella-star-sense-entry-text-beginning-a-star.stella.v0_1.citation.v0_1",
+      "open-instrument.source-record.capture.scaife-lewis-short-v0-1.headword-v-s-o-vision-sense-entry-text-beginning-sight-vision.v-s-o.v0_1.citation.v0_1",
+      "order.lewis-short.ordo.v0_1",
+      "research.external.scaife-lewis-short-libertas-freedom.scale50.cohortG.citation.v0_1",
+      "research.external.scaife-lewis-short-vir-man.scale50.cohortG.citation.v0_1"
+    ]
+  },
+  "sourceTraditionPolicy": {
+    "sourceTraditions": [
+      "scaife.lewis-short.v0_1"
+    ],
+    "researchSubstrateAuthorized": true,
+    "productionAuthorized": false,
+    "licensePolicyStatus": "POLICY_METADATA_ONLY_NO_LEGAL_CONCLUSION",
+    "sourceFetchPerformedByS2": false,
+    "newSourceIntroduced": false
+  },
+  "provenanceIntegrity": {
+    "roundtripCount": 19,
+    "orphanDirectRecords": 0,
+    "missingCitations": 0,
+    "extraUnauthorizedCitations": 0,
+    "provenanceLoss": 0,
+    "sourceIdentityLoss": 0,
+    "locatorLoss": 0,
+    "versionDateLoss": 0,
+    "hashArchiveIdentityLoss": 0
+  },
+  "quarantineValidation": {
+    "rawRows": 98,
+    "loadedRows": 95,
+    "quarantinedRows": 3,
+    "quarantinedIdentities": [
+      "research.external.albanian-ere-era.v0_1",
+      "research.external.albanian-ere-smell.v0_1",
+      "research.external.albanian-ere-wind.v0_1"
+    ],
+    "quarantineReasonCodes": [
+      "LOADER_QUARANTINED_UNRESOLVED_RESEARCH_ARTIFACT"
+    ],
+    "quarantinedRowsInDirectSubstrate": 0
+  },
+  "heldExcludedValidation": {
+    "admissionUnresolvedCount": 6,
+    "admissionUnresolvedInDirectSubstrate": 0,
+    "adapterDeferredCount": 2,
+    "adapterDeferredInDirectSubstrate": 0,
+    "boundaryExcludedCount": 14,
+    "boundaryExcludedInDirectSubstrate": 0,
+    "exclusionPredicatesChanged": false
+  },
+  "collisionValidation": {
+    "baselineVsS1FormDuplicates": [],
+    "baselineVsS1QueryKeyCollisions": [],
+    "intraS1FormDuplicates": [],
+    "intraS1QueryKeyCollisions": [],
+    "wholeSubstrateFormDuplicates": [],
+    "wholeSubstrateQueryKeyCollisions": []
+  },
+  "pronunciationBoundary": {
+    "latinPronunciationAuthority": "NONE_UNAUTHORIZED",
+    "candidateVoicePathPolicy": "NULL_UNAUTHORIZED",
+    "spokenVoiceFromLatinOrthography": false,
+    "latinGammaFromUnauthorizedPronunciation": false,
+    "latinZcFromUnauthorizedPronunciation": false,
+    "latinMath7PromotedFromLexicalAttestation": false
+  },
+  "functionalBoundary": {
+    "newLatinFunctionalAuthorityCount": 0,
+    "functionalAuthorityFromGlossOnly": 0,
+    "functionalAuthorityRuleChanged": false
+  },
+  "historicalBoundary": {
+    "historicalOriginClaimsAdded": 0,
+    "etymologicalDerivationClaimsAdded": 0,
+    "languagePriorityClaimsAdded": 0,
+    "winnerClaimsAdded": 0,
+    "noSingleWinner": true,
+    "userDecides": true
+  },
+  "productionBoundary": {
+    "s1RowsProductionAuthorized": 0,
+    "productionSourceStatusChanged": false,
+    "productionPronunciationChanged": false,
+    "productionSemanticAuthorityChanged": false,
+    "productionApiContractChanged": false
+  },
+  "truthLayerValidation": {
+    "sourceFact": true,
+    "derivedStructure": true,
+    "functionalHypothesis": true,
+    "unknownNull": true,
+    "layersRemainDistinct": true
+  },
+  "antiHardcoding": {
+    "targetWordRuntimeBranches": "NONE",
+    "postRetrievalInjection": "NO",
+    "candidateShopping": "NO",
+    "winnerSelection": "NO",
+    "rowIdRuntimeSpecialCases": "NO"
+  },
+  "s3Firewall": {
+    "frozenEvaluationProcedureChanged": false,
+    "frozenEvaluationSampleChanged": false,
+    "expandedSampleResultsInspected": false,
+    "s3EvaluationExecuted": false,
+    "coverageDeltaComputed": false
+  },
+  "sourceInputs": {
+    "docs/open-instrument/research-artifacts/multilingual-discovery-substrate-v0.2-s0-baseline-freeze-v0.1/baseline.json": "52fd4865fd3a0eb2067ea460af7d75024948de5c56cbcc8ce9936361a591a58e",
+    "docs/open-instrument/research-artifacts/multilingual-discovery-substrate-v0.2-s0-baseline-freeze-v0.1/hash-manifest.json": "38d57de7082b4d719b76aa5cf34e177c5e0d811a1a11341bba9535fafcbf764f",
+    "src/shared/openInstrument/multilingualDiscoverySubstrateS1.v0_2.ts": "8f65b688ca6c3e7a4a130c478c2c6ec3abbb6b6875db742fd9666b4ced5b61d3",
+    "src/shared/openInstrument/multilingualDiscoverySubstrateS0.v0_2.ts": "bf7f9592b6123fc2d634af7616415fdedf317469ba1e3ca9f654a0e4dc4ce265",
+    "src/shared/openInstrument/motivationEngineDiscovery.v0_1.ts": "febe40af34ae4e60f6a1ffa91e63a36e4e2c04748b1d5cfae4ba53f7195e45de",
+    "src/data/multiSourceFunctionalResearchEvidenceCatalog.v0_1.json": "65ce90cc72395e0c5c777cba6d26cd8636f4dd9e4e1b0b7efb27025a2d154dc8",
+    "src/data/openInstrument/genericFunctionalWitnessSourceRecords.v1.json": "5a6aaf7742033d62d183e960841dbb4a06c4950070b4f5b655da7a5a4671ddde",
+    "docs/open-instrument/reviewed-source-tradition-authority-policy-v1.md": "8c9361834a8aa0055cb08b0284e7ebbccd8653b58c199e36832bbf1c990dc826"
+  }
+}
