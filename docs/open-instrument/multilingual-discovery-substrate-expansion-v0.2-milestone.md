@@ -27,7 +27,7 @@ The selected scope is:
 
 `OPTION_E_EXISTING_ONLY_V0_2`
 
-Project the currently eligible, not-yet-projected rows from the existing
+Project the currently eligible, not-yet-projected Latin rows from the existing
 multi-source research catalog into the existing generic Discovery substrate.
 This is a projection/reconciliation task, not a source-acquisition campaign.
 
@@ -80,14 +80,23 @@ LOADED CATALOG                      95
   - not projected                   41
 
 LOADED CATALOG                     95
-  - eligible under existing
+  - preliminary eligible under
     fact/relation/citation rules    81
   - excluded by existing boundaries 14
 
-ELIGIBLE NOT-YET-PROJECTED          27
+PRELIMINARILY ELIGIBLE NOT-YET-
+PROJECTED UNDER RELATION/CITATION
+PREDICATES                          27
   - Ancient Greek                    3
   - Latin                           23
   - Turkic comparative evidence      1
+
+FULL CURRENT ADMISSION AND DIRECT
+ADAPTER REVIEW
+  - Latin rows ready for this slice  19
+  - Ancient Greek rows deferred       2
+  - admission-unresolved rows         6
+  - existing boundary exclusions     14
 ```
 
 The `54` current catalog projections are `52` Albanian rows and `2` Latin
@@ -111,10 +120,33 @@ boundary is:
 - `1` Turkic comparative row is eligible under those predicates but outside
   the current direct Discovery language boundary.
 
-Thus the `27` recoverable rows are `23 + 3 + 1`, with no query-key collision
-against the current `57`-record substrate in the inventory audit. The
-implementation lane must not rescue the remaining `14` rows by weakening
-relation, attestation, or truth-boundary rules.
+The preliminary `27` count was based on relation, citation, and attestation
+predicates only. It is not the final recovery count because the current
+catalog-admission contract also requires a non-empty `provenanceGroupId` on
+citations and a non-empty `targetSenseId` on every functional hypothesis.
+Those requirements are checked by `validateIncomingRowV0_1` and are binding for
+new admission/projection.
+
+The binding implementation seam is
+`src/shared/openInstrumentResearchCatalogAdmission.v0_1.ts`; this milestone
+does not weaken or bypass it.
+
+The full current-contract review identifies six unresolved rows: Greek
+`eremos`, Turkic `ak`, and Latin `cor`, `edo`, `mens`, and `belligero`. They
+remain out of the v0.2 first slice until their existing evidence is
+metadata-hardened or re-attested under the current admission contract. Two
+Ancient Greek rows satisfy the admission predicates but remain outside the
+current direct Albanian/Latin adapter pair. The first implementation slice is
+therefore the `19` Latin rows that satisfy both current admission and the
+existing direct adapter boundary.
+
+The `22` held rows are `6` admission-unresolved rows, `2` admission-valid but
+adapter-deferred Ancient Greek rows, and the `14` existing boundary
+exclusions. The `19` selected rows have no query-key collision against the current
+`57`-record substrate in the inventory audit. The implementation lane must
+not rescue the `14` intentionally excluded rows by weakening relation,
+attestation, or truth-boundary rules, and must not silently add the two Greek
+rows without a separately authorized adapter boundary.
 
 ### Source and status inventory
 
@@ -127,14 +159,15 @@ code; this milestone must not create a parallel ingestion path.
 
 ### Recovery classification
 
-For the `27` eligible rows:
+For the `19` strict first-slice rows:
 
-- recoverable with existing citations: `27`;
-- recoverable with existing metadata: `27`;
-- recoverable without external source fetch: `27`;
-- requiring source re-attestation: `0` at definition time;
+- recoverable with existing citations: `19`;
+- recoverable with existing metadata: `19`;
+- recoverable without external source fetch: `19`;
+- requiring source re-attestation or metadata hardening: `6` held rows;
+- admission-valid but requiring a new direct language adapter: `2` held rows;
 - requiring a new source: `0`;
-- requiring a new language: `0`;
+- requiring a new language in the selected slice: `0`;
 - intentionally non-projectable under current policy: `14`.
 
 The implementation lane must still validate each row against the current
@@ -149,9 +182,11 @@ pronunciation, semantic, historical, or functional authority.
 
 1. Freeze the `57`-record direct Discovery baseline, its source identities,
    provenance fields, normalized query keys, and the reconciled `98 → 95 →
-   54/41 → 27/14` accounting.
-2. Project the `27` eligible existing-catalog rows through the existing
-   generic substrate/review seam.
+   54/41 → 19 selected / 22 held` accounting.
+2. Project the `19` strict-admission-compatible Latin rows through the
+   existing generic substrate/review seam. Keep the two admission-valid
+   Ancient Greek rows outside this slice because the current direct adapter
+   boundary is Albanian plus Latin.
 3. Preserve source form, normalized lookup form, gloss, source identity,
    stable locator, version/date fields where present, attestation status, and
    source-status metadata.
@@ -266,17 +301,19 @@ Confirm that the baseline can be reconstructed from repository inputs.
 
 ### S1 — Existing-catalog projection
 
-Project only the `27` pre-identified eligible rows through the existing
-source-record/substrate seam. Do not add a new adapter family, source, or
-language. Preserve deterministic ordering and all source/provenance fields.
+Project only the `19` pre-identified Latin rows that pass the full current
+admission contract through the existing source-record/substrate seam. Do not
+add a new adapter family, source, or language. Preserve deterministic ordering
+and all source/provenance fields.
 
 ### S2 — Authority and truth-boundary validation
 
-Verify that all `27` rows remain source-attested research facts under existing
+Verify that all `19` rows remain source-attested research facts under existing
 admission rules, that no duplicate or collision is introduced, and that the
 `14` excluded rows plus the three quarantined raw rows remain excluded for
 their existing reasons. Verify no pronunciation, historical, functional, or
-production claim is introduced.
+production claim is introduced. Verify that the six admission-unresolved rows
+and two adapter-deferred Greek rows are not projected by this slice.
 
 ### S3 — Independent coverage evaluation
 
@@ -299,10 +336,11 @@ comprehensible.
 
 The milestone may close only when all of the following are proven:
 
-- the `57`-record baseline and `98 → 95 → 54/41 → 27/14` accounting are
+- the `57`-record baseline and `98 → 95 → 54/41 → 19 selected / 22 held`
+  accounting are
   reproducible;
-- the `27` existing-only recovery set is deterministically projected or each
-  rejected row has an existing contract reason;
+- the `19` existing-only Latin recovery set is deterministically projected or
+  each rejected row has an existing contract reason;
 - no new source or language is silently introduced;
 - source identity, citation, locator, version/date, license metadata where
   available, attestation status, and artifact fingerprints are preserved;
@@ -331,16 +369,19 @@ by this definition.
 The repository evidence supports one immediate source-family action:
 
 - Latin Lewis & Short / existing `scaife.lewis-short.v0_1` rows are a bounded
-  existing-source recovery candidate: `23` eligible rows remain outside the
-  current Latin substrate, with `2` already present.
+  existing-source recovery candidate: `19` rows pass the full current
+  admission contract and remain outside the current Latin substrate, with `2`
+  already present. Four additional Latin rows (`cor`, `edo`, `mens`, and
+  `belligero`) remain admission-unresolved.
 
 Other loaded families are deferred from the first slice:
 
-- Ancient Greek has `3` eligible rows outside the current direct language
-  boundary, but generic Ancient Greek substrate policy is not yet part of the
-  current adapter pair;
-- Turkic comparative evidence has one eligible row, but its language-family
-  scope and source-tradition role are not a justified first expansion;
+- Ancient Greek has `2` admission-valid rows outside the current direct
+  language boundary and one admission-unresolved row (`eremos`); generic
+  Ancient Greek substrate policy is not yet part of the current adapter pair;
+- Turkic comparative evidence has one admission-unresolved row (`ak`), and its
+  language-family scope and source-tradition role are not a justified first
+  expansion;
 - reconstructed or inference rows remain excluded and are not source-attested
   lexical facts under this lane.
 
