@@ -1,10 +1,6 @@
 import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import {
-  getAlbanianLexicalSubstrateRecordsV0_1,
-} from "./albanianLexicalSubstrate.v0_1";
-
 export const MULTILINGUAL_DISCOVERY_SUBSTRATE_BROADER_DIAGNOSTIC_PROCEDURE_ID_V0_2 =
   "open-instrument.multilingual-discovery-substrate-expansion-v0.2.broader-stratified-diagnostic-procedure.v0.1" as const;
 
@@ -24,6 +20,16 @@ export const BROADER_DIAGNOSTIC_EXPECTED_PREPARED_POPULATION_COUNT_V0_2 =
 
 export const BROADER_DIAGNOSTIC_SELECTION_ID_V0_2 =
   "ORDINAL_STRATIFIED_PREPARED_POPULATION_LOWER_ENDPOINT_N1024" as const;
+
+export const BROADER_DIAGNOSTIC_FROZEN_INHERITED_SUBSTRATE_EXCLUSIONS_V0_2 = Object.freeze([
+  "art",
+  "da",
+  "grua",
+  "ha",
+  "mal",
+  "re",
+  "shi",
+] as const);
 
 type PopulationEntryV0_2 = Readonly<{
   lexicalWord: string;
@@ -66,9 +72,9 @@ function compareTextV0_2(left: string, right: string): number {
  * Reconstructs only the pre-frozen prepared input population.
  *
  * This helper intentionally does not import the query generator, pronunciation
- * engine, candidate adapters, or any result artifact. It uses only the frozen
- * lexical exclusion forms needed to reconstruct the prepared population, so it
- * is safe to use while freezing the selection procedure.
+ * engine, candidate adapters, substrate records, or any result artifact. It
+ * uses only the frozen M7 exclusion set needed to reconstruct the prepared
+ * population, so later changes to substrate contents cannot change selection.
  */
 export function reconstructBroaderDiagnosticPreparedPopulationV0_2(
   rootDir = process.cwd(),
@@ -81,13 +87,11 @@ export function reconstructBroaderDiagnosticPreparedPopulationV0_2(
     rootDir,
     BROADER_DIAGNOSTIC_PREPARATION_PROCEDURE_PATH_V0_2,
   );
-  const explicitExclusions = new Set(
+  const frozenM7Exclusions = new Set(
     preparation.preparedWordExclusion.excludedWords.map(normalizeWordV0_2),
   );
-  const substrateFormExclusions = new Set(
-    getAlbanianLexicalSubstrateRecordsV0_1()
-      .map((record) => normalizeWordV0_2(record.sourceForm))
-      .filter((word) => /^[a-z]+$/u.test(word)),
+  const frozenInheritedSubstrateExclusions = new Set<string>(
+    BROADER_DIAGNOSTIC_FROZEN_INHERITED_SUBSTRATE_EXCLUSIONS_V0_2,
   );
   const raw = [
     ...new Set(
@@ -97,11 +101,9 @@ export function reconstructBroaderDiagnosticPreparedPopulationV0_2(
         .filter((word) => /^[a-z]+$/u.test(word)),
     ),
   ].sort(compareTextV0_2);
-  const excluded = new Set([
-    ...explicitExclusions,
-    ...substrateFormExclusions,
-  ]);
-  const prepared = raw.filter((word) => !excluded.has(word));
+  const prepared = raw.filter((word) =>
+    !frozenM7Exclusions.has(word) && !frozenInheritedSubstrateExclusions.has(word),
+  );
   return {
     raw,
     prepared,

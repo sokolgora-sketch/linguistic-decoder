@@ -3,6 +3,7 @@ import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
 import {
   BROADER_DIAGNOSTIC_EXPECTED_PREPARED_POPULATION_COUNT_V0_2,
+  BROADER_DIAGNOSTIC_FROZEN_INHERITED_SUBSTRATE_EXCLUSIONS_V0_2,
   BROADER_DIAGNOSTIC_SAMPLE_SIZE_V0_2,
   MULTILINGUAL_DISCOVERY_SUBSTRATE_BROADER_DIAGNOSTIC_PROCEDURE_ID_V0_2,
   reconstructBroaderDiagnosticPreparedPopulationV0_2,
@@ -53,6 +54,13 @@ type ProcedureFixtureV0_2 = Readonly<{
     s3AuthoritativeAttempts: number;
     s3Outcome: string;
   }>;
+  populationAuthority: Readonly<{
+    preparationProcedureSha256: string;
+    frozenM7ExclusionCount: number;
+    inheritedSubstrateDerivedExclusionForms: readonly string[];
+    inheritedSubstrateDerivedExclusionCount: number;
+    preparationPredicate: string;
+  }>;
   substrateAuthority: Readonly<{
     total: number;
     languageCounts: Readonly<Record<string, number>>;
@@ -94,6 +102,21 @@ describe("multilingual Discovery substrate broader diagnostic definition", () =>
     expect(population.prepared.length).toBe(BROADER_DIAGNOSTIC_EXPECTED_PREPARED_POPULATION_COUNT_V0_2);
     expect(population.prepared).toEqual([...population.prepared].sort());
     expect(new Set(population.prepared).size).toBe(population.prepared.length);
+    const helperSource = readFileSync(join(
+      ROOT,
+      "src/shared/openInstrument/multilingualDiscoverySubstrateBroaderDiagnostic.v0_2.ts",
+    ), "utf8");
+    expect(helperSource).not.toContain("albanianLexicalSubstrate.v0_1");
+    expect(helperSource).not.toContain("getAlbanianLexicalSubstrateRecordsV0_1");
+    const procedure = readProcedure();
+    expect(procedure.populationAuthority.frozenM7ExclusionCount).toBe(84);
+    expect(procedure.populationAuthority.inheritedSubstrateDerivedExclusionForms).toEqual(
+      BROADER_DIAGNOSTIC_FROZEN_INHERITED_SUBSTRATE_EXCLUSIONS_V0_2,
+    );
+    expect(procedure.populationAuthority.inheritedSubstrateDerivedExclusionCount).toBe(7);
+    expect(procedure.populationAuthority.preparationPredicate).toContain(
+      "current substrate modules, substrate keys, generated query keys, and candidate responses are not read",
+    );
   });
 
   it("selects exactly one deterministic lower endpoint per ordinal stratum", () => {
@@ -128,6 +151,7 @@ describe("multilingual Discovery substrate broader diagnostic definition", () =>
     const manifest = JSON.parse(readFileSync(MANIFEST_PATH, "utf8")) as {
       artifacts: readonly { path: string; bytes: number; sha256: string }[];
       implementation: readonly { path: string; sha256: string }[];
+      inputs: readonly { path: string; sha256: string }[];
     };
     const procedureArtifact = manifest.artifacts.find((entry) => entry.path.endsWith("/procedure.json"));
     expect(procedureArtifact).toBeDefined();
@@ -136,8 +160,17 @@ describe("multilingual Discovery substrate broader diagnostic definition", () =>
     for (const entry of manifest.implementation) {
       expect(sha256File(join(ROOT, entry.path))).toBe(entry.sha256);
     }
+    const selectionProcedureBinding = manifest.inputs.find((entry) =>
+      entry.path.endsWith("m7-novel-input-generalization-v0.1/selection-procedure.json"),
+    );
+    expect(selectionProcedureBinding?.sha256).toBe(
+      readProcedure().populationAuthority.preparationProcedureSha256,
+    );
+    expect(selectionProcedureBinding?.sha256).toBe(
+      "de0363366f854230b178011c36a52818add15664f57a7241105bdbc6fb9b8eb7",
+    );
     expect(sha256File(join(ROOT, "src/shared/openInstrument/multilingualDiscoverySubstrateS3.v0_2.ts")))
-      .toBe("98dcb948a47c62f5763565113fc2dc9a9acb81ab94c15e54b4d0b7aaa0ee96df");
+      .toBe("dd4a01e61c0e37846a0416242b347f499ed135e608eecf446a58bc83da079220");
     expect(sha256File(join(ROOT, "src/shared/structuralHypothesisDiscovery.v0_1.ts")))
       .toBe("96fba8363df8b3d59caf6d7dc9ac9ad88007d15432bec4b647b83484a25555db");
     expect(sha256File(join(ROOT, "src/shared/openInstrument/genericFunctionalWitnessSourceAcquisition.v1.ts")))

@@ -467,11 +467,15 @@ additive broader diagnostic rather than reopening S3 or acquiring a source.
 `BROADER_STRATIFIED_DIAGNOSTIC_ATTEMPTS=0`
 
 The procedure freezes a deterministic 1024-input equal-ordinal-stratum sample
-over the existing prepared eligible population. It does not inspect generated
-query keys or candidate outcomes during definition, and it does not replace,
-rerun, or reinterpret S3. S4 remains not started and the milestone remains
-active. No new source, language, pronunciation authority, production authority,
-or matching behavior is authorized by this definition.
+over the existing prepared eligible population. Its preparation uses the
+already-frozen M7 exclusion set plus the separately frozen inherited seven-form
+substrate-derived exclusion set, with the M7 file hash bound in the procedure
+manifest; it does not read current Albanian substrate contents while selecting
+the sample. It does not inspect generated query keys or candidate outcomes
+during definition, and it does not replace, rerun, or reinterpret S3. S4
+remains not started and the milestone remains active. No new source, language,
+pronunciation authority, production authority, or matching behavior is
+authorized by this definition.
 
 ## Explicit next action
 

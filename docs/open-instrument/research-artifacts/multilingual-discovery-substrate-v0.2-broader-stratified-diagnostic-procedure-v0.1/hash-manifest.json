@@ -6,18 +6,18 @@
   "artifacts": [
     {
       "path": "docs/open-instrument/research-artifacts/multilingual-discovery-substrate-v0.2-broader-stratified-diagnostic-procedure-v0.1/procedure.json",
-      "bytes": 13617,
-      "sha256": "34236434d3a917a52d0db555178ccf33bc2fa362264d40e0d8019377ef42e1f1"
+      "bytes": 14445,
+      "sha256": "c84bfa8214c7abedd9da80124f304cc6f42cabb856913d22f7bcecee7e7b0c29"
     }
   ],
   "implementation": [
     {
       "path": "src/shared/openInstrument/multilingualDiscoverySubstrateBroaderDiagnostic.v0_2.ts",
-      "sha256": "00497a34122ca1830ced2dbae850c2dbe351d24ddedbb839a30c36d5333af74c"
+      "sha256": "5b55f694b331833c3414ad65c771a2e58ace4204be63ec825bfb95f2d2ef5127"
     },
     {
       "path": "tests/openInstrument.multilingualDiscoverySubstrateBroaderDiagnostic.v0_2.spec.ts",
-      "sha256": "0db265797e4593af4f59c1e82bca0c059534c16447db1921390a01c1e080c4a6"
+      "sha256": "6a12d995a2299ea8cc6d8c727b183d0feb3b24d14c9a0f391da04b772e6a3e06"
     }
   ],
   "inputs": [
@@ -67,7 +67,7 @@
     },
     {
       "path": "src/shared/openInstrument/multilingualDiscoverySubstrateS3.v0_2.ts",
-      "sha256": "98dcb948a47c62f5763565113fc2dc9a9acb81ab94c15e54b4d0b7aaa0ee96df"
+      "sha256": "dd4a01e61c0e37846a0416242b347f499ed135e608eecf446a58bc83da079220"
     },
     {
       "path": "src/shared/structuralHypothesisDiscovery.v0_1.ts",

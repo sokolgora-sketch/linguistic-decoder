@@ -31,7 +31,20 @@
     "reachablePopulationCountPolicy": "Not materialized in the definition lane. Execution applies the unchanged reachability predicate to the predeclared selected inputs and reports VALID_INPUT_COUNT.",
     "ordering": "Normalize NFC, trim, lower-case with the existing English CMUdict convention; retain ASCII alphabetic normalized words; deduplicate; compare by Unicode code point ascending.",
     "eligibilityPredicate": "Population-spec entry eligibility=ELIGIBLE, followed by the existing normalized ASCII lexical-word filter and lexical-word deduplication.",
-    "preparationPredicate": "Remove the frozen M7 prepared-word exclusion set and ASCII-alphabetic forms of the existing Albanian substrate records; no new exclusions are permitted.",
+    "preparationProcedurePath": "docs/open-instrument/research-artifacts/m7-novel-input-generalization-v0.1/selection-procedure.json",
+    "preparationProcedureSha256": "de0363366f854230b178011c36a52818add15664f57a7241105bdbc6fb9b8eb7",
+    "frozenM7ExclusionCount": 84,
+    "inheritedSubstrateDerivedExclusionForms": [
+      "art",
+      "da",
+      "grua",
+      "ha",
+      "mal",
+      "re",
+      "shi"
+    ],
+    "inheritedSubstrateDerivedExclusionCount": 7,
+    "preparationPredicate": "Remove the frozen M7 prepared-word exclusion set plus the separately frozen inherited ASCII substrate-derived exclusion set listed above; current substrate modules, substrate keys, generated query keys, and candidate responses are not read during selection; no new exclusions are permitted.",
     "reachabilityPredicate": [
       "authorized usable production pronunciation/profile is defined",
       "canonical spoken Voice path is non-null and non-empty",
@@ -47,7 +60,7 @@
       "deterministic systematic sampling across the entire ordered population"
     ],
     "selectedDesign": "DETERMINISTIC_EQUAL_ORDINAL_STRATA_OVER_PREPARED_POPULATION",
-    "whySelected": "The prepared population is already frozen and ordered. Equal ordinal strata span the complete ordered population, directly correct the first-512 alphabetical concentration, require no randomness, do not overweight rare initials, and use no substrate or candidate response.",
+    "whySelected": "The prepared population is already frozen and ordered. Equal ordinal strata span the complete ordered population, directly correct the first-512 alphabetical concentration, require no randomness, do not overweight rare initials, and use no current substrate or candidate response; the inherited seven-form exclusion set is frozen before selection.",
     "sampleSize": 1024,
     "sampleSizeJustification": "1024 is the smallest reviewed bounded size selected for this diagnostic: it doubles the original 512-input support, places one input in each of 1024 equal ordinal strata across 117389 prepared inputs, and remains deterministic and inexpensive without selecting multiple sizes.",
     "selectionId": "ORDINAL_STRATIFIED_PREPARED_POPULATION_LOWER_ENDPOINT_N1024",
@@ -114,7 +127,7 @@
   "queryMatchingAuthority": {
     "queryGeneratorPath": "src/shared/openInstrument/multilingualDiscoverySubstrateS3.v0_2.ts",
     "queryGeneratorSymbol": "genericQueryKeysForWordV0_2",
-    "queryGeneratorSha256": "98dcb948a47c62f5763565113fc2dc9a9acb81ab94c15e54b4d0b7aaa0ee96df",
+    "queryGeneratorSha256": "dd4a01e61c0e37846a0416242b347f499ed135e608eecf446a58bc83da079220",
     "structuralNormalizerPath": "src/shared/structuralHypothesisDiscovery.v0_1.ts",
     "structuralNormalizerSymbol": "normalizeStructuralBasisV0_1",
     "structuralNormalizerSha256": "96fba8363df8b3d59caf6d7dc9ac9ad88007d15432bec4b647b83484a25555db",
@@ -177,10 +190,12 @@
       "frozen population ordering and position",
       "frozen population-spec eligibility",
       "frozen M7 preparation exclusions",
+      "separately frozen inherited ASCII substrate-derived exclusion set",
       "frozen deterministic ordinal-stratum arithmetic"
     ],
     "selectionInputsNotUsed": [
-      "76-record substrate contents or keys",
+      "current 76-record substrate contents or keys",
+      "current Albanian substrate module or source forms",
       "AT",
       "21 Latin keys",
       "13 ASCII Latin keys",
@@ -192,7 +207,7 @@
       "semantic attractiveness",
       "new target-word selection"
     ],
-    "status": "SELECTION_INDEPENDENT_OF_SUBSTRATE_AND_DISCOVERY_RESPONSE"
+    "status": "SELECTION_INDEPENDENT_OF_CURRENT_SUBSTRATE_AND_DISCOVERY_RESPONSE"
   },
   "executionFirewall": {
     "authoritativeAttempts": 0,
