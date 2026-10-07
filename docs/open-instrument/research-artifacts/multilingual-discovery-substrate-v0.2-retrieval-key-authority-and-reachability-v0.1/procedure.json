@@ -8,6 +8,30 @@
   "authorityDecision": {
     "currentDecision": "INSUFFICIENT_EVIDENCE",
     "possibleDecisions": ["AUTHORIZED", "NOT_AUTHORIZED", "INSUFFICIENT_EVIDENCE"],
+    "gate": {
+      "decisionOrder": [
+        "AUTHORIZED if explicit source-tradition authority permits the exact frozen operator, every frozen source record is covered, and all source/truth invariants pass",
+        "NOT_AUTHORIZED if explicit source-tradition authority prohibits retrieval-key derivation or any frozen invariant fails",
+        "INSUFFICIENT_EVIDENCE otherwise"
+      ],
+      "requiredEvidence": [
+        "explicit source-tradition authority statement for the exact enumerated scholarly quantity transformations",
+        "complete operator coverage for the frozen 21-record set",
+        "sourceForm/citation/gloss/attestation preservation",
+        "no pronunciation, historical, functional, or semantic equivalence claim",
+        "collision policy and exact-match invariants pass"
+      ],
+      "currentEvidence": {
+        "explicitSourceTraditionAuthorization": false,
+        "explicitSourceTraditionProhibition": false,
+        "operatorCoverage": "PASS",
+        "sourceTruthInvariants": "PASS",
+        "collisionPolicyFrozen": "PASS",
+        "currentDecision": "INSUFFICIENT_EVIDENCE"
+      },
+      "postFreezeEvidenceMayChangeDecision": false,
+      "decisionMustBeReboundByNewProcedureVersion": true
+    },
     "runtimeCanonicalizationAuthorized": false,
     "currentMatchingChanged": false,
     "s4Started": false
@@ -78,6 +102,34 @@
     "OPTION_4": "No canonicalization; fallback if the candidate authority gate is not authorized or remains insufficient."
   },
   "collisionClasses": ["SOURCE_FORM_COLLISION", "RETRIEVAL_KEY_COLLISION", "CROSS_LANGUAGE_COLLISION", "WITHIN_LANGUAGE_COLLISION", "WITHIN_SOURCE_TRADITION_COLLISION"],
+  "collisionPolicy": {
+    "newCollisionAcceptance": "ZERO_NEW_COLLISIONS",
+    "unacceptableCollisionPredicate": "Any Arm B retrieval-key collision between distinct source records that is absent from Arm A, including within-language, cross-language, or within-source-tradition collisions, is unacceptable for CLASS_C.",
+    "truthGate": {
+      "sourceFormMutated": false,
+      "citationSetMutated": false,
+      "glossMutated": false,
+      "attestationMutated": false,
+      "pronunciationAuthorityGranted": false,
+      "historicalEquivalenceGranted": false,
+      "functionalEquivalenceGranted": false,
+      "semanticEquivalenceGranted": false,
+      "winnerSelected": false,
+      "userDecidesPreserved": true,
+      "noSingleWinnerPreserved": true
+    },
+    "classCRequires": [
+      "canonicalLatinKeysReached > currentLatinKeysReached",
+      "newCollisionCount = 0",
+      "all truthGate fields pass",
+      "all source records remain represented with complete citation sets"
+    ],
+    "classDRequires": [
+      "canonicalLatinKeysReached > currentLatinKeysReached",
+      "newCollisionCount > 0 or any truthGate field fails"
+    ],
+    "existingCollisions": "Report separately and preserve; existing collisions do not become new collisions solely by being observed."
+  },
   "latinTestSet": {
     "sourceAuthority": "scaife.lewis-short.v0_1",
     "recordCount": 21,
@@ -117,12 +169,19 @@
     "populationSpecSha256": "81248026f57cffb0c357a4e29e0cce4d3139adc1521eda89e72754783095ed44",
     "preparationProcedurePath": "docs/open-instrument/research-artifacts/m7-novel-input-generalization-v0.1/selection-procedure.json",
     "preparationProcedureSha256": "de0363366f854230b178011c36a52818add15664f57a7241105bdbc6fb9b8eb7",
+    "rawEligiblePopulationCount": 117473,
     "preparedPopulationCount": 117389,
     "ordering": "NFC, trim, lower-case under existing English CMUdict convention, retain ASCII alphabetic normalized words, deduplicate, Unicode code-point ascending",
     "eligibility": "Population-spec eligibility=ELIGIBLE followed by existing normalized ASCII lexical-word filter and lexical-word deduplication",
-    "exclusions": "Reuse frozen M7 prepared-word exclusion set and inherited substrate-derived exclusions; do not consult substrate responses or candidates",
-    "inputPopulationFingerprintMethod": "SHA-256 of canonical JSON containing the above source/spec/procedure hashes, prepared count, ordering, eligibility, and exclusions; execution must recompute it before query generation",
-    "inputPopulationFingerprint": "DERIVED_FROM_FROZEN_INPUT_IDENTITY_TUPLE_AT_EXECUTION"
+    "exclusions": "Use exactly the materialized explicit and inherited exclusion arrays below; do not consult substrate responses or candidates",
+    "explicitExclusionWords": ["abandon", "at", "balance", "banana", "blood", "bone", "break", "build", "candle", "carry", "cat", "change", "child", "cloud", "comic", "damage", "data", "death", "di", "dij", "drink", "ear", "eat", "father", "first", "foot", "freedom", "friend", "gjak", "hand", "head", "hear", "heart", "home", "justice", "king", "learning", "life", "make", "man", "mat", "mathematics", "memory", "mind", "mode", "mother", "mountain", "mouth", "name", "nose", "order", "peace", "project", "rain", "research", "river", "run", "sea", "second", "shter", "shterp", "sky", "sleep", "snow", "speak", "start", "sterile", "stone", "studies", "study", "support", "synthetic", "time", "tree", "truth", "unicode", "walk", "war", "water", "wind", "woman", "work", "xyz", "zemër"],
+    "inheritedSubstrateExclusionWords": ["art", "at", "da", "det", "di", "dua", "eci", "flas", "gjak", "grua", "ha", "liri", "mal", "mat", "mbaj", "mbret", "mendje", "mik", "ndryshim", "paqe", "qiell", "re", "rend", "shi", "shter", "shterp", "thyej", "vesh", "vizion", "vrapoj", "yll"],
+    "combinedExclusionWords": ["abandon", "art", "at", "balance", "banana", "blood", "bone", "break", "build", "candle", "carry", "cat", "change", "child", "cloud", "comic", "da", "damage", "data", "death", "det", "di", "dij", "drink", "dua", "ear", "eat", "eci", "father", "first", "flas", "foot", "freedom", "friend", "gjak", "grua", "ha", "hand", "head", "hear", "heart", "home", "justice", "king", "learning", "life", "liri", "make", "mal", "man", "mat", "mathematics", "mbaj", "mbret", "memory", "mendje", "mik", "mind", "mode", "mother", "mountain", "mouth", "name", "ndryshim", "nose", "order", "paqe", "peace", "project", "qiell", "rain", "re", "rend", "research", "river", "run", "sea", "second", "shi", "shter", "shterp", "sky", "sleep", "snow", "speak", "start", "sterile", "stone", "studies", "study", "support", "synthetic", "thyej", "time", "tree", "truth", "unicode", "vesh", "vizion", "vrapoj", "walk", "war", "water", "wind", "woman", "work", "xyz", "yll", "zemër"],
+    "exclusionSetFingerprint": "c0d23a68f7ea0610e145cd7426a47a88bdf4158f7ead036272d69d3e4f2e9c2d",
+    "preparedPopulationFingerprint": "751987cbf7cd71d527ff0fc16f1e316fd6066a870eb11bc72aece51e9cf428a2",
+    "inputPopulationFingerprintMethod": "SHA-256 of canonical JSON containing source/spec/procedure hashes, raw/prepared counts, ordering, eligibility, and the exact explicit/inherited/combined exclusion arrays; execution must recompute it before query generation",
+    "inputPopulationFingerprintInput": "931a9f4502e394d2f0e49ae45d4fc5ddc21d63cc960c115a741702baf4cf0aec",
+    "inputPopulationFingerprint": "931a9f4502e394d2f0e49ae45d4fc5ddc21d63cc960c115a741702baf4cf0aec"
   },
   "queryMatchingAuthority": {
     "queryGeneratorPath": "src/shared/openInstrument/multilingualDiscoverySubstrateS3.v0_2.ts",

@@ -66,7 +66,21 @@ describe("retrieval-key authority and reachability definition v0.1", () => {
   const procedure = readJson<{
     status: string;
     procedureId: string;
-    authorityDecision: { currentDecision: string };
+    authorityDecision: {
+      currentDecision: string;
+      gate: {
+        currentEvidence: {
+          explicitSourceTraditionAuthorization: boolean;
+          explicitSourceTraditionProhibition: boolean;
+          operatorCoverage: string;
+          sourceTruthInvariants: string;
+          collisionPolicyFrozen: string;
+          currentDecision: string;
+        };
+        postFreezeEvidenceMayChangeDecision: boolean;
+        decisionMustBeReboundByNewProcedureVersion: boolean;
+      };
+    };
     operator: {
       operatorId: string;
       status: string;
@@ -83,6 +97,12 @@ describe("retrieval-key authority and reachability definition v0.1", () => {
       matching: string;
       matchingAlternativesAuthorized: boolean;
     };
+    collisionPolicy: {
+      newCollisionAcceptance: string;
+      unacceptableCollisionPredicate: string;
+      classCRequires: string[];
+      classDRequires: string[];
+    };
     latinTestSet: {
       recordCount: number;
       currentAsciiCount: number;
@@ -92,6 +112,16 @@ describe("retrieval-key authority and reachability definition v0.1", () => {
     arms: Record<string, { queryGeneratorSame: boolean; populationSame: boolean }>;
     metrics: string[];
     decisionClasses: Record<string, string>;
+    populationAuthority: {
+      rawEligiblePopulationCount: number;
+      preparedPopulationCount: number;
+      explicitExclusionWords: string[];
+      inheritedSubstrateExclusionWords: string[];
+      combinedExclusionWords: string[];
+      exclusionSetFingerprint: string;
+      preparedPopulationFingerprint: string;
+      inputPopulationFingerprint: string;
+    };
     antiCircularity: { authoritativeAttemptsMax: number; noSingleWinner: boolean; userDecides: boolean };
     executionFirewall: {
       authoritativeAttempts: number;
@@ -112,7 +142,26 @@ describe("retrieval-key authority and reachability definition v0.1", () => {
     );
     expect(procedure.operator.status).toBe("PROPOSED_NOT_AUTHORIZED_FOR_RUNTIME");
     expect(procedure.authorityDecision.currentDecision).toBe("INSUFFICIENT_EVIDENCE");
+    expect(procedure.authorityDecision.gate.currentEvidence).toEqual({
+      explicitSourceTraditionAuthorization: false,
+      explicitSourceTraditionProhibition: false,
+      operatorCoverage: "PASS",
+      sourceTruthInvariants: "PASS",
+      collisionPolicyFrozen: "PASS",
+      currentDecision: "INSUFFICIENT_EVIDENCE",
+    });
+    expect(procedure.authorityDecision.gate.postFreezeEvidenceMayChangeDecision).toBe(false);
+    expect(procedure.authorityDecision.gate.decisionMustBeReboundByNewProcedureVersion).toBe(true);
     expect(procedure.currentRepresentationContract.matchingAlternativesAuthorized).toBe(false);
+    expect(procedure.collisionPolicy.newCollisionAcceptance).toBe("ZERO_NEW_COLLISIONS");
+    expect(procedure.collisionPolicy.unacceptableCollisionPredicate).toContain("Any Arm B retrieval-key collision");
+    expect(procedure.collisionPolicy.classCRequires).toEqual(expect.arrayContaining([
+      "newCollisionCount = 0",
+      "all truthGate fields pass",
+    ]));
+    expect(procedure.collisionPolicy.classDRequires).toEqual(expect.arrayContaining([
+      "newCollisionCount > 0 or any truthGate field fails",
+    ]));
     expect(procedure.executionFirewall.authoritativeAttempts).toBe(0);
     expect(procedure.executionFirewall.resultArtifactCreated).toBe(false);
     expect(procedure.executionFirewall.s3Rerun).toBe(false);
@@ -177,6 +226,28 @@ describe("retrieval-key authority and reachability definition v0.1", () => {
     expect(procedure.antiCircularity.authoritativeAttemptsMax).toBe(1);
     expect(procedure.antiCircularity.noSingleWinner).toBe(true);
     expect(procedure.antiCircularity.userDecides).toBe(true);
+  });
+
+  test("materializes the exact prepared-population exclusion and fingerprint authority", () => {
+    const population = procedure.populationAuthority;
+    expect(population.rawEligiblePopulationCount).toBe(117473);
+    expect(population.preparedPopulationCount).toBe(117389);
+    expect(population.explicitExclusionWords).toHaveLength(84);
+    expect(population.inheritedSubstrateExclusionWords).toHaveLength(31);
+    expect(population.combinedExclusionWords).toHaveLength(109);
+    expect(new Set([
+      ...population.explicitExclusionWords,
+      ...population.inheritedSubstrateExclusionWords,
+    ])).toEqual(new Set(population.combinedExclusionWords));
+    expect(population.exclusionSetFingerprint).toBe(
+      "c0d23a68f7ea0610e145cd7426a47a88bdf4158f7ead036272d69d3e4f2e9c2d",
+    );
+    expect(population.preparedPopulationFingerprint).toBe(
+      "751987cbf7cd71d527ff0fc16f1e316fd6066a870eb11bc72aece51e9cf428a2",
+    );
+    expect(population.inputPopulationFingerprint).toBe(
+      "931a9f4502e394d2f0e49ae45d4fc5ddc21d63cc960c115a741702baf4cf0aec",
+    );
   });
 
   test("binds procedure and protected result identities without changing them", () => {

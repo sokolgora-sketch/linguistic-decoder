@@ -67,6 +67,18 @@ The future pre-execution authority gate may classify the candidate as
 `AUTHORIZED`, Arm B is not scientifically executed and the result class is
 `CLASS_E`.
 
+The gate is deterministic and has no post-result discretion. It returns
+`AUTHORIZED` only when the frozen evidence includes an explicit
+source-tradition authority statement permitting the exact enumerated
+transformations, complete coverage of the 21-record set, preservation of all
+source/truth fields, no unauthorized equivalence claim, and passing exact-key
+and collision invariants. It returns `NOT_AUTHORIZED` if the frozen authority
+explicitly prohibits the operator or an invariant fails. Otherwise it returns
+`INSUFFICIENT_EVIDENCE`. The current frozen evidence has no explicit
+authorization or prohibition, so the bound decision is
+`INSUFFICIENT_EVIDENCE`; changing that decision requires a new procedure
+version.
+
 ### Candidate operator
 
 1. Input is one of the 21 frozen Latin source records from the pinned
@@ -112,6 +124,13 @@ collision, that arm is `INVALID`/fail-closed for the bounded measurement; no
 record is dropped and no collision policy is invented after results appear.
 Empty or unsupported keys fail closed.
 
+For the predeclared aggregate classes, `CLASS_C` requires zero new
+retrieval-key collisions in Arm B relative to Arm A, complete source-record
+and citation preservation, and all truth gates passing. Any new within-language,
+cross-language, or within-source-tradition collision, or any failed truth gate,
+is an unacceptable collision/truth risk and makes an otherwise improving Arm B
+result `CLASS_D`. Existing collisions are reported and preserved separately.
+
 ## Frozen 21-record test set
 
 The exact 21-record identity is stored in the machine-readable procedure. It
@@ -134,9 +153,12 @@ The future execution uses the complete existing prepared CMUdict population
 population specification, M7 preparation procedure, exclusion rules, and
 ordering. The population fingerprint is the deterministic hash of the frozen
 input identity tuple in `procedure.json`; execution must recompute and compare
-that tuple before query generation. No source response, gloss, semantic
-attractiveness, known success, target word, or candidate outcome may select or
-exclude a population item.
+that tuple before query generation. The tuple materializes `117473` raw
+eligible normalized words, the 84 explicit M7 exclusions, the 31 inherited
+substrate-derived exclusions, their 109-word union, and the resulting prepared
+population fingerprint. No source response, gloss, semantic attractiveness,
+known success, target word, or candidate outcome may select or exclude a
+population item.
 
 Both arms use the same prepared population, pronunciation/profile eligibility,
 structural query generator, structural normalizer, source forms, citations,

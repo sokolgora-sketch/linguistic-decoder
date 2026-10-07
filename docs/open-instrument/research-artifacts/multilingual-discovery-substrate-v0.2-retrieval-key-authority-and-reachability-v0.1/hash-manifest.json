@@ -6,8 +6,8 @@
   "artifacts": [
     {
       "path": "docs/open-instrument/research-artifacts/multilingual-discovery-substrate-v0.2-retrieval-key-authority-and-reachability-v0.1/procedure.json",
-      "bytes": 27037,
-      "sha256": "ca37610e3018b438d0a382146e7200b48811ee000db23dfc4ad515024a2ca100"
+      "bytes": 32019,
+      "sha256": "353f036165c1efeaecd9d0485cd485eb18094afe67d1fc451ecd725ae8c20879"
     }
   ],
   "implementationAuthority": [
