@@ -392,7 +392,7 @@ function repairStoredSerializationMetadata(): void {
 }
 
 export function verifyStoredResult(): { resultSha256: string; manifestSha256: string } {
-  const { procedure } = verifyFrozenInputs();
+  const { procedure, latinIdentity } = verifyFrozenInputs();
   const result = readJson<any>(RESULT_RELATIVE_PATH);
   const manifest = readJson<any>(RESULT_MANIFEST_RELATIVE_PATH);
   const resultSha256 = sha256File(RESULT_RELATIVE_PATH);
@@ -405,6 +405,7 @@ export function verifyStoredResult(): { resultSha256: string; manifestSha256: st
   assert(result.noRerun === true && result.syntheticOnly === true && result.realDataExecuted === false, "Stored result execution flags mismatch");
   assert(result.authorityGate.decision === "INSUFFICIENT_EVIDENCE", "Stored authority gate mismatch");
   assert(result.latinTestSet.recordCount === 21 && result.latinTestSet.currentAsciiCount === 13 && result.latinTestSet.currentDiacriticCount === 8, "Stored Latin partition mismatch");
+  assert(result.latinTestSet.identitySha256 === latinIdentity.identitySha256, "Stored Latin identity binding mismatch");
   assert(result.authorityGate.derivedFromFrozenProcedureOnly === true, "Stored authority derivation binding missing");
   assert(result.arms.ARM_A.scientificReachabilityExecuted === false, "Arm A unexpectedly executed");
   assert(result.arms.ARM_B.status === "NOT_AUTHORIZED" && result.arms.ARM_B.scientificReachabilityExecuted === false, "Arm B execution mismatch");
@@ -415,6 +416,7 @@ export function verifyStoredResult(): { resultSha256: string; manifestSha256: st
   assert(sha256File(PROCEDURE_RELATIVE_PATH) === result.procedureSha256, "Procedure changed after result creation");
   assert(sha256File(PROCEDURE_MANIFEST_RELATIVE_PATH) === result.procedureManifestSha256, "Procedure manifest changed after result creation");
   assert(manifest.procedure.sha256 === PROCEDURE_SHA256 && manifest.procedureManifest.sha256 === PROCEDURE_MANIFEST_SHA256, "Result manifest authority mismatch");
+  assert(manifest.authorityBindings.latinTestSetIdentity === latinIdentity.identitySha256, "Result manifest Latin identity binding mismatch");
   assert(manifest.artifacts.some((artifact: any) => artifact.path === RESULT_RELATIVE_PATH && artifact.bytes === fs.statSync(absolute(RESULT_RELATIVE_PATH)).size && artifact.sha256 === resultSha256), "Result manifest artifact binding mismatch");
   assert(manifest.execution.authoritativeAttempts === 1 && manifest.execution.noRerun === true && manifest.execution.armBExecuted === false, "Result manifest execution mismatch");
   assert(manifest.outcome.authorityGate === "INSUFFICIENT_EVIDENCE" && manifest.outcome.interpretationClass === "CLASS_E_OPERATOR_NOT_AUTHORIZED_OR_NOT_SCIENTIFICALLY_DEFENSIBLE", "Result manifest outcome mismatch");
