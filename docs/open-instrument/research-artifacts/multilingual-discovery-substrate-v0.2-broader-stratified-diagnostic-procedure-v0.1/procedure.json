@@ -1,0 +1,221 @@
+{
+  "schemaVersion": "open-instrument.multilingual-discovery-substrate-expansion-broader-stratified-diagnostic-procedure.v0.1",
+  "status": "DEFINED_NOT_EXECUTED",
+  "procedureId": "open-instrument.multilingual-discovery-substrate-expansion-v0.2.broader-stratified-diagnostic-procedure.v0.1",
+  "repositoryBaselineHead": "3397975e3c9bee76b93d0c582353c41d449b5dcd",
+  "purpose": "Measure broader prepared-population reachability of the unchanged 76-record direct Discovery substrate without replacing or rerunning S3.",
+  "postS3DecisionAuthority": {
+    "classification": "COMBINED_LIMITATION",
+    "s3Outcome": "NO_MEASURABLE_EXISTING_ONLY_IMPROVEMENT",
+    "s3AuthoritativeAttempts": 1,
+    "s3SampleSize": 512,
+    "s3DistinctGeneratedKeys": 1085,
+    "s3SubstrateIntersectionKeys": 1,
+    "s3GeneratedKeySubstrateCoverageRate": 0.000921658986175,
+    "s3LatinKeysReached": 0,
+    "s3AsciiLatinKeysReached": 0,
+    "unresolvedQuestion": "Whether the original first-512 reachable sample was too alphabetically concentrated to support a broader statement about reachability of the existing 76-key substrate."
+  },
+  "populationAuthority": {
+    "sourceProfileId": "open-instrument.cmudict-arpabet-en-us.v0_1",
+    "sourceRevision": "74790861f652b15e4ac49015a90074ad62a27690",
+    "sourceNotation": "ARPABET",
+    "sourcePath": "src/data/openInstrument/pronunciation/cmudict.dict",
+    "sourceSha256": "81917843c7f44ce2b094ac63873c2c7a4cf802040792c455ba3ca406891c3d22",
+    "populationSpecPath": "docs/open-instrument/research-artifacts/zero-consonantal-structural-composition-v0.1-cmudict-validation-v0.1b/population-spec.json",
+    "populationSpecSha256": "81248026f57cffb0c357a4e29e0cce4d3139adc1521eda89e72754783095ed44",
+    "rawSourceVariantCount": 135166,
+    "eligibleNormalizedAsciiWordCount": 117473,
+    "preparedPopulationCount": 117389,
+    "reachablePopulationCount": null,
+    "reachablePopulationCountPolicy": "Not materialized in the definition lane. Execution applies the unchanged reachability predicate to the predeclared selected inputs and reports VALID_INPUT_COUNT.",
+    "ordering": "Normalize NFC, trim, lower-case with the existing English CMUdict convention; retain ASCII alphabetic normalized words; deduplicate; compare by Unicode code point ascending.",
+    "eligibilityPredicate": "Population-spec entry eligibility=ELIGIBLE, followed by the existing normalized ASCII lexical-word filter and lexical-word deduplication.",
+    "preparationPredicate": "Remove the frozen M7 prepared-word exclusion set and ASCII-alphabetic forms of the existing Albanian substrate records; no new exclusions are permitted.",
+    "reachabilityPredicate": [
+      "authorized usable production pronunciation/profile is defined",
+      "canonical spoken Voice path is non-null and non-empty",
+      "existing structural hypothesis/DeepRoot query-generation machinery produces structural state",
+      "at least one generic query key is generated before substrate response lookup",
+      "substrate response, candidate count, candidate form, gloss, and semantic attractiveness are not consulted for selection"
+    ]
+  },
+  "samplingDesign": {
+    "candidatesReviewed": [
+      "equal-sized ordinal population strata",
+      "alphabetic-initial strata",
+      "deterministic systematic sampling across the entire ordered population"
+    ],
+    "selectedDesign": "DETERMINISTIC_EQUAL_ORDINAL_STRATA_OVER_PREPARED_POPULATION",
+    "whySelected": "The prepared population is already frozen and ordered. Equal ordinal strata span the complete ordered population, directly correct the first-512 alphabetical concentration, require no randomness, do not overweight rare initials, and use no substrate or candidate response.",
+    "sampleSize": 1024,
+    "sampleSizeJustification": "1024 is the smallest reviewed bounded size selected for this diagnostic: it doubles the original 512-input support, places one input in each of 1024 equal ordinal strata across 117389 prepared inputs, and remains deterministic and inexpensive without selecting multiple sizes.",
+    "selectionId": "ORDINAL_STRATIFIED_PREPARED_POPULATION_LOWER_ENDPOINT_N1024",
+    "stratumCount": 1024,
+    "stratumDefinition": "For stratum i in [0,1023], use the 1-indexed prepared-population interval [floor(i*N/1024)+1, floor((i+1)*N/1024)] where N=117389.",
+    "withinStratumSelectionRule": "Select the lower endpoint of every non-empty stratum exactly once.",
+    "tieBreakRule": "None; prepared lexical words are unique and ordinal positions are unique.",
+    "duplicatePolicy": "No duplicate prepared lexical word may enter the sample; duplicate source variants were already collapsed by the frozen lexical-word population rule.",
+    "seed": null,
+    "seedPolicy": "No randomness; SEED=NULL.",
+    "sampleIdentitiesMaterialized": false,
+    "sampleIdentityMaterializationBoundary": "The definition freezes the algorithm only. Execution may derive and fingerprint input identities before any query generation; no generated query keys or candidate outcomes may be stored as selection evidence.",
+    "fullPopulationSpanProof": "The first stratum begins at prepared position 1 and the final stratum ends at prepared position N; every ordinal interval is represented exactly once."
+  },
+  "substrateAuthority": {
+    "total": 76,
+    "languageCounts": {
+      "Albanian": 55,
+      "Latin": 21,
+      "Other": 0
+    },
+    "uniqueNormalizedForms": 76,
+    "uniqueQueryKeys": 76,
+    "duplicateNormalizedForms": [],
+    "queryKeyCollisions": [],
+    "fingerprint": "1c4714a1d9a7550c1c037b4ce62ca85e9ff24966f2e8d447c038bce001b45d81",
+    "authoritySources": [
+      {
+        "path": "docs/open-instrument/research-artifacts/multilingual-discovery-substrate-v0.2-s0-baseline-freeze-v0.1/baseline.json",
+        "sha256": "52fd4865fd3a0eb2067ea460af7d75024948de5c56cbcc8ce9936361a591a58e"
+      },
+      {
+        "path": "src/shared/openInstrument/multilingualDiscoverySubstrateS1.v0_2.ts",
+        "sha256": "8f65b688ca6c3e7a4a130c478c2c6ec3abbb6b6875db742fd9666b4ced5b61d3"
+      }
+    ],
+    "asciiLatinKeys": [
+      "AMO",
+      "ARBOR",
+      "ARS",
+      "CAELUM",
+      "FAMILIARIS",
+      "FRANGO",
+      "MARE",
+      "NIMBUS",
+      "NIX",
+      "ORDO",
+      "PELLIS",
+      "SOMNUS",
+      "STELLA"
+    ],
+    "diacriticLatinKeys": [
+      "CAERŬLĔUS",
+      "LĪBERTAS",
+      "MŪTĀTIŌ",
+      "PĀNIS",
+      "SPĒS",
+      "VĪSĬO",
+      "VĬR",
+      "ĂQUA"
+    ],
+    "candidateVoicePathPolicy": "NULL_UNAUTHORIZED"
+  },
+  "queryMatchingAuthority": {
+    "queryGeneratorPath": "src/shared/openInstrument/multilingualDiscoverySubstrateS3.v0_2.ts",
+    "queryGeneratorSymbol": "genericQueryKeysForWordV0_2",
+    "queryGeneratorSha256": "98dcb948a47c62f5763565113fc2dc9a9acb81ab94c15e54b4d0b7aaa0ee96df",
+    "structuralNormalizerPath": "src/shared/structuralHypothesisDiscovery.v0_1.ts",
+    "structuralNormalizerSymbol": "normalizeStructuralBasisV0_1",
+    "structuralNormalizerSha256": "96fba8363df8b3d59caf6d7dc9ac9ad88007d15432bec4b647b83484a25555db",
+    "matchingAdapterPath": "src/shared/openInstrument/genericFunctionalWitnessSourceAcquisition.v1.ts",
+    "matchingAdapterSymbol": "createGenericFunctionalWitnessSourceAdapterV1",
+    "matchingAdapterSha256": "f49ff4f0b877887b466002ce465feb58adbb07204cc6560c3caaa0364d95a0a0",
+    "matchingSemantics": "normalized-exact textual equality: the source adapter matches record.lookupForm === input.embryo after the existing NFC/trim query normalization contract.",
+    "queryGenerationChanged": false,
+    "matchingChanged": false
+  },
+  "predeclaredQuestions": {
+    "primary": "Within the broader deterministic sample of the existing prepared eligible population, what fraction of distinct generated generic query keys intersects the unchanged 76-record direct Discovery substrate?",
+    "secondary": [
+      "How many of the 76 substrate query keys are reached at least once?",
+      "How many Albanian substrate keys are reached?",
+      "How many Latin substrate keys are reached?",
+      "Do any of the 13 currently structurally-generatable ASCII Latin keys occur?",
+      "Do any of the 8 currently non-generatable diacritic Latin keys occur?",
+      "How does the broader-sample reachability compare descriptively with the original frozen S3 sample?"
+    ]
+  },
+  "predeclaredMetrics": {
+    "inputCount": "number of predeclared sample identities",
+    "validInputCount": "number of selected inputs satisfying the unchanged reachability predicate before substrate response lookup",
+    "totalQueryKeyOccurrences": "sum of generated generic query-key counts over valid inputs",
+    "distinctQueryKeys": "cardinality of the union of generated generic query keys over valid inputs",
+    "distinctSubstrateKeysReached": "cardinality of generated keys intersecting the 76-key substrate set",
+    "distinctAlbanianKeysReached": "cardinality of reached substrate keys whose source language is Albanian",
+    "distinctLatinKeysReached": "cardinality of reached substrate keys whose source language is Latin",
+    "distinctAsciiLatinKeysReached": "cardinality of reached keys in the frozen 13-key ASCII Latin set",
+    "distinctDiacriticLatinKeysReached": "cardinality of reached keys in the frozen 8-key diacritic Latin set",
+    "generatedKeysWithAnySubstrateRecord": "number of distinct generated keys having at least one substrate record",
+    "generatedKeysWithNoSubstrateRecord": "distinctQueryKeys minus generatedKeysWithAnySubstrateRecord",
+    "generatedKeySubstrateCoverageRate": "generatedKeysWithAnySubstrateRecord / distinctQueryKeys; undefined when distinctQueryKeys=0",
+    "substrateKeyReachabilityRate": "distinctSubstrateKeysReached / 76",
+    "albanianSubstrateKeyReachabilityRate": "distinctAlbanianKeysReached / 55",
+    "latinSubstrateKeyReachabilityRate": "distinctLatinKeysReached / 21",
+    "asciiLatinSubstrateKeyReachabilityRate": "distinctAsciiLatinKeysReached / 13",
+    "inputsWithAnySubstrateIntersection": "number of valid inputs with at least one generated key in the substrate",
+    "inputsWithAlbanianIntersection": "number of valid inputs with at least one generated Albanian substrate key",
+    "inputsWithLatinIntersection": "number of valid inputs with at least one generated Latin substrate key",
+    "multipleSubstrateKeyInputs": "number of valid inputs reaching more than one distinct substrate key"
+  },
+  "s3ComparisonBoundary": {
+    "s3Replaced": false,
+    "s3Rerun": false,
+    "s3ResultChanged": false,
+    "formalSignificanceTest": false,
+    "comparison": "Descriptive only; the broader sample is not combined with, treated as independent of, or substituted for S3.",
+    "headlineContextWording": "On the frozen S3 sample, the current 76-record substrate covered 1 of the 1,085 distinct query keys generated by those 512 inputs (0.0921658986175%)."
+  },
+  "interpretationClasses": {
+    "CLASS_A_BROADER_SAMPLE_REVEALS_NO_ADDITIONAL_SUBSTRATE_KEYS": "The broader sample reaches only the same substrate-key set as S3; this is evidence about the bounded diagnostic and does not authorize a new source or architecture change.",
+    "CLASS_B_BROADER_SAMPLE_REVEALS_ADDITIONAL_EXISTING_SUBSTRATE_KEYS_BUT_NO_LATIN": "The broader sample reaches additional existing substrate keys but no Latin key; sample support and Latin/source-key coverage remain separate limitations.",
+    "CLASS_C_BROADER_SAMPLE_REVEALS_ONE_OR_MORE_ASCII_LATIN_KEYS": "The broader sample reaches one or more current ASCII Latin keys; S3 remains valid but its zero-Latin result is not generalized to the broader population.",
+    "CLASS_D_OTHER_PREDECLARED_RESULT": "Any mechanically possible result not covered by A-C, including diacritic-key behavior under unchanged normalization."
+  },
+  "antiCircularity": {
+    "selectionInputsUsed": [
+      "frozen population ordering and position",
+      "frozen population-spec eligibility",
+      "frozen M7 preparation exclusions",
+      "frozen deterministic ordinal-stratum arithmetic"
+    ],
+    "selectionInputsNotUsed": [
+      "76-record substrate contents or keys",
+      "AT",
+      "21 Latin keys",
+      "13 ASCII Latin keys",
+      "8 diacritic Latin keys",
+      "language labels",
+      "glosses",
+      "generated query keys",
+      "candidate outcomes or counts",
+      "semantic attractiveness",
+      "new target-word selection"
+    ],
+    "status": "SELECTION_INDEPENDENT_OF_SUBSTRATE_AND_DISCOVERY_RESPONSE"
+  },
+  "executionFirewall": {
+    "authoritativeAttempts": 0,
+    "resultArtifactCreated": false,
+    "queryOutcomesInspectedDuringDefinition": false,
+    "candidateOutcomesInspectedDuringDefinition": false,
+    "s3EvaluationExecuted": false,
+    "realDataExecuted": false,
+    "sourceAcquisition": false,
+    "sourceReattestation": false,
+    "automaticSourceExpansion": false,
+    "automaticMatchingChange": false,
+    "automaticS4": false,
+    "automaticMilestoneClosure": false,
+    "postDiagnosticNextAction": "REVIEW_BROADER_STRATIFIED_DIAGNOSTIC_RESULT_AND_DECIDE_SUBSTRATE_ARCHITECTURE",
+    "lastSampleBreadthDiagnostic": true
+  },
+  "historicalLabelBookkeeping": {
+    "v0_1bResultSha256": "20c1ad43e95a59912908334ad7fb2bf7f98765aa85b4f5a4f569ac1dea5fdf02",
+    "v0_1bResultArtifact": "docs/open-instrument/research-artifacts/frd02-cvc-v0.1b-p4-synthetic-calibration-v0.1/result.json",
+    "v0_1bContractId": "OPEN_INSTRUMENT_FRD02_CVC_V0_1B_P4_METHODOLOGY_V0_1",
+    "currentGenericLabel": "V0_1_RESULT_SHA256",
+    "action": "No historical artifact rewrite; use precise V0_1B_RESULT_SHA256 terminology in this definition.",
+    "closureReconciliationDebt": true
+  }
+}

@@ -450,8 +450,31 @@ After a confirmed repository merge, the existing DF_BRAIN project file and
 the correct October 2026 log may receive a factual local continuity update.
 DF_BRAIN has no authorized remote push in this milestone.
 
+## Post-S3 decision and broader diagnostic definition
+
+The post-S3 decision audit is complete with classification
+`COMBINED_LIMITATION`: the frozen 512-input sample was alphabetically narrow,
+and the existing 76-key substrate remains sparse under the unchanged query
+generation and exact matching boundary. The audit therefore selected one
+additive broader diagnostic rather than reopening S3 or acquiring a source.
+
+`POST_S3_DECISION_AUDIT=COMPLETE`
+
+`BROADER_STRATIFIED_DIAGNOSTIC=DEFINED_NOT_EXECUTED`
+
+`BROADER_STRATIFIED_DIAGNOSTIC_PROCEDURE=docs/open-instrument/research-artifacts/multilingual-discovery-substrate-v0.2-broader-stratified-diagnostic-procedure-v0.1/procedure.json`
+
+`BROADER_STRATIFIED_DIAGNOSTIC_ATTEMPTS=0`
+
+The procedure freezes a deterministic 1024-input equal-ordinal-stratum sample
+over the existing prepared eligible population. It does not inspect generated
+query keys or candidate outcomes during definition, and it does not replace,
+rerun, or reinterpret S3. S4 remains not started and the milestone remains
+active. No new source, language, pronunciation authority, production authority,
+or matching behavior is authorized by this definition.
+
 ## Explicit next action
 
-`NEXT_ACTION=REVIEW_V0_2_EXISTING_ONLY_NULL_RESULT_BEFORE_SCOPE_DECISION`
+`NEXT_ACTION=EXECUTE_PREDECLARED_BROADER_STRATIFIED_DIAGNOSTIC`
 
-This action is not executed by the S3 evaluation lane.
+This action is not executed by the definition lane.

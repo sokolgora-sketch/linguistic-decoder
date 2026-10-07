@@ -1,0 +1,99 @@
+{
+  "schemaVersion": "open-instrument.multilingual-discovery-substrate-expansion-broader-stratified-diagnostic-hash-manifest.v0.1",
+  "status": "FROZEN_BROADER_STRATIFIED_DIAGNOSTIC_PROCEDURE",
+  "procedureId": "open-instrument.multilingual-discovery-substrate-expansion-v0.2.broader-stratified-diagnostic-procedure.v0.1",
+  "repositoryBaselineHead": "3397975e3c9bee76b93d0c582353c41d449b5dcd",
+  "artifacts": [
+    {
+      "path": "docs/open-instrument/research-artifacts/multilingual-discovery-substrate-v0.2-broader-stratified-diagnostic-procedure-v0.1/procedure.json",
+      "bytes": 13617,
+      "sha256": "34236434d3a917a52d0db555178ccf33bc2fa362264d40e0d8019377ef42e1f1"
+    }
+  ],
+  "implementation": [
+    {
+      "path": "src/shared/openInstrument/multilingualDiscoverySubstrateBroaderDiagnostic.v0_2.ts",
+      "sha256": "00497a34122ca1830ced2dbae850c2dbe351d24ddedbb839a30c36d5333af74c"
+    },
+    {
+      "path": "tests/openInstrument.multilingualDiscoverySubstrateBroaderDiagnostic.v0_2.spec.ts",
+      "sha256": "0db265797e4593af4f59c1e82bca0c059534c16447db1921390a01c1e080c4a6"
+    }
+  ],
+  "inputs": [
+    {
+      "path": "src/data/openInstrument/pronunciation/cmudict.dict",
+      "sha256": "81917843c7f44ce2b094ac63873c2c7a4cf802040792c455ba3ca406891c3d22"
+    },
+    {
+      "path": "docs/open-instrument/research-artifacts/zero-consonantal-structural-composition-v0.1-cmudict-validation-v0.1b/population-spec.json",
+      "sha256": "81248026f57cffb0c357a4e29e0cce4d3139adc1521eda89e72754783095ed44"
+    },
+    {
+      "path": "docs/open-instrument/research-artifacts/m7-novel-input-generalization-v0.1/selection-procedure.json",
+      "sha256": "de0363366f854230b178011c36a52818add15664f57a7241105bdbc6fb9b8eb7"
+    },
+    {
+      "path": "docs/open-instrument/research-artifacts/m7-substrate-reachable-generalization-v0.1/procedure.json",
+      "sha256": "2b7ecf4b1b0b7e3f2ced15a0a92381316206711b3392676b22e81e6481ed81cb"
+    },
+    {
+      "path": "docs/open-instrument/research-artifacts/m7-substrate-reachable-generalization-v0.1/reachable-sample.json",
+      "sha256": "7c991d806086569f9434f07f0a60ea0d8ec225434fa87050ed6c79d04f738255"
+    },
+    {
+      "path": "docs/open-instrument/research-artifacts/multilingual-discovery-substrate-v0.2-s3-independent-coverage-evaluation-v0.1/sample.json",
+      "sha256": "8ba957d57f5f2509f2acc2b875a5427e075942d2a9c52d63b9208590045cc2cd"
+    },
+    {
+      "path": "docs/open-instrument/research-artifacts/multilingual-discovery-substrate-v0.2-s3-independent-coverage-evaluation-v0.1/paired-results.json",
+      "sha256": "b703051f8d6020548f93dc9a6591b22278f467bb0c521871b31aafb47be4ca03"
+    },
+    {
+      "path": "docs/open-instrument/research-artifacts/multilingual-discovery-substrate-v0.2-s3-independent-coverage-evaluation-v0.1/summary.json",
+      "sha256": "1985db5f7d8d7fd59c6ca741f30d1814ffa469f95c141ff7e9aef109da11ebea"
+    },
+    {
+      "path": "docs/open-instrument/research-artifacts/multilingual-discovery-substrate-v0.2-s3-independent-coverage-evaluation-v0.1/hash-manifest.json",
+      "sha256": "7fa23b2eb80cc2b78ecd880295d71f5a542e561918747cdf7082bf76f2055497"
+    },
+    {
+      "path": "docs/open-instrument/research-artifacts/multilingual-discovery-substrate-v0.2-s0-baseline-freeze-v0.1/baseline.json",
+      "sha256": "52fd4865fd3a0eb2067ea460af7d75024948de5c56cbcc8ce9936361a591a58e"
+    },
+    {
+      "path": "src/shared/openInstrument/multilingualDiscoverySubstrateS1.v0_2.ts",
+      "sha256": "8f65b688ca6c3e7a4a130c478c2c6ec3abbb6b6875db742fd9666b4ced5b61d3"
+    },
+    {
+      "path": "src/shared/openInstrument/multilingualDiscoverySubstrateS3.v0_2.ts",
+      "sha256": "98dcb948a47c62f5763565113fc2dc9a9acb81ab94c15e54b4d0b7aaa0ee96df"
+    },
+    {
+      "path": "src/shared/structuralHypothesisDiscovery.v0_1.ts",
+      "sha256": "96fba8363df8b3d59caf6d7dc9ac9ad88007d15432bec4b647b83484a25555db"
+    },
+    {
+      "path": "src/shared/openInstrument/genericFunctionalWitnessSourceAcquisition.v1.ts",
+      "sha256": "f49ff4f0b877887b466002ce465feb58adbb07204cc6560c3caaa0364d95a0a0"
+    }
+  ],
+  "substrate": {
+    "total": 76,
+    "albanian": 55,
+    "latin": 21,
+    "other": 0,
+    "fingerprint": "1c4714a1d9a7550c1c037b4ce62ca85e9ff24966f2e8d447c038bce001b45d81"
+  },
+  "execution": {
+    "authoritativeAttempts": 0,
+    "authoritativeAttemptsMax": 1,
+    "resultArtifactCreated": false,
+    "queryOutcomesInspected": false,
+    "candidateOutcomesInspected": false,
+    "s3Rerun": false,
+    "s3ResultChanged": false,
+    "realDataExecuted": false,
+    "providerExecution": false
+  }
+}
