@@ -289,7 +289,7 @@ function stableUniqueRootsV0_2(word: string) {
   });
 }
 
-function genericQueryKeysForWordV0_2(word: string): readonly string[] {
+export function genericQueryKeysForWordV0_2(word: string): readonly string[] {
   const structuralHypotheses = discoverStructuralHypothesesV0_1(word);
   const contexts: Array<{ queryForm: string; contextId: string }> = [];
   const seen = new Set<string>();
