@@ -6,8 +6,8 @@
   "artifacts": [
     {
       "path": "docs/open-instrument/research-artifacts/multilingual-discovery-substrate-v0.2-s0-baseline-freeze-v0.1/baseline.json",
-      "bytes": 293428,
-      "sha256": "0aebfd6d022a5e2d94bacd181702a7174a57a21d010bc7f5956771b1c4d90325"
+      "bytes": 293579,
+      "sha256": "52fd4865fd3a0eb2067ea460af7d75024948de5c56cbcc8ce9936361a591a58e"
     }
   ],
   "inputs": [

@@ -378,11 +378,13 @@ function catalogRowSnapshotV0_2(
   } else if (boundaryReasons.length > 0) {
     s0Classification = "BOUNDARY_EXCLUDED";
     reasonCodes = boundaryReasons;
+  } else if (admissionReasons.length === 0 && row.language === "Latin" &&
+    baselineQueryKeys.has(normalizedQueryKey)) {
+    s0Classification = "BOUNDARY_EXCLUDED";
+    reasonCodes = ["BASELINE_QUERY_KEY_COLLISION"];
   } else if (admissionReasons.length === 0 && row.language === "Latin") {
     s0Classification = "S1_SELECTED";
-    reasonCodes = baselineQueryKeys.has(normalizedQueryKey)
-      ? ["BASELINE_QUERY_KEY_COLLISION"]
-      : ["FULL_ADMISSION_AND_LATIN_ADAPTER_BOUNDARY"];
+    reasonCodes = ["FULL_ADMISSION_AND_LATIN_ADAPTER_BOUNDARY"];
   } else if (admissionReasons.length === 0) {
     s0Classification = "ADAPTER_DEFERRED";
     reasonCodes = ["ADMISSION_VALID_OUTSIDE_CURRENT_DIRECT_LANGUAGE_ADAPTER_BOUNDARY"];
@@ -585,9 +587,9 @@ export function buildMultilingualDiscoverySubstrateS0BaselineV0_2(options: {
       },
       languageCounts: countByV0_2(loadedRows.map((row) => row.language)),
       sourceTraditionCounts: countByV0_2(
-        loadedRows.map((row) => {
-          return row.citations[0]?.provenanceGroupId ?? "NONE";
-        }),
+        loadedRows.flatMap((row) => [...new Set(
+          row.citations.map((citation) => citation.provenanceGroupId ?? "NONE"),
+        )]),
       ),
       attestationTruthCounts: countByV0_2(loadedRows.map((row) => row.attestationTruth)),
       sourceStatusCounts: countByV0_2(loadedRows.map((row) => row.sourceStatus)),

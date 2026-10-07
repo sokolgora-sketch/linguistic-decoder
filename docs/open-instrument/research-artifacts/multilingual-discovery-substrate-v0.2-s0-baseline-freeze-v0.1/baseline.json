@@ -6318,11 +6318,14 @@
     },
     "sourceTraditionCounts": {
       "NONE": 35,
+      "fjale.fjalor-shqip.albanian-shter.v0_1": 1,
+      "fjale.fjalor-shqip.albanian-shterp.v0_1": 2,
       "fjale.fjalor-shqip.albanian-shterpezoj.v0_1": 1,
       "fjale.fjalor-shqip.v0_1": 26,
       "fjalori.online.albanian-mat.v0_1": 1,
       "fjalori.online.albanian-shter.v0_1": 1,
       "fjalori.online.albanian-shterp.v0_1": 2,
+      "kaikki.wiktionary.albanian-mas.v0_1": 1,
       "logeion.lsj.v0_1": 1,
       "scaife.lewis-short.v0_1": 24,
       "scaife.middle-liddell.v0_1": 4

@@ -11,9 +11,9 @@
 - `S0=COMPLETE`
 - `S1=NOT_STARTED`
 - `S0_ARTIFACT=docs/open-instrument/research-artifacts/multilingual-discovery-substrate-v0.2-s0-baseline-freeze-v0.1/baseline.json`
-- `S0_ARTIFACT_SHA256=0aebfd6d022a5e2d94bacd181702a7174a57a21d010bc7f5956771b1c4d90325`
+- `S0_ARTIFACT_SHA256=52fd4865fd3a0eb2067ea460af7d75024948de5c56cbcc8ce9936361a591a58e`
 - `S0_MANIFEST=docs/open-instrument/research-artifacts/multilingual-discovery-substrate-v0.2-s0-baseline-freeze-v0.1/hash-manifest.json`
-- `S0_MANIFEST_SHA256=46dbbc28d68bc4eaa485c123867a9e06cadd5a80ae3c36660da5410e8eebf20c`
+- `S0_MANIFEST_SHA256=38d57de7082b4d719b76aa5cf34e177c5e0d811a1a11341bba9535fafcbf764f`
 
 This milestone follows the closed Motivation Engine / Discovery Lab v0.1
 milestone, including its M7 generic generalization, M8 multilingual seam, M9

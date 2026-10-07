@@ -53,6 +53,25 @@ describe("multilingual Discovery substrate v0.2 S0 baseline freeze", () => {
       boundaryExcluded: 14,
       preliminaryEligible: 81,
     });
+    expect(reconstructed.catalog.loadedRows
+      .filter((row) => row.s0Classification === "S1_SELECTED")
+      .every((row) => !reconstructed.directSubstrate.queryKeyCollisions
+        .some((collision) => collision.key === row.normalizedQueryKey)))
+      .toBe(true);
+    expect(reconstructed.catalog.sourceTraditionCounts).toEqual({
+      "NONE": 35,
+      "fjale.fjalor-shqip.albanian-shter.v0_1": 1,
+      "fjale.fjalor-shqip.albanian-shterp.v0_1": 2,
+      "fjale.fjalor-shqip.albanian-shterpezoj.v0_1": 1,
+      "fjale.fjalor-shqip.v0_1": 26,
+      "fjalori.online.albanian-mat.v0_1": 1,
+      "fjalori.online.albanian-shter.v0_1": 1,
+      "fjalori.online.albanian-shterp.v0_1": 2,
+      "kaikki.wiktionary.albanian-mas.v0_1": 1,
+      "logeion.lsj.v0_1": 1,
+      "scaife.lewis-short.v0_1": 24,
+      "scaife.middle-liddell.v0_1": 4,
+    });
   });
 
   test("freezes the exact S1 cohort without projecting it", () => {
@@ -115,13 +134,13 @@ describe("multilingual Discovery substrate v0.2 S0 baseline freeze", () => {
     expect(artifactBinding).toBeDefined();
     expect(artifactBinding?.bytes).toBe(artifactBytes.byteLength);
     expect(artifactBinding?.sha256).toBe(sha256(artifactBytes));
-    expect(artifactBytes.byteLength).toBe(293428);
+    expect(artifactBytes.byteLength).toBe(293579);
     expect(sha256(artifactBytes)).toBe(
-      "0aebfd6d022a5e2d94bacd181702a7174a57a21d010bc7f5956771b1c4d90325",
+      "52fd4865fd3a0eb2067ea460af7d75024948de5c56cbcc8ce9936361a591a58e",
     );
     expect(manifestBytes.byteLength).toBe(2675);
     expect(sha256(manifestBytes)).toBe(
-      "46dbbc28d68bc4eaa485c123867a9e06cadd5a80ae3c36660da5410e8eebf20c",
+      "38d57de7082b4d719b76aa5cf34e177c5e0d811a1a11341bba9535fafcbf764f",
     );
     expect(baselineArtifact).toEqual(reconstructed);
     expect(reconstructed.evaluationProcedure.procedureId).toBe(
