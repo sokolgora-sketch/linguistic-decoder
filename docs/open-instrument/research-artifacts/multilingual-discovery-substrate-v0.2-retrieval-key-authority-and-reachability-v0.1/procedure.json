@@ -1,0 +1,262 @@
+{
+  "schemaVersion": "open-instrument.multilingual-discovery-substrate-v0.2-retrieval-key-authority-and-reachability-procedure.v0.1",
+  "status": "DEFINED_NOT_EXECUTED",
+  "procedureId": "open-instrument.multilingual-discovery-substrate-v0.2.retrieval-key-authority-and-reachability.v0.1",
+  "milestoneId": "OPEN_INSTRUMENT_MULTILINGUAL_DISCOVERY_SUBSTRATE_EXPANSION_V0_2",
+  "repositoryBaselineHead": "0abf2ee7371773db65679cf5a50040de9887e94a",
+  "purpose": "Decide whether a narrowly scoped independent retrieval-key representation is authorized and whether it changes Latin reachability under unchanged query generation and exact matching.",
+  "authorityDecision": {
+    "currentDecision": "INSUFFICIENT_EVIDENCE",
+    "possibleDecisions": ["AUTHORIZED", "NOT_AUTHORIZED", "INSUFFICIENT_EVIDENCE"],
+    "gate": {
+      "decisionOrder": [
+        "AUTHORIZED if explicit source-tradition authority permits the exact frozen operator, every frozen source record is covered, and all source/truth invariants pass",
+        "NOT_AUTHORIZED if explicit source-tradition authority prohibits retrieval-key derivation or any frozen invariant fails",
+        "INSUFFICIENT_EVIDENCE otherwise"
+      ],
+      "requiredEvidence": [
+        "explicit source-tradition authority statement for the exact enumerated scholarly quantity transformations",
+        "complete operator coverage for the frozen 21-record set",
+        "sourceForm/citation/gloss/attestation preservation",
+        "no pronunciation, historical, functional, or semantic equivalence claim",
+        "collision policy and exact-match invariants pass"
+      ],
+      "currentEvidence": {
+        "explicitSourceTraditionAuthorization": false,
+        "explicitSourceTraditionProhibition": false,
+        "operatorCoverage": "PASS",
+        "sourceTruthInvariants": "PASS",
+        "collisionPolicyFrozen": "PASS",
+        "currentDecision": "INSUFFICIENT_EVIDENCE"
+      },
+      "postFreezeEvidenceMayChangeDecision": false,
+      "decisionMustBeReboundByNewProcedureVersion": true
+    },
+    "runtimeCanonicalizationAuthorized": false,
+    "currentMatchingChanged": false,
+    "s4Started": false
+  },
+  "priorResults": {
+    "s3ResultPath": "docs/open-instrument/research-artifacts/multilingual-discovery-substrate-v0.2-s3-independent-coverage-evaluation-v0.1/paired-results.json",
+    "s3ResultSha256": "b703051f8d6020548f93dc9a6591b22278f467bb0c521871b31aafb47be4ca03",
+    "s3SummarySha256": "1985db5f7d8d7fd59c6ca741f30d1814ffa469f95c141ff7e9aef109da11ebea",
+    "broaderResultPath": "docs/open-instrument/research-artifacts/multilingual-discovery-substrate-v0.2-broader-stratified-diagnostic-v0.1/results.json",
+    "broaderResultSha256": "51019087d2199f8506267c3e6a4fbdb8824962641a6ed49abaa7e2c7bcc59ee6",
+    "broaderSummarySha256": "ef245127223957dc82dbd743543c31eded442253e61622bd4f6111610b9fbbbf",
+    "broaderManifestSha256": "41df36151de521353a2b2ea1ce178e3bb4a3aafe022cace01aa32c9baa2f657c",
+    "broaderClassification": "CLASS_B_BROADER_SAMPLE_REVEALS_ADDITIONAL_EXISTING_SUBSTRATE_KEYS_BUT_NO_LATIN",
+    "broaderMetrics": {
+      "sampleInputs": 1024,
+      "validInputs": 688,
+      "distinctGeneratedQueryKeys": 2469,
+      "substrateKeysReached": 4,
+      "albanianKeysReached": 4,
+      "latinKeysReached": 0,
+      "reachedKeys": ["ART", "AT", "MAT", "RE"]
+    }
+  },
+  "currentRepresentationContract": {
+    "sourceFormNormalization": "EXACT_PRESERVED",
+    "queryNormalization": "STRUCTURAL_DISPLAY_UPPERCASE",
+    "lookupNormalization": "EXACT_NFC",
+    "lookupTransformationAuthority": "STRUCTURAL_HYPOTHESIS_DISPLAY_FORM_V0_1",
+    "queryFormEqualsLookupForm": true,
+    "lookupFormRule": "sourceForm.toLocaleUpperCase(en-US).normalize(NFC)",
+    "matching": "record.lookupForm === input.embryo after existing NFC/trim query normalization",
+    "matchingAlternativesAuthorized": false
+  },
+  "operator": {
+    "operatorId": "open-instrument.retrieval-key-canonicalization.latin-scholarly-quantity.v0.1",
+    "selectedOption": "OPTION_2",
+    "status": "PROPOSED_NOT_AUTHORIZED_FOR_RUNTIME",
+    "inputDomain": "The 21 frozen Latin records from source tradition scaife.lewis-short.v0_1 and the raw generated query-key strings from the same prepared population.",
+    "outputDomain": "Non-empty ASCII alphabetic retrieval keys, or fail-closed Null/error.",
+    "unicodeNormalization": "NFC before and after the explicit mapping.",
+    "caseNormalization": "English uppercase after NFC and before mapping.",
+    "authorizedCharacterTransformations": {
+      "Ā": "A", "Ă": "A", "Ē": "E", "Ĕ": "E", "Ī": "I", "Ĭ": "I", "Ō": "O", "Ŏ": "O", "Ū": "U", "Ŭ": "U"
+    },
+    "prohibitedTransformations": ["generic combining-mark removal", "unlisted diacritic removal", "transliteration", "consonant rewrite", "phonetic rewrite", "semantic rewrite", "sourceForm mutation"],
+    "languageScope": ["Latin"],
+    "sourceTraditionScope": ["scaife.lewis-short.v0_1"],
+    "failClosedConditions": ["unsupported source tradition", "unsupported code point", "empty output", "non-ASCII output", "non-string input", "non-idempotent output"],
+    "collisionPolicy": "Preserve every source record and citation set under the shared retrieval key; report collisions; never deduplicate or choose a winner; fail closed only if the current candidate representation cannot carry the collision.",
+    "emptyKeyPolicy": "FAIL_CLOSED",
+    "idempotenceRequired": true,
+    "determinismRequired": true,
+    "versioningPolicy": "Any transformation-set, scope, failure, or collision-policy change requires a new operator ID and a new frozen procedure.",
+    "sourceFormMutated": false,
+    "citationMutated": false,
+    "glossMutated": false,
+    "attestationMutated": false,
+    "pronunciationAuthorityGranted": false,
+    "historicalEquivalenceGranted": false,
+    "functionalEquivalenceGranted": false,
+    "semanticEquivalenceGranted": false
+  },
+  "operatorOptions": {
+    "OPTION_0": "Current uppercase NFC identity control; authorized current behavior.",
+    "OPTION_1": "NFD plus removal only of an independently authorized scholarly quantity mark set; not selected because the current contract does not freeze that taxonomy.",
+    "OPTION_2": "Explicit Latin macron/breve mapping for the enumerated code points; bounded future candidate only.",
+    "OPTION_3": "Generic Unicode diacritic removal; rejected due to information-loss and cross-language truth-boundary risk.",
+    "OPTION_4": "No canonicalization; fallback if the candidate authority gate is not authorized or remains insufficient."
+  },
+  "collisionClasses": ["SOURCE_FORM_COLLISION", "RETRIEVAL_KEY_COLLISION", "CROSS_LANGUAGE_COLLISION", "WITHIN_LANGUAGE_COLLISION", "WITHIN_SOURCE_TRADITION_COLLISION"],
+  "collisionPolicy": {
+    "newCollisionAcceptance": "ZERO_NEW_COLLISIONS",
+    "unacceptableCollisionPredicate": "Any Arm B retrieval-key collision between distinct source records that is absent from Arm A, including within-language, cross-language, or within-source-tradition collisions, is unacceptable for CLASS_C.",
+    "truthGate": {
+      "sourceFormMutated": false,
+      "citationSetMutated": false,
+      "glossMutated": false,
+      "attestationMutated": false,
+      "pronunciationAuthorityGranted": false,
+      "historicalEquivalenceGranted": false,
+      "functionalEquivalenceGranted": false,
+      "semanticEquivalenceGranted": false,
+      "winnerSelected": false,
+      "userDecidesPreserved": true,
+      "noSingleWinnerPreserved": true
+    },
+    "classCRequires": [
+      "canonicalLatinKeysReached > currentLatinKeysReached",
+      "newCollisionCount = 0",
+      "all truthGate fields pass",
+      "all source records remain represented with complete citation sets"
+    ],
+    "classDRequires": [
+      "canonicalLatinKeysReached > currentLatinKeysReached",
+      "newCollisionCount > 0 or any truthGate field fails"
+    ],
+    "existingCollisions": "Report separately and preserve; existing collisions do not become new collisions solely by being observed."
+  },
+  "latinTestSet": {
+    "sourceAuthority": "scaife.lewis-short.v0_1",
+    "recordCount": 21,
+    "currentAsciiCount": 13,
+    "currentDiacriticCount": 8,
+    "records": [
+      {"sourceRecordId":"research.external.latin-amo-love.v0_1","sourceForm":"amo","currentLookupForm":"AMO","proposedRetrievalKey":"AMO","sourceTradition":"scaife.lewis-short.v0_1","citationIds":["research.external.lewis-short-amo-love.citation.v0_1"],"attestation":"fact","sourceStatus":"research_candidate","transformationApplied":"NO_OP","transformationReason":"ASCII source display under candidate operator","collisionStatus":"MUST_BE_MEASURED"},
+      {"sourceRecordId":"research.external.latin-caelum-sky.scale50.v0_1","sourceForm":"caelum","currentLookupForm":"CAELUM","proposedRetrievalKey":"CAELUM","sourceTradition":"scaife.lewis-short.v0_1","citationIds":["research.external.lewis-short-caelum-sky.scale50.citation.v0_1"],"attestation":"fact","sourceStatus":"research_candidate","transformationApplied":"NO_OP","transformationReason":"ASCII source display under candidate operator","collisionStatus":"MUST_BE_MEASURED"},
+      {"sourceRecordId":"research.external.latin-libertas-freedom.scale50.cohortG.v0_1","sourceForm":"lībertas","currentLookupForm":"LĪBERTAS","proposedRetrievalKey":"LIBERTAS","sourceTradition":"scaife.lewis-short.v0_1","citationIds":["research.external.scaife-lewis-short-libertas-freedom.scale50.cohortG.citation.v0_1"],"attestation":"fact","sourceStatus":"research_candidate","transformationApplied":"Ī→I","transformationReason":"Explicit Latin macron mapping only","collisionStatus":"MUST_BE_MEASURED"},
+      {"sourceRecordId":"research.external.latin-vir-man.scale50.cohortG.v0_1","sourceForm":"vĭr","currentLookupForm":"VĬR","proposedRetrievalKey":"VIR","sourceTradition":"scaife.lewis-short.v0_1","citationIds":["research.external.scaife-lewis-short-vir-man.scale50.cohortG.citation.v0_1"],"attestation":"fact","sourceStatus":"research_candidate","transformationApplied":"Ĭ→I","transformationReason":"Explicit Latin breve mapping only","collisionStatus":"MUST_BE_MEASURED"},
+      {"sourceRecordId":"research.external.open-instrument-research-evidence-packet-v0-1.art-creative-artistic-activity-v0-1.verified-source-capture-scaife-lewis-short-v0-1-headword-ars-art-sense-entry-text-beginning-skill-in-producing-any-material-form-ars-v0-1","sourceForm":"ars","currentLookupForm":"ARS","proposedRetrievalKey":"ARS","sourceTradition":"scaife.lewis-short.v0_1","citationIds":["open-instrument.source-record.capture.scaife-lewis-short-v0-1.headword-ars-art-sense-entry-text-beginning-skill-in-producing-any-material-form.ars.v0_1.citation.v0_1"],"attestation":"fact","sourceStatus":"research_candidate","transformationApplied":"NO_OP","transformationReason":"ASCII source display under candidate operator","collisionStatus":"MUST_BE_MEASURED"},
+      {"sourceRecordId":"research.external.open-instrument-research-evidence-packet-v0-1.blue-blue-color-v0-1.verified-source-capture-scaife-lewis-short-v0-1-headword-caer-l-us-blue-sense-entry-text-beginning-dark-colored-dark-blue-caer-l-us-v0-1","sourceForm":"caerŭlĕus","currentLookupForm":"CAERŬLĔUS","proposedRetrievalKey":"CAERULEUS","sourceTradition":"scaife.lewis-short.v0_1","citationIds":["open-instrument.source-record.capture.scaife-lewis-short-v0-1.headword-caer-l-us-blue-sense-entry-text-beginning-dark-colored-dark-blue.caer-l-us.v0_1.citation.v0_1"],"attestation":"fact","sourceStatus":"research_candidate","transformationApplied":"Ŭ→U; Ĕ→E","transformationReason":"Explicit Latin breve mapping only","collisionStatus":"MUST_BE_MEASURED"},
+      {"sourceRecordId":"research.external.open-instrument-research-evidence-packet-v0-1.bread-physical-baked-food-v0-1.verified-source-capture-scaife-lewis-short-v0-1-headword-p-nis-bread-sense-entry-text-beginning-bread-p-nis-v0-1","sourceForm":"pānis","currentLookupForm":"PĀNIS","proposedRetrievalKey":"PANIS","sourceTradition":"scaife.lewis-short.v0_1","citationIds":["open-instrument.source-record.capture.scaife-lewis-short-v0-1.headword-p-nis-bread-sense-entry-text-beginning-bread.p-nis.v0_1.citation.v0_1"],"attestation":"fact","sourceStatus":"research_candidate","transformationApplied":"Ā→A","transformationReason":"Explicit Latin macron mapping only","collisionStatus":"MUST_BE_MEASURED"},
+      {"sourceRecordId":"research.external.open-instrument-research-evidence-packet-v0-1.break-physical-break-damage-source-review-v0-1.verified-source-capture-scaife-lewis-short-v0-1-headword-frango-physical-break-sense-entry-text-beginning-to-break-break-in-pieces-frango-v0-1","sourceForm":"frango","currentLookupForm":"FRANGO","proposedRetrievalKey":"FRANGO","sourceTradition":"scaife.lewis-short.v0_1","citationIds":["open-instrument.source-record.capture.scaife-lewis-short-v0-1.headword-frango-physical-break-sense-entry-text-beginning-to-break-break-in-pieces.frango.v0_1.citation.v0_1"],"attestation":"fact","sourceStatus":"research_candidate","transformationApplied":"NO_OP","transformationReason":"ASCII source display under candidate operator","collisionStatus":"MUST_BE_MEASURED"},
+      {"sourceRecordId":"research.external.open-instrument-research-evidence-packet-v0-1.change-alteration-v0-1.lewis-short-mutatio","sourceForm":"mūtātiō","currentLookupForm":"MŪTĀTIŌ","proposedRetrievalKey":"MUTATIO","sourceTradition":"scaife.lewis-short.v0_1","citationIds":["change.lewis-short.mutatio.v0_1"],"attestation":"fact","sourceStatus":"research_candidate","transformationApplied":"Ū→U; Ā→A; Ō→O","transformationReason":"Explicit Latin macron mapping only","collisionStatus":"MUST_BE_MEASURED"},
+      {"sourceRecordId":"research.external.open-instrument-research-evidence-packet-v0-1.cloud-physical-atmospheric-v0-1.verified-source-capture-scaife-lewis-short-v0-1-headword-nimbus-cloud-in-general-entry-text-beginning-a-cloud-in-general-nimbus-v0-1","sourceForm":"nimbus","currentLookupForm":"NIMBUS","proposedRetrievalKey":"NIMBUS","sourceTradition":"scaife.lewis-short.v0_1","citationIds":["open-instrument.source-record.capture.scaife-lewis-short-v0-1.headword-nimbus-cloud-in-general-entry-text-beginning-a-cloud-in-general.nimbus.v0_1.citation.v0_1"],"attestation":"fact","sourceStatus":"research_candidate","transformationApplied":"NO_OP","transformationReason":"ASCII source display under candidate operator","collisionStatus":"MUST_BE_MEASURED"},
+      {"sourceRecordId":"research.external.open-instrument-research-evidence-packet-v0-1.friend-close-person-v0-1.verified-source-capture-scaife-lewis-short-v0-1-headword-familiaris-friendly-friend-sense-entry-text-beginning-familiar-intimate-friendly-familiaris-v0-1","sourceForm":"familiaris","currentLookupForm":"FAMILIARIS","proposedRetrievalKey":"FAMILIARIS","sourceTradition":"scaife.lewis-short.v0_1","citationIds":["open-instrument.source-record.capture.scaife-lewis-short-v0-1.headword-familiaris-friendly-friend-sense-entry-text-beginning-familiar-intimate-friendly.familiaris.v0_1.citation.v0_1"],"attestation":"fact","sourceStatus":"research_candidate","transformationApplied":"NO_OP","transformationReason":"ASCII source display under candidate operator","collisionStatus":"MUST_BE_MEASURED"},
+      {"sourceRecordId":"research.external.open-instrument-research-evidence-packet-v0-1.hope-mental-desired-expectation-v0-1.verified-source-capture-scaife-lewis-short-v0-1-headword-spes-hope-sense-entry-text-beginning-expectation-of-something-desired-sp-s-v0-1","sourceForm":"spēs","currentLookupForm":"SPĒS","proposedRetrievalKey":"SPES","sourceTradition":"scaife.lewis-short.v0_1","citationIds":["open-instrument.source-record.capture.scaife-lewis-short-v0-1.headword-spes-hope-sense-entry-text-beginning-expectation-of-something-desired.sp-s.v0_1.citation.v0_1"],"attestation":"fact","sourceStatus":"research_candidate","transformationApplied":"Ē→E","transformationReason":"Explicit Latin macron mapping only","collisionStatus":"MUST_BE_MEASURED"},
+      {"sourceRecordId":"research.external.open-instrument-research-evidence-packet-v0-1.order-lexical-arrangement-v0-1.lewis-short-ordo","sourceForm":"ordo","currentLookupForm":"ORDO","proposedRetrievalKey":"ORDO","sourceTradition":"scaife.lewis-short.v0_1","citationIds":["order.lewis-short.ordo.v0_1"],"attestation":"fact","sourceStatus":"research_candidate","transformationApplied":"NO_OP","transformationReason":"ASCII source display under candidate operator","collisionStatus":"MUST_BE_MEASURED"},
+      {"sourceRecordId":"research.external.open-instrument-research-evidence-packet-v0-1.sea-physical-saltwater-body-v0-1.verified-source-capture-scaife-lewis-short-v0-1-headword-mare-sea-sense-entry-text-beginning-sea-mare-v0-1","sourceForm":"mare","currentLookupForm":"MARE","proposedRetrievalKey":"MARE","sourceTradition":"scaife.lewis-short.v0_1","citationIds":["open-instrument.source-record.capture.scaife-lewis-short-v0-1.headword-mare-sea-sense-entry-text-beginning-sea.mare.v0_1.citation.v0_1"],"attestation":"fact","sourceStatus":"research_candidate","transformationApplied":"NO_OP","transformationReason":"ASCII source display under candidate operator","collisionStatus":"MUST_BE_MEASURED"},
+      {"sourceRecordId":"research.external.open-instrument-research-evidence-packet-v0-1.skin-physical-body-covering-v0-1.verified-source-capture-scaife-lewis-short-v0-1-headword-pellis-skin-hide-sense-entry-text-beginning-skin-hide-pellis-v0-1","sourceForm":"pellis","currentLookupForm":"PELLIS","proposedRetrievalKey":"PELLIS","sourceTradition":"scaife.lewis-short.v0_1","citationIds":["open-instrument.source-record.capture.scaife-lewis-short-v0-1.headword-pellis-skin-hide-sense-entry-text-beginning-skin-hide.pellis.v0_1.citation.v0_1"],"attestation":"fact","sourceStatus":"research_candidate","transformationApplied":"NO_OP","transformationReason":"ASCII source display under candidate operator","collisionStatus":"MUST_BE_MEASURED"},
+      {"sourceRecordId":"research.external.open-instrument-research-evidence-packet-v0-1.sleep-physical-sleep-state-v0-1.verified-source-capture-scaife-lewis-short-v0-1-headword-somnus-sleep-sense-entry-text-beginning-sleep-somnus-v0-1","sourceForm":"somnus","currentLookupForm":"SOMNUS","proposedRetrievalKey":"SOMNUS","sourceTradition":"scaife.lewis-short.v0_1","citationIds":["open-instrument.source-record.capture.scaife-lewis-short-v0-1.headword-somnus-sleep-sense-entry-text-beginning-sleep.somnus.v0_1.citation.v0_1"],"attestation":"fact","sourceStatus":"research_candidate","transformationApplied":"NO_OP","transformationReason":"ASCII source display under candidate operator","collisionStatus":"MUST_BE_MEASURED"},
+      {"sourceRecordId":"research.external.open-instrument-research-evidence-packet-v0-1.snow-physical-precipitation-v0-1.verified-source-capture-scaife-lewis-short-v0-1-headword-nix-snow-sense-entry-text-beginning-snow-nix-v0-1","sourceForm":"nix","currentLookupForm":"NIX","proposedRetrievalKey":"NIX","sourceTradition":"scaife.lewis-short.v0_1","citationIds":["open-instrument.source-record.capture.scaife-lewis-short-v0-1.headword-nix-snow-sense-entry-text-beginning-snow.nix.v0_1.citation.v0_1"],"attestation":"fact","sourceStatus":"research_candidate","transformationApplied":"NO_OP","transformationReason":"ASCII source display under candidate operator","collisionStatus":"MUST_BE_MEASURED"},
+      {"sourceRecordId":"research.external.open-instrument-research-evidence-packet-v0-1.star-astronomical-star-v0-1.verified-source-capture-scaife-lewis-short-v0-1-headword-stella-star-sense-entry-text-beginning-a-star-stella-v0-1","sourceForm":"stella","currentLookupForm":"STELLA","proposedRetrievalKey":"STELLA","sourceTradition":"scaife.lewis-short.v0_1","citationIds":["open-instrument.source-record.capture.scaife-lewis-short-v0-1.headword-stella-star-sense-entry-text-beginning-a-star.stella.v0_1.citation.v0_1"],"attestation":"fact","sourceStatus":"research_candidate","transformationApplied":"NO_OP","transformationReason":"ASCII source display under candidate operator","collisionStatus":"MUST_BE_MEASURED"},
+      {"sourceRecordId":"research.external.open-instrument-research-evidence-packet-v0-1.tree-physical-plant-v0-1.verified-source-capture-scaife-lewis-short-v0-1-headword-arbor-general-tree-sense-entry-text-beginning-a-tree-arbor-v0-1","sourceForm":"arbor","currentLookupForm":"ARBOR","proposedRetrievalKey":"ARBOR","sourceTradition":"scaife.lewis-short.v0_1","citationIds":["open-instrument.source-record.capture.scaife-lewis-short-v0-1.headword-arbor-general-tree-sense-entry-text-beginning-a-tree.arbor.v0_1.citation.v0_1"],"attestation":"fact","sourceStatus":"research_candidate","transformationApplied":"NO_OP","transformationReason":"ASCII source display under candidate operator","collisionStatus":"MUST_BE_MEASURED"},
+      {"sourceRecordId":"research.external.open-instrument-research-evidence-packet-v0-1.vision-visual-appearance-or-vision-v0-1.verified-source-capture-scaife-lewis-short-v0-1-headword-v-s-o-vision-sense-entry-text-beginning-sight-vision-v-s-o-v0-1","sourceForm":"vīsĭo","currentLookupForm":"VĪSĬO","proposedRetrievalKey":"VISIO","sourceTradition":"scaife.lewis-short.v0_1","citationIds":["open-instrument.source-record.capture.scaife-lewis-short-v0-1.headword-v-s-o-vision-sense-entry-text-beginning-sight-vision.v-s-o.v0_1.citation.v0_1"],"attestation":"fact","sourceStatus":"research_candidate","transformationApplied":"Ī→I; Ĭ→I","transformationReason":"Explicit Latin macron/breve mapping only","collisionStatus":"MUST_BE_MEASURED"},
+      {"sourceRecordId":"research.external.open-instrument-research-evidence-packet-v0-1.water-physical-liquid-v0-1.verified-source-capture-scaife-lewis-short-v0-1-headword-qua-general-water-sense-entry-text-beginning-water-in-its-most-gen-signif-qua-v0-1","sourceForm":"ăqua","currentLookupForm":"ĂQUA","proposedRetrievalKey":"AQUA","sourceTradition":"scaife.lewis-short.v0_1","citationIds":["open-instrument.source-record.capture.scaife-lewis-short-v0-1.headword-qua-general-water-sense-entry-text-beginning-water-in-its-most-gen-signif.qua.v0_1.citation.v0_1"],"attestation":"fact","sourceStatus":"research_candidate","transformationApplied":"Ă→A","transformationReason":"Explicit Latin breve mapping only","collisionStatus":"MUST_BE_MEASURED"}
+    ]
+  },
+  "populationAuthority": {
+    "sourceProfileId": "open-instrument.cmudict-arpabet-en-us.v0_1",
+    "sourceRevision": "74790861f652b15e4ac49015a90074ad62a27690",
+    "sourceNotation": "ARPABET",
+    "sourcePath": "src/data/openInstrument/pronunciation/cmudict.dict",
+    "sourceSha256": "81917843c7f44ce2b094ac63873c2c7a4cf802040792c455ba3ca406891c3d22",
+    "populationSpecPath": "docs/open-instrument/research-artifacts/zero-consonantal-structural-composition-v0.1-cmudict-validation-v0.1b/population-spec.json",
+    "populationSpecSha256": "81248026f57cffb0c357a4e29e0cce4d3139adc1521eda89e72754783095ed44",
+    "preparationProcedurePath": "docs/open-instrument/research-artifacts/m7-novel-input-generalization-v0.1/selection-procedure.json",
+    "preparationProcedureSha256": "de0363366f854230b178011c36a52818add15664f57a7241105bdbc6fb9b8eb7",
+    "rawEligiblePopulationCount": 117473,
+    "preparedPopulationCount": 117389,
+    "ordering": "NFC, trim, lower-case under existing English CMUdict convention, retain ASCII alphabetic normalized words, deduplicate, Unicode code-point ascending",
+    "eligibility": "Population-spec eligibility=ELIGIBLE followed by existing normalized ASCII lexical-word filter and lexical-word deduplication",
+    "exclusions": "Use exactly the materialized explicit and inherited exclusion arrays below; do not consult substrate responses or candidates",
+    "explicitExclusionWords": ["abandon", "at", "balance", "banana", "blood", "bone", "break", "build", "candle", "carry", "cat", "change", "child", "cloud", "comic", "damage", "data", "death", "di", "dij", "drink", "ear", "eat", "father", "first", "foot", "freedom", "friend", "gjak", "hand", "head", "hear", "heart", "home", "justice", "king", "learning", "life", "make", "man", "mat", "mathematics", "memory", "mind", "mode", "mother", "mountain", "mouth", "name", "nose", "order", "peace", "project", "rain", "research", "river", "run", "sea", "second", "shter", "shterp", "sky", "sleep", "snow", "speak", "start", "sterile", "stone", "studies", "study", "support", "synthetic", "time", "tree", "truth", "unicode", "walk", "war", "water", "wind", "woman", "work", "xyz", "zemër"],
+    "inheritedSubstrateExclusionWords": ["art", "at", "da", "det", "di", "dua", "eci", "flas", "gjak", "grua", "ha", "liri", "mal", "mat", "mbaj", "mbret", "mendje", "mik", "ndryshim", "paqe", "qiell", "re", "rend", "shi", "shter", "shterp", "thyej", "vesh", "vizion", "vrapoj", "yll"],
+    "combinedExclusionWords": ["abandon", "art", "at", "balance", "banana", "blood", "bone", "break", "build", "candle", "carry", "cat", "change", "child", "cloud", "comic", "da", "damage", "data", "death", "det", "di", "dij", "drink", "dua", "ear", "eat", "eci", "father", "first", "flas", "foot", "freedom", "friend", "gjak", "grua", "ha", "hand", "head", "hear", "heart", "home", "justice", "king", "learning", "life", "liri", "make", "mal", "man", "mat", "mathematics", "mbaj", "mbret", "memory", "mendje", "mik", "mind", "mode", "mother", "mountain", "mouth", "name", "ndryshim", "nose", "order", "paqe", "peace", "project", "qiell", "rain", "re", "rend", "research", "river", "run", "sea", "second", "shi", "shter", "shterp", "sky", "sleep", "snow", "speak", "start", "sterile", "stone", "studies", "study", "support", "synthetic", "thyej", "time", "tree", "truth", "unicode", "vesh", "vizion", "vrapoj", "walk", "war", "water", "wind", "woman", "work", "xyz", "yll", "zemër"],
+    "exclusionSetFingerprint": "c0d23a68f7ea0610e145cd7426a47a88bdf4158f7ead036272d69d3e4f2e9c2d",
+    "preparedPopulationFingerprint": "751987cbf7cd71d527ff0fc16f1e316fd6066a870eb11bc72aece51e9cf428a2",
+    "inputPopulationFingerprintMethod": "SHA-256 of canonical JSON containing source/spec/procedure hashes, raw/prepared counts, ordering, eligibility, and the exact explicit/inherited/combined exclusion arrays; execution must recompute it before query generation",
+    "inputPopulationFingerprintInput": "931a9f4502e394d2f0e49ae45d4fc5ddc21d63cc960c115a741702baf4cf0aec",
+    "inputPopulationFingerprint": "931a9f4502e394d2f0e49ae45d4fc5ddc21d63cc960c115a741702baf4cf0aec"
+  },
+  "queryMatchingAuthority": {
+    "queryGeneratorPath": "src/shared/openInstrument/multilingualDiscoverySubstrateS3.v0_2.ts",
+    "queryGeneratorSymbol": "genericQueryKeysForWordV0_2",
+    "queryGeneratorSha256": "dd4a01e61c0e37846a0416242b347f499ed135e608eecf446a58bc83da079220",
+    "structuralNormalizerPath": "src/shared/structuralHypothesisDiscovery.v0_1.ts",
+    "structuralNormalizerSymbol": "normalizeStructuralBasisV0_1",
+    "structuralNormalizerSha256": "96fba8363df8b3d59caf6d7dc9ac9ad88007d15432bec4b647b83484a25555db",
+    "matchingAdapterPath": "src/shared/openInstrument/genericFunctionalWitnessSourceAcquisition.v1.ts",
+    "matchingAdapterSymbol": "createGenericFunctionalWitnessSourceAdapterV1",
+    "matchingAdapterSha256": "f49ff4f0b877887b466002ce465feb58adbb07204cc6560c3caaa0364d95a0a0",
+    "queryGeneratorChanged": false,
+    "matchingChanged": false,
+    "normalizationChanged": false,
+    "matchingSemantics": "Exact equality of authorized retrieval keys only."
+  },
+  "substrateAuthority": {
+    "total": 76,
+    "albanian": 55,
+    "latin": 21,
+    "other": 0,
+    "fingerprint": "1c4714a1d9a7550c1c037b4ce62ca85e9ff24966f2e8d447c038bce001b45d81",
+    "s3ProcedurePath": "docs/open-instrument/research-artifacts/m7-substrate-reachable-generalization-v0.1/procedure.json",
+    "s3ProcedureSha256": "2b7ecf4b1b0b7e3f2ced15a0a92381316206711b3392676b22e81e6481ed81cb"
+  },
+  "arms": {
+    "ARM_A": {"representation":"CURRENT_UPPERCASE_NFC_IDENTITY","operator":"OPTION_0","queryGeneratorSame":true,"populationSame":true,"sourceFormsSame":true,"citationsSame":true,"matching":"EXACT_EQUALITY"},
+    "ARM_B": {"representation":"PROPOSED_LATIN_SCHOLARLY_QUANTITY_RETRIEVAL_KEY","operator":"open-instrument.retrieval-key-canonicalization.latin-scholarly-quantity.v0.1","status":"CONDITIONAL_ON_AUTHORIZED_GATE","queryGeneratorSame":true,"rawGeneratedKeysSame":true,"populationSame":true,"sourceFormsSame":true,"citationsSame":true,"matching":"EXACT_EQUALITY_OF_DERIVED_KEYS"}
+  },
+  "metrics": [
+    "preparedPopulationCount", "validInputCount", "invalidInputCount", "totalQueryKeyOccurrences", "distinctGeneratedQueryKeys", "latinRecordCount", "latinCurrentDistinctKeys", "latinCanonicalDistinctKeys", "currentLatinKeysReached", "canonicalLatinKeysReached", "currentAsciiLatinKeysReached", "currentDiacriticLatinKeysReached", "canonicalAsciiLatinKeysReached", "canonicalizedDiacriticSourceRecordsReached", "inputsWithCurrentLatinIntersection", "inputsWithCanonicalLatinIntersection", "perLatinKeyInputCount", "perLatinRecordInputCount", "retrievalKeyCollisionCount", "withinLanguageCollisionCount", "crossLanguageCollisionCount", "sourceRecordsPerRetrievalKeyDistribution", "currentRepresentationReachabilityRate", "canonicalRepresentationReachabilityRate", "absoluteReachabilityDelta", "relativeReachabilityDelta", "validNullCount"
+  ],
+  "decisionClasses": {
+    "CLASS_A": "NO_LATIN_REACHABILITY_UNDER_EITHER_REPRESENTATION",
+    "CLASS_B": "CURRENT_REPRESENTATION_ALREADY_REACHES_LATIN_KEYS_AND_CANONICALIZATION_ADDS_NO_VALUE",
+    "CLASS_C": "CANONICAL_RETRIEVAL_REPRESENTATION_INCREASES_LATIN_KEY_REACHABILITY_WITHOUT_UNACCEPTABLE_COLLISIONS",
+    "CLASS_D": "CANONICALIZATION_INCREASES_REACHABILITY_BUT_CREATES_UNACCEPTABLE_COLLISION_OR_TRUTH_RISK",
+    "CLASS_E": "OPERATOR_NOT_AUTHORIZED_OR_NOT_SCIENTIFICALLY_DEFENSIBLE",
+    "CLASS_F": "OTHER_PREDECLARED_RESULT"
+  },
+  "decisionRules": [
+    "CLASS_E if authority gate is NOT_AUTHORIZED or INSUFFICIENT_EVIDENCE; Arm B is not executed.",
+    "CLASS_A if Arm B is authorized, both arms reach zero Latin keys, and no frozen integrity gate fails.",
+    "CLASS_B if Arm A reaches at least one Latin key, Arm B adds no Latin key, and no unacceptable collision/truth gate fails.",
+    "CLASS_C if Arm B reaches more distinct Latin keys than Arm A and all collision/truth gates pass.",
+    "CLASS_D if Arm B increases reachability but any frozen collision or truth gate fails.",
+    "CLASS_F only for a mechanically specified outcome not covered above; no discretionary reinterpretation is permitted."
+  ],
+  "antiCircularity": {
+    "authoritativeAttemptsMax": 1,
+    "selectionInputs": ["frozen complete prepared population", "frozen population authority", "frozen query generator", "frozen 21-record test set", "frozen operator", "frozen exact matching", "frozen exclusions"],
+    "selectionInputsNotUsed": ["candidate gloss", "semantic attractiveness", "historical relation", "functional motivation", "target-word choice", "known successful examples", "substrate responses", "post-result source additions"],
+    "forbiddenAfterFreeze": ["operator swapping", "query generator changes", "matching changes", "source-form changes", "citation changes", "population changes", "exclusion changes", "adaptive replication", "successful-example selection", "automatic S4"],
+    "sourceFormMutated": false,
+    "citationMutated": false,
+    "glossMutated": false,
+    "attestationMutated": false,
+    "noSingleWinner": true,
+    "userDecides": true
+  },
+  "executionFirewall": {
+    "authoritativeAttempts": 0,
+    "authoritativeAttemptsMax": 1,
+    "resultArtifactCreated": false,
+    "s3Rerun": false,
+    "broaderDiagnosticRerun": false,
+    "s4Started": false,
+    "realDataExecuted": false,
+    "providerExecution": false,
+    "sourceAcquisition": false,
+    "newLanguage": false,
+    "runtimeChanged": false,
+    "apiChanged": false,
+    "uiChanged": false,
+    "productionPromotion": false,
+    "nextAction": "EXECUTE_FROZEN_RETRIEVAL_KEY_REACHABILITY_PROCEDURE"
+  }
+}
