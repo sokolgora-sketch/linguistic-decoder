@@ -5,6 +5,7 @@ import {
   S3_EXPECTED_AFTER_FINGERPRINT_V0_2,
   S3_EXPECTED_BEFORE_FINGERPRINT_V0_2,
 } from "@/shared/openInstrument/multilingualDiscoverySubstrateS3.v0_2";
+import { execFileSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
@@ -72,5 +73,11 @@ describe("multilingual Discovery substrate v0.2 S3 preflight", () => {
     for (const artifact of manifest.artifacts) {
       expect(fileSha256(join(process.cwd(), artifact.path))).toBe(artifact.sha256);
     }
+    const verificationOutput = execFileSync(
+      "npx",
+      ["tsx", "scripts/openInstrumentMultilingualDiscoverySubstrateS3.v0_2.ts", "--verify"],
+      { encoding: "utf8" },
+    );
+    expect(verificationOutput).toContain("STORED_RESULT_INTEGRITY_PASS");
   });
 });

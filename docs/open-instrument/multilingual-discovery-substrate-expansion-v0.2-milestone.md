@@ -21,7 +21,17 @@
 - `S1_SOURCE_RECORD_PROJECTION_PATH=src/shared/openInstrument/multilingualDiscoverySubstrateS1.v0_2.ts`
 - `S1_SOURCE_RECORD_PROJECTION_SHA256=8f65b688ca6c3e7a4a130c478c2c6ec3abbb6b6875db742fd9666b4ced5b61d3`
 - `S2=COMPLETE`
-- `S3=NOT_STARTED`
+- `S3=COMPLETE`
+- `S3_OUTCOME=NO_MEASURABLE_EXISTING_ONLY_IMPROVEMENT`
+- `S3_AUTHORITATIVE_ATTEMPTS=1`
+- `S3_SAMPLE_SIZE=512`
+- `S3_BEFORE_AFTER_CROSS_FORM_POSITIVES=4/4`
+- `S3_BEFORE_AFTER_VALID_NULL=508/508`
+- `S3_S1_ROWS_RETRIEVED=0/21`
+- `S3_RESULT_ARTIFACT=docs/open-instrument/research-artifacts/multilingual-discovery-substrate-v0.2-s3-independent-coverage-evaluation-v0.1/paired-results.json`
+- `S3_RESULT_SHA256=b703051f8d6020548f93dc9a6591b22278f467bb0c521871b31aafb47be4ca03`
+- `S3_SUMMARY_SHA256=1985db5f7d8d7fd59c6ca741f30d1814ffa469f95c141ff7e9aef109da11ebea`
+- `S4=NOT_STARTED`
 - `S2_VALIDATION_ARTIFACT=docs/open-instrument/research-artifacts/multilingual-discovery-substrate-v0.2-s2-authority-truth-validation-v0.1/validation.json`
 - `S2_VALIDATION_ARTIFACT_SHA256=6dd24ea7074aa73f2060c40afb254370a79270a8ce0db8f273bec5b332792fae`
 - `S2_VALIDATION_MANIFEST=docs/open-instrument/research-artifacts/multilingual-discovery-substrate-v0.2-s2-authority-truth-validation-v0.1/hash-manifest.json`
@@ -428,12 +438,13 @@ production `/api/analyze-v1` use.
 
 ## Planning and lifecycle boundary
 
-This document originally defined the milestone and its boundaries. S0 and S1
-are now complete under those boundaries; S2 remains not started. No external
-source was acquired, no new language was added, and the frozen evaluation was
-not executed. Existing Linear planning must be inspected before any planning
-mutation. Stage issues are not created unless current planning conventions
-require them.
+This document originally defined the milestone and its boundaries. S0, S1,
+S2, and S3 are now complete under those boundaries; S4 remains not started.
+The frozen S3 evaluation was executed exactly once and produced
+`NO_MEASURABLE_EXISTING_ONLY_IMPROVEMENT`; no external source was acquired, no
+new language was added, and no production authority was promoted. Existing
+Linear planning must be inspected before any planning mutation. Stage issues
+are not created unless current planning conventions require them.
 
 After a confirmed repository merge, the existing DF_BRAIN project file and
 the correct October 2026 log may receive a factual local continuity update.
@@ -441,6 +452,6 @@ DF_BRAIN has no authorized remote push in this milestone.
 
 ## Explicit next action
 
-`NEXT_ACTION=BEGIN_V0_2_INDEPENDENT_COVERAGE_EVALUATION`
+`NEXT_ACTION=REVIEW_V0_2_EXISTING_ONLY_NULL_RESULT_BEFORE_SCOPE_DECISION`
 
-This action is not executed by the S2 validation lane.
+This action is not executed by the S3 evaluation lane.

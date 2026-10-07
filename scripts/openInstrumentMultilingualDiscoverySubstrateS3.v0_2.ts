@@ -346,19 +346,68 @@ function buildSummary(
 }
 
 function assertStoredResultIntegrity(rootDir = ROOT): void {
-  assert(existsSync(PAIRED_RESULTS_PATH) && existsSync(SUMMARY_PATH), "S3_RESULT_ARTIFACTS_MISSING");
-  const paired = readJson<{ cases: Awaited<ReturnType<typeof evaluateFrozenS3PairV0_2>> }>(PAIRED_RESULTS_PATH);
-  const summary = readJson<ReturnType<typeof buildSummary>>(SUMMARY_PATH);
+  const artifactDirectory = join(rootDir, ARTIFACT_RELATIVE_DIRECTORY);
+  const pairedResultsPath = join(artifactDirectory, "paired-results.json");
+  const summaryPath = join(artifactDirectory, "summary.json");
+  const samplePath = join(artifactDirectory, "sample.json");
+  const executionPath = join(artifactDirectory, "execution.json");
+  const manifestPath = join(artifactDirectory, "hash-manifest.json");
+  assert(existsSync(pairedResultsPath) && existsSync(summaryPath) && existsSync(manifestPath), "S3_RESULT_ARTIFACTS_MISSING");
+  const paired = readJson<{ cases: Awaited<ReturnType<typeof evaluateFrozenS3PairV0_2>> }>(pairedResultsPath);
+  const summary = readJson<ReturnType<typeof buildSummary> & {
+    reproducibility: {
+      sampleHashRun1: string;
+      sampleHashRun2: string;
+      beforeResultHashRun1: string;
+      beforeResultHashRun2: string;
+      afterResultHashRun1: string;
+      afterResultHashRun2: string;
+    };
+  }>(summaryPath);
+  const manifest = readJson<{
+    artifacts: readonly { path: string; bytes: number; sha256: string }[];
+    schedule: { sampleSha256: string };
+    resultFingerprints: {
+      beforeRun1: string;
+      beforeRun2: string;
+      afterRun1: string;
+      afterRun2: string;
+      summaryRun1: string;
+      summaryRun2: string;
+    };
+  }>(manifestPath);
   assert(paired.cases.length === SAMPLE_SIZE, "S3_RESULT_CASE_COUNT");
   assert(paired.cases.every((entry) => entry.before.upstream.fingerprint === entry.after.upstream.fingerprint), "S3_UPSTREAM_RESULT_MISMATCH");
-  const storedBeforeHash1 = caseSideFingerprint(paired.cases, "before");
-  const storedBeforeHash2 = caseSideFingerprint(paired.cases, "before");
-  const storedAfterHash1 = caseSideFingerprint(paired.cases, "after");
-  const storedAfterHash2 = caseSideFingerprint(paired.cases, "after");
-  const summaryHash1 = sha256CanonicalJson(summary);
-  const summaryHash2 = sha256CanonicalJson(summary);
-  assert(storedBeforeHash1 === storedBeforeHash2 && storedAfterHash1 === storedAfterHash2 && summaryHash1 === summaryHash2, "S3_STORED_RESULT_NONDETERMINISTIC");
-  void rootDir;
+  for (const artifact of manifest.artifacts) {
+    const artifactPath = join(rootDir, artifact.path);
+    const bytes = readFileSync(artifactPath);
+    assert(bytes.byteLength === artifact.bytes, `S3_ARTIFACT_BYTES:${artifact.path}`);
+    assert(sha256BytesV0_2(bytes) === artifact.sha256, `S3_ARTIFACT_HASH:${artifact.path}`);
+  }
+  const actualSampleHash = sha256BytesV0_2(readFileSync(samplePath));
+  const actualPairedResultsHash = sha256BytesV0_2(readFileSync(pairedResultsPath));
+  const actualSummaryHash = sha256BytesV0_2(readFileSync(summaryPath));
+  const execution = readJson<{
+    sampleArtifactSha256: string;
+    pairedResultsArtifactSha256: string;
+    summaryArtifactSha256: string;
+  }>(executionPath);
+  assert(actualSampleHash === manifest.schedule.sampleSha256, "S3_SAMPLE_MANIFEST_HASH");
+  assert(actualSampleHash === summary.reproducibility.sampleHashRun1 && actualSampleHash === summary.reproducibility.sampleHashRun2, "S3_SAMPLE_REPRODUCIBILITY_HASH");
+  assert(actualSampleHash === execution.sampleArtifactSha256, "S3_EXECUTION_SAMPLE_HASH");
+  assert(actualPairedResultsHash === execution.pairedResultsArtifactSha256, "S3_EXECUTION_PAIRED_RESULTS_HASH");
+  assert(actualSummaryHash === execution.summaryArtifactSha256, "S3_EXECUTION_SUMMARY_HASH");
+  const storedBeforeHash = caseSideFingerprint(paired.cases, "before");
+  const storedAfterHash = caseSideFingerprint(paired.cases, "after");
+  assert(storedBeforeHash === manifest.resultFingerprints.beforeRun1 && storedBeforeHash === manifest.resultFingerprints.beforeRun2, "S3_BEFORE_RESULT_BINDING_HASH");
+  assert(storedAfterHash === manifest.resultFingerprints.afterRun1 && storedAfterHash === manifest.resultFingerprints.afterRun2, "S3_AFTER_RESULT_BINDING_HASH");
+  assert(storedBeforeHash === summary.reproducibility.beforeResultHashRun1 && storedBeforeHash === summary.reproducibility.beforeResultHashRun2, "S3_BEFORE_RESULT_REPRODUCIBILITY_HASH");
+  assert(storedAfterHash === summary.reproducibility.afterResultHashRun1 && storedAfterHash === summary.reproducibility.afterResultHashRun2, "S3_AFTER_RESULT_REPRODUCIBILITY_HASH");
+  assert(actualSummaryHash === manifest.resultFingerprints.summaryRun1 && actualSummaryHash === manifest.resultFingerprints.summaryRun2, "S3_SUMMARY_BINDING_HASH");
+  const states = reconstructS3SubstrateStatesV0_2(rootDir);
+  const { reproducibility: _reproducibility, ...storedSummaryCore } = summary;
+  const recomputedSummary = buildSummary(paired.cases, states);
+  assert(canonicalJson(storedSummaryCore) === canonicalJson(recomputedSummary), "S3_SUMMARY_CONTENT_MISMATCH");
 }
 
 async function executeOnce(): Promise<void> {
