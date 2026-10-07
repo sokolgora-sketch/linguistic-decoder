@@ -1,0 +1,1839 @@
+{
+  "experimentId": "open-instrument.multilingual-discovery-substrate-expansion-v0.2.s3-independent-coverage-evaluation.v0.1",
+  "contractId": "OPEN_INSTRUMENT_MULTILINGUAL_DISCOVERY_SUBSTRATE_EXPANSION_V0_2",
+  "schemaVersion": "open-instrument.multilingual-discovery-substrate-expansion-s3-independent-coverage-evaluation.v0.1",
+  "procedureId": "open-instrument.multilingual-discovery-substrate-expansion-v0.2.s3-coverage-procedure.v0.1",
+  "repositoryHead": "3855488b9b37fcd42c2c1eaf3dbd4191831578d8",
+  "scheduleVersion": "frozen-prepared-ordered-population-v0.1",
+  "fixtureVersion": "m7-frozen-cmudict-population-v0.1",
+  "acceptanceVersion": "multilingual-discovery-substrate-v0.2-s3-coverage-v0.1",
+  "masterSeed": null,
+  "streams": [],
+  "sample": {
+    "sourcePath": "docs/open-instrument/research-artifacts/m7-substrate-reachable-generalization-v0.1/reachable-sample.json",
+    "sourceSha256": "7c991d806086569f9434f07f0a60ea0d8ec225434fa87050ed6c79d04f738255",
+    "sampleSize": 512,
+    "selectionId": "M7_FROZEN_PREPARED_ORDERED_POPULATION_FIRST_512_REACHABLE",
+    "firstInput": "aiello",
+    "lastInput": "balzarini"
+  },
+  "substrate": {
+    "before": {
+      "total": 57,
+      "languageCounts": {
+        "Albanian": 55,
+        "Latin": 2
+      },
+      "uniqueForms": 57,
+      "uniqueQueryKeys": 57,
+      "fingerprint": "d3d3ab37062d8f9de081f62592c1d3a6e9b0e66721d0202679fc639d0fe37059"
+    },
+    "after": {
+      "total": 76,
+      "languageCounts": {
+        "Albanian": 55,
+        "Latin": 21
+      },
+      "uniqueForms": 76,
+      "uniqueQueryKeys": 76,
+      "fingerprint": "1c4714a1d9a7550c1c037b4ce62ca85e9ff24966f2e8d447c038bce001b45d81"
+    }
+  },
+  "authority": {
+    "sourceProcedure": {
+      "path": "docs/open-instrument/research-artifacts/m7-substrate-reachable-generalization-v0.1/procedure.json",
+      "sha256": "2b7ecf4b1b0b7e3f2ced15a0a92381316206711b3392676b22e81e6481ed81cb"
+    },
+    "sourceSample": {
+      "path": "docs/open-instrument/research-artifacts/m7-substrate-reachable-generalization-v0.1/reachable-sample.json",
+      "sha256": "7c991d806086569f9434f07f0a60ea0d8ec225434fa87050ed6c79d04f738255"
+    },
+    "populationSpec": {
+      "path": "docs/open-instrument/research-artifacts/zero-consonantal-structural-composition-v0.1-cmudict-validation-v0.1b/population-spec.json",
+      "sha256": "81248026f57cffb0c357a4e29e0cce4d3139adc1521eda89e72754783095ed44"
+    },
+    "cmudict": {
+      "path": "src/data/openInstrument/pronunciation/cmudict.dict",
+      "sha256": "81917843c7f44ce2b094ac63873c2c7a4cf802040792c455ba3ca406891c3d22"
+    },
+    "preS3": {
+      "s0Artifact": "52fd4865fd3a0eb2067ea460af7d75024948de5c56cbcc8ce9936361a591a58e",
+      "s0Manifest": "38d57de7082b4d719b76aa5cf34e177c5e0d811a1a11341bba9535fafcbf764f",
+      "s1Projection": "8f65b688ca6c3e7a4a130c478c2c6ec3abbb6b6875db742fd9666b4ced5b61d3",
+      "s1CatalogDerivation": "bf7f9592b6123fc2d634af7616415fdedf317469ba1e3ca9f654a0e4dc4ce265",
+      "s1RuntimeComposition": "febe40af34ae4e60f6a1ffa91e63a36e4e2c04748b1d5cfae4ba53f7195e45de",
+      "s2Artifact": "6dd24ea7074aa73f2060c40afb254370a79270a8ce0db8f273bec5b332792fae",
+      "s2Manifest": "8a8976b5cbd3586ea76661e3f5f93beb4fcceab8a16fb627e2678bd9dacf0234",
+      "sourceProcedure": "2b7ecf4b1b0b7e3f2ced15a0a92381316206711b3392676b22e81e6481ed81cb",
+      "sourceSample": "7c991d806086569f9434f07f0a60ea0d8ec225434fa87050ed6c79d04f738255",
+      "populationSpec": "81248026f57cffb0c357a4e29e0cce4d3139adc1521eda89e72754783095ed44",
+      "cmudict": "81917843c7f44ce2b094ac63873c2c7a4cf802040792c455ba3ca406891c3d22"
+    }
+  },
+  "execution": {
+    "authoritativeAttemptsBefore": 0,
+    "authoritativeAttemptsMax": 1,
+    "noRerun": true,
+    "syntheticOnly": true,
+    "realDataExecuted": false,
+    "providerExecution": false
+  },
+  "status": "COMPLETED",
+  "startedUtc": "2026-10-07T10:56:04.090Z",
+  "completedUtc": "2026-10-07T10:56:13.511Z",
+  "sampleArtifact": "docs/open-instrument/research-artifacts/multilingual-discovery-substrate-v0.2-s3-independent-coverage-evaluation-v0.1/sample.json",
+  "sampleArtifactSha256": "8ba957d57f5f2509f2acc2b875a5427e075942d2a9c52d63b9208590045cc2cd",
+  "pairedResultsArtifact": "docs/open-instrument/research-artifacts/multilingual-discovery-substrate-v0.2-s3-independent-coverage-evaluation-v0.1/paired-results.json",
+  "pairedResultsArtifactSha256": "b703051f8d6020548f93dc9a6591b22278f467bb0c521871b31aafb47be4ca03",
+  "summaryArtifact": "docs/open-instrument/research-artifacts/multilingual-discovery-substrate-v0.2-s3-independent-coverage-evaluation-v0.1/summary.json",
+  "summaryArtifactSha256": "1985db5f7d8d7fd59c6ca741f30d1814ffa469f95c141ff7e9aef109da11ebea",
+  "substrates": {
+    "beforeRecords": [
+      {
+        "sourceRecordId": "research.external.albanian-burre-man.scale50.cohortG.v0_1",
+        "language": "Albanian",
+        "sourceForm": "burrë",
+        "queryForm": "BURRË",
+        "sourceTraditionId": "fjale.fjalor-shqip.v0_1",
+        "citationIds": [
+          "research.external.fjale-burre-man.scale50.cohortG.citation.v0_1"
+        ],
+        "gloss": "a person of the male sex; a mature or adult male person",
+        "attestationTruth": "fact",
+        "sourceStatus": "research_candidate"
+      },
+      {
+        "sourceRecordId": "research.external.albanian-dore-hand.scale50.v0_1",
+        "language": "Albanian",
+        "sourceForm": "dorë",
+        "queryForm": "DORË",
+        "sourceTraditionId": "multi-source-functional-research-evidence-catalog.v0_1",
+        "citationIds": [
+          "research.external.fjale-dore-hand.scale50.citation.v0_1"
+        ],
+        "gloss": "hand; upper limb and especially the part from the wrist with palm and fingers",
+        "attestationTruth": "fact",
+        "sourceStatus": "research_candidate"
+      },
+      {
+        "sourceRecordId": "research.external.albanian-dua-love.v0_1",
+        "language": "Albanian",
+        "sourceForm": "dua",
+        "queryForm": "DUA",
+        "sourceTraditionId": "multi-source-functional-research-evidence-catalog.v0_1",
+        "citationIds": [
+          "research.external.fjale-dua-love.citation.v0_1"
+        ],
+        "gloss": "to love; to have a feeling of love for someone or something",
+        "attestationTruth": "fact",
+        "sourceStatus": "research_candidate"
+      },
+      {
+        "sourceRecordId": "research.external.albanian-eci-walk.scale50.v0_1",
+        "language": "Albanian",
+        "sourceForm": "eci",
+        "queryForm": "ECI",
+        "sourceTraditionId": "multi-source-functional-research-evidence-catalog.v0_1",
+        "citationIds": [
+          "research.external.fjale-eci-walk.scale50.citation.v0_1"
+        ],
+        "gloss": "to walk; to go on foot with ordinary steps",
+        "attestationTruth": "fact",
+        "sourceStatus": "research_candidate"
+      },
+      {
+        "sourceRecordId": "research.external.albanian-femije-child.scale50.v0_1",
+        "language": "Albanian",
+        "sourceForm": "fëmijë",
+        "queryForm": "FËMIJË",
+        "sourceTraditionId": "multi-source-functional-research-evidence-catalog.v0_1",
+        "citationIds": [
+          "research.external.fjale-femije-child.scale50.citation.v0_1"
+        ],
+        "gloss": "child; young boy or girl; son or daughter relative to parents",
+        "attestationTruth": "fact",
+        "sourceStatus": "research_candidate"
+      },
+      {
+        "sourceRecordId": "research.external.albanian-flas-speak.scale50.v0_1",
+        "language": "Albanian",
+        "sourceForm": "flas",
+        "queryForm": "FLAS",
+        "sourceTraditionId": "multi-source-functional-research-evidence-catalog.v0_1",
+        "citationIds": [
+          "research.external.fjale-flas-speak.scale50.citation.v0_1"
+        ],
+        "gloss": "to speak; articulate words and sentences",
+        "attestationTruth": "fact",
+        "sourceStatus": "research_candidate"
+      },
+      {
+        "sourceRecordId": "research.external.albanian-gjak-blood.scale50.v0_1",
+        "language": "Albanian",
+        "sourceForm": "gjak",
+        "queryForm": "GJAK",
+        "sourceTraditionId": "multi-source-functional-research-evidence-catalog.v0_1",
+        "citationIds": [
+          "research.external.fjale-gjak-blood.scale50.citation.v0_1"
+        ],
+        "gloss": "blood; red liquid circulating in the body",
+        "attestationTruth": "fact",
+        "sourceStatus": "research_candidate"
+      },
+      {
+        "sourceRecordId": "research.external.albanian-grua-woman.scale50.v0_1",
+        "language": "Albanian",
+        "sourceForm": "grua",
+        "queryForm": "GRUA",
+        "sourceTraditionId": "multi-source-functional-research-evidence-catalog.v0_1",
+        "citationIds": [
+          "research.external.fjale-grua-woman.scale50.citation.v0_1"
+        ],
+        "gloss": "woman; adult female human",
+        "attestationTruth": "fact",
+        "sourceStatus": "research_candidate"
+      },
+      {
+        "sourceRecordId": "research.external.albanian-ha-eat.scale50.v0_1",
+        "language": "Albanian",
+        "sourceForm": "ha",
+        "queryForm": "HA",
+        "sourceTraditionId": "multi-source-functional-research-evidence-catalog.v0_1",
+        "citationIds": [
+          "research.external.fjale-ha-eat.scale50.citation.v0_1"
+        ],
+        "gloss": "to eat; chew and swallow something for nourishment",
+        "attestationTruth": "fact",
+        "sourceStatus": "research_candidate"
+      },
+      {
+        "sourceRecordId": "research.external.albanian-hunde-nose.scale50.v0_1",
+        "language": "Albanian",
+        "sourceForm": "hundë",
+        "queryForm": "HUNDË",
+        "sourceTraditionId": "multi-source-functional-research-evidence-catalog.v0_1",
+        "citationIds": [
+          "research.external.fjale-hunde-nose.scale50.citation.v0_1"
+        ],
+        "gloss": "organ of smell; projecting part of the face through which air passes",
+        "attestationTruth": "fact",
+        "sourceStatus": "research_candidate"
+      },
+      {
+        "sourceRecordId": "research.external.albanian-jete-life.scale50.v0_1",
+        "language": "Albanian",
+        "sourceForm": "jetë",
+        "queryForm": "JETË",
+        "sourceTraditionId": "multi-source-functional-research-evidence-catalog.v0_1",
+        "citationIds": [
+          "research.external.fjale-jete-life.scale50.citation.v0_1"
+        ],
+        "gloss": "life; existence and state of being alive",
+        "attestationTruth": "fact",
+        "sourceStatus": "research_candidate"
+      },
+      {
+        "sourceRecordId": "research.external.albanian-kembe-foot.scale50.v0_1",
+        "language": "Albanian",
+        "sourceForm": "këmbë",
+        "queryForm": "KËMBË",
+        "sourceTraditionId": "multi-source-functional-research-evidence-catalog.v0_1",
+        "citationIds": [
+          "research.external.fjale-kembe-foot.scale50.citation.v0_1"
+        ],
+        "gloss": "lower limb and its terminal part; foot used for standing, walking, or movement",
+        "attestationTruth": "fact",
+        "sourceStatus": "research_candidate"
+      },
+      {
+        "sourceRecordId": "research.external.albanian-kocke-bone.scale50.v0_1",
+        "language": "Albanian",
+        "sourceForm": "kockë",
+        "queryForm": "KOCKË",
+        "sourceTraditionId": "multi-source-functional-research-evidence-catalog.v0_1",
+        "citationIds": [
+          "research.external.fjale-kocke-bone.scale50.citation.v0_1"
+        ],
+        "gloss": "bone; component of the human or vertebrate skeleton",
+        "attestationTruth": "fact",
+        "sourceStatus": "research_candidate"
+      },
+      {
+        "sourceRecordId": "research.external.albanian-kujtese-memory.scale50.v0_1",
+        "language": "Albanian",
+        "sourceForm": "kujtesë",
+        "queryForm": "KUJTESË",
+        "sourceTraditionId": "multi-source-functional-research-evidence-catalog.v0_1",
+        "citationIds": [
+          "research.external.fjale-kujtese-memory.scale50.citation.v0_1"
+        ],
+        "gloss": "memory; ability to retain and reproduce past experience or learning",
+        "attestationTruth": "fact",
+        "sourceStatus": "research_candidate"
+      },
+      {
+        "sourceRecordId": "research.external.albanian-liri-freedom.scale50.cohortG.v0_1",
+        "language": "Albanian",
+        "sourceForm": "liri",
+        "queryForm": "LIRI",
+        "sourceTraditionId": "fjale.fjalor-shqip.v0_1",
+        "citationIds": [
+          "research.external.fjale-liri-freedom.scale50.cohortG.citation.v0_1"
+        ],
+        "gloss": "being free; absence of oppression, dependence, or restrictions; being not imprisoned and enjoying civil rights",
+        "attestationTruth": "fact",
+        "sourceStatus": "research_candidate"
+      },
+      {
+        "sourceRecordId": "research.external.albanian-lufte-war.scale50.v0_1",
+        "language": "Albanian",
+        "sourceForm": "luftë",
+        "queryForm": "LUFTË",
+        "sourceTraditionId": "multi-source-functional-research-evidence-catalog.v0_1",
+        "citationIds": [
+          "research.external.fjale-lufte-war.scale50.citation.v0_1"
+        ],
+        "gloss": "war; armed conflict between states or opposing military forces",
+        "attestationTruth": "fact",
+        "sourceStatus": "research_candidate"
+      },
+      {
+        "sourceRecordId": "research.external.albanian-lume-river.scale50.v0_1",
+        "language": "Albanian",
+        "sourceForm": "lumë",
+        "queryForm": "LUMË",
+        "sourceTraditionId": "multi-source-functional-research-evidence-catalog.v0_1",
+        "citationIds": [
+          "research.external.fjale-lume-river.scale50.citation.v0_1"
+        ],
+        "gloss": "river; large permanent natural flow of fresh water",
+        "attestationTruth": "fact",
+        "sourceStatus": "research_candidate"
+      },
+      {
+        "sourceRecordId": "research.external.albanian-mal-mountain.scale50.v0_1",
+        "language": "Albanian",
+        "sourceForm": "mal",
+        "queryForm": "MAL",
+        "sourceTraditionId": "multi-source-functional-research-evidence-catalog.v0_1",
+        "citationIds": [
+          "research.external.fjale-mal-mountain.scale50.citation.v0_1"
+        ],
+        "gloss": "mountain; elevated land higher than a hill",
+        "attestationTruth": "fact",
+        "sourceStatus": "research_candidate"
+      },
+      {
+        "sourceRecordId": "research.external.albanian-mat-measure.v0_1",
+        "language": "Albanian",
+        "sourceForm": "mat",
+        "queryForm": "MAT",
+        "sourceTraditionId": "kaikki.wiktionary.albanian-mas.v0_1",
+        "citationIds": [
+          "research.external.albanian-mas-kaikki.citation.v0_1",
+          "research.external.albanian-mat-fjalori-online.citation.v0_1"
+        ],
+        "gloss": "to measure (alternative form of verb mas)",
+        "attestationTruth": "fact",
+        "sourceStatus": "research_candidate"
+      },
+      {
+        "sourceRecordId": "research.external.albanian-mbaj-carry.scale50.cohortG.v0_1",
+        "language": "Albanian",
+        "sourceForm": "mbaj",
+        "queryForm": "MBAJ",
+        "sourceTraditionId": "fjale.fjalor-shqip.v0_1",
+        "citationIds": [
+          "research.external.fjale-mbaj-carry.scale50.cohortG.citation.v0_1"
+        ],
+        "gloss": "hold something so it does not fall or move; carry or transport it on the back, neck, arm, or by a vehicle",
+        "attestationTruth": "fact",
+        "sourceStatus": "research_candidate"
+      },
+      {
+        "sourceRecordId": "research.external.albanian-mbret-king.scale50.v0_1",
+        "language": "Albanian",
+        "sourceForm": "mbret",
+        "queryForm": "MBRET",
+        "sourceTraditionId": "multi-source-functional-research-evidence-catalog.v0_1",
+        "citationIds": [
+          "research.external.fjale-mbret-king.scale50.citation.v0_1"
+        ],
+        "gloss": "king; monarch who holds the hereditary royal title",
+        "attestationTruth": "fact",
+        "sourceStatus": "research_candidate"
+      },
+      {
+        "sourceRecordId": "research.external.albanian-mendje-mind.scale50.v0_1",
+        "language": "Albanian",
+        "sourceForm": "mendje",
+        "queryForm": "MENDJE",
+        "sourceTraditionId": "multi-source-functional-research-evidence-catalog.v0_1",
+        "citationIds": [
+          "research.external.fjale-mendje-mind.scale50.citation.v0_1"
+        ],
+        "gloss": "mind; capacity to think, know, reason, and judge",
+        "attestationTruth": "fact",
+        "sourceStatus": "research_candidate"
+      },
+      {
+        "sourceRecordId": "research.external.albanian-ndertoj-build.scale50.cohortG.v0_1",
+        "language": "Albanian",
+        "sourceForm": "ndërtoj",
+        "queryForm": "NDËRTOJ",
+        "sourceTraditionId": "fjale.fjalor-shqip.v0_1",
+        "citationIds": [
+          "research.external.fjale-ndertoj-build.scale50.cohortG.citation.v0_1"
+        ],
+        "gloss": "raise or make a building, bridge, or other physical object from materials; prepare a machine or device from parts",
+        "attestationTruth": "fact",
+        "sourceStatus": "research_candidate"
+      },
+      {
+        "sourceRecordId": "research.external.albanian-nene-mother.scale50.v0_1",
+        "language": "Albanian",
+        "sourceForm": "nënë",
+        "queryForm": "NËNË",
+        "sourceTraditionId": "multi-source-functional-research-evidence-catalog.v0_1",
+        "citationIds": [
+          "research.external.fjale-nene-mother.scale50.citation.v0_1"
+        ],
+        "gloss": "mother; woman in relation to her children",
+        "attestationTruth": "fact",
+        "sourceStatus": "research_candidate"
+      },
+      {
+        "sourceRecordId": "research.external.albanian-paqe-peace.scale50.v0_1",
+        "language": "Albanian",
+        "sourceForm": "paqe",
+        "queryForm": "PAQE",
+        "sourceTraditionId": "multi-source-functional-research-evidence-catalog.v0_1",
+        "citationIds": [
+          "research.external.fjale-paqe-peace.scale50.citation.v0_1"
+        ],
+        "gloss": "peace; calm relations and a state without war or conflict",
+        "attestationTruth": "fact",
+        "sourceStatus": "research_candidate"
+      },
+      {
+        "sourceRecordId": "research.external.albanian-qiell-sky.scale50.v0_1",
+        "language": "Albanian",
+        "sourceForm": "qiell",
+        "queryForm": "QIELL",
+        "sourceTraditionId": "multi-source-functional-research-evidence-catalog.v0_1",
+        "citationIds": [
+          "research.external.fjale-qiell-sky.scale50.citation.v0_1"
+        ],
+        "gloss": "sky; the space surrounding Earth and the visible expanse above",
+        "attestationTruth": "fact",
+        "sourceStatus": "research_candidate"
+      },
+      {
+        "sourceRecordId": "research.external.albanian-shi-rain.scale50.v0_1",
+        "language": "Albanian",
+        "sourceForm": "shi",
+        "queryForm": "SHI",
+        "sourceTraditionId": "multi-source-functional-research-evidence-catalog.v0_1",
+        "citationIds": [
+          "research.external.fjale-shi-rain.scale50.citation.v0_1"
+        ],
+        "gloss": "rain; precipitation formed from atmospheric water vapor and falling in drops",
+        "attestationTruth": "fact",
+        "sourceStatus": "research_candidate"
+      },
+      {
+        "sourceRecordId": "research.external.albanian-shter-depletion.v0_1",
+        "language": "Albanian",
+        "sourceForm": "shter",
+        "queryForm": "SHTER",
+        "sourceTraditionId": "fjale.fjalor-shqip.albanian-shter.v0_1",
+        "citationIds": [
+          "research.external.albanian-shter-fjale.citation.v0_1",
+          "research.external.albanian-shter-fjalori-online.citation.v0_1"
+        ],
+        "gloss": "dry up; run out; end; exhaust or weaken",
+        "attestationTruth": "fact",
+        "sourceStatus": "research_candidate"
+      },
+      {
+        "sourceRecordId": "research.external.albanian-shterp-barren.v0_1",
+        "language": "Albanian",
+        "sourceForm": "shterp",
+        "queryForm": "SHTERP",
+        "sourceTraditionId": "fjale.fjalor-shqip.albanian-shterp.v0_1",
+        "citationIds": [
+          "research.external.albanian-shterp-fjale.citation.v0_1",
+          "research.external.albanian-shterp-fjalori-online.citation.v0_1"
+        ],
+        "gloss": "barren; non-reproductive; non-producing; unfruitful",
+        "attestationTruth": "fact",
+        "sourceStatus": "research_candidate"
+      },
+      {
+        "sourceRecordId": "research.external.albanian-shterpe-barren.v0_1",
+        "language": "Albanian",
+        "sourceForm": "shterpë",
+        "queryForm": "SHTERPË",
+        "sourceTraditionId": "fjale.fjalor-shqip.albanian-shterp.v0_1",
+        "citationIds": [
+          "research.external.albanian-shterpe-fjale.citation.v0_1",
+          "research.external.albanian-shterpe-fjalori-online.citation.v0_1"
+        ],
+        "gloss": "barren livestock or other non-reproductive being",
+        "attestationTruth": "fact",
+        "sourceStatus": "research_candidate"
+      },
+      {
+        "sourceRecordId": "research.external.albanian-shterpezoj-sterilize.v0_1",
+        "language": "Albanian",
+        "sourceForm": "shterpëzoj",
+        "queryForm": "SHTERPËZOJ",
+        "sourceTraditionId": "fjale.fjalor-shqip.albanian-shterpezoj.v0_1",
+        "citationIds": [
+          "research.external.albanian-shterpezoj-fjale.citation.v0_1"
+        ],
+        "gloss": "remove reproductive ability; make barren; sterilize",
+        "attestationTruth": "fact",
+        "sourceStatus": "research_candidate"
+      },
+      {
+        "sourceRecordId": "research.external.albanian-vertete-truth.scale50.v0_1",
+        "language": "Albanian",
+        "sourceForm": "vërtetë",
+        "queryForm": "VËRTETË",
+        "sourceTraditionId": "multi-source-functional-research-evidence-catalog.v0_1",
+        "citationIds": [
+          "research.external.fjale-vertete-truth.scale50.citation.v0_1"
+        ],
+        "gloss": "truth; something that corresponds to reality",
+        "attestationTruth": "fact",
+        "sourceStatus": "research_candidate"
+      },
+      {
+        "sourceRecordId": "research.external.albanian-vesh-ear.scale50.v0_1",
+        "language": "Albanian",
+        "sourceForm": "vesh",
+        "queryForm": "VESH",
+        "sourceTraditionId": "multi-source-functional-research-evidence-catalog.v0_1",
+        "citationIds": [
+          "research.external.fjale-vesh-ear.scale50.citation.v0_1"
+        ],
+        "gloss": "each of the two hearing organs; also the capacity for hearing",
+        "attestationTruth": "fact",
+        "sourceStatus": "research_candidate"
+      },
+      {
+        "sourceRecordId": "research.external.albanian-vrapoj-run.scale50.v0_1",
+        "language": "Albanian",
+        "sourceForm": "vrapoj",
+        "queryForm": "VRAPOJ",
+        "sourceTraditionId": "multi-source-functional-research-evidence-catalog.v0_1",
+        "citationIds": [
+          "research.external.fjale-vrapoj-run.scale50.citation.v0_1"
+        ],
+        "gloss": "to run; to move with very quick steps",
+        "attestationTruth": "fact",
+        "sourceStatus": "research_candidate"
+      },
+      {
+        "sourceRecordId": "research.external.albanian-zemer-heart.scale50.v0_1",
+        "language": "Albanian",
+        "sourceForm": "zemër",
+        "queryForm": "ZEMËR",
+        "sourceTraditionId": "multi-source-functional-research-evidence-catalog.v0_1",
+        "citationIds": [
+          "research.external.fjale-zemer-heart.scale50.citation.v0_1"
+        ],
+        "gloss": "heart; central organ of the circulatory system in humans and animals",
+        "attestationTruth": "fact",
+        "sourceStatus": "research_candidate"
+      },
+      {
+        "sourceRecordId": "research.external.latin-amo-love.v0_1",
+        "language": "Latin",
+        "sourceForm": "amo",
+        "queryForm": "AMO",
+        "sourceTraditionId": "scaife.lewis-short.v0_1",
+        "citationIds": [
+          "research.external.lewis-short-amo-love.citation.v0_1"
+        ],
+        "gloss": "to like, to love",
+        "attestationTruth": "fact",
+        "sourceStatus": "research_candidate"
+      },
+      {
+        "sourceRecordId": "research.external.latin-caelum-sky.scale50.v0_1",
+        "language": "Latin",
+        "sourceForm": "caelum",
+        "queryForm": "CAELUM",
+        "sourceTraditionId": "scaife.lewis-short.v0_1",
+        "citationIds": [
+          "research.external.lewis-short-caelum-sky.scale50.citation.v0_1"
+        ],
+        "gloss": "the sky, heaven, the heavens, the vault of heaven",
+        "attestationTruth": "fact",
+        "sourceStatus": "research_candidate"
+      },
+      {
+        "sourceRecordId": "research.external.open-instrument-research-evidence-packet-v0-1.art-creative-artistic-activity-v0-1.verified-source-capture-fjale-fjalor-shqip-v0-1-art-m-sense-1-art-v0-1",
+        "language": "Albanian",
+        "sourceForm": "art",
+        "queryForm": "ART",
+        "sourceTraditionId": "fjale.fjalor-shqip.v0_1",
+        "citationIds": [
+          "open-instrument.source-record.capture.fjale-fjalor-shqip-v0-1.art-m-sense-1.art.v0_1.citation.v0_1"
+        ],
+        "gloss": "Formë e pasqyrimit të botës nëpërmjet riprodhimit të realitetit në mënyrë krijuese me anë figurash artistike; veprimtaria krijuese artistike.",
+        "attestationTruth": "fact",
+        "sourceStatus": "research_candidate"
+      },
+      {
+        "sourceRecordId": "research.external.open-instrument-research-evidence-packet-v0-1.blue-blue-color-v0-1.verified-source-capture-fjale-fjalor-shqip-v0-1-blu-i-f-sense-1-blu-i-v0-1",
+        "language": "Albanian",
+        "sourceForm": "blu I",
+        "queryForm": "BLU I",
+        "sourceTraditionId": "fjale.fjalor-shqip.v0_1",
+        "citationIds": [
+          "open-instrument.source-record.capture.fjale-fjalor-shqip-v0-1.blu-i-f-sense-1.blu-i.v0_1.citation.v0_1"
+        ],
+        "gloss": "Ngjyra blu.",
+        "attestationTruth": "fact",
+        "sourceStatus": "research_candidate"
+      },
+      {
+        "sourceRecordId": "research.external.open-instrument-research-evidence-packet-v0-1.bread-physical-baked-food-v0-1.verified-source-capture-fjale-fjalor-shqip-v0-1-buk-f-sense-1-buk-v0-1",
+        "language": "Albanian",
+        "sourceForm": "bukë",
+        "queryForm": "BUKË",
+        "sourceTraditionId": "fjale.fjalor-shqip.v0_1",
+        "citationIds": [
+          "open-instrument.source-record.capture.fjale-fjalor-shqip-v0-1.buk-f-sense-1.buk.v0_1.citation.v0_1"
+        ],
+        "gloss": "Ushqim që bëhet me miell drithi të gatuar me ujë e të pjekur në furrë a në saç; një copë e veçantë e këtij ushqimi, e gatuar me forma të ndryshme dhe e pjekur.",
+        "attestationTruth": "fact",
+        "sourceStatus": "research_candidate"
+      },
+      {
+        "sourceRecordId": "research.external.open-instrument-research-evidence-packet-v0-1.break-physical-break-damage-source-review-v0-1.verified-source-capture-fjale-fjalor-shqip-v0-1-thyej-kal-sense-1-thyej-v0-1",
+        "language": "Albanian",
+        "sourceForm": "thyej",
+        "queryForm": "THYEJ",
+        "sourceTraditionId": "fjale.fjalor-shqip.v0_1",
+        "citationIds": [
+          "open-instrument.source-record.capture.fjale-fjalor-shqip-v0-1.thyej-kal-sense-1.thyej.v0_1.citation.v0_1"
+        ],
+        "gloss": "E ndaj një gjë më dysh a në shumë copa me dorë ose duke e përpjekur pas diçkaje të fortë; e bëj pjesë-pjesë a copa-copa diçka të ngurtë, e copëtoj, duke e goditur me diçka a duke e përpjekur pas diçkaje të fort.",
+        "attestationTruth": "fact",
+        "sourceStatus": "research_candidate"
+      },
+      {
+        "sourceRecordId": "research.external.open-instrument-research-evidence-packet-v0-1.change-alteration-v0-1.fjale-ndryshim",
+        "language": "Albanian",
+        "sourceForm": "ndryshim",
+        "queryForm": "NDRYSHIM",
+        "sourceTraditionId": "fjale.fjalor-shqip.v0_1",
+        "citationIds": [
+          "change.fjale.ndryshim.v0_1"
+        ],
+        "gloss": "act and state according to ndryshoj; changes and alterations",
+        "attestationTruth": "fact",
+        "sourceStatus": "research_candidate"
+      },
+      {
+        "sourceRecordId": "research.external.open-instrument-research-evidence-packet-v0-1.cloud-physical-atmospheric-v0-1.verified-source-capture-fjale-fjalor-shqip-v0-1-re-i-f-sense-1-re-v0-1",
+        "language": "Albanian",
+        "sourceForm": "re",
+        "queryForm": "RE",
+        "sourceTraditionId": "fjale.fjalor-shqip.v0_1",
+        "citationIds": [
+          "open-instrument.source-record.capture.fjale-fjalor-shqip-v0-1.re-i-f-sense-1.re.v0_1.citation.v0_1"
+        ],
+        "gloss": "Grumbull avujsh uji, që rrinë pezull lart në qiell.",
+        "attestationTruth": "fact",
+        "sourceStatus": "research_candidate"
+      },
+      {
+        "sourceRecordId": "research.external.open-instrument-research-evidence-packet-v0-1.friend-close-person-v0-1.verified-source-capture-fjale-fjalor-shqip-v0-1-mik-m-sense-1-mik-v0-1",
+        "language": "Albanian",
+        "sourceForm": "mik",
+        "queryForm": "MIK",
+        "sourceTraditionId": "fjale.fjalor-shqip.v0_1",
+        "citationIds": [
+          "open-instrument.source-record.capture.fjale-fjalor-shqip-v0-1.mik-m-sense-1.mik.v0_1.citation.v0_1"
+        ],
+        "gloss": "Ai me të cilin kemi miqësi; ai që na do të mirën, na ndihmon me gjithë zemër e na gjendet në çdo nevojë; një i njohur, me të cilin kemi lidhje të ngushta, njeri i afërt.",
+        "attestationTruth": "fact",
+        "sourceStatus": "research_candidate"
+      },
+      {
+        "sourceRecordId": "research.external.open-instrument-research-evidence-packet-v0-1.hope-mental-desired-expectation-v0-1.verified-source-capture-fjale-fjalor-shqip-v0-1-shpres-f-sense-1-shpres-v0-1",
+        "language": "Albanian",
+        "sourceForm": "shpresë",
+        "queryForm": "SHPRESË",
+        "sourceTraditionId": "fjale.fjalor-shqip.v0_1",
+        "citationIds": [
+          "open-instrument.source-record.capture.fjale-fjalor-shqip-v0-1.shpres-f-sense-1.shpres.v0_1.citation.v0_1"
+        ],
+        "gloss": "Besimi që kemi se do të na plotësohet një dëshirë, një qëllim a një synim; qëndrimi në pritje me një besim të tillë; ndjenja që kemi kur e shohim si të mundshme përmbushjen e një dëshire a arritjen e një qëllimi.",
+        "attestationTruth": "fact",
+        "sourceStatus": "research_candidate"
+      },
+      {
+        "sourceRecordId": "research.external.open-instrument-research-evidence-packet-v0-1.order-lexical-arrangement-v0-1.fjale-rend",
+        "language": "Albanian",
+        "sourceForm": "rend",
+        "queryForm": "REND",
+        "sourceTraditionId": "fjale.fjalor-shqip.v0_1",
+        "citationIds": [
+          "order.fjale.rend.v0_1"
+        ],
+        "gloss": "row; arrangement according to a specified order; sequence",
+        "attestationTruth": "fact",
+        "sourceStatus": "research_candidate"
+      },
+      {
+        "sourceRecordId": "research.external.open-instrument-research-evidence-packet-v0-1.sea-physical-saltwater-body-v0-1.verified-source-capture-fjale-fjalor-shqip-v0-1-det-m-sense-1-det-v0-1",
+        "language": "Albanian",
+        "sourceForm": "det",
+        "queryForm": "DET",
+        "sourceTraditionId": "fjale.fjalor-shqip.v0_1",
+        "citationIds": [
+          "open-instrument.source-record.capture.fjale-fjalor-shqip-v0-1.det-m-sense-1.det.v0_1.citation.v0_1"
+        ],
+        "gloss": "Hapësirë shumë e madhe me ujë të kripur, që zakonisht është e rrethuar me tokë jo nga të gjitha anët dhe që qëndron disi e veçuar; pjesa më e madhe e rruzullit tokësor, e mbuluar me ujë të kripur.",
+        "attestationTruth": "fact",
+        "sourceStatus": "research_candidate"
+      },
+      {
+        "sourceRecordId": "research.external.open-instrument-research-evidence-packet-v0-1.skin-physical-body-covering-v0-1.verified-source-capture-fjale-fjalor-shqip-v0-1-l-kur-f-sense-1-l-kur-v0-1",
+        "language": "Albanian",
+        "sourceForm": "lëkurë",
+        "queryForm": "LËKURË",
+        "sourceTraditionId": "fjale.fjalor-shqip.v0_1",
+        "citationIds": [
+          "open-instrument.source-record.capture.fjale-fjalor-shqip-v0-1.l-kur-f-sense-1.l-kur.v0_1.citation.v0_1"
+        ],
+        "gloss": "Shtresë e hollë, që mbështjell trupin e njeriut ose të kafshëve; kjo shtresë që u rripet kafshëve dhe përpunohet për qëllime të ndryshme; lëkurçe.",
+        "attestationTruth": "fact",
+        "sourceStatus": "research_candidate"
+      },
+      {
+        "sourceRecordId": "research.external.open-instrument-research-evidence-packet-v0-1.sleep-physical-sleep-state-v0-1.verified-source-capture-fjale-fjalor-shqip-v0-1-gjum-m-sense-1-gjum-v0-1",
+        "language": "Albanian",
+        "sourceForm": "gjumë",
+        "queryForm": "GJUMË",
+        "sourceTraditionId": "fjale.fjalor-shqip.v0_1",
+        "citationIds": [
+          "open-instrument.source-record.capture.fjale-fjalor-shqip-v0-1.gjum-m-sense-1.gjum.v0_1.citation.v0_1"
+        ],
+        "gloss": "Gjendje e njeriut që fle, kur pushon trupi, ndërpritet pjesërisht ose plotësisht veprimtaria e vetëdijes dhe dobësohen disa procese fiziologjike; nevoja, dëshira ose mundësia për të fjetur.",
+        "attestationTruth": "fact",
+        "sourceStatus": "research_candidate"
+      },
+      {
+        "sourceRecordId": "research.external.open-instrument-research-evidence-packet-v0-1.snow-physical-precipitation-v0-1.verified-source-capture-fjale-fjalor-shqip-v0-1-bor-f-kryes-nj-sh-sense-1-bor-v0-1",
+        "language": "Albanian",
+        "sourceForm": "borë",
+        "queryForm": "BORË",
+        "sourceTraditionId": "fjale.fjalor-shqip.v0_1",
+        "citationIds": [
+          "open-instrument.source-record.capture.fjale-fjalor-shqip-v0-1.bor-f-kryes-nj-sh-sense-1.bor.v0_1.citation.v0_1"
+        ],
+        "gloss": "Reshje atmosferike, që bie nga retë flokë-flokë në trajtë kristalesh të bardha; shtresa e bardhë e këtyre flokëve, që mbulojnë vendin aty ku bien; dëborë.",
+        "attestationTruth": "fact",
+        "sourceStatus": "research_candidate"
+      },
+      {
+        "sourceRecordId": "research.external.open-instrument-research-evidence-packet-v0-1.star-astronomical-star-v0-1.verified-source-capture-fjale-fjalor-shqip-v0-1-yll-m-sense-1-yll-v0-1",
+        "language": "Albanian",
+        "sourceForm": "yll",
+        "queryForm": "YLL",
+        "sourceTraditionId": "fjale.fjalor-shqip.v0_1",
+        "citationIds": [
+          "open-instrument.source-record.capture.fjale-fjalor-shqip-v0-1.yll-m-sense-1.yll.v0_1.citation.v0_1"
+        ],
+        "gloss": "Trup qiellor i ngjashëm me Diellin, që ndodhet shumë larg Tokës dhe që duket natën në qiell si pikë e ndritshme; çdo trup qiellor, përveç Diellit dhe Hënës, që ndrit natën në qiell.",
+        "attestationTruth": "fact",
+        "sourceStatus": "research_candidate"
+      },
+      {
+        "sourceRecordId": "research.external.open-instrument-research-evidence-packet-v0-1.tree-physical-plant-v0-1.verified-source-capture-fjale-fjalor-shqip-v0-1-pem-f-sense-2-pem-v0-1",
+        "language": "Albanian",
+        "sourceForm": "pemë",
+        "queryForm": "PEMË",
+        "sourceTraditionId": "fjale.fjalor-shqip.v0_1",
+        "citationIds": [
+          "open-instrument.source-record.capture.fjale-fjalor-shqip-v0-1.pem-f-sense-2.pem.v0_1.citation.v0_1"
+        ],
+        "gloss": "Dru me trung dhe me shumë degë të cilat formojnë një si kurorë; fryti i këtij druri.",
+        "attestationTruth": "fact",
+        "sourceStatus": "research_candidate"
+      },
+      {
+        "sourceRecordId": "research.external.open-instrument-research-evidence-packet-v0-1.vision-visual-appearance-or-vision-v0-1.verified-source-capture-fjale-fjalor-shqip-v0-1-vizion-m-sense-1-vizion-v0-1",
+        "language": "Albanian",
+        "sourceForm": "vizion",
+        "queryForm": "VIZION",
+        "sourceTraditionId": "fjale.fjalor-shqip.v0_1",
+        "citationIds": [
+          "open-instrument.source-record.capture.fjale-fjalor-shqip-v0-1.vizion-m-sense-1.vizion.v0_1.citation.v0_1"
+        ],
+        "gloss": "Vegim.",
+        "attestationTruth": "fact",
+        "sourceStatus": "research_candidate"
+      },
+      {
+        "sourceRecordId": "research.external.open-instrument-research-evidence-packet-v0-1.water-physical-liquid-v0-1.verified-source-capture-fjale-fjalor-shqip-v0-1-uj-m-sh-sense-1-uj-v0-1",
+        "language": "Albanian",
+        "sourceForm": "ujë",
+        "queryForm": "UJË",
+        "sourceTraditionId": "fjale.fjalor-shqip.v0_1",
+        "citationIds": [
+          "open-instrument.source-record.capture.fjale-fjalor-shqip-v0-1.uj-m-sh-sense-1.uj.v0_1.citation.v0_1"
+        ],
+        "gloss": "Lëng pa ngjyrë, pa erë, i përbërë nga oksigjeni dhe hidrogjeni; përdoret për t’u pirë, për të larë etj.",
+        "attestationTruth": "fact",
+        "sourceStatus": "research_candidate"
+      },
+      {
+        "sourceRecordId": "reviewed.external.albanian-at.father.candidate.v0_1",
+        "language": "Albanian",
+        "sourceForm": "at",
+        "queryForm": "AT",
+        "sourceTraditionId": "reviewed-external-lexicon-source-row-registry.v0_1",
+        "citationIds": [
+          "reviewed.external.albanian-at.father.citation.v0_1"
+        ],
+        "gloss": "father",
+        "attestationTruth": "fact",
+        "sourceStatus": "reviewed_candidate"
+      },
+      {
+        "sourceRecordId": "reviewed.external.di.knowledge.candidate.v0_1",
+        "language": "Albanian",
+        "sourceForm": "di",
+        "queryForm": "DI",
+        "sourceTraditionId": "reviewed-external-lexicon-source-row-registry.v0_1",
+        "citationIds": [
+          "reviewed.external.di.knowledge.candidate.citation.v0_1"
+        ],
+        "gloss": "know / knowledge",
+        "attestationTruth": "fact",
+        "sourceStatus": "reviewed_candidate"
+      },
+      {
+        "sourceRecordId": "reviewed.external.gheg-da.damage.candidate.v0_1",
+        "language": "Albanian",
+        "sourceForm": "da",
+        "queryForm": "DA",
+        "sourceTraditionId": "reviewed-external-lexicon-source-row-registry.v0_1",
+        "citationIds": [
+          "reviewed.external.gheg-da.damage.candidate.citation.v0_1"
+        ],
+        "gloss": "to split, cut, divide",
+        "attestationTruth": "fact",
+        "sourceStatus": "reviewed_candidate"
+      }
+    ],
+    "afterRecords": [
+      {
+        "sourceRecordId": "research.external.albanian-burre-man.scale50.cohortG.v0_1",
+        "language": "Albanian",
+        "sourceForm": "burrë",
+        "queryForm": "BURRË",
+        "sourceTraditionId": "fjale.fjalor-shqip.v0_1",
+        "citationIds": [
+          "research.external.fjale-burre-man.scale50.cohortG.citation.v0_1"
+        ],
+        "gloss": "a person of the male sex; a mature or adult male person",
+        "attestationTruth": "fact",
+        "sourceStatus": "research_candidate"
+      },
+      {
+        "sourceRecordId": "research.external.albanian-dore-hand.scale50.v0_1",
+        "language": "Albanian",
+        "sourceForm": "dorë",
+        "queryForm": "DORË",
+        "sourceTraditionId": "multi-source-functional-research-evidence-catalog.v0_1",
+        "citationIds": [
+          "research.external.fjale-dore-hand.scale50.citation.v0_1"
+        ],
+        "gloss": "hand; upper limb and especially the part from the wrist with palm and fingers",
+        "attestationTruth": "fact",
+        "sourceStatus": "research_candidate"
+      },
+      {
+        "sourceRecordId": "research.external.albanian-dua-love.v0_1",
+        "language": "Albanian",
+        "sourceForm": "dua",
+        "queryForm": "DUA",
+        "sourceTraditionId": "multi-source-functional-research-evidence-catalog.v0_1",
+        "citationIds": [
+          "research.external.fjale-dua-love.citation.v0_1"
+        ],
+        "gloss": "to love; to have a feeling of love for someone or something",
+        "attestationTruth": "fact",
+        "sourceStatus": "research_candidate"
+      },
+      {
+        "sourceRecordId": "research.external.albanian-eci-walk.scale50.v0_1",
+        "language": "Albanian",
+        "sourceForm": "eci",
+        "queryForm": "ECI",
+        "sourceTraditionId": "multi-source-functional-research-evidence-catalog.v0_1",
+        "citationIds": [
+          "research.external.fjale-eci-walk.scale50.citation.v0_1"
+        ],
+        "gloss": "to walk; to go on foot with ordinary steps",
+        "attestationTruth": "fact",
+        "sourceStatus": "research_candidate"
+      },
+      {
+        "sourceRecordId": "research.external.albanian-femije-child.scale50.v0_1",
+        "language": "Albanian",
+        "sourceForm": "fëmijë",
+        "queryForm": "FËMIJË",
+        "sourceTraditionId": "multi-source-functional-research-evidence-catalog.v0_1",
+        "citationIds": [
+          "research.external.fjale-femije-child.scale50.citation.v0_1"
+        ],
+        "gloss": "child; young boy or girl; son or daughter relative to parents",
+        "attestationTruth": "fact",
+        "sourceStatus": "research_candidate"
+      },
+      {
+        "sourceRecordId": "research.external.albanian-flas-speak.scale50.v0_1",
+        "language": "Albanian",
+        "sourceForm": "flas",
+        "queryForm": "FLAS",
+        "sourceTraditionId": "multi-source-functional-research-evidence-catalog.v0_1",
+        "citationIds": [
+          "research.external.fjale-flas-speak.scale50.citation.v0_1"
+        ],
+        "gloss": "to speak; articulate words and sentences",
+        "attestationTruth": "fact",
+        "sourceStatus": "research_candidate"
+      },
+      {
+        "sourceRecordId": "research.external.albanian-gjak-blood.scale50.v0_1",
+        "language": "Albanian",
+        "sourceForm": "gjak",
+        "queryForm": "GJAK",
+        "sourceTraditionId": "multi-source-functional-research-evidence-catalog.v0_1",
+        "citationIds": [
+          "research.external.fjale-gjak-blood.scale50.citation.v0_1"
+        ],
+        "gloss": "blood; red liquid circulating in the body",
+        "attestationTruth": "fact",
+        "sourceStatus": "research_candidate"
+      },
+      {
+        "sourceRecordId": "research.external.albanian-grua-woman.scale50.v0_1",
+        "language": "Albanian",
+        "sourceForm": "grua",
+        "queryForm": "GRUA",
+        "sourceTraditionId": "multi-source-functional-research-evidence-catalog.v0_1",
+        "citationIds": [
+          "research.external.fjale-grua-woman.scale50.citation.v0_1"
+        ],
+        "gloss": "woman; adult female human",
+        "attestationTruth": "fact",
+        "sourceStatus": "research_candidate"
+      },
+      {
+        "sourceRecordId": "research.external.albanian-ha-eat.scale50.v0_1",
+        "language": "Albanian",
+        "sourceForm": "ha",
+        "queryForm": "HA",
+        "sourceTraditionId": "multi-source-functional-research-evidence-catalog.v0_1",
+        "citationIds": [
+          "research.external.fjale-ha-eat.scale50.citation.v0_1"
+        ],
+        "gloss": "to eat; chew and swallow something for nourishment",
+        "attestationTruth": "fact",
+        "sourceStatus": "research_candidate"
+      },
+      {
+        "sourceRecordId": "research.external.albanian-hunde-nose.scale50.v0_1",
+        "language": "Albanian",
+        "sourceForm": "hundë",
+        "queryForm": "HUNDË",
+        "sourceTraditionId": "multi-source-functional-research-evidence-catalog.v0_1",
+        "citationIds": [
+          "research.external.fjale-hunde-nose.scale50.citation.v0_1"
+        ],
+        "gloss": "organ of smell; projecting part of the face through which air passes",
+        "attestationTruth": "fact",
+        "sourceStatus": "research_candidate"
+      },
+      {
+        "sourceRecordId": "research.external.albanian-jete-life.scale50.v0_1",
+        "language": "Albanian",
+        "sourceForm": "jetë",
+        "queryForm": "JETË",
+        "sourceTraditionId": "multi-source-functional-research-evidence-catalog.v0_1",
+        "citationIds": [
+          "research.external.fjale-jete-life.scale50.citation.v0_1"
+        ],
+        "gloss": "life; existence and state of being alive",
+        "attestationTruth": "fact",
+        "sourceStatus": "research_candidate"
+      },
+      {
+        "sourceRecordId": "research.external.albanian-kembe-foot.scale50.v0_1",
+        "language": "Albanian",
+        "sourceForm": "këmbë",
+        "queryForm": "KËMBË",
+        "sourceTraditionId": "multi-source-functional-research-evidence-catalog.v0_1",
+        "citationIds": [
+          "research.external.fjale-kembe-foot.scale50.citation.v0_1"
+        ],
+        "gloss": "lower limb and its terminal part; foot used for standing, walking, or movement",
+        "attestationTruth": "fact",
+        "sourceStatus": "research_candidate"
+      },
+      {
+        "sourceRecordId": "research.external.albanian-kocke-bone.scale50.v0_1",
+        "language": "Albanian",
+        "sourceForm": "kockë",
+        "queryForm": "KOCKË",
+        "sourceTraditionId": "multi-source-functional-research-evidence-catalog.v0_1",
+        "citationIds": [
+          "research.external.fjale-kocke-bone.scale50.citation.v0_1"
+        ],
+        "gloss": "bone; component of the human or vertebrate skeleton",
+        "attestationTruth": "fact",
+        "sourceStatus": "research_candidate"
+      },
+      {
+        "sourceRecordId": "research.external.albanian-kujtese-memory.scale50.v0_1",
+        "language": "Albanian",
+        "sourceForm": "kujtesë",
+        "queryForm": "KUJTESË",
+        "sourceTraditionId": "multi-source-functional-research-evidence-catalog.v0_1",
+        "citationIds": [
+          "research.external.fjale-kujtese-memory.scale50.citation.v0_1"
+        ],
+        "gloss": "memory; ability to retain and reproduce past experience or learning",
+        "attestationTruth": "fact",
+        "sourceStatus": "research_candidate"
+      },
+      {
+        "sourceRecordId": "research.external.albanian-liri-freedom.scale50.cohortG.v0_1",
+        "language": "Albanian",
+        "sourceForm": "liri",
+        "queryForm": "LIRI",
+        "sourceTraditionId": "fjale.fjalor-shqip.v0_1",
+        "citationIds": [
+          "research.external.fjale-liri-freedom.scale50.cohortG.citation.v0_1"
+        ],
+        "gloss": "being free; absence of oppression, dependence, or restrictions; being not imprisoned and enjoying civil rights",
+        "attestationTruth": "fact",
+        "sourceStatus": "research_candidate"
+      },
+      {
+        "sourceRecordId": "research.external.albanian-lufte-war.scale50.v0_1",
+        "language": "Albanian",
+        "sourceForm": "luftë",
+        "queryForm": "LUFTË",
+        "sourceTraditionId": "multi-source-functional-research-evidence-catalog.v0_1",
+        "citationIds": [
+          "research.external.fjale-lufte-war.scale50.citation.v0_1"
+        ],
+        "gloss": "war; armed conflict between states or opposing military forces",
+        "attestationTruth": "fact",
+        "sourceStatus": "research_candidate"
+      },
+      {
+        "sourceRecordId": "research.external.albanian-lume-river.scale50.v0_1",
+        "language": "Albanian",
+        "sourceForm": "lumë",
+        "queryForm": "LUMË",
+        "sourceTraditionId": "multi-source-functional-research-evidence-catalog.v0_1",
+        "citationIds": [
+          "research.external.fjale-lume-river.scale50.citation.v0_1"
+        ],
+        "gloss": "river; large permanent natural flow of fresh water",
+        "attestationTruth": "fact",
+        "sourceStatus": "research_candidate"
+      },
+      {
+        "sourceRecordId": "research.external.albanian-mal-mountain.scale50.v0_1",
+        "language": "Albanian",
+        "sourceForm": "mal",
+        "queryForm": "MAL",
+        "sourceTraditionId": "multi-source-functional-research-evidence-catalog.v0_1",
+        "citationIds": [
+          "research.external.fjale-mal-mountain.scale50.citation.v0_1"
+        ],
+        "gloss": "mountain; elevated land higher than a hill",
+        "attestationTruth": "fact",
+        "sourceStatus": "research_candidate"
+      },
+      {
+        "sourceRecordId": "research.external.albanian-mat-measure.v0_1",
+        "language": "Albanian",
+        "sourceForm": "mat",
+        "queryForm": "MAT",
+        "sourceTraditionId": "kaikki.wiktionary.albanian-mas.v0_1",
+        "citationIds": [
+          "research.external.albanian-mas-kaikki.citation.v0_1",
+          "research.external.albanian-mat-fjalori-online.citation.v0_1"
+        ],
+        "gloss": "to measure (alternative form of verb mas)",
+        "attestationTruth": "fact",
+        "sourceStatus": "research_candidate"
+      },
+      {
+        "sourceRecordId": "research.external.albanian-mbaj-carry.scale50.cohortG.v0_1",
+        "language": "Albanian",
+        "sourceForm": "mbaj",
+        "queryForm": "MBAJ",
+        "sourceTraditionId": "fjale.fjalor-shqip.v0_1",
+        "citationIds": [
+          "research.external.fjale-mbaj-carry.scale50.cohortG.citation.v0_1"
+        ],
+        "gloss": "hold something so it does not fall or move; carry or transport it on the back, neck, arm, or by a vehicle",
+        "attestationTruth": "fact",
+        "sourceStatus": "research_candidate"
+      },
+      {
+        "sourceRecordId": "research.external.albanian-mbret-king.scale50.v0_1",
+        "language": "Albanian",
+        "sourceForm": "mbret",
+        "queryForm": "MBRET",
+        "sourceTraditionId": "multi-source-functional-research-evidence-catalog.v0_1",
+        "citationIds": [
+          "research.external.fjale-mbret-king.scale50.citation.v0_1"
+        ],
+        "gloss": "king; monarch who holds the hereditary royal title",
+        "attestationTruth": "fact",
+        "sourceStatus": "research_candidate"
+      },
+      {
+        "sourceRecordId": "research.external.albanian-mendje-mind.scale50.v0_1",
+        "language": "Albanian",
+        "sourceForm": "mendje",
+        "queryForm": "MENDJE",
+        "sourceTraditionId": "multi-source-functional-research-evidence-catalog.v0_1",
+        "citationIds": [
+          "research.external.fjale-mendje-mind.scale50.citation.v0_1"
+        ],
+        "gloss": "mind; capacity to think, know, reason, and judge",
+        "attestationTruth": "fact",
+        "sourceStatus": "research_candidate"
+      },
+      {
+        "sourceRecordId": "research.external.albanian-ndertoj-build.scale50.cohortG.v0_1",
+        "language": "Albanian",
+        "sourceForm": "ndërtoj",
+        "queryForm": "NDËRTOJ",
+        "sourceTraditionId": "fjale.fjalor-shqip.v0_1",
+        "citationIds": [
+          "research.external.fjale-ndertoj-build.scale50.cohortG.citation.v0_1"
+        ],
+        "gloss": "raise or make a building, bridge, or other physical object from materials; prepare a machine or device from parts",
+        "attestationTruth": "fact",
+        "sourceStatus": "research_candidate"
+      },
+      {
+        "sourceRecordId": "research.external.albanian-nene-mother.scale50.v0_1",
+        "language": "Albanian",
+        "sourceForm": "nënë",
+        "queryForm": "NËNË",
+        "sourceTraditionId": "multi-source-functional-research-evidence-catalog.v0_1",
+        "citationIds": [
+          "research.external.fjale-nene-mother.scale50.citation.v0_1"
+        ],
+        "gloss": "mother; woman in relation to her children",
+        "attestationTruth": "fact",
+        "sourceStatus": "research_candidate"
+      },
+      {
+        "sourceRecordId": "research.external.albanian-paqe-peace.scale50.v0_1",
+        "language": "Albanian",
+        "sourceForm": "paqe",
+        "queryForm": "PAQE",
+        "sourceTraditionId": "multi-source-functional-research-evidence-catalog.v0_1",
+        "citationIds": [
+          "research.external.fjale-paqe-peace.scale50.citation.v0_1"
+        ],
+        "gloss": "peace; calm relations and a state without war or conflict",
+        "attestationTruth": "fact",
+        "sourceStatus": "research_candidate"
+      },
+      {
+        "sourceRecordId": "research.external.albanian-qiell-sky.scale50.v0_1",
+        "language": "Albanian",
+        "sourceForm": "qiell",
+        "queryForm": "QIELL",
+        "sourceTraditionId": "multi-source-functional-research-evidence-catalog.v0_1",
+        "citationIds": [
+          "research.external.fjale-qiell-sky.scale50.citation.v0_1"
+        ],
+        "gloss": "sky; the space surrounding Earth and the visible expanse above",
+        "attestationTruth": "fact",
+        "sourceStatus": "research_candidate"
+      },
+      {
+        "sourceRecordId": "research.external.albanian-shi-rain.scale50.v0_1",
+        "language": "Albanian",
+        "sourceForm": "shi",
+        "queryForm": "SHI",
+        "sourceTraditionId": "multi-source-functional-research-evidence-catalog.v0_1",
+        "citationIds": [
+          "research.external.fjale-shi-rain.scale50.citation.v0_1"
+        ],
+        "gloss": "rain; precipitation formed from atmospheric water vapor and falling in drops",
+        "attestationTruth": "fact",
+        "sourceStatus": "research_candidate"
+      },
+      {
+        "sourceRecordId": "research.external.albanian-shter-depletion.v0_1",
+        "language": "Albanian",
+        "sourceForm": "shter",
+        "queryForm": "SHTER",
+        "sourceTraditionId": "fjale.fjalor-shqip.albanian-shter.v0_1",
+        "citationIds": [
+          "research.external.albanian-shter-fjale.citation.v0_1",
+          "research.external.albanian-shter-fjalori-online.citation.v0_1"
+        ],
+        "gloss": "dry up; run out; end; exhaust or weaken",
+        "attestationTruth": "fact",
+        "sourceStatus": "research_candidate"
+      },
+      {
+        "sourceRecordId": "research.external.albanian-shterp-barren.v0_1",
+        "language": "Albanian",
+        "sourceForm": "shterp",
+        "queryForm": "SHTERP",
+        "sourceTraditionId": "fjale.fjalor-shqip.albanian-shterp.v0_1",
+        "citationIds": [
+          "research.external.albanian-shterp-fjale.citation.v0_1",
+          "research.external.albanian-shterp-fjalori-online.citation.v0_1"
+        ],
+        "gloss": "barren; non-reproductive; non-producing; unfruitful",
+        "attestationTruth": "fact",
+        "sourceStatus": "research_candidate"
+      },
+      {
+        "sourceRecordId": "research.external.albanian-shterpe-barren.v0_1",
+        "language": "Albanian",
+        "sourceForm": "shterpë",
+        "queryForm": "SHTERPË",
+        "sourceTraditionId": "fjale.fjalor-shqip.albanian-shterp.v0_1",
+        "citationIds": [
+          "research.external.albanian-shterpe-fjale.citation.v0_1",
+          "research.external.albanian-shterpe-fjalori-online.citation.v0_1"
+        ],
+        "gloss": "barren livestock or other non-reproductive being",
+        "attestationTruth": "fact",
+        "sourceStatus": "research_candidate"
+      },
+      {
+        "sourceRecordId": "research.external.albanian-shterpezoj-sterilize.v0_1",
+        "language": "Albanian",
+        "sourceForm": "shterpëzoj",
+        "queryForm": "SHTERPËZOJ",
+        "sourceTraditionId": "fjale.fjalor-shqip.albanian-shterpezoj.v0_1",
+        "citationIds": [
+          "research.external.albanian-shterpezoj-fjale.citation.v0_1"
+        ],
+        "gloss": "remove reproductive ability; make barren; sterilize",
+        "attestationTruth": "fact",
+        "sourceStatus": "research_candidate"
+      },
+      {
+        "sourceRecordId": "research.external.albanian-vertete-truth.scale50.v0_1",
+        "language": "Albanian",
+        "sourceForm": "vërtetë",
+        "queryForm": "VËRTETË",
+        "sourceTraditionId": "multi-source-functional-research-evidence-catalog.v0_1",
+        "citationIds": [
+          "research.external.fjale-vertete-truth.scale50.citation.v0_1"
+        ],
+        "gloss": "truth; something that corresponds to reality",
+        "attestationTruth": "fact",
+        "sourceStatus": "research_candidate"
+      },
+      {
+        "sourceRecordId": "research.external.albanian-vesh-ear.scale50.v0_1",
+        "language": "Albanian",
+        "sourceForm": "vesh",
+        "queryForm": "VESH",
+        "sourceTraditionId": "multi-source-functional-research-evidence-catalog.v0_1",
+        "citationIds": [
+          "research.external.fjale-vesh-ear.scale50.citation.v0_1"
+        ],
+        "gloss": "each of the two hearing organs; also the capacity for hearing",
+        "attestationTruth": "fact",
+        "sourceStatus": "research_candidate"
+      },
+      {
+        "sourceRecordId": "research.external.albanian-vrapoj-run.scale50.v0_1",
+        "language": "Albanian",
+        "sourceForm": "vrapoj",
+        "queryForm": "VRAPOJ",
+        "sourceTraditionId": "multi-source-functional-research-evidence-catalog.v0_1",
+        "citationIds": [
+          "research.external.fjale-vrapoj-run.scale50.citation.v0_1"
+        ],
+        "gloss": "to run; to move with very quick steps",
+        "attestationTruth": "fact",
+        "sourceStatus": "research_candidate"
+      },
+      {
+        "sourceRecordId": "research.external.albanian-zemer-heart.scale50.v0_1",
+        "language": "Albanian",
+        "sourceForm": "zemër",
+        "queryForm": "ZEMËR",
+        "sourceTraditionId": "multi-source-functional-research-evidence-catalog.v0_1",
+        "citationIds": [
+          "research.external.fjale-zemer-heart.scale50.citation.v0_1"
+        ],
+        "gloss": "heart; central organ of the circulatory system in humans and animals",
+        "attestationTruth": "fact",
+        "sourceStatus": "research_candidate"
+      },
+      {
+        "sourceRecordId": "research.external.latin-amo-love.v0_1",
+        "language": "Latin",
+        "sourceForm": "amo",
+        "queryForm": "AMO",
+        "sourceTraditionId": "scaife.lewis-short.v0_1",
+        "citationIds": [
+          "research.external.lewis-short-amo-love.citation.v0_1"
+        ],
+        "gloss": "to like, to love",
+        "attestationTruth": "fact",
+        "sourceStatus": "research_candidate"
+      },
+      {
+        "sourceRecordId": "research.external.latin-caelum-sky.scale50.v0_1",
+        "language": "Latin",
+        "sourceForm": "caelum",
+        "queryForm": "CAELUM",
+        "sourceTraditionId": "scaife.lewis-short.v0_1",
+        "citationIds": [
+          "research.external.lewis-short-caelum-sky.scale50.citation.v0_1"
+        ],
+        "gloss": "the sky, heaven, the heavens, the vault of heaven",
+        "attestationTruth": "fact",
+        "sourceStatus": "research_candidate"
+      },
+      {
+        "sourceRecordId": "research.external.latin-libertas-freedom.scale50.cohortG.v0_1",
+        "language": "Latin",
+        "sourceForm": "lībertas",
+        "queryForm": "LĪBERTAS",
+        "sourceTraditionId": "scaife.lewis-short.v0_1",
+        "citationIds": [
+          "research.external.scaife-lewis-short-libertas-freedom.scale50.cohortG.citation.v0_1"
+        ],
+        "gloss": "the state or condition of a freeman; freedom, liberty, freedom from restraint or obligation",
+        "attestationTruth": "fact",
+        "sourceStatus": "research_candidate"
+      },
+      {
+        "sourceRecordId": "research.external.latin-vir-man.scale50.cohortG.v0_1",
+        "language": "Latin",
+        "sourceForm": "vĭr",
+        "queryForm": "VĬR",
+        "sourceTraditionId": "scaife.lewis-short.v0_1",
+        "citationIds": [
+          "research.external.scaife-lewis-short-vir-man.scale50.cohortG.citation.v0_1"
+        ],
+        "gloss": "a male person, adult male, man",
+        "attestationTruth": "fact",
+        "sourceStatus": "research_candidate"
+      },
+      {
+        "sourceRecordId": "research.external.open-instrument-research-evidence-packet-v0-1.art-creative-artistic-activity-v0-1.verified-source-capture-fjale-fjalor-shqip-v0-1-art-m-sense-1-art-v0-1",
+        "language": "Albanian",
+        "sourceForm": "art",
+        "queryForm": "ART",
+        "sourceTraditionId": "fjale.fjalor-shqip.v0_1",
+        "citationIds": [
+          "open-instrument.source-record.capture.fjale-fjalor-shqip-v0-1.art-m-sense-1.art.v0_1.citation.v0_1"
+        ],
+        "gloss": "Formë e pasqyrimit të botës nëpërmjet riprodhimit të realitetit në mënyrë krijuese me anë figurash artistike; veprimtaria krijuese artistike.",
+        "attestationTruth": "fact",
+        "sourceStatus": "research_candidate"
+      },
+      {
+        "sourceRecordId": "research.external.open-instrument-research-evidence-packet-v0-1.art-creative-artistic-activity-v0-1.verified-source-capture-scaife-lewis-short-v0-1-headword-ars-art-sense-entry-text-beginning-skill-in-producing-any-material-form-ars-v0-1",
+        "language": "Latin",
+        "sourceForm": "ars",
+        "queryForm": "ARS",
+        "sourceTraditionId": "scaife.lewis-short.v0_1",
+        "citationIds": [
+          "open-instrument.source-record.capture.scaife-lewis-short-v0-1.headword-ars-art-sense-entry-text-beginning-skill-in-producing-any-material-form.ars.v0_1.citation.v0_1"
+        ],
+        "gloss": "the knowledge, art, skill, workmanship",
+        "attestationTruth": "fact",
+        "sourceStatus": "research_candidate"
+      },
+      {
+        "sourceRecordId": "research.external.open-instrument-research-evidence-packet-v0-1.blue-blue-color-v0-1.verified-source-capture-fjale-fjalor-shqip-v0-1-blu-i-f-sense-1-blu-i-v0-1",
+        "language": "Albanian",
+        "sourceForm": "blu I",
+        "queryForm": "BLU I",
+        "sourceTraditionId": "fjale.fjalor-shqip.v0_1",
+        "citationIds": [
+          "open-instrument.source-record.capture.fjale-fjalor-shqip-v0-1.blu-i-f-sense-1.blu-i.v0_1.citation.v0_1"
+        ],
+        "gloss": "Ngjyra blu.",
+        "attestationTruth": "fact",
+        "sourceStatus": "research_candidate"
+      },
+      {
+        "sourceRecordId": "research.external.open-instrument-research-evidence-packet-v0-1.blue-blue-color-v0-1.verified-source-capture-scaife-lewis-short-v0-1-headword-caer-l-us-blue-sense-entry-text-beginning-dark-colored-dark-blue-caer-l-us-v0-1",
+        "language": "Latin",
+        "sourceForm": "caerŭlĕus",
+        "queryForm": "CAERŬLĔUS",
+        "sourceTraditionId": "scaife.lewis-short.v0_1",
+        "citationIds": [
+          "open-instrument.source-record.capture.scaife-lewis-short-v0-1.headword-caer-l-us-blue-sense-entry-text-beginning-dark-colored-dark-blue.caer-l-us.v0_1.citation.v0_1"
+        ],
+        "gloss": "dark-colored, dark blue, dark green, cerulean, azure",
+        "attestationTruth": "fact",
+        "sourceStatus": "research_candidate"
+      },
+      {
+        "sourceRecordId": "research.external.open-instrument-research-evidence-packet-v0-1.bread-physical-baked-food-v0-1.verified-source-capture-fjale-fjalor-shqip-v0-1-buk-f-sense-1-buk-v0-1",
+        "language": "Albanian",
+        "sourceForm": "bukë",
+        "queryForm": "BUKË",
+        "sourceTraditionId": "fjale.fjalor-shqip.v0_1",
+        "citationIds": [
+          "open-instrument.source-record.capture.fjale-fjalor-shqip-v0-1.buk-f-sense-1.buk.v0_1.citation.v0_1"
+        ],
+        "gloss": "Ushqim që bëhet me miell drithi të gatuar me ujë e të pjekur në furrë a në saç; një copë e veçantë e këtij ushqimi, e gatuar me forma të ndryshme dhe e pjekur.",
+        "attestationTruth": "fact",
+        "sourceStatus": "research_candidate"
+      },
+      {
+        "sourceRecordId": "research.external.open-instrument-research-evidence-packet-v0-1.bread-physical-baked-food-v0-1.verified-source-capture-scaife-lewis-short-v0-1-headword-p-nis-bread-sense-entry-text-beginning-bread-p-nis-v0-1",
+        "language": "Latin",
+        "sourceForm": "pānis",
+        "queryForm": "PĀNIS",
+        "sourceTraditionId": "scaife.lewis-short.v0_1",
+        "citationIds": [
+          "open-instrument.source-record.capture.scaife-lewis-short-v0-1.headword-p-nis-bread-sense-entry-text-beginning-bread.p-nis.v0_1.citation.v0_1"
+        ],
+        "gloss": "bread, a loaf",
+        "attestationTruth": "fact",
+        "sourceStatus": "research_candidate"
+      },
+      {
+        "sourceRecordId": "research.external.open-instrument-research-evidence-packet-v0-1.break-physical-break-damage-source-review-v0-1.verified-source-capture-fjale-fjalor-shqip-v0-1-thyej-kal-sense-1-thyej-v0-1",
+        "language": "Albanian",
+        "sourceForm": "thyej",
+        "queryForm": "THYEJ",
+        "sourceTraditionId": "fjale.fjalor-shqip.v0_1",
+        "citationIds": [
+          "open-instrument.source-record.capture.fjale-fjalor-shqip-v0-1.thyej-kal-sense-1.thyej.v0_1.citation.v0_1"
+        ],
+        "gloss": "E ndaj një gjë më dysh a në shumë copa me dorë ose duke e përpjekur pas diçkaje të fortë; e bëj pjesë-pjesë a copa-copa diçka të ngurtë, e copëtoj, duke e goditur me diçka a duke e përpjekur pas diçkaje të fort.",
+        "attestationTruth": "fact",
+        "sourceStatus": "research_candidate"
+      },
+      {
+        "sourceRecordId": "research.external.open-instrument-research-evidence-packet-v0-1.break-physical-break-damage-source-review-v0-1.verified-source-capture-scaife-lewis-short-v0-1-headword-frango-physical-break-sense-entry-text-beginning-to-break-break-in-pieces-frango-v0-1",
+        "language": "Latin",
+        "sourceForm": "frango",
+        "queryForm": "FRANGO",
+        "sourceTraditionId": "scaife.lewis-short.v0_1",
+        "citationIds": [
+          "open-instrument.source-record.capture.scaife-lewis-short-v0-1.headword-frango-physical-break-sense-entry-text-beginning-to-break-break-in-pieces.frango.v0_1.citation.v0_1"
+        ],
+        "gloss": "to break, break in pieces, dash to pieces, shiver, break in two",
+        "attestationTruth": "fact",
+        "sourceStatus": "research_candidate"
+      },
+      {
+        "sourceRecordId": "research.external.open-instrument-research-evidence-packet-v0-1.change-alteration-v0-1.fjale-ndryshim",
+        "language": "Albanian",
+        "sourceForm": "ndryshim",
+        "queryForm": "NDRYSHIM",
+        "sourceTraditionId": "fjale.fjalor-shqip.v0_1",
+        "citationIds": [
+          "change.fjale.ndryshim.v0_1"
+        ],
+        "gloss": "act and state according to ndryshoj; changes and alterations",
+        "attestationTruth": "fact",
+        "sourceStatus": "research_candidate"
+      },
+      {
+        "sourceRecordId": "research.external.open-instrument-research-evidence-packet-v0-1.change-alteration-v0-1.lewis-short-mutatio",
+        "language": "Latin",
+        "sourceForm": "mūtātiō",
+        "queryForm": "MŪTĀTIŌ",
+        "sourceTraditionId": "scaife.lewis-short.v0_1",
+        "citationIds": [
+          "change.lewis-short.mutatio.v0_1"
+        ],
+        "gloss": "a changing, altering, a change, alteration, mutation",
+        "attestationTruth": "fact",
+        "sourceStatus": "research_candidate"
+      },
+      {
+        "sourceRecordId": "research.external.open-instrument-research-evidence-packet-v0-1.cloud-physical-atmospheric-v0-1.verified-source-capture-fjale-fjalor-shqip-v0-1-re-i-f-sense-1-re-v0-1",
+        "language": "Albanian",
+        "sourceForm": "re",
+        "queryForm": "RE",
+        "sourceTraditionId": "fjale.fjalor-shqip.v0_1",
+        "citationIds": [
+          "open-instrument.source-record.capture.fjale-fjalor-shqip-v0-1.re-i-f-sense-1.re.v0_1.citation.v0_1"
+        ],
+        "gloss": "Grumbull avujsh uji, që rrinë pezull lart në qiell.",
+        "attestationTruth": "fact",
+        "sourceStatus": "research_candidate"
+      },
+      {
+        "sourceRecordId": "research.external.open-instrument-research-evidence-packet-v0-1.cloud-physical-atmospheric-v0-1.verified-source-capture-scaife-lewis-short-v0-1-headword-nimbus-cloud-in-general-entry-text-beginning-a-cloud-in-general-nimbus-v0-1",
+        "language": "Latin",
+        "sourceForm": "nimbus",
+        "queryForm": "NIMBUS",
+        "sourceTraditionId": "scaife.lewis-short.v0_1",
+        "citationIds": [
+          "open-instrument.source-record.capture.scaife-lewis-short-v0-1.headword-nimbus-cloud-in-general-entry-text-beginning-a-cloud-in-general.nimbus.v0_1.citation.v0_1"
+        ],
+        "gloss": "a cloud in general; a black rain-cloud or thunder-cloud",
+        "attestationTruth": "fact",
+        "sourceStatus": "research_candidate"
+      },
+      {
+        "sourceRecordId": "research.external.open-instrument-research-evidence-packet-v0-1.friend-close-person-v0-1.verified-source-capture-fjale-fjalor-shqip-v0-1-mik-m-sense-1-mik-v0-1",
+        "language": "Albanian",
+        "sourceForm": "mik",
+        "queryForm": "MIK",
+        "sourceTraditionId": "fjale.fjalor-shqip.v0_1",
+        "citationIds": [
+          "open-instrument.source-record.capture.fjale-fjalor-shqip-v0-1.mik-m-sense-1.mik.v0_1.citation.v0_1"
+        ],
+        "gloss": "Ai me të cilin kemi miqësi; ai që na do të mirën, na ndihmon me gjithë zemër e na gjendet në çdo nevojë; një i njohur, me të cilin kemi lidhje të ngushta, njeri i afërt.",
+        "attestationTruth": "fact",
+        "sourceStatus": "research_candidate"
+      },
+      {
+        "sourceRecordId": "research.external.open-instrument-research-evidence-packet-v0-1.friend-close-person-v0-1.verified-source-capture-scaife-lewis-short-v0-1-headword-familiaris-friendly-friend-sense-entry-text-beginning-familiar-intimate-friendly-familiaris-v0-1",
+        "language": "Latin",
+        "sourceForm": "familiaris",
+        "queryForm": "FAMILIARIS",
+        "sourceTraditionId": "scaife.lewis-short.v0_1",
+        "citationIds": [
+          "open-instrument.source-record.capture.scaife-lewis-short-v0-1.headword-familiaris-friendly-friend-sense-entry-text-beginning-familiar-intimate-friendly.familiaris.v0_1.citation.v0_1"
+        ],
+        "gloss": "familiar, intimate, friendly; a familiar acquaintance, friend",
+        "attestationTruth": "fact",
+        "sourceStatus": "research_candidate"
+      },
+      {
+        "sourceRecordId": "research.external.open-instrument-research-evidence-packet-v0-1.hope-mental-desired-expectation-v0-1.verified-source-capture-fjale-fjalor-shqip-v0-1-shpres-f-sense-1-shpres-v0-1",
+        "language": "Albanian",
+        "sourceForm": "shpresë",
+        "queryForm": "SHPRESË",
+        "sourceTraditionId": "fjale.fjalor-shqip.v0_1",
+        "citationIds": [
+          "open-instrument.source-record.capture.fjale-fjalor-shqip-v0-1.shpres-f-sense-1.shpres.v0_1.citation.v0_1"
+        ],
+        "gloss": "Besimi që kemi se do të na plotësohet një dëshirë, një qëllim a një synim; qëndrimi në pritje me një besim të tillë; ndjenja që kemi kur e shohim si të mundshme përmbushjen e një dëshire a arritjen e një qëllimi.",
+        "attestationTruth": "fact",
+        "sourceStatus": "research_candidate"
+      },
+      {
+        "sourceRecordId": "research.external.open-instrument-research-evidence-packet-v0-1.hope-mental-desired-expectation-v0-1.verified-source-capture-scaife-lewis-short-v0-1-headword-spes-hope-sense-entry-text-beginning-expectation-of-something-desired-sp-s-v0-1",
+        "language": "Latin",
+        "sourceForm": "spēs",
+        "queryForm": "SPĒS",
+        "sourceTraditionId": "scaife.lewis-short.v0_1",
+        "citationIds": [
+          "open-instrument.source-record.capture.scaife-lewis-short-v0-1.headword-spes-hope-sense-entry-text-beginning-expectation-of-something-desired.sp-s.v0_1.citation.v0_1"
+        ],
+        "gloss": "the expectation of something desired, hope",
+        "attestationTruth": "fact",
+        "sourceStatus": "research_candidate"
+      },
+      {
+        "sourceRecordId": "research.external.open-instrument-research-evidence-packet-v0-1.order-lexical-arrangement-v0-1.fjale-rend",
+        "language": "Albanian",
+        "sourceForm": "rend",
+        "queryForm": "REND",
+        "sourceTraditionId": "fjale.fjalor-shqip.v0_1",
+        "citationIds": [
+          "order.fjale.rend.v0_1"
+        ],
+        "gloss": "row; arrangement according to a specified order; sequence",
+        "attestationTruth": "fact",
+        "sourceStatus": "research_candidate"
+      },
+      {
+        "sourceRecordId": "research.external.open-instrument-research-evidence-packet-v0-1.order-lexical-arrangement-v0-1.lewis-short-ordo",
+        "language": "Latin",
+        "sourceForm": "ordo",
+        "queryForm": "ORDO",
+        "sourceTraditionId": "scaife.lewis-short.v0_1",
+        "citationIds": [
+          "order.lewis-short.ordo.v0_1"
+        ],
+        "gloss": "regular row, line, or series; methodical arrangement; order",
+        "attestationTruth": "fact",
+        "sourceStatus": "research_candidate"
+      },
+      {
+        "sourceRecordId": "research.external.open-instrument-research-evidence-packet-v0-1.sea-physical-saltwater-body-v0-1.verified-source-capture-fjale-fjalor-shqip-v0-1-det-m-sense-1-det-v0-1",
+        "language": "Albanian",
+        "sourceForm": "det",
+        "queryForm": "DET",
+        "sourceTraditionId": "fjale.fjalor-shqip.v0_1",
+        "citationIds": [
+          "open-instrument.source-record.capture.fjale-fjalor-shqip-v0-1.det-m-sense-1.det.v0_1.citation.v0_1"
+        ],
+        "gloss": "Hapësirë shumë e madhe me ujë të kripur, që zakonisht është e rrethuar me tokë jo nga të gjitha anët dhe që qëndron disi e veçuar; pjesa më e madhe e rruzullit tokësor, e mbuluar me ujë të kripur.",
+        "attestationTruth": "fact",
+        "sourceStatus": "research_candidate"
+      },
+      {
+        "sourceRecordId": "research.external.open-instrument-research-evidence-packet-v0-1.sea-physical-saltwater-body-v0-1.verified-source-capture-scaife-lewis-short-v0-1-headword-mare-sea-sense-entry-text-beginning-sea-mare-v0-1",
+        "language": "Latin",
+        "sourceForm": "mare",
+        "queryForm": "MARE",
+        "sourceTraditionId": "scaife.lewis-short.v0_1",
+        "citationIds": [
+          "open-instrument.source-record.capture.scaife-lewis-short-v0-1.headword-mare-sea-sense-entry-text-beginning-sea.mare.v0_1.citation.v0_1"
+        ],
+        "gloss": "sea, the sea",
+        "attestationTruth": "fact",
+        "sourceStatus": "research_candidate"
+      },
+      {
+        "sourceRecordId": "research.external.open-instrument-research-evidence-packet-v0-1.skin-physical-body-covering-v0-1.verified-source-capture-fjale-fjalor-shqip-v0-1-l-kur-f-sense-1-l-kur-v0-1",
+        "language": "Albanian",
+        "sourceForm": "lëkurë",
+        "queryForm": "LËKURË",
+        "sourceTraditionId": "fjale.fjalor-shqip.v0_1",
+        "citationIds": [
+          "open-instrument.source-record.capture.fjale-fjalor-shqip-v0-1.l-kur-f-sense-1.l-kur.v0_1.citation.v0_1"
+        ],
+        "gloss": "Shtresë e hollë, që mbështjell trupin e njeriut ose të kafshëve; kjo shtresë që u rripet kafshëve dhe përpunohet për qëllime të ndryshme; lëkurçe.",
+        "attestationTruth": "fact",
+        "sourceStatus": "research_candidate"
+      },
+      {
+        "sourceRecordId": "research.external.open-instrument-research-evidence-packet-v0-1.skin-physical-body-covering-v0-1.verified-source-capture-scaife-lewis-short-v0-1-headword-pellis-skin-hide-sense-entry-text-beginning-skin-hide-pellis-v0-1",
+        "language": "Latin",
+        "sourceForm": "pellis",
+        "queryForm": "PELLIS",
+        "sourceTraditionId": "scaife.lewis-short.v0_1",
+        "citationIds": [
+          "open-instrument.source-record.capture.scaife-lewis-short-v0-1.headword-pellis-skin-hide-sense-entry-text-beginning-skin-hide.pellis.v0_1.citation.v0_1"
+        ],
+        "gloss": "skin, hide, pelt; a skin or hide of an animal",
+        "attestationTruth": "fact",
+        "sourceStatus": "research_candidate"
+      },
+      {
+        "sourceRecordId": "research.external.open-instrument-research-evidence-packet-v0-1.sleep-physical-sleep-state-v0-1.verified-source-capture-fjale-fjalor-shqip-v0-1-gjum-m-sense-1-gjum-v0-1",
+        "language": "Albanian",
+        "sourceForm": "gjumë",
+        "queryForm": "GJUMË",
+        "sourceTraditionId": "fjale.fjalor-shqip.v0_1",
+        "citationIds": [
+          "open-instrument.source-record.capture.fjale-fjalor-shqip-v0-1.gjum-m-sense-1.gjum.v0_1.citation.v0_1"
+        ],
+        "gloss": "Gjendje e njeriut që fle, kur pushon trupi, ndërpritet pjesërisht ose plotësisht veprimtaria e vetëdijes dhe dobësohen disa procese fiziologjike; nevoja, dëshira ose mundësia për të fjetur.",
+        "attestationTruth": "fact",
+        "sourceStatus": "research_candidate"
+      },
+      {
+        "sourceRecordId": "research.external.open-instrument-research-evidence-packet-v0-1.sleep-physical-sleep-state-v0-1.verified-source-capture-scaife-lewis-short-v0-1-headword-somnus-sleep-sense-entry-text-beginning-sleep-somnus-v0-1",
+        "language": "Latin",
+        "sourceForm": "somnus",
+        "queryForm": "SOMNUS",
+        "sourceTraditionId": "scaife.lewis-short.v0_1",
+        "citationIds": [
+          "open-instrument.source-record.capture.scaife-lewis-short-v0-1.headword-somnus-sleep-sense-entry-text-beginning-sleep.somnus.v0_1.citation.v0_1"
+        ],
+        "gloss": "sleep, slumber",
+        "attestationTruth": "fact",
+        "sourceStatus": "research_candidate"
+      },
+      {
+        "sourceRecordId": "research.external.open-instrument-research-evidence-packet-v0-1.snow-physical-precipitation-v0-1.verified-source-capture-fjale-fjalor-shqip-v0-1-bor-f-kryes-nj-sh-sense-1-bor-v0-1",
+        "language": "Albanian",
+        "sourceForm": "borë",
+        "queryForm": "BORË",
+        "sourceTraditionId": "fjale.fjalor-shqip.v0_1",
+        "citationIds": [
+          "open-instrument.source-record.capture.fjale-fjalor-shqip-v0-1.bor-f-kryes-nj-sh-sense-1.bor.v0_1.citation.v0_1"
+        ],
+        "gloss": "Reshje atmosferike, që bie nga retë flokë-flokë në trajtë kristalesh të bardha; shtresa e bardhë e këtyre flokëve, që mbulojnë vendin aty ku bien; dëborë.",
+        "attestationTruth": "fact",
+        "sourceStatus": "research_candidate"
+      },
+      {
+        "sourceRecordId": "research.external.open-instrument-research-evidence-packet-v0-1.snow-physical-precipitation-v0-1.verified-source-capture-scaife-lewis-short-v0-1-headword-nix-snow-sense-entry-text-beginning-snow-nix-v0-1",
+        "language": "Latin",
+        "sourceForm": "nix",
+        "queryForm": "NIX",
+        "sourceTraditionId": "scaife.lewis-short.v0_1",
+        "citationIds": [
+          "open-instrument.source-record.capture.scaife-lewis-short-v0-1.headword-nix-snow-sense-entry-text-beginning-snow.nix.v0_1.citation.v0_1"
+        ],
+        "gloss": "snow",
+        "attestationTruth": "fact",
+        "sourceStatus": "research_candidate"
+      },
+      {
+        "sourceRecordId": "research.external.open-instrument-research-evidence-packet-v0-1.star-astronomical-star-v0-1.verified-source-capture-fjale-fjalor-shqip-v0-1-yll-m-sense-1-yll-v0-1",
+        "language": "Albanian",
+        "sourceForm": "yll",
+        "queryForm": "YLL",
+        "sourceTraditionId": "fjale.fjalor-shqip.v0_1",
+        "citationIds": [
+          "open-instrument.source-record.capture.fjale-fjalor-shqip-v0-1.yll-m-sense-1.yll.v0_1.citation.v0_1"
+        ],
+        "gloss": "Trup qiellor i ngjashëm me Diellin, që ndodhet shumë larg Tokës dhe që duket natën në qiell si pikë e ndritshme; çdo trup qiellor, përveç Diellit dhe Hënës, që ndrit natën në qiell.",
+        "attestationTruth": "fact",
+        "sourceStatus": "research_candidate"
+      },
+      {
+        "sourceRecordId": "research.external.open-instrument-research-evidence-packet-v0-1.star-astronomical-star-v0-1.verified-source-capture-scaife-lewis-short-v0-1-headword-stella-star-sense-entry-text-beginning-a-star-stella-v0-1",
+        "language": "Latin",
+        "sourceForm": "stella",
+        "queryForm": "STELLA",
+        "sourceTraditionId": "scaife.lewis-short.v0_1",
+        "citationIds": [
+          "open-instrument.source-record.capture.scaife-lewis-short-v0-1.headword-stella-star-sense-entry-text-beginning-a-star.stella.v0_1.citation.v0_1"
+        ],
+        "gloss": "a star",
+        "attestationTruth": "fact",
+        "sourceStatus": "research_candidate"
+      },
+      {
+        "sourceRecordId": "research.external.open-instrument-research-evidence-packet-v0-1.tree-physical-plant-v0-1.verified-source-capture-fjale-fjalor-shqip-v0-1-pem-f-sense-2-pem-v0-1",
+        "language": "Albanian",
+        "sourceForm": "pemë",
+        "queryForm": "PEMË",
+        "sourceTraditionId": "fjale.fjalor-shqip.v0_1",
+        "citationIds": [
+          "open-instrument.source-record.capture.fjale-fjalor-shqip-v0-1.pem-f-sense-2.pem.v0_1.citation.v0_1"
+        ],
+        "gloss": "Dru me trung dhe me shumë degë të cilat formojnë një si kurorë; fryti i këtij druri.",
+        "attestationTruth": "fact",
+        "sourceStatus": "research_candidate"
+      },
+      {
+        "sourceRecordId": "research.external.open-instrument-research-evidence-packet-v0-1.tree-physical-plant-v0-1.verified-source-capture-scaife-lewis-short-v0-1-headword-arbor-general-tree-sense-entry-text-beginning-a-tree-arbor-v0-1",
+        "language": "Latin",
+        "sourceForm": "arbor",
+        "queryForm": "ARBOR",
+        "sourceTraditionId": "scaife.lewis-short.v0_1",
+        "citationIds": [
+          "open-instrument.source-record.capture.scaife-lewis-short-v0-1.headword-arbor-general-tree-sense-entry-text-beginning-a-tree.arbor.v0_1.citation.v0_1"
+        ],
+        "gloss": "a tree; in general, a tree",
+        "attestationTruth": "fact",
+        "sourceStatus": "research_candidate"
+      },
+      {
+        "sourceRecordId": "research.external.open-instrument-research-evidence-packet-v0-1.vision-visual-appearance-or-vision-v0-1.verified-source-capture-fjale-fjalor-shqip-v0-1-vizion-m-sense-1-vizion-v0-1",
+        "language": "Albanian",
+        "sourceForm": "vizion",
+        "queryForm": "VIZION",
+        "sourceTraditionId": "fjale.fjalor-shqip.v0_1",
+        "citationIds": [
+          "open-instrument.source-record.capture.fjale-fjalor-shqip-v0-1.vizion-m-sense-1.vizion.v0_1.citation.v0_1"
+        ],
+        "gloss": "Vegim.",
+        "attestationTruth": "fact",
+        "sourceStatus": "research_candidate"
+      },
+      {
+        "sourceRecordId": "research.external.open-instrument-research-evidence-packet-v0-1.vision-visual-appearance-or-vision-v0-1.verified-source-capture-scaife-lewis-short-v0-1-headword-v-s-o-vision-sense-entry-text-beginning-sight-vision-v-s-o-v0-1",
+        "language": "Latin",
+        "sourceForm": "vīsĭo",
+        "queryForm": "VĪSĬO",
+        "sourceTraditionId": "scaife.lewis-short.v0_1",
+        "citationIds": [
+          "open-instrument.source-record.capture.scaife-lewis-short-v0-1.headword-v-s-o-vision-sense-entry-text-beginning-sight-vision.v-s-o.v0_1.citation.v0_1"
+        ],
+        "gloss": "the act or sense of seeing, sight, vision",
+        "attestationTruth": "fact",
+        "sourceStatus": "research_candidate"
+      },
+      {
+        "sourceRecordId": "research.external.open-instrument-research-evidence-packet-v0-1.water-physical-liquid-v0-1.verified-source-capture-fjale-fjalor-shqip-v0-1-uj-m-sh-sense-1-uj-v0-1",
+        "language": "Albanian",
+        "sourceForm": "ujë",
+        "queryForm": "UJË",
+        "sourceTraditionId": "fjale.fjalor-shqip.v0_1",
+        "citationIds": [
+          "open-instrument.source-record.capture.fjale-fjalor-shqip-v0-1.uj-m-sh-sense-1.uj.v0_1.citation.v0_1"
+        ],
+        "gloss": "Lëng pa ngjyrë, pa erë, i përbërë nga oksigjeni dhe hidrogjeni; përdoret për t’u pirë, për të larë etj.",
+        "attestationTruth": "fact",
+        "sourceStatus": "research_candidate"
+      },
+      {
+        "sourceRecordId": "research.external.open-instrument-research-evidence-packet-v0-1.water-physical-liquid-v0-1.verified-source-capture-scaife-lewis-short-v0-1-headword-qua-general-water-sense-entry-text-beginning-water-in-its-most-gen-signif-qua-v0-1",
+        "language": "Latin",
+        "sourceForm": "ăqua",
+        "queryForm": "ĂQUA",
+        "sourceTraditionId": "scaife.lewis-short.v0_1",
+        "citationIds": [
+          "open-instrument.source-record.capture.scaife-lewis-short-v0-1.headword-qua-general-water-sense-entry-text-beginning-water-in-its-most-gen-signif.qua.v0_1.citation.v0_1"
+        ],
+        "gloss": "water, in its most general signification; rainwater, river-water, sea-water, etc.",
+        "attestationTruth": "fact",
+        "sourceStatus": "research_candidate"
+      },
+      {
+        "sourceRecordId": "reviewed.external.albanian-at.father.candidate.v0_1",
+        "language": "Albanian",
+        "sourceForm": "at",
+        "queryForm": "AT",
+        "sourceTraditionId": "reviewed-external-lexicon-source-row-registry.v0_1",
+        "citationIds": [
+          "reviewed.external.albanian-at.father.citation.v0_1"
+        ],
+        "gloss": "father",
+        "attestationTruth": "fact",
+        "sourceStatus": "reviewed_candidate"
+      },
+      {
+        "sourceRecordId": "reviewed.external.di.knowledge.candidate.v0_1",
+        "language": "Albanian",
+        "sourceForm": "di",
+        "queryForm": "DI",
+        "sourceTraditionId": "reviewed-external-lexicon-source-row-registry.v0_1",
+        "citationIds": [
+          "reviewed.external.di.knowledge.candidate.citation.v0_1"
+        ],
+        "gloss": "know / knowledge",
+        "attestationTruth": "fact",
+        "sourceStatus": "reviewed_candidate"
+      },
+      {
+        "sourceRecordId": "reviewed.external.gheg-da.damage.candidate.v0_1",
+        "language": "Albanian",
+        "sourceForm": "da",
+        "queryForm": "DA",
+        "sourceTraditionId": "reviewed-external-lexicon-source-row-registry.v0_1",
+        "citationIds": [
+          "reviewed.external.gheg-da.damage.candidate.citation.v0_1"
+        ],
+        "gloss": "to split, cut, divide",
+        "attestationTruth": "fact",
+        "sourceStatus": "reviewed_candidate"
+      }
+    ]
+  },
+  "result": {
+    "outcomeClassification": "NO_MEASURABLE_EXISTING_ONLY_IMPROVEMENT",
+    "authoritativeAttempts": 1,
+    "beforeResultHash": "6a646ac71f804d910737359974131c128722f46b963b4f21d50e7b235dc314be",
+    "afterResultHash": "6a646ac71f804d910737359974131c128722f46b963b4f21d50e7b235dc314be"
+  }
+}

@@ -1,0 +1,252 @@
+{
+  "schemaVersion": "open-instrument.multilingual-discovery-substrate-expansion-s3-independent-coverage-evaluation.v0.1",
+  "experimentId": "open-instrument.multilingual-discovery-substrate-expansion-v0.2.s3-independent-coverage-evaluation.v0.1",
+  "before": {
+    "totalInputs": 512,
+    "validEvaluatedInputs": 512,
+    "crossFormPositiveInputs": 4,
+    "selfMatchOnlyInputs": 0,
+    "validNullInputs": 508,
+    "substrateNoMatchInputs": 508,
+    "upstreamNullInputs": 0,
+    "unsupportedAuthorityInputs": 0,
+    "engineFailures": 0,
+    "crossFormRate": 0.0078125,
+    "totalCandidateRecordsRetrieved": 4,
+    "distinctCandidateSourceRecords": 1,
+    "distinctCandidateLanguages": 1,
+    "meanCandidatesPerInput": 0.0078125,
+    "medianCandidatesPerInput": 0,
+    "maxCandidatesPerInput": 1,
+    "languageContribution": {
+      "Albanian": {
+        "candidateOccurrences": 4,
+        "distinctSourceRecords": 1,
+        "inputsReached": 4
+      }
+    },
+    "sourceTraditionContribution": {
+      "reviewed-external-lexicon-source-row-registry.v0_1": {
+        "candidateOccurrences": 4,
+        "distinctSourceRecords": 1,
+        "inputsReached": 4
+      }
+    },
+    "nullDiagnostics": {
+      "substrateNoMatch": 508,
+      "pronunciationNull": 0,
+      "structureNull": 0,
+      "queryNull": 0,
+      "unsupportedAuthority": 0,
+      "engineFailure": 0
+    },
+    "diversity": {
+      "sourceRecords": {
+        "mean": 0.0078125,
+        "median": 0,
+        "max": 1
+      },
+      "languages": {
+        "mean": 0.0078125,
+        "median": 0,
+        "max": 1
+      },
+      "sourceTraditions": {
+        "mean": 0.0078125,
+        "median": 0,
+        "max": 1
+      },
+      "zeroCandidates": 508,
+      "oneCandidate": 4,
+      "multipleCandidates": 0
+    }
+  },
+  "after": {
+    "totalInputs": 512,
+    "validEvaluatedInputs": 512,
+    "crossFormPositiveInputs": 4,
+    "selfMatchOnlyInputs": 0,
+    "validNullInputs": 508,
+    "substrateNoMatchInputs": 508,
+    "upstreamNullInputs": 0,
+    "unsupportedAuthorityInputs": 0,
+    "engineFailures": 0,
+    "crossFormRate": 0.0078125,
+    "totalCandidateRecordsRetrieved": 4,
+    "distinctCandidateSourceRecords": 1,
+    "distinctCandidateLanguages": 1,
+    "meanCandidatesPerInput": 0.0078125,
+    "medianCandidatesPerInput": 0,
+    "maxCandidatesPerInput": 1,
+    "languageContribution": {
+      "Albanian": {
+        "candidateOccurrences": 4,
+        "distinctSourceRecords": 1,
+        "inputsReached": 4
+      }
+    },
+    "sourceTraditionContribution": {
+      "reviewed-external-lexicon-source-row-registry.v0_1": {
+        "candidateOccurrences": 4,
+        "distinctSourceRecords": 1,
+        "inputsReached": 4
+      }
+    },
+    "nullDiagnostics": {
+      "substrateNoMatch": 508,
+      "pronunciationNull": 0,
+      "structureNull": 0,
+      "queryNull": 0,
+      "unsupportedAuthority": 0,
+      "engineFailure": 0
+    },
+    "diversity": {
+      "sourceRecords": {
+        "mean": 0.0078125,
+        "median": 0,
+        "max": 1
+      },
+      "languages": {
+        "mean": 0.0078125,
+        "median": 0,
+        "max": 1
+      },
+      "sourceTraditions": {
+        "mean": 0.0078125,
+        "median": 0,
+        "max": 1
+      },
+      "zeroCandidates": 508,
+      "oneCandidate": 4,
+      "multipleCandidates": 0
+    }
+  },
+  "transitions": {
+    "transitions": {
+      "GENERIC_CROSS_FORM_POSITIVE_TO_GENERIC_CROSS_FORM_POSITIVE": 4,
+      "SUBSTRATE_NO_MATCH_TO_SUBSTRATE_NO_MATCH": 508
+    },
+    "nullToNull": 508,
+    "nullToCrossFormPositive": 0,
+    "nullToSelfMatchOnly": 0,
+    "selfMatchOnlyToSelfMatchOnly": 0,
+    "selfMatchOnlyToCrossFormPositive": 0,
+    "crossFormPositiveToCrossFormPositive": 4,
+    "crossFormPositiveToNull": 0,
+    "crossFormPositiveToSelfMatchOnly": 0,
+    "newCrossFormPositiveInputs": 0,
+    "lostCrossFormPositiveInputs": 0,
+    "unchangedCrossFormPositiveInputs": 4,
+    "newSelfMatchOnlyInputs": 0,
+    "lostSelfMatchOnlyInputs": 0,
+    "resolvedValidNullInputs": 0,
+    "newValidNullInputs": 0,
+    "netCrossFormPositiveDelta": 0,
+    "netSelfMatchDelta": 0,
+    "netValidNullDelta": 0,
+    "beforeCrossFormRate": 0.0078125,
+    "afterCrossFormRate": 0.0078125,
+    "absoluteRateDelta": 0,
+    "relativeRateDelta": 0
+  },
+  "attribution": {
+    "changedInputCount": 0,
+    "changedInputsExplainedByS1Rows": 0,
+    "changedInputsWithNonS1Cause": 0,
+    "s1RowsRetrievedCount": 0,
+    "s1RowsNeverRetrievedCount": 21,
+    "s1RowsRetrieved": [],
+    "s1RowsNeverRetrieved": [
+      "research.external.latin-amo-love.v0_1",
+      "research.external.latin-caelum-sky.scale50.v0_1",
+      "research.external.latin-libertas-freedom.scale50.cohortG.v0_1",
+      "research.external.latin-vir-man.scale50.cohortG.v0_1",
+      "research.external.open-instrument-research-evidence-packet-v0-1.art-creative-artistic-activity-v0-1.verified-source-capture-scaife-lewis-short-v0-1-headword-ars-art-sense-entry-text-beginning-skill-in-producing-any-material-form-ars-v0-1",
+      "research.external.open-instrument-research-evidence-packet-v0-1.blue-blue-color-v0-1.verified-source-capture-scaife-lewis-short-v0-1-headword-caer-l-us-blue-sense-entry-text-beginning-dark-colored-dark-blue-caer-l-us-v0-1",
+      "research.external.open-instrument-research-evidence-packet-v0-1.bread-physical-baked-food-v0-1.verified-source-capture-scaife-lewis-short-v0-1-headword-p-nis-bread-sense-entry-text-beginning-bread-p-nis-v0-1",
+      "research.external.open-instrument-research-evidence-packet-v0-1.break-physical-break-damage-source-review-v0-1.verified-source-capture-scaife-lewis-short-v0-1-headword-frango-physical-break-sense-entry-text-beginning-to-break-break-in-pieces-frango-v0-1",
+      "research.external.open-instrument-research-evidence-packet-v0-1.change-alteration-v0-1.lewis-short-mutatio",
+      "research.external.open-instrument-research-evidence-packet-v0-1.cloud-physical-atmospheric-v0-1.verified-source-capture-scaife-lewis-short-v0-1-headword-nimbus-cloud-in-general-entry-text-beginning-a-cloud-in-general-nimbus-v0-1",
+      "research.external.open-instrument-research-evidence-packet-v0-1.friend-close-person-v0-1.verified-source-capture-scaife-lewis-short-v0-1-headword-familiaris-friendly-friend-sense-entry-text-beginning-familiar-intimate-friendly-familiaris-v0-1",
+      "research.external.open-instrument-research-evidence-packet-v0-1.hope-mental-desired-expectation-v0-1.verified-source-capture-scaife-lewis-short-v0-1-headword-spes-hope-sense-entry-text-beginning-expectation-of-something-desired-sp-s-v0-1",
+      "research.external.open-instrument-research-evidence-packet-v0-1.order-lexical-arrangement-v0-1.lewis-short-ordo",
+      "research.external.open-instrument-research-evidence-packet-v0-1.sea-physical-saltwater-body-v0-1.verified-source-capture-scaife-lewis-short-v0-1-headword-mare-sea-sense-entry-text-beginning-sea-mare-v0-1",
+      "research.external.open-instrument-research-evidence-packet-v0-1.skin-physical-body-covering-v0-1.verified-source-capture-scaife-lewis-short-v0-1-headword-pellis-skin-hide-sense-entry-text-beginning-skin-hide-pellis-v0-1",
+      "research.external.open-instrument-research-evidence-packet-v0-1.sleep-physical-sleep-state-v0-1.verified-source-capture-scaife-lewis-short-v0-1-headword-somnus-sleep-sense-entry-text-beginning-sleep-somnus-v0-1",
+      "research.external.open-instrument-research-evidence-packet-v0-1.snow-physical-precipitation-v0-1.verified-source-capture-scaife-lewis-short-v0-1-headword-nix-snow-sense-entry-text-beginning-snow-nix-v0-1",
+      "research.external.open-instrument-research-evidence-packet-v0-1.star-astronomical-star-v0-1.verified-source-capture-scaife-lewis-short-v0-1-headword-stella-star-sense-entry-text-beginning-a-star-stella-v0-1",
+      "research.external.open-instrument-research-evidence-packet-v0-1.tree-physical-plant-v0-1.verified-source-capture-scaife-lewis-short-v0-1-headword-arbor-general-tree-sense-entry-text-beginning-a-tree-arbor-v0-1",
+      "research.external.open-instrument-research-evidence-packet-v0-1.vision-visual-appearance-or-vision-v0-1.verified-source-capture-scaife-lewis-short-v0-1-headword-v-s-o-vision-sense-entry-text-beginning-sight-vision-v-s-o-v0-1",
+      "research.external.open-instrument-research-evidence-packet-v0-1.water-physical-liquid-v0-1.verified-source-capture-scaife-lewis-short-v0-1-headword-qua-general-water-sense-entry-text-beginning-water-in-its-most-gen-signif-qua-v0-1"
+    ],
+    "incrementalCandidateOccurrences": 0,
+    "uniqueInputsReachedByS1": 0
+  },
+  "languageContribution": {
+    "before": {
+      "Albanian": {
+        "candidateOccurrences": 4,
+        "distinctSourceRecords": 1,
+        "inputsReached": 4
+      }
+    },
+    "after": {
+      "Albanian": {
+        "candidateOccurrences": 4,
+        "distinctSourceRecords": 1,
+        "inputsReached": 4
+      }
+    }
+  },
+  "sourceTraditionContribution": {
+    "before": {
+      "reviewed-external-lexicon-source-row-registry.v0_1": {
+        "candidateOccurrences": 4,
+        "distinctSourceRecords": 1,
+        "inputsReached": 4
+      }
+    },
+    "after": {
+      "reviewed-external-lexicon-source-row-registry.v0_1": {
+        "candidateOccurrences": 4,
+        "distinctSourceRecords": 1,
+        "inputsReached": 4
+      }
+    }
+  },
+  "diversityDelta": {
+    "increased": 0,
+    "unchanged": 512,
+    "decreased": 0
+  },
+  "authorityProvenanceValidation": {
+    "candidatesWithProvenanceLoss": 0,
+    "candidatesWithMissingCitation": 0,
+    "unauthorizedPronunciationPositives": 0,
+    "unauthorizedFunctionalPositives": 0,
+    "unauthorizedHistoricalClaims": 0,
+    "unauthorizedProductionPromotions": 0,
+    "noSingleWinner": true,
+    "userDecides": true
+  },
+  "historicalM7Reference": {
+    "referenceOnly": true,
+    "substrate": "55_ALBANIAN",
+    "sampleSize": 512,
+    "crossFormPositives": 4,
+    "selfMatchOnly": 0,
+    "noMatch": 508,
+    "positiveRatePercent": 0.78125,
+    "usedAsControlledS3Before": false
+  },
+  "outcomeClassification": "NO_MEASURABLE_EXISTING_ONLY_IMPROVEMENT",
+  "outcomeRationale": "The frozen existing-only expansion produced no measurable paired coverage or candidate-universe increase.",
+  "reproducibility": {
+    "sampleHashRun1": "8ba957d57f5f2509f2acc2b875a5427e075942d2a9c52d63b9208590045cc2cd",
+    "sampleHashRun2": "8ba957d57f5f2509f2acc2b875a5427e075942d2a9c52d63b9208590045cc2cd",
+    "beforeResultHashRun1": "6a646ac71f804d910737359974131c128722f46b963b4f21d50e7b235dc314be",
+    "beforeResultHashRun2": "6a646ac71f804d910737359974131c128722f46b963b4f21d50e7b235dc314be",
+    "afterResultHashRun1": "6a646ac71f804d910737359974131c128722f46b963b4f21d50e7b235dc314be",
+    "afterResultHashRun2": "6a646ac71f804d910737359974131c128722f46b963b4f21d50e7b235dc314be"
+  }
+}
