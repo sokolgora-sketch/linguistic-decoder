@@ -1,0 +1,66 @@
+{
+  "schemaVersion": "open-instrument.multilingual-discovery-substrate-expansion-s0-hash-manifest.v0.1",
+  "status": "FROZEN_S0_BASELINE",
+  "procedureId": "open-instrument.multilingual-discovery-substrate-expansion-v0.2.s0-baseline-freeze.v0.1",
+  "repositoryBaselineHead": "ac9a17f9f40709e0da209cef64d86ba224cac778",
+  "artifacts": [
+    {
+      "path": "docs/open-instrument/research-artifacts/multilingual-discovery-substrate-v0.2-s0-baseline-freeze-v0.1/baseline.json",
+      "bytes": 293579,
+      "sha256": "52fd4865fd3a0eb2067ea460af7d75024948de5c56cbcc8ce9936361a591a58e"
+    }
+  ],
+  "inputs": [
+    {
+      "path": "src/data/multiSourceFunctionalResearchEvidenceCatalog.v0_1.json",
+      "bytes": 198224,
+      "sha256": "65ce90cc72395e0c5c777cba6d26cd8636f4dd9e4e1b0b7efb27025a2d154dc8"
+    },
+    {
+      "path": "src/data/openInstrument/genericFunctionalWitnessSourceRecords.v1.json",
+      "bytes": 17933,
+      "sha256": "5a6aaf7742033d62d183e960841dbb4a06c4950070b4f5b655da7a5a4671ddde"
+    },
+    {
+      "path": "src/shared/reviewedExternalLexiconSourceRowRegistry.v0_1.ts",
+      "bytes": 19232,
+      "sha256": "3e2ef28ac98af4ff898f97736292e1157dfbd6a51266d4fdb30860fdb523b3c4"
+    },
+    {
+      "path": "src/shared/openInstrument/albanianLexicalSubstrate.v0_1.ts",
+      "bytes": 8231,
+      "sha256": "2d2357f3d1ef1016f9cea24c334b9503e23922b1603932e93df8cc707eebbc25"
+    },
+    {
+      "path": "src/shared/openInstrument/latinLexicalSubstrate.v0_1.ts",
+      "bytes": 1783,
+      "sha256": "4a397bef16f1afe1e899048f565291a7d118ab65169cb6f228eef5f8ef4ec17e"
+    },
+    {
+      "path": "src/shared/openInstrumentResearchCatalogAdmission.v0_1.ts",
+      "bytes": 9579,
+      "sha256": "11b3de6894e4071a78eaf83f65547ad9ddd6c7d9bc6024a692017b827d4831bf"
+    },
+    {
+      "path": "docs/open-instrument/research-artifacts/m7-substrate-reachable-generalization-v0.1/procedure.json",
+      "bytes": 6349,
+      "sha256": "2b7ecf4b1b0b7e3f2ced15a0a92381316206711b3392676b22e81e6481ed81cb"
+    },
+    {
+      "path": "docs/open-instrument/research-artifacts/zero-consonantal-structural-composition-v0.1-cmudict-validation-v0.1b/population-spec.json",
+      "bytes": 52494645,
+      "sha256": "81248026f57cffb0c357a4e29e0cce4d3139adc1521eda89e72754783095ed44"
+    },
+    {
+      "path": "src/data/openInstrument/pronunciation/cmudict.dict",
+      "bytes": 3618488,
+      "sha256": "81917843c7f44ce2b094ac63873c2c7a4cf802040792c455ba3ca406891c3d22"
+    }
+  ],
+  "execution": {
+    "s0Reconstruction": "deterministic_repository_input_reconstruction",
+    "s1Projected": false,
+    "expandedResultsInspected": false,
+    "targetWordSelectionPresent": false
+  }
+}
