@@ -657,15 +657,47 @@ export function verifyStoredBroaderDiagnosticResultV0_2(rootDir = process.cwd())
   ) {
     throw new Error("BROADER_DIAGNOSTIC_STORED_RESULT_INTEGRITY_FAILURE");
   }
-  const artifactEntries = manifest.artifacts;
-  if (!Array.isArray(artifactEntries) || artifactEntries.some((entry) => {
+  const artifactEntries = Array.isArray(manifest.artifacts) ? manifest.artifacts : [];
+  const artifactPaths = artifactEntries.map((entry) => (entry as JsonObject).path);
+  const expectedArtifactPaths = [
+    BROADER_DIAGNOSTIC_SAMPLE_ARTIFACT_PATH_V0_2,
+    BROADER_DIAGNOSTIC_RAW_RESULT_ARTIFACT_PATH_V0_2,
+    BROADER_DIAGNOSTIC_SUMMARY_ARTIFACT_PATH_V0_2,
+  ];
+  if (
+    artifactEntries.length !== expectedArtifactPaths.length ||
+    new Set(artifactPaths).size !== expectedArtifactPaths.length ||
+    expectedArtifactPaths.some((path) => !artifactPaths.includes(path)) ||
+    artifactEntries.some((entry) => {
     const item = entry as JsonObject;
     return typeof item.path !== "string" || typeof item.sha256 !== "string" ||
       typeof item.bytes !== "number" ||
       readFileSync(join(rootDir, item.path)).byteLength !== item.bytes ||
       sha256FileV0_2(rootDir, item.path) !== item.sha256;
-  })) {
+    })
+  ) {
     throw new Error("BROADER_DIAGNOSTIC_STORED_RESULT_HASH_FAILURE");
+  }
+  if (
+    result.sampleArtifact !== BROADER_DIAGNOSTIC_SAMPLE_ARTIFACT_PATH_V0_2 ||
+    result.sampleArtifactSha256 !== sha256FileV0_2(rootDir, BROADER_DIAGNOSTIC_SAMPLE_ARTIFACT_PATH_V0_2) ||
+    result.sampleIdentitySha256 !== sample.sampleIdentitySha256 ||
+    result.sampleInputCount !== sample.sampleSize ||
+    result.sampleFirstPosition !== positions[0] ||
+    result.sampleLastPosition !== positions.at(-1) ||
+    (summary as JsonObject).sampleIdentitySha256 !== sample.sampleIdentitySha256 ||
+    (summary as JsonObject).sampleInputCount !== sample.sampleSize ||
+    sampleIdentities.some((identity, index) => {
+      const expected = identity as JsonObject;
+      const actual = cases[index] as JsonObject | undefined;
+      return !actual ||
+        expected.input !== actual.input ||
+        expected.rawPopulationPosition !== actual.rawPopulationPosition ||
+        expected.preparedPopulationPosition !== actual.preparedPopulationPosition ||
+        (expected.stratumIndex as number) + 1 !== actual.selectedPopulationPosition;
+    })
+  ) {
+    throw new Error("BROADER_DIAGNOSTIC_STORED_RESULT_SAMPLE_BINDING_FAILURE");
   }
   if (
     result.executionWrapperPath !== EXECUTION_WRAPPER_PATH_V0_2 ||
