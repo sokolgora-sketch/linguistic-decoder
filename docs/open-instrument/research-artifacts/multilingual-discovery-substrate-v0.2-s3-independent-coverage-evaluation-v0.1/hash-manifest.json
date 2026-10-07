@@ -1,0 +1,103 @@
+{
+  "schemaVersion": "open-instrument.multilingual-discovery-substrate-expansion-s3-independent-coverage-evaluation.v0.1.hash-manifest",
+  "status": "FROZEN_RESULT_BINDINGS",
+  "experimentId": "open-instrument.multilingual-discovery-substrate-expansion-v0.2.s3-independent-coverage-evaluation.v0.1",
+  "repositoryHead": "3855488b9b37fcd42c2c1eaf3dbd4191831578d8",
+  "artifacts": [
+    {
+      "path": "docs/open-instrument/research-artifacts/multilingual-discovery-substrate-v0.2-s3-independent-coverage-evaluation-v0.1/execution.json",
+      "bytes": 86634,
+      "sha256": "b2b88448d0f8f761faaa0ef5b731ad65e7830eedb7b14b268317a2572b882928"
+    },
+    {
+      "path": "docs/open-instrument/research-artifacts/multilingual-discovery-substrate-v0.2-s3-independent-coverage-evaluation-v0.1/sample.json",
+      "bytes": 762984,
+      "sha256": "8ba957d57f5f2509f2acc2b875a5427e075942d2a9c52d63b9208590045cc2cd"
+    },
+    {
+      "path": "docs/open-instrument/research-artifacts/multilingual-discovery-substrate-v0.2-s3-independent-coverage-evaluation-v0.1/paired-results.json",
+      "bytes": 1357402,
+      "sha256": "b703051f8d6020548f93dc9a6591b22278f467bb0c521871b31aafb47be4ca03"
+    },
+    {
+      "path": "docs/open-instrument/research-artifacts/multilingual-discovery-substrate-v0.2-s3-independent-coverage-evaluation-v0.1/summary.json",
+      "bytes": 10774,
+      "sha256": "1985db5f7d8d7fd59c6ca741f30d1814ffa469f95c141ff7e9aef109da11ebea"
+    }
+  ],
+  "authorityBindings": {
+    "sourceProcedure": {
+      "path": "docs/open-instrument/research-artifacts/m7-substrate-reachable-generalization-v0.1/procedure.json",
+      "sha256": "2b7ecf4b1b0b7e3f2ced15a0a92381316206711b3392676b22e81e6481ed81cb"
+    },
+    "sourceSample": {
+      "path": "docs/open-instrument/research-artifacts/m7-substrate-reachable-generalization-v0.1/reachable-sample.json",
+      "sha256": "7c991d806086569f9434f07f0a60ea0d8ec225434fa87050ed6c79d04f738255"
+    },
+    "populationSpec": {
+      "path": "docs/open-instrument/research-artifacts/zero-consonantal-structural-composition-v0.1-cmudict-validation-v0.1b/population-spec.json",
+      "sha256": "81248026f57cffb0c357a4e29e0cce4d3139adc1521eda89e72754783095ed44"
+    },
+    "cmudict": {
+      "path": "src/data/openInstrument/pronunciation/cmudict.dict",
+      "sha256": "81917843c7f44ce2b094ac63873c2c7a4cf802040792c455ba3ca406891c3d22"
+    },
+    "preS3": {
+      "s0Artifact": "52fd4865fd3a0eb2067ea460af7d75024948de5c56cbcc8ce9936361a591a58e",
+      "s0Manifest": "38d57de7082b4d719b76aa5cf34e177c5e0d811a1a11341bba9535fafcbf764f",
+      "s1Projection": "8f65b688ca6c3e7a4a130c478c2c6ec3abbb6b6875db742fd9666b4ced5b61d3",
+      "s1CatalogDerivation": "bf7f9592b6123fc2d634af7616415fdedf317469ba1e3ca9f654a0e4dc4ce265",
+      "s1RuntimeComposition": "febe40af34ae4e60f6a1ffa91e63a36e4e2c04748b1d5cfae4ba53f7195e45de",
+      "s2Artifact": "6dd24ea7074aa73f2060c40afb254370a79270a8ce0db8f273bec5b332792fae",
+      "s2Manifest": "8a8976b5cbd3586ea76661e3f5f93beb4fcceab8a16fb627e2678bd9dacf0234",
+      "sourceProcedure": "2b7ecf4b1b0b7e3f2ced15a0a92381316206711b3392676b22e81e6481ed81cb",
+      "sourceSample": "7c991d806086569f9434f07f0a60ea0d8ec225434fa87050ed6c79d04f738255",
+      "populationSpec": "81248026f57cffb0c357a4e29e0cce4d3139adc1521eda89e72754783095ed44",
+      "cmudict": "81917843c7f44ce2b094ac63873c2c7a4cf802040792c455ba3ca406891c3d22"
+    }
+  },
+  "substrateBindings": {
+    "before": {
+      "total": 57,
+      "languageCounts": {
+        "Albanian": 55,
+        "Latin": 2
+      },
+      "uniqueForms": 57,
+      "uniqueQueryKeys": 57,
+      "fingerprint": "d3d3ab37062d8f9de081f62592c1d3a6e9b0e66721d0202679fc639d0fe37059"
+    },
+    "after": {
+      "total": 76,
+      "languageCounts": {
+        "Albanian": 55,
+        "Latin": 21
+      },
+      "uniqueForms": 76,
+      "uniqueQueryKeys": 76,
+      "fingerprint": "1c4714a1d9a7550c1c037b4ce62ca85e9ff24966f2e8d447c038bce001b45d81"
+    }
+  },
+  "execution": {
+    "attempts": 1,
+    "attemptsMax": 1,
+    "noRerun": true,
+    "syntheticOnly": true,
+    "realDataExecuted": false,
+    "providerExecution": false
+  },
+  "schedule": {
+    "sampleSize": 512,
+    "sampleSelectionId": "M7_FROZEN_PREPARED_ORDERED_POPULATION_FIRST_512_REACHABLE",
+    "sampleSha256": "8ba957d57f5f2509f2acc2b875a5427e075942d2a9c52d63b9208590045cc2cd"
+  },
+  "outcomeClassification": "NO_MEASURABLE_EXISTING_ONLY_IMPROVEMENT",
+  "resultFingerprints": {
+    "beforeRun1": "6a646ac71f804d910737359974131c128722f46b963b4f21d50e7b235dc314be",
+    "beforeRun2": "6a646ac71f804d910737359974131c128722f46b963b4f21d50e7b235dc314be",
+    "afterRun1": "6a646ac71f804d910737359974131c128722f46b963b4f21d50e7b235dc314be",
+    "afterRun2": "6a646ac71f804d910737359974131c128722f46b963b4f21d50e7b235dc314be",
+    "summaryRun1": "1985db5f7d8d7fd59c6ca741f30d1814ffa469f95c141ff7e9aef109da11ebea",
+    "summaryRun2": "1985db5f7d8d7fd59c6ca741f30d1814ffa469f95c141ff7e9aef109da11ebea"
+  }
+}
