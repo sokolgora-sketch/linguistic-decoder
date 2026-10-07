@@ -119,7 +119,7 @@ export function EvidenceTraceCard({
         data-testid="evidence-population-boundary"
         className="mt-3 rounded-[10px] border border-[#27313d] bg-[#0d1117] p-3 text-[11px] leading-5 text-[#aeb7c5]"
       >
-        This is the broader analysis evidence-row population. It is separate from the Motivation Discovery candidate count and may be larger because it includes other emitted analysis records.
+        This is a separate analysis candidate/evidence-row population. It is not a superset of the Motivation Discovery candidate population; the two counts can differ in either direction because they come from different VM fields.
       </div>
 
       <div className="mt-4 rounded-[10px] border border-[#27313d] bg-[#0d1117] p-3 text-[11px] leading-5 text-[#7d8ea3]">

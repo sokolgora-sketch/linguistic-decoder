@@ -41,7 +41,7 @@ describe("EvidenceTraceCard summary clarity", () => {
 
     expect(screen.getByText("analysis candidate/evidence rows emitted")).toBeInTheDocument();
     expect(screen.getByTestId("evidence-population-boundary")).toHaveTextContent(
-      "separate from the Motivation Discovery candidate count",
+      "not a superset of the Motivation Discovery candidate population",
     );
     expect(screen.getByText("candidate vowel paths emitted")).toBeInTheDocument();
 
