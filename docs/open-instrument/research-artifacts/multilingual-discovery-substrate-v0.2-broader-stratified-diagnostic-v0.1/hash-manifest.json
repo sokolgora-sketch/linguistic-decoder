@@ -1,0 +1,86 @@
+{
+  "schemaVersion": "open-instrument.multilingual-discovery-substrate-expansion-broader-stratified-diagnostic-v0.1.hash-manifest",
+  "status": "COMPLETED_RESULT_BINDINGS",
+  "experimentId": "open-instrument.multilingual-discovery-substrate-expansion-v0.2.broader-stratified-diagnostic.v0.1",
+  "procedureId": "open-instrument.multilingual-discovery-substrate-expansion-v0.2.broader-stratified-diagnostic-procedure.v0.1",
+  "repositoryExecutionHead": "8802601343ac3d7855c5b7ca50dae406a54a0fae",
+  "procedure": {
+    "path": "docs/open-instrument/research-artifacts/multilingual-discovery-substrate-v0.2-broader-stratified-diagnostic-procedure-v0.1/procedure.json",
+    "sha256": "c84bfa8214c7abedd9da80124f304cc6f42cabb856913d22f7bcecee7e7b0c29"
+  },
+  "procedureManifest": {
+    "path": "docs/open-instrument/research-artifacts/multilingual-discovery-substrate-v0.2-broader-stratified-diagnostic-procedure-v0.1/hash-manifest.json",
+    "sha256": "174c63d3e17bc0af4d3228d51b521c899df88f5502919be901612b47eec4e201"
+  },
+  "artifacts": [
+    {
+      "path": "docs/open-instrument/research-artifacts/multilingual-discovery-substrate-v0.2-broader-stratified-diagnostic-v0.1/sample.json",
+      "bytes": 162261,
+      "sha256": "20bd7e0f93629d8c1c87dfa76c1b1f1b9bfeb763dc44905bced2f91341179ffd"
+    },
+    {
+      "path": "docs/open-instrument/research-artifacts/multilingual-discovery-substrate-v0.2-broader-stratified-diagnostic-v0.1/results.json",
+      "bytes": 464395,
+      "sha256": "51019087d2199f8506267c3e6a4fbdb8824962641a6ed49abaa7e2c7bcc59ee6"
+    },
+    {
+      "path": "docs/open-instrument/research-artifacts/multilingual-discovery-substrate-v0.2-broader-stratified-diagnostic-v0.1/summary.json",
+      "bytes": 4169,
+      "sha256": "ef245127223957dc82dbd743543c31eded442253e61622bd4f6111610b9fbbbf"
+    }
+  ],
+  "authorityBindings": {
+    "s3Sample": {
+      "path": "docs/open-instrument/research-artifacts/multilingual-discovery-substrate-v0.2-s3-independent-coverage-evaluation-v0.1/sample.json",
+      "sha256": "8ba957d57f5f2509f2acc2b875a5427e075942d2a9c52d63b9208590045cc2cd"
+    },
+    "s3PairedResults": {
+      "path": "docs/open-instrument/research-artifacts/multilingual-discovery-substrate-v0.2-s3-independent-coverage-evaluation-v0.1/paired-results.json",
+      "sha256": "b703051f8d6020548f93dc9a6591b22278f467bb0c521871b31aafb47be4ca03"
+    },
+    "s3Summary": {
+      "path": "docs/open-instrument/research-artifacts/multilingual-discovery-substrate-v0.2-s3-independent-coverage-evaluation-v0.1/summary.json",
+      "sha256": "1985db5f7d8d7fd59c6ca741f30d1814ffa469f95c141ff7e9aef109da11ebea"
+    },
+    "s3Manifest": {
+      "path": "docs/open-instrument/research-artifacts/multilingual-discovery-substrate-v0.2-s3-independent-coverage-evaluation-v0.1/hash-manifest.json",
+      "sha256": "7fa23b2eb80cc2b78ecd880295d71f5a542e561918747cdf7082bf76f2055497"
+    },
+    "queryGenerator": {
+      "path": "src/shared/openInstrument/multilingualDiscoverySubstrateS3.v0_2.ts",
+      "sha256": "dd4a01e61c0e37846a0416242b347f499ed135e608eecf446a58bc83da079220"
+    },
+    "structuralNormalizer": {
+      "path": "src/shared/structuralHypothesisDiscovery.v0_1.ts",
+      "sha256": "96fba8363df8b3d59caf6d7dc9ac9ad88007d15432bec4b647b83484a25555db"
+    },
+      "matchingAdapter": {
+        "path": "src/shared/openInstrument/genericFunctionalWitnessSourceAcquisition.v1.ts",
+        "sha256": "f49ff4f0b877887b466002ce465feb58adbb07204cc6560c3caaa0364d95a0a0"
+      },
+      "executionWrapper": {
+        "path": "scripts/openInstrumentMultilingualDiscoveryBroaderDiagnosticExecution.v0_2.ts",
+        "sha256": "ecc1877fe2d0d4f2ea89eb6046a12ec04893a349e90b7c88ceb38900c8adb9ed"
+      },
+    "substrateFingerprint": "1c4714a1d9a7550c1c037b4ce62ca85e9ff24966f2e8d447c038bce001b45d81"
+  },
+  "execution": {
+    "authoritativeAttemptsBefore": 0,
+    "authoritativeAttempts": 1,
+    "authoritativeAttemptsMax": 1,
+    "noRerun": true,
+    "syntheticOnly": true,
+    "realDataExecuted": false,
+    "providerExecution": false,
+    "queryOutcomesInspected": true,
+    "candidateOutcomesInspected": false,
+    "s3Rerun": false,
+    "postResultSampleChange": false,
+    "postResultQueryChange": false,
+    "postResultMatchingChange": false
+  },
+  "outcome": {
+    "interpretationClass": "CLASS_B_BROADER_SAMPLE_REVEALS_ADDITIONAL_EXISTING_SUBSTRATE_KEYS_BUT_NO_LATIN",
+    "postResultNextAction": "REVIEW_BROADER_STRATIFIED_DIAGNOSTIC_RESULT_AND_DECIDE_SUBSTRATE_ARCHITECTURE"
+  }
+}
