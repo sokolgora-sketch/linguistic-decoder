@@ -94,7 +94,7 @@ export function EvidenceTraceCard({
         <TraceRow label="Orthographic vowel sequence (non-authoritative)" value={`orthographic=${vowelPathText(readout.voicePathSurface)}`} />
         <TraceRow label="Functional / normalization path" value={`functional=${vowelPathText(readout.voicePathFunctional)}`} />
         <TraceRow label="path delta" value={`delta=${readout.voicePathDelta}`} />
-        <TraceRow label="candidate rows emitted" value={`rows=${rows.length}`} />
+        <TraceRow label="analysis candidate/evidence rows emitted" value={`rows=${rows.length}`} />
         <TraceRow label="candidate provenance kinds" value={`provenance=${sourceKindSummary(rows)}`} />
         <TraceRow label="candidate vowel paths emitted" value={`paths=${rows.length ? emittedCandidatePathSummary(rows) : "not emitted"}`} />
         <TraceRow label="RootMap hypothesis" value={`rootMap=${rootMapStatus(rootMap)}`} />
@@ -113,6 +113,13 @@ export function EvidenceTraceCard({
         ) : (
           <div className="mt-2 text-xs text-[#7d8ea3]">not emitted</div>
         )}
+      </div>
+
+      <div
+        data-testid="evidence-population-boundary"
+        className="mt-3 rounded-[10px] border border-[#27313d] bg-[#0d1117] p-3 text-[11px] leading-5 text-[#aeb7c5]"
+      >
+        This is the broader analysis evidence-row population. It is separate from the Motivation Discovery candidate count and may be larger because it includes other emitted analysis records.
       </div>
 
       <div className="mt-4 rounded-[10px] border border-[#27313d] bg-[#0d1117] p-3 text-[11px] leading-5 text-[#7d8ea3]">

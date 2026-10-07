@@ -39,7 +39,10 @@ describe("EvidenceTraceCard summary clarity", () => {
       screen.getByText("Compact inspection map of emitted VM fields behind this readout.")
     ).toBeInTheDocument();
 
-    expect(screen.getByText("candidate rows emitted")).toBeInTheDocument();
+    expect(screen.getByText("analysis candidate/evidence rows emitted")).toBeInTheDocument();
+    expect(screen.getByTestId("evidence-population-boundary")).toHaveTextContent(
+      "separate from the Motivation Discovery candidate count",
+    );
     expect(screen.getByText("candidate vowel paths emitted")).toBeInTheDocument();
 
     expect(screen.getByText("candidate provenance kinds")).toBeInTheDocument();

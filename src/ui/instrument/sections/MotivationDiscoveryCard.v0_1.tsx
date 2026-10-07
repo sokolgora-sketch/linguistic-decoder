@@ -222,6 +222,9 @@ export function MotivationDiscoveryCardV0_1({
   const value = discovery.value;
   const math = value.derivedStructure.math7;
   const zc = value.derivedStructure.zeroConsonantalStructuralComposition;
+  const lexicalSelfMatchCount = value.candidates.filter(
+    (candidate) => candidate.structuralComparison.presentationClassification === "LEXICAL_ENTRY_CONFIRMATION",
+  ).length;
 
   return (
     <section
@@ -237,11 +240,26 @@ export function MotivationDiscoveryCardV0_1({
           <h2 className="mt-1 text-base font-semibold text-[#f5f7fb]">
             What structure and source evidence were found?
           </h2>
+          <p className="mt-1 max-w-2xl text-xs leading-5 text-[#aeb7c5]">
+            This count is the Motivation Discovery candidate population. The Evidence tab reports a broader emitted-row population and may show a different count.
+          </p>
         </div>
         <span className="rounded-full border border-[#6b5b2f] px-2.5 py-1 text-[11px] font-semibold text-[#f0ddb0]">
-          {value.candidates.length} candidate{value.candidates.length === 1 ? "" : "s"}
+          {value.candidates.length} Discovery candidate{value.candidates.length === 1 ? "" : "s"}
         </span>
       </div>
+
+      {lexicalSelfMatchCount > 0 ? (
+        <div
+          data-testid="motivation-lexical-self-match-summary"
+          className="mt-3 rounded-lg border border-[#6b5b2f] bg-[#18140e] p-3 text-xs leading-5 text-[#f0ddb0]"
+        >
+          <div className="font-semibold uppercase tracking-[0.12em]">LEXICAL SELF-MATCH / ENTRY CONFIRMATION</div>
+          <p className="mt-1 text-sm">
+            This input matches a source-attested lexical entry. It is not a cross-form functional motivation claim.
+          </p>
+        </div>
+      ) : null}
 
       <div className="mt-3 grid gap-2 sm:grid-cols-[1fr_auto]">
         <div className="rounded-lg border border-[#3f3a2b] bg-[#101217] p-3 text-xs leading-5 text-[#c5ced8]">
@@ -298,7 +316,7 @@ export function MotivationDiscoveryCardV0_1({
         <div className="mt-4 space-y-3">
           <div className="flex flex-wrap items-baseline justify-between gap-2">
             <div>
-              <div className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#d8bb7a]">CANDIDATES</div>
+              <div className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#d8bb7a]">MOTIVATION DISCOVERY CANDIDATES</div>
               <p className="mt-1 text-xs text-[#c5ced8]">Each candidate is evidence-bound; order is not a ranking.</p>
             </div>
             <div className="text-xs font-semibold text-[#f0ddb0]">No single winner · You decide</div>

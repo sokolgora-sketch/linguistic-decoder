@@ -168,7 +168,7 @@ describe("Motivation Discovery Lab presentation v0.1", () => {
 
     render(<MotivationDiscoveryCardV0_1 discovery={{ kind: "present", value: model({ candidates: [di, da] }) }} />);
 
-    expect(screen.getByText("2 candidates")).toBeInTheDocument();
+    expect(screen.getByText("2 Discovery candidates")).toBeInTheDocument();
     expect(screen.getByText("da")).toBeInTheDocument();
     expect(screen.getByText("to split, cut, divide")).toBeInTheDocument();
     expect(screen.getAllByText("WHY THIS CANDIDATE")).toHaveLength(2);
@@ -248,6 +248,12 @@ describe("Motivation Discovery Lab presentation v0.1", () => {
     });
 
     render(<MotivationDiscoveryCardV0_1 discovery={{ kind: "present", value }} />);
+    expect(screen.getByTestId("motivation-lexical-self-match-summary")).toHaveTextContent(
+      "LEXICAL SELF-MATCH / ENTRY CONFIRMATION",
+    );
+    expect(screen.getByTestId("motivation-lexical-self-match-summary")).toHaveTextContent(
+      "not a cross-form functional motivation claim",
+    );
     expect(screen.getAllByText(/lexical entry confirmation/i).length).toBeGreaterThan(0);
     expect(screen.getByText(/not a cross-form structural motivation claim/)).toBeInTheDocument();
     expect(screen.getByText("Not applicable to an exact lexical self-match")).toBeInTheDocument();
