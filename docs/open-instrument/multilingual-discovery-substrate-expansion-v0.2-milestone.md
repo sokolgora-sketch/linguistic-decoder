@@ -600,9 +600,11 @@ created.
 
 ## Explicit next action
 
-`NEXT_ACTION=REVIEW_V0_2_SUBSTRATE_SOURCE_ARCHITECTURE_AFTER_CLASS_E`
+`NEXT_ACTION=BEGIN_OPEN_INSTRUMENT_SOURCE_FAMILY_LEXICAL_SUBSTRATE_V0_1_CONTRACT_AND_SOURCE_AUTHORITY_AUDIT`
 
 The canonicalization hypothesis is closed for this frozen procedure. This does
 not establish that canonicalization would fail or succeed in a future
 authorized procedure. The v0.2 milestone remains active/incomplete and S4 is
-not started.
+not started. The completed architecture decision selects a separate,
+source-fact-only source-family contract and authority audit before any source
+acquisition or runtime implementation.
