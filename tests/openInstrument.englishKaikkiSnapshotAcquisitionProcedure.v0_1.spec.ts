@@ -13,6 +13,10 @@ const RUNBOOK_PATH = path.join(
   ROOT,
   "docs/open-instrument/english-kaikki-snapshot-acquisition-procedure-v0.1.md",
 );
+const MILESTONE_PATH = path.join(
+  ROOT,
+  "docs/open-instrument/multilingual-discovery-substrate-expansion-v0.2-milestone.md",
+);
 
 function readJson<T>(filePath: string): T {
   return JSON.parse(fs.readFileSync(filePath, "utf8")) as T;
@@ -136,5 +140,22 @@ describe("English Kaikki snapshot acquisition procedure v0.1", () => {
       "docs/open-instrument/research-artifacts/source-family-lexical-substrate-v0.1-english-kaikki-snapshot-acquisition-procedure-v0.1/procedure.json",
     ]);
     expect(fs.existsSync(RUNBOOK_PATH)).toBe(true);
+  });
+
+  test("binds the milestone procedure hash to the recomputed procedure hash", () => {
+    const procedureHash = sha256(PROCEDURE_PATH);
+    const manifest = readJson<{
+      artifacts: Array<{ path: string; sha256: string }>;
+    }>(MANIFEST_PATH);
+    const procedureArtifact = manifest.artifacts.find(
+      (artifact) => artifact.path.endsWith("/procedure.json"),
+    );
+    const milestone = fs.readFileSync(MILESTONE_PATH, "utf8");
+    const milestoneHash = milestone.match(
+      /`ENGLISH_KAIKKI_PROCEDURE_SHA256=([0-9a-f]{64})`/,
+    )?.[1];
+
+    expect(procedureArtifact?.sha256).toBe(procedureHash);
+    expect(milestoneHash).toBe(procedureHash);
   });
 });

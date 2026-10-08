@@ -662,7 +662,7 @@ historical claim, or scientific execution.
 
 `ENGLISH_KAIKKI_PROCEDURE=docs/open-instrument/research-artifacts/source-family-lexical-substrate-v0.1-english-kaikki-snapshot-acquisition-procedure-v0.1/procedure.json`
 
-`ENGLISH_KAIKKI_PROCEDURE_SHA256=fa67e7bb0b39454c632e963efb8098e57af1b52954a40b60534a2231285dc8f3`
+`ENGLISH_KAIKKI_PROCEDURE_SHA256=0c031549c58f7ca7f0ffc95108a2529c19dade6db925f59c7ab6671f2f793c35`
 
 `ENGLISH_KAIKKI_PROCEDURE_MANIFEST=docs/open-instrument/research-artifacts/source-family-lexical-substrate-v0.1-english-kaikki-snapshot-acquisition-procedure-v0.1/hash-manifest.json`
 
