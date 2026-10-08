@@ -33,8 +33,16 @@
 - `S3_SUMMARY_SHA256=1985db5f7d8d7fd59c6ca741f30d1814ffa469f95c141ff7e9aef109da11ebea`
 - `S4=NOT_STARTED`
 - `RETRIEVAL_KEY_AUTHORITY_DEFINITION=COMPLETE`
-- `RETRIEVAL_KEY_PROCEDURE_STATUS=DEFINED_NOT_EXECUTED`
-- `RETRIEVAL_KEY_AUTHORITATIVE_ATTEMPTS=0`
+- `RETRIEVAL_KEY_PROCEDURE_STATUS=COMPLETE`
+- `RETRIEVAL_KEY_AUTHORITATIVE_ATTEMPTS=1`
+- `RETRIEVAL_KEY_AUTHORITY_GATE=INSUFFICIENT_EVIDENCE`
+- `RETRIEVAL_KEY_ARM_B_STATUS=NOT_AUTHORIZED`
+- `RETRIEVAL_KEY_INTERPRETATION_CLASS=CLASS_E_OPERATOR_NOT_AUTHORIZED_OR_NOT_SCIENTIFICALLY_DEFENSIBLE`
+- `RETRIEVAL_KEY_CANONICALIZATION_HYPOTHESIS_STATUS=CLOSED_UNSUPPORTED_BY_FROZEN_AUTHORITY`
+- `RETRIEVAL_KEY_RESULT=docs/open-instrument/research-artifacts/multilingual-discovery-substrate-v0.2-retrieval-key-authority-and-reachability-execution-v0.1/result.json`
+- `RETRIEVAL_KEY_RESULT_SHA256=43828f3dee6fe3d86a6cb673cfe600826222f1c776563798fb2d00b71e9f7188`
+- `RETRIEVAL_KEY_RESULT_MANIFEST=docs/open-instrument/research-artifacts/multilingual-discovery-substrate-v0.2-retrieval-key-authority-and-reachability-execution-v0.1/hash-manifest.json`
+- `RETRIEVAL_KEY_RESULT_MANIFEST_SHA256=6be8afee402f79b6c827d85900676784cc7eac00a02c3cf4505ba0f738ec2d27`
 - `RETRIEVAL_KEY_PROCEDURE=docs/open-instrument/research-artifacts/multilingual-discovery-substrate-v0.2-retrieval-key-authority-and-reachability-v0.1/procedure.json`
 - `RETRIEVAL_KEY_MANIFEST=docs/open-instrument/research-artifacts/multilingual-discovery-substrate-v0.2-retrieval-key-authority-and-reachability-v0.1/hash-manifest.json`
 - `S2_VALIDATION_ARTIFACT=docs/open-instrument/research-artifacts/multilingual-discovery-substrate-v0.2-s2-authority-truth-validation-v0.1/validation.json`
@@ -592,9 +600,11 @@ created.
 
 ## Explicit next action
 
-`NEXT_ACTION=REVIEW_V0_2_SUBSTRATE_SOURCE_ARCHITECTURE_AFTER_CLASS_E`
+`NEXT_ACTION=BEGIN_OPEN_INSTRUMENT_SOURCE_FAMILY_LEXICAL_SUBSTRATE_V0_1_CONTRACT_AND_SOURCE_AUTHORITY_AUDIT`
 
 The canonicalization hypothesis is closed for this frozen procedure. This does
 not establish that canonicalization would fail or succeed in a future
 authorized procedure. The v0.2 milestone remains active/incomplete and S4 is
-not started.
+not started. The completed architecture decision selects a separate,
+source-fact-only source-family contract and authority audit before any source
+acquisition or runtime implementation.
