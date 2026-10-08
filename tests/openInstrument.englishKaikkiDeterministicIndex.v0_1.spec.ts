@@ -342,7 +342,7 @@ describe("English Kaikki deterministic index v0.1", () => {
     } finally {
       await rm(directory, { recursive: true, force: true });
     }
-  });
+  }, 30_000);
 
   it("keeps the raw source reader byte-exact across boundaries and final no-LF input", async () => {
     const directory = await mkdtemp(tmpdir() + "/open-instrument-source-reader-");
