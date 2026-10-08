@@ -681,7 +681,7 @@ historical claim, or scientific execution.
 
 `ENGLISH_KAIKKI_RESULT=docs/open-instrument/research-artifacts/source-family-lexical-substrate-v0.1-english-kaikki-snapshot-acquisition-procedure-v0.1/result.json`
 
-`ENGLISH_KAIKKI_RESULT_SHA256=71db9e5fa6aa7988a679c115157f979ee97066789a54b9cafcb12baab1a5a532`
+`ENGLISH_KAIKKI_RESULT_SHA256=f2dcdf51d99414ccd0114e47444f101e92c0b2459b7ad5498d15165f3cc38125`
 
 `SOURCE_IMPORT_AUTHORIZED=NO`
 

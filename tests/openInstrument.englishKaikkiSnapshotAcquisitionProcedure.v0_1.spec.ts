@@ -142,6 +142,11 @@ describe("English Kaikki snapshot acquisition procedure v0.1", () => {
       sourceFamilyId: string;
       localExternalPath: string;
       acquisitionMode: string;
+      toolingIdentity: {
+        transfer: string;
+        hash: string;
+        runtime: string;
+      };
       authoritativeAcquisitionAttemptCount: number;
       transferAttemptCount: number;
       observedBytes: number;
@@ -204,6 +209,11 @@ describe("English Kaikki snapshot acquisition procedure v0.1", () => {
       sourceFamilyId: "open-instrument.wiktionary-kaikki-english-lexical-sense.v0_1",
       localExternalPath: "OPEN_INSTRUMENT_EXTERNAL_SOURCE_ROOT/source-family/english-kaikki/2026-10-03/kaikki.org-dictionary-English.jsonl",
       acquisitionMode: "NETWORK_TRANSFER_VERIFIED",
+      toolingIdentity: {
+        transfer: "curl 8.7.1 (x86_64-apple-darwin24.0) libcurl/8.7.1 (SecureTransport) LibreSSL/3.3.6 zlib/1.2.12 nghttp2/1.64.0",
+        hash: "shasum 6.02 (SHA-256)",
+        runtime: "node v24.11.0",
+      },
       authoritativeAcquisitionAttemptCount: 1,
       transferAttemptCount: 1,
       observedBytes: 3335546346,
