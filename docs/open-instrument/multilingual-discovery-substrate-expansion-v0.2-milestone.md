@@ -648,13 +648,47 @@ The English selection does not authorize a download, source slice, adapter,
 index, runtime integration, pronunciation promotion, functional promotion,
 historical claim, or scientific execution.
 
+## English Kaikki snapshot acquisition procedure
+
+`SOURCE_FAMILY_LEXICAL_SUBSTRATE_V0_1=COMPLETE`
+
+`FIRST_SOURCE_FAMILY=open-instrument.wiktionary-kaikki-english-lexical-sense.v0_1`
+
+`ENGLISH_KAIKKI_ACQUISITION_PROCEDURE=DEFINED_NOT_EXECUTED`
+
+`ENGLISH_KAIKKI_ACQUISITION_ATTEMPTS=0`
+
+`ENGLISH_KAIKKI_SOURCE_ACQUIRED=NO`
+
+`ENGLISH_KAIKKI_PROCEDURE=docs/open-instrument/research-artifacts/source-family-lexical-substrate-v0.1-english-kaikki-snapshot-acquisition-procedure-v0.1/procedure.json`
+
+`ENGLISH_KAIKKI_PROCEDURE_SHA256=fa67e7bb0b39454c632e963efb8098e57af1b52954a40b60534a2231285dc8f3`
+
+`ENGLISH_KAIKKI_PROCEDURE_MANIFEST=docs/open-instrument/research-artifacts/source-family-lexical-substrate-v0.1-english-kaikki-snapshot-acquisition-procedure-v0.1/hash-manifest.json`
+
+`ENGLISH_KAIKKI_PROCEDURE_MANIFEST_SHA256=35ea4b0ce78b8aac09e19a06aef9c959e08392766c978bb44b72e2cac808e797`
+
+`SOURCE_IMPORT_AUTHORIZED=NO`
+
+`SOURCE_RUNTIME_AUTHORIZED=NO`
+
+`S4=NOT_STARTED`
+
+`MILESTONE_COMPLETE=NO`
+
+`NEXT_ACTION=REVIEW_AND_AUTHORIZE_CONTROLLED_ENGLISH_KAIKKI_SNAPSHOT_ACQUISITION`
+
+The procedure freezes only a source-identity-bound external acquisition
+method. It does not download, inspect, import, index, or expose the 3.3 GB
+source, and it does not define a source adapter or runtime population.
+
 ## Explicit next action
 
-`NEXT_ACTION=DEFINE_AND_FREEZE_ENGLISH_KAIKKI_SNAPSHOT_ACQUISITION_PROCEDURE`
+`NEXT_ACTION=REVIEW_AND_AUTHORIZE_CONTROLLED_ENGLISH_KAIKKI_SNAPSHOT_ACQUISITION`
 
 The source-family contract and authority audit are complete as a
-documentation-only lane. The canonicalization hypothesis remains closed for
-the frozen procedure. The v0.2 milestone remains active/incomplete and S4 is
-not started. The selected English family still requires a separate,
-source-fact-only snapshot acquisition procedure before any source acquisition,
-import, or runtime implementation.
+documentation-only lane. The canonicalization hypothesis remains closed. The
+English snapshot acquisition procedure is defined but not executed. The v0.2
+milestone remains active/incomplete and S4 is not started. Any source
+acquisition, import, or runtime implementation requires a later explicit
+authorization.
