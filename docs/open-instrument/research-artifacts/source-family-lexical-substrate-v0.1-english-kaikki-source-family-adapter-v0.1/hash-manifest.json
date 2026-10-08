@@ -1,0 +1,58 @@
+{
+  "schemaVersion": "open-instrument.hash-manifest.v0.1",
+  "status": "DEFINED_AND_FROZEN",
+  "contractId": "OPEN_INSTRUMENT_ENGLISH_KAIKKI_SOURCE_FAMILY_ADAPTER_V0_1",
+  "ownerMilestone": "60b634df-0b79-4aee-8089-ed158890241b",
+  "repositoryBaselineHead": "5fe1adb904a9de7f6165c1af67ad6de9ba456d24",
+  "sourceIdentity": {
+    "sourceFamilyId": "open-instrument.wiktionary-kaikki-english-lexical-sense.v0_1",
+    "snapshotId": "open-instrument.wiktionary-kaikki-english-lexical-sense.snapshot.2026-10-03.v0_1",
+    "expectedBytes": 3335546346,
+    "expectedSha256": "9978ce34256e4143c3498387564d293a9a2971ef376c1e038d369a2021c02195"
+  },
+  "artifacts": [
+    {
+      "role": "human_readable_contract",
+      "path": "docs/open-instrument/english-kaikki-source-family-adapter-v0.1.md",
+      "bytes": 7994,
+      "sha256": "c53fdd4f9682cfb9b5dae132668ffb80a55b086d3d05bf097269b253b9c7f67b"
+    },
+    {
+      "role": "machine_readable_frozen_contract",
+      "path": "docs/open-instrument/research-artifacts/source-family-lexical-substrate-v0.1-english-kaikki-source-family-adapter-v0.1/contract.json",
+      "bytes": 10009,
+      "sha256": "a359b0a8d6fe172b32937aed93690545adfc2403c40419209f358fc46d14ed02"
+    },
+    {
+      "role": "focused_contract_validation",
+      "path": "tests/openInstrument.englishKaikkiSourceFamilyAdapterContract.v0_1.spec.ts",
+      "bytes": 7131,
+      "sha256": "97d14f1e390cfce49334cddeeebfc51521f8d712561c1585bcdceb40d9a36217"
+    }
+  ],
+  "boundedSchemaInspection": {
+    "method": "FIXED_PREFIX_BOUNDED_JSONL_SCHEMA_SUMMARY",
+    "bytesRead": 33554432,
+    "completeRecordsInspected": 1024,
+    "fullSourceParsed": false,
+    "targetWordSearchPerformed": false,
+    "semanticAnalysisPerformed": false,
+    "candidateRetrievalPerformed": false,
+    "coverageEvaluated": false
+  },
+  "implementationState": {
+    "sourceAcquired": true,
+    "sourceImported": false,
+    "adapterImplemented": false,
+    "indexBuilt": false,
+    "runtimeChanged": false,
+    "s4": "NOT_STARTED",
+    "nextAction": "IMPLEMENT_ENGLISH_KAIKKI_SOURCE_FAMILY_ADAPTER_V0_1"
+  },
+  "validation": {
+    "artifactBytesAndSha256Bound": true,
+    "absoluteMachineLocalPathExposed": false,
+    "sourceIdentityReverifiedBeforeInspection": true,
+    "productionAdapterExecuted": false
+  }
+}

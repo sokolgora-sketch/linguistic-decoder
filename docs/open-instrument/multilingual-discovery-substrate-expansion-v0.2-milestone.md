@@ -712,3 +712,66 @@ The source-family contract and authority audit remain complete. The
 canonicalization hypothesis remains closed. The v0.2 milestone remains
 active/incomplete and S4 is not started. Any source import, adapter, index, or
 runtime implementation requires a later explicit authorization.
+
+## English Kaikki source-family adapter v0.1 definition and freeze
+
+The exact acquired English Kaikki snapshot was reverified before a bounded
+schema-only inspection. The inspection read a fixed 32 MiB prefix containing
+1,024 complete JSONL records. It did not perform a full parse, target-word
+search, semantic analysis, candidate retrieval, coverage evaluation, or
+runtime work. The source-family adapter boundary is now defined and frozen as
+repository documentation and a machine-readable contract only.
+
+`ENGLISH_KAIKKI_SOURCE_FAMILY_ADAPTER_CONTRACT=DEFINED_AND_FROZEN`
+
+`ENGLISH_KAIKKI_SOURCE_FAMILY_ADAPTER_CONTRACT_DOCUMENT=docs/open-instrument/english-kaikki-source-family-adapter-v0.1.md`
+
+`ENGLISH_KAIKKI_SOURCE_FAMILY_ADAPTER_CONTRACT_DOCUMENT_SHA256=c53fdd4f9682cfb9b5dae132668ffb80a55b086d3d05bf097269b253b9c7f67b`
+
+`ENGLISH_KAIKKI_SOURCE_FAMILY_ADAPTER_CONTRACT_ARTIFACT=docs/open-instrument/research-artifacts/source-family-lexical-substrate-v0.1-english-kaikki-source-family-adapter-v0.1/contract.json`
+
+`ENGLISH_KAIKKI_SOURCE_FAMILY_ADAPTER_CONTRACT_ARTIFACT_SHA256=a359b0a8d6fe172b32937aed93690545adfc2403c40419209f358fc46d14ed02`
+
+`ENGLISH_KAIKKI_SOURCE_FAMILY_ADAPTER_HASH_MANIFEST=docs/open-instrument/research-artifacts/source-family-lexical-substrate-v0.1-english-kaikki-source-family-adapter-v0.1/hash-manifest.json`
+
+`ENGLISH_KAIKKI_SOURCE_FAMILY_ADAPTER_HASH_MANIFEST_SHA256=1e01001c7f262d6fe8044ac1f7d5bcf56f897f735deb6a8b5a5c71ffea900f23`
+
+`ENGLISH_KAIKKI_SOURCE_FAMILY_ADAPTER_SOURCE_FAMILY=open-instrument.wiktionary-kaikki-english-lexical-sense.v0_1`
+
+`ENGLISH_KAIKKI_SOURCE_FAMILY_ADAPTER_SNAPSHOT=open-instrument.wiktionary-kaikki-english-lexical-sense.snapshot.2026-10-03.v0_1`
+
+`ENGLISH_KAIKKI_SOURCE_FAMILY_ADAPTER_SOURCE_BYTES=3335546346`
+
+`ENGLISH_KAIKKI_SOURCE_FAMILY_ADAPTER_SOURCE_SHA256=9978ce34256e4143c3498387564d293a9a2971ef376c1e038d369a2021c02195`
+
+`ENGLISH_KAIKKI_SOURCE_FAMILY_ADAPTER_BOUNDED_SCHEMA_INSPECTION=YES`
+
+`ENGLISH_KAIKKI_SOURCE_FAMILY_ADAPTER_INSPECTION_METHOD=FIXED_PREFIX_BOUNDED_JSONL_SCHEMA_SUMMARY`
+
+`ENGLISH_KAIKKI_SOURCE_FAMILY_ADAPTER_INSPECTION_BYTES=33554432`
+
+`ENGLISH_KAIKKI_SOURCE_FAMILY_ADAPTER_INSPECTION_RECORDS=1024`
+
+`ENGLISH_KAIKKI_SOURCE_ACQUISITION_ATTEMPTS=1`
+
+`ENGLISH_KAIKKI_SOURCE_ACQUIRED=YES`
+
+`ENGLISH_KAIKKI_SOURCE_CONTENT_INSPECTED=YES_BOUNDED_SCHEMA_ONLY`
+
+`ENGLISH_KAIKKI_SOURCE_IMPORTED=NO`
+
+`ENGLISH_KAIKKI_SOURCE_ADAPTER_IMPLEMENTED=NO`
+
+`ENGLISH_KAIKKI_SOURCE_INDEX_BUILT=NO`
+
+`ENGLISH_KAIKKI_COVERAGE_EVALUATED=NO`
+
+`ENGLISH_KAIKKI_SOURCE_RUNTIME_AUTHORIZED=NO`
+
+`RUNTIME_CHANGED=NO`
+
+`S4=NOT_STARTED`
+
+`MILESTONE_COMPLETE=NO`
+
+`NEXT_ACTION=IMPLEMENT_ENGLISH_KAIKKI_SOURCE_FAMILY_ADAPTER_V0_1`
