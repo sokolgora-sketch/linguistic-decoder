@@ -239,6 +239,7 @@ describe("English Kaikki snapshot acquisition procedure v0.1", () => {
 
   test("binds the milestone procedure hash to the recomputed procedure hash", () => {
     const procedureHash = sha256(PROCEDURE_PATH);
+    const manifestHash = sha256(MANIFEST_PATH);
     const manifest = readJson<{
       artifacts: Array<{ path: string; sha256: string }>;
     }>(MANIFEST_PATH);
@@ -249,9 +250,13 @@ describe("English Kaikki snapshot acquisition procedure v0.1", () => {
     const milestoneHash = milestone.match(
       /`ENGLISH_KAIKKI_PROCEDURE_SHA256=([0-9a-f]{64})`/,
     )?.[1];
+    const milestoneManifestHash = milestone.match(
+      /`ENGLISH_KAIKKI_PROCEDURE_MANIFEST_SHA256=([0-9a-f]{64})`/,
+    )?.[1];
 
     expect(procedureArtifact?.sha256).toBe(procedureHash);
     expect(milestoneHash).toBe(procedureHash);
+    expect(milestoneManifestHash).toBe(manifestHash);
   });
 
   test("binds milestone execution facts to the verified result", () => {
