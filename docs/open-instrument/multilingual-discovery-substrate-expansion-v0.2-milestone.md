@@ -644,7 +644,8 @@ The selected family is a bounded recommendation for a later acquisition and
 projection procedure. The existing FJALË and Scaife source surfaces remain
 preserved but do not currently provide the complete hash-bound scalable
 snapshot and license posture required for the first source-family procedure.
-The English selection does not authorize a download, source slice, adapter,
+The frozen procedure and its later execution record authorize only the exact
+external snapshot acquisition; they do not authorize a source slice, adapter,
 index, runtime integration, pronunciation promotion, functional promotion,
 historical claim, or scientific execution.
 
@@ -654,11 +655,21 @@ historical claim, or scientific execution.
 
 `FIRST_SOURCE_FAMILY=open-instrument.wiktionary-kaikki-english-lexical-sense.v0_1`
 
-`ENGLISH_KAIKKI_ACQUISITION_PROCEDURE=DEFINED_NOT_EXECUTED`
+`ENGLISH_KAIKKI_ACQUISITION_PROCEDURE=EXECUTED`
 
-`ENGLISH_KAIKKI_ACQUISITION_ATTEMPTS=0`
+`ENGLISH_KAIKKI_ACQUISITION_ATTEMPTS=1`
 
-`ENGLISH_KAIKKI_SOURCE_ACQUIRED=NO`
+`ENGLISH_KAIKKI_SOURCE_ACQUIRED=YES`
+
+`ENGLISH_KAIKKI_SOURCE_VERIFICATION=PASS`
+
+`ENGLISH_KAIKKI_SOURCE_CONTENT_INSPECTED=NO`
+
+`ENGLISH_KAIKKI_SOURCE_ADAPTER_IMPLEMENTED=NO`
+
+`ENGLISH_KAIKKI_SOURCE_INDEX_BUILT=NO`
+
+`ENGLISH_KAIKKI_COVERAGE_EVALUATED=NO`
 
 `ENGLISH_KAIKKI_PROCEDURE=docs/open-instrument/research-artifacts/source-family-lexical-substrate-v0.1-english-kaikki-snapshot-acquisition-procedure-v0.1/procedure.json`
 
@@ -666,29 +677,38 @@ historical claim, or scientific execution.
 
 `ENGLISH_KAIKKI_PROCEDURE_MANIFEST=docs/open-instrument/research-artifacts/source-family-lexical-substrate-v0.1-english-kaikki-snapshot-acquisition-procedure-v0.1/hash-manifest.json`
 
-`ENGLISH_KAIKKI_PROCEDURE_MANIFEST_SHA256=35ea4b0ce78b8aac09e19a06aef9c959e08392766c978bb44b72e2cac808e797`
+`ENGLISH_KAIKKI_PROCEDURE_MANIFEST_SHA256=b154709ea8329ad9c22417daa97bb75f92f9a7cc4214d5de722cc9d3aa755621`
+
+`ENGLISH_KAIKKI_RESULT=docs/open-instrument/research-artifacts/source-family-lexical-substrate-v0.1-english-kaikki-snapshot-acquisition-procedure-v0.1/result.json`
+
+`ENGLISH_KAIKKI_RESULT_SHA256=f2dcdf51d99414ccd0114e47444f101e92c0b2459b7ad5498d15165f3cc38125`
 
 `SOURCE_IMPORT_AUTHORIZED=NO`
 
+`SOURCE_IMPORTED=NO`
+
 `SOURCE_RUNTIME_AUTHORIZED=NO`
+
+`RUNTIME_CHANGED=NO`
 
 `S4=NOT_STARTED`
 
 `MILESTONE_COMPLETE=NO`
 
-`NEXT_ACTION=REVIEW_AND_AUTHORIZE_CONTROLLED_ENGLISH_KAIKKI_SNAPSHOT_ACQUISITION`
+`NEXT_ACTION=DEFINE_AND_FREEZE_ENGLISH_KAIKKI_SOURCE_FAMILY_ADAPTER_V0_1`
 
-The procedure freezes only a source-identity-bound external acquisition
-method. It does not download, inspect, import, index, or expose the 3.3 GB
-source, and it does not define a source adapter or runtime population.
+The exact frozen English Kaikki snapshot was acquired to the authorized
+external hash-bound root and verified at `3335546346` bytes with SHA-256
+`9978ce34256e4143c3498387564d293a9a2971ef376c1e038d369a2021c02195`.
+The source remains outside Git and was not inspected, imported, indexed, or
+connected to runtime. S0-S3 history is unchanged, S4 remains not started, and
+the next bounded action is to define and freeze the source-family adapter.
 
 ## Explicit next action
 
-`NEXT_ACTION=REVIEW_AND_AUTHORIZE_CONTROLLED_ENGLISH_KAIKKI_SNAPSHOT_ACQUISITION`
+`NEXT_ACTION=DEFINE_AND_FREEZE_ENGLISH_KAIKKI_SOURCE_FAMILY_ADAPTER_V0_1`
 
-The source-family contract and authority audit are complete as a
-documentation-only lane. The canonicalization hypothesis remains closed. The
-English snapshot acquisition procedure is defined but not executed. The v0.2
-milestone remains active/incomplete and S4 is not started. Any source
-acquisition, import, or runtime implementation requires a later explicit
-authorization.
+The source-family contract and authority audit remain complete. The
+canonicalization hypothesis remains closed. The v0.2 milestone remains
+active/incomplete and S4 is not started. Any source import, adapter, index, or
+runtime implementation requires a later explicit authorization.

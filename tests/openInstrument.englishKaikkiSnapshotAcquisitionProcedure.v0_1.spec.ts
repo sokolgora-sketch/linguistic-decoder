@@ -9,6 +9,7 @@ const ARTIFACT_DIR = path.join(
 );
 const PROCEDURE_PATH = path.join(ARTIFACT_DIR, "procedure.json");
 const MANIFEST_PATH = path.join(ARTIFACT_DIR, "hash-manifest.json");
+const RESULT_PATH = path.join(ARTIFACT_DIR, "result.json");
 const RUNBOOK_PATH = path.join(
   ROOT,
   "docs/open-instrument/english-kaikki-snapshot-acquisition-procedure-v0.1.md",
@@ -112,21 +113,79 @@ describe("English Kaikki snapshot acquisition procedure v0.1", () => {
     });
   });
 
-  test("binds only repository procedure artifacts and creates no result placeholder", () => {
+  test("binds the external execution result without bundling the source", () => {
     const manifest = readJson<{
       status: string;
       procedureId: string;
       artifacts: Array<{ path: string; bytes: number; sha256: string }>;
-      execution: { sourceAcquisitionAttempts: number; resultArtifactCreated: boolean };
+      execution: {
+        sourceAcquisitionAttempts: number;
+        authoritativeAcquisitionAttemptCount: number;
+        transferAttemptCount: number;
+        sourceAcquired: boolean;
+        sourceSnapshotVerification: string;
+        observedBytes: number;
+        observedSha256: string;
+        identityMatch: boolean;
+        resultArtifactCreated: boolean;
+        sourceImported: boolean;
+        sourceIndexed: boolean;
+        coverageEvaluated: boolean;
+        s4Started: boolean;
+        runtimeChanged: boolean;
+      };
     }>(MANIFEST_PATH);
+    const result = readJson<{
+      procedureId: string;
+      procedureSha256: string;
+      sourceSnapshotId: string;
+      sourceFamilyId: string;
+      localExternalPath: string;
+      acquisitionMode: string;
+      toolingIdentity: {
+        transfer: string;
+        hash: string;
+        runtime: string;
+      };
+      authoritativeAcquisitionAttemptCount: number;
+      transferAttemptCount: number;
+      observedBytes: number;
+      observedSha256: string;
+      byteLengthMatch: boolean;
+      sha256Match: boolean;
+      identityMatch: boolean;
+      sourceSnapshotVerification: string;
+      acquired: boolean;
+      sourceContentInspected: boolean;
+      imported: boolean;
+      adapterImplemented: boolean;
+      indexed: boolean;
+      coverageEvaluated: boolean;
+      runtimeChanged: boolean;
+      s4: string;
+      failureReason: string | null;
+      nextAction: string;
+    }>(RESULT_PATH);
 
-    expect(manifest.status).toBe("DEFINED_NOT_EXECUTED");
+    expect(manifest.status).toBe("EXECUTED");
     expect(manifest.procedureId).toBe(
       "open-instrument.source-family-lexical-substrate.english-kaikki.snapshot-acquisition.v0.1",
     );
     expect(manifest.execution).toMatchObject({
-      sourceAcquisitionAttempts: 0,
-      resultArtifactCreated: false,
+      sourceAcquisitionAttempts: 1,
+      authoritativeAcquisitionAttemptCount: 1,
+      transferAttemptCount: 1,
+      sourceAcquired: true,
+      sourceSnapshotVerification: "PASS",
+      observedBytes: 3335546346,
+      observedSha256: "9978ce34256e4143c3498387564d293a9a2971ef376c1e038d369a2021c02195",
+      identityMatch: true,
+      resultArtifactCreated: true,
+      sourceImported: false,
+      sourceIndexed: false,
+      coverageEvaluated: false,
+      s4Started: false,
+      runtimeChanged: false,
     });
     for (const artifact of manifest.artifacts) {
       const absolutePath = path.join(ROOT, artifact.path);
@@ -134,11 +193,47 @@ describe("English Kaikki snapshot acquisition procedure v0.1", () => {
       expect(fs.statSync(absolutePath).size).toBe(artifact.bytes);
       expect(sha256(absolutePath)).toBe(artifact.sha256);
     }
-    expect(fs.existsSync(path.join(ARTIFACT_DIR, "result.json"))).toBe(false);
+    expect(fs.existsSync(RESULT_PATH)).toBe(true);
     expect(manifest.artifacts.map((artifact) => artifact.path)).toEqual([
       "docs/open-instrument/english-kaikki-snapshot-acquisition-procedure-v0.1.md",
       "docs/open-instrument/research-artifacts/source-family-lexical-substrate-v0.1-english-kaikki-snapshot-acquisition-procedure-v0.1/procedure.json",
+      "docs/open-instrument/research-artifacts/source-family-lexical-substrate-v0.1-english-kaikki-snapshot-acquisition-procedure-v0.1/result.json",
     ]);
+    const resultArtifact = manifest.artifacts.find((artifact) => artifact.path.endsWith("/result.json"));
+    expect(resultArtifact?.bytes).toBe(fs.statSync(RESULT_PATH).size);
+    expect(resultArtifact?.sha256).toBe(sha256(RESULT_PATH));
+    expect(result).toMatchObject({
+      procedureId: manifest.procedureId,
+      procedureSha256: "0c031549c58f7ca7f0ffc95108a2529c19dade6db925f59c7ab6671f2f793c35",
+      sourceSnapshotId: "open-instrument.wiktionary-kaikki-english-lexical-sense.snapshot.2026-10-03.v0_1",
+      sourceFamilyId: "open-instrument.wiktionary-kaikki-english-lexical-sense.v0_1",
+      localExternalPath: "OPEN_INSTRUMENT_EXTERNAL_SOURCE_ROOT/source-family/english-kaikki/2026-10-03/kaikki.org-dictionary-English.jsonl",
+      acquisitionMode: "NETWORK_TRANSFER_VERIFIED",
+      toolingIdentity: {
+        transfer: "curl 8.7.1 (x86_64-apple-darwin24.0) libcurl/8.7.1 (SecureTransport) LibreSSL/3.3.6 zlib/1.2.12 nghttp2/1.64.0",
+        hash: "shasum 6.02 (SHA-256)",
+        runtime: "node v24.11.0",
+      },
+      authoritativeAcquisitionAttemptCount: 1,
+      transferAttemptCount: 1,
+      observedBytes: 3335546346,
+      observedSha256: "9978ce34256e4143c3498387564d293a9a2971ef376c1e038d369a2021c02195",
+      byteLengthMatch: true,
+      sha256Match: true,
+      identityMatch: true,
+      sourceSnapshotVerification: "PASS",
+      acquired: true,
+      sourceContentInspected: false,
+      imported: false,
+      adapterImplemented: false,
+      indexed: false,
+      coverageEvaluated: false,
+      runtimeChanged: false,
+      s4: "NOT_STARTED",
+      failureReason: null,
+      nextAction: "DEFINE_AND_FREEZE_ENGLISH_KAIKKI_SOURCE_FAMILY_ADAPTER_V0_1",
+    });
+    expect(manifest.artifacts.some((artifact) => artifact.path.endsWith(".jsonl"))).toBe(false);
     expect(fs.existsSync(RUNBOOK_PATH)).toBe(true);
   });
 
@@ -157,5 +252,25 @@ describe("English Kaikki snapshot acquisition procedure v0.1", () => {
 
     expect(procedureArtifact?.sha256).toBe(procedureHash);
     expect(milestoneHash).toBe(procedureHash);
+  });
+
+  test("binds milestone execution facts to the verified result", () => {
+    const milestone = fs.readFileSync(MILESTONE_PATH, "utf8");
+    const result = readJson<{ nextAction: string; s4: string }>(RESULT_PATH);
+
+    expect(milestone).toContain("`ENGLISH_KAIKKI_ACQUISITION_PROCEDURE=EXECUTED`");
+    expect(milestone).toContain("`ENGLISH_KAIKKI_ACQUISITION_ATTEMPTS=1`");
+    expect(milestone).toContain("`ENGLISH_KAIKKI_SOURCE_ACQUIRED=YES`");
+    expect(milestone).toContain("`ENGLISH_KAIKKI_SOURCE_VERIFICATION=PASS`");
+    expect(milestone).toContain("`ENGLISH_KAIKKI_SOURCE_CONTENT_INSPECTED=NO`");
+    expect(milestone).toContain("`ENGLISH_KAIKKI_SOURCE_ADAPTER_IMPLEMENTED=NO`");
+    expect(milestone).toContain("`ENGLISH_KAIKKI_SOURCE_INDEX_BUILT=NO`");
+    expect(milestone).toContain("`ENGLISH_KAIKKI_COVERAGE_EVALUATED=NO`");
+    expect(milestone).toContain("`SOURCE_IMPORTED=NO`");
+    expect(milestone).toContain("`SOURCE_RUNTIME_AUTHORIZED=NO`");
+    expect(milestone).toContain("`RUNTIME_CHANGED=NO`");
+    expect(milestone).toContain("`S4=NOT_STARTED`");
+    expect(milestone).toContain(`\`NEXT_ACTION=${result.nextAction}\``);
+    expect(result.s4).toBe("NOT_STARTED");
   });
 });

@@ -1,6 +1,6 @@
 {
   "schemaVersion": "open-instrument.hash-manifest.v0.1",
-  "status": "DEFINED_NOT_EXECUTED",
+  "status": "EXECUTED",
   "procedureId": "open-instrument.source-family-lexical-substrate.english-kaikki.snapshot-acquisition.v0.1",
   "ownerMilestone": "OPEN_INSTRUMENT_MULTILINGUAL_DISCOVERY_SUBSTRATE_EXPANSION_V0_2",
   "repositoryBaselineHead": "74b8e02dd2d789cb4330b08046510c4d8992ebe7",
@@ -20,17 +20,29 @@
       "path": "docs/open-instrument/research-artifacts/source-family-lexical-substrate-v0.1-english-kaikki-snapshot-acquisition-procedure-v0.1/procedure.json",
       "bytes": 10172,
       "sha256": "0c031549c58f7ca7f0ffc95108a2529c19dade6db925f59c7ab6671f2f793c35"
+    },
+    {
+      "path": "docs/open-instrument/research-artifacts/source-family-lexical-substrate-v0.1-english-kaikki-snapshot-acquisition-procedure-v0.1/result.json",
+      "bytes": 2025,
+      "sha256": "f2dcdf51d99414ccd0114e47444f101e92c0b2459b7ad5498d15165f3cc38125"
     }
   ],
   "execution": {
-    "sourceAcquisitionAttempts": 0,
-    "sourceAcquired": false,
+    "sourceAcquisitionAttempts": 1,
+    "authoritativeAcquisitionAttemptCount": 1,
+    "transferAttemptCount": 1,
+    "sourceAcquired": true,
+    "sourceSnapshotVerification": "PASS",
+    "observedBytes": 3335546346,
+    "observedSha256": "9978ce34256e4143c3498387564d293a9a2971ef376c1e038d369a2021c02195",
+    "identityMatch": true,
     "sourceImported": false,
     "sourceIndexed": false,
-    "resultArtifactCreated": false,
+    "resultArtifactCreated": true,
     "coverageEvaluated": false,
     "s4Started": false,
     "runtimeChanged": false,
+    "nextAction": "DEFINE_AND_FREEZE_ENGLISH_KAIKKI_SOURCE_FAMILY_ADAPTER_V0_1",
     "newExperimentRun": false
   },
   "validation": {
