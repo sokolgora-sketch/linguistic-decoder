@@ -66,7 +66,7 @@ describe("English Kaikki deterministic index contract v0.1", () => {
     expect(contract.authority.adapter).toMatchObject({
       contractId: "OPEN_INSTRUMENT_ENGLISH_KAIKKI_SOURCE_FAMILY_ADAPTER_V0_1",
       contractSha256: "a359b0a8d6fe172b32937aed93690545adfc2403c40419209f358fc46d14ed02",
-      implementationCommit: "5861df5f571f94ace0f1e6dcf9c4b308bb7d15e2",
+      implementationCommit: "4e37b56b9194983b836f85269033f916c6ae408d",
       implementationSha256: "2b8a41fd2c5cd8d7a11e8b157690d3e4b4dfd12ed44a1de48c5070347e11c28f",
     });
     expect(sha256(adapterContractPath)).toBe(contract.authority.adapter.contractSha256);
@@ -159,8 +159,49 @@ describe("English Kaikki deterministic index contract v0.1", () => {
       bom: false,
       lineEnding: "LF",
       finalLineEnding: true,
+      jsonStringEscaping: "OPEN_INSTRUMENT_CANONICAL_JSON_STRING_V0_1",
+      jsonStringEncodingRule:
+        "EMIT_LITERAL_UTF8_UNICODE_SCALARS_EXCEPT_QUOTE_BACKSLASH_AND_U0000_TO_U001F_CONTROLS",
+      controlEscapeRule: "ALL_U0000_TO_U001F_CONTROLS_USE_LOWERCASE_HEX_\\u00xx; NO_SHORT_ESCAPES",
+      optionalEscapeRule: "NO_SOLIDUS_ESCAPES_NO_OPTIONAL_NON_ASCII_ESCAPES",
+      surrogatePolicy: "UNPAIRED_SURROGATE_CODE_UNITS_REJECTED_FAIL_CLOSED",
       timestamps: "FORBIDDEN_IN_CANONICAL_INDEX_FILES",
       absolutePaths: "FORBIDDEN_IN_CANONICAL_INDEX_FILES",
+    });
+    expect(contract.indexSchema.artifactIdentity).toMatchObject({
+      identityFileSetInOrder: ["directory.ndjson", "postings.ndjson"],
+      manifestSelfTreatment:
+        "manifest.json BYTE_LENGTH AND SHA256 ARE EXCLUDED FROM ARTIFACT_IDENTITY_PAYLOAD; MANIFEST IS VALIDATED SEPARATELY",
+    });
+    expect(contract.indexSchema.artifactIdentity.identityPayload).toMatchObject({
+      objectFieldOrder: [
+        "schemaVersion",
+        "indexId",
+        "indexContractId",
+        "indexContractVersion",
+        "indexContractSha256",
+        "sourceSnapshot",
+        "adapter",
+        "buildProcedureId",
+        "files",
+      ],
+      sourceSnapshotFieldOrder: [
+        "sourceFamilyId",
+        "snapshotId",
+        "expectedBytes",
+        "expectedSha256",
+      ],
+      adapterFieldOrder: [
+        "contractId",
+        "contractSha256",
+        "implementationCommit",
+        "implementationSha256",
+      ],
+      fileFieldOrder: ["path", "bytes", "sha256"],
+      filesArrayOrder: ["directory.ndjson", "postings.ndjson"],
+      manifestSelfLength: "EXCLUDED",
+      manifestSelfSha256: "EXCLUDED",
+      canonicalJsonStringEncoding: "OPEN_INSTRUMENT_CANONICAL_JSON_STRING_V0_1",
     });
     expect(contract.buildContract.streaming).toMatchObject({
       rawCorpusLoadedIntoMemory: false,

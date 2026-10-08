@@ -25,7 +25,7 @@
       "contractPath": "docs/open-instrument/research-artifacts/source-family-lexical-substrate-v0.1-english-kaikki-source-family-adapter-v0.1/contract.json",
       "contractSha256": "a359b0a8d6fe172b32937aed93690545adfc2403c40419209f358fc46d14ed02",
       "implementationStatus": "IMPLEMENTED_SOURCE_RECORD_BOUNDARY_ONLY",
-      "implementationCommit": "5861df5f571f94ace0f1e6dcf9c4b308bb7d15e2",
+      "implementationCommit": "4e37b56b9194983b836f85269033f916c6ae408d",
       "implementationPath": "src/shared/openInstrument/englishKaikkiSourceFamilyAdapter.v0_1.ts",
       "implementationSha256": "2b8a41fd2c5cd8d7a11e8b157690d3e4b4dfd12ed44a1de48c5070347e11c28f",
       "implementationArtifactPath": "docs/open-instrument/research-artifacts/source-family-lexical-substrate-v0.1-english-kaikki-source-family-adapter-v0.1/implementation.json",
@@ -68,8 +68,50 @@
     ],
     "artifactIdentity": {
       "algorithm": "SHA-256",
-      "payload": "CANONICAL_JSON_IDENTITY_PAYLOAD_WITH_SCHEMA_BINDINGS_FILE_NAMES_FILE_BYTES_AND_FILE_SHA256_VALUES; MANIFEST_SELF_HASH_EXCLUDED",
-      "fileHashScope": "EXACT_CANONICAL_FILE_BYTES"
+      "payload": "CANONICAL_JSON_IDENTITY_PAYLOAD_V0_1",
+      "fileHashScope": "EXACT_CANONICAL_FILE_BYTES",
+      "identityFileSetInOrder": [
+        "directory.ndjson",
+        "postings.ndjson"
+      ],
+      "manifestSelfTreatment": "manifest.json BYTE_LENGTH AND SHA256 ARE EXCLUDED FROM ARTIFACT_IDENTITY_PAYLOAD; MANIFEST IS VALIDATED SEPARATELY",
+      "identityPayload": {
+        "objectFieldOrder": [
+          "schemaVersion",
+          "indexId",
+          "indexContractId",
+          "indexContractVersion",
+          "indexContractSha256",
+          "sourceSnapshot",
+          "adapter",
+          "buildProcedureId",
+          "files"
+        ],
+        "sourceSnapshotFieldOrder": [
+          "sourceFamilyId",
+          "snapshotId",
+          "expectedBytes",
+          "expectedSha256"
+        ],
+        "adapterFieldOrder": [
+          "contractId",
+          "contractSha256",
+          "implementationCommit",
+          "implementationSha256"
+        ],
+        "fileFieldOrder": [
+          "path",
+          "bytes",
+          "sha256"
+        ],
+        "filesArrayOrder": [
+          "directory.ndjson",
+          "postings.ndjson"
+        ],
+        "manifestSelfLength": "EXCLUDED",
+        "manifestSelfSha256": "EXCLUDED",
+        "canonicalJsonStringEncoding": "OPEN_INSTRUMENT_CANONICAL_JSON_STRING_V0_1"
+      }
     }
   },
   "keyContract": {
@@ -155,7 +197,11 @@
     "finalLineEnding": true,
     "insignificantWhitespace": false,
     "propertyOrder": "FIELDS_IN_CONTRACT_DECLARED_ORDER",
-    "jsonStringEscaping": "RFC_8259",
+    "jsonStringEscaping": "OPEN_INSTRUMENT_CANONICAL_JSON_STRING_V0_1",
+    "jsonStringEncodingRule": "EMIT_LITERAL_UTF8_UNICODE_SCALARS_EXCEPT_QUOTE_BACKSLASH_AND_U0000_TO_U001F_CONTROLS",
+    "controlEscapeRule": "ALL_U0000_TO_U001F_CONTROLS_USE_LOWERCASE_HEX_\\u00xx; NO_SHORT_ESCAPES",
+    "optionalEscapeRule": "NO_SOLIDUS_ESCAPES_NO_OPTIONAL_NON_ASCII_ESCAPES",
+    "surrogatePolicy": "UNPAIRED_SURROGATE_CODE_UNITS_REJECTED_FAIL_CLOSED",
     "numericPolicy": "BASE10_SAFE_INTEGER_OFFSETS_LENGTHS_AND_COUNTS_ONLY",
     "timestamps": "FORBIDDEN_IN_CANONICAL_INDEX_FILES",
     "absolutePaths": "FORBIDDEN_IN_CANONICAL_INDEX_FILES",
@@ -165,7 +211,7 @@
       "postingByteLength",
       "postingCount"
     ],
-    "manifestCanonicalization": "SAME_UTF8_CANONICAL_JSON_RULES; NO_RUN_TIMESTAMP"
+    "manifestCanonicalization": "SAME_UTF8_CANONICAL_JSON_RULES; NO_RUN_TIMESTAMP; MANIFEST_SELF_HASH_EXCLUDED_FROM_ARTIFACT_IDENTITY"
   },
   "buildContract": {
     "input": "VERIFIED_SOURCE_SNAPSHOT_PLUS_FROZEN_ADAPTER_CONTRACT_IMPLEMENTATION_AND_INDEX_CONTRACT",

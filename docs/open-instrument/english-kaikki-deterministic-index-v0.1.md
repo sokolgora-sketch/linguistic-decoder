@@ -129,10 +129,30 @@ Directory entries are sorted by the same UTF-8 key order. Their byte ranges
 refer to `postings.ndjson` and are computed from the canonical serialized
 bytes. The generated manifest records file byte lengths and SHA-256 values.
 
-The logical artifact identity is SHA-256 over the canonical identity payload
-defined in `contract.json`, including the schema, bindings, fixed file list,
-file lengths, and file hashes. The manifest itself is not self-hashed. Two
-conforming builds from the same verified snapshot, adapter authority, and
+The logical artifact identity is SHA-256 over the exact canonical identity
+payload defined in `contract.json`. That payload is one JSON object with this
+fixed property order and nesting:
+
+```text
+schemaVersion, indexId, indexContractId, indexContractVersion,
+indexContractSha256, sourceSnapshot, adapter, buildProcedureId, files
+```
+
+`sourceSnapshot` has the fixed order
+`sourceFamilyId, snapshotId, expectedBytes, expectedSha256`; `adapter` has the
+fixed order `contractId, contractSha256, implementationCommit,
+implementationSha256`; and each `files` item has the fixed order
+`path, bytes, sha256`. The `files` array is exactly
+`directory.ndjson`, then `postings.ndjson`. `manifest.json` is excluded from
+this identity payload, including its own byte length and SHA-256, so the
+manifest is not self-referential. The manifest still records and validates its
+own canonical content separately when it is published.
+
+Canonical strings use literal UTF-8 Unicode scalar values except that `"`, `\`,
+and every U+0000–U+001F control character are escaped; controls always use
+lowercase-hex `\\u00xx`, with no short escapes, solidus escapes, optional
+non-ASCII escapes, or unpaired surrogates. This makes serialized bytes unique.
+Two conforming builds from the same verified snapshot, adapter authority, and
 contract therefore produce byte-identical canonical artifacts; build buffer
 size does not change the final ordering or serialization.
 

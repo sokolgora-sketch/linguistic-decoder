@@ -15,26 +15,26 @@
     "contractSha256": "a359b0a8d6fe172b32937aed93690545adfc2403c40419209f358fc46d14ed02",
     "implementationPath": "src/shared/openInstrument/englishKaikkiSourceFamilyAdapter.v0_1.ts",
     "implementationSha256": "2b8a41fd2c5cd8d7a11e8b157690d3e4b4dfd12ed44a1de48c5070347e11c28f",
-    "implementationCommit": "5861df5f571f94ace0f1e6dcf9c4b308bb7d15e2"
+    "implementationCommit": "4e37b56b9194983b836f85269033f916c6ae408d"
   },
   "artifacts": [
     {
       "role": "human_definition",
       "path": "docs/open-instrument/english-kaikki-deterministic-index-v0.1.md",
-      "bytes": 9468,
-      "sha256": "7eb9bc1981380805cf3a4f543bec19048a077ad8f0bd9a3e6388e259e860b5e5"
+      "bytes": 10468,
+      "sha256": "c108f82172dcf87c786e2e9baebccc3ffaf6d3430c0b55b30018d626abe153cf"
     },
     {
       "role": "machine_readable_contract",
       "path": "docs/open-instrument/research-artifacts/source-family-lexical-substrate-v0.1-english-kaikki-deterministic-index-v0.1/contract.json",
-      "bytes": 13792,
-      "sha256": "aebc8d70c621689f48d1fec2d51b215a5570167c5da8fab6bb94c33b47d76181"
+      "bytes": 15402,
+      "sha256": "0606a159918d672c03e1deafc0e547c0099e92a63e1b48363bf4348310e757b8"
     },
     {
       "role": "focused_contract_tests",
       "path": "tests/openInstrument.englishKaikkiDeterministicIndexContract.v0_1.spec.ts",
-      "bytes": 11053,
-      "sha256": "31bc50a46db18a91b1f84665628f4e5c54d882b1834240e7ad0baf33c3563fc6"
+      "bytes": 12717,
+      "sha256": "55412dec12594005e13e4ac16010c298c46c2434d9f5b9456e92d743af66529d"
     },
     {
       "role": "frozen_adapter_contract",
