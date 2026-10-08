@@ -1,0 +1,241 @@
+{
+  "schemaVersion": "open-instrument.source-family-lexical-substrate.english-kaikki-snapshot-acquisition-procedure.v0.1",
+  "procedureId": "open-instrument.source-family-lexical-substrate.english-kaikki.snapshot-acquisition.v0.1",
+  "status": "DEFINED_NOT_EXECUTED",
+  "ownerMilestone": "OPEN_INSTRUMENT_MULTILINGUAL_DISCOVERY_SUBSTRATE_EXPANSION_V0_2",
+  "parentContractId": "OPEN_INSTRUMENT_SOURCE_FAMILY_LEXICAL_SUBSTRATE_V0_1",
+  "sourceAuthorityContractId": "OPEN_INSTRUMENT_ENGLISH_LEXICAL_SENSE_SOURCE_AUTHORITY_V0_1",
+  "sourceSnapshot": {
+    "snapshotId": "open-instrument.wiktionary-kaikki-english-lexical-sense.snapshot.2026-10-03.v0_1",
+    "sourceFamilyId": "open-instrument.wiktionary-kaikki-english-lexical-sense.v0_1",
+    "language": "English",
+    "languageCode": "en",
+    "format": "POSTPROCESSED_JSONL",
+    "upstreamDumpDate": "2026-09-02",
+    "kaikkiBuildDate": "2026-10-03",
+    "wiktextractRevision": "1a05e46",
+    "wikitextprocessorRevision": "e3d6d4e",
+    "expectedBytes": 3335546346,
+    "expectedSha256": "9978ce34256e4143c3498387564d293a9a2971ef376c1e038d369a2021c02195",
+    "canonicalSourceReference": "https://kaikki.org/dictionary/English/kaikki.org-dictionary-English.jsonl",
+    "acquisitionLocator": {
+      "kind": "MUTABLE_HTTP_URL",
+      "url": "https://kaikki.org/dictionary/English/kaikki.org-dictionary-English.jsonl",
+      "urlIsImmutableIdentity": false,
+      "identityRule": "The expected byte length and SHA-256 are the immutable source identity; a URL response is never accepted without both checks."
+    }
+  },
+  "procedure": {
+    "attemptPolicy": {
+      "authoritativeAcquisitionAttemptsMax": 1,
+      "transferAttemptsMax": 3,
+      "resumeAttemptsIncludedInTransferLimit": true,
+      "retryOnlyForTransportFailure": true,
+      "identityMismatchIsNotRetryable": true,
+      "noAdaptiveSourceSubstitution": true,
+      "noSecondAuthoritativeAcquisition": true
+    },
+    "resumePolicy": {
+      "allowed": true,
+      "onlySameLocatorTargetAndExpectedIdentity": true,
+      "requiresRangeSupport": true,
+      "requiresVerifiedExistingPartialPrefix": true,
+      "partialIsNeverAuthoritative": true,
+      "rangeFailureBehavior": "FAIL_CLOSED_AND_DO_NOT_SUBSTITUTE_SOURCE",
+      "completedExactFileBehavior": "VERIFY_AND_REUSE_WITHOUT_TRANSFER"
+    },
+    "hashPolicy": {
+      "algorithm": "SHA-256",
+      "hashScope": "EXACT_DOWNLOADED_BYTE_SEQUENCE",
+      "expectedBytesRequired": true,
+      "expectedSha256Required": true,
+      "mismatchReasonCode": "SOURCE_IDENTITY_MISMATCH",
+      "silentExpectedIdentityUpdate": false
+    },
+    "bytePolicy": {
+      "expectedByteLength": 3335546346,
+      "byteCountIncludes": "ALL_TRANSFERRED_BYTES",
+      "zeroLengthRejected": true,
+      "shortOrLongTransferRejected": true,
+      "partialOrTemporaryFileCannotBeImported": true
+    },
+    "storagePolicy": {
+      "storageClass": "EXTERNAL_HASH_BOUND_NOT_REPOSITORY_BUNDLED",
+      "externalRootEnvironmentVariable": "OPEN_INSTRUMENT_EXTERNAL_SOURCE_ROOT",
+      "controlledRelativePath": "source-family/english-kaikki/2026-10-03/kaikki.org-dictionary-English.jsonl",
+      "repositoryBundling": false,
+      "gitLfs": false,
+      "derivedSemanticSlice": false,
+      "runtimeFetch": false,
+      "sameFilesystemTemporaryPath": true,
+      "atomicRenameAfterVerification": true,
+      "temporarySuffix": ".partial"
+    },
+    "localExistingArtifactPolicy": {
+      "inspectBeforeTransfer": true,
+      "filenameTrust": false,
+      "exactBytesAndHashMayBeReused": true,
+      "mismatchBehavior": "REPORT_OR_QUARANTINE_WITHOUT_DELETE_OR_ADOPT",
+      "unverifiedLocalFileMayEnterPipeline": false
+    },
+    "resourcePreflight": {
+      "metadataOnlyBeforeTransfer": true,
+      "largeBodyRequestBeforePreflight": false,
+      "requiredFreeBytesFormula": "(expectedBytes * 2) + 1073741824",
+      "requiredFreeBytes": 7676116696,
+      "reasonForMargin": "Storage safety for one final file, one temporary transfer, and a fixed 1 GiB margin; not a linguistic or scientific criterion.",
+      "targetMustBeOutsideGitWorktree": true,
+      "targetMustNotBeSymlinkAmbiguous": true,
+      "transportMustExposeStableByteCountOrFailClosed": true,
+      "toolingIdentityRecordedAtExecution": true
+    },
+    "transfer": {
+      "method": "STREAMED_HTTPS_TO_EXTERNAL_PARTIAL_FILE",
+      "redirects": "FOLLOW_ONLY_WITHIN_SAME_DECLARED_SOURCE_LOCATOR_POLICY",
+      "contentEncoding": "VERIFY_DECOMPRESSED_OR_RAW_BYTES_AGAINST_FROZEN_ARTIFACT_IDENTITY_AS_SPECIFIED_BY_RESPONSE",
+      "memoryBuffering": "DO_NOT_BUFFER_WHOLE_ARTIFACT",
+      "progress": "OPERATOR_LOG_ONLY",
+      "contentInspectionBeforeIdentityVerification": false
+    },
+    "verificationOrder": [
+      "resolve_external_target",
+      "inspect_exact_existing_or_partial_state",
+      "metadata_only_resource_preflight",
+      "stream_to_partial_target",
+      "compute_exact_byte_length_and_sha256",
+      "validate_frozen_source_identity",
+      "atomically_rename_verified_file",
+      "emit_future_acquisition_result"
+    ],
+    "failurePolicy": {
+      "allFailuresFailClosed": true,
+      "sourceIdentityMismatch": "SOURCE_IDENTITY_MISMATCH",
+      "sourceUnavailable": "SOURCE_UNAVAILABLE",
+      "licenseOrAttributionUnclear": "LICENSE_AUTHORITY_UNRESOLVED",
+      "insufficientStorage": "RESOURCE_PREFLIGHT_FAILED",
+      "partialTransfer": "INCOMPLETE_TRANSFER",
+      "unexpectedResponse": "SOURCE_RESPONSE_UNACCEPTABLE",
+      "noExpectedIdentitySubstitution": true,
+      "noSourceVersionSubstitution": true,
+      "noImportAfterFailure": true
+    },
+    "futureResultArtifact": {
+      "required": true,
+      "createdInThisLane": false,
+      "mustBind": [
+        "procedureId",
+        "procedureSha256",
+        "repositoryHead",
+        "executionTimestampUtc",
+        "sourceSnapshotId",
+        "locator",
+        "localExternalPath",
+        "transferAttemptCount",
+        "observedBytes",
+        "observedSha256",
+        "identityMatch",
+        "licenseAttributionStatus",
+        "acquired",
+        "imported",
+        "indexed",
+        "failureReason"
+      ]
+    }
+  },
+  "recordIdentity": {
+    "policyStatus": "DEFERRED_TO_SEPARATE_SOURCE_ADAPTER_DEFINITION",
+    "sourceRecordIdRule": "A future adapter must freeze a deterministic source-native identity from admitted entry fields and/or a source ordinal after snapshot verification; this procedure invents no record identity.",
+    "entryLocatorRule": "A future adapter must freeze a deterministic source-native locator; this procedure does not infer or fabricate entry locators.",
+    "sensePreservation": {
+      "allAdmittedSensesPreserved": true,
+      "sourceSenseOrderPreserved": true,
+      "multipleEntriesPreserved": true,
+      "multiplePartsOfSpeechPreserved": true,
+      "primarySenseSelection": false,
+      "senseMerging": false,
+      "semanticRanking": false,
+      "winnerSelection": false
+    },
+    "sourceFormPolicy": {
+      "exactSourceWordPreserved": true,
+      "sourceFormRewritten": false,
+      "trim": false,
+      "stemming": false,
+      "lemmatization": false,
+      "transliteration": false,
+      "diacriticRemoval": false,
+      "phoneticNormalization": false
+    },
+    "retrievalRepresentationPolicy": {
+      "definedByThisProcedure": false,
+      "newGenericRetrievalNormalization": false,
+      "existingLexicalJoinKeyMayBeSilentlyReused": false,
+      "requiresSeparateAdapterAndRuntimeAuthority": true
+    }
+  },
+  "licenseAndAttribution": {
+    "sourceDataLicenseStatement": "Kaikki states that dictionary data is under the same licenses as Wiktionary.",
+    "wiktionaryDataLicenses": ["CC-BY-SA", "GFDL"],
+    "attributionRequired": true,
+    "wiktextractSoftwareLicense": "MIT",
+    "legalConclusion": false,
+    "localResearchAcquisitionAuthority": "PROCEDURE_DEFINED_BUT_SEPARATE_EXECUTION_AUTHORIZATION_REQUIRED",
+    "repositoryBundlingAuthority": "NO",
+    "derivedIndexRedistributionAuthority": "NO",
+    "productionDistributionAuthority": "NO",
+    "attributionRecordRequiredAtExecution": true,
+    "licenseMismatchBehavior": "LICENSE_AUTHORITY_UNRESOLVED_FAIL_CLOSED"
+  },
+  "purposeFirewall": {
+    "sourceFactOnly": true,
+    "oldFunctionalPipelineReusedAsDiscoveryAdapter": false,
+    "functionalClaims": false,
+    "historicalClaims": false,
+    "pronunciationAuthority": false,
+    "semanticRanking": false,
+    "targetBasedFiltering": false,
+    "candidateGeneration": false,
+    "productionRuntime": false,
+    "s4": false,
+    "providerOrModel": false
+  },
+  "futureBoundary": {
+    "outputOfAcquisition": "VERIFIED_EXTERNAL_SOURCE_SNAPSHOT_ONLY",
+    "sourceContentInspectionInThisLane": false,
+    "sourceImportInThisLane": false,
+    "sourceIndexInThisLane": false,
+    "coverageEvaluationInThisLane": false,
+    "runtimePopulationInThisLane": false,
+    "nextGate": "SEPARATE_REVIEW_AND_AUTHORIZATION_BEFORE_CONTROLLED_ACQUISITION"
+  },
+  "inputBindings": {
+    "repositoryBaselineHead": "74b8e02dd2d789cb4330b08046510c4d8992ebe7",
+    "sourceFamilyContract": {
+      "path": "docs/open-instrument/source-family-lexical-substrate-v0.1-contract.md",
+      "sha256": "81322eca802578dd94d41aee53de6596d702ee1966494fd8ad8f425a5eeaf215"
+    },
+    "sourceAuthorityContract": {
+      "path": "docs/open-instrument/english-lexical-sense-source-authority-contract-v0.1.md",
+      "sha256": "7c6ed510dfafa8423781b679d2dcac8e87d89bdc4d914a1bf225a96df90d6934"
+    },
+    "sourceAuthorityImplementation": {
+      "path": "src/shared/openInstrument/englishLexicalSenseSourceContract.v0_1.ts",
+      "sha256": "d68ea30de5ca2df3b0e3537c022df4749f82b9764f1071653bd1131286ae7b61"
+    },
+    "hashBoundLocalReader": {
+      "path": "src/shared/openInstrument/englishLexicalSenseSourceReader.v0_1.ts",
+      "sha256": "78c5f14fd534be0a8617bf1ea7ad44d7b9ec75f1c97130cb9356b4cf5a08c556"
+    }
+  },
+  "executionState": {
+    "sourceAcquisitionAuthorized": false,
+    "sourceAcquisitionAttempts": 0,
+    "sourceAcquired": false,
+    "sourceImported": false,
+    "sourceAdapterImplemented": false,
+    "sourceIndexBuilt": false,
+    "coverageEvaluated": false,
+    "runtimeChanged": false,
+    "s4": "NOT_STARTED"
+  }
+}
