@@ -1,0 +1,54 @@
+{
+  "schemaVersion": "open-instrument.hash-manifest.v0.1",
+  "status": "IMPLEMENTED_SOURCE_RECORD_BOUNDARY_ONLY",
+  "contractId": "OPEN_INSTRUMENT_ENGLISH_KAIKKI_SOURCE_FAMILY_ADAPTER_V0_1",
+  "ownerMilestone": "60b634df-0b79-4aee-8089-ed158890241b",
+  "repositoryBaselineHead": "ef53bbe8f5fdbd25811af8b2404e4b7592e0550c",
+  "contractArtifact": {
+    "path": "docs/open-instrument/research-artifacts/source-family-lexical-substrate-v0.1-english-kaikki-source-family-adapter-v0.1/contract.json",
+    "sha256": "a359b0a8d6fe172b32937aed93690545adfc2403c40419209f358fc46d14ed02"
+  },
+  "implementationArtifact": {
+    "path": "docs/open-instrument/research-artifacts/source-family-lexical-substrate-v0.1-english-kaikki-source-family-adapter-v0.1/implementation.json",
+    "sha256": "5d65e3adf15f9b5c71e8f3506365314bcd507cb05672b2039ba7f7f00f27c4d7"
+  },
+  "artifacts": [
+    {
+      "role": "primary_adapter",
+      "path": "src/shared/openInstrument/englishKaikkiSourceFamilyAdapter.v0_1.ts",
+      "bytes": 14358,
+      "sha256": "2b8a41fd2c5cd8d7a11e8b157690d3e4b4dfd12ed44a1de48c5070347e11c28f"
+    },
+    {
+      "role": "focused_tests",
+      "path": "tests/openInstrument.englishKaikkiSourceFamilyAdapter.v0_1.spec.ts",
+      "bytes": 12955,
+      "sha256": "cea5907d1e816c95dfafc46ac85a70a2d5456652df241f2efa9c0dd426a56ad4"
+    }
+  ],
+  "sourceIdentity": {
+    "sourceFamilyId": "open-instrument.wiktionary-kaikki-english-lexical-sense.v0_1",
+    "snapshotId": "open-instrument.wiktionary-kaikki-english-lexical-sense.snapshot.2026-10-03.v0_1",
+    "expectedBytes": 3335546346,
+    "expectedSha256": "9978ce34256e4143c3498387564d293a9a2971ef376c1e038d369a2021c02195"
+  },
+  "state": {
+    "sourceAcquired": true,
+    "sourceSnapshotVerified": true,
+    "sourceContentBoundedSchemaInspection": true,
+    "sourceImported": false,
+    "adapterImplemented": true,
+    "indexBuilt": false,
+    "coverageEvaluated": false,
+    "runtimeAuthorized": false,
+    "runtimeChanged": false,
+    "s4": "NOT_STARTED",
+    "nextAction": "DEFINE_AND_FREEZE_ENGLISH_KAIKKI_DETERMINISTIC_INDEX_V0_1"
+  },
+  "validation": {
+    "absoluteMachineLocalPathExposed": false,
+    "fullCorpusParsed": false,
+    "persistentIndexConstructed": false,
+    "runtimeWiringAdded": false
+  }
+}

@@ -1,0 +1,64 @@
+{
+  "schemaVersion": "open-instrument.english-kaikki-source-family-adapter-implementation.v0.1",
+  "contractId": "OPEN_INSTRUMENT_ENGLISH_KAIKKI_SOURCE_FAMILY_ADAPTER_V0_1",
+  "contractStatusPreserved": "DEFINED_AND_FROZEN_NOT_IMPLEMENTED",
+  "implementationStatus": "IMPLEMENTED_SOURCE_RECORD_BOUNDARY_ONLY",
+  "repositoryBaselineHead": "ef53bbe8f5fdbd25811af8b2404e4b7592e0550c",
+  "sourceIdentity": {
+    "sourceFamilyId": "open-instrument.wiktionary-kaikki-english-lexical-sense.v0_1",
+    "snapshotId": "open-instrument.wiktionary-kaikki-english-lexical-sense.snapshot.2026-10-03.v0_1",
+    "bytes": 3335546346,
+    "sha256": "9978ce34256e4143c3498387564d293a9a2971ef376c1e038d369a2021c02195",
+    "acquired": true,
+    "verified": true
+  },
+  "state": {
+    "sourceContentBoundedSchemaInspection": true,
+    "sourceImported": false,
+    "adapterImplemented": true,
+    "indexBuilt": false,
+    "coverageEvaluated": false,
+    "runtimeAuthorized": false,
+    "runtimeChanged": false,
+    "s4": "NOT_STARTED"
+  },
+  "implementationBoundary": {
+    "inputUnit": "ONE_EXACT_PHYSICAL_JSONL_RECORD_BYTE_SEQUENCE_PLUS_ONE_BASED_ORDINAL_PLUS_VERIFIED_SNAPSHOT_IDENTITY",
+    "admittedFields": [
+      "word",
+      "lang",
+      "lang_code",
+      "pos",
+      "senses[].id",
+      "senses[].glosses",
+      "senses[].raw_glosses",
+      "senses[].tags",
+      "senses[].raw_tags"
+    ],
+    "unknownFieldPolicy": "IGNORE_AND_DO_NOT_PROJECT",
+    "genericProjection": "ONE_GENERIC_SOURCE_RECORD_PER_SOURCE_RECORD_SENSE_SELECTED_GLOSS_TUPLE",
+    "fullCorpusParsed": false,
+    "persistentIndexConstructed": false,
+    "runtimeWiringAdded": false
+  },
+  "artifacts": [
+    {
+      "role": "primary_adapter",
+      "path": "src/shared/openInstrument/englishKaikkiSourceFamilyAdapter.v0_1.ts",
+      "bytes": 14358,
+      "sha256": "2b8a41fd2c5cd8d7a11e8b157690d3e4b4dfd12ed44a1de48c5070347e11c28f"
+    },
+    {
+      "role": "focused_tests",
+      "path": "tests/openInstrument.englishKaikkiSourceFamilyAdapter.v0_1.spec.ts",
+      "bytes": 12955,
+      "sha256": "cea5907d1e816c95dfafc46ac85a70a2d5456652df241f2efa9c0dd426a56ad4"
+    }
+  ],
+  "validation": {
+    "focusedTests": "PASS",
+    "typecheckContracts": "PASS",
+    "typecheckProduction": "PASS"
+  },
+  "nextAction": "DEFINE_AND_FREEZE_ENGLISH_KAIKKI_DETERMINISTIC_INDEX_V0_1"
+}
