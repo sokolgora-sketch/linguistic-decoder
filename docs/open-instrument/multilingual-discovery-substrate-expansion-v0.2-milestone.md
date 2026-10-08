@@ -598,13 +598,63 @@ created.
 
 `S4=NOT_STARTED`
 
+## Source-family lexical substrate v0.1 contract and authority audit
+
+The v0.2 source architecture decision is now followed by a source-fact-only
+contract and repository source-authority audit. This documentation-only lane
+does not acquire, import, index, or expose a source family.
+
+SOURCE_ARCHITECTURE_DECISION=COMPLETE
+
+SELECTED_ARCHITECTURE=OPTION_C_HYBRID_SCALABLE_SUBSTRATE_PLUS_CURATED_ENRICHMENT
+
+SOURCE_FAMILY_LEXICAL_SUBSTRATE_V0_1=CONTRACT_AND_SOURCE_AUTHORITY_AUDIT_COMPLETE
+
+SOURCE_FAMILY_CONTRACT=docs/open-instrument/source-family-lexical-substrate-v0.1-contract.md
+
+SOURCE_FAMILY_AUTHORITY_AUDIT=docs/open-instrument/source-family-lexical-substrate-v0.1-source-authority-audit.md
+
+SOURCE_FAMILY_SELECTED=YES
+
+FIRST_SOURCE_FAMILY=open-instrument.wiktionary-kaikki-english-lexical-sense.v0_1
+
+SOURCE_ACQUISITION_AUTHORIZED=NO
+
+SOURCE_IMPORT_AUTHORIZED=NO
+
+SOURCE_RUNTIME_AUTHORIZED=NO
+
+S0=COMPLETE
+
+S1=COMPLETE
+
+S2=COMPLETE
+
+S3=COMPLETE
+
+BROADER_STRATIFIED_DIAGNOSTIC=COMPLETE_RESULT_PRESERVED
+
+S4=NOT_STARTED
+
+MILESTONE_COMPLETE=NO
+
+NEXT_ACTION=DEFINE_AND_FREEZE_ENGLISH_KAIKKI_SNAPSHOT_ACQUISITION_PROCEDURE
+
+The selected family is a bounded recommendation for a later acquisition and
+projection procedure. The existing FJALË and Scaife source surfaces remain
+preserved but do not currently provide the complete hash-bound scalable
+snapshot and license posture required for the first source-family procedure.
+The English selection does not authorize a download, source slice, adapter,
+index, runtime integration, pronunciation promotion, functional promotion,
+historical claim, or scientific execution.
+
 ## Explicit next action
 
-`NEXT_ACTION=BEGIN_OPEN_INSTRUMENT_SOURCE_FAMILY_LEXICAL_SUBSTRATE_V0_1_CONTRACT_AND_SOURCE_AUTHORITY_AUDIT`
+`NEXT_ACTION=DEFINE_AND_FREEZE_ENGLISH_KAIKKI_SNAPSHOT_ACQUISITION_PROCEDURE`
 
-The canonicalization hypothesis is closed for this frozen procedure. This does
-not establish that canonicalization would fail or succeed in a future
-authorized procedure. The v0.2 milestone remains active/incomplete and S4 is
-not started. The completed architecture decision selects a separate,
-source-fact-only source-family contract and authority audit before any source
-acquisition or runtime implementation.
+The source-family contract and authority audit are complete as a
+documentation-only lane. The canonicalization hypothesis remains closed for
+the frozen procedure. The v0.2 milestone remains active/incomplete and S4 is
+not started. The selected English family still requires a separate,
+source-fact-only snapshot acquisition procedure before any source acquisition,
+import, or runtime implementation.
