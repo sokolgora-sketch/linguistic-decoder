@@ -281,7 +281,9 @@ async function resolveExternalPathsV0_1(): Promise<Readonly<{
   const externalRoot = await realpath(externalRootValue);
   const repositoryRoot = await realpath(REPOSITORY_ROOT);
   assert(
-    !isInside(repositoryRoot, externalRoot) && !isInside(externalRoot, repositoryRoot),
+    externalRoot !== repositoryRoot &&
+      !isInside(repositoryRoot, externalRoot) &&
+      !isInside(externalRoot, repositoryRoot),
     "EXTERNAL_ROOT_NOT_OUTSIDE_GIT",
   );
   const sourcePathCandidate = join(externalRoot, SOURCE_RELATIVE_PATH);
@@ -551,7 +553,8 @@ class BucketWritersV0_1 {
   }
 
   async close(): Promise<void> {
-    for (const bucket of this.handles.keys()) await this.flush(bucket);
+    const buckets = new Set([...this.handles.keys(), ...this.buffers.keys()]);
+    for (const bucket of buckets) await this.flush(bucket);
     for (const handle of this.handles.values()) await handle.close();
   }
 }
@@ -761,6 +764,7 @@ async function verifyArtifactV0_1(input: Readonly<{
   const directoryEntries = await readDirectoryEntriesV0_1(directoryPath);
   let postingsOffset = 0;
   let postingsCount = 0;
+  let totalPostingsCount = 0;
   let directoryIndex = 0;
   let lastPosting: EnglishKaikkiDeterministicIndexPostingV0_1 | undefined;
   let currentDirectory: EnglishKaikkiDeterministicIndexDirectoryEntryV0_1 | undefined;
@@ -783,6 +787,7 @@ async function verifyArtifactV0_1(input: Readonly<{
       }
       assert(currentDirectory !== undefined, "INDEX_DIRECTORY_MISSING");
       postingsCount += 1;
+      totalPostingsCount += 1;
       postingsOffset += lineBytes.length;
       assert(postingsOffset <= currentDirectory.postingByteOffset + currentDirectory.postingByteLength, "INDEX_POSTING_OUTSIDE_DIRECTORY_RANGE");
   }
@@ -793,7 +798,8 @@ async function verifyArtifactV0_1(input: Readonly<{
   }
   assert(directoryIndex === directoryEntries.length, "INDEX_DIRECTORY_ENTRY_COUNT_MISMATCH");
   assert(postingsOffset === postingsFile.bytes, "INDEX_POSTINGS_BYTE_COUNT_MISMATCH");
-  assert(postingsCount === 0 || manifest.counts.postingsWritten > 0, "INDEX_POSTING_COUNT_INVALID");
+  assert(totalPostingsCount === manifest.counts.recordsProcessed, "INDEX_TOTAL_RECORD_COUNT_MISMATCH");
+  assert(totalPostingsCount === manifest.counts.postingsWritten, "INDEX_TOTAL_POSTING_COUNT_MISMATCH");
 
   const zeroPrefix = "__open_instrument_index_zero_match_";
   let zeroCandidate = "";
@@ -1020,12 +1026,12 @@ async function buildIndexV0_1(input: Readonly<{
     } catch (error) {
       if (error instanceof Error && "code" in error && error.code !== "ENOENT") throw error;
     }
-    await rename(tempRoot, input.indexPath);
     const verified = await verifyArtifactV0_1({
-      indexPath: input.indexPath,
+      indexPath: tempRoot,
       sourcePath: input.sourcePath,
       sourceIdentity: input.sourceIdentity,
     });
+    await rename(tempRoot, input.indexPath);
     return Object.freeze({
       counts: Object.freeze({ recordsProcessed, postingsWritten, distinctLookupKeys, sourceRecordFailures }),
       manifest: verified.manifest,
@@ -1122,7 +1128,7 @@ async function writeExecutionArtifactsV0_1(input: Readonly<{
   } as const;
   const resultBytes = canonicalJsonLineV0_1(result);
   const resultPath = resolve(REPOSITORY_ROOT, EXECUTION_RESULT_RELATIVE_PATH);
-  await writeFile(resultPath, resultBytes, { flag: "wx" });
+  await writeFile(resultPath, resultBytes);
   const resultHash = sha256FileBytes(resultBytes);
   const resultManifest = {
     schemaVersion: "open-instrument.english-kaikki-deterministic-index-build-execution-result-hash-manifest.v0.1",
@@ -1136,7 +1142,7 @@ async function writeExecutionArtifactsV0_1(input: Readonly<{
   } as const;
   const resultManifestBytes = canonicalJsonLineV0_1(resultManifest);
   const resultManifestPath = resolve(REPOSITORY_ROOT, EXECUTION_RESULT_MANIFEST_RELATIVE_PATH);
-  await writeFile(resultManifestPath, resultManifestBytes, { flag: "wx" });
+  await writeFile(resultManifestPath, resultManifestBytes);
   return Object.freeze({
     resultSha256: resultHash,
     manifestSha256: sha256FileBytes(resultManifestBytes),
