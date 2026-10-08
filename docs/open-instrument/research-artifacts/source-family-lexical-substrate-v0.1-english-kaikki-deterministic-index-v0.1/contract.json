@@ -1,0 +1,346 @@
+{
+  "schemaVersion": "open-instrument.english-kaikki-deterministic-index-contract.v0.1",
+  "contractId": "OPEN_INSTRUMENT_ENGLISH_KAIKKI_DETERMINISTIC_INDEX_V0_1",
+  "version": "v0.1",
+  "status": "DEFINED_AND_FROZEN_NOT_IMPLEMENTED",
+  "ownerMilestone": "60b634df-0b79-4aee-8089-ed158890241b",
+  "repositoryBaselineHead": "4e37b56b9194983b836f85269033f916c6ae408d",
+  "purpose": "Freeze a scalable deterministic exact-lookup index contract over the verified English Kaikki snapshot without building the index or wiring runtime.",
+  "authority": {
+    "sourceSnapshot": {
+      "sourceFamilyId": "open-instrument.wiktionary-kaikki-english-lexical-sense.v0_1",
+      "snapshotId": "open-instrument.wiktionary-kaikki-english-lexical-sense.snapshot.2026-10-03.v0_1",
+      "sourceDescription": "English Wiktionary -> Wiktextract -> Kaikki English JSONL",
+      "format": "POSTPROCESSED_JSONL",
+      "expectedBytes": 3335546346,
+      "expectedSha256": "9978ce34256e4143c3498387564d293a9a2971ef376c1e038d369a2021c02195",
+      "identityRule": "EXACT_BYTES_AND_SHA256_REQUIRED_BEFORE_INDEX_BUILD_OR_RECOVERY",
+      "externalRootEnvironmentVariable": "OPEN_INSTRUMENT_EXTERNAL_SOURCE_ROOT",
+      "controlledRelativeSourcePath": "source-family/english-kaikki/2026-10-03/kaikki.org-dictionary-English.jsonl"
+    },
+    "adapter": {
+      "contractId": "OPEN_INSTRUMENT_ENGLISH_KAIKKI_SOURCE_FAMILY_ADAPTER_V0_1",
+      "contractVersion": "v0.1",
+      "contractStatus": "DEFINED_AND_FROZEN_NOT_IMPLEMENTED",
+      "contractPath": "docs/open-instrument/research-artifacts/source-family-lexical-substrate-v0.1-english-kaikki-source-family-adapter-v0.1/contract.json",
+      "contractSha256": "a359b0a8d6fe172b32937aed93690545adfc2403c40419209f358fc46d14ed02",
+      "implementationStatus": "IMPLEMENTED_SOURCE_RECORD_BOUNDARY_ONLY",
+      "implementationCommit": "5861df5f571f94ace0f1e6dcf9c4b308bb7d15e2",
+      "implementationPath": "src/shared/openInstrument/englishKaikkiSourceFamilyAdapter.v0_1.ts",
+      "implementationSha256": "2b8a41fd2c5cd8d7a11e8b157690d3e4b4dfd12ed44a1de48c5070347e11c28f",
+      "implementationArtifactPath": "docs/open-instrument/research-artifacts/source-family-lexical-substrate-v0.1-english-kaikki-source-family-adapter-v0.1/implementation.json",
+      "implementationArtifactSha256": "5d65e3adf15f9b5c71e8f3506365314bcd507cb05672b2039ba7f7f00f27c4d7"
+    }
+  },
+  "inputContract": {
+    "recordUnit": "ONE_ADAPTER_VALIDATED_ENGLISH_KAIKKI_SOURCE_RECORD_V0_1_FROM_ONE_PHYSICAL_JSONL_RECORD",
+    "rawSourceReinterpretation": "FORBIDDEN_INDEX_BUILDER_MUST_USE_FROZEN_ADAPTER_BOUNDARY",
+    "sourceRecordId": "REQUIRED_AND_PRESERVED",
+    "entryLocator": "REQUIRED_AND_PRESERVED",
+    "sourceOrder": "PRESERVE_ONE_BASED_PHYSICAL_JSONL_RECORD_ORDER_AND_ADAPTER_SENSE_ORDER",
+    "multiplicity": "ONE_POSTING_PER_ADMITTED_PHYSICAL_SOURCE_RECORD; ALL_SENSES_AND_GLOSSES_RECOVERED_THROUGH_ADAPTER",
+    "physicalByteRange": {
+      "recordByteOffset": "ZERO_BASED_BYTE_OFFSET_OF_JSONL_RECORD",
+      "recordByteLength": "EXACT_RECORD_BYTES_INCLUDING_ORIGINAL_LINE_ENDING_WHEN_PRESENT",
+      "lineEndingPolicy": "PRESERVE_EXACT_BYTES; SPLIT_ON_LF; CR_BEFORE_LF_REMAINS_IN_RECORD_BYTES; NO_REWRITE"
+    },
+    "admittedFields": [
+      "word",
+      "lang",
+      "lang_code",
+      "pos",
+      "senses[].id",
+      "senses[].glosses",
+      "senses[].raw_glosses",
+      "senses[].tags",
+      "senses[].raw_tags"
+    ]
+  },
+  "indexSchema": {
+    "schemaVersion": "open-instrument.english-kaikki-deterministic-index.v0.1",
+    "indexId": "open-instrument.wiktionary-kaikki-english-lexical-sense.index.v0_1",
+    "buildProcedureId": "open-instrument.english-kaikki-deterministic-index-build.v0.1",
+    "artifactDirectoryRelativePath": "source-family/english-kaikki/2026-10-03/index/open-instrument.wiktionary-kaikki-english-lexical-sense.index.v0_1",
+    "files": [
+      "directory.ndjson",
+      "postings.ndjson",
+      "manifest.json"
+    ],
+    "artifactIdentity": {
+      "algorithm": "SHA-256",
+      "payload": "CANONICAL_JSON_IDENTITY_PAYLOAD_WITH_SCHEMA_BINDINGS_FILE_NAMES_FILE_BYTES_AND_FILE_SHA256_VALUES; MANIFEST_SELF_HASH_EXCLUDED",
+      "fileHashScope": "EXACT_CANONICAL_FILE_BYTES"
+    }
+  },
+  "keyContract": {
+    "sourceFormField": "word",
+    "sourceFormPolicy": "EXACT_PRESERVED_SOURCE_WORD; NEVER_REPLACED_BY_LOOKUP_KEY",
+    "operatorId": "OPEN_INSTRUMENT_ENGLISH_LEXICAL_SENSE_JOIN_KEY_V0_1",
+    "normalization": "NFC -> locale-independent English lowercase using en-US -> NFC",
+    "lookupEquality": "EXACT_LOOKUP_KEY_STRING_EQUALITY_ONLY",
+    "trim": false,
+    "stemming": false,
+    "lemmatization": false,
+    "fuzzyMatching": false,
+    "phoneticMatching": false,
+    "translationMatching": false,
+    "morphologicalExpansion": false,
+    "semanticNormalization": false,
+    "emptyKeyPolicy": "SOURCE_WORD_IS_NON_EMPTY; EMPTY_INDEX_KEYS_REJECTED_FAIL_CLOSED",
+    "caseNormalizationCollisionPolicy": "PRESERVE_ALL_POSTINGS_NO_DEDUPE_NO_WINNER"
+  },
+  "postingContract": {
+    "postingUnit": "ONE_ADMITTED_PHYSICAL_SOURCE_RECORD",
+    "fieldsInCanonicalOrder": [
+      "lookupKey",
+      "sourceRecordId",
+      "entryLocator",
+      "recordOrdinal",
+      "recordByteOffset",
+      "recordByteLength",
+      "recordSha256"
+    ],
+    "recovery": {
+      "mechanism": "READ_EXACT_BYTE_RANGE_FROM_VERIFIED_EXTERNAL_JSONL_SNAPSHOT",
+      "verifyRecordSha256BeforeAdaptation": true,
+      "reAdaptWithFrozenAdapter": true,
+      "recoverAllSensesPosAndGlosses": true,
+      "sourceRecordReferenceMustRemainBoundToPosting": true
+    },
+    "corpusDuplication": "NO_FULL_SOURCE_RECORD_COPY_IN_POSTING; RECOVERY_REFERENCE_ONLY",
+    "provenance": [
+      "sourceRecordId",
+      "entryLocator",
+      "recordSha256",
+      "snapshotId",
+      "sourceFamilyId"
+    ]
+  },
+  "multiplicityAndCollision": {
+    "multiplePhysicalRecordsSameLookupKey": "PRESERVE_ALL",
+    "sameWordMultiplePos": "PRESERVE_ALL",
+    "homographs": "PRESERVE_ALL",
+    "caseNormalizationCollisions": "PRESERVE_ALL",
+    "multipleSenses": "PRESERVE_ALL_IN_ADAPTER_SOURCE_ORDER",
+    "multipleGlosses": "PRESERVE_ALL_IN_ADAPTER_SOURCE_ORDER",
+    "deduplication": "NO",
+    "primaryRecordSelection": "NO",
+    "primarySenseSelection": "NO",
+    "ranking": "NO",
+    "winnerSelection": "NO",
+    "collisionIsFailure": false,
+    "collisionClasses": [
+      "WITHIN_PHYSICAL_SOURCE_RECORD",
+      "WITHIN_SOURCE_WORD_AND_POS",
+      "CASE_NORMALIZATION",
+      "MULTIPLE_SOURCE_RECORDS_UNDER_KEY"
+    ]
+  },
+  "ordering": {
+    "keyOrder": "UTF-8_UNSIGNED_BYTE_LEXICOGRAPHIC_ORDER",
+    "postingOrder": [
+      "lookupKey_UTF8_ASCENDING",
+      "recordOrdinal_ASCENDING",
+      "sourceRecordId_UTF8_ASCENDING_TIE_BREAKER"
+    ],
+    "directoryOrder": "lookupKey_UTF8_UNSIGNED_BYTE_LEXICOGRAPHIC_ORDER",
+    "lookupResultOrder": "POSTING_ORDER_WITHOUT_REORDERING",
+    "semanticRanking": false
+  },
+  "serialization": {
+    "format": "CANONICAL_JSON_LINES",
+    "encoding": "UTF-8",
+    "bom": false,
+    "lineEnding": "LF",
+    "finalLineEnding": true,
+    "insignificantWhitespace": false,
+    "propertyOrder": "FIELDS_IN_CONTRACT_DECLARED_ORDER",
+    "jsonStringEscaping": "RFC_8259",
+    "numericPolicy": "BASE10_SAFE_INTEGER_OFFSETS_LENGTHS_AND_COUNTS_ONLY",
+    "timestamps": "FORBIDDEN_IN_CANONICAL_INDEX_FILES",
+    "absolutePaths": "FORBIDDEN_IN_CANONICAL_INDEX_FILES",
+    "directoryFieldsInCanonicalOrder": [
+      "lookupKey",
+      "postingByteOffset",
+      "postingByteLength",
+      "postingCount"
+    ],
+    "manifestCanonicalization": "SAME_UTF8_CANONICAL_JSON_RULES; NO_RUN_TIMESTAMP"
+  },
+  "buildContract": {
+    "input": "VERIFIED_SOURCE_SNAPSHOT_PLUS_FROZEN_ADAPTER_CONTRACT_IMPLEMENTATION_AND_INDEX_CONTRACT",
+    "output": "EXTERNAL_DIRECTORY_NDJSON_POSTINGS_DIRECTORY_NDJSON_AND_CANONICAL_MANIFEST",
+    "fullCorpusBuildExecutedInThisLane": false,
+    "indexBuilderImplementedInThisLane": false,
+    "streaming": {
+      "rawCorpusLoadedIntoMemory": false,
+      "recordByRecordInput": true,
+      "boundedWorkingMemoryRequired": true,
+      "externalSortRunsAllowed": true,
+      "runSerialization": "SAME_CANONICAL_POSTING_SERIALIZATION",
+      "finalMergeOrder": "FROZEN_POSTING_ORDER",
+      "performanceClaims": "NONE_WITHOUT_MEASUREMENT"
+    },
+    "resourcePreflight": {
+      "required": true,
+      "formula": "SUFFICIENT_FREE_SPACE_FOR_BOUNDED_TEMPORARY_RUNS_PLUS_FINAL_ARTIFACTS_PLUS_OPERATOR_DEFINED_SAFETY_MARGIN",
+      "measuredValues": "RECORDED_ONLY_IN_EXTERNAL_EXECUTION_RECORD",
+      "targetOutsideGitWorktree": true
+    },
+    "temporaryArtifacts": {
+      "sameFilesystemAsFinal": true,
+      "partialArtifactsAuthoritative": false,
+      "failureCleanupOrQuarantineRequired": true,
+      "resume": false,
+      "restartFromVerifiedSnapshot": true
+    },
+    "atomicPublication": {
+      "required": true,
+      "method": "SAME_FILESYSTEM_ATOMIC_RENAME_AFTER_ALL_HASHES_AND_BINDINGS_VALIDATE",
+      "silentOverwrite": false,
+      "exactExistingArtifactMayBeReused": true
+    }
+  },
+  "lookupContract": {
+    "queryInput": "NON_NULL_STRING",
+    "queryTransformation": "EXACT_FROZEN_ENGLISH_LEXICAL_JOIN_KEY_OPERATOR; NO_PRE_TRIM",
+    "directoryLookup": "EXACT_LOOKUP_KEY_EQUALITY_ONLY",
+    "zeroMatch": "LEXICAL_SENSE_SOURCE_NOT_FOUND_VALID_NULL",
+    "collisionResult": "ALL_ORDERED_POSTINGS_PRESERVED_AND_RETURNED",
+    "sourceRecovery": "VERIFY_INDEX_BINDING_READ_POSTING_BYTE_RANGE_VERIFY_RECORD_HASH_REAPPLY_ADAPTER",
+    "invalidQuery": "INDEX_LOOKUP_INVALID_QUERY_FAIL_CLOSED",
+    "projectionBoundary": "INDEX_RETURNS_SOURCE_RECORD_REFERENCES; ADAPTER_PROJECTS_SOURCE_FACTS; GENERIC_DISCOVERY_BRIDGE_REMAINS_SEPARATE",
+    "runtimeAuthorization": false
+  },
+  "storageAndManifest": {
+    "rawSnapshot": "EXTERNAL_HASH_BOUND_NOT_REPOSITORY_BUNDLED",
+    "generatedIndex": "EXTERNAL_DERIVED_ARTIFACT_NOT_REPOSITORY_BUNDLED",
+    "repositoryBundling": false,
+    "gitLfs": false,
+    "runtimeFetch": false,
+    "redistributionAuthorization": false,
+    "manifestRequired": true,
+    "manifestMustBind": [
+      "indexSchemaVersion",
+      "indexId",
+      "sourceSnapshotIdentity",
+      "adapterContractIdentity",
+      "adapterImplementationIdentity",
+      "buildProcedureId",
+      "canonicalFileNames",
+      "fileByteLengths",
+      "fileSha256Values",
+      "artifactIdentity"
+    ]
+  },
+  "failureSemantics": {
+    "sourceFailure": [
+      "SOURCE_SNAPSHOT_MISSING",
+      "SOURCE_IDENTITY_MISMATCH",
+      "SOURCE_UNREADABLE",
+      "INVALID_SOURCE_RECORD",
+      "UNSUPPORTED_RECORD"
+    ],
+    "indexFailure": [
+      "INDEX_MISSING",
+      "INDEX_SCHEMA_MISMATCH",
+      "INDEX_SOURCE_BINDING_MISMATCH",
+      "INDEX_ADAPTER_CONTRACT_MISMATCH",
+      "INDEX_ADAPTER_IMPLEMENTATION_MISMATCH",
+      "INDEX_HASH_MISMATCH",
+      "INDEX_INCOMPLETE",
+      "INDEX_CORRUPT",
+      "INDEX_POSTING_INVALID",
+      "INDEX_LOOKUP_INVALID_QUERY"
+    ],
+    "validNull": [
+      "LEXICAL_SENSE_SOURCE_NOT_FOUND",
+      "LEXICAL_SENSE_GLOSS_NOT_FOUND"
+    ],
+    "collision": "NOT_FAILURE; PRESERVE_ALL_MATCHING_POSTINGS",
+    "semanticMeaningOfNoMatch": "NOT_NO_MEANING_NOT_NO_FUNCTION_NOT_NO_HISTORY_NOT_NO_OTHER_LEXICAL_EVIDENCE"
+  },
+  "provenanceAndLicense": {
+    "sourceTitle": "English Wiktionary -> Wiktextract -> Kaikki English JSONL",
+    "sourceUrlOrArchiveRef": "https://kaikki.org/dictionary/English/kaikki.org-dictionary-English.jsonl",
+    "dataLicenses": [
+      "CC-BY-SA",
+      "GFDL"
+    ],
+    "softwareLicense": "Wiktextract MIT",
+    "attributionRequired": true,
+    "legalConclusion": false,
+    "derivedIndexRedistributionAuthorized": false
+  },
+  "truthFirewall": {
+    "sourceFactsOnly": true,
+    "forbiddenFieldsOrAuthority": [
+      "targetWord",
+      "targetSense",
+      "semanticBridge",
+      "functionalMeaning",
+      "functionalCorrespondence",
+      "historicalRelation",
+      "historicalOrigin",
+      "pronunciation",
+      "IPA-derived Voice",
+      "voicePath",
+      "Seven-Voice interpretation",
+      "Gamma",
+      "ZC",
+      "Math7",
+      "candidate ranking",
+      "winner",
+      "language superiority",
+      "provider/model output",
+      "reviewed functional conclusion"
+    ],
+    "functionalAuthority": false,
+    "historicalAuthority": false,
+    "pronunciationAuthority": false,
+    "voiceAuthority": false,
+    "rankingAuthority": false,
+    "winnerAuthority": false,
+    "providerModelExecution": false,
+    "targetSpecificLogic": false
+  },
+  "antiCircularity": {
+    "genericOverEntireBoundSnapshot": true,
+    "knownExampleSearch": false,
+    "targetSpecificFiltering": false,
+    "wordSpecificShortcuts": false,
+    "syntheticFixturesMayProveContractOnly": true
+  },
+  "nonAuthorization": {
+    "sourceImported": false,
+    "indexBuilderImplemented": false,
+    "indexBuilt": false,
+    "indexLookupRuntimeImplemented": false,
+    "indexWiredToDiscovery": false,
+    "coverageEvaluated": false,
+    "runtimeAuthorized": false,
+    "runtimeChanged": false,
+    "s4": "NOT_STARTED",
+    "milestoneComplete": false,
+    "nextAction": "IMPLEMENT_ENGLISH_KAIKKI_DETERMINISTIC_INDEX_V0_1"
+  },
+  "stateAfterFreeze": {
+    "sourceAcquired": true,
+    "sourceSnapshotVerified": true,
+    "sourceContentBoundedSchemaInspection": true,
+    "sourceImported": false,
+    "adapterImplemented": true,
+    "deterministicIndexContractDefined": true,
+    "deterministicIndexContractFrozen": true,
+    "indexBuilderImplemented": false,
+    "indexBuilt": false,
+    "indexLookupRuntimeImplemented": false,
+    "indexWiredToDiscovery": false,
+    "coverageEvaluated": false,
+    "runtimeAuthorized": false,
+    "runtimeChanged": false,
+    "s4": "NOT_STARTED",
+    "milestoneComplete": false
+  },
+  "nextAction": "IMPLEMENT_ENGLISH_KAIKKI_DETERMINISTIC_INDEX_V0_1"
+}

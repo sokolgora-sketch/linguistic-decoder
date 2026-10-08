@@ -1,0 +1,94 @@
+{
+  "schemaVersion": "open-instrument.english-kaikki-deterministic-index-hash-manifest.v0.1",
+  "status": "DEFINED_AND_FROZEN_NOT_IMPLEMENTED",
+  "contractId": "OPEN_INSTRUMENT_ENGLISH_KAIKKI_DETERMINISTIC_INDEX_V0_1",
+  "ownerMilestone": "60b634df-0b79-4aee-8089-ed158890241b",
+  "repositoryBaselineHead": "4e37b56b9194983b836f85269033f916c6ae408d",
+  "sourceIdentity": {
+    "sourceFamilyId": "open-instrument.wiktionary-kaikki-english-lexical-sense.v0_1",
+    "snapshotId": "open-instrument.wiktionary-kaikki-english-lexical-sense.snapshot.2026-10-03.v0_1",
+    "expectedBytes": 3335546346,
+    "expectedSha256": "9978ce34256e4143c3498387564d293a9a2971ef376c1e038d369a2021c02195"
+  },
+  "adapterAuthority": {
+    "contractPath": "docs/open-instrument/research-artifacts/source-family-lexical-substrate-v0.1-english-kaikki-source-family-adapter-v0.1/contract.json",
+    "contractSha256": "a359b0a8d6fe172b32937aed93690545adfc2403c40419209f358fc46d14ed02",
+    "implementationPath": "src/shared/openInstrument/englishKaikkiSourceFamilyAdapter.v0_1.ts",
+    "implementationSha256": "2b8a41fd2c5cd8d7a11e8b157690d3e4b4dfd12ed44a1de48c5070347e11c28f",
+    "implementationCommit": "5861df5f571f94ace0f1e6dcf9c4b308bb7d15e2"
+  },
+  "artifacts": [
+    {
+      "role": "human_definition",
+      "path": "docs/open-instrument/english-kaikki-deterministic-index-v0.1.md",
+      "bytes": 9468,
+      "sha256": "7eb9bc1981380805cf3a4f543bec19048a077ad8f0bd9a3e6388e259e860b5e5"
+    },
+    {
+      "role": "machine_readable_contract",
+      "path": "docs/open-instrument/research-artifacts/source-family-lexical-substrate-v0.1-english-kaikki-deterministic-index-v0.1/contract.json",
+      "bytes": 13792,
+      "sha256": "aebc8d70c621689f48d1fec2d51b215a5570167c5da8fab6bb94c33b47d76181"
+    },
+    {
+      "role": "focused_contract_tests",
+      "path": "tests/openInstrument.englishKaikkiDeterministicIndexContract.v0_1.spec.ts",
+      "bytes": 11053,
+      "sha256": "31bc50a46db18a91b1f84665628f4e5c54d882b1834240e7ad0baf33c3563fc6"
+    },
+    {
+      "role": "frozen_adapter_contract",
+      "path": "docs/open-instrument/research-artifacts/source-family-lexical-substrate-v0.1-english-kaikki-source-family-adapter-v0.1/contract.json",
+      "bytes": 10009,
+      "sha256": "a359b0a8d6fe172b32937aed93690545adfc2403c40419209f358fc46d14ed02"
+    },
+    {
+      "role": "frozen_adapter_implementation_artifact",
+      "path": "docs/open-instrument/research-artifacts/source-family-lexical-substrate-v0.1-english-kaikki-source-family-adapter-v0.1/implementation.json",
+      "bytes": 2335,
+      "sha256": "5d65e3adf15f9b5c71e8f3506365314bcd507cb05672b2039ba7f7f00f27c4d7"
+    },
+    {
+      "role": "frozen_lexical_key_authority",
+      "path": "src/shared/openInstrument/englishLexicalSenseSourceContract.v0_1.ts",
+      "bytes": 10880,
+      "sha256": "d68ea30de5ca2df3b0e3537c022df4749f82b9764f1071653bd1131286ae7b61"
+    }
+  ],
+  "generatedIndex": {
+    "authorizedInThisLane": false,
+    "expectedStorage": "EXTERNAL_DERIVED_ARTIFACT_NOT_REPOSITORY_BUNDLED",
+    "expectedFiles": [
+      "directory.ndjson",
+      "postings.ndjson",
+      "manifest.json"
+    ],
+    "artifactIdentitySelfHash": "MANIFEST_SELF_HASH_EXCLUDED"
+  },
+  "state": {
+    "sourceAcquired": true,
+    "sourceSnapshotVerified": true,
+    "sourceContentBoundedSchemaInspection": true,
+    "sourceImported": false,
+    "adapterImplemented": true,
+    "deterministicIndexContractDefined": true,
+    "deterministicIndexContractFrozen": true,
+    "indexBuilderImplemented": false,
+    "indexBuilt": false,
+    "indexLookupRuntimeImplemented": false,
+    "indexWiredToDiscovery": false,
+    "coverageEvaluated": false,
+    "runtimeAuthorized": false,
+    "runtimeChanged": false,
+    "s4": "NOT_STARTED",
+    "milestoneComplete": false,
+    "nextAction": "IMPLEMENT_ENGLISH_KAIKKI_DETERMINISTIC_INDEX_V0_1"
+  },
+  "validationBoundary": {
+    "fullCorpusParsed": false,
+    "sourceContentInspectedInThisLane": false,
+    "secondAcquisitionPerformed": false,
+    "providerModelExecuted": false,
+    "absoluteMachineLocalPathExposed": false
+  }
+}
