@@ -15,7 +15,10 @@ Production configuration is derived only from
 `OPEN_INSTRUMENT_EXTERNAL_SOURCE_ROOT` and the frozen relative source/index
 paths. The canonical root must be outside the Git worktree. Missing roots,
 missing files, symlinks, manifest schema errors, frozen identity mismatches,
-and byte-length mismatches produce a configuration failure result.
+and byte-length or content-hash mismatches produce a configuration failure
+result. Provider initialization performs one streaming hash prevalidation of
+the source, directory, and postings artifacts against the frozen manifest;
+the per-lookup path remains bounded.
 
 ## Exact lookup
 

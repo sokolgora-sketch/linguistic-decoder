@@ -1,3 +1,5 @@
+import { createHash } from "node:crypto";
+import { createReadStream } from "node:fs";
 import { open, readFile, realpath, stat, lstat } from "node:fs/promises";
 import type { FileHandle } from "node:fs/promises";
 import { isAbsolute, join, relative, resolve } from "node:path";
@@ -14,6 +16,7 @@ import {
 import {
   artifactIdentitySha256V0_1,
   canonicalJsonLineV0_1,
+  comparePostingsV0_1,
   compareUtf8BytesV0_1,
   createIdentityPayloadV0_1,
   normalizeIndexQueryV0_1,
@@ -51,6 +54,17 @@ const EXPECTED_ADAPTER_IMPLEMENTATION_COMMIT =
   "4e37b56b9194983b836f85269033f916c6ae408d";
 const EXPECTED_ADAPTER_IMPLEMENTATION_SHA256 =
   "2b8a41fd2c5cd8d7a11e8b157690d3e4b4dfd12ed44a1de48c5070347e11c28f";
+const EXPECTED_INDEX_ARTIFACT_IDENTITY_SHA256 =
+  "0bc436e346a903193a326534f4bfd643e7bc0721cffecd74df8912f706777ae9";
+const EXPECTED_DIRECTORY_BYTES = 133992318;
+const EXPECTED_DIRECTORY_SHA256 =
+  "286f114d630d4dca83d6df4c79baf511dcdd145c11b13a446e42701782660fd2";
+const EXPECTED_POSTINGS_BYTES = 750627474;
+const EXPECTED_POSTINGS_SHA256 =
+  "daa79101fe08115ac4bd7d58f26dd9e2786f9de6c9ea54f2d764ef180b837ff1";
+const EXPECTED_RECORDS_PROCESSED = 1492836;
+const EXPECTED_POSTINGS_WRITTEN = 1492836;
+const EXPECTED_DISTINCT_LOOKUP_KEYS = 1355933;
 
 type ProviderRecordAdapterV0_1 = (input: Readonly<{
   recordBytes: Uint8Array;
@@ -267,6 +281,18 @@ async function boundedRealpathV0_1(root: string, path: string): Promise<string> 
   return resolved;
 }
 
+async function hashFileV0_1(path: string): Promise<Readonly<{ bytes: number; sha256: string }>> {
+  const hash = createHash("sha256");
+  let bytes = 0;
+  const stream = createReadStream(path, { highWaterMark: 8 * 1024 * 1024 });
+  for await (const chunk of stream) {
+    const buffer = Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk);
+    bytes += buffer.length;
+    hash.update(buffer);
+  }
+  return Object.freeze({ bytes, sha256: hash.digest("hex") });
+}
+
 function validManifestShapeV0_1(value: unknown): value is EnglishKaikkiDeterministicIndexManifestV0_1 {
   if (!isRecordV0_1(value)) return false;
   if (
@@ -365,7 +391,15 @@ async function loadProviderStateV0_1(input: Readonly<{
     (manifest.sourceSnapshot.expectedBytes !== ENGLISH_LEXICAL_SENSE_SOURCE_ARTIFACT_BYTES_V0_1 ||
       manifest.sourceSnapshot.expectedSha256 !== ENGLISH_LEXICAL_SENSE_SOURCE_ARTIFACT_SHA256_V0_1 ||
       manifest.adapter.implementationCommit !== EXPECTED_ADAPTER_IMPLEMENTATION_COMMIT ||
-      manifest.publication.externalRelativePath !== ENGLISH_KAIKKI_INDEX_RELATIVE_PATH_V0_1)
+      manifest.publication.externalRelativePath !== ENGLISH_KAIKKI_INDEX_RELATIVE_PATH_V0_1 ||
+      manifest.artifactIdentity.sha256 !== EXPECTED_INDEX_ARTIFACT_IDENTITY_SHA256 ||
+      manifest.files[0].bytes !== EXPECTED_DIRECTORY_BYTES ||
+      manifest.files[0].sha256 !== EXPECTED_DIRECTORY_SHA256 ||
+      manifest.files[1].bytes !== EXPECTED_POSTINGS_BYTES ||
+      manifest.files[1].sha256 !== EXPECTED_POSTINGS_SHA256 ||
+      manifest.counts.recordsProcessed !== EXPECTED_RECORDS_PROCESSED ||
+      manifest.counts.postingsWritten !== EXPECTED_POSTINGS_WRITTEN ||
+      manifest.counts.distinctLookupKeys !== EXPECTED_DISTINCT_LOOKUP_KEYS)
   ) {
     throw new Error("PROVIDER_FROZEN_IDENTITY_MISMATCH");
   }
@@ -380,6 +414,21 @@ async function loadProviderStateV0_1(input: Readonly<{
     postingsStat.size !== manifest.files[1].bytes
   ) {
     throw new Error("PROVIDER_ARTIFACT_BYTE_LENGTH_MISMATCH");
+  }
+  const [sourceDigest, directoryDigest, postingsDigest] = await Promise.all([
+    hashFileV0_1(sourcePath),
+    hashFileV0_1(directoryPath),
+    hashFileV0_1(postingsPath),
+  ]);
+  if (
+    sourceDigest.bytes !== manifest.sourceSnapshot.expectedBytes ||
+    sourceDigest.sha256 !== manifest.sourceSnapshot.expectedSha256 ||
+    directoryDigest.bytes !== manifest.files[0].bytes ||
+    directoryDigest.sha256 !== manifest.files[0].sha256 ||
+    postingsDigest.bytes !== manifest.files[1].bytes ||
+    postingsDigest.sha256 !== manifest.files[1].sha256
+  ) {
+    throw new Error("PROVIDER_ARTIFACT_BYTES_HASH_MISMATCH");
   }
   return Object.freeze({
     sourcePath,
@@ -515,10 +564,7 @@ function parsePostingRangeV0_1(
     const posting = parsePostingLineV0_1(bytes.subarray(start, lineFeed));
     if (posting.lookupKey !== entry.lookupKey) throw new Error("INDEX_POSTING_LOOKUP_KEY_MISMATCH");
     if (previous !== undefined) {
-      if (
-        compareUtf8BytesV0_1(previous.lookupKey, posting.lookupKey) > 0 ||
-        (previous.lookupKey === posting.lookupKey && previous.recordOrdinal > posting.recordOrdinal)
-      ) {
+      if (comparePostingsV0_1(previous, posting) >= 0) {
         throw new Error("INDEX_POSTING_ORDER_INVALID");
       }
     }

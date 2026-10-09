@@ -52,6 +52,55 @@ async function copyFixture(): Promise<string> {
   return directory;
 }
 
+async function rewriteFixtureManifestForBytes(
+  directory: string,
+  overrides: Readonly<{
+    source?: Uint8Array;
+    directory?: Uint8Array;
+    postings?: Uint8Array;
+  }>,
+): Promise<void> {
+  const manifestPath = join(directory, "manifest.json");
+  const manifest = JSON.parse(await readFile(manifestPath, "utf8")) as EnglishKaikkiDeterministicIndexManifestV0_1;
+  const sourceBytes = overrides.source ?? (await readFile(join(directory, "source.jsonl")));
+  const directoryBytes = overrides.directory ?? (await readFile(join(directory, "directory.ndjson")));
+  const postingsBytes = overrides.postings ?? (await readFile(join(directory, "postings.ndjson")));
+  const sourceSnapshot = {
+    ...manifest.sourceSnapshot,
+    expectedBytes: sourceBytes.byteLength,
+    expectedSha256: createHash("sha256").update(sourceBytes).digest("hex"),
+  };
+  const files: readonly [typeof manifest.files[0], typeof manifest.files[1]] = [
+    {
+      ...manifest.files[0],
+      bytes: directoryBytes.byteLength,
+      sha256: createHash("sha256").update(directoryBytes).digest("hex"),
+    },
+    {
+      ...manifest.files[1],
+      bytes: postingsBytes.byteLength,
+      sha256: createHash("sha256").update(postingsBytes).digest("hex"),
+    },
+  ];
+  const artifactIdentity = artifactIdentitySha256V0_1(
+    createIdentityPayloadV0_1({
+      sourceSnapshot,
+      adapter: manifest.adapter,
+      files,
+    }),
+  );
+  await writeFile(
+    manifestPath,
+    JSON.stringify({
+      ...manifest,
+      sourceSnapshot,
+      files,
+      artifactIdentity: { ...manifest.artifactIdentity, sha256: artifactIdentity },
+    }),
+    "utf8",
+  );
+}
+
 function expectNoRecords(
   result: EnglishKaikkiServerOnlyExactIndexProviderResultV0_1,
 ) {
@@ -167,6 +216,9 @@ describe("English Kaikki server-only exact index provider v0.1", () => {
         `"recordSha256":"${"f".repeat(64)}"`,
       );
       await writeFile(postingsPath, corrupted, "utf8");
+      await rewriteFixtureManifestForBytes(directory, {
+        postings: Buffer.from(corrupted, "utf8"),
+      });
       const provider = await fixtureProvider(fixtureAdapter, directory);
       expect(await provider.query("apple")).toMatchObject({
         status: "SOURCE_RECORD_RECOVERY_FAILURE",
@@ -182,7 +234,11 @@ describe("English Kaikki server-only exact index provider v0.1", () => {
     try {
       const postingsPath = join(directory, "postings.ndjson");
       const postings = await readFile(postingsPath, "utf8");
-      await writeFile(postingsPath, postings.replace('"recordByteLength":221', '"recordByteLength":999'), "utf8");
+      const corrupted = postings.replace('"recordByteLength":221', '"recordByteLength":999');
+      await writeFile(postingsPath, corrupted, "utf8");
+      await rewriteFixtureManifestForBytes(directory, {
+        postings: Buffer.from(corrupted, "utf8"),
+      });
       const provider = await fixtureProvider(fixtureAdapter, directory);
       expect(await provider.query("apple")).toMatchObject({
         status: "SOURCE_RECORD_RECOVERY_FAILURE",
