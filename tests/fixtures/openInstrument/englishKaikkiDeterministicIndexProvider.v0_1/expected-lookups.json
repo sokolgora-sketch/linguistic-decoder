@@ -1,0 +1,8 @@
+{
+  "exactMatch": "apple",
+  "caseCollisionPostingCount": 2,
+  "caseCollisionGlossCount": 4,
+  "multipleSenseGlossCount": 3,
+  "absent": "cantaloupe",
+  "recordCount": 3
+}
