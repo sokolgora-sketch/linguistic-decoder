@@ -176,7 +176,7 @@
     "body-parser": "1.20.6",
     "fast-uri": "3.1.7",
     "hono": "4.13.5",
-    "sharp": "0.35.4",
+    "sharp": "0.35.5",
     "websocket-driver": "0.7.5",
     "brace-expansion@<2.0.0": "1.1.18",
     "brace-expansion@>=3.0.0 <5.0.9": "5.0.9"
