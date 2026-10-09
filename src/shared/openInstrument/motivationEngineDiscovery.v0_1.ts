@@ -606,6 +606,32 @@ function matchContextsV0_1(
 }
 
 /**
+ * Returns the exact deterministic embryo/query forms used by the generic
+ * Discovery projection. Server-only source providers may resolve these forms
+ * asynchronously before handing records to the existing pure seam.
+ */
+export function getMotivationEngineDiscoveryQueryFormsV0_1(
+  word: string,
+): readonly string[] {
+  const normalizedWord = word.normalize("NFC").trim();
+  if (!normalizedWord) return Object.freeze([]);
+
+  const structuralHypotheses = discoverStructuralHypothesesV0_1(normalizedWord).map(
+    (hypothesis) => ({
+      hypothesisId: hypothesis.hypothesisId,
+      embryo: hypothesis.embryo,
+      expansionChain: [...hypothesis.expansionChain],
+      reasonCodes: [...hypothesis.reasonCodes],
+    }),
+  );
+  const queryForms = [...new Set(
+    matchContextsV0_1(normalizedWord, structuralHypotheses)
+      .map((context) => context.queryForm),
+  )];
+  return Object.freeze(queryForms);
+}
+
+/**
  * Builds the additive Discovery Lab projection from existing deterministic
  * structure and existing generic source adapters. It is deliberately separate
  * from the production candidate/status path.

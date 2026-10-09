@@ -38,6 +38,9 @@ import { AnalyzeWordResultV1ContractSchema } from "@/shared/analyzeWordResult.v1
 import { buildHeartInstrumentV1 } from "@/v1/heartInstrument.v1";
 import { projectDoctrineReadingV1 } from "@/shared/openInstrument/doctrineReadingContract.v1";
 import {
+  buildMotivationEngineDiscoveryServerOnlyV0_1,
+} from "@/shared/openInstrument/motivationEngineDiscoveryServerOnly.v0_1";
+import {
   buildMotivationEngineDiscoveryV0_1,
 } from "@/shared/openInstrument/motivationEngineDiscovery.v0_1";
 
@@ -1350,14 +1353,27 @@ async function runAnalyzeV1Orchestration(
           ? "albanian"
           : heartInstrumentV1.spokenPronunciation.sourceProfileId || payloadAlphabet;
 
-      (final as any).motivationDiscoveryV0_1 =
-        buildMotivationEngineDiscoveryV0_1({
-          word,
-          inputLanguage: discoveryInputLanguage,
-          inputProfile: discoveryInputProfile,
-          analysis: final as any,
-          heart: heartInstrumentV1,
+      const discoveryInput = {
+        word,
+        inputLanguage: discoveryInputLanguage,
+        inputProfile: discoveryInputProfile,
+        analysis: final as any,
+        heart: heartInstrumentV1,
+      };
+      const discoveryResult = providerExecution === "disabled"
+        ? {
+            discovery: buildMotivationEngineDiscoveryV0_1(discoveryInput),
+            englishProvider: { status: "NOT_QUERIED" as const },
+          }
+        : await buildMotivationEngineDiscoveryServerOnlyV0_1(discoveryInput);
+      if (discoveryResult.englishProvider.status === "UNAVAILABLE") {
+        logInternalFailure({
+          kind: "orchestration",
+          message: "optional English Kaikki Discovery source unavailable; existing Discovery preserved",
+          issues: discoveryResult.englishProvider,
         });
+      }
+      (final as any).motivationDiscoveryV0_1 = discoveryResult.discovery;
     }
 
     return NextResponse.json(final);

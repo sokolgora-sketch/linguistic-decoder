@@ -358,7 +358,7 @@ async function loadProviderStateV0_1(input: Readonly<{
   productionIdentity: boolean;
 }>): Promise<ProviderStateV0_1> {
   const externalRoot = await realpath(input.externalRoot);
-  const repositoryRoot = await realpath(resolve(process.cwd()));
+  const repositoryRoot = await realpath(resolve(/* turbopackIgnore: true */ process.cwd()));
   if (input.productionIdentity && (externalRoot === repositoryRoot || isInsideV0_1(repositoryRoot, externalRoot) || isInsideV0_1(externalRoot, repositoryRoot))) {
     throw new Error("EXTERNAL_ROOT_NOT_OUTSIDE_GIT");
   }
