@@ -1,0 +1,50 @@
+{
+  "schemaVersion": "open-instrument.english-kaikki-deterministic-index-manifest.v0.1",
+  "status": "PUBLISHED_AND_VERIFIED",
+  "contractId": "OPEN_INSTRUMENT_ENGLISH_KAIKKI_DETERMINISTIC_INDEX_V0_1",
+  "indexSchema": "open-instrument.english-kaikki-deterministic-index.v0.1",
+  "indexId": "open-instrument.wiktionary-kaikki-english-lexical-sense.index.v0_1",
+  "buildProcedureId": "open-instrument.english-kaikki-deterministic-index-build.v0.1",
+  "sourceSnapshot": {
+    "sourceFamilyId": "open-instrument.wiktionary-kaikki-english-lexical-sense.v0_1",
+    "snapshotId": "open-instrument.wiktionary-kaikki-english-lexical-sense.snapshot.2026-10-03.v0_1",
+    "expectedBytes": 532,
+    "expectedSha256": "fb912eb51d81b45e5a5c9bad5a1a6c53832e8daf675126048608757c86cd792c"
+  },
+  "adapter": {
+    "contractId": "OPEN_INSTRUMENT_ENGLISH_KAIKKI_SOURCE_FAMILY_ADAPTER_V0_1",
+    "contractSha256": "a359b0a8d6fe172b32937aed93690545adfc2403c40419209f358fc46d14ed02",
+    "implementationCommit": "4e37b56b9194983b836f85269033f916c6ae408d",
+    "implementationSha256": "2b8a41fd2c5cd8d7a11e8b157690d3e4b4dfd12ed44a1de48c5070347e11c28f"
+  },
+  "files": [
+    {
+      "path": "directory.ndjson",
+      "bytes": 173,
+      "sha256": "99152f08dd64f6d11ca3484d7df0a6c6033eebd061c1db4ff3f2efd2f9f4831f"
+    },
+    {
+      "path": "postings.ndjson",
+      "bytes": 1421,
+      "sha256": "1e6fea607b8970f908796e1c47d25441b3926a96e843c898ffb0a61ad2a50367"
+    }
+  ],
+  "manifestSelfTreatment": "EXCLUDED_FROM_ARTIFACT_IDENTITY_AND_FILE_BINDINGS",
+  "artifactIdentity": {
+    "algorithm": "SHA-256",
+    "payload": "CANONICAL_JSON_IDENTITY_PAYLOAD_V0_1",
+    "sha256": "c5a1b7caf312358861e8101929854bc98311d9a60f1f643ee2b4ca451bf32b4c",
+    "manifestSelfHashExcluded": true
+  },
+  "counts": {
+    "recordsProcessed": 3,
+    "postingsWritten": 3,
+    "distinctLookupKeys": 2
+  },
+  "publication": {
+    "externalRelativePath": "synthetic-fixture",
+    "atomic": true,
+    "sourceImported": false,
+    "runtimeRegistered": false
+  }
+}
