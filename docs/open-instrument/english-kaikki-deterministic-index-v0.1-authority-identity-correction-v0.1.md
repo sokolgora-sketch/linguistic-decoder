@@ -1,133 +1,113 @@
-# Open Instrument English Kaikki deterministic index v0.1 authority and identity correction
+# Open Instrument English Kaikki deterministic index v0.1 authority and completeness repair
 
-Status: `POST_2133_FROZEN_AUTHORITY_IDENTITY_CORRECTION_APPLIED`
+Status: `TARGETED_6597_POSTING_COMPLETENESS_REPAIR_PASS`
 
-Correction ID: `OPEN_INSTRUMENT_ENGLISH_KAIKKI_DETERMINISTIC_INDEX_V0_1_AUTHORITY_IDENTITY_CORRECTION_V0_1`
+Correction ID: `OPEN_INSTRUMENT_ENGLISH_KAIKKI_DETERMINISTIC_INDEX_V0_1_AUTHORITY_IDENTITY_AND_TARGETED_COMPLETENESS_REPAIR_V0_1`
 
-## Purpose and provenance
+## Historical boundary
 
-This is an additive post-merge correction to PR #2133. The original frozen
-contract, hash manifest, execution result, and execution-result hash manifest
-remain immutable historical records. This correction does not rewrite them.
+PR #2133 remains the historical third controlled full-corpus build. Its
+execution record reported 1,492,836 processed records, but the published
+postings file physically contained 1,486,239 postings. The prior PR #2134
+correction path incorrectly attempted to relabel that incomplete file by
+rewriting metadata counters. That path was removed.
 
-Parent contract:
-`docs/open-instrument/research-artifacts/source-family-lexical-substrate-v0.1-english-kaikki-deterministic-index-v0.1/contract.json`
+Forensic reconciliation proved that exactly 6,597 admitted physical source
+records were absent. The root cause was the pre-hardening bucket writer close
+lifecycle: buffered-only buckets below the 1 MiB opening threshold were not
+flushed. The repair below is targeted recovery, not a fourth authoritative
+build and not a full-corpus rebuild.
 
-Parent contract SHA-256:
-`0606a159918d672c03e1deafc0e547c0099e92a63e1b48363bf4348310e757b8`
+## Authority clarification
 
-PR #2133 merge SHA:
-`54764d00e8d41e67442dda90db8741a9ba555c9c`
-
-## Frozen-authority ambiguity discovered after #2133
-
-The frozen identity payload names `indexContractSha256`, but the v0.1 frozen
-authority did not state whether that field binds the machine-readable
-`contract.json` or the explanatory Markdown definition. PR #2133 implemented
-the human-definition SHA in the identity binding. The repository hash manifest
-already kept the two artifact roles distinct, but the implementation constant
-did not.
-
-The historical PR #2133 result and its external artifact identity remain
-historical facts. They are not rewritten as though the old authority had
-always specified the corrected role.
-
-## DF authority decision
-
-`indexContractSha256` is the machine identity binding and therefore binds the
-machine-readable deterministic-index `contract.json`:
+The frozen identity field `indexContractSha256` binds the machine-readable
+deterministic-index contract JSON:
 
 ```text
 INDEX_CONTRACT_SHA256_SEMANTIC_ROLE=MACHINE_READABLE_CONTRACT_JSON
 INDEX_CONTRACT_SHA256=0606a159918d672c03e1deafc0e547c0099e92a63e1b48363bf4348310e757b8
-```
-
-The explanatory Markdown definition remains separately identified as:
-
-```text
 HUMAN_DEFINITION_MARKDOWN_SHA256=c108f82172dcf87c786e2e9baebccc3ffaf6d3430c0b55b30018d626abe153cf
 ```
 
-The implementation now uses explicitly named machine-contract and
-human-definition constants. The builder validates both hashes against their
-respective files, and identity payload construction uses only the explicitly
-named machine-contract hash. Future builders must not infer the role from a
-generic variable name.
+The clarification is additive. The frozen contract, historical execution
+result, and historical artifact identity remain historical records.
 
-## External identity correction
-
-The verified `directory.ndjson` and `postings.ndjson` files were not rebuilt,
-rewritten, or reparsed from the source. Their bytes and hashes are unchanged.
-Only the external `manifest.json` metadata was atomically replaced so its
-artifact identity reflects the corrected machine-contract binding and its
-record counters reflect the already-published directory/postings bytes. The
-pre-correction counters were stale; this metadata correction does not alter
-the protected files.
+## Targeted repair proof
 
 ```text
-DIRECTORY_SHA256=2455eaf2ef9cb625d0744986e6ea65103796cd0465ef1e8d52cadd22427cfd5a
-POSTINGS_SHA256=1c9e35493e1e76d9189cef3a9bffb091194f541c4be4414f9c07971aff2f680a
-ARTIFACT_IDENTITY_BEFORE=e963008034b37a2dbe379cc16c2b037674544f17f0062934ece067425e1f9543
-ARTIFACT_IDENTITY_AFTER=861284c56f00d1297b84229e772a791f765f00e059679c6849db0d4924e7ec39
-MANIFEST_COUNTS_BEFORE=recordsProcessed:1492836,postingsWritten:1492836,distinctLookupKeys:1349964
-MANIFEST_COUNTS_AFTER=recordsProcessed:1486239,postingsWritten:1486239,distinctLookupKeys:1349964
-IDENTITY_CHANGED=YES
+ROOT_CAUSE=BUCKET_FLUSH_DEFECT
+AFFECTED_BUFFERED_ONLY_BUCKETS=47
+INCOMPLETE_POSTINGS=1486239
+RECOVERED_POSTINGS=6597
+FINAL_POSTINGS=1492836
+MISSING_ORDINALS_SHA256=5c8c1c5e1624068888f3e7bb5c7988264ff3cb03d36a40427639f0178176f30b
+SOURCE_RECORDS_RECOVERED=6597
+ADAPTER_ADMITTED=6597
+ADAPTER_REJECTED=0
+FULL_CORPUS_BUILD_EXECUTED=NO
+ATTEMPT_4_EXECUTED=NO
+SOURCE_REACQUIRED=NO
 ```
 
-The source remains externally stored and hash-bound. No source reacquisition,
-source reparse, full-corpus build, directory rebuild, postings rebuild, or
-fourth authoritative attempt was authorized or performed.
+The repair scans the verified frozen source only to recover the proven missing
+physical ordinals, merges the 1,486,239 existing canonical postings with the
+6,597 recovered postings, regenerates directory ranges from the merged stream,
+and publishes a fully verified sibling candidate atomically. It does not
+deduplicate collisions, rank entries, select winners, or change lookup
+semantics.
 
-## Execution-evidence reconciliation
-
-Project-controlled historical accounting is:
+## Repaired external artifact
 
 ```text
-ATTEMPT_1=FAIL / ERR_USE_AFTER_CLOSE / EXTERNAL_RUN_MERGE
-ATTEMPT_2=FAIL / ERR_USE_AFTER_CLOSE / EXTERNAL_RUN_MERGE
-ATTEMPT_3=PASS
-ATTEMPT_4=NOT_EXECUTED
+SOURCE_SHA256=9978ce34256e4143c3498387564d293a9a2971ef376c1e038d369a2021c02195
+DIRECTORY_BYTES=133992318
+DIRECTORY_SHA256=286f114d630d4dca83d6df4c79baf511dcdd145c11b13a446e42701782660fd2
+POSTINGS_BYTES=750627474
+POSTINGS_SHA256=daa79101fe08115ac4bd7d58f26dd9e2786f9de6c9ea54f2d764ef180b837ff1
+MANIFEST_BYTES=1894
+MANIFEST_SHA256=be15e21c895091b333d1a66f6e3556152aee2cf384585944dbd8c9d8776d58a5
+ARTIFACT_IDENTITY=0bc436e346a903193a326534f4bfd643e7bc0721cffecd74df8912f706777ae9
+DIRECTORY_ENTRY_COUNT=1355933
 ```
 
-The committed execution artifact independently preserves only one explicit
-prior failure plus the successful replacement-build record. It does not by
-itself independently preserve both prior failures. This correction records
-that limitation instead of fabricating missing durable execution logs.
+The old incomplete artifact remains recoverable in the external root as a
+retained sibling backup. Neither the source nor generated index files are
+imported into Git.
 
-The authorization-chain interpretation is:
+## Physical completeness invariant
 
 ```text
-AUTHORIZATION_LOGIC_INTEGRITY=PASS_WITH_POST_BUILD_TEST_TIMEOUT_CHANGE
-REVIEWED_TEST_SHA=036666526744117ae12dc34494c7d67827f2982d4ee1378467362bfe4896a5ba
-FINAL_MAIN_TEST_SHA_BEFORE_CORRECTION=7cf2a586f3a6a9c2a54c7ad92a5813ffec5cee120c08a4d9073bfeb9662b42e4
-TEST_FILE_DIFFERENCE_CLASS=POST_BUILD_TEST_HARNESS_TIMEOUT_ONLY
+COUNT_A_PHYSICAL_LF=1492836
+COUNT_B_STREAMING_NDJSON=1492836
+COUNT_C_DIRECTORY_POSTING_SUM=1492836
+UNIQUE_RECORD_ORDINALS=1492836
+DUPLICATE_RECORD_ORDINALS=0
+MISSING_RECORD_ORDINALS=0
+MIN_RECORD_ORDINAL=1
+MAX_RECORD_ORDINAL=1492836
+DIRECTORY_RANGES_CONTIGUOUS=YES
+DIRECTORY_FINAL_RANGE_EQUALS_POSTINGS_EOF=YES
+POSTINGS_CANONICAL_ORDER=YES
+POSTINGS_FINAL_LF=YES
 ```
 
-The reviewed test bytes were not identical to the final-main test bytes; the
-known difference is limited to the post-build stress-test timeout.
+The physical verifier rejects a file with fewer postings even when all local
+counters agree. Focused regression coverage also proves the generic
+buffered-only bucket close invariant.
 
-## Preserved boundaries
+## Preserved boundaries and next action
 
 ```text
 SOURCE_IMPORTED_TO_GIT=NO
-DIRECTORY_IMPORTED_TO_GIT=NO
-POSTINGS_IMPORTED_TO_GIT=NO
+INDEX_IMPORTED_TO_GIT=NO
 DISCOVERY_CHANGED=NO
 RUNTIME_CHANGED=NO
 API_CHANGED=NO
 UI_CHANGED=NO
-COVERAGE_CHANGED=NO
-S4_CHANGED=NO
+COVERAGE_EVALUATED=NO
+S4=NOT_STARTED
+NEXT_ACTION=SECURITY_REMEDIATION_INSPECT_CRITICAL_NEXTJS_RCE_ALERTS_288_289_AND_PR_2123
 ```
 
-The correction is metadata/authority binding only. It does not authorize
-Discovery integration or any runtime, API, UI, coverage, provider, semantic,
-pronunciation, or production lane.
-
-## Next action
-
-```text
-DEFINE_AND_FREEZE_ENGLISH_KAIKKI_INDEX_DISCOVERY_INTEGRATION_V0_1
-```
-
-This next action is recorded only; it is not executed by this correction lane.
+This next action is recorded only and is not executed by the targeted repair
+lane.

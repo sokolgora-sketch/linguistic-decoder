@@ -512,7 +512,7 @@ class BufferedFileWriterV0_1 {
   }
 }
 
-class BucketWritersV0_1 {
+export class BucketWritersV0_1 {
   private readonly handles = new Map<number, Awaited<ReturnType<typeof open>>>();
   private readonly buffers = new Map<number, Buffer[]>();
   private readonly bufferedBytes = new Map<number, number>();
