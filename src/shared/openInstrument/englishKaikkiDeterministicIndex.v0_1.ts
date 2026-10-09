@@ -10,7 +10,9 @@ import { normalizeEnglishLexicalJoinKeyV0_1 } from "./englishLexicalSenseSourceC
 
 export const ENGLISH_KAIKKI_DETERMINISTIC_INDEX_CONTRACT_ID_V0_1 =
   "OPEN_INSTRUMENT_ENGLISH_KAIKKI_DETERMINISTIC_INDEX_V0_1" as const;
-export const ENGLISH_KAIKKI_DETERMINISTIC_INDEX_CONTRACT_SHA256_V0_1 =
+export const ENGLISH_KAIKKI_DETERMINISTIC_INDEX_MACHINE_CONTRACT_SHA256_V0_1 =
+  "0606a159918d672c03e1deafc0e547c0099e92a63e1b48363bf4348310e757b8" as const;
+export const ENGLISH_KAIKKI_DETERMINISTIC_INDEX_HUMAN_DEFINITION_SHA256_V0_1 =
   "c108f82172dcf87c786e2e9baebccc3ffaf6d3430c0b55b30018d626abe153cf" as const;
 export const ENGLISH_KAIKKI_DETERMINISTIC_INDEX_SCHEMA_V0_1 =
   "open-instrument.english-kaikki-deterministic-index.v0.1" as const;
@@ -72,7 +74,7 @@ export type EnglishKaikkiDeterministicIndexIdentityPayloadV0_1 = Readonly<{
   indexId: typeof ENGLISH_KAIKKI_DETERMINISTIC_INDEX_ID_V0_1;
   indexContractId: typeof ENGLISH_KAIKKI_DETERMINISTIC_INDEX_CONTRACT_ID_V0_1;
   indexContractVersion: "v0.1";
-  indexContractSha256: typeof ENGLISH_KAIKKI_DETERMINISTIC_INDEX_CONTRACT_SHA256_V0_1;
+  indexContractSha256: typeof ENGLISH_KAIKKI_DETERMINISTIC_INDEX_MACHINE_CONTRACT_SHA256_V0_1;
   sourceSnapshot: Readonly<{
     sourceFamilyId: typeof ENGLISH_KAIKKI_SOURCE_FAMILY_ID_V0_1;
     snapshotId: typeof ENGLISH_KAIKKI_SNAPSHOT_ID_V0_1;
@@ -289,7 +291,7 @@ export function createIdentityPayloadV0_1(input: Readonly<{
     indexId: ENGLISH_KAIKKI_DETERMINISTIC_INDEX_ID_V0_1,
     indexContractId: ENGLISH_KAIKKI_DETERMINISTIC_INDEX_CONTRACT_ID_V0_1,
     indexContractVersion: "v0.1",
-    indexContractSha256: ENGLISH_KAIKKI_DETERMINISTIC_INDEX_CONTRACT_SHA256_V0_1,
+    indexContractSha256: ENGLISH_KAIKKI_DETERMINISTIC_INDEX_MACHINE_CONTRACT_SHA256_V0_1,
     sourceSnapshot: Object.freeze({
       sourceFamilyId: ENGLISH_KAIKKI_SOURCE_FAMILY_ID_V0_1,
       snapshotId: ENGLISH_KAIKKI_SNAPSHOT_ID_V0_1,

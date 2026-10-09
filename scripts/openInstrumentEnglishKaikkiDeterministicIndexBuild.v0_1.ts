@@ -34,8 +34,9 @@ import {
   createPostingV0_1,
   ENGLISH_KAIKKI_DETERMINISTIC_INDEX_BUILD_PROCEDURE_ID_V0_1,
   ENGLISH_KAIKKI_DETERMINISTIC_INDEX_CONTRACT_ID_V0_1,
-  ENGLISH_KAIKKI_DETERMINISTIC_INDEX_CONTRACT_SHA256_V0_1,
+  ENGLISH_KAIKKI_DETERMINISTIC_INDEX_HUMAN_DEFINITION_SHA256_V0_1,
   ENGLISH_KAIKKI_DETERMINISTIC_INDEX_ID_V0_1,
+  ENGLISH_KAIKKI_DETERMINISTIC_INDEX_MACHINE_CONTRACT_SHA256_V0_1,
   ENGLISH_KAIKKI_DETERMINISTIC_INDEX_SCHEMA_V0_1,
   firstUtf8ByteV0_1,
   normalizeIndexQueryV0_1,
@@ -319,11 +320,11 @@ async function verifyFrozenAuthorityV0_1(): Promise<void> {
     sha256File(adapterImplementationPath),
   ]);
   assert(
-    definitionFile.sha256 === ENGLISH_KAIKKI_DETERMINISTIC_INDEX_CONTRACT_SHA256_V0_1,
+    definitionFile.sha256 === ENGLISH_KAIKKI_DETERMINISTIC_INDEX_HUMAN_DEFINITION_SHA256_V0_1,
     "FROZEN_INDEX_DEFINITION_HASH_MISMATCH",
   );
   assert(
-    contractFile.sha256 === "0606a159918d672c03e1deafc0e547c0099e92a63e1b48363bf4348310e757b8",
+    contractFile.sha256 === ENGLISH_KAIKKI_DETERMINISTIC_INDEX_MACHINE_CONTRACT_SHA256_V0_1,
     "FROZEN_INDEX_MACHINE_CONTRACT_HASH_MISMATCH",
   );
   assert(
@@ -511,7 +512,7 @@ class BufferedFileWriterV0_1 {
   }
 }
 
-class BucketWritersV0_1 {
+export class BucketWritersV0_1 {
   private readonly handles = new Map<number, Awaited<ReturnType<typeof open>>>();
   private readonly buffers = new Map<number, Buffer[]>();
   private readonly bufferedBytes = new Map<number, number>();
@@ -1063,7 +1064,7 @@ async function writeExecutionArtifactsV0_1(input: Readonly<{
     implementationBinding: "WORKING_TREE_DELTA_FROM_REPOSITORY_BASELINE_HEAD",
     indexContract: {
       id: ENGLISH_KAIKKI_DETERMINISTIC_INDEX_CONTRACT_ID_V0_1,
-      sha256: ENGLISH_KAIKKI_DETERMINISTIC_INDEX_CONTRACT_SHA256_V0_1,
+      sha256: ENGLISH_KAIKKI_DETERMINISTIC_INDEX_MACHINE_CONTRACT_SHA256_V0_1,
     },
     sourceSnapshot: {
       sourceFamilyId: ENGLISH_KAIKKI_SOURCE_FAMILY_ID_V0_1,

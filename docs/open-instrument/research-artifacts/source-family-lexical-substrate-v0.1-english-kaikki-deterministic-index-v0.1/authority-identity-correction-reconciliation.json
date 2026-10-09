@@ -1,0 +1,92 @@
+{
+  "schemaVersion": "open-instrument.english-kaikki-deterministic-index-authority-identity-and-targeted-repair-reconciliation.v0.1",
+  "correctionId": "OPEN_INSTRUMENT_ENGLISH_KAIKKI_DETERMINISTIC_INDEX_V0_1_AUTHORITY_IDENTITY_AND_TARGETED_COMPLETENESS_REPAIR_V0_1",
+  "status": "TARGETED_6597_POSTING_COMPLETENESS_REPAIR_PASS",
+  "repository": {
+    "identity": "sokolgora-sketch/linguistic-decoder",
+    "historicalSourcePr": 2133,
+    "repairPr": 2134,
+    "historicalSourcePrMergeSha": "54764d00e8d41e67442dda90db8741a9ba555c9c"
+  },
+  "parentAuthority": {
+    "contractId": "OPEN_INSTRUMENT_ENGLISH_KAIKKI_DETERMINISTIC_INDEX_V0_1",
+    "contractPath": "docs/open-instrument/research-artifacts/source-family-lexical-substrate-v0.1-english-kaikki-deterministic-index-v0.1/contract.json",
+    "machineContractSha256": "0606a159918d672c03e1deafc0e547c0099e92a63e1b48363bf4348310e757b8",
+    "humanDefinitionPath": "docs/open-instrument/english-kaikki-deterministic-index-v0.1.md",
+    "humanDefinitionSha256": "c108f82172dcf87c786e2e9baebccc3ffaf6d3430c0b55b30018d626abe153cf",
+    "historicalArtifactsRemainImmutable": true,
+    "indexContractSha256SemanticRole": "MACHINE_READABLE_CONTRACT_JSON"
+  },
+  "forensicBinding": {
+    "expectedSourceRecords": 1492836,
+    "expectedAdmittedRecords": 1492836,
+    "incompletePostings": 1486239,
+    "missingPostings": 6597,
+    "missingOrdinalsSha256": "5c8c1c5e1624068888f3e7bb5c7988264ff3cb03d36a40427639f0178176f30b",
+    "recordOrdinalSemantics": "PHYSICAL_SOURCE",
+    "rootCause": "BUCKET_FLUSH_DEFECT",
+    "rootCauseConfidence": "HIGH",
+    "affectedBufferedOnlyBuckets": 47
+  },
+  "preRepairArtifact": {
+    "source": { "bytes": 3335546346, "sha256": "9978ce34256e4143c3498387564d293a9a2971ef376c1e038d369a2021c02195" },
+    "directory": { "bytes": 133425417, "sha256": "2455eaf2ef9cb625d0744986e6ea65103796cd0465ef1e8d52cadd22427cfd5a" },
+    "postings": { "bytes": 747334531, "sha256": "1c9e35493e1e76d9189cef3a9bffb091194f541c4be4414f9c07971aff2f680a" },
+    "manifestSha256": "b04888d390e81626dc85d8931116f115a5552bafc4505c5d7521ee4b6411c967",
+    "artifactIdentitySha256": "e963008034b37a2dbe379cc16c2b037674544f17f0062934ece067425e1f9543"
+  },
+  "targetedRecovery": {
+    "method": "BOUNDED_FROZEN_SOURCE_SCAN_FOR_PROVEN_MISSING_PHYSICAL_ORDINALS",
+    "sourceRecordsRecovered": 6597,
+    "adapterAdmitted": 6597,
+    "adapterRejected": 0,
+    "recoveredPostings": 6597,
+    "recoveredMissingOrdinalsSha256": "5c8c1c5e1624068888f3e7bb5c7988264ff3cb03d36a40427639f0178176f30b",
+    "fullCorpusBuildExecuted": false,
+    "attempt4Executed": false,
+    "sourceReacquired": false
+  },
+  "repairedArtifact": {
+    "source": { "bytes": 3335546346, "sha256": "9978ce34256e4143c3498387564d293a9a2971ef376c1e038d369a2021c02195" },
+    "directory": { "bytes": 133992318, "sha256": "286f114d630d4dca83d6df4c79baf511dcdd145c11b13a446e42701782660fd2" },
+    "postings": { "bytes": 750627474, "sha256": "daa79101fe08115ac4bd7d58f26dd9e2786f9de6c9ea54f2d764ef180b837ff1" },
+    "manifest": { "bytes": 1894, "sha256": "be15e21c895091b333d1a66f6e3556152aee2cf384585944dbd8c9d8776d58a5" },
+    "artifactIdentitySha256": "0bc436e346a903193a326534f4bfd643e7bc0721cffecd74df8912f706777ae9",
+    "directoryEntryCount": 1355933,
+    "backupRetained": true
+  },
+  "physicalCompletenessProof": {
+    "countMethodA": "PHYSICAL_POSTINGS_NDJSON_LF_COUNT",
+    "countA": 1492836,
+    "countMethodB": "STREAMING_NDJSON_PARSE_COUNT",
+    "countB": 1492836,
+    "countMethodC": "DIRECTORY_POSTING_COUNT_SUM",
+    "countC": 1492836,
+    "allCountsAgree": true,
+    "uniqueRecordOrdinals": 1492836,
+    "duplicateRecordOrdinals": 0,
+    "missingRecordOrdinals": 0,
+    "minRecordOrdinal": 1,
+    "maxRecordOrdinal": 1492836,
+    "directoryRangesContiguous": true,
+    "directoryFinalRangeEqualsPostingsEof": true,
+    "postingsCanonicalOrder": true,
+    "postingsFinalLf": true
+  },
+  "attemptHistory": {
+    "historicalAttempt3RemainsHistorical": true,
+    "targetedRepairIsNotAttempt4": true,
+    "fullCorpusBuildExecuted": false
+  },
+  "preservedBoundaries": {
+    "sourceImportedToGit": false,
+    "indexImportedToGit": false,
+    "discoveryChanged": false,
+    "runtimeChanged": false,
+    "apiChanged": false,
+    "uiChanged": false,
+    "coverageEvaluated": false,
+    "s4": "NOT_STARTED"
+  },
+  "nextAction": "SECURITY_REMEDIATION_INSPECT_CRITICAL_NEXTJS_RCE_ALERTS_288_289_AND_PR_2123"
+}
