@@ -13,7 +13,6 @@ import {
 } from "@/shared/openInstrument/englishLexicalSenseSourceContract.v0_1";
 import {
   buildMotivationEngineDiscoveryV0_1,
-  getMotivationEngineDiscoveryQueryFormsV0_1,
   type MotivationEngineDiscoveryV0_1,
 } from "@/shared/openInstrument/motivationEngineDiscovery.v0_1";
 import {
@@ -79,6 +78,31 @@ function providerFailureReasonV0_1(
   result: EnglishKaikkiServerOnlyExactIndexProviderResultV0_1,
 ): string | null {
   return "reasonCode" in result ? result.reasonCode : null;
+}
+
+function getMotivationEngineDiscoveryQueryFormsV0_1(input: {
+  word: string;
+  inputLanguage: string;
+  inputProfile: string;
+  analysis: AnalyzeWordResultV1;
+  heart: HeartInstrumentV1;
+}): readonly string[] {
+  const queryForms = new Set<string>();
+  const captureAdapter: GenericFunctionalWitnessSourceAdapterV1 = {
+    adapterId: "open-instrument.discovery-query-form-capture.v0.1",
+    candidateVoicePathPolicy: "NULL_UNAUTHORIZED",
+    query(queryInput: GenericFunctionalWitnessQueryV1): GenericFunctionalWitnessSourceAdapterResultV1 {
+      queryForms.add(queryInput.embryo);
+      return { ok: true, records: [] };
+    },
+  };
+
+  buildMotivationEngineDiscoveryV0_1({
+    ...input,
+    sourceAdapters: [captureAdapter],
+  });
+
+  return Object.freeze([...queryForms]);
 }
 
 async function resolveEnglishRecordsV0_1(
@@ -173,7 +197,7 @@ export async function buildMotivationEngineDiscoveryServerOnlyV0_1(input: {
   provider?: EnglishKaikkiServerOnlyExactIndexProviderV0_1;
 }): Promise<MotivationEngineDiscoveryServerOnlyResultV0_1> {
   const provider = input.provider ?? await getProductionProviderV0_1();
-  const queryForms = getMotivationEngineDiscoveryQueryFormsV0_1(input.word);
+  const queryForms = getMotivationEngineDiscoveryQueryFormsV0_1(input);
   const resolved = await resolveEnglishRecordsV0_1(provider, queryForms);
   const sourceAdapters: readonly GenericFunctionalWitnessSourceAdapterV1[] = [
     createAlbanianLexicalSubstrateWitnessAdapterV0_1(),

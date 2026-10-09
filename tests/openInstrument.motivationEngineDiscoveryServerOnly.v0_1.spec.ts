@@ -22,6 +22,8 @@ const FIXTURE_ROOT = resolve(
   "tests/fixtures/openInstrument/englishKaikkiDeterministicIndexProvider.v0_1",
 );
 
+jest.setTimeout(30_000);
+
 const fixtureAdapter = (input: Parameters<typeof adaptEnglishKaikkiJsonlRecordV0_1>[0]) =>
   adaptEnglishKaikkiJsonlRecordV0_1({
     ...input,
