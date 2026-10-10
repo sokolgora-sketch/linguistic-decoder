@@ -33,7 +33,7 @@ describe("Lane 4 witness presentation", () => {
       />,
     );
 
-    expect(screen.getByText("Seven-Voices doctrinal reading")).toBeInTheDocument();
+    expect(screen.getByText("WORD-SPECIFIC READING")).toBeInTheDocument();
     expect(screen.getByText("Functional witnesses")).toBeInTheDocument();
     expect(
       screen.getByText(

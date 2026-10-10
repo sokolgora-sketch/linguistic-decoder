@@ -84,7 +84,29 @@ describe("analyze-v1 Functional Motivation Interpretation v0.2 boundary", () => 
     expect(screen.getAllByText("CANDIDATE CORRESPONDENCE").length).toBeGreaterThan(0);
     expect(screen.getAllByText("REVIEWED FUNCTIONAL EVIDENCE").length).toBeGreaterThan(0);
     expect(screen.getAllByText("ZË-RO FUNCTIONAL HYPOTHESIS").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("This candidate and input do not have an authorized structural relation for this comparison.").length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/Interpretation reason code: NO_AUTHORIZED_STRUCTURAL_RELATION/).length).toBeGreaterThan(0);
     expect(screen.getByText(/No winner · user decides · historical relation not claimed/)).toBeInTheDocument();
+  });
+
+  it("translates a mapped Null reason in the primary layer while retaining the exact code", async () => {
+    const payload = await analyze({
+      word: "study",
+      mode: "strict",
+      alphabet: "auto",
+      providerExecution: "disabled",
+    });
+    const vm = adaptAnalysisToTelemetryVM(payload);
+
+    render(
+      <MotivationDiscoveryCardV0_1
+        discovery={vm.motivationDiscoveryV0_1}
+        interpretation={vm.functionalMotivationInterpretationV0_2}
+      />,
+    );
+
+    expect(screen.getAllByText("A target sense was not supplied, so no functional bridge was authorized.").length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/Interpretation reason code: MISSING_TARGET_SENSE/).length).toBeGreaterThan(0);
   });
 
   it("fails closed when the optional interpretation field is present but malformed", () => {

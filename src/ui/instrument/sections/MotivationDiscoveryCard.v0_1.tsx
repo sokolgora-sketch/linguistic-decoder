@@ -39,17 +39,46 @@ function functionalStatusLabel(
   }
 }
 
+const NULL_REASON_EXPLANATIONS: Record<string, string> = {
+  MISSING_TARGET_SENSE:
+    "A target sense was not supplied, so no functional bridge was authorized.",
+  INSUFFICIENT_FUNCTIONAL_EVIDENCE:
+    "No reviewed functional evidence currently supports this bridge.",
+  NO_AUTHORIZED_STRUCTURAL_RELATION:
+    "This candidate and input do not have an authorized structural relation for this comparison.",
+  LEXICAL_SELF_MATCH_NOT_FUNCTIONAL_MOTIVATION:
+    "This confirms a lexical entry, but an exact self-match is not a cross-form functional motivation claim.",
+  TARGET_SENSE_NOT_BOUND_TO_REVIEWED_EVIDENCE:
+    "The requested sense is not bound to reviewed evidence, so the functional bridge remains unclaimed.",
+  NO_GENERIC_AUTHORIZED_SOURCE_WITNESS:
+    "No authorized source witness supports a functional interpretation for this result.",
+};
+
+function nullReasonSummary(reason: string | null): string {
+  if (!reason) return "No functional interpretation is currently available.";
+  return NULL_REASON_EXPLANATIONS[reason] ?? `Unclassified interpretation state: ${reason}`;
+}
+
 function functionalSummary(candidate: MotivationDiscoveryCandidateV0_1VM): string {
   if (candidate.functionalInterpretation.statement) {
     return candidate.functionalInterpretation.statement;
   }
-  if (candidate.functionalInterpretation.reason === "LEXICAL_SELF_MATCH_NOT_FUNCTIONAL_MOTIVATION") {
-    return "This lexical record confirms the entry; it does not establish a cross-form functional motivation claim.";
+  return nullReasonSummary(candidate.functionalInterpretation.reason);
+}
+
+function interpretationHypothesisSummary(
+  interpretation: FunctionalMotivationCandidateInterpretationV0_2VM,
+): string {
+  if (interpretation.hypothesis.statement) return interpretation.hypothesis.statement;
+  return nullReasonSummary(interpretation.hypothesis.reason);
+}
+
+function discoveryEntryCause(candidate: MotivationDiscoveryCandidateV0_1VM): string {
+  const reason = candidate.structuralComparison.matchReason.trim();
+  if (reason) {
+    return `This candidate appears because the existing Discovery record says: ${reason}`;
   }
-  if (candidate.functionalInterpretation.reason === "INSUFFICIENT_FUNCTIONAL_EVIDENCE") {
-    return "No reviewed functional evidence currently supports this bridge.";
-  }
-  return "No supported functional interpretation is currently available.";
+  return "This candidate entered through the existing source/structural Discovery path.";
 }
 
 function representationLabel(value: string): string {
@@ -108,7 +137,7 @@ function Candidate({
             </h4>
             <span className="text-xs text-[#9fb1bf]">{candidate.candidateLanguage}</span>
             <span className="rounded-full border border-[#3f5368] bg-[#10161c] px-2 py-0.5 text-[10px] uppercase text-[#b8cce0]">
-              {isSelfMatch ? "lexical entry confirmation" : "structural motivation candidate"}
+              {isSelfMatch ? "lexical entry confirmation" : "source Discovery candidate"}
             </span>
           </div>
           <p className="mt-1 text-sm text-[#d7dde7]">{candidate.candidateGloss}</p>
@@ -132,7 +161,10 @@ function Candidate({
               {interpretation.reviewedFunctionalEvidence.authorityStatus === "REVIEWED_ACCEPTED" ? "Present" : "Unknown / Null"}
             </div>
             <div className="break-words text-[#9fb1bf]">
-              {interpretation.reviewedFunctionalEvidence.evidenceRefs.join(", ") || interpretation.reviewedFunctionalEvidence.reason || "No reviewed evidence"}
+              {interpretation.reviewedFunctionalEvidence.evidenceRefs.join(", ") ||
+                (interpretation.reviewedFunctionalEvidence.reason
+                  ? nullReasonSummary(interpretation.reviewedFunctionalEvidence.reason)
+                  : "No reviewed evidence")}
             </div>
           </div>
           <div className="rounded border border-[#4b3f2c] bg-[#18140e] p-2 text-xs leading-5 text-[#f0ddb0]">
@@ -141,7 +173,7 @@ function Candidate({
               {interpretation.hypothesis.status === "HYPOTHESIS" ? "Hypothesis" : "Unknown / Null"}
             </div>
             <div className="break-words">
-              {interpretation.hypothesis.statement ?? interpretation.hypothesis.reason ?? "No supported functional interpretation"}
+              {interpretationHypothesisSummary(interpretation)}
             </div>
           </div>
         </div>
@@ -155,6 +187,11 @@ function Candidate({
           {isSelfMatch ? "LEXICAL ENTRY CONFIRMATION" : "WHY THIS CANDIDATE"}
         </div>
         <p className="mt-1 text-sm text-[#d7dde7]">{comparison.matchReason}</p>
+        {!isSelfMatch ? (
+          <p data-testid="discovery-entry-cause" className="mt-2 text-sm text-[#c5ced8]">
+            {discoveryEntryCause(candidate)}
+          </p>
+        ) : null}
         {!isSelfMatch && boundary ? (
           <p className="mt-2 rounded border border-[#4a402d] bg-[#18140e] p-2 text-[#e3cf9b]">
             {boundary}
@@ -244,6 +281,18 @@ function Candidate({
             Functional evidence refs: {candidate.functionalInterpretation.evidenceRefs.join(", ") || "none"}
             <br />
             Functional reason: {candidate.functionalInterpretation.reason ?? "none"}
+            {interpretation?.hypothesis.reason ? (
+              <>
+                <br />
+                Interpretation reason code: {interpretation.hypothesis.reason}
+              </>
+            ) : null}
+            {interpretation?.reviewedFunctionalEvidence.reason ? (
+              <>
+                <br />
+                Reviewed evidence reason code: {interpretation.reviewedFunctionalEvidence.reason}
+              </>
+            ) : null}
             <br />
             Historical relation: {candidate.historicalRelation}
           </div>
@@ -270,20 +319,23 @@ export function MotivationDiscoveryCardV0_1({
 
   return (
     <section
-      aria-label="Motivation Engine Discovery Lab"
+      aria-label="Multilingual source Discovery"
       data-testid="motivation-discovery-card"
       className="rounded-[12px] border border-[#6b5b2f] bg-[#17140e] p-4 shadow-[0_12px_32px_rgba(0,0,0,0.16)]"
     >
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#d8bb7a]">
-            Motivation Engine / Discovery Lab
+            MULTILINGUAL SOURCE DISCOVERY
           </div>
           <h2 className="mt-1 text-base font-semibold text-[#f5f7fb]">
-            What structure and source evidence were found?
+            Source-bound candidates to inspect
           </h2>
           <p className="mt-1 max-w-2xl text-xs leading-5 text-[#aeb7c5]">
-            This count is the Motivation Discovery candidate population. The Evidence tab reports a broader emitted-row population and may show a different count.
+            This surface shows multilingual candidates from the existing source/structural Discovery path. It keeps source evidence separate from interpretation; no candidate is a selected choice.
+          </p>
+          <p data-testid="multilingual-discovery-role" className="mt-2 max-w-2xl text-xs leading-5 text-[#c5ced8]">
+            Discovery explains which source-bound candidates are available for inspection. It does not select a candidate or override the separate word-specific reading.
           </p>
         </div>
         <span className="rounded-full border border-[#6b5b2f] px-2.5 py-1 text-[11px] font-semibold text-[#f0ddb0]">
@@ -381,7 +433,17 @@ export function MotivationDiscoveryCardV0_1({
             <div className="rounded border border-[#303843] bg-[#10161c] p-2 text-[#c5ced8]">
               <div className="font-semibold uppercase tracking-[0.1em] text-[#8ea4ba]">PROVENANCE / UNRESOLVED FIELDS</div>
               <div className="mt-1 break-words">Source facts: {interpretation.value.input.sourceFacts.length}</div>
-              <div className="break-words">Unresolved: {interpretation.value.unresolved.map((item) => item.reason).join(", ") || "none"}</div>
+              <div className="break-words">
+                Unresolved: {interpretation.value.unresolved.map((item) => nullReasonSummary(item.reason)).join(" ") || "none"}
+              </div>
+              {interpretation.value.unresolved.length > 0 ? (
+                <details className="mt-2 rounded border border-[#303843] bg-[#101217] p-2">
+                  <summary className="cursor-pointer font-semibold">Exact unresolved reason codes</summary>
+                  <div className="mt-1 break-words font-mono">
+                    {interpretation.value.unresolved.map((item) => item.reason).join(", ")}
+                  </div>
+                </details>
+              ) : null}
               <div className="break-words text-[#9fb1bf]">No winner · user decides · historical relation not claimed</div>
             </div>
           </div>
@@ -417,7 +479,13 @@ export function MotivationDiscoveryCardV0_1({
       ) : (
         <div className="mt-4 rounded-lg border border-[#4b3f2c] bg-[#18140e] p-3 text-xs leading-5 text-[#f0ddb0]">
           <div className="font-semibold uppercase tracking-[0.12em]">NO SUPPORTED MOTIVATION CANDIDATE YET</div>
-          <div className="mt-1">{value.unknownOrNull.reason ?? "No qualifying source witness is currently available."}</div>
+          <div className="mt-1">{nullReasonSummary(value.unknownOrNull.reason)}</div>
+          {value.unknownOrNull.reason ? (
+            <details className="mt-2 rounded border border-[#6b5b2f] bg-[#101217] p-2 text-[#c5ced8]">
+              <summary className="cursor-pointer font-semibold">Exact Null reason code</summary>
+              <div className="mt-1 font-mono">{value.unknownOrNull.reason}</div>
+            </details>
+          ) : null}
           <div className="mt-1 text-[#d5c28f]">This Null result does not disprove the doctrine; it records the current evidence boundary.</div>
         </div>
       )}

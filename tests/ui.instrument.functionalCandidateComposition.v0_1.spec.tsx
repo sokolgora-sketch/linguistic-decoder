@@ -153,9 +153,10 @@ describe(
 
       render(<EmbryoExpansionContextCardV0_1 vm={vm} />);
 
-      expect(
-        screen.getByText("Seven-Voices doctrinal reading"),
-      ).toBeInTheDocument();
+      expect(screen.getByText("WORD-SPECIFIC READING")).toBeInTheDocument();
+      expect(screen.getByTestId("word-specific-reading-role")).toHaveTextContent(
+        "not a selected choice among multilingual source candidates",
+      );
       expect(screen.getByText("A · inference")).toBeInTheDocument();
       expect(screen.getByText("Evidence: None available")).toBeInTheDocument();
       expect(screen.getByText("Bounded doctrinal reading")).toBeInTheDocument();

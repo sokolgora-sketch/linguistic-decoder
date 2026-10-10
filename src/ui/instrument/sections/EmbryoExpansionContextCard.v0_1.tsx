@@ -719,7 +719,7 @@ function NoSupportedFunctionalCandidate({
       className="rounded-xl border border-slate-300 bg-slate-50 p-5 dark:border-slate-700 dark:bg-slate-900/40"
     >
       <div className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-600 dark:text-slate-300">
-        Functional motivation
+        WORD-SPECIFIC READING
       </div>
 
       <div className="mt-3 text-xl font-semibold text-slate-900 dark:text-white">
@@ -731,6 +731,10 @@ function NoSupportedFunctionalCandidate({
           {`No supported functional-motivation result is currently available for "${word}".`}
         </div>
       ) : null}
+
+      <p data-testid="word-specific-reading-role" className="mt-4 text-sm leading-6 text-slate-700 dark:text-slate-300">
+        This word-specific reading organizes the current word analysis; it is not a selected choice among multilingual source candidates and does not override source Discovery.
+      </p>
 
       <div className="mt-4 text-xs text-slate-500 dark:text-slate-400">
         Functional motivation, not historical etymology.
@@ -1585,9 +1589,7 @@ export function EmbryoExpansionContextCardV0_1({
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <div className="text-xs font-semibold uppercase tracking-[0.16em] text-emerald-700 dark:text-emerald-300">
-            {isGenericFunctionalCandidate
-              ? "Seven-Voices doctrinal reading"
-              : "Functional motivation"}
+            WORD-SPECIFIC READING
           </div>
 
           <div className="mt-2 text-sm text-slate-600 dark:text-slate-400">
@@ -1621,6 +1623,10 @@ export function EmbryoExpansionContextCardV0_1({
           ) : null}
         </div>
       </div>
+
+      <p data-testid="word-specific-reading-role" className="mt-4 rounded-lg border border-blue-300/70 bg-blue-50/70 p-3 text-sm leading-6 text-slate-700 dark:border-blue-400/25 dark:bg-blue-500/5 dark:text-slate-300">
+        This primary display organizes the existing word-specific reading. It is not a selected choice among multilingual source candidates and does not override the separate source Discovery surface.
+      </p>
 
       <div className="mt-5">
         <div className="text-xs font-semibold uppercase tracking-[0.14em] text-slate-600 dark:text-slate-400">
@@ -1861,7 +1867,7 @@ export function EmbryoExpansionContextCardV0_1({
 
       <div className="mt-4 text-xs leading-5 text-slate-500 dark:text-slate-400">
         {isGenericFunctionalCandidate
-          ? "Doctrinal reading, not historical etymology."
+          ? "Word-specific doctrinal reading, not historical etymology."
           : "Functional motivation, not historical etymology."}
       </div>
       </section>

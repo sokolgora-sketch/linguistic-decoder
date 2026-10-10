@@ -136,7 +136,13 @@ describe("Motivation Discovery Lab presentation v0.1", () => {
     expect(screen.getByText("Source fact")).toBeInTheDocument();
     expect(screen.getByTestId("motivation-structural-comparison")).toBeInTheDocument();
     expect(screen.getByText("WHY THIS CANDIDATE")).toBeInTheDocument();
-    expect(screen.getByText(/structural motivation candidate/i)).toBeInTheDocument();
+    expect(screen.getByText(/source Discovery candidate/i)).toBeInTheDocument();
+    expect(screen.getByTestId("multilingual-discovery-role")).toHaveTextContent(
+      "does not select a candidate or override the separate word-specific reading",
+    );
+    expect(screen.getByTestId("discovery-entry-cause")).toHaveTextContent(
+      "existing Discovery record says",
+    );
     expect(screen.getByText("CROSS_REPRESENTATION")).toBeInTheDocument();
     expect(screen.getByText("NOT_COMPARABLE_ACROSS_REPRESENTATIONS")).toBeInTheDocument();
     expect(screen.getByText(/no target-word mapping/)).toBeInTheDocument();
@@ -204,8 +210,35 @@ describe("Motivation Discovery Lab presentation v0.1", () => {
     );
 
     expect(screen.getByText("NO SUPPORTED MOTIVATION CANDIDATE YET")).toBeInTheDocument();
+    expect(screen.getByText("No authorized source witness supports a functional interpretation for this result.")).toBeInTheDocument();
+    expect(screen.getByText("Exact Null reason code")).toBeInTheDocument();
     expect(screen.getByText("NO_GENERIC_AUTHORIZED_SOURCE_WITNESS")).toBeInTheDocument();
     expect(screen.queryByTestId("motivation-discovery-candidate")).not.toBeInTheDocument();
+  });
+
+  it("keeps an unmapped Null reason visible and conservative while preserving its exact code in details", () => {
+    const candidate = model().candidates[0];
+    const value = model({
+      candidates: [{
+        ...candidate,
+        functionalInterpretation: {
+          ...candidate.functionalInterpretation,
+          status: "UNKNOWN_OR_NULL",
+          truthClassification: "unknown_or_null",
+          statement: null,
+          evidenceKind: "none",
+          evidenceRefs: [],
+          reason: "UNMAPPED_NULL_REASON_EXAMPLE",
+        },
+      }],
+    });
+
+    render(<MotivationDiscoveryCardV0_1 discovery={{ kind: "present", value }} />);
+
+    expect(screen.getByText("Unclassified interpretation state: UNMAPPED_NULL_REASON_EXAMPLE")).toBeInTheDocument();
+    expect(screen.getByTestId("motivation-candidate-details")).toHaveTextContent(
+      "Functional reason: UNMAPPED_NULL_REASON_EXAMPLE",
+    );
   });
 
   it("separates an exact lexical self-match from a structural motivation candidate", () => {
