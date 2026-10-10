@@ -49,6 +49,16 @@ The execution must not target a positive result, a coverage increase, or an
 attractive lexical match. ARCHITECTURE_CHANGED_TO_FIT_NEW_SOURCE is not a
 success condition.
 
+S5_GENERALIZATION_LAYER_SCOPE=RETRIEVAL_PROVENANCE_AND_AUTHORITY_BOUNDARY
+
+S5 is limited to whether an independently sourced third linguistic family can
+enter the existing Discovery contract through exact retrieval, provenance
+preservation, and authority-boundary projection. It does not establish
+cross-family generalization of spoken pronunciation, Seven Voices paths,
+Gamma, or ZC because the selected source does not provide authorized
+pronunciation data. Those layers remain protected and must remain Null or
+unchanged unless a separate authority is explicitly authorized.
+
 ## 3. Existing architecture boundary
 
 The future source-family path is bounded to:
@@ -223,13 +233,14 @@ are present and internally consistent:
 ## 8. Normalization and transliteration policy
 
 ORIGINAL_SCRIPT_PRESERVATION=Preserve exact source-native SLP1 fields and raw bytes; any Devanagari or IAST representation is an additional attributed field, never a replacement
-UNICODE_NORMALIZATION=NFC validation for Unicode metadata and derived display fields only; never rewrite the source byte boundary
+UNICODE_NORMALIZATION=NFC is the only preregistered normalization, applied for Unicode metadata and derived display fields only; never rewrite the source byte boundary
 CASE_NORMALIZATION=NONE for source and lookup identity; no case folding
 DIACRITIC_POLICY=Preserve every source distinction, including IAST diacritics and Vedic accent markers; no accent/diacritic stripping
 TRANSLITERATION_POLICY=SLP1 remains the source-native representation; IAST and Devanagari, if supplied, remain separately named derived/display representations
 TRANSLITERATION_AUTHORITY=Cologne/MWS documented representation conventions; no new transliteration mapping is authorized in S5
 DISPLAY_FORM_POLICY=Display exact source form with any derived representation explicitly labeled and provenance-linked
-LOOKUP_FORM_POLICY=EXACT_NFC over one predeclared source-native representation only; no transliteration equivalence, case equivalence, stemming, fuzzy match, phonetic match, or semantic match
+LOOKUP_FORM_POLICY=EXACT source-native SLP1 lookup representation after the explicitly preregistered NFC validation boundary; no transliteration equivalence, case equivalence, stemming, fuzzy match, phonetic match, or semantic match
+LOOKUP_FORM_CASE_POLICY=NO_LOWERCASE; SLP1 lookup is case-sensitive and preserves the exact source-native representation
 PRONUNCIATION_FROM_TRANSLITERATION_ALLOWED=NO
 
 If the existing generic query boundary cannot carry the source-native lookup
@@ -269,6 +280,10 @@ spoken pronunciation. A source citation is not historical descent. A structural
 match is not semantic equivalence. Any future record lacking authorized
 pronunciation must project NULL_UNAUTHORIZED or the equivalent existing
 contract posture.
+
+S5 does not establish cross-family generalization of spoken pronunciation,
+Seven Voices paths, Gamma, or ZC because the selected source lacks authorized
+pronunciation data.
 
 ## 10. Future execution sampling and proof plan
 
