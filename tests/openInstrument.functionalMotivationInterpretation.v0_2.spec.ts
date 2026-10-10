@@ -8,6 +8,12 @@ import {
 import { buildMotivationEngineDiscoveryV0_1 } from "@/shared/openInstrument/motivationEngineDiscovery.v0_1";
 import { createAlbanianLexicalSubstrateWitnessAdapterV0_1 } from "@/shared/openInstrument/albanianLexicalSubstrate.v0_1";
 import { createLatinLexicalSubstrateWitnessAdapterV0_1 } from "@/shared/openInstrument/latinLexicalSubstrate.v0_1";
+import {
+  adaptEnglishKaikkiJsonlRecordV0_1,
+  createEnglishKaikkiGenericWitnessSourceAdapterV0_1,
+  ENGLISH_KAIKKI_ADAPTER_EXPECTED_SNAPSHOT_IDENTITY_V0_1,
+} from "@/shared/openInstrument/englishKaikkiSourceFamilyAdapter.v0_1";
+import type { GenericFunctionalWitnessSourceAdapterV1 } from "@/shared/openInstrument/genericFunctionalWitnessDiscovery.v1";
 
 async function analysisFor(word: string, alphabet = "auto") {
   const payload = await runAnalysisDeterministic(word, {
@@ -17,7 +23,12 @@ async function analysisFor(word: string, alphabet = "auto") {
   return enginePayloadToAnalysisResult(payload);
 }
 
-async function discoveryFor(word: string, inputLanguage = "en", inputProfile?: string) {
+async function discoveryFor(
+  word: string,
+  inputLanguage = "en",
+  inputProfile?: string,
+  sourceAdapters?: readonly GenericFunctionalWitnessSourceAdapterV1[],
+) {
   const heart = buildHeartInstrumentV1(word);
   return {
     heart,
@@ -27,8 +38,26 @@ async function discoveryFor(word: string, inputLanguage = "en", inputProfile?: s
       inputProfile: inputProfile ?? heart.spokenPronunciation.sourceProfileId,
       analysis: await analysisFor(word, inputLanguage === "sq" ? "albanian" : "auto"),
       heart,
+      sourceAdapters,
     }),
   };
+}
+
+function englishSourceRecordForTest() {
+  const record = {
+    word: "di",
+    lang: "English",
+    lang_code: "en",
+    pos: "noun",
+    senses: [{ id: "fixture.di.1", glosses: ["learning"] }],
+  };
+  const result = adaptEnglishKaikkiJsonlRecordV0_1({
+    recordBytes: new TextEncoder().encode(JSON.stringify(record)),
+    recordOrdinal: 1,
+    verifiedSnapshot: ENGLISH_KAIKKI_ADAPTER_EXPECTED_SNAPSHOT_IDENTITY_V0_1,
+  });
+  if (!result.ok) throw new Error(`English fixture did not adapt: ${result.reasonCode}`);
+  return result.record;
 }
 
 describe("Functional Motivation Interpretation v0.2 projector", () => {
@@ -135,60 +164,75 @@ describe("Functional Motivation Interpretation v0.2 projector", () => {
   });
 
   it("preserves English lexical source facts, exact citations, and source status without promotion", async () => {
-    const { heart, discovery } = await discoveryFor("study");
-    const reviewedDi = discovery.candidates.find((candidate) => candidate.candidateEmbryo === "DI");
-    expect(reviewedDi).toBeDefined();
-    if (!reviewedDi) return;
-
-    const reviewedCitationRefs = [
-      "reviewed.external.di.knowledge.candidate.citation.v0_1",
-    ];
-    expect(reviewedDi.sourceFact.evidenceRefs).toEqual(reviewedCitationRefs);
-
-    const reviewedResult = buildFunctionalMotivationInterpretationV0_2({
-      discovery,
-      targetSense: {
-        id: "user_sense_learning",
-        label: "learning",
-        authority: "EXPLICIT_USER_OR_AUTHORIZED_SOURCE",
-      },
-      heart,
-    });
-    const projectedReviewed = reviewedResult.candidates.find(
-      (candidate) => candidate.candidateEmbryo === "DI",
-    );
-    expect(projectedReviewed?.sourceFact.citationRefs).toEqual(reviewedCitationRefs);
-    expect(projectedReviewed?.reviewedFunctionalEvidence.evidenceRefs).toEqual(reviewedCitationRefs);
-    expect(projectedReviewed?.sourceFact.sourceStatus).toBe("reviewed_accepted");
-    expect(projectedReviewed?.reviewedFunctionalEvidence.sourceStatus).toBe("reviewed_accepted");
-    expect(projectedReviewed?.reviewedFunctionalEvidence.authorityStatus).toBe("REVIEWED_ACCEPTED");
-
-    const englishCandidate = {
-      ...reviewedDi,
-      candidateId: "fixture:english:study:source-only",
-      candidateLanguage: "English",
-      candidateForm: "study",
-      candidateGloss: "to spend time learning",
-      sourceFact: {
-        ...reviewedDi.sourceFact,
-        sourceId: "fixture.english.study.source-only.v0_2",
-        sourceStatus: "source_only",
-        evidenceRefs: ["fixture.english.study.citation.v0_2"],
-        sourceUrlOrArchiveRef: "fixture://english/study",
-        entryLocator: "fixture:english/study",
-      },
-      functionalInterpretation: {
-        ...reviewedDi.functionalInterpretation,
-        status: "UNKNOWN_OR_NULL" as const,
-        truthClassification: "unknown_or_null" as const,
-        statement: null,
-        evidenceKind: "none" as const,
-        evidenceRefs: [],
-        reason: "INSUFFICIENT_FUNCTIONAL_EVIDENCE",
+    const englishSourceRecord = englishSourceRecordForTest();
+    const englishSourceAdapter = createEnglishKaikkiGenericWitnessSourceAdapterV0_1([
+      englishSourceRecord,
+    ]);
+    const englishAdapter: GenericFunctionalWitnessSourceAdapterV1 = {
+      adapterId: englishSourceAdapter.adapterId,
+      candidateVoicePathPolicy: englishSourceAdapter.candidateVoicePathPolicy,
+      query: (input) => {
+        const response = englishSourceAdapter.query({
+          ...input,
+          embryo: input.embryo.normalize("NFC").trim().toLocaleLowerCase("en-US"),
+        });
+        if (!response.ok) return response;
+        return {
+          ok: true as const,
+          records: response.records.map((record) => ({
+            ...record,
+            queryForm: input.embryo,
+          })),
+        };
       },
     };
+    const { heart, discovery } = await discoveryFor(
+      "study",
+      "en",
+      undefined,
+      [englishAdapter],
+    );
+    const englishCandidate = discovery.candidates.find(
+      (candidate) => candidate.candidateLanguage === "English" && candidate.candidateEmbryo === "DI",
+    );
+    expect(englishCandidate).toBeDefined();
+    if (!englishCandidate) return;
+
+    const exactEnglishCitationRefs = [
+      "https://kaikki.org/dictionary/English/kaikki.org-dictionary-English.jsonl",
+      englishSourceRecord.entryLocator,
+    ];
+    expect(englishCandidate).toMatchObject({
+      candidateLanguage: "English",
+      candidateForm: "di",
+      candidateGloss: "learning",
+      sourceFact: {
+        sourceStatus: "research_candidate",
+        evidenceRefs: exactEnglishCitationRefs,
+        sourceUrlOrArchiveRef: exactEnglishCitationRefs[0],
+        entryLocator: englishSourceRecord.entryLocator,
+      },
+    });
+
+    const sourceOnlyComparableDiscovery = {
+      ...discovery,
+      candidates: discovery.candidates.map((candidate) =>
+        candidate.candidateId === englishCandidate.candidateId
+          ? {
+              ...candidate,
+              structuralComparison: {
+                ...candidate.structuralComparison,
+                candidateRepresentationKind: "production_spoken" as const,
+                representationCompatibility: "SAME_REPRESENTATION" as const,
+                voiceRelationship: "EXACT_ORDERED_VOICE_MATCH" as const,
+                authorizedOperationIds: ["fixture.authorized.structural.relation"],
+              },
+            }
+          : candidate,
+      ),
+    };
     const englishResult = buildFunctionalMotivationInterpretationV0_2({
-      discovery: { ...discovery, candidates: [englishCandidate] },
+      discovery: sourceOnlyComparableDiscovery,
       targetSense: {
         id: "user_sense_learning",
         label: "learning",
@@ -196,12 +240,16 @@ describe("Functional Motivation Interpretation v0.2 projector", () => {
       },
       heart,
     });
-    const projectedEnglish = englishResult.candidates[0];
+    const projectedEnglish = englishResult.candidates.find(
+      (candidate) => candidate.candidateId === englishCandidate.candidateId,
+    );
+    expect(projectedEnglish).toBeDefined();
+    if (!projectedEnglish) return;
 
     expect(projectedEnglish).toMatchObject({
       candidateLanguage: "English",
-      candidateForm: "study",
-      candidateGloss: "to spend time learning",
+      candidateForm: "di",
+      candidateGloss: "learning",
       historicalRelation: "not_claimed",
       winnerClaim: "not_claimed",
       languageSuperiorityClaim: "not_claimed",
@@ -209,14 +257,14 @@ describe("Functional Motivation Interpretation v0.2 projector", () => {
       noSingleWinner: true,
     });
     expect(projectedEnglish?.sourceFact).toMatchObject({
-      sourceId: "fixture.english.study.source-only.v0_2",
-      sourceStatus: "source_only",
-      citationRefs: ["fixture.english.study.citation.v0_2"],
-      sourceUrlOrArchiveRef: "fixture://english/study",
-      entryLocator: "fixture:english/study",
+      sourceId: englishCandidate.sourceFact.sourceId,
+      sourceStatus: "research_candidate",
+      citationRefs: exactEnglishCitationRefs,
+      sourceUrlOrArchiveRef: exactEnglishCitationRefs[0],
+      entryLocator: englishSourceRecord.entryLocator,
     });
     expect(projectedEnglish?.reviewedFunctionalEvidence).toMatchObject({
-      sourceStatus: "source_only",
+      sourceStatus: "research_candidate",
       authorityStatus: "UNKNOWN_OR_NULL",
       evidenceRefs: [],
     });
@@ -224,6 +272,7 @@ describe("Functional Motivation Interpretation v0.2 projector", () => {
       layer: "UNKNOWN_OR_NULL",
       status: "UNKNOWN_OR_NULL",
       statement: null,
+      reason: "INSUFFICIENT_FUNCTIONAL_EVIDENCE",
     });
   });
 
