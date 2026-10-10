@@ -134,6 +134,99 @@ describe("Functional Motivation Interpretation v0.2 projector", () => {
     expect(unboundDi?.hypothesis.reason).toBe("TARGET_SENSE_NOT_BOUND_TO_REVIEWED_EVIDENCE");
   });
 
+  it("preserves English lexical source facts, exact citations, and source status without promotion", async () => {
+    const { heart, discovery } = await discoveryFor("study");
+    const reviewedDi = discovery.candidates.find((candidate) => candidate.candidateEmbryo === "DI");
+    expect(reviewedDi).toBeDefined();
+    if (!reviewedDi) return;
+
+    const reviewedCitationRefs = [
+      "reviewed.external.di.knowledge.candidate.citation.v0_1",
+    ];
+    expect(reviewedDi.sourceFact.evidenceRefs).toEqual(reviewedCitationRefs);
+
+    const reviewedResult = buildFunctionalMotivationInterpretationV0_2({
+      discovery,
+      targetSense: {
+        id: "user_sense_learning",
+        label: "learning",
+        authority: "EXPLICIT_USER_OR_AUTHORIZED_SOURCE",
+      },
+      heart,
+    });
+    const projectedReviewed = reviewedResult.candidates.find(
+      (candidate) => candidate.candidateEmbryo === "DI",
+    );
+    expect(projectedReviewed?.sourceFact.citationRefs).toEqual(reviewedCitationRefs);
+    expect(projectedReviewed?.reviewedFunctionalEvidence.evidenceRefs).toEqual(reviewedCitationRefs);
+    expect(projectedReviewed?.sourceFact.sourceStatus).toBe("reviewed_accepted");
+    expect(projectedReviewed?.reviewedFunctionalEvidence.sourceStatus).toBe("reviewed_accepted");
+    expect(projectedReviewed?.reviewedFunctionalEvidence.authorityStatus).toBe("REVIEWED_ACCEPTED");
+
+    const englishCandidate = {
+      ...reviewedDi,
+      candidateId: "fixture:english:study:source-only",
+      candidateLanguage: "English",
+      candidateForm: "study",
+      candidateGloss: "to spend time learning",
+      sourceFact: {
+        ...reviewedDi.sourceFact,
+        sourceId: "fixture.english.study.source-only.v0_2",
+        sourceStatus: "source_only",
+        evidenceRefs: ["fixture.english.study.citation.v0_2"],
+        sourceUrlOrArchiveRef: "fixture://english/study",
+        entryLocator: "fixture:english/study",
+      },
+      functionalInterpretation: {
+        ...reviewedDi.functionalInterpretation,
+        status: "UNKNOWN_OR_NULL" as const,
+        truthClassification: "unknown_or_null" as const,
+        statement: null,
+        evidenceKind: "none" as const,
+        evidenceRefs: [],
+        reason: "INSUFFICIENT_FUNCTIONAL_EVIDENCE",
+      },
+    };
+    const englishResult = buildFunctionalMotivationInterpretationV0_2({
+      discovery: { ...discovery, candidates: [englishCandidate] },
+      targetSense: {
+        id: "user_sense_learning",
+        label: "learning",
+        authority: "EXPLICIT_USER_OR_AUTHORIZED_SOURCE",
+      },
+      heart,
+    });
+    const projectedEnglish = englishResult.candidates[0];
+
+    expect(projectedEnglish).toMatchObject({
+      candidateLanguage: "English",
+      candidateForm: "study",
+      candidateGloss: "to spend time learning",
+      historicalRelation: "not_claimed",
+      winnerClaim: "not_claimed",
+      languageSuperiorityClaim: "not_claimed",
+      userDecisionPosture: "user_decides",
+      noSingleWinner: true,
+    });
+    expect(projectedEnglish?.sourceFact).toMatchObject({
+      sourceId: "fixture.english.study.source-only.v0_2",
+      sourceStatus: "source_only",
+      citationRefs: ["fixture.english.study.citation.v0_2"],
+      sourceUrlOrArchiveRef: "fixture://english/study",
+      entryLocator: "fixture:english/study",
+    });
+    expect(projectedEnglish?.reviewedFunctionalEvidence).toMatchObject({
+      sourceStatus: "source_only",
+      authorityStatus: "UNKNOWN_OR_NULL",
+      evidenceRefs: [],
+    });
+    expect(projectedEnglish?.hypothesis).toMatchObject({
+      layer: "UNKNOWN_OR_NULL",
+      status: "UNKNOWN_OR_NULL",
+      statement: null,
+    });
+  });
+
   it("preserves Albanian profile structure without promoting spelling to spoken authority", async () => {
     const { heart, discovery } = await discoveryFor("zemër", "sq", "albanian");
     const result = buildFunctionalMotivationInterpretationV0_2({
