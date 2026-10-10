@@ -1,0 +1,37 @@
+{
+  "schemaVersion": "open-instrument.multilingual-discovery-substrate-expansion-s4-product-validation.v0.1.execution",
+  "status": "COMPLETED_RESULT_PRESERVED",
+  "procedurePath": "docs/open-instrument/research-artifacts/multilingual-discovery-substrate-v0.2-s4-product-validation-v0.1/procedure.json",
+  "procedureSha256": "97f7307d3eb3677750083889ee028639714b678ee2a80d723fe7fff9f1d52405",
+  "repositoryAuthorityBase": "6b06c0d6009f11570807973ad7a28e1c633c1a21",
+  "repositoryExecutionHead": "59849b18e703d8c0841ddda608806f1fdbfb6df6",
+  "samplePath": "docs/open-instrument/research-artifacts/multilingual-discovery-substrate-v0.2-broader-stratified-diagnostic-v0.1/sample.json",
+  "sampleSha256": "20bd7e0f93629d8c1c87dfa76c1b1f1b9bfeb763dc44905bced2f91341179ffd",
+  "sampleIdentitySha256": "5fa453b1a6b7ad6dbc965080d6b47d48d54c4a4c7961813e13d6cae25a010dc3",
+  "validityBindingPath": "docs/open-instrument/research-artifacts/multilingual-discovery-substrate-v0.2-broader-stratified-diagnostic-v0.1/results.json",
+  "validityBindingSha256": "51019087d2199f8506267c3e6a4fbdb8824962641a6ed49abaa7e2c7bcc59ee6",
+  "externalRootConfigured": true,
+  "externalRootRecorded": false,
+  "attempt1": {
+    "classification": "MECHANICAL_POST_EVALUATION_PERSISTENCE_FAILURE",
+    "providerEvaluationReachedPersistence": true,
+    "executionJsonWritten": false,
+    "resultsJsonWritten": false,
+    "interpretableResearchResult": false,
+    "failure": "EXISTING_PROCEDURE_DIRECTORY_RECREATION"
+  },
+  "correctiveAttempt": {
+    "authorized": true,
+    "number": 2,
+    "reason": "MECHANICAL_PERSISTENCE_FAILURE_BEFORE_DURABLE_RESULT_COMMIT"
+  },
+  "authoritativeAttemptsBefore": 1,
+  "authoritativeAttempts": 2,
+  "authoritativeAttemptsMax": 2,
+  "durableResultAttempt": 2,
+  "sourceAcquisitionPerformed": false,
+  "sourceContentInspectedByS4": false,
+  "networkTransferPerformed": false,
+  "historicalS0S3Rerun": false,
+  "casesEvaluated": 688
+}
