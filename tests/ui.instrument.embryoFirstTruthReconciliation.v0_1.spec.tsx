@@ -423,7 +423,7 @@ describe(
 
       expect(
         screen.getByText(
-          "Functional motivation",
+          "WORD-SPECIFIC READING",
         ),
       ).toBeInTheDocument();
 
@@ -525,7 +525,7 @@ describe(
 
       expect(
         screen.getByText(
-          "Functional motivation",
+          "WORD-SPECIFIC READING",
         ),
       ).toBeInTheDocument();
 
@@ -591,7 +591,7 @@ describe(
 
       expect(
         screen.getByText(
-          "Functional motivation",
+          "WORD-SPECIFIC READING",
         ),
       ).toBeInTheDocument();
 
@@ -616,7 +616,7 @@ describe(
 
       expect(
         screen.getByText(
-          "Functional motivation",
+          "WORD-SPECIFIC READING",
         ),
       ).toBeInTheDocument();
 

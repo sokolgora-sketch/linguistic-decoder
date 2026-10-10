@@ -88,6 +88,20 @@ async function main(): Promise<void> {
     console.log("CURRENT_ANALYSIS_PROVENANCE=PASS");
     console.log(`ANALYZE_REQUESTS_AFTER_FRESH=${analyzeRequests}`);
 
+    const assertAuthorityHierarchy = async (viewportLabel: "DESKTOP" | "MOBILE") => {
+      await page.getByText("MULTILINGUAL SOURCE DISCOVERY", { exact: true }).first().waitFor({ state: "visible" });
+      await page.getByTestId("multilingual-discovery-role").first().waitFor({ state: "visible" });
+      await page.getByText("WORD-SPECIFIC READING", { exact: true }).first().waitFor({ state: "visible" });
+      await page.getByTestId("word-specific-reading-role").first().waitFor({ state: "visible" });
+      await page.getByText(/No single winner.*(?:You decide|User decides)/i).first().waitFor({ state: "visible" });
+      console.log(`${viewportLabel}_VISUAL_AUTHORITY_HIERARCHY=PASS`);
+    };
+
+    await assertAuthorityHierarchy("DESKTOP");
+    await page.setViewportSize({ width: 390, height: 844 });
+    await assertAuthorityHierarchy("MOBILE");
+    await page.setViewportSize({ width: 1280, height: 900 });
+
     const defaultSpokenPronunciationSurface = page.getByTestId("spoken-pronunciation-overview");
     const spokenResultCompositionSummary = page.getByTestId("spoken-result-composition-summary");
     await defaultSpokenPronunciationSurface.waitFor({ state: "visible" });
