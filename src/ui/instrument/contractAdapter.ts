@@ -30,6 +30,7 @@ import type {
   ResonanceProfileV1VM,
   MotivationDiscoveryV0_1VM,
   MotivationDiscoveryCandidateV0_1VM,
+  FunctionalMotivationInterpretationV0_2VM,
 } from "../telemetry/types";
 import {
   DOCTRINE_READING_COMPOSITION_MODE_V1,
@@ -60,6 +61,9 @@ import {
   isWordSpecificFunctionalDepthV0_1,
 } from "@/shared/openInstrument/wordSpecificFunctionalDepth.v0_1";
 import type { WordSpecificFunctionalDepthV0_1 } from "@/shared/openInstrument/wordSpecificFunctionalDepth.v0_1";
+import {
+  isFunctionalMotivationInterpretationV0_2,
+} from "@/shared/openInstrument/functionalMotivationInterpretation.v0_2";
 
 type ParseRootMapResult = { ok: true; value: RootMapV1 } | { ok: false; reason: string };
 
@@ -1023,6 +1027,19 @@ function parseMotivationDiscoveryV0_1(
   return present(value as unknown as MotivationDiscoveryV0_1VM);
 }
 
+function parseFunctionalMotivationInterpretationV0_2(
+  raw: unknown,
+): PresentOrMissing<FunctionalMotivationInterpretationV0_2VM> {
+  const value = getField(raw, "functionalMotivationInterpretationV0_2");
+  if (value == null) {
+    return missing("not_emitted", "functionalMotivationInterpretationV0_2");
+  }
+  if (!isFunctionalMotivationInterpretationV0_2(value)) {
+    return missing("malformed", "functionalMotivationInterpretationV0_2 shape invalid");
+  }
+  return present(value);
+}
+
 function pickVoicePaths(payload: unknown): { detected: string | null; surface: string | null; functional: string | null } {
   // detected (primary)
   const primaryPathValue = getField(payload, "primaryPath");
@@ -1205,6 +1222,10 @@ export function adaptAnalysisToTelemetryVM(raw: unknown): TelemetryViewModel {
   const motivationDiscoveryV0_1 = parseMotivationDiscoveryV0_1(payload);
   const motivationDiscoveryFieldEmitted =
     isRecord(payload) && Object.prototype.hasOwnProperty.call(payload, "motivationDiscoveryV0_1");
+  const functionalMotivationInterpretationV0_2 =
+    parseFunctionalMotivationInterpretationV0_2(payload);
+  const functionalMotivationInterpretationFieldEmitted =
+    isRecord(payload) && Object.prototype.hasOwnProperty.call(payload, "functionalMotivationInterpretationV0_2");
 
   const vp = pickVoicePaths(payload);
 
@@ -2547,6 +2568,11 @@ const originClaimGates: OriginClaimGatesVM = {
       : motivationDiscoveryV0_1.kind === "missing"
       ? {}
       : { motivationDiscoveryV0_1 }),
+    ...(functionalMotivationInterpretationFieldEmitted
+      ? { functionalMotivationInterpretationV0_2 }
+      : functionalMotivationInterpretationV0_2.kind === "missing"
+      ? {}
+      : { functionalMotivationInterpretationV0_2 }),
     evidence: {
       normalizationSteps: pomStringListFromEvidenceField(evidence, "normalizationSteps"),
       ops: pomStringListFromEvidenceField(evidence, "ops"),

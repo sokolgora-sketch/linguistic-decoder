@@ -225,6 +225,7 @@ export const AnalyzeWordResultV1ContractSchema = z
     doctrineReading: z.unknown().nullable().optional(),
     wordSpecificFunctionalDepth:
       WordSpecificFunctionalDepthContractSchema.nullable().optional(),
+    functionalMotivationInterpretationV0_2: z.unknown().optional(),
   })
   .strict();
 
@@ -274,6 +275,7 @@ export function toAnalyzeWordResultV1Contract(input: unknown): AnalyzeWordResult
     heartInstrumentV1: o.heartInstrumentV1,
     doctrineReading: o.doctrineReading,
     wordSpecificFunctionalDepth: o.wordSpecificFunctionalDepth,
+    functionalMotivationInterpretationV0_2: o.functionalMotivationInterpretationV0_2,
   };
 
   return AnalyzeWordResultV1ContractSchema.parse(picked);

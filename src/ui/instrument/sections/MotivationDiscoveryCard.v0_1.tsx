@@ -1,6 +1,8 @@
 "use client";
 
 import type {
+  FunctionalMotivationCandidateInterpretationV0_2VM,
+  FunctionalMotivationInterpretationV0_2VM,
   MotivationDiscoveryCandidateV0_1VM,
   MotivationDiscoveryV0_1VM,
   PresentOrMissing,
@@ -80,7 +82,13 @@ function representationBoundary(candidate: MotivationDiscoveryCandidateV0_1VM): 
   return `Voice comparison is limited: the input uses ${representationLabel(comparison.inputRepresentationKind)} while this candidate currently uses ${representationLabel(comparison.candidateRepresentationKind)}.`;
 }
 
-function Candidate({ candidate }: { candidate: MotivationDiscoveryCandidateV0_1VM }) {
+function Candidate({
+  candidate,
+  interpretation,
+}: {
+  candidate: MotivationDiscoveryCandidateV0_1VM;
+  interpretation?: FunctionalMotivationCandidateInterpretationV0_2VM;
+}) {
   const comparison = candidate.structuralComparison;
   const inputStructure = comparison.inputConsonantalStructure;
   const candidateStructure = comparison.candidateConsonantalStructure;
@@ -106,6 +114,38 @@ function Candidate({ candidate }: { candidate: MotivationDiscoveryCandidateV0_1V
           <p className="mt-1 text-sm text-[#d7dde7]">{candidate.candidateGloss}</p>
         </div>
       </div>
+
+      {interpretation ? (
+        <div
+          data-testid="functional-motivation-interpretation-layers"
+          className="mt-3 grid gap-2 sm:grid-cols-3"
+        >
+          <div className="rounded border border-[#303843] bg-[#10161c] p-2 text-xs leading-5 text-[#c5ced8]">
+            <div className="font-semibold uppercase tracking-[0.1em] text-[#8ea4ba]">CANDIDATE CORRESPONDENCE</div>
+            <div className="mt-1 break-words font-mono">{interpretation.correspondence.matchClassification}</div>
+            <div className="break-words text-[#9fb1bf]">{interpretation.correspondence.representationCompatibility}</div>
+            <div className="break-words text-[#9fb1bf]">operations: {interpretation.correspondence.operationIds.join(", ") || "none"}</div>
+          </div>
+          <div className="rounded border border-[#303843] bg-[#10161c] p-2 text-xs leading-5 text-[#c5ced8]">
+            <div className="font-semibold uppercase tracking-[0.1em] text-[#8ea4ba]">REVIEWED FUNCTIONAL EVIDENCE</div>
+            <div className="mt-1 font-semibold">
+              {interpretation.reviewedFunctionalEvidence.authorityStatus === "REVIEWED_ACCEPTED" ? "Present" : "Unknown / Null"}
+            </div>
+            <div className="break-words text-[#9fb1bf]">
+              {interpretation.reviewedFunctionalEvidence.evidenceRefs.join(", ") || interpretation.reviewedFunctionalEvidence.reason || "No reviewed evidence"}
+            </div>
+          </div>
+          <div className="rounded border border-[#4b3f2c] bg-[#18140e] p-2 text-xs leading-5 text-[#f0ddb0]">
+            <div className="font-semibold uppercase tracking-[0.1em]">ZË-RO FUNCTIONAL HYPOTHESIS</div>
+            <div className="mt-1 font-semibold">
+              {interpretation.hypothesis.status === "HYPOTHESIS" ? "Hypothesis" : "Unknown / Null"}
+            </div>
+            <div className="break-words">
+              {interpretation.hypothesis.statement ?? interpretation.hypothesis.reason ?? "No supported functional interpretation"}
+            </div>
+          </div>
+        </div>
+      ) : null}
 
       <div
         data-testid="motivation-structural-comparison"
@@ -215,8 +255,10 @@ function Candidate({ candidate }: { candidate: MotivationDiscoveryCandidateV0_1V
 
 export function MotivationDiscoveryCardV0_1({
   discovery,
+  interpretation,
 }: {
   discovery: PresentOrMissing<MotivationDiscoveryV0_1VM> | undefined;
+  interpretation?: PresentOrMissing<FunctionalMotivationInterpretationV0_2VM>;
 }) {
   if (!discovery || discovery.kind !== "present") return null;
   const value = discovery.value;
@@ -312,6 +354,47 @@ export function MotivationDiscoveryCardV0_1({
         </details>
       </div>
 
+      {interpretation?.kind === "present" ? (
+        <div
+          data-testid="functional-motivation-interpretation"
+          className="mt-3 rounded-lg border border-[#4b3f2c] bg-[#18140e] p-3 text-xs leading-5 text-[#f0ddb0]"
+        >
+          <div className="font-semibold uppercase tracking-[0.12em]">FUNCTIONAL MOTIVATION INTERPRETATION v0.2</div>
+          <div className="mt-1 text-sm">
+            {interpretation.value.status === "INTERPRETATIONS_FOUND"
+              ? "A bounded hypothesis is available; it remains separate from source fact and derived structure."
+              : "No supported functional interpretation is currently available; Null is valid."}
+          </div>
+          <div className="mt-3 grid gap-2 sm:grid-cols-2">
+            <div className="rounded border border-[#303843] bg-[#10161c] p-2 text-[#c5ced8]">
+              <div className="font-semibold uppercase tracking-[0.1em] text-[#8ea4ba]">STRUCTURAL FACTS</div>
+              <div className="mt-1 break-words font-mono">
+                Voice events: {interpretation.value.input.derivedStructure.nucleusEvents.map((event) => `${event.pathIndex}:${event.voice}`).join(" · ") || "Null"}
+              </div>
+              <div className="break-words text-[#9fb1bf]">
+                Γ: {interpretation.value.input.derivedStructure.gamma.orderedUnits.join(" → ") || "Null"} · ZC: {interpretation.value.input.derivedStructure.zeroConsonantalStructuralComposition.status}
+              </div>
+              <div className="break-words text-[#9fb1bf]">
+                Target sense: {interpretation.value.input.targetSense?.label ?? "Null; functional bridge fails closed"}
+              </div>
+            </div>
+            <div className="rounded border border-[#303843] bg-[#10161c] p-2 text-[#c5ced8]">
+              <div className="font-semibold uppercase tracking-[0.1em] text-[#8ea4ba]">PROVENANCE / UNRESOLVED FIELDS</div>
+              <div className="mt-1 break-words">Source facts: {interpretation.value.input.sourceFacts.length}</div>
+              <div className="break-words">Unresolved: {interpretation.value.unresolved.map((item) => item.reason).join(", ") || "none"}</div>
+              <div className="break-words text-[#9fb1bf]">No winner · user decides · historical relation not claimed</div>
+            </div>
+          </div>
+        </div>
+      ) : interpretation?.kind === "missing" && interpretation.missing === "malformed" ? (
+        <div
+          data-testid="functional-motivation-interpretation-malformed"
+          className="mt-3 rounded-lg border border-[#5b3434] bg-[#1a1111] p-3 text-xs text-[#f0c0c0]"
+        >
+          Functional Motivation Interpretation v0.2 was emitted but malformed; the UI failed closed.
+        </div>
+      ) : null}
+
       {value.candidates.length ? (
         <div className="mt-4 space-y-3">
           <div className="flex flex-wrap items-baseline justify-between gap-2">
@@ -322,7 +405,13 @@ export function MotivationDiscoveryCardV0_1({
             <div className="text-xs font-semibold text-[#f0ddb0]">No single winner · You decide</div>
           </div>
           {value.candidates.map((candidate) => (
-            <Candidate key={candidate.candidateId} candidate={candidate} />
+            <Candidate
+              key={candidate.candidateId}
+              candidate={candidate}
+              interpretation={interpretation?.kind === "present"
+                ? interpretation.value.candidates.find((item) => item.candidateId === candidate.candidateId)
+                : undefined}
+            />
           ))}
         </div>
       ) : (
