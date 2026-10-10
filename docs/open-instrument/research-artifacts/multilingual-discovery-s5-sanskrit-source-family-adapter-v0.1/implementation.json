@@ -1,0 +1,102 @@
+{
+  "schemaVersion": "open-instrument.multilingual-discovery-s5-sanskrit-source-family-adapter-implementation.v0.1",
+  "contractId": "OPEN_INSTRUMENT_MULTILINGUAL_DISCOVERY_S5_SANSKRIT_SOURCE_FAMILY_ADAPTER_V0_1",
+  "implementationStatus": "IMPLEMENTED_SOURCE_RECORD_BOUNDARY_ONLY",
+  "repositoryBaselineHead": "93d1afb8ac5f25a65575fa9b49eaf01fba2f5bbb",
+  "sourceIdentity": {
+    "sourceFamilyId": "sanskrit-mw",
+    "sourceTraditionId": "cdsl-monier-williams-1899",
+    "snapshotId": "open-instrument.sanskrit-mw.snapshot.1899-cdsl-csl-orig-55e8addb.v0_1",
+    "upstreamRevision": "55e8addbd96e8d9001b8789026b026763f4049c1",
+    "artifactPath": "v02/mw/mw.txt",
+    "encoding": "UTF-8",
+    "bytes": 50163993,
+    "sha256": "555ecf5aadaaf21e5965d6b3b419f428fc9ab9237f563627001ceca468d0cff8",
+    "license": "CC BY-SA 4.0",
+    "acquired": true,
+    "verified": true,
+    "sourceImported": false
+  },
+  "externalSnapshotRead": {
+    "escalationRequired": true,
+    "escalationUsed": true,
+    "escalatedCommandCount": 14,
+    "networkTransferPerformed": false,
+    "snapshotMutated": false,
+    "manifestMutated": false
+  },
+  "state": {
+    "sourceContentInspected": true,
+    "sourceSnapshotStructureVerified": true,
+    "recordsVisited": 286525,
+    "distinctL": 286525,
+    "distinctK1": 194083,
+    "duplicateLCount": 0,
+    "recordsLost": 0,
+    "malformedRecordCount": 0,
+    "adapterImplemented": true,
+    "indexBuilt": false,
+    "coverageEvaluated": false,
+    "runtimeAuthorized": false,
+    "runtimeChanged": false,
+    "s4": "NOT_STARTED"
+  },
+  "implementationBoundary": {
+    "inputUnit": "ONE_EXACT_PHYSICAL_CSL_RECORD_BYTE_SEQUENCE_PLUS_ONE_BASED_ORDINAL_PLUS_VERIFIED_SNAPSHOT_IDENTITY",
+    "preservedFields": ["L", "pc", "k1", "k2", "h", "e"],
+    "lookupField": "k1",
+    "lookupRepresentation": "SLP1",
+    "lookupPolicy": "EXACT_CASE_SENSITIVE_NO_NORMALIZATION",
+    "sameLookupMultiplicity": "PRESERVED_IN_SOURCE_ORDER",
+    "rawEntryPolicy": "e_RETAINED_AS_RAW_ENTRY_METADATA_NOT_GENERIC_GLOSS",
+    "pronunciationPolicy": "NULL_UNAUTHORIZED",
+    "genericAnalyticalContractChanged": false,
+    "genericAdditiveExtensionIntroduced": false,
+    "candidateGenerationChanged": false,
+    "runtimeWiringAdded": false,
+    "s5ThirtyTwoRecordExperimentExecuted": false,
+    "discoveryExperimentExecuted": false,
+    "productionSanskritDiscoveryActivated": false
+  },
+  "registration": {
+    "status": "REGISTERED",
+    "activationDefault": "REGISTERED_AND_DISABLED_PENDING_FUTURE_ACTIVATION_LANE",
+    "enabledByDefault": false,
+    "runtimeActiveAfterMerge": false,
+    "futureActivationLaneRequired": true
+  },
+  "validation": {
+    "focusedTests": "PASS",
+    "focusedTestCount": 6,
+    "typecheckFull": "PASS",
+    "typecheckContracts": "PASS",
+    "lint": "PASS",
+    "gateQuick": "PASS",
+    "productionBuild": "PASS",
+    "browserValidation": "PASS",
+    "browserValidationFallbackUsed": false,
+    "k1CasePreservation": "PASS",
+    "sourceRecordsRecoverable": "PASS",
+    "externalSnapshotMutated": false,
+    "manifestMutated": false
+  },
+  "artifacts": [
+    {
+      "role": "primary_adapter",
+      "path": "src/shared/openInstrument/sanskritMwSourceFamilyAdapter.v0_1.ts"
+    },
+    {
+      "role": "disabled_registration",
+      "path": "src/shared/openInstrument/sanskritMwSourceFamilyRegistration.v0_1.ts"
+    },
+    {
+      "role": "focused_tests",
+      "path": "tests/openInstrument.sanskritMwSourceFamilyAdapter.v0_1.spec.ts"
+    },
+    {
+      "role": "human_readable_implementation_record",
+      "path": "docs/open-instrument/sanskrit-mw-source-family-adapter-v0.1.md"
+    }
+  ],
+  "nextAction": "AUTHORIZE_FUTURE_S5_SANSKRIT_SOURCE_ACTIVATION_LANE"
+}
