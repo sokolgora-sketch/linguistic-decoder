@@ -5,6 +5,10 @@ import type { DeepRootHeartGateV01 } from "@/shared/deepRootHeartGate.v0.1";
 import type { GenericFunctionalWitnessRuntimeProjectionV1 } from "@/shared/openInstrument/genericFunctionalWitnessRuntimeProjection.v1";
 import type { WordSpecificFunctionalDepthV0_1 } from "@/shared/openInstrument/wordSpecificFunctionalDepth.v0_1";
 import type { DoctrineReadingV1 } from "@/shared/openInstrument/doctrineReadingContract.v1";
+import type {
+  FunctionalMotivationCandidateInterpretationV0_2,
+  FunctionalMotivationInterpretationV0_2,
+} from "@/shared/openInstrument/functionalMotivationInterpretation.v0_2";
 
 /**
  * UI contract for vowel chips. Keep this as the only allowed vowel set.
@@ -30,6 +34,8 @@ export type PresentOrMissing<T> =
 
 export type RootMapVM = RootMapV1;
 export type DoctrineReadingVM = DoctrineReadingV1;
+export type FunctionalMotivationInterpretationV0_2VM = FunctionalMotivationInterpretationV0_2;
+export type FunctionalMotivationCandidateInterpretationV0_2VM = FunctionalMotivationCandidateInterpretationV0_2;
 
 export type SoundRootsWarningVM = {
   code: string;
@@ -475,4 +481,5 @@ export interface TelemetryViewModel {
 
   analysisStatusV0_1?: PresentOrMissing<AnalysisStatusV0_1VM>;
   motivationDiscoveryV0_1?: PresentOrMissing<MotivationDiscoveryV0_1VM>;
+  functionalMotivationInterpretationV0_2?: PresentOrMissing<FunctionalMotivationInterpretationV0_2VM>;
 }

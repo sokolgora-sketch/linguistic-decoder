@@ -43,6 +43,9 @@ import {
 import {
   buildMotivationEngineDiscoveryV0_1,
 } from "@/shared/openInstrument/motivationEngineDiscovery.v0_1";
+import {
+  buildFunctionalMotivationInterpretationV0_2,
+} from "@/shared/openInstrument/functionalMotivationInterpretation.v0_2";
 
 const BodySchema = z
   .object({
@@ -1374,6 +1377,18 @@ async function runAnalyzeV1Orchestration(
         });
       }
       (final as any).motivationDiscoveryV0_1 = discoveryResult.discovery;
+      (final as any).functionalMotivationInterpretationV0_2 =
+        buildFunctionalMotivationInterpretationV0_2({
+          discovery: discoveryResult.discovery,
+          targetSense: targetSenseId && targetSenseLabel
+            ? {
+                id: targetSenseId,
+                label: targetSenseLabel,
+                authority: "EXPLICIT_USER_OR_AUTHORIZED_SOURCE",
+              }
+            : null,
+          heart: heartInstrumentV1,
+        });
     }
 
     return NextResponse.json(final);

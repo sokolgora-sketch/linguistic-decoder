@@ -520,6 +520,7 @@ export function InstrumentPanel(props: Props) {
 
               <MotivationDiscoveryCardV0_1
                 discovery={vm.motivationDiscoveryV0_1}
+                interpretation={vm.functionalMotivationInterpretationV0_2}
               />
 
               {primaryNullStatus ? (
