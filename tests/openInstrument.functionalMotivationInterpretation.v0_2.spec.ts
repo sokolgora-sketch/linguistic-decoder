@@ -61,7 +61,7 @@ describe("Functional Motivation Interpretation v0.2 projector", () => {
     expect(result.claimBoundary.spellingDerivedPronunciation).toBe("not_authorized");
   });
 
-  it("requires an explicit sense before emitting a bounded hypothesis", async () => {
+  it("keeps cross-representation evidence Null even with an explicit target sense", async () => {
     const { heart, discovery } = await discoveryFor("study");
     const result = buildFunctionalMotivationInterpretationV0_2({
       discovery,
@@ -74,15 +74,64 @@ describe("Functional Motivation Interpretation v0.2 projector", () => {
     });
 
     const di = result.candidates.find((candidate) => candidate.candidateEmbryo === "DI");
-    expect(result.status).toBe("INTERPRETATIONS_FOUND");
-    expect(di?.hypothesis.status).toBe("HYPOTHESIS");
-    expect(di?.hypothesis.layer).toBe("ZRO_FUNCTIONAL_HYPOTHESIS");
-    expect(di?.hypothesis.evidenceRefs.length).toBeGreaterThan(0);
+    expect(result.status).toBe("NO_SUPPORTED_INTERPRETATION");
+    expect(di?.hypothesis.status).toBe("UNKNOWN_OR_NULL");
+    expect(di?.hypothesis.layer).toBe("UNKNOWN_OR_NULL");
+    expect(di?.hypothesis.reason).toBe("NO_AUTHORIZED_STRUCTURAL_RELATION");
     expect(di?.reviewedFunctionalEvidence.claimBoundary).toBe(
       "functional evidence only; not historical origin",
     );
     const da = result.candidates.find((candidate) => candidate.candidateEmbryo === "DA");
-    expect(da?.hypothesis.reason).toBe("INSUFFICIENT_FUNCTIONAL_EVIDENCE");
+    expect(da?.hypothesis.reason).toBe("NO_AUTHORIZED_STRUCTURAL_RELATION");
+  });
+
+  it("emits a hypothesis only for comparable, target-bound reviewed evidence", async () => {
+    const { heart, discovery } = await discoveryFor("study");
+    const comparableDiscovery = {
+      ...discovery,
+      candidates: discovery.candidates.map((candidate) =>
+        candidate.candidateEmbryo === "DI"
+          ? {
+              ...candidate,
+              structuralComparison: {
+                ...candidate.structuralComparison,
+                candidateRepresentationKind: "production_spoken" as const,
+                representationCompatibility: "SAME_REPRESENTATION" as const,
+                voiceRelationship: "EXACT_ORDERED_VOICE_MATCH" as const,
+              },
+            }
+          : candidate,
+      ),
+    };
+    const result = buildFunctionalMotivationInterpretationV0_2({
+      discovery: comparableDiscovery,
+      targetSense: {
+        id: "user_sense_learning",
+        label: "learning",
+        authority: "EXPLICIT_USER_OR_AUTHORIZED_SOURCE",
+      },
+      heart,
+    });
+
+    const di = result.candidates.find((candidate) => candidate.candidateEmbryo === "DI");
+    expect(result.status).toBe("INTERPRETATIONS_FOUND");
+    expect(di?.hypothesis).toMatchObject({
+      status: "HYPOTHESIS",
+      layer: "ZRO_FUNCTIONAL_HYPOTHESIS",
+    });
+    expect(di?.hypothesis.evidenceRefs.length).toBeGreaterThan(0);
+
+    const unbound = buildFunctionalMotivationInterpretationV0_2({
+      discovery: comparableDiscovery,
+      targetSense: {
+        id: "user_sense_reading_room",
+        label: "room used for reading",
+        authority: "EXPLICIT_USER_OR_AUTHORIZED_SOURCE",
+      },
+      heart,
+    });
+    const unboundDi = unbound.candidates.find((candidate) => candidate.candidateEmbryo === "DI");
+    expect(unboundDi?.hypothesis.reason).toBe("TARGET_SENSE_NOT_BOUND_TO_REVIEWED_EVIDENCE");
   });
 
   it("preserves Albanian profile structure without promoting spelling to spoken authority", async () => {
@@ -187,5 +236,14 @@ describe("Functional Motivation Interpretation v0.2 projector", () => {
       sourceFact.candidateId = "different-candidate";
     }
     expect(isFunctionalMotivationInterpretationV0_2(provenanceMismatch)).toBe(false);
+
+    const malformedCorrespondence = JSON.parse(JSON.stringify(result)) as Record<string, unknown>;
+    const malformedCandidates = malformedCorrespondence.candidates as Array<Record<string, unknown>>;
+    const malformedFirst = malformedCandidates[0];
+    if (malformedFirst) {
+      const correspondence = malformedFirst.correspondence as Record<string, unknown>;
+      correspondence.operationIds = null;
+    }
+    expect(isFunctionalMotivationInterpretationV0_2(malformedCorrespondence)).toBe(false);
   });
 });

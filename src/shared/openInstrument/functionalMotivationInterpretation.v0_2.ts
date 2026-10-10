@@ -212,6 +212,26 @@ function uniqueSortedV0_2(values: readonly string[]): readonly string[] {
   return [...new Set(values)].sort(compareTextV0_2);
 }
 
+function normalizedSenseTokensV0_2(value: string): readonly string[] {
+  return uniqueSortedV0_2(
+    value.normalize("NFC").toLocaleLowerCase("en-US").match(/\p{L}[\p{L}\p{N}]*/gu) ?? [],
+  ).filter((token) => token.length >= 3);
+}
+
+function targetSenseBoundToReviewedEvidenceV0_2(
+  candidate: MotivationEngineDiscoveryCandidateV0_1,
+  targetSense: FunctionalMotivationTargetSenseV0_2,
+): boolean {
+  const requiredTokens = normalizedSenseTokensV0_2(targetSense.label);
+  if (requiredTokens.length === 0) return false;
+  const reviewedContext = [
+    candidate.functionalInterpretation.statement ?? "",
+    candidate.candidateGloss,
+  ].join(" ");
+  const reviewedTokens = new Set(normalizedSenseTokensV0_2(reviewedContext));
+  return requiredTokens.every((token) => reviewedTokens.has(token));
+}
+
 function deepFreezeV0_2<T>(value: T, seen = new WeakSet<object>()): T {
   if (value === null || typeof value !== "object") return value;
   if (seen.has(value)) return value;
@@ -383,7 +403,8 @@ function structuralRelationAuthorizedV0_2(
   const comparison = candidate.structuralComparison;
   return (
     comparison.matchClassification === "STRUCTURAL_MOTIVATION_CANDIDATE" &&
-    comparison.representationCompatibility !== "UNKNOWN" &&
+    comparison.representationCompatibility === "SAME_REPRESENTATION" &&
+    comparison.voiceRelationship !== "NOT_COMPARABLE_ACROSS_REPRESENTATIONS" &&
     (
       comparison.authorizedOperationIds.length > 0 ||
       comparison.expansionOrCompositionChain.length > 0 ||
@@ -406,15 +427,6 @@ function hypothesisV0_2(
       reason: "LEXICAL_SELF_MATCH_NOT_FUNCTIONAL_MOTIVATION",
     };
   }
-  if (!structuralRelationAuthorizedV0_2(candidate)) {
-    return {
-      layer: "UNKNOWN_OR_NULL",
-      status: "UNKNOWN_OR_NULL",
-      statement: null,
-      evidenceRefs: [],
-      reason: "NO_AUTHORIZED_STRUCTURAL_RELATION",
-    };
-  }
   if (targetSense === null) {
     return {
       layer: "UNKNOWN_OR_NULL",
@@ -424,6 +436,15 @@ function hypothesisV0_2(
       reason: "MISSING_TARGET_SENSE",
     };
   }
+  if (!structuralRelationAuthorizedV0_2(candidate)) {
+    return {
+      layer: "UNKNOWN_OR_NULL",
+      status: "UNKNOWN_OR_NULL",
+      statement: null,
+      evidenceRefs: [],
+      reason: "NO_AUTHORIZED_STRUCTURAL_RELATION",
+    };
+  }
   if (reviewed.authorityStatus !== "REVIEWED_ACCEPTED") {
     return {
       layer: "UNKNOWN_OR_NULL",
@@ -431,6 +452,15 @@ function hypothesisV0_2(
       statement: null,
       evidenceRefs: [],
       reason: "INSUFFICIENT_FUNCTIONAL_EVIDENCE",
+    };
+  }
+  if (!targetSenseBoundToReviewedEvidenceV0_2(candidate, targetSense)) {
+    return {
+      layer: "UNKNOWN_OR_NULL",
+      status: "UNKNOWN_OR_NULL",
+      statement: null,
+      evidenceRefs: [],
+      reason: "TARGET_SENSE_NOT_BOUND_TO_REVIEWED_EVIDENCE",
     };
   }
 
@@ -590,6 +620,10 @@ function stringArrayV0_2(value: unknown): value is readonly string[] {
   return Array.isArray(value) && value.every((item) => typeof item === "string");
 }
 
+function enumValueV0_2(value: unknown, allowed: readonly string[]): boolean {
+  return typeof value === "string" && allowed.includes(value);
+}
+
 function validTargetSenseV0_2(value: unknown): boolean {
   if (value === null) return true;
   if (!isRecordV0_2(value)) return false;
@@ -707,9 +741,54 @@ export function isFunctionalMotivationInterpretationV0_2(
         source.candidateId === candidate.candidateId &&
         isRecordV0_2(correspondence) &&
         correspondence.layer === "DERIVED_STRUCTURE" &&
+        enumValueV0_2(correspondence.matchClassification, [
+          "STRUCTURAL_MOTIVATION_CANDIDATE",
+          "EXACT_LEXICAL_SELF_MATCH",
+        ]) &&
+        enumValueV0_2(correspondence.presentationClassification, [
+          "STRUCTURAL_MOTIVATION",
+          "LEXICAL_ENTRY_CONFIRMATION",
+        ]) &&
         typeof correspondence.matchedQuery === "string" &&
+        enumValueV0_2(correspondence.inputRepresentationKind, [
+          "production_spoken",
+          "albanian_profile",
+          "orthographic_profile_derived",
+          "unknown",
+        ]) &&
+        enumValueV0_2(correspondence.candidateRepresentationKind, [
+          "production_spoken",
+          "albanian_profile",
+          "orthographic_profile_derived",
+          "unknown",
+        ]) &&
+        enumValueV0_2(correspondence.representationCompatibility, [
+          "SAME_REPRESENTATION",
+          "CROSS_REPRESENTATION",
+          "NOT_COMPARABLE_ACROSS_REPRESENTATIONS",
+          "UNKNOWN",
+        ]) &&
         stringArrayV0_2(correspondence.inputVoicePath) &&
         stringArrayV0_2(correspondence.candidateVoicePath) &&
+        enumValueV0_2(correspondence.candidateVoicePathStatus, [
+          "AUTHORIZED",
+          "NULL_UNAUTHORIZED",
+        ]) &&
+        enumValueV0_2(correspondence.voiceRelationship, [
+          "EXACT_ORDERED_VOICE_MATCH",
+          "PARTIAL_ORDERED_VOICE_MATCH",
+          "EMBRYO_VOICE_MATCH",
+          "NO_AUTHORIZED_VOICE_RELATION",
+          "NOT_COMPARABLE_ACROSS_REPRESENTATIONS",
+          "UNKNOWN",
+        ]) &&
+        (correspondence.gamma === null || stringArrayV0_2(correspondence.gamma)) &&
+        (correspondence.zeroConsonantalStructuralComposition === null ||
+          Array.isArray(correspondence.zeroConsonantalStructuralComposition)) &&
+        stringArrayV0_2(correspondence.operationIds) &&
+        stringArrayV0_2(correspondence.reasonCodes) &&
+        stringArrayV0_2(correspondence.unresolvedFields) &&
+        typeof correspondence.matchReason === "string" &&
         validEvidenceV0_2(reviewedEvidence) &&
         reviewedEvidence.candidateId === candidate.candidateId &&
         isRecordV0_2(hypothesis) &&

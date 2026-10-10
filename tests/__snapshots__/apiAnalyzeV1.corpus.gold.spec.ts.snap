@@ -5719,7 +5719,7 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
           "hypothesis": {
             "evidenceRefs": [],
             "layer": "UNKNOWN_OR_NULL",
-            "reason": "NO_AUTHORIZED_STRUCTURAL_RELATION",
+            "reason": "MISSING_TARGET_SENSE",
             "statement": null,
             "status": "UNKNOWN_OR_NULL",
           },
@@ -5768,7 +5768,7 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
             },
             {
               "layer": "UNKNOWN_OR_NULL",
-              "reason": "NO_AUTHORIZED_STRUCTURAL_RELATION",
+              "reason": "MISSING_TARGET_SENSE",
             },
           ],
           "userDecisionPosture": "user_decides",
@@ -5895,10 +5895,6 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
         {
           "layer": "UNKNOWN_OR_NULL",
           "reason": "MISSING_TARGET_SENSE",
-        },
-        {
-          "layer": "UNKNOWN_OR_NULL",
-          "reason": "NO_AUTHORIZED_STRUCTURAL_RELATION",
         },
       ],
       "userDecisionPosture": "user_decides",
@@ -11714,7 +11710,7 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
           "hypothesis": {
             "evidenceRefs": [],
             "layer": "UNKNOWN_OR_NULL",
-            "reason": "NO_AUTHORIZED_STRUCTURAL_RELATION",
+            "reason": "MISSING_TARGET_SENSE",
             "statement": null,
             "status": "UNKNOWN_OR_NULL",
           },
@@ -11761,7 +11757,7 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
             },
             {
               "layer": "UNKNOWN_OR_NULL",
-              "reason": "NO_AUTHORIZED_STRUCTURAL_RELATION",
+              "reason": "MISSING_TARGET_SENSE",
             },
           ],
           "userDecisionPosture": "user_decides",
@@ -11886,10 +11882,6 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
         {
           "layer": "UNKNOWN_OR_NULL",
           "reason": "MISSING_TARGET_SENSE",
-        },
-        {
-          "layer": "UNKNOWN_OR_NULL",
-          "reason": "NO_AUTHORIZED_STRUCTURAL_RELATION",
         },
       ],
       "userDecisionPosture": "user_decides",

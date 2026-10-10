@@ -38,7 +38,7 @@ describe("analyze-v1 Functional Motivation Interpretation v0.2 boundary", () => 
     expect(payload.analysisStatusV0_1).toBeDefined();
   });
 
-  it("shows a reviewed-evidence hypothesis only with explicit target sense and keeps candidates competing", async () => {
+  it("keeps a cross-representation candidate Null even with explicit target sense", async () => {
     const payload = await analyze({
       word: "study",
       mode: "strict",
@@ -52,8 +52,9 @@ describe("analyze-v1 Functional Motivation Interpretation v0.2 boundary", () => 
       (candidate: { candidateEmbryo: string }) => candidate.candidateEmbryo === "DI",
     );
 
-    expect(interpretation.status).toBe("INTERPRETATIONS_FOUND");
-    expect(di.hypothesis.status).toBe("HYPOTHESIS");
+    expect(interpretation.status).toBe("NO_SUPPORTED_INTERPRETATION");
+    expect(di.hypothesis.status).toBe("UNKNOWN_OR_NULL");
+    expect(di.hypothesis.reason).toBe("NO_AUTHORIZED_STRUCTURAL_RELATION");
     expect(di.reviewedFunctionalEvidence.authorityStatus).toBe("REVIEWED_ACCEPTED");
     expect(interpretation.candidates.length).toBeGreaterThan(1);
     expect(interpretation.candidates.every((candidate: { noSingleWinner: boolean }) => candidate.noSingleWinner)).toBe(true);
