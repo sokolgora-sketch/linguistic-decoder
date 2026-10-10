@@ -7,6 +7,11 @@ import type {
   MotivationDiscoveryV0_1VM,
   PresentOrMissing,
 } from "@/ui/telemetry/types";
+import {
+  aggregateMotivationDiscoveryCandidatesV0_1,
+  measureMotivationDiscoveryAggregationV0_1,
+  type MotivationDiscoveryPrimaryWitnessV0_1,
+} from "@/ui/instrument/motivationDiscoveryPresentationAggregation.v0_1";
 
 function pathText(values: readonly string[]): string {
   return values.length ? values.join(" → ") : "Null";
@@ -112,12 +117,14 @@ function representationBoundary(candidate: MotivationDiscoveryCandidateV0_1VM): 
 }
 
 function Candidate({
-  candidate,
+  witness,
   interpretation,
 }: {
-  candidate: MotivationDiscoveryCandidateV0_1VM;
+  witness: MotivationDiscoveryPrimaryWitnessV0_1;
   interpretation?: FunctionalMotivationCandidateInterpretationV0_2VM;
 }) {
+  const candidate = witness.representative;
+  const records = witness.records;
   const comparison = candidate.structuralComparison;
   const inputStructure = comparison.inputConsonantalStructure;
   const candidateStructure = comparison.candidateConsonantalStructure;
@@ -127,6 +134,7 @@ function Candidate({
   return (
     <article
       data-testid="motivation-discovery-candidate"
+      data-primary-witness="true"
       className="rounded-lg border border-[#3e4b59] bg-[#0d1117] p-3"
     >
       <div className="flex flex-wrap items-start justify-between gap-2">
@@ -137,10 +145,15 @@ function Candidate({
             </h4>
             <span className="text-xs text-[#9fb1bf]">{candidate.candidateLanguage}</span>
             <span className="rounded-full border border-[#3f5368] bg-[#10161c] px-2 py-0.5 text-[10px] uppercase text-[#b8cce0]">
-              {isSelfMatch ? "lexical entry confirmation" : "source Discovery candidate"}
+              {isSelfMatch ? "lexical entry confirmation" : "primary source witness"}
             </span>
           </div>
           <p className="mt-1 text-sm text-[#d7dde7]">{candidate.candidateGloss}</p>
+          {records.length > 1 ? (
+            <p className="mt-1 text-xs text-[#9fb1bf]">
+              {records.length} underlying source records retained in the evidence ledger.
+            </p>
+          ) : null}
         </div>
       </div>
 
@@ -222,20 +235,55 @@ function Candidate({
         <div className="space-y-3 border-t border-[#303843] px-3 py-3 leading-5">
           <div>
             <div className="font-semibold text-[#f0ddb0]">Source fact</div>
-            <div className="mt-1 break-words font-mono">{candidate.sourceFact.sourceId}</div>
-            <div className="break-words text-[#9fb1bf]">
-              {candidate.sourceFact.attestationTruth} · {candidate.sourceFact.sourceStatus}
+            <div className="mt-1 text-[#9fb1bf]">
+              Evidence ledger: {records.length} record{records.length === 1 ? "" : "s"}
             </div>
-            <div className="break-words text-[#9fb1bf]">
-              {candidate.sourceFact.sourceUrlOrArchiveRef ?? "Source locator unavailable"}
-              {candidate.sourceFact.entryLocator ? ` · ${candidate.sourceFact.entryLocator}` : ""}
+            <div className="mt-1 text-[#9fb1bf]">
+              Source family: {candidate.sourceFact.sourceFamilyId ?? "unavailable"}
             </div>
-            <div className="break-words text-[#9fb1bf]">
-              lexical source: {candidate.sourceFact.sourceUrlOrArchiveRef ?? "unavailable"}
-              {candidate.sourceFact.entryLocator ? ` · ${candidate.sourceFact.entryLocator}` : ""}
-            </div>
-            <div className="mt-1 break-words text-[#9fb1bf]">
-              Evidence refs: {candidate.sourceFact.evidenceRefs.join(", ") || "none"}
+            <div className="mt-2 space-y-3">
+              {records.map((record, index) => (
+                <div
+                  key={`${record.sourceFact.sourceId}:${index}`}
+                  data-testid="motivation-evidence-ledger-record"
+                  className="rounded border border-[#303843] bg-[#0d1117] p-2"
+                >
+                  <div className="font-semibold text-[#d7dde7]">Source record {index + 1}</div>
+                  <div className="mt-1 break-words font-mono">{record.sourceFact.sourceId}</div>
+                  <div className="break-words text-[#9fb1bf]">
+                    {record.candidateForm} · {record.candidateGloss}
+                  </div>
+                  <div className="break-words text-[#9fb1bf]">
+                    {record.sourceFact.attestationTruth} · {record.sourceFact.sourceStatus}
+                  </div>
+                  <div className="break-words text-[#9fb1bf]">
+                    {record.sourceFact.sourceUrlOrArchiveRef ?? "Source locator unavailable"}
+                    {record.sourceFact.entryLocator ? ` · ${record.sourceFact.entryLocator}` : ""}
+                  </div>
+                  <div className="break-words text-[#9fb1bf]">
+                    lexical source: {record.sourceFact.sourceUrlOrArchiveRef ?? "unavailable"}
+                    {record.sourceFact.entryLocator ? ` · ${record.sourceFact.entryLocator}` : ""}
+                  </div>
+                  <div className="break-words text-[#9fb1bf]">
+                    Evidence refs: {record.sourceFact.evidenceRefs.join(", ") || "none"}
+                  </div>
+                  <div className="break-words text-[#9fb1bf]">
+                    Matched query: {record.structuralComparison.matchedQuery} · relation: {record.structuralComparison.matchClassification}
+                  </div>
+                  <div className="break-words text-[#9fb1bf]">
+                    Entry reason: {record.structuralComparison.matchReason}
+                  </div>
+                  <div className="break-words text-[#9fb1bf]">
+                    Reason codes: {record.structuralComparison.reasonCodes.join(", ") || "none"}
+                  </div>
+                  <div className="break-words text-[#9fb1bf]">
+                    Representation: {record.structuralComparison.representationCompatibility} · carrier: {record.structuralComparison.consonantalCarrierRelationship}
+                  </div>
+                  <div className="break-words text-[#9fb1bf]">
+                    Functional authority: {record.functionalInterpretation.status} · {record.functionalInterpretation.reason ?? "none"}
+                  </div>
+                </div>
+              ))}
             </div>
             <div className="mt-1 text-[#9fb1bf]">deterministic embryo/source-row lookup; no target-word mapping</div>
           </div>
@@ -313,8 +361,13 @@ export function MotivationDiscoveryCardV0_1({
   const value = discovery.value;
   const math = value.derivedStructure.math7;
   const zc = value.derivedStructure.zeroConsonantalStructuralComposition;
-  const lexicalSelfMatchCount = value.candidates.filter(
-    (candidate) => candidate.structuralComparison.presentationClassification === "LEXICAL_ENTRY_CONFIRMATION",
+  const primaryWitnesses = aggregateMotivationDiscoveryCandidatesV0_1(value.candidates);
+  const aggregationMetrics = measureMotivationDiscoveryAggregationV0_1(
+    value.candidates,
+    primaryWitnesses,
+  );
+  const lexicalSelfMatchCount = primaryWitnesses.filter(
+    (witness) => witness.representative.structuralComparison.presentationClassification === "LEXICAL_ENTRY_CONFIRMATION",
   ).length;
 
   return (
@@ -329,17 +382,17 @@ export function MotivationDiscoveryCardV0_1({
             MULTILINGUAL SOURCE DISCOVERY
           </div>
           <h2 className="mt-1 text-base font-semibold text-[#f5f7fb]">
-            Source-bound candidates to inspect
+            Primary source witnesses to inspect
           </h2>
           <p className="mt-1 max-w-2xl text-xs leading-5 text-[#aeb7c5]">
-            This surface shows multilingual candidates from the existing source/structural Discovery path. It keeps source evidence separate from interpretation; no candidate is a selected choice.
+            This surface shows primary witnesses from the existing source/structural Discovery path. Each witness retains its underlying source records, while source evidence remains separate from interpretation.
           </p>
           <p data-testid="multilingual-discovery-role" className="mt-2 max-w-2xl text-xs leading-5 text-[#c5ced8]">
-            Discovery explains which source-bound candidates are available for inspection. It does not select a candidate or override the separate word-specific reading.
+            Discovery explains which source-bound witnesses are available for inspection. It does not select a candidate or override the separate word-specific reading.
           </p>
         </div>
         <span className="rounded-full border border-[#6b5b2f] px-2.5 py-1 text-[11px] font-semibold text-[#f0ddb0]">
-          {value.candidates.length} Discovery candidate{value.candidates.length === 1 ? "" : "s"}
+          {aggregationMetrics.primaryWitnessCount} primary Discovery witness{aggregationMetrics.primaryWitnessCount === 1 ? "" : "es"}
         </span>
       </div>
 
@@ -457,21 +510,21 @@ export function MotivationDiscoveryCardV0_1({
         </div>
       ) : null}
 
-      {value.candidates.length ? (
+      {primaryWitnesses.length ? (
         <div className="mt-4 space-y-3">
           <div className="flex flex-wrap items-baseline justify-between gap-2">
             <div>
-              <div className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#d8bb7a]">MOTIVATION DISCOVERY CANDIDATES</div>
-              <p className="mt-1 text-xs text-[#c5ced8]">Each candidate is evidence-bound; order is not a ranking.</p>
+              <div className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#d8bb7a]">MOTIVATION DISCOVERY PRIMARY WITNESSES</div>
+              <p className="mt-1 text-xs text-[#c5ced8]">Each primary witness retains its underlying source records; order is not a ranking.</p>
             </div>
             <div className="text-xs font-semibold text-[#f0ddb0]">No single winner · You decide</div>
           </div>
-          {value.candidates.map((candidate) => (
+          {primaryWitnesses.map((witness) => (
             <Candidate
-              key={candidate.candidateId}
-              candidate={candidate}
+              key={witness.primaryWitnessId}
+              witness={witness}
               interpretation={interpretation?.kind === "present"
-                ? interpretation.value.candidates.find((item) => item.candidateId === candidate.candidateId)
+                ? interpretation.value.candidates.find((item) => item.candidateId === witness.representative.candidateId)
                 : undefined}
             />
           ))}

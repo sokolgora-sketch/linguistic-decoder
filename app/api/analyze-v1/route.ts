@@ -39,6 +39,7 @@ import { buildHeartInstrumentV1 } from "@/v1/heartInstrument.v1";
 import { projectDoctrineReadingV1 } from "@/shared/openInstrument/doctrineReadingContract.v1";
 import {
   buildMotivationEngineDiscoveryServerOnlyV0_1,
+  projectMotivationEngineDiscoverySourceFamiliesV0_1,
 } from "@/shared/openInstrument/motivationEngineDiscoveryServerOnly.v0_1";
 import {
   buildMotivationEngineDiscoveryV0_1,
@@ -1365,7 +1366,9 @@ async function runAnalyzeV1Orchestration(
       };
       const discoveryResult = providerExecution === "disabled"
         ? {
-            discovery: buildMotivationEngineDiscoveryV0_1(discoveryInput),
+            discovery: projectMotivationEngineDiscoverySourceFamiliesV0_1(
+              buildMotivationEngineDiscoveryV0_1(discoveryInput),
+            ),
             englishProvider: { status: "NOT_QUERIED" as const },
           }
         : await buildMotivationEngineDiscoveryServerOnlyV0_1(discoveryInput);

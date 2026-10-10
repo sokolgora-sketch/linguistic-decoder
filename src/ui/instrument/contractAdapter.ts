@@ -949,6 +949,8 @@ function parseMotivationDiscoveryV0_1(
       typeof candidate.candidateGloss !== "string" ||
       typeof candidate.candidateEmbryo !== "string" ||
       !isStringArray(candidate.candidateVoicePath) ||
+      (source.sourceFamilyId !== undefined &&
+        (typeof source.sourceFamilyId !== "string" || source.sourceFamilyId.length === 0)) ||
       typeof source.sourceId !== "string" ||
       typeof source.sourceStatus !== "string" ||
       typeof source.attestationTruth !== "string" ||
