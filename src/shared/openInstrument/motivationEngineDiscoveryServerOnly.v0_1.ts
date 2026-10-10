@@ -1,6 +1,7 @@
 import type { AnalyzeWordResultV1 } from "@/shared/analysisResult.v1";
 import {
   createAlbanianLexicalSubstrateWitnessAdapterV0_1,
+  getAlbanianLexicalSubstrateRecordsV0_1,
 } from "@/shared/openInstrument/albanianLexicalSubstrate.v0_1";
 import {
   createEnglishKaikkiServerOnlyExactIndexProviderV0_1,
@@ -17,6 +18,7 @@ import {
 } from "@/shared/openInstrument/motivationEngineDiscovery.v0_1";
 import {
   createMultilingualDiscoverySubstrateS1LatinWitnessAdapterV0_2,
+  getMultilingualDiscoverySubstrateS1LatinSubstrateRecordsV0_2,
 } from "@/shared/openInstrument/multilingualDiscoverySubstrateS1.v0_2";
 import type {
   GenericFunctionalWitnessQueryV1,
@@ -78,6 +80,66 @@ function providerFailureReasonV0_1(
   result: EnglishKaikkiServerOnlyExactIndexProviderResultV0_1,
 ): string | null {
   return "reasonCode" in result ? result.reasonCode : null;
+}
+
+function attachSourceFamilyProjectionV0_1(
+  discovery: MotivationEngineDiscoveryV0_1,
+  sourceFamilyBySourceId: ReadonlyMap<string, string>,
+): MotivationEngineDiscoveryV0_1 {
+  const candidates = discovery.candidates.map((candidate) => {
+    const sourceFamilyId = sourceFamilyBySourceId.get(candidate.sourceFact.sourceId);
+    return {
+      ...candidate,
+      sourceFact: {
+        ...candidate.sourceFact,
+        ...(sourceFamilyId ? { sourceFamilyId } : {}),
+      },
+    };
+  });
+
+  return {
+    ...discovery,
+    candidates,
+  } as MotivationEngineDiscoveryV0_1;
+}
+
+function addStaticSourceFamiliesV0_1(
+  sourceFamilyBySourceId: Map<string, string>,
+): void {
+  for (const record of getAlbanianLexicalSubstrateRecordsV0_1()) {
+    const sourceFamilyId = record.sourceProvenance?.sourceTraditionId;
+    if (sourceFamilyId) sourceFamilyBySourceId.set(record.sourceId, sourceFamilyId);
+  }
+  for (const record of getMultilingualDiscoverySubstrateS1LatinSubstrateRecordsV0_2()) {
+    sourceFamilyBySourceId.set(record.sourceRecordId, record.sourceTraditionId);
+  }
+}
+
+function sourceFamilyRecordingAdapterV0_1(
+  adapter: GenericFunctionalWitnessSourceAdapterV1,
+  sourceFamilyBySourceId: Map<string, string>,
+): GenericFunctionalWitnessSourceAdapterV1 {
+  return Object.freeze({
+    ...adapter,
+    query(input: GenericFunctionalWitnessQueryV1): GenericFunctionalWitnessSourceAdapterResultV1 {
+      const result = adapter.query(input);
+      if (result.ok) {
+        for (const record of result.records) {
+          const sourceFamilyId = record.sourceProvenance?.sourceTraditionId;
+          if (sourceFamilyId) sourceFamilyBySourceId.set(record.sourceId, sourceFamilyId);
+        }
+      }
+      return result;
+    },
+  });
+}
+
+export function projectMotivationEngineDiscoverySourceFamiliesV0_1(
+  discovery: MotivationEngineDiscoveryV0_1,
+): MotivationEngineDiscoveryV0_1 {
+  const sourceFamilyBySourceId = new Map<string, string>();
+  addStaticSourceFamiliesV0_1(sourceFamilyBySourceId);
+  return attachSourceFamilyProjectionV0_1(discovery, sourceFamilyBySourceId);
 }
 
 function getMotivationEngineDiscoveryQueryFormsV0_1(input: {
@@ -204,16 +266,21 @@ export async function buildMotivationEngineDiscoveryServerOnlyV0_1(input: {
     createMultilingualDiscoverySubstrateS1LatinWitnessAdapterV0_2(),
     createResolvedEnglishAdapterV0_1(resolved.recordsByQuery),
   ];
+  const sourceFamilyBySourceId = new Map<string, string>();
+  addStaticSourceFamiliesV0_1(sourceFamilyBySourceId);
+  const recordingSourceAdapters = sourceAdapters.map((adapter) =>
+    sourceFamilyRecordingAdapterV0_1(adapter, sourceFamilyBySourceId),
+  );
 
   return Object.freeze({
-    discovery: buildMotivationEngineDiscoveryV0_1({
+    discovery: attachSourceFamilyProjectionV0_1(buildMotivationEngineDiscoveryV0_1({
       word: input.word,
       inputLanguage: input.inputLanguage,
       inputProfile: input.inputProfile,
       analysis: input.analysis,
       heart: input.heart,
-      sourceAdapters,
-    }),
+      sourceAdapters: recordingSourceAdapters,
+    }), sourceFamilyBySourceId),
     englishProvider: resolved.operationalStatus,
   });
 }

@@ -2,6 +2,10 @@ import { render, screen } from "@testing-library/react";
 import { GET } from "../app/api/analyze-v1/route";
 import { adaptAnalysisToTelemetryVM } from "@/ui/instrument/contractAdapter";
 import { MotivationDiscoveryCardV0_1 } from "@/ui/instrument/sections/MotivationDiscoveryCard.v0_1";
+import {
+  aggregateMotivationDiscoveryCandidatesV0_1,
+  measureMotivationDiscoveryAggregationV0_1,
+} from "@/ui/instrument/motivationDiscoveryPresentationAggregation.v0_1";
 import type { MotivationDiscoveryV0_1VM } from "@/ui/telemetry/types";
 
 function model(overrides: Partial<MotivationDiscoveryV0_1VM> = {}): MotivationDiscoveryV0_1VM {
@@ -119,10 +123,10 @@ describe("Motivation Discovery Lab presentation v0.1", () => {
     expect(screen.getByText("amo")).toBeInTheDocument();
     expect(screen.getByText("Latin")).toBeInTheDocument();
     expect(screen.getByText("to like, to love")).toBeInTheDocument();
-    expect(screen.getByText(/Candidate pronunciation and spoken Voice path are Null/)).toBeInTheDocument();
-    expect(screen.getByText(/orthographic_profile_derived/)).toBeInTheDocument();
-    expect(screen.getByText("Functional motivation unknown")).toBeInTheDocument();
-    expect(screen.getByText("No single winner · You decide")).toBeInTheDocument();
+    expect(screen.getAllByText(/Candidate pronunciation and spoken Voice path are Null/).length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/orthographic_profile_derived/).length).toBeGreaterThan(0);
+    expect(screen.getAllByText("Functional motivation unknown").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("No single winner · You decide").length).toBeGreaterThan(0);
   });
 
   it("shows fact, derived structure, hypothesis, status, and provenance without a winner", () => {
@@ -136,7 +140,7 @@ describe("Motivation Discovery Lab presentation v0.1", () => {
     expect(screen.getByText("Source fact")).toBeInTheDocument();
     expect(screen.getByTestId("motivation-structural-comparison")).toBeInTheDocument();
     expect(screen.getByText("WHY THIS CANDIDATE")).toBeInTheDocument();
-    expect(screen.getByText(/source Discovery candidate/i)).toBeInTheDocument();
+    expect(screen.getByText("primary source witness")).toBeInTheDocument();
     expect(screen.getByTestId("multilingual-discovery-role")).toHaveTextContent(
       "does not select a candidate or override the separate word-specific reading",
     );
@@ -174,7 +178,7 @@ describe("Motivation Discovery Lab presentation v0.1", () => {
 
     render(<MotivationDiscoveryCardV0_1 discovery={{ kind: "present", value: model({ candidates: [di, da] }) }} />);
 
-    expect(screen.getByText("2 Discovery candidates")).toBeInTheDocument();
+    expect(screen.getByText("2 primary Discovery witnesses")).toBeInTheDocument();
     expect(screen.getByText("da")).toBeInTheDocument();
     expect(screen.getByText("to split, cut, divide")).toBeInTheDocument();
     expect(screen.getAllByText("WHY THIS CANDIDATE")).toHaveLength(2);
@@ -288,7 +292,9 @@ describe("Motivation Discovery Lab presentation v0.1", () => {
       "not a cross-form functional motivation claim",
     );
     expect(screen.getAllByText(/lexical entry confirmation/i).length).toBeGreaterThan(0);
-    expect(screen.getByText(/not a cross-form structural motivation claim/)).toBeInTheDocument();
+    expect(screen.getByTestId("motivation-structural-comparison")).toHaveTextContent(
+      "not a cross-form structural motivation claim",
+    );
     expect(screen.getByText("Not applicable to an exact lexical self-match")).toBeInTheDocument();
   });
 
@@ -317,4 +323,119 @@ describe("Motivation Discovery Lab presentation v0.1", () => {
       missing: "malformed",
     });
   });
+
+  it("aggregates same-witness records while retaining every source record", () => {
+    const first = model().candidates[0];
+    const second = {
+      ...first,
+      candidateId: "discovery:study:di:sense-2",
+      candidateGloss: "understanding",
+      sourceFact: {
+        ...first.sourceFact,
+        sourceFamilyId: "fixture.source.family.v0_1",
+        sourceId: "fixture.source.family.v0_1#sense-2",
+        evidenceRefs: ["fixture.citation-2"],
+      },
+    };
+    const firstWithFamily = {
+      ...first,
+      sourceFact: {
+        ...first.sourceFact,
+        sourceFamilyId: "fixture.source.family.v0_1",
+        sourceId: "fixture.source.family.v0_1#sense-1",
+        evidenceRefs: ["fixture.citation-1"],
+      },
+    };
+
+    const primaryWitnesses = aggregateMotivationDiscoveryCandidatesV0_1([
+      firstWithFamily,
+      second,
+    ]);
+    const metrics = measureMotivationDiscoveryAggregationV0_1(
+      [firstWithFamily, second],
+      primaryWitnesses,
+    );
+
+    expect(primaryWitnesses).toHaveLength(1);
+    expect(primaryWitnesses[0].primaryWitnessId).not.toContain("#sense-1");
+    expect(primaryWitnesses[0].primaryWitnessId).not.toContain("#sense-2");
+    expect(primaryWitnesses[0].records).toHaveLength(2);
+    expect(primaryWitnesses[0].records.map((record) => record.sourceFact.sourceId)).toEqual([
+      "fixture.source.family.v0_1#sense-1",
+      "fixture.source.family.v0_1#sense-2",
+    ]);
+    expect(metrics).toMatchObject({
+      rawCandidateRecordCount: 2,
+      primaryWitnessCount: 1,
+      aggregatedRecordCount: 2,
+      aggregationReductionRatio: 0.5,
+      aggregationReductionPercentage: 50,
+      evidenceLedgerRecordCount: 2,
+      recordsLost: 0,
+    });
+
+    render(
+      <MotivationDiscoveryCardV0_1
+        discovery={{ kind: "present", value: model({ candidates: [firstWithFamily, second] }) }}
+      />,
+    );
+    expect(screen.getByText("1 primary Discovery witness")).toBeInTheDocument();
+    expect(screen.getAllByTestId("motivation-evidence-ledger-record")).toHaveLength(2);
+    expect(screen.getByText("fixture.source.family.v0_1#sense-1")).toBeInTheDocument();
+    expect(screen.getByText("fixture.source.family.v0_1#sense-2")).toBeInTheDocument();
+  });
+
+  it("does not over-merge materially different witnesses", () => {
+    const first = model().candidates[0];
+    const differentReason = {
+      ...first,
+      candidateId: "discovery:study:di:different-reason",
+      sourceFact: {
+        ...first.sourceFact,
+        sourceFamilyId: "fixture.source.family.v0_1",
+        sourceId: "fixture.source.family.v0_1#different-reason",
+      },
+      structuralComparison: {
+        ...first.structuralComparison,
+        matchReason: "A materially different authorized entry reason.",
+      },
+    };
+
+    const primaryWitnesses = aggregateMotivationDiscoveryCandidatesV0_1([
+      first,
+      differentReason,
+    ]);
+
+    expect(primaryWitnesses).toHaveLength(2);
+    expect(primaryWitnesses.every((witness) => witness.records.length === 1)).toBe(true);
+  });
+
+  it.each(["study", "studies", "learning", "zemër", "stone"])(
+    "preserves the complete evidence ledger for regression input %s",
+    async (word) => {
+      const response = await GET(
+        new Request(`http://localhost/api/analyze-v1?word=${encodeURIComponent(word)}&mode=strict&alphabet=auto`),
+      );
+      const vm = adaptAnalysisToTelemetryVM(await response.json());
+      if (vm.motivationDiscoveryV0_1.kind !== "present") {
+        throw new Error(`missing Discovery VM for ${word}`);
+      }
+      expect(vm.motivationDiscoveryV0_1.value.candidates.every(
+        (candidate) => typeof candidate.sourceFact.sourceFamilyId === "string",
+      )).toBe(true);
+
+      const primaryWitnesses = aggregateMotivationDiscoveryCandidatesV0_1(
+        vm.motivationDiscoveryV0_1.value.candidates,
+      );
+      const metrics = measureMotivationDiscoveryAggregationV0_1(
+        vm.motivationDiscoveryV0_1.value.candidates,
+        primaryWitnesses,
+      );
+      console.info("DISCOVERY_AGGREGATION_REGRESSION", word, metrics);
+
+      expect(metrics.evidenceLedgerRecordCount).toBe(metrics.rawCandidateRecordCount);
+      expect(metrics.recordsLost).toBe(0);
+      expect(metrics.primaryWitnessCount).toBeLessThanOrEqual(metrics.rawCandidateRecordCount);
+    },
+  );
 });

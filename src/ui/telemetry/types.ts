@@ -355,6 +355,8 @@ export type MotivationDiscoveryCandidateV0_1VM = Readonly<{
   candidateEmbryo: string;
   candidateVoicePath: string[];
   sourceFact: Readonly<{
+    /** Additive source-tradition provenance used only by presentation aggregation. */
+    sourceFamilyId?: string;
     sourceId: string;
     sourceStatus: string;
     attestationTruth: string;
