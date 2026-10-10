@@ -1,0 +1,42 @@
+{
+  "schemaVersion": "open-instrument.multilingual-discovery-substrate-expansion-s4-product-validation-v0.1.hash-manifest",
+  "status": "COMPLETED_RESULT_PRESERVED",
+  "artifacts": [
+    {
+      "path": "docs/open-instrument/research-artifacts/multilingual-discovery-substrate-v0.2-s4-product-validation-v0.1/procedure.json",
+      "sha256": "97f7307d3eb3677750083889ee028639714b678ee2a80d723fe7fff9f1d52405"
+    },
+    {
+      "path": "docs/open-instrument/research-artifacts/multilingual-discovery-substrate-v0.2-s4-product-validation-v0.1/execution.json",
+      "sha256": "badab83c7692ea0e53128d51e12cf16e8b38d30081649284d5191b0e2ba9867b"
+    },
+    {
+      "path": "docs/open-instrument/research-artifacts/multilingual-discovery-substrate-v0.2-s4-product-validation-v0.1/results.json",
+      "sha256": "a729cf6f7f9ca74cc20d8aaea0c2a0a4435499345ec8b45a43d72064135f9f66"
+    },
+    {
+      "path": "docs/open-instrument/research-artifacts/multilingual-discovery-substrate-v0.2-s4-product-validation-v0.1/summary.json",
+      "sha256": "9cfb308b2ad4e3f66eaef2fa9ea954c7a05ad575d5146c8c072f14b5b4f90ae1"
+    }
+  ],
+  "recovery": {
+    "method": "OFFLINE_DETERMINISTIC_ARTIFACT_FINALIZATION",
+    "attempt1Classification": "MECHANICAL_POST_EVALUATION_PERSISTENCE_FAILURE",
+    "attempt1DurableResult": false,
+    "correctiveAttemptNumber": 2,
+    "providerQueriesDuringRecovery": 0,
+    "indexLookupsDuringRecovery": 0,
+    "networkCallsDuringRecovery": 0,
+    "evaluationInputsReexecuted": 0
+  },
+  "execution": {
+    "attempts": 2,
+    "attemptsMax": 2,
+    "correctiveAttempt": 2,
+    "durableResultAttempt": 2,
+    "noThirdAttempt": true,
+    "sourceAcquisition": false,
+    "sourceContentInspected": false,
+    "networkTransfer": false
+  }
+}

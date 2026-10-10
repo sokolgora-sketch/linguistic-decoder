@@ -1,0 +1,47 @@
+{
+  "schemaVersion": "open-instrument.multilingual-discovery-substrate-expansion-s4-product-validation.v0.1.summary",
+  "status": "COMPLETED_RESULT_PRESERVED",
+  "authority": {
+    "procedurePath": "docs/open-instrument/research-artifacts/multilingual-discovery-substrate-v0.2-s4-product-validation-v0.1/procedure.json",
+    "procedureSha256": "97f7307d3eb3677750083889ee028639714b678ee2a80d723fe7fff9f1d52405",
+    "samplePath": "docs/open-instrument/research-artifacts/multilingual-discovery-substrate-v0.2-broader-stratified-diagnostic-v0.1/sample.json",
+    "sampleSha256": "20bd7e0f93629d8c1c87dfa76c1b1f1b9bfeb763dc44905bced2f91341179ffd",
+    "sampleIdentitySha256": "5fa453b1a6b7ad6dbc965080d6b47d48d54c4a4c7961813e13d6cae25a010dc3",
+    "validityBindingSha256": "51019087d2199f8506267c3e6a4fbdb8824962641a6ed49abaa7e2c7bcc59ee6"
+  },
+  "recovery": {
+    "method": "OFFLINE_DETERMINISTIC_ARTIFACT_FINALIZATION",
+    "attempt1Classification": "MECHANICAL_POST_EVALUATION_PERSISTENCE_FAILURE",
+    "attempt1DurableResult": false,
+    "correctiveAttemptNumber": 2,
+    "providerQueriesDuringRecovery": 0,
+    "indexLookupsDuringRecovery": 0,
+    "networkCallsDuringRecovery": 0,
+    "evaluationInputsReexecuted": 0
+  },
+  "summary": {
+    "TOTAL_INPUTS": 1024,
+    "VALID_INPUTS": 688,
+    "BASELINE_POSITIVE_INPUTS": 8,
+    "EXPANDED_POSITIVE_INPUTS": 451,
+    "NEW_POSITIVE_INPUTS": 443,
+    "UNCHANGED_POSITIVE_INPUTS": 8,
+    "UNCHANGED_NULL_INPUTS": 65,
+    "REGRESSED_INPUTS": 0,
+    "ENGLISH_CONTRIBUTING_INPUTS": 443,
+    "ALBANIAN_CONTRIBUTING_INPUTS": 0,
+    "LATIN_CONTRIBUTING_INPUTS": 0,
+    "MULTI_SOURCE_CONTRIBUTING_INPUTS": 0,
+    "COVERAGE_BEFORE": 0.011627906976744186,
+    "COVERAGE_AFTER": 0.6555232558139535,
+    "COVERAGE_ABSOLUTE_DELTA": 0.6438953488372093,
+    "COVERAGE_RELATIVE_DELTA": 55.375,
+    "TOTAL_BASELINE_CANDIDATES": 9,
+    "TOTAL_EXPANDED_CANDIDATES": 9951,
+    "DISTINCT_BASELINE_SOURCE_RECORDS": 4,
+    "DISTINCT_EXPANDED_SOURCE_RECORDS": 8765,
+    "MAX_EXPANDED_CANDIDATES_PER_INPUT": 204
+  },
+  "outcome": "S4_MEASURABLE_IMPROVEMENT",
+  "productSurfaceValidation": "PENDING"
+}
