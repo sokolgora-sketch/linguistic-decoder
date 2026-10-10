@@ -787,7 +787,21 @@ export function verifyS4ProductValidationV0_2(rootDir = process.cwd()): Readonly
   assertEqual(execution.networkTransferPerformed, false, "S4_NETWORK_TRANSFER_FLAG");
   assertEqual(results.status, "COMPLETED_RESULT_PRESERVED", "S4_RESULT_STATUS_MISMATCH");
   assertEqual(summaryArtifact.status, "COMPLETED_RESULT_PRESERVED", "S4_SUMMARY_STATUS_MISMATCH");
-  const artifacts = Array.isArray(manifest.artifacts) ? manifest.artifacts : [];
+  const expectedArtifactPaths = [
+    S4_PRODUCT_VALIDATION_PROCEDURE_PATH_V0_2,
+    S4_PRODUCT_VALIDATION_EXECUTION_PATH_V0_2,
+    S4_PRODUCT_VALIDATION_RESULTS_PATH_V0_2,
+    S4_PRODUCT_VALIDATION_SUMMARY_PATH_V0_2,
+  ];
+  if (!Array.isArray(manifest.artifacts) || manifest.artifacts.length !== expectedArtifactPaths.length) {
+    throw new Error("S4_HASH_MANIFEST_ARTIFACT_SET_MISMATCH");
+  }
+  const artifacts = manifest.artifacts;
+  const manifestPaths = artifacts.map((value) => {
+    const artifact = asObject(value);
+    return typeof artifact.path === "string" ? artifact.path : "";
+  });
+  assertArrayEqual(manifestPaths, expectedArtifactPaths, "S4_HASH_MANIFEST_ARTIFACT_SET_MISMATCH");
   for (const value of artifacts) {
     const artifact = asObject(value);
     if (typeof artifact.path !== "string" || typeof artifact.sha256 !== "string" || sha256FileS4V0_2(rootDir, artifact.path) !== artifact.sha256) {

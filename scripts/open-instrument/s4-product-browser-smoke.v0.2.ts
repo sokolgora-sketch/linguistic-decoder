@@ -2,7 +2,7 @@
 
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import { chromium } from "playwright";
+import { chromium, type Browser } from "playwright";
 import { startNextServer } from "../../tests/helpers/ownedNextServer";
 
 type PersistedResult = {
@@ -27,8 +27,9 @@ async function main(): Promise<void> {
   assert(target && english, "No persisted English new-positive representative was available.");
 
   const server = await startNextServer("start");
-  const browser = await chromium.launch({ headless: true });
+  let browser: Browser | undefined;
   try {
+    browser = await chromium.launch({ headless: true });
     const page = await browser.newPage();
     page.setDefaultTimeout(30_000);
     const response = await page.goto(`${server.base}/chat`, { waitUntil: "domcontentloaded" });
@@ -44,7 +45,7 @@ async function main(): Promise<void> {
     console.log(`S4_CHAT_REPRESENTATIVE_INPUT=${target.input}`);
     console.log(`S4_CHAT_REPRESENTATIVE_FORM=${english.candidateForm}`);
   } finally {
-    await browser.close();
+    await browser?.close();
     await server.stop();
   }
 }
