@@ -19,6 +19,7 @@
     "print:vowels": "tsx src/scripts/print-seven-vowels.ts",
     "typecheck:contracts": "tsc -p tsconfig.contracts.json --noEmit",
     "gate:quick": "node scripts/gate.mjs --quick",
+    "gate:prepush": "node scripts/gate.prepush.mjs",
     "gate": "node scripts/gate.mjs",
     "lint:fix": "eslint -c eslint.config.mjs \"src/**/*.{js,jsx,ts,tsx}\" \"app/**/*.{js,jsx,ts,tsx}\" \"tests/**/*.{js,jsx,ts,tsx}\" \"scripts/**/*.{js,jsx,ts,tsx,mjs}\" --fix",
     "typecheck:prod": "tsc -p tsconfig.typecheck.prod.json --noEmit",

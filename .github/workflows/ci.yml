@@ -51,6 +51,9 @@ jobs:
       - name: Test
         run: npm test --silent
 
+      - name: Integration
+        run: npm run test:integration
+
       - name: Build
         env:
           NEXT_TELEMETRY_DISABLED: "1"

@@ -8,5 +8,5 @@ if [[ "${SKIP_PREPUSH:-0}" == "1" ]]; then
   exit 0
 fi
 
-echo "pre-push: running npm run gate:quick (lint + test)"
-npm run gate:quick
+echo "pre-push: running npm run gate:prepush (lint + serial CI-mode deterministic tests)"
+npm run gate:prepush
