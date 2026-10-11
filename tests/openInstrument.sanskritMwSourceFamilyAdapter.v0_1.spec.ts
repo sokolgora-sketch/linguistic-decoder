@@ -5,6 +5,7 @@ import {
   parseSanskritMwRecordV0_1,
   SANSKRIT_MW_ADAPTER_EXPECTED_SNAPSHOT_IDENTITY_V0_1,
   validateSanskritMwSourceArtifactIdentityV0_1,
+  verifySanskritMwSnapshotFileV0_1,
 } from "@/shared/openInstrument/sanskritMwSourceFamilyAdapter.v0_1";
 import {
   getRegisteredSanskritMwSourceFamilyV0_1,
@@ -42,6 +43,7 @@ describe("Sanskrit MW source-family adapter v0.1", () => {
       k2: "a—kAra",
       h: "1",
       e: "3",
+      rawRecordBody: "<s>akAra</s> ¦ a source-attested entry body",
       rawEntryMetadata: "3",
       representation: "SLP1",
       sourceFormNormalization: "EXACT_PRESERVED",
@@ -85,6 +87,41 @@ describe("Sanskrit MW source-family adapter v0.1", () => {
     expect(
       parseSanskritMwRecordV0_1("<L>1<pc>1,1<k1>a<k2>a<e>1\n<LEND><\n", 1),
     ).toMatchObject({ ok: true });
+    expect(
+      parseSanskritMwRecordV0_1(
+        "<L>1<pc>1,1<k1>a<k2>a<e>1\n<LEND><anything-else>\n",
+        1,
+      ),
+    ).toEqual({ ok: false, reasonCode: "SOURCE_ADAPTER_FAILURE" });
+  });
+
+  it("preserves the complete raw body and rejects interior record boundaries", () => {
+    const body = "<s>akAra</s>  ¦  source text\n<ls>reference</ls> literal <L> markup";
+    const record = parseSanskritMwRecordV0_1(
+      `<L>1<pc>1,1<k1>a<k2>a<e>1\n${body}\n<LEND>\n`,
+      1,
+    );
+    expect(record).toMatchObject({ ok: true });
+    if (record.ok) expect(record.record.rawRecordBody).toBe(body);
+
+    expect(
+      parseSanskritMwRecordV0_1(
+        `<L>1<pc>1,1<k1>a<k2>a<e>1\n<s>first</s>\n<L>2<pc>1,1<k1>b<k2>b<e>2\n<LEND>\n`,
+        1,
+      ),
+    ).toEqual({ ok: false, reasonCode: "SOURCE_RECORD_INVALID" });
+    expect(
+      parseSanskritMwRecordV0_1(
+        `<L>1<pc>1,1<k1>a<k2>a<e>1\n<s>first</s>\n<LEND>\n<LEND>\n`,
+        1,
+      ),
+    ).toEqual({ ok: false, reasonCode: "SOURCE_RECORD_INVALID" });
+    expect(
+      parseSanskritMwRecordV0_1(
+        `<L>1<pc>1,1<k1>a<k2>a<e>1\n<s>first</s>\n<LEND><\n<LEND>\n`,
+        1,
+      ),
+    ).toEqual({ ok: false, reasonCode: "SOURCE_RECORD_INVALID" });
   });
 
   it("uses exact case-sensitive lookup and preserves same-k1 multiplicity", () => {
@@ -134,5 +171,13 @@ describe("Sanskrit MW source-family adapter v0.1", () => {
         sha256: SANSKRIT_MW_ADAPTER_EXPECTED_SNAPSHOT_IDENTITY_V0_1.sha256,
       }),
     ).toMatchObject({ ok: false, reasonCode: "SOURCE_IDENTITY_MISMATCH" });
+  });
+
+  it("rejects non-regular snapshot paths before reading", async () => {
+    await expect(verifySanskritMwSnapshotFileV0_1(process.cwd())).resolves.toEqual({
+      ok: false,
+      reasonCode: "SOURCE_ADAPTER_FAILURE",
+      observed: { byteLength: expect.any(Number), sha256: null },
+    });
   });
 });
