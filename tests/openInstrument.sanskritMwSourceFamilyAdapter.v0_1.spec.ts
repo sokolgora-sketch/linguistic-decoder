@@ -5,6 +5,7 @@ import {
   parseSanskritMwRecordV0_1,
   SANSKRIT_MW_ADAPTER_EXPECTED_SNAPSHOT_IDENTITY_V0_1,
   validateSanskritMwSourceArtifactIdentityV0_1,
+  verifySanskritMwSnapshotFileV0_1,
 } from "@/shared/openInstrument/sanskritMwSourceFamilyAdapter.v0_1";
 import {
   getRegisteredSanskritMwSourceFamilyV0_1,
@@ -170,5 +171,13 @@ describe("Sanskrit MW source-family adapter v0.1", () => {
         sha256: SANSKRIT_MW_ADAPTER_EXPECTED_SNAPSHOT_IDENTITY_V0_1.sha256,
       }),
     ).toMatchObject({ ok: false, reasonCode: "SOURCE_IDENTITY_MISMATCH" });
+  });
+
+  it("rejects non-regular snapshot paths before reading", async () => {
+    await expect(verifySanskritMwSnapshotFileV0_1(process.cwd())).resolves.toEqual({
+      ok: false,
+      reasonCode: "SOURCE_ADAPTER_FAILURE",
+      observed: { byteLength: expect.any(Number), sha256: null },
+    });
   });
 });

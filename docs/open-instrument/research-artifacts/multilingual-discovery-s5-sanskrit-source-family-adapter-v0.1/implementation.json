@@ -75,7 +75,7 @@
   },
   "validation": {
     "focusedTests": "PASS",
-    "focusedTestCount": 7,
+    "focusedTestCount": 8,
     "typecheckFull": "PASS",
     "typecheckContracts": "PASS",
     "lint": "PASS",
@@ -87,6 +87,7 @@
     "sourceRecordsRecoverable": "PASS",
     "rawRecordBodyRecoverable": "PASS",
     "interiorBoundaryRejection": "PASS",
+    "nonRegularHandleRejection": "PASS",
     "verifiedAndParsedBytesBinding": "PASS",
     "externalSnapshotMutated": false,
     "manifestMutated": false

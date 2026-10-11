@@ -377,6 +377,9 @@ async function readVerifiedSnapshotBytesV0_1(
 ): Promise<Uint8Array> {
   const fileHandle = await open(snapshotPath, "r");
   try {
+    if (!(await fileHandle.stat()).isFile()) {
+      throw new Error("SOURCE_ADAPTER_FAILURE");
+    }
     const bytes = new Uint8Array(await fileHandle.readFile());
     const identity = validateSanskritMwSourceArtifactIdentityV0_1({
       byteLength: bytes.byteLength,
@@ -395,6 +398,14 @@ export async function verifySanskritMwSnapshotFileV0_1(
   let fileHandle: Awaited<ReturnType<typeof open>> | null = null;
   try {
     fileHandle = await open(snapshotPath, "r");
+    const metadata = await fileHandle.stat();
+    if (!metadata.isFile()) {
+      return Object.freeze({
+        ok: false,
+        reasonCode: "SOURCE_ADAPTER_FAILURE",
+        observed: Object.freeze({ byteLength: metadata.size, sha256: null }),
+      });
+    }
     const bytes = new Uint8Array(await fileHandle.readFile());
     return validateSanskritMwSourceArtifactIdentityV0_1({
       byteLength: bytes.byteLength,

@@ -77,8 +77,8 @@ implementation lane.
   closed, while inline body substrings are preserved;
 - source multiplicity and exact case are preserved;
 - the snapshot stream opens one file instance, hashes the bytes read from that
-  instance, and parses the same verified in-memory bytes without reopening the
-  pathname;
+  instance, rejects non-regular handles before reading, and parses the same
+  verified in-memory bytes without reopening the pathname;
 - pronunciation, Voice path, Gamma, and ZC remain `Null`;
 - candidate generation, ranking, filtering, winner policy, and analytical
   semantics are unchanged;
