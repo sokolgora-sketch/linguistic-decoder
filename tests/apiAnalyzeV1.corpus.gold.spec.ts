@@ -35,7 +35,7 @@ describe("apiAnalyzeV1 — corpus gold (contract projection)", () => {
       const url =
         "http://localhost/api/analyze-v1" +
         `?word=${encodeURIComponent(word)}` +
-        `&mode=strict`;
+        `&mode=strict&providerExecution=disabled`;
 
       const res = await GET(new NextRequest(url));
       expect(res.status).toBe(200);
