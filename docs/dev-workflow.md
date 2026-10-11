@@ -109,6 +109,25 @@ Run focused tests first for changed behavior. Use the actual repository commands
 
 Use `npm run gate:quick` for quick validation when a build is not required. Use `npm run gate`, or report a separately executed `npm run build`, when production-build validation is required. Pre-merge proof must show the command that actually provided build coverage.
 
+The repository pre-push hook runs `npm run gate:prepush` for constrained local
+environments. This is not a validation bypass: it runs lint plus Jest in
+`--ci --runInBand` mode with `OPEN_INSTRUMENT_EXTERNAL_SOURCE_ROOT` unset so
+deterministic local results cannot change with an optional external provider.
+It excludes only the known capability-dependent suites that require loopback,
+`tsx` child-process IPC, or the integration build/network path:
+
+- `tests/apiAnalyzeV1.evidence.smoke.curl.spec.ts`
+- `tests/apiAnalyzeV1.stability.repeat.smoke.spec.ts`
+- `tests/openInstrument.multilingualDiscoverySubstrateS3.v0_2.spec.ts`
+- `tests/ownedNextServer.spec.ts`
+- `tests/battery/batterySeriesStatsGenerator.v0.1.spec.ts`
+- `tests/battery/batteryEvidencePackInspectScript.v0.1.spec.ts`
+
+Those suites remain mandatory in CI. The CI workflow runs the full unit suite,
+`npm run test:integration`, the production build, and the browser smoke. A
+normal capable local environment may still use `npm run gate:quick` or
+`npm run gate` directly.
+
 Never claim PASS, build success, CI success, or gate success without actual output. Do not encode transient test counts in this durable workflow.
 
 For the current repository command surface, the normal pre-merge sequence is
