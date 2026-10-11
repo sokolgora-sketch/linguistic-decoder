@@ -113,12 +113,21 @@ representation is Null or unknown and cannot be promoted by inference.
 
 ### Gamma authority distinction
 
-The existing Albanian profile path contains an explicitly authorized
-profile-derived structural output: `profileDerivedGamma` reads the profile
-consonant field and returns `status: "profile_derived"`. This is a
-non-spoken structural path. It is not candidate pronunciation authority, does
-not authorize spoken Gamma, and cannot bypass the candidate pronunciation or
-representation-authority firewall.
+The repository contains an Albanian profile-derived structural output:
+`profileDerivedGamma` reads the profile consonant field and returns
+`status: "profile_derived"`. Under this contract, that output is explicitly
+profile-authorized only when the actual input profile identity is bound to the
+Albanian profile contract. A language label such as `inputLanguage: "sq"`, an
+`auto` alphabet, or another non-Albanian profile identifier does not establish
+that profile identity. This is a non-spoken structural path. It is not
+candidate pronunciation authority, does not authorize spoken Gamma, and cannot
+bypass the candidate pronunciation or representation-authority firewall.
+
+The current implementation's language-only branch is therefore not
+authorization under this contract; it must not be treated as evidence that an
+auto/non-Albanian request has an authorized Albanian profile. Any future use of
+`PROFILE_DERIVED_GAMMA` must first carry and validate the actual compatible
+profile identity and its independent profile contract.
 
 For a candidate entering spoken comparison, `SPOKEN_GAMMA` requires the
 complete compatible pronunciation authority chain below. An explicitly
