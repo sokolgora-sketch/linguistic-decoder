@@ -46,22 +46,26 @@ This contract preserves the following:
    comparability.
 6. Candidate pronunciation remains Null where no authorized pronunciation
    source exists.
-7. Gamma derives from authorized pronunciation only.
-8. Zero-consonantal structure derives from authorized pronunciation only.
-9. Spoken comparison uses authorized pronunciation, never spelling
+7. Spoken Gamma derives from authorized pronunciation only.
+8. An explicitly authorized profile-derived Gamma may exist as a separate
+   non-spoken structural output under its profile contract. It does not become
+   pronunciation authority and does not authorize SAME_REPRESENTATION with
+   production_spoken.
+9. Zero-consonantal structure derives from authorized pronunciation only.
+10. Spoken comparison uses authorized pronunciation, never spelling
    masquerading as pronunciation.
-10. Cross-representation evidence remains cross-representation unless an
+11. Cross-representation evidence remains cross-representation unless an
     independently authorized bridge exists.
-11. SAME_REPRESENTATION is an authority claim, not a convenience flag.
-12. No consonant semantics are inferred.
-13. No historical origin, cognacy, borrowing, or language-priority inference
+12. SAME_REPRESENTATION is an authority claim, not a convenience flag.
+13. No consonant semantics are inferred.
+14. No historical origin, cognacy, borrowing, or language-priority inference
     is introduced.
-14. no_single_winner remains true.
-15. user_decides remains the product boundary.
-16. Null remains valid.
-17. No word, language, candidate, or study-specific production exception is
+15. no_single_winner remains true.
+16. user_decides remains the product boundary.
+17. Null remains valid.
+18. No word, language, candidate, or study-specific production exception is
     authorized.
-18. No source gains authority merely because it helps the word study.
+19. No source gains authority merely because it helps the word study.
 
 ## Current authority gap
 
@@ -85,8 +89,9 @@ classification for the current data.
 
 The source supplies pronunciation data under an explicit contract that
 authorizes the value for the candidate form and language or variety. This class
-may support Gamma, zero-consonantal structure, and a spoken comparison,
-subject to normalization, variant, scope, and evidence checks.
+does not by itself authorize Gamma, zero-consonantal structure, or spoken
+comparison. Each applicable notation, normalization, projection, and
+representation-bridge stage must also be explicitly authorized and compatible.
 
 ### AUTHORIZED_PROFILE_REPRESENTATION
 
@@ -105,6 +110,30 @@ SAME_REPRESENTATION relation.
 
 No representation authority sufficient for comparison is present. The
 representation is Null or unknown and cannot be promoted by inference.
+
+### Gamma authority distinction
+
+The repository contains an Albanian profile-derived structural output:
+`profileDerivedGamma` reads the profile consonant field and returns
+`status: "profile_derived"`. Under this contract, that output is explicitly
+profile-authorized only when the actual input profile identity is bound to the
+Albanian profile contract. A language label such as `inputLanguage: "sq"`, an
+`auto` alphabet, or another non-Albanian profile identifier does not establish
+that profile identity. This is a non-spoken structural path. It is not
+candidate pronunciation authority, does not authorize spoken Gamma, and cannot
+bypass the candidate pronunciation or representation-authority firewall.
+
+The current implementation's language-only branch is therefore not
+authorization under this contract; it must not be treated as evidence that an
+auto/non-Albanian request has an authorized Albanian profile. Any future use of
+`PROFILE_DERIVED_GAMMA` must first carry and validate the actual compatible
+profile identity and its independent profile contract.
+
+For a candidate entering spoken comparison, `SPOKEN_GAMMA` requires the
+complete compatible pronunciation authority chain below. An explicitly
+authorized `PROFILE_DERIVED_GAMMA` may exist only where its profile contract
+independently authorizes the consonantal structure; it remains distinct from
+spoken pronunciation and does not by itself establish SAME_REPRESENTATION.
 
 ## SAME_REPRESENTATION definition
 
@@ -129,15 +158,29 @@ The relation requires all of the following:
 String equality, shared letters, shared gloss, shared source family, reviewed
 status, or a manually supplied comparison flag are not sufficient.
 
+For a source-pronunciation candidate entering a spoken comparison, the
+following authority stages are separate requirements wherever applicable:
+
+- `SOURCE_PRONUNCIATION_AUTHORITY`;
+- `NOTATION_AUTHORITY`;
+- `NORMALIZATION_AUTHORITY`;
+- `PROJECTION_AUTHORITY`;
+- `REPRESENTATION_BRIDGE_AUTHORITY`.
+
+An authorized source pronunciation is therefore not equivalent to authorized
+spoken comparability. This document names the required stages only; it does not
+specify any notation-to-Voice, notation-to-Gamma, notation-to-ZC, or other
+projection transformation.
+
 ## Representation bridge policy
 
 | Input representation | Candidate representation | Authority result |
 | --- | --- | --- |
-| Authorized source pronunciation | Production spoken | Authorizable only with an explicit source contract |
+| Authorized source pronunciation | Production spoken | Authorizable only when all applicable source-pronunciation, notation, normalization, projection, and representation-bridge authorities are explicit and compatible |
 | Authorized profile representation | Same compatible profile | Authorizable only with an explicit profile contract |
 | Authorized profile representation | Production spoken | Not authorized by this contract |
 | Orthographic profile derived | Production spoken | Not authorized |
-| External IPA or equivalent | Production spoken | Authorizable only with explicit source, notation, and projection contracts |
+| External IPA or equivalent | Production spoken | Authorizable only with explicit and compatible source, notation, normalization, projection, and representation-bridge contracts |
 | Unknown or Null | Any representation | Not authorized |
 
 An independently authorized bridge may be added in a future lane, but this
@@ -235,9 +278,11 @@ A future authorized candidate pronunciation record must preserve at least:
 - source version or snapshot date;
 - language and variety;
 - authority status;
-- deterministic normalization result;
-- deterministic pronunciation-to-Voice projection contract;
-- deterministic Gamma and zero-consonantal projection contract where applicable;
+- deterministic normalization result and its explicit authority contract;
+- explicit projection authority contracts for Voice, Gamma, and
+  zero-consonantal structure where applicable, without assuming or defining
+  their internal transformation rules;
+- explicit representation-bridge authority where a bridge is required;
 - variant identity and deterministic ordering;
 - an explicit failure or Null reason when normalization or projection is not
   authorized.
@@ -247,9 +292,10 @@ replace raw provenance with a guessed normalized value.
 
 ## Future pronunciation authority rules
 
-Only a reviewed, explicitly authorized pronunciation record may enter the
-candidate spoken path. Spelling, transliteration, gloss, source family,
-historical relation, and lexical similarity cannot substitute for it.
+Only a reviewed, explicitly authorized pronunciation record with all
+applicable authority stages above may enter the candidate spoken path.
+Spelling, transliteration, gloss, source family, historical relation, and
+lexical similarity cannot substitute for any missing stage.
 
 Normalization must be deterministic and source-contract-bound. Unsupported
 notation, unresolved language/variety, malformed values, and ambiguous
@@ -259,8 +305,10 @@ Variants remain individually recoverable and deterministically ordered. A
 future selector may not silently discard variants or create a winner.
 
 SAME_REPRESENTATION requires compatible authority scope, notation,
-normalization, segmentation, ordering, and deterministic projection on both
-sides. A future bridge must be explicit and reviewable.
+normalization, segmentation, ordering, deterministic projection, and
+representation-bridge authority on both sides where applicable. A future
+bridge must be explicit and reviewable. No source pronunciation field alone
+provides those authorities.
 
 ## Existing authorized pronunciation contracts
 
