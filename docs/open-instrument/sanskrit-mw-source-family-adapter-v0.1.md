@@ -1,6 +1,6 @@
 # Sanskrit MW source-family adapter v0.1
 
-Status: `IMPLEMENTED_SOURCE_RECORD_BOUNDARY_ONLY`
+Status: `IMPLEMENTED_SOURCE_RECORD_BOUNDARY_CORRECTIVE`
 
 This adapter implements the frozen S5 CDSL Monier-Williams source-record
 boundary. It does not activate Sanskrit in production, run Discovery, build an
@@ -30,9 +30,15 @@ implementation.
 The adapter accepts one exact physical `<L>...<LEND>` record byte sequence,
 one-based physical record ordinal, and the verified frozen snapshot identity.
 It preserves `L`, `pc`, `k1`, `k2`, optional `h`, and `e` exactly as source
-fields. `k1` is the sole exact case-sensitive SLP1 lookup form; no lowercasing,
-Unicode normalization, diacritic stripping, transliteration, fuzzy matching,
-or semantic matching is performed.
+fields. It also preserves `rawRecordBody`, defined as every source-authored
+physical line after header line 1 and before the final terminal line, joined
+with the parser's canonical `\n` line boundary. Header and terminal lines are
+excluded; source order, tags, punctuation, case, internal whitespace, and
+source-authored characters are not semantically reinterpreted.
+
+`k1` is the sole exact case-sensitive SLP1 lookup form; no lowercasing, Unicode
+normalization, diacritic stripping, transliteration, fuzzy matching, or
+semantic matching is performed.
 
 Record identity is snapshot-scoped `snapshotId#L-<L>` because the completed
 S5 structural evidence established unique `L` values. The locator retains both
@@ -67,7 +73,12 @@ implementation lane.
 - raw source bytes are never imported into Git;
 - snapshot identity mismatch fails closed;
 - malformed records fail closed without salvage;
+- a second line-start `<L>` or exact interior `<LEND>` / `<LEND><` fails
+  closed, while inline body substrings are preserved;
 - source multiplicity and exact case are preserved;
+- the snapshot stream opens one file instance, hashes the bytes read from that
+  instance, and parses the same verified in-memory bytes without reopening the
+  pathname;
 - pronunciation, Voice path, Gamma, and ZC remain `Null`;
 - candidate generation, ranking, filtering, winner policy, and analytical
   semantics are unchanged;

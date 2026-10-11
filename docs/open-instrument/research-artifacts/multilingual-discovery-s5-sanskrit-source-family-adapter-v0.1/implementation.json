@@ -1,7 +1,7 @@
 {
   "schemaVersion": "open-instrument.multilingual-discovery-s5-sanskrit-source-family-adapter-implementation.v0.1",
   "contractId": "OPEN_INSTRUMENT_MULTILINGUAL_DISCOVERY_S5_SANSKRIT_SOURCE_FAMILY_ADAPTER_V0_1",
-  "implementationStatus": "IMPLEMENTED_SOURCE_RECORD_BOUNDARY_ONLY",
+  "implementationStatus": "IMPLEMENTED_SOURCE_RECORD_BOUNDARY_CORRECTIVE",
   "repositoryBaselineHead": "93d1afb8ac5f25a65575fa9b49eaf01fba2f5bbb",
   "sourceIdentity": {
     "sourceFamilyId": "sanskrit-mw",
@@ -43,7 +43,15 @@
   },
   "implementationBoundary": {
     "inputUnit": "ONE_EXACT_PHYSICAL_CSL_RECORD_BYTE_SEQUENCE_PLUS_ONE_BASED_ORDINAL_PLUS_VERIFIED_SNAPSHOT_IDENTITY",
-    "preservedFields": ["L", "pc", "k1", "k2", "h", "e"],
+    "preservedFields": ["L", "pc", "k1", "k2", "h", "e", "rawRecordBody"],
+    "rawRecordBodyDefinition": "ALL_SOURCE_AUTHORED_PHYSICAL_LINES_AFTER_HEADER_LINE_1_BEFORE_FINAL_TERMINAL_BOUNDARY",
+    "rawRecordBodyHeaderIncluded": false,
+    "rawRecordBodyTerminatorIncluded": false,
+    "rawRecordBodyStorage": "CANONICAL_NEWLINE_JOINED_SOURCE_LINES_WITHOUT_SEMANTIC_REINTERPRETATION",
+    "interiorBoundaryPolicy": "REJECT_LINE_START_L_AND_EXACT_LEND_OR_LEND_ANOMALY_ONLY",
+    "lendAnomalyLiteral": "<LEND><",
+    "lendAnomalyCountExpected": 1,
+    "verifiedAndParsedBytesBinding": "ONE_OPENED_FILE_INSTANCE_READ_ONCE_HASHED_IN_MEMORY_AND_PARSED_FROM_THE_SAME_BUFFER",
     "lookupField": "k1",
     "lookupRepresentation": "SLP1",
     "lookupPolicy": "EXACT_CASE_SENSITIVE_NO_NORMALIZATION",
@@ -67,7 +75,7 @@
   },
   "validation": {
     "focusedTests": "PASS",
-    "focusedTestCount": 6,
+    "focusedTestCount": 7,
     "typecheckFull": "PASS",
     "typecheckContracts": "PASS",
     "lint": "PASS",
@@ -77,6 +85,9 @@
     "browserValidationFallbackUsed": false,
     "k1CasePreservation": "PASS",
     "sourceRecordsRecoverable": "PASS",
+    "rawRecordBodyRecoverable": "PASS",
+    "interiorBoundaryRejection": "PASS",
+    "verifiedAndParsedBytesBinding": "PASS",
     "externalSnapshotMutated": false,
     "manifestMutated": false
   },
@@ -98,5 +109,5 @@
       "path": "docs/open-instrument/sanskrit-mw-source-family-adapter-v0.1.md"
     }
   ],
-  "nextAction": "AUTHORIZE_FUTURE_S5_SANSKRIT_SOURCE_ACTIVATION_LANE"
+  "nextAction": "AWAIT_DF_DECISION"
 }

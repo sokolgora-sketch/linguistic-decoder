@@ -1,7 +1,5 @@
 import { createHash } from "node:crypto";
-import { createReadStream } from "node:fs";
-import { stat } from "node:fs/promises";
-import { createInterface } from "node:readline";
+import { open } from "node:fs/promises";
 
 export const SANSKRIT_MW_SOURCE_FAMILY_ADAPTER_ID_V0_1 =
   "open-instrument.sanskrit-mw-source-family-adapter.v0_1" as const;
@@ -53,6 +51,7 @@ export type SanskritMwSourceRecordV0_1 = Readonly<{
   k2: string;
   h: string | null;
   e: string;
+  rawRecordBody: string;
   rawEntryMetadata: string;
   sourceForm: string;
   lookupForm: string;
@@ -230,7 +229,6 @@ function recordFromTextV0_1(
   if (lines.length < 2 || !isRecordEndLineV0_1(lines.at(-1))) {
     return Object.freeze({ ok: false, reasonCode: "SOURCE_ADAPTER_FAILURE" });
   }
-  if (lines.at(-1) === "<LEND><") lines[lines.length - 1] = "<LEND>";
 
   const header = headerFieldsV0_1(lines[0] ?? "");
   if (!header) {
@@ -256,6 +254,15 @@ function recordFromTextV0_1(
     return Object.freeze({ ok: false, reasonCode: "SOURCE_RECORD_INVALID" });
   }
 
+  const rawBodyLines = lines.slice(1, -1);
+  if (
+    rawBodyLines.some(
+      (line) => line.startsWith("<L>") || isRecordEndLineV0_1(line),
+    )
+  ) {
+    return Object.freeze({ ok: false, reasonCode: "SOURCE_RECORD_INVALID" });
+  }
+
   return {
     ok: true,
     record: deepFreezeV0_1({
@@ -276,6 +283,7 @@ function recordFromTextV0_1(
       k2,
       h,
       e,
+      rawRecordBody: rawBodyLines.join("\n"),
       rawEntryMetadata: e,
       sourceForm: k1,
       lookupForm: k1,
@@ -358,31 +366,39 @@ export function validateSanskritMwSourceArtifactIdentityV0_1(
   });
 }
 
-async function sha256FileV0_1(path: string): Promise<string> {
+function sha256BytesV0_1(bytes: Uint8Array): string {
   const hash = createHash("sha256");
-  const stream = createReadStream(path);
-  for await (const chunk of stream) {
-    hash.update(chunk as Uint8Array);
-  }
+  hash.update(bytes);
   return hash.digest("hex");
+}
+
+async function readVerifiedSnapshotBytesV0_1(
+  snapshotPath: string,
+): Promise<Uint8Array> {
+  const fileHandle = await open(snapshotPath, "r");
+  try {
+    const bytes = new Uint8Array(await fileHandle.readFile());
+    const identity = validateSanskritMwSourceArtifactIdentityV0_1({
+      byteLength: bytes.byteLength,
+      sha256: sha256BytesV0_1(bytes),
+    });
+    if (!identity.ok) throw new Error(identity.reasonCode);
+    return bytes;
+  } finally {
+    await fileHandle.close();
+  }
 }
 
 export async function verifySanskritMwSnapshotFileV0_1(
   snapshotPath: string,
 ): Promise<SanskritMwSnapshotValidationResultV0_1> {
+  let fileHandle: Awaited<ReturnType<typeof open>> | null = null;
   try {
-    const metadata = await stat(snapshotPath);
-    if (!metadata.isFile()) {
-      return Object.freeze({
-        ok: false,
-        reasonCode: "SOURCE_ADAPTER_FAILURE",
-        observed: Object.freeze({ byteLength: metadata.size, sha256: null }),
-      });
-    }
-    const sha256 = await sha256FileV0_1(snapshotPath);
+    fileHandle = await open(snapshotPath, "r");
+    const bytes = new Uint8Array(await fileHandle.readFile());
     return validateSanskritMwSourceArtifactIdentityV0_1({
-      byteLength: metadata.size,
-      sha256,
+      byteLength: bytes.byteLength,
+      sha256: sha256BytesV0_1(bytes),
     });
   } catch {
     return Object.freeze({
@@ -390,49 +406,48 @@ export async function verifySanskritMwSnapshotFileV0_1(
       reasonCode: "SOURCE_ADAPTER_FAILURE",
       observed: Object.freeze({ byteLength: 0, sha256: null }),
     });
+  } finally {
+    await fileHandle?.close().catch(() => undefined);
   }
 }
 
 export async function* streamSanskritMwSnapshotRecordsV0_1(input: Readonly<{
   snapshotPath: string;
 }>): AsyncGenerator<SanskritMwSourceRecordV0_1, void, void> {
-  const identity = await verifySanskritMwSnapshotFileV0_1(input.snapshotPath);
-  if (!identity.ok) {
-    throw new Error(identity.reasonCode);
+  const snapshotBytes = await readVerifiedSnapshotBytesV0_1(input.snapshotPath);
+  let snapshotText: string;
+  try {
+    snapshotText = new TextDecoder("utf-8", { fatal: true }).decode(snapshotBytes);
+  } catch {
+    throw new Error("SOURCE_ADAPTER_FAILURE");
   }
 
-  const lineReader = createInterface({
-    input: createReadStream(input.snapshotPath),
-    crlfDelay: Infinity,
-  });
+  const sourceLines = snapshotText.replace(/\r\n/gu, "\n").split("\n");
+  if (sourceLines.at(-1) === "") sourceLines.pop();
   const lines: string[] = [];
   let recordOrdinal = 0;
 
-  try {
-    for await (const line of lineReader) {
-      if (lines.length === 0 && line === "") continue;
-      if (isRecordEndLineV0_1(line)) {
-        if (lines.length === 0) throw new Error("SOURCE_RECORD_INVALID");
-        lines.push(line);
-        recordOrdinal += 1;
-        const result = adaptSanskritMwRecordV0_1({
-          recordBytes: new TextEncoder().encode(`${lines.join("\n")}\n`),
-          recordOrdinal,
-          verifiedSnapshot: EXPECTED_SNAPSHOT_IDENTITY_V0_1,
-        });
-        if (!result.ok) throw new Error(result.reasonCode);
-        yield result.record;
-        lines.length = 0;
-        continue;
-      }
-
-      if (lines.length === 0 && !line.startsWith("<L>")) {
-        throw new Error("SOURCE_RECORD_INVALID");
-      }
+  for (const line of sourceLines) {
+    if (lines.length === 0 && line === "") continue;
+    if (isRecordEndLineV0_1(line)) {
+      if (lines.length === 0) throw new Error("SOURCE_RECORD_INVALID");
       lines.push(line);
+      recordOrdinal += 1;
+      const result = recordFromTextV0_1(
+        lines.join("\n"),
+        recordOrdinal,
+        EXPECTED_SNAPSHOT_IDENTITY_V0_1,
+      );
+      if (!result.ok) throw new Error(result.reasonCode);
+      yield result.record;
+      lines.length = 0;
+      continue;
     }
-  } finally {
-    lineReader.close();
+
+    if (lines.length === 0 && !line.startsWith("<L>")) {
+      throw new Error("SOURCE_RECORD_INVALID");
+    }
+    lines.push(line);
   }
 
   if (lines.length > 0) throw new Error("SOURCE_RECORD_INVALID");
