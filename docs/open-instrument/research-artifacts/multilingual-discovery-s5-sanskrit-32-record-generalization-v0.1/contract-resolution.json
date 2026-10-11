@@ -1,0 +1,68 @@
+{
+  "schemaVersion": "open-instrument.multilingual-discovery-s5-sanskrit-gloss-contract-resolution.v0.1",
+  "contractId": "OPEN_INSTRUMENT_MULTILINGUAL_DISCOVERY_S5_SANSKRIT_GENERIC_WITNESS_GLOSS_CONTRACT_RESOLUTION_V0_1",
+  "resolutionStatus": "COMPLETE_PENDING_DF_DECISION",
+  "previousExecutionClassification": "S5_SANSKRIT_32_EXECUTION_METHOD_INVALID",
+  "invalidatedSampleFreezeSha256": "cd5165a71e0a2aac065af1721f50a975b915dcf052b5a4133a857ed45b7c11cf",
+  "invalidatedSampleReusableForInference": false,
+  "invalidationReason": "unauthorized non-empty rawRecordBody admissibility predicate",
+  "genericWitnessFinding": {
+    "genericGlossNonemptyRequired": true,
+    "genericGlossNullSupported": false,
+    "authorizedSanskritGenericGlossAvailable": false,
+    "provisionalRunnerAddedUnauthorizedAdmissibilityRule": true,
+    "provisionalOutcomeObservationsAreScientificEvidence": false
+  },
+  "sourceFieldStructuralInspection": {
+    "performed": true,
+    "individualDictionarySemanticInspectionPerformed": false,
+    "fieldSemanticInspectionRequired": false,
+    "basis": [
+      "repository adapter types and parser behavior",
+      "source-family adapter contract",
+      "generic witness schema and validator",
+      "frozen S5 source-field policy"
+    ]
+  },
+  "optionEvaluation": {
+    "k1AsGloss": "FORBIDDEN_BY_SPECIFIC_CONTRACT_SOURCE_NATIVE_LOOKUP_FIELD",
+    "eAsGloss": "FORBIDDEN_BY_SPECIFIC_CONTRACT_RAW_ENTRY_METADATA_NOT_GENERIC_GLOSS",
+    "rawEntryMetadataAsGloss": "FORBIDDEN_BY_SPECIFIC_CONTRACT_RAW_ENTRY_METADATA_NOT_GENERIC_GLOSS",
+    "rawRecordBodyAsGloss": "FORBIDDEN_BY_SPECIFIC_CONTRACT_RAW_SOURCE_BODY_NOT_GENERIC_GLOSS",
+    "placeholderAsGloss": "FORBIDDEN_BY_SPECIFIC_CONTRACT_SOURCE_FACT_AND_ATTESTATION_BOUNDARY",
+    "otherFieldAsGloss": "FORBIDDEN_BY_SPECIFIC_CONTRACT_NO_AUTHORIZED_SOURCE_GLOSS_FIELD",
+    "fabricateGloss": "FORBIDDEN_BY_SPECIFIC_CONTRACT_SOURCE_FACT_AND_ATTESTATION_BOUNDARY",
+    "authorizedGenericGlossProjectionAvailable": false,
+    "sourceDerivedGlossSemanticallyInspected": false,
+    "genericNullGloss": "ARCHITECTURAL_REVIEW_REQUIRED"
+  },
+  "classification": {
+    "ambiguity": false,
+    "supportableClassifications": [
+      "S5_GLOSS_CONTRACT_ARCHITECTURAL_REVIEW_REQUIRED"
+    ],
+    "contractResolutionClassification": "S5_GLOSS_CONTRACT_ARCHITECTURAL_REVIEW_REQUIRED",
+    "supportingEvidence": [
+      "existing generic witness validation requires a non-empty gloss",
+      "existing Sanskrit adapter exposes no authorized generic gloss",
+      "existing adapter contract explicitly keeps e as raw metadata",
+      "no generic Null gloss path exists; introducing one would change the generic witness/evidence contract"
+    ],
+    "counterevidence": "none observed in the authorized structural inspection"
+  },
+  "runtimePosture": {
+    "sanskritSourceEnabledByDefault": false,
+    "productionSanskritDiscoveryActive": false,
+    "s5RerunPerformed": false,
+    "contractSolutionImplemented": false,
+    "s5Closed": true,
+    "s5ScientificResultObtained": false,
+    "boundedNegativeCloseoutComplete": true
+  },
+  "auditDisposition": {
+    "noValidS5ScientificResultObtained": true,
+    "futureExecutionRequiresFreshSample": true,
+    "invalidExecutionOutputsDeletedPerFile": true,
+    "nextAction": "AWAIT_DF_DECISION"
+  }
+}
