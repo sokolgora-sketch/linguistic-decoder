@@ -32,7 +32,8 @@
     "placeholderAsGloss": "FORBIDDEN_BY_SPECIFIC_CONTRACT_SOURCE_FACT_AND_ATTESTATION_BOUNDARY",
     "otherFieldAsGloss": "FORBIDDEN_BY_SPECIFIC_CONTRACT_NO_AUTHORIZED_SOURCE_GLOSS_FIELD",
     "fabricateGloss": "FORBIDDEN_BY_SPECIFIC_CONTRACT_SOURCE_FACT_AND_ATTESTATION_BOUNDARY",
-    "sourceDerivedGlossAvailable": false,
+    "authorizedGenericGlossProjectionAvailable": false,
+    "sourceDerivedGlossSemanticallyInspected": false,
     "genericNullGloss": "ARCHITECTURAL_REVIEW_REQUIRED"
   },
   "classification": {
@@ -54,7 +55,9 @@
     "productionSanskritDiscoveryActive": false,
     "s5RerunPerformed": false,
     "contractSolutionImplemented": false,
-    "s5Closed": false
+    "s5Closed": true,
+    "s5ScientificResultObtained": false,
+    "boundedNegativeCloseoutComplete": true
   },
   "auditDisposition": {
     "noValidS5ScientificResultObtained": true,
