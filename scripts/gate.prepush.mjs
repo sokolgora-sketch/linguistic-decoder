@@ -19,7 +19,9 @@ const capabilityDependentTestPatterns = [
 ];
 
 const gateEnvironment = { ...process.env };
-delete gateEnvironment.OPEN_INSTRUMENT_EXTERNAL_SOURCE_ROOT;
+// Preserve an explicit disabled value so Next/Jest dotenv loading cannot
+// restore a truthy local external-root configuration from .env.test.local.
+gateEnvironment.OPEN_INSTRUMENT_EXTERNAL_SOURCE_ROOT = "";
 
 function run(command, args) {
   const result = spawnSync(command, args, {
