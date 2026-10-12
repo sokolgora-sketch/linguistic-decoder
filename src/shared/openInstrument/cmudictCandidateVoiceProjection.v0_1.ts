@@ -128,7 +128,7 @@ function deepCloneAndFreezeV0_1<T>(
 }
 
 function candidateEnvelopeV0_1(
-  evidence: CmuDictCandidatePronunciationEvidenceV0_1,
+  evidence: unknown,
 ): Pick<
   CmuDictCandidateVoiceProjectionV0_1,
   | "schemaVersion"
@@ -700,10 +700,23 @@ function projectVariantV0_1(
 }
 
 export function projectCmuDictCandidateVoiceProjectionV0_1(
-  evidence: CmuDictCandidatePronunciationEvidenceV0_1,
+  evidence: unknown,
 ): CmuDictCandidateVoiceProjectionV0_1 {
   const envelope = candidateEnvelopeV0_1(evidence);
-  const sourceReason = sourceEvidenceReasonV0_1(evidence);
+  const evidenceRecord =
+    evidence !== null && typeof evidence === "object" && !Array.isArray(evidence)
+      ? (evidence as CmuDictCandidatePronunciationEvidenceV0_1)
+      : null;
+  if (evidenceRecord === null) {
+    return deepCloneAndFreezeV0_1({
+      ...envelope,
+      variants: [],
+      status: "null" as const,
+      reasonCode: "CMUDICT_CANDIDATE_AUTHORITY_INVARIANT_VIOLATION" as const,
+    });
+  }
+
+  const sourceReason = sourceEvidenceReasonV0_1(evidenceRecord);
   if (sourceReason !== null) {
     return deepCloneAndFreezeV0_1({
       ...envelope,
@@ -713,8 +726,8 @@ export function projectCmuDictCandidateVoiceProjectionV0_1(
     });
   }
 
-  const variants = evidence.variants.map((variant) =>
-    projectVariantV0_1(variant, evidence.candidateJoinKey),
+  const variants = evidenceRecord.variants.map((variant) =>
+    projectVariantV0_1(variant, evidenceRecord.candidateJoinKey),
   );
   const failed = variants.find((variant) => variant.reasonCode !== null);
   return deepCloneAndFreezeV0_1({
