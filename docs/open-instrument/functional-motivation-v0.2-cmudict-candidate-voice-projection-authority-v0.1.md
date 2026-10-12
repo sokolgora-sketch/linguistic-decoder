@@ -164,13 +164,14 @@ spoken nuclei.
 
 ```text
 PROPOSED_CANDIDATE_VOICE_VARIANT_CARDINALITY=One independently traceable Voice-projection result per defined candidate source-evidence variant; N physical CMUdict evidence variants produce N per-variant projection results, including duplicate raw records with distinct locators.
-PROPOSED_IDENTICAL_VOICE_PATH_VARIANT_POLICY=Retain all N source-evidence and per-variant projection records even when derived Voice paths are identical. An optional aggregate summary may report the common path only if every per-variant record remains recoverable and an explicit future aggregate rule is ratified; identical paths never select or delete a source variant.
+PROPOSED_VARIANT_AGGREGATION_POLICY=No candidate-level Voice path is emitted or selected in this contract. The candidate envelope is an ordered per-variant ledger; every variant is represented independently as defined or null, and differing derived paths remain distinct defined per-variant results. A future single-path aggregate would require a new explicit authority contract and is not part of this lane.
+PROPOSED_IDENTICAL_VOICE_PATH_VARIANT_POLICY=Retain all N source-evidence and per-variant projection records even when derived Voice paths are identical. Identical paths never select, collapse, or delete a source variant; no aggregate summary is emitted by this contract.
 VOICE_VARIANT_WINNER_SELECTION=NO
 SOURCE_VARIANT_IDENTITY_PRESERVED=YES
 NO_SINGLE_WINNER_PRESERVED=YES
 
 PROPOSED_CANDIDATE_VOICE_PROVENANCE_CHAIN=Existing lexical candidate -> candidate source evidence envelope -> exact CMUdict physical source record -> exact artifact profile/revision/bytes/SHA-256/notation -> raw ARPAbet tokens and source locator -> exact reviewed mapping identity -> derived per-variant Voice path. Every derived path must retain the complete preceding chain.
-PROPOSED_VOICE_PROJECTION_AUTHORITY_TAG=DERIVED_FROM_RATIFIED_CMUDICT_CANDIDATE_SOURCE_EVIDENCE_VIA_REVIEWED_OPEN_INSTRUMENT_MAPPING_PENDING_DF_RATIFICATION
+PROPOSED_VOICE_PROJECTION_AUTHORITY_TAG=ASSESSMENT_ONLY_PENDING_DF_RATIFICATION; FUTURE_EMITTED_RESULT_TAG_AFTER_RATIFICATION=DERIVED_FROM_RATIFIED_CMUDICT_CANDIDATE_SOURCE_EVIDENCE_VIA_REVIEWED_OPEN_INSTRUMENT_MAPPING
 PROPOSED_VOICE_MAPPING_VERSION_FIELD=mappingId=pronunciation-to-voice.open-instrument.cmudict-arpabet-en-us.v0_1.v0_1; sourceProfileId; sourceNotation; sourceRevision; mapping table identity=CMUDICT_ARPABET_VOICE_PROFILE_V0_1
 PROPOSED_SOURCE_EVIDENCE_REFERENCE_FIELDS=candidateId; candidateSourceId; candidateSourceFamilyId; candidateSourceRecordId; candidateSourceForm; candidateJoinKey; sourceProfileId; sourceRevision; sourceNotation; sourceArtifactBytes; sourceArtifactSha256; sourceLineNumber; rawSourceLine; sourceForm; baseSourceForm; variantId; variantOrder; rawPronunciation; orderedRawArpabetTokens; losslessBaseStressViews; opaqueAnnotationText; authorityStatus
 ```
@@ -189,13 +190,19 @@ PROPOSED_VOICE_OUTPUT_AUTHORITY_BOUNDARY=Source evidence remains ratified source
 ## Failure and Null taxonomy
 
 ```text
-PROPOSED_CANDIDATE_VOICE_NULL_TAXONOMY=PRONUNCIATION_NOT_FOUND; PRONUNCIATION_JOIN_COLLISION; CMUDICT_SOURCE_LINE_MALFORMED; CMUDICT_ARPABET_TOKEN_UNSUPPORTED; CMUDICT_STRESS_DIGIT_MALFORMED; CMUDICT_SOURCE_ARTIFACT_MISMATCH; CMUDICT_SOURCE_REVISION_MISMATCH; CMUDICT_CANDIDATE_NOTATION_UNAUTHORIZED; CMUDICT_CANDIDATE_AUTHORITY_INVARIANT_VIOLATION; PRONUNCIATION_PROVENANCE_UNRESOLVED; CMUDICT_CANDIDATE_VOICE_PROJECTION_UNAUTHORIZED; VOICE_FAMILY_AUTHORITY_MISSING; MOVING_NUCLEUS_AUTHORITY_MISSING; SPOKEN_NUCLEUS_STRUCTURE_UNRESOLVED; PRONUNCIATION_VARIANT_AMBIGUOUS; CMUDICT_CANDIDATE_VOICE_PROJECTION_MAPPING_GAP; CMUDICT_CANDIDATE_VOICE_PROJECTION_INVARIANT_VIOLATION.
+PROPOSED_CANDIDATE_VOICE_NULL_TAXONOMY=PRONUNCIATION_NOT_FOUND; PRONUNCIATION_JOIN_COLLISION; CMUDICT_SOURCE_LINE_MALFORMED; CMUDICT_ARPABET_TOKEN_UNSUPPORTED; CMUDICT_STRESS_DIGIT_MALFORMED; CMUDICT_SOURCE_ARTIFACT_MISMATCH; CMUDICT_SOURCE_REVISION_MISMATCH; CMUDICT_CANDIDATE_NOTATION_UNAUTHORIZED; CMUDICT_CANDIDATE_AUTHORITY_INVARIANT_VIOLATION; PRONUNCIATION_PROVENANCE_UNRESOLVED; CMUDICT_CANDIDATE_VOICE_PROJECTION_UNAUTHORIZED; VOICE_FAMILY_AUTHORITY_MISSING; MOVING_NUCLEUS_AUTHORITY_MISSING; SPOKEN_NUCLEUS_STRUCTURE_UNRESOLVED; CMUDICT_CANDIDATE_VOICE_PROJECTION_MAPPING_GAP; CMUDICT_CANDIDATE_VOICE_PROJECTION_INVARIANT_VIOLATION.
 SOURCE_NULL_PROPAGATION_POLICY=If candidate source evidence is Null, candidate notation/provenance/artifact authority is unresolved, or candidate Voice authority is not ratified, do not invoke Voice projection; preserve the source reason and return a Voice Null envelope with an explicit non-collapsing reason. Source-evidence failure remains distinct from projection failure.
 VOICE_NULL_REMAINS_VALID=YES
 UNKNOWN_REMAINS_DISTINCT_FROM_NULL=YES
 ```
 
 The existing source reason must not be rewritten as a generic projection error.
+Variant disagreement is not a candidate-level Null in this per-variant ledger:
+different defined variants remain separate defined records, while an
+individual failing variant retains its own exact Null reason. The existing
+input-role `PRONUNCIATION_VARIANT_AMBIGUOUS` behavior is not imported into the
+candidate contract because this lane emits no single aggregate path; a future
+single-path request would require a separately ratified aggregate policy.
 The existing mapping failures remain explicit: unsupported categories map to
 `PRONUNCIATION_VOWEL_CATEGORY_UNSUPPORTED`, missing Voice-family authority maps
 to `VOICE_FAMILY_AUTHORITY_MISSING`, unresolved moving authority maps to
