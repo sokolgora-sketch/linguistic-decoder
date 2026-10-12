@@ -186,8 +186,14 @@ function nullVariantV0_1(
 
 type FrozenCmuDictArtifactV0_1 =
   | Readonly<{
-      text: string;
-      records: readonly CmuDictCandidateParsedSourceRecordV0_1[];
+      lines: readonly string[];
+      variantsByJoinKey: ReadonlyMap<
+        string,
+        readonly Extract<
+          CmuDictCandidateParsedSourceRecordV0_1,
+          { kind: "valid" }
+        >[]
+      >;
     }>
   | Readonly<{
       reasonCode: "CMUDICT_SOURCE_ARTIFACT_MISMATCH";
@@ -221,9 +227,31 @@ function frozenCmuDictArtifactV0_1(): FrozenCmuDictArtifactV0_1 {
     return cachedFrozenCmuDictArtifactV0_1;
   }
 
+  const variantsByJoinKey = new Map<
+    string,
+    Extract<CmuDictCandidateParsedSourceRecordV0_1, { kind: "valid" }>[]
+  >();
+  for (const record of parseCmuDictCandidateSourceRecordsV0_1(text)) {
+    if (record.kind !== "valid") continue;
+    const joinKey = normalizeEnglishLexicalJoinKeyV0_1(record.baseSourceForm);
+    const variants = variantsByJoinKey.get(joinKey) ?? [];
+    variants.push(record);
+    variantsByJoinKey.set(joinKey, variants);
+  }
+  const frozenVariantsByJoinKey = new Map<
+    string,
+    readonly Extract<
+      CmuDictCandidateParsedSourceRecordV0_1,
+      { kind: "valid" }
+    >[]
+  >();
+  for (const [joinKey, variants] of variantsByJoinKey) {
+    frozenVariantsByJoinKey.set(joinKey, Object.freeze(variants));
+  }
+
   cachedFrozenCmuDictArtifactV0_1 = {
-    text,
-    records: parseCmuDictCandidateSourceRecordsV0_1(text),
+    lines: Object.freeze(text.split(/\r?\n/u)),
+    variantsByJoinKey: frozenVariantsByJoinKey,
   };
   return cachedFrozenCmuDictArtifactV0_1;
 }
@@ -271,7 +299,9 @@ function sourceEvidenceReasonV0_1(
   }
 
   if (evidence.status !== "defined" || evidence.reasonCode !== null) {
-    return "CMUDICT_CANDIDATE_VOICE_PROJECTION_INVARIANT_VIOLATION";
+    return evidence.reasonCode === "PRONUNCIATION_VARIANT_AMBIGUOUS"
+      ? "CMUDICT_CANDIDATE_VOICE_PROJECTION_INVARIANT_VIOLATION"
+      : evidence.reasonCode;
   }
 
   if (evidence.variants.length === 0) {
@@ -281,19 +311,15 @@ function sourceEvidenceReasonV0_1(
   const artifact = frozenCmuDictArtifactV0_1();
   if ("reasonCode" in artifact) return artifact.reasonCode;
 
-  const expectedVariants = artifact.records.filter(
-    (record) =>
-      record.kind === "valid" &&
-      normalizeEnglishLexicalJoinKeyV0_1(record.baseSourceForm) ===
-        evidence.candidateJoinKey,
-  );
+  const expectedVariants =
+    artifact.variantsByJoinKey.get(evidence.candidateJoinKey) ?? [];
   if (expectedVariants.length !== evidence.variants.length) {
     return "CMUDICT_CANDIDATE_AUTHORITY_INVARIANT_VIOLATION";
   }
 
   for (const [index, variant] of evidence.variants.entries()) {
     const expected = expectedVariants[index];
-    const physicalLine = artifact.text.split(/\r?\n/u)[variant.sourceLineNumber - 1];
+    const physicalLine = artifact.lines[variant.sourceLineNumber - 1];
     if (physicalLine !== variant.rawSourceLine) {
       return "CMUDICT_SOURCE_ARTIFACT_MISMATCH";
     }
@@ -327,7 +353,7 @@ function sourceVariantConsistencyReasonV0_1(
   const artifact = frozenCmuDictArtifactV0_1();
   if ("reasonCode" in artifact) return artifact.reasonCode;
 
-  const physicalLine = artifact.text.split(/\r?\n/u)[variant.sourceLineNumber - 1];
+  const physicalLine = artifact.lines[variant.sourceLineNumber - 1];
   if (physicalLine !== variant.rawSourceLine) {
     return "CMUDICT_SOURCE_ARTIFACT_MISMATCH";
   }

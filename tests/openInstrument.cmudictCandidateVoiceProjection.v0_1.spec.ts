@@ -246,7 +246,7 @@ describe("CMUdict candidate Voice projection v0.1", () => {
     const sourceResult = projectCmuDictCandidateVoiceProjectionV0_1(sourceNull);
     expect(sourceResult.status).toBe("null");
     expect(sourceResult.sourceEvidenceReasonCode).toBe("CMUDICT_SOURCE_ARTIFACT_MISMATCH");
-    expect(sourceResult.reasonCode).toBe("CMUDICT_CANDIDATE_VOICE_PROJECTION_INVARIANT_VIOLATION");
+    expect(sourceResult.reasonCode).toBe("CMUDICT_SOURCE_ARTIFACT_MISMATCH");
 
   });
 
