@@ -129,6 +129,15 @@ describe("CMUdict candidate Voice projection v0.1", () => {
     );
   });
 
+  it("rejects a ledger that omits a physical source variant", () => {
+    const tampered = mutateEvidence("read", (current) => {
+      current.variants = [current.variants[0]] as typeof current.variants;
+    });
+    expect(projectCmuDictCandidateVoiceProjectionV0_1(tampered).reasonCode).toBe(
+      "CMUDICT_CANDIDATE_AUTHORITY_INVARIANT_VIOLATION",
+    );
+  });
+
   it("keeps different Voice paths as separate records without an aggregate", () => {
     const result = projectCmuDictCandidateVoiceProjectionV0_1(evidence("read"));
     expect(result.variants.length).toBeGreaterThan(1);

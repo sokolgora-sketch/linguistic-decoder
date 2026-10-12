@@ -184,6 +184,73 @@ function nullVariantV0_1(
   };
 }
 
+type FrozenCmuDictArtifactV0_1 =
+  | Readonly<{
+      text: string;
+      records: readonly CmuDictCandidateParsedSourceRecordV0_1[];
+    }>
+  | Readonly<{
+      reasonCode: "CMUDICT_SOURCE_ARTIFACT_MISMATCH";
+    }>;
+
+let cachedFrozenCmuDictArtifactV0_1: FrozenCmuDictArtifactV0_1 | null = null;
+
+function frozenCmuDictArtifactV0_1(): FrozenCmuDictArtifactV0_1 {
+  if (cachedFrozenCmuDictArtifactV0_1 !== null) {
+    return cachedFrozenCmuDictArtifactV0_1;
+  }
+
+  let text: string;
+  try {
+    text = readFileSync(CMUDICT_DATASET_PATH_V0_1, "utf8");
+  } catch {
+    cachedFrozenCmuDictArtifactV0_1 = {
+      reasonCode: "CMUDICT_SOURCE_ARTIFACT_MISMATCH",
+    };
+    return cachedFrozenCmuDictArtifactV0_1;
+  }
+
+  if (
+    Buffer.byteLength(text, "utf8") !== CMUDICT_DATA_BYTES_V0_1 ||
+    createHash("sha256").update(Buffer.from(text, "utf8")).digest("hex") !==
+      CMUDICT_DATA_SHA256_V0_1
+  ) {
+    cachedFrozenCmuDictArtifactV0_1 = {
+      reasonCode: "CMUDICT_SOURCE_ARTIFACT_MISMATCH",
+    };
+    return cachedFrozenCmuDictArtifactV0_1;
+  }
+
+  cachedFrozenCmuDictArtifactV0_1 = {
+    text,
+    records: parseCmuDictCandidateSourceRecordsV0_1(text),
+  };
+  return cachedFrozenCmuDictArtifactV0_1;
+}
+
+function sameSourceRecordV0_1(
+  expected: Extract<
+    CmuDictCandidateParsedSourceRecordV0_1,
+    { kind: "valid" }
+  >,
+  actual: CmuDictCandidatePronunciationEvidenceVariantV0_1,
+): boolean {
+  return (
+    expected.sourceLineNumber === actual.sourceLineNumber &&
+    expected.rawSourceLine === actual.rawSourceLine &&
+    expected.sourceForm === actual.sourceForm &&
+    expected.baseSourceForm === actual.baseSourceForm &&
+    expected.variantId === actual.variantId &&
+    expected.variantOrder === actual.variantOrder &&
+    expected.rawPronunciation === actual.rawPronunciation &&
+    JSON.stringify(expected.orderedRawArpabetTokens) ===
+      JSON.stringify(actual.orderedRawArpabetTokens) &&
+    JSON.stringify(expected.losslessBaseStressViews) ===
+      JSON.stringify(actual.losslessBaseStressViews) &&
+    expected.opaqueAnnotationText === actual.opaqueAnnotationText
+  );
+}
+
 function sourceEvidenceReasonV0_1(
   evidence: CmuDictCandidatePronunciationEvidenceV0_1,
 ): CmuDictCandidateVoiceProjectionReasonCodeV0_1 | null {
@@ -211,13 +278,26 @@ function sourceEvidenceReasonV0_1(
     return "PRONUNCIATION_NOT_FOUND";
   }
 
+  const artifact = frozenCmuDictArtifactV0_1();
+  if ("reasonCode" in artifact) return artifact.reasonCode;
+
+  const expectedVariants = artifact.records.filter(
+    (record) =>
+      record.kind === "valid" &&
+      normalizeEnglishLexicalJoinKeyV0_1(record.baseSourceForm) ===
+        evidence.candidateJoinKey,
+  );
+  if (expectedVariants.length !== evidence.variants.length) {
+    return "CMUDICT_CANDIDATE_AUTHORITY_INVARIANT_VIOLATION";
+  }
+
   for (const [index, variant] of evidence.variants.entries()) {
-    const previous = evidence.variants[index - 1];
-    if (
-      variant.variantOrder !== index ||
-      (previous !== undefined &&
-        variant.sourceLineNumber <= previous.sourceLineNumber)
-    ) {
+    const expected = expectedVariants[index];
+    const physicalLine = artifact.text.split(/\r?\n/u)[variant.sourceLineNumber - 1];
+    if (physicalLine !== variant.rawSourceLine) {
+      return "CMUDICT_SOURCE_ARTIFACT_MISMATCH";
+    }
+    if (expected?.kind !== "valid" || !sameSourceRecordV0_1(expected, variant)) {
       return "CMUDICT_CANDIDATE_AUTHORITY_INVARIANT_VIOLATION";
     }
   }
@@ -244,22 +324,10 @@ function mapParsedSourceReasonV0_1(
 function sourceVariantConsistencyReasonV0_1(
   variant: CmuDictCandidatePronunciationEvidenceVariantV0_1,
 ): CmuDictCandidateVoiceProjectionReasonCodeV0_1 | null {
-  let sourceText: string;
-  try {
-    sourceText = readFileSync(CMUDICT_DATASET_PATH_V0_1, "utf8");
-  } catch {
-    return "CMUDICT_SOURCE_ARTIFACT_MISMATCH";
-  }
+  const artifact = frozenCmuDictArtifactV0_1();
+  if ("reasonCode" in artifact) return artifact.reasonCode;
 
-  if (
-    Buffer.byteLength(sourceText, "utf8") !== CMUDICT_DATA_BYTES_V0_1 ||
-    createHash("sha256").update(Buffer.from(sourceText, "utf8")).digest("hex") !==
-      CMUDICT_DATA_SHA256_V0_1
-  ) {
-    return "CMUDICT_SOURCE_ARTIFACT_MISMATCH";
-  }
-
-  const physicalLine = sourceText.split(/\r?\n/u)[variant.sourceLineNumber - 1];
+  const physicalLine = artifact.text.split(/\r?\n/u)[variant.sourceLineNumber - 1];
   if (physicalLine !== variant.rawSourceLine) {
     return "CMUDICT_SOURCE_ARTIFACT_MISMATCH";
   }
