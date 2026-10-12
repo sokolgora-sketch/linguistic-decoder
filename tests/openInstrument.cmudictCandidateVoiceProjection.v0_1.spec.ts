@@ -280,6 +280,25 @@ describe("CMUdict candidate Voice projection v0.1", () => {
     expect(result.reasonCode).toBe("CMUDICT_CANDIDATE_AUTHORITY_INVARIANT_VIOLATION");
   });
 
+  it("rejects Null evidence that still carries source variants", () => {
+    const contradictory = mutateEvidence("stone", (current) => {
+      current.status = "null";
+      current.reasonCode = "CMUDICT_SOURCE_ARTIFACT_MISMATCH";
+    });
+    const result = projectCmuDictCandidateVoiceProjectionV0_1(contradictory);
+    expect(result.status).toBe("null");
+    expect(result.reasonCode).toBe("CMUDICT_CANDIDATE_AUTHORITY_INVARIANT_VIOLATION");
+  });
+
+  it("fails closed for malformed candidate envelope field types", () => {
+    const malformed = mutateEvidence("stone", (current) => {
+      current.candidateId = null as never;
+    });
+    const result = projectCmuDictCandidateVoiceProjectionV0_1(malformed);
+    expect(result.status).toBe("null");
+    expect(result.reasonCode).toBe("CMUDICT_CANDIDATE_AUTHORITY_INVARIANT_VIOLATION");
+  });
+
   it("reports malformed stress and unsupported ARPABET deterministically", () => {
     const malformed = mutateEvidence("stone", (current) => {
       const variant = current.variants[0];

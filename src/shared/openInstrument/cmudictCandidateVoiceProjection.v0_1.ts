@@ -283,6 +283,16 @@ function sourceEvidenceReasonV0_1(
   evidence: CmuDictCandidatePronunciationEvidenceV0_1,
 ): CmuDictCandidateVoiceProjectionReasonCodeV0_1 | null {
   if (
+    typeof evidence.candidateId !== "string" ||
+    typeof evidence.candidateSourceId !== "string" ||
+    typeof evidence.candidateSourceFamilyId !== "string" ||
+    typeof evidence.candidateSourceRecordId !== "string" ||
+    typeof evidence.candidateSourceForm !== "string" ||
+    typeof evidence.candidateJoinKey !== "string" ||
+    !Array.isArray(evidence.variants) ||
+    evidence.candidateSourceProvenance === null ||
+    typeof evidence.candidateSourceProvenance !== "object" ||
+    Array.isArray(evidence.candidateSourceProvenance) ||
     evidence.candidateId.length === 0 ||
     evidence.candidateSourceId.length === 0 ||
     evidence.candidateSourceFamilyId.length === 0 ||
@@ -311,6 +321,10 @@ function sourceEvidenceReasonV0_1(
     (evidence.status === "defined" && evidence.reasonCode !== null) ||
     (evidence.status === "null" && evidence.reasonCode === null)
   ) {
+    return "CMUDICT_CANDIDATE_AUTHORITY_INVARIANT_VIOLATION";
+  }
+
+  if (evidence.status === "null" && evidence.variants.length !== 0) {
     return "CMUDICT_CANDIDATE_AUTHORITY_INVARIANT_VIOLATION";
   }
 
