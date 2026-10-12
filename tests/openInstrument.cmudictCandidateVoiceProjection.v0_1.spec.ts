@@ -297,6 +297,11 @@ describe("CMUdict candidate Voice projection v0.1", () => {
     const result = projectCmuDictCandidateVoiceProjectionV0_1(malformed);
     expect(result.status).toBe("null");
     expect(result.reasonCode).toBe("CMUDICT_CANDIDATE_AUTHORITY_INVARIANT_VIOLATION");
+    expect(result.candidateId).toBe("");
+    expect(result.sourceEvidence.status).toBe("null");
+    expect(result.sourceEvidence.reasonCode).toBe(
+      "CMUDICT_CANDIDATE_AUTHORITY_INVARIANT_VIOLATION",
+    );
   });
 
   it("fails closed for malformed source variant elements", () => {
@@ -307,6 +312,10 @@ describe("CMUdict candidate Voice projection v0.1", () => {
     expect(result.status).toBe("null");
     expect(result.reasonCode).toBe("CMUDICT_CANDIDATE_AUTHORITY_INVARIANT_VIOLATION");
     expect(result.sourceEvidence.variants).toEqual([]);
+    expect(result.sourceEvidence.status).toBe("null");
+    expect(result.sourceEvidence.reasonCode).toBe(
+      "CMUDICT_CANDIDATE_AUTHORITY_INVARIANT_VIOLATION",
+    );
   });
 
   it("accepts an explicitly undefined optional annotation", () => {

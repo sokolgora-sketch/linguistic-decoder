@@ -146,20 +146,21 @@ function candidateEnvelopeV0_1(
   | "mappingId"
   | "mappingTable"
 > {
+  const sourceEvidence = sourceEvidenceForOutputV0_1(evidence);
   return {
     schemaVersion: CMUDICT_CANDIDATE_VOICE_PROJECTION_SCHEMA_V0_1,
-    candidateId: evidence.candidateId,
-    candidateSourceId: evidence.candidateSourceId,
-    candidateSourceFamilyId: evidence.candidateSourceFamilyId,
-    candidateSourceRecordId: evidence.candidateSourceRecordId,
-    candidateSourceForm: evidence.candidateSourceForm,
-    candidateJoinKey: evidence.candidateJoinKey,
+    candidateId: sourceEvidence.candidateId,
+    candidateSourceId: sourceEvidence.candidateSourceId,
+    candidateSourceFamilyId: sourceEvidence.candidateSourceFamilyId,
+    candidateSourceRecordId: sourceEvidence.candidateSourceRecordId,
+    candidateSourceForm: sourceEvidence.candidateSourceForm,
+    candidateJoinKey: sourceEvidence.candidateJoinKey,
     candidateSourceProvenance: deepCloneAndFreezeV0_1(
-      evidence.candidateSourceProvenance,
+      sourceEvidence.candidateSourceProvenance,
     ),
-    sourceEvidence: sourceEvidenceForOutputV0_1(evidence),
-    sourceEvidenceStatus: evidence.status,
-    sourceEvidenceReasonCode: evidence.reasonCode,
+    sourceEvidence,
+    sourceEvidenceStatus: sourceEvidence.status,
+    sourceEvidenceReasonCode: sourceEvidence.reasonCode,
     authorityTag:
       CMUDICT_CANDIDATE_VOICE_PROJECTION_RUNTIME_AUTHORITY_TAG_V0_1,
     mappingId: CMUDICT_CANDIDATE_VOICE_PROJECTION_MAPPING_ID_V0_1,
@@ -435,14 +436,74 @@ function isSourceEvidenceVariantShapeV0_1(
 }
 
 function sourceEvidenceForOutputV0_1(
-  evidence: CmuDictCandidatePronunciationEvidenceV0_1,
+  evidence: unknown,
 ): CmuDictCandidatePronunciationEvidenceV0_1 {
-  const variants =
-    Array.isArray(evidence.variants) &&
-    evidence.variants.every(isSourceEvidenceVariantShapeV0_1)
-      ? evidence.variants
-      : [];
-  return deepCloneAndFreezeV0_1({ ...evidence, variants });
+  const input =
+    evidence !== null && typeof evidence === "object" && !Array.isArray(evidence)
+      ? (evidence as Record<string, unknown>)
+      : {};
+  const variantInput = input.variants;
+  const variantsValid =
+    Array.isArray(variantInput) &&
+    variantInput.every(isSourceEvidenceVariantShapeV0_1);
+  const statusValid = input.status === "defined" || input.status === "null";
+  const reasonValid =
+    input.reasonCode === null ||
+    isKnownCmuDictCandidateAdapterReasonCodeV0_1(input.reasonCode);
+  const statusReasonValid =
+    (input.status === "defined" && input.reasonCode === null) ||
+    (input.status === "null" && input.reasonCode !== null);
+  const stringFieldsValid = [
+    "candidateId",
+    "candidateSourceId",
+    "candidateSourceFamilyId",
+    "candidateSourceRecordId",
+    "candidateSourceForm",
+    "candidateJoinKey",
+  ].every((field) => typeof input[field] === "string");
+  const provenanceValid =
+    input.candidateSourceProvenance !== null &&
+    typeof input.candidateSourceProvenance === "object" &&
+    !Array.isArray(input.candidateSourceProvenance);
+  const nullCardinalityValid =
+    !(input.status === "null" && variantsValid && variantInput.length !== 0);
+  const valid =
+    stringFieldsValid &&
+    provenanceValid &&
+    statusValid &&
+    reasonValid &&
+    statusReasonValid &&
+    variantsValid &&
+    nullCardinalityValid;
+  const sanitized: Record<string, unknown> = {
+    candidateId: typeof input.candidateId === "string" ? input.candidateId : "",
+    candidateSourceId:
+      typeof input.candidateSourceId === "string" ? input.candidateSourceId : "",
+    candidateSourceFamilyId:
+      typeof input.candidateSourceFamilyId === "string"
+        ? input.candidateSourceFamilyId
+        : "",
+    candidateSourceRecordId:
+      typeof input.candidateSourceRecordId === "string"
+        ? input.candidateSourceRecordId
+        : "",
+    candidateSourceForm:
+      typeof input.candidateSourceForm === "string" ? input.candidateSourceForm : "",
+    candidateJoinKey:
+      typeof input.candidateJoinKey === "string" ? input.candidateJoinKey : "",
+    candidateSourceProvenance: provenanceValid
+      ? input.candidateSourceProvenance
+      : {},
+    status: valid && input.status === "defined" ? "defined" : "null",
+    reasonCode:
+      valid
+        ? input.reasonCode
+        : "CMUDICT_CANDIDATE_AUTHORITY_INVARIANT_VIOLATION",
+    variants: valid ? variantInput : [],
+  };
+  if (typeof input.senseId === "string") sanitized.senseId = input.senseId;
+  if (typeof input.gloss === "string") sanitized.gloss = input.gloss;
+  return deepCloneAndFreezeV0_1(sanitized);
 }
 
 function mapParsedSourceReasonV0_1(
