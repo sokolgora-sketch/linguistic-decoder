@@ -503,7 +503,9 @@ function sourceEvidenceForOutputV0_1(
   };
   if (typeof input.senseId === "string") sanitized.senseId = input.senseId;
   if (typeof input.gloss === "string") sanitized.gloss = input.gloss;
-  return deepCloneAndFreezeV0_1(sanitized);
+  return deepCloneAndFreezeV0_1(
+    sanitized,
+  ) as CmuDictCandidatePronunciationEvidenceV0_1;
 }
 
 function mapParsedSourceReasonV0_1(
