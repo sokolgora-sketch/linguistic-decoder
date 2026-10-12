@@ -1,3 +1,7 @@
+import { createHash } from "node:crypto";
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
+
 import type { VowelVoice } from "@/shared/vowels/vowelVoices.v0.1";
 
 import {
@@ -15,6 +19,7 @@ import {
   type CmuDictCandidatePronunciationEvidenceV0_1,
   type CmuDictCandidatePronunciationEvidenceVariantV0_1,
 } from "./cmudictCandidateSourceAdapter.v0_1";
+import { normalizeEnglishLexicalJoinKeyV0_1 } from "./englishLexicalSenseSourceContract.v0_1";
 import {
   PRONUNCIATION_TO_VOICE_PROFILE_V0_1,
   resolveArpabetPronunciationVariantsToVoiceV0_1,
@@ -91,6 +96,11 @@ type ResolverReasonCode =
   | "SPOKEN_NUCLEUS_STRUCTURE_UNRESOLVED"
   | "VOICE_FAMILY_AUTHORITY_MISSING"
   | "MOVING_NUCLEUS_AUTHORITY_MISSING";
+
+const CMUDICT_DATASET_PATH_V0_1 = join(
+  process.cwd(),
+  "src/data/openInstrument/pronunciation/cmudict.dict",
+);
 
 function deepCloneAndFreezeV0_1<T>(
   value: T,
@@ -184,6 +194,8 @@ function sourceEvidenceReasonV0_1(
     evidence.candidateSourceRecordId.length === 0 ||
     evidence.candidateSourceForm.length === 0 ||
     evidence.candidateJoinKey.length === 0 ||
+    normalizeEnglishLexicalJoinKeyV0_1(evidence.candidateSourceForm) !==
+      evidence.candidateJoinKey ||
     evidence.candidateSourceProvenance === null ||
     typeof evidence.candidateSourceProvenance !== "object" ||
     Array.isArray(evidence.candidateSourceProvenance)
@@ -197,6 +209,17 @@ function sourceEvidenceReasonV0_1(
 
   if (evidence.variants.length === 0) {
     return "PRONUNCIATION_NOT_FOUND";
+  }
+
+  for (const [index, variant] of evidence.variants.entries()) {
+    const previous = evidence.variants[index - 1];
+    if (
+      variant.variantOrder !== index ||
+      (previous !== undefined &&
+        variant.sourceLineNumber <= previous.sourceLineNumber)
+    ) {
+      return "CMUDICT_CANDIDATE_AUTHORITY_INVARIANT_VIOLATION";
+    }
   }
 
   return null;
@@ -221,6 +244,26 @@ function mapParsedSourceReasonV0_1(
 function sourceVariantConsistencyReasonV0_1(
   variant: CmuDictCandidatePronunciationEvidenceVariantV0_1,
 ): CmuDictCandidateVoiceProjectionReasonCodeV0_1 | null {
+  let sourceText: string;
+  try {
+    sourceText = readFileSync(CMUDICT_DATASET_PATH_V0_1, "utf8");
+  } catch {
+    return "CMUDICT_SOURCE_ARTIFACT_MISMATCH";
+  }
+
+  if (
+    Buffer.byteLength(sourceText, "utf8") !== CMUDICT_DATA_BYTES_V0_1 ||
+    createHash("sha256").update(Buffer.from(sourceText, "utf8")).digest("hex") !==
+      CMUDICT_DATA_SHA256_V0_1
+  ) {
+    return "CMUDICT_SOURCE_ARTIFACT_MISMATCH";
+  }
+
+  const physicalLine = sourceText.split(/\r?\n/u)[variant.sourceLineNumber - 1];
+  if (physicalLine !== variant.rawSourceLine) {
+    return "CMUDICT_SOURCE_ARTIFACT_MISMATCH";
+  }
+
   if (
     variant.rawPronunciation !== variant.orderedRawArpabetTokens.join(" ")
   ) {
@@ -256,6 +299,7 @@ function sourceVariantConsistencyReasonV0_1(
 
 function variantEvidenceReasonV0_1(
   variant: CmuDictCandidatePronunciationEvidenceVariantV0_1,
+  candidateJoinKey: string,
 ): CmuDictCandidateVoiceProjectionReasonCodeV0_1 | null {
   if (variant.authorityStatus !== "RATIFIED_SOURCE_EVIDENCE_ONLY") {
     return "CMUDICT_CANDIDATE_VOICE_PROJECTION_UNAUTHORIZED";
@@ -293,6 +337,10 @@ function variantEvidenceReasonV0_1(
 
   const consistencyReason = sourceVariantConsistencyReasonV0_1(variant);
   if (consistencyReason !== null) return consistencyReason;
+
+  if (normalizeEnglishLexicalJoinKeyV0_1(variant.baseSourceForm) !== candidateJoinKey) {
+    return "CMUDICT_CANDIDATE_AUTHORITY_INVARIANT_VIOLATION";
+  }
 
   for (const [index, token] of variant.orderedRawArpabetTokens.entries()) {
     const view = variant.losslessBaseStressViews[index];
@@ -356,7 +404,7 @@ function projectVariantV0_1(
   evidence: CmuDictCandidatePronunciationEvidenceVariantV0_1,
   candidateJoinKey: string,
 ): CmuDictCandidateVoiceProjectionVariantV0_1 {
-  const evidenceReason = variantEvidenceReasonV0_1(evidence);
+  const evidenceReason = variantEvidenceReasonV0_1(evidence, candidateJoinKey);
   if (evidenceReason !== null) return nullVariantV0_1(evidence, evidenceReason);
 
   const resolved = resolveArpabetPronunciationVariantsToVoiceV0_1(

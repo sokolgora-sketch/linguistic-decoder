@@ -92,24 +92,40 @@ describe("CMUdict candidate Voice projection v0.1", () => {
   });
 
   it("preserves duplicate physical records and identical paths as distinct records", () => {
-    const value = evidence();
-    const original = firstVariant(value);
-    const duplicate = {
-      ...copy(original),
-      sourceForm: "stone(2)",
-      rawSourceLine: `stone(2) ${original.rawPronunciation}`,
-      variantId: "2",
-      variantOrder: 1,
-    };
-    const duplicated = copy(value);
-    duplicated.variants = [original, duplicate] as typeof duplicated.variants;
-    const result = projectCmuDictCandidateVoiceProjectionV0_1(duplicated);
+    const result = projectCmuDictCandidateVoiceProjectionV0_1(evidence("mormonism"));
     expect(result.variants).toHaveLength(2);
     expect(result.variants[0].sourceEvidence.variantId).not.toBe(
       result.variants[1].sourceEvidence.variantId,
     );
     expect(result.variants[0].canonicalVoicePath).toEqual(
       result.variants[1].canonicalVoicePath,
+    );
+  });
+
+  it("requires each cited line to match the frozen CMUdict artifact", () => {
+    const tampered = mutateEvidence("stone", (current) => {
+      current.variants[0].rawSourceLine = "stone S T OW1 N E";
+    });
+    expect(projectCmuDictCandidateVoiceProjectionV0_1(tampered).reasonCode).toBe(
+      "CMUDICT_SOURCE_ARTIFACT_MISMATCH",
+    );
+  });
+
+  it("requires each source variant to match the candidate join key", () => {
+    const tampered = mutateEvidence("stone", (current) => {
+      current.variants = [copy(firstVariant(evidence("read")))] as typeof current.variants;
+    });
+    expect(projectCmuDictCandidateVoiceProjectionV0_1(tampered).reasonCode).toBe(
+      "CMUDICT_CANDIDATE_AUTHORITY_INVARIANT_VIOLATION",
+    );
+  });
+
+  it("rejects reordered or duplicated physical variant ordering", () => {
+    const tampered = mutateEvidence("read", (current) => {
+      current.variants = [...current.variants].reverse();
+    });
+    expect(projectCmuDictCandidateVoiceProjectionV0_1(tampered).reasonCode).toBe(
+      "CMUDICT_CANDIDATE_AUTHORITY_INVARIANT_VIOLATION",
     );
   });
 
@@ -153,23 +169,13 @@ describe("CMUdict candidate Voice projection v0.1", () => {
   });
 
   it("preserves stress without changing Voice identity", () => {
-    const value = evidence("stone");
-    const stressed = copy(value);
-    const variant = firstVariant(stressed);
-    const stressedTokens = variant.orderedRawArpabetTokens.map((token) =>
-      token.replace(/[012]$/u, "2"),
+    const result = projectCmuDictCandidateVoiceProjectionV0_1(evidence("abstract"));
+    expect(result.variants[0].sourceEvidence.losslessBaseStressViews).not.toEqual(
+      result.variants[1].sourceEvidence.losslessBaseStressViews,
     );
-    variant.rawPronunciation = stressedTokens.join(" ");
-    variant.rawSourceLine = `${variant.sourceForm} ${variant.rawPronunciation}`;
-    variant.orderedRawArpabetTokens = stressedTokens;
-    variant.losslessBaseStressViews = variant.losslessBaseStressViews.map((view) => ({
-      ...view,
-      rawToken: view.rawToken.replace(/[012]$/u, "2"),
-      stress: view.stress === null ? null : "2",
-    }));
-    const first = projectCmuDictCandidateVoiceProjectionV0_1(value);
-    const second = projectCmuDictCandidateVoiceProjectionV0_1(stressed);
-    expect(first.variants[0].canonicalVoicePath).toEqual(second.variants[0].canonicalVoicePath);
+    expect(result.variants[0].canonicalVoicePath).toEqual(
+      result.variants[1].canonicalVoicePath,
+    );
   });
 
   it("preserves moving-nucleus two-event behavior without an inter-region", () => {
@@ -251,10 +257,10 @@ describe("CMUdict candidate Voice projection v0.1", () => {
       variant.losslessBaseStressViews = [{ rawToken: "AX1", baseToken: "AX", stress: "1" }];
     });
     expect(projectCmuDictCandidateVoiceProjectionV0_1(malformed).reasonCode).toBe(
-      "CMUDICT_STRESS_DIGIT_MALFORMED",
+      "CMUDICT_SOURCE_ARTIFACT_MISMATCH",
     );
     expect(projectCmuDictCandidateVoiceProjectionV0_1(unsupported).reasonCode).toBe(
-      "CMUDICT_CANDIDATE_VOICE_PROJECTION_MAPPING_GAP",
+      "CMUDICT_SOURCE_ARTIFACT_MISMATCH",
     );
   });
 
@@ -274,10 +280,10 @@ describe("CMUdict candidate Voice projection v0.1", () => {
       variant.losslessBaseStressViews = [{ rawToken: "S1", baseToken: "S", stress: "1" }];
     });
     expect(projectCmuDictCandidateVoiceProjectionV0_1(unknownBase).reasonCode).toBe(
-      "CMUDICT_CANDIDATE_VOICE_PROJECTION_MAPPING_GAP",
+      "CMUDICT_SOURCE_ARTIFACT_MISMATCH",
     );
     expect(projectCmuDictCandidateVoiceProjectionV0_1(stressedConsonant).reasonCode).toBe(
-      "CMUDICT_STRESS_DIGIT_MALFORMED",
+      "CMUDICT_SOURCE_ARTIFACT_MISMATCH",
     );
   });
 
