@@ -299,6 +299,15 @@ describe("CMUdict candidate Voice projection v0.1", () => {
     expect(result.reasonCode).toBe("CMUDICT_CANDIDATE_AUTHORITY_INVARIANT_VIOLATION");
   });
 
+  it("fails closed for malformed source variant elements", () => {
+    const malformed = mutateEvidence("stone", (current) => {
+      current.variants = [null] as never;
+    });
+    const result = projectCmuDictCandidateVoiceProjectionV0_1(malformed);
+    expect(result.status).toBe("null");
+    expect(result.reasonCode).toBe("CMUDICT_CANDIDATE_AUTHORITY_INVARIANT_VIOLATION");
+  });
+
   it("reports malformed stress and unsupported ARPABET deterministically", () => {
     const malformed = mutateEvidence("stone", (current) => {
       const variant = current.variants[0];

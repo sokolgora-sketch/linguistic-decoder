@@ -307,6 +307,9 @@ function sourceEvidenceReasonV0_1(
   ) {
     return "CMUDICT_CANDIDATE_AUTHORITY_INVARIANT_VIOLATION";
   }
+  if (!evidence.variants.every(isSourceEvidenceVariantShapeV0_1)) {
+    return "CMUDICT_CANDIDATE_AUTHORITY_INVARIANT_VIOLATION";
+  }
 
   if (evidence.status !== "defined" && evidence.status !== "null") {
     return "CMUDICT_CANDIDATE_AUTHORITY_INVARIANT_VIOLATION";
@@ -380,6 +383,54 @@ function isKnownCmuDictCandidateAdapterReasonCodeV0_1(
     default:
       return false;
   }
+}
+
+function isSourceEvidenceVariantShapeV0_1(
+  value: unknown,
+): value is CmuDictCandidatePronunciationEvidenceVariantV0_1 {
+  if (value === null || typeof value !== "object" || Array.isArray(value)) {
+    return false;
+  }
+  const variant = value as Record<string, unknown>;
+  const stringFields = [
+    "sourceProfileId",
+    "sourceRevision",
+    "sourceNotation",
+    "sourceArtifactSha256",
+    "rawSourceLine",
+    "sourceForm",
+    "baseSourceForm",
+    "variantId",
+    "rawPronunciation",
+    "authorityStatus",
+  ];
+  if (!stringFields.every((field) => typeof variant[field] === "string")) {
+    return false;
+  }
+  if (
+    typeof variant.sourceArtifactBytes !== "number" ||
+    typeof variant.sourceLineNumber !== "number" ||
+    typeof variant.variantOrder !== "number" ||
+    !Array.isArray(variant.orderedRawArpabetTokens) ||
+    !variant.orderedRawArpabetTokens.every((token) => typeof token === "string") ||
+    !Array.isArray(variant.losslessBaseStressViews) ||
+    !variant.losslessBaseStressViews.every((view) => {
+      if (view === null || typeof view !== "object" || Array.isArray(view)) {
+        return false;
+      }
+      const tokenView = view as Record<string, unknown>;
+      return (
+        typeof tokenView.rawToken === "string" &&
+        typeof tokenView.baseToken === "string" &&
+        (tokenView.stress === null || typeof tokenView.stress === "string")
+      );
+    }) ||
+    ("opaqueAnnotationText" in variant &&
+      typeof variant.opaqueAnnotationText !== "string")
+  ) {
+    return false;
+  }
+  return true;
 }
 
 function mapParsedSourceReasonV0_1(
