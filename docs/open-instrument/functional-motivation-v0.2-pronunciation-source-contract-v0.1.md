@@ -320,3 +320,124 @@ The bounded documentation review used official source documentation only:
 
 These references establish source/documentation facts only. They do not
 authorize data acquisition or override repository contracts.
+
+## DF ratification and next-dependency reconciliation
+
+This section is an append-only prospective reconciliation of PR #2166. PR
+#2166 merged the source selection before DF ratification; this record does not
+rewrite that history or imply that the original selection was ratified at
+merge time.
+
+```text
+DF_RATIFICATION_STATUS=RATIFIED
+DF_RATIFIED_SOURCE_ARCHITECTURE=LANGUAGE_SPECIFIC_MULTISOURCE
+DF_RATIFIED_ENGLISH_SOURCE_FAMILY=CMUDICT
+DF_RATIFIED_ALBANIAN_SOURCE_FAMILY=WIKTIONARY_WIKTEXTRACT_KAIKKI_ALBANIAN_IPA
+
+PREVIOUS_PR2166_AUTHORITY_STATUS=MERGED_BEFORE_DF_RATIFICATION
+CURRENT_AUTHORITY_STATUS=RATIFIED_POST_MERGE_BY_DF
+RATIFICATION_CHANGES_SOURCE_FAMILIES=NO
+RATIFICATION_ADDS_QUALIFICATIONS=YES
+```
+
+The ratification is limited to source-family and source-level pronunciation
+posture. CMUdict remains an input-pronunciation profile; its candidate role
+requires a separate authority contract. The Albanian source family remains
+source-contract authority only because the exact frozen artifact is not
+available in the checked repository and the current live locator does not
+reproduce its frozen identity. No candidate adapter, candidate runtime,
+notation transformation, normalization transformation, Voice/Gamma/ZC
+projection, representation bridge, `SAME_REPRESENTATION`, false-Null
+execution, or two-mode design is authorized by this reconciliation.
+
+```text
+CMUDICT_SOURCE_FAMILY_RATIFIED=YES
+CMUDICT_CANDIDATE_ROLE_AUTHORIZED_NOW=NO
+CMUDICT_CANDIDATE_ROLE_REQUIRES_SEPARATE_AUTHORITY=YES
+
+ALBANIAN_SOURCE_FAMILY_RATIFIED=YES
+ALBANIAN_FROZEN_ARTIFACT_AVAILABLE_NOW=NO
+ALBANIAN_EXECUTION_AVAILABLE_NOW=NO
+ALBANIAN_ACQUISITION_OR_EXACT_SNAPSHOT_RECOVERY_REQUIRED=YES
+
+PROFILE_IDENTITY_DIVERGENCE_IN_SCOPE=NO
+
+SOURCE_FAMILY_AUTHORITY=RATIFIED
+CANDIDATE_ROLE_AUTHORITY=NOT_AUTOMATICALLY_GRANTED
+NOTATION_AUTHORITY=NOT_AUTOMATICALLY_GRANTED
+NORMALIZATION_AUTHORITY=NOT_AUTOMATICALLY_GRANTED
+VOICE_PROJECTION_AUTHORITY=NOT_AUTOMATICALLY_GRANTED
+GAMMA_PROJECTION_AUTHORITY=NOT_AUTOMATICALLY_GRANTED
+ZC_PROJECTION_AUTHORITY=NOT_AUTOMATICALLY_GRANTED
+REPRESENTATION_BRIDGE_AUTHORITY=NOT_AUTOMATICALLY_GRANTED
+SAME_REPRESENTATION_AUTHORIZED_NOW=NO
+```
+
+### Dependency order
+
+The dependency order is derived from the existing source, representation, and
+artifact contracts rather than from source-list order. The existing CMUdict
+notation, normalization, and Voice mapping are scoped to the English input
+profile and cannot be reused for candidates without a separate candidate-role
+decision. The Albanian observation reader verifies the exact artifact before
+it can produce authoritative observations.
+
+```text
+ENGLISH_DEPENDENCY_GRAPH=
+SOURCE_FAMILY_AUTHORITY(RATIFIED)
+-> CANDIDATE_ROLE_AUTHORITY(REQUIRED)
+-> CANDIDATE_SCOPED_NOTATION_AUTHORITY
+-> CANDIDATE_SCOPED_NORMALIZATION_AUTHORITY
+-> CANDIDATE_ADAPTER
+-> VOICE_PROJECTION
+-> GAMMA_PROJECTION
+-> ZC_PROJECTION
+-> REPRESENTATION_BRIDGE
+-> NATURAL_V0_2_POSITIVE_CONTROL
+
+ALBANIAN_DEPENDENCY_GRAPH=
+SOURCE_FAMILY_AUTHORITY(RATIFIED)
+-> FROZEN_ARTIFACT_RECOVERY_OR_ACQUISITION
+-> SOURCE_SNAPSHOT_VERIFICATION
+-> CANDIDATE_SCOPED_NOTATION_AUTHORITY
+-> CANDIDATE_SCOPED_NORMALIZATION_AUTHORITY
+-> CANDIDATE_ROLE_AUTHORITY
+-> CANDIDATE_ADAPTER
+-> VOICE_PROJECTION
+-> GAMMA_PROJECTION
+-> ZC_PROJECTION
+-> REPRESENTATION_BRIDGE
+-> NATURAL_V0_2_POSITIVE_CONTROL
+
+ENGLISH_FIRST_UNSATISFIED_DEPENDENCY=CANDIDATE_ROLE_AUTHORITY
+ALBANIAN_FIRST_UNSATISFIED_DEPENDENCY=FROZEN_ARTIFACT_AVAILABILITY
+RECOMMENDED_EXECUTION_TOPOLOGY=PARTIALLY_PARALLEL
+```
+
+English candidate-role authority work and Albanian exact-artifact recovery are
+independent language-specific prerequisites and may be evaluated separately.
+Within either language, downstream adapter, projection, bridge, and positive
+control work remains sequential behind its upstream authority gates. DF retains
+authority over which prerequisite proceeds.
+
+```text
+NEXT_RECOMMENDED_LANE=CMUDICT_CANDIDATE_ROLE_AUTHORITY_CONTRACT
+NEXT_RECOMMENDED_LANE_REASON=The first unresolved English dependency is the missing candidate-role authority; existing CMUdict input authority cannot be inherited, while Albanian remains blocked earlier by exact frozen-artifact availability.
+NEXT_RECOMMENDED_LANE_DF_AUTHORIZATION_REQUIRED=YES
+
+ALBANIAN_SOURCE_DATA_ACQUIRED=NO
+ALBANIAN_NETWORK_SOURCE_DATA_TRANSFER=NO
+ALBANIAN_FROZEN_HASH_CHANGED=NO
+ALBANIAN_LIVE_BYTES_ACCEPTED_AS_FROZEN_ARTIFACT=NO
+
+CMUDICT_CANDIDATE_RUNTIME_WIRED=NO
+CMUDICT_CANDIDATE_ROLE_IMPLEMENTED=NO
+
+FALSE_NULL_DIAGNOSTIC_DISPOSITION=DEFERRED_PENDING_V0_2_REACHABILITY
+TWO_MODE_DESIGN_STATUS=NOT_AUTHORIZED
+NEXT_ACTION=AWAIT_DF_DECISION
+```
+
+No next lane is executed by this reconciliation. The historical S5 invalid
+sample remains non-reusable, Sanskrit remains disabled, and no source data,
+snapshot, runtime path, or production positive control is created here.
