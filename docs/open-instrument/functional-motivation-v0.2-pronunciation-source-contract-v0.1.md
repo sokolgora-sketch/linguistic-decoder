@@ -52,8 +52,10 @@ language boundaries:
 This is not a convenience selection. CMUdict is selected for English because
 the repository contains an exact, hash-bound pronunciation artifact and a
 source-profile contract for its ARPAbet variants. The Albanian source is
-selected because the repository contains an exact, hash-bound source contract
-that preserves explicit IPA, dialect scope, variants, and provenance. Neither
+selected at the source-contract level because the repository preserves an
+exact frozen identity and a contract for explicit IPA, dialect scope, variants,
+and provenance; the exact frozen artifact is not bundled in the checked
+repository and the current live locator does not match that identity. Neither
 selection is based on the current DI study candidate, and neither selection
 authorizes a runtime candidate role by itself.
 
@@ -100,13 +102,16 @@ version=upstream dump 2026-09-02; Kaikki build 2026-09-25; Wiktextract 1a05e46f9
 locator=https://kaikki.org/dictionary/Albanian/kaikki.org-dictionary-Albanian.jsonl; frozen artifact identity by SHA-256
 provenance=lexical form, language/code, explicit IPA, sound tags/notes, variant identity/order, locator, build metadata
 license=source data CC BY-SA/GFDL posture with attribution; Wiktextract software MIT; license notice required
-reproducible_snapshot=HASH_BOUND_YES; 67438755 bytes; SHA-256 7bd411e2b3cdfd83b7f09af9700791c01e81f36224ec5134e118ff26e83d0aa0; complete replay not proven
+reproducible_snapshot=HASH_BOUND_YES; 67438755 bytes; SHA-256 7bd411e2b3cdfd83b7f09af9700791c01e81f36224ec5134e118ff26e83d0aa0; complete replay not proven; exact frozen artifact unavailable in checked repository; live locator mismatch recorded
 normalization=raw pronunciation preserved; source-specific notation/input processing exists, but candidate spoken normalization is not authorized here
 malformed_unknown_policy=PRONUNCIATION_NOT_FOUND, DIALECT_SCOPE_UNRESOLVED, or PRONUNCIATION_VARIANT_AMBIGUOUS; missing IPA is not filled from spelling
-repo_present=YES
+repo_present=NO
+source_contract_present=YES
+frozen_artifact_available_in_checked_repo=NO
+live_locator_matches_frozen_identity=NO
 currently_authorized_as_candidate_role=NO
-suitability=SOURCE_LEVEL_ALBANIAN_PRONUNCIATION_YES
-rejection_reason_for_current_runtime_role=SOURCE_CONTRACT_ONLY; runtime lookup and IPA-to-Voice projection are explicitly undefined
+suitability=SOURCE_LEVEL_ALBANIAN_PRONUNCIATION_CONTRACT_YES_ARTIFACT_UNAVAILABLE
+rejection_reason_for_current_runtime_role=SOURCE_CONTRACT_ONLY_AND_ARTIFACT_UNAVAILABLE; exact frozen artifact recovery is a prerequisite; runtime lookup and IPA-to-Voice projection are explicitly undefined
 ```
 
 ### 3. `open-instrument.wiktionary-kaikki-english-lexical-sense.v0_1`
@@ -231,7 +236,9 @@ CURRENT_CANDIDATE_PRONUNCIATION_SOURCE=NONE_AUTHORIZED
 CURRENT_CANDIDATE_PRONUNCIATION_AUTHORITY=NOT_AUTHORIZED
 CURRENT_ALBANIAN_PRONUNCIATION_SOURCE_EXISTS=YES_AT_SOURCE_CONTRACT_LEVEL
 CURRENT_ALBANIAN_PRONUNCIATION_SOURCE=open-instrument.wiktionary-kaikki-albanian-ipa.v0_1
-CURRENT_ALBANIAN_PRONUNCIATION_AUTHORITY=AUTHORIZED_AT_SOURCE_CONTRACT_LEVEL_ONLY
+CURRENT_ALBANIAN_PRONUNCIATION_AUTHORITY=AUTHORIZED_AT_SOURCE_CONTRACT_LEVEL_ONLY_ARTIFACT_UNAVAILABLE
+CURRENT_ALBANIAN_FROZEN_ARTIFACT_AVAILABLE_IN_CHECKED_REPO=NO
+CURRENT_ALBANIAN_LIVE_LOCATOR_MATCHES_FROZEN_IDENTITY=NO
 ```
 
 The Albanian source contract is not relabeled as a current runtime candidate
@@ -285,11 +292,12 @@ SANSKRIT_SOURCE_SELECTED=NO
 
 ## Next-lane recommendation
 
-The selected sources have source-level identity and pronunciation authority,
-but candidate-role wiring is absent and the Albanian path still lacks a
-candidate-compatible normalization authority. The next lane must therefore
-define notation/normalization authority before any candidate-role adapter or
-runtime work:
+The selected source contracts have source-level identity and pronunciation
+authority, but candidate-role wiring is absent, the Albanian frozen artifact is
+not currently available in the checked repository, and the Albanian path still
+lacks a candidate-compatible normalization authority. The next lane must
+therefore define notation/normalization authority before any candidate-role
+adapter or runtime work:
 
 ```text
 NEXT_RECOMMENDED_LANE=PRONUNCIATION_NOTATION_AND_NORMALIZATION_AUTHORITY_CONTRACT
