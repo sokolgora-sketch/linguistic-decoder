@@ -109,8 +109,8 @@ No current reviewed reusable spoken candidate Gamma mechanism exists.
 ## Proposed candidate Gamma input
 
 ```text
-PROPOSED_CANDIDATE_GAMMA_INPUT=One defined candidate Voice projection variant together with its unchanged candidate source-evidence reference, using the existing normalizedSegments, nuclei, canonicalVoicePath, variantId, variantOrder, sourceProfileId, sourceNotation, and sourceRevision fields. The source evidence remains the provenance authority; the shared normalized pronunciation structure supplies source-order segmentation.
-PROPOSED_CANDIDATE_GAMMA_REQUIRED_FIELDS=candidateId; candidate source-evidence reference; exact physical source locator; sourceProfileId; sourceNotation; sourceRevision; source artifact identity; variantId; variantOrder; normalizedSegments in segmentIndex order; nuclei in nucleusIndex order; matching source segment indices; canonicalVoicePath; candidate Voice mapping identity; defined/null status and exact upstream reason.
+PROPOSED_CANDIDATE_GAMMA_INPUT=The complete candidate Voice projection envelope together with its unchanged candidate source-evidence ledger: preserve the envelope-level defined/null status and exact reason, and derive one independently traceable Gamma projection from each ledger variant, including defined variants and explicit null variants. A defined variant uses the existing normalizedSegments, nuclei, canonicalVoicePath, variantId, variantOrder, sourceProfileId, sourceNotation, and sourceRevision fields. The source evidence remains the provenance authority; the shared normalized pronunciation structure supplies source-order segmentation.
+PROPOSED_CANDIDATE_GAMMA_REQUIRED_FIELDS=candidateId; candidate source-evidence reference; exact physical source locator; sourceProfileId; sourceNotation; sourceRevision; source artifact identity; candidate Voice envelope status; candidate Voice envelope reason; complete ordered variant ledger; per-variant defined/null status and exact upstream reason; variantId; variantOrder; normalizedSegments in segmentIndex order when defined; nuclei in nucleusIndex order when defined; matching source segment indices when defined; canonicalVoicePath when defined; candidate Voice mapping identity.
 PROPOSED_CANDIDATE_GAMMA_FORBIDDEN_INPUTS=lexical spelling; orthographic consonants; gloss; POS; sense selection; semantic or functional evidence; target word meaning; etymology; cognacy; borrowing; morphology; historical relation; language label without source authority; profile-derived Albanian consonant slots; fuzzy matching; source fallback; ranking; variant winner; ZC; representation bridge; SAME_REPRESENTATION.
 CANDIDATE_VOICE_PATH_ALONE_SUFFICIENT_FOR_GAMMA=NO
 RAW_ARPABET_REQUIRED_FOR_GAMMA=NO_DIRECT_REPARSE;YES_AS_PRESERVED_SOURCE_PROVENANCE
@@ -120,8 +120,10 @@ SHARED_PRONUNCIATION_STRUCTURE_REQUIRED_FOR_GAMMA=YES
 
 Voice alone contains vowel-nucleus events and does not contain enough
 consonantal source position or identity information. The smallest sufficient
-input is the existing candidate Voice per-variant structure plus its source
-evidence, not a new raw-token parser and not the flattened Voice path.
+input is the existing candidate Voice envelope, its complete defined/null
+variant ledger, and its source evidence—not a new raw-token parser and not the
+flattened Voice path. Null entries are retained for propagation and are not
+silently omitted or converted into empty defined Gamma output.
 
 ## Consonant identity and structural boundary
 
@@ -278,7 +280,7 @@ implementation lane. This document does not implement or activate Gamma.
 
 ```text
 AUTHORITY_ARTIFACT=docs/open-instrument/functional-motivation-v0.2-cmudict-candidate-gamma-projection-authority-v0.1.md
-AUTHORITY_ARTIFACT_SHA256=325629517bfedccfe1b68a407e2f0cb87ead5b72a1d966af02a929acde5f3751
+AUTHORITY_ARTIFACT_SHA256=31f6a262da4cbec827facd77caf1c8b6136832314e60988e374b675ccad5f645
 FINAL_CHANGED_FILE_COUNT=1
 PRODUCTION_CODE_CHANGED=NO
 TEST_BEHAVIOR_CHANGED=NO
