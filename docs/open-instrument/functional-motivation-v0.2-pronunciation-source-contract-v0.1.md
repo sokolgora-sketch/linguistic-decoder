@@ -300,9 +300,12 @@ therefore define notation/normalization authority before any candidate-role
 adapter or runtime work:
 
 ```text
-NEXT_RECOMMENDED_LANE=PRONUNCIATION_NOTATION_AND_NORMALIZATION_AUTHORITY_CONTRACT
+PRE_RATIFICATION_NEXT_RECOMMENDED_LANE=PRONUNCIATION_NOTATION_AND_NORMALIZATION_AUTHORITY_CONTRACT
 NEXT_ACTION=AWAIT_DF_DECISION
 ```
+
+The pre-ratification recommendation above is preserved as historical context
+and is superseded by the post-ratification dependency freeze below.
 
 No next lane is executed by this artifact.
 
