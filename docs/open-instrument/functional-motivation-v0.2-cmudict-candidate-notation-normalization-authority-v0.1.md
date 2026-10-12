@@ -91,8 +91,12 @@ LEXICAL_SOURCE_MULTIPLICITY_OUTCOME=multiple lexical records sharing a normalize
 Load-bearing implementation evidence: `normalizeLexicalWordV0_1` and
 `normalizeCmuDictLexicalWordV0_1` in
 `src/shared/openInstrument/cmudictArpabetPronunciation.v0_1.ts:30-32,99-101`.
-The candidate role may use the ratified join boundary; it must not treat the
-input-role Voice result as inherited candidate authority.
+The candidate role may use the ratified join boundary, but the existing CMUdict
+normalizer trims and therefore MUST NOT be reused for the exact candidate join.
+The exact join must call the frozen
+`normalizeEnglishLexicalJoinKeyV0_1` contract (or an equivalent no-trim
+projection). It must not treat the input-role Voice result as inherited
+candidate authority.
 
 ### B. Source-line parsing
 
@@ -165,8 +169,8 @@ TOKEN_CASE_NORMALIZATION=FORBIDDEN; require uppercase source notation
 WHITESPACE_NORMALIZATION=lossless token-boundary parsing only; preserve exact raw-line provenance
 RAW_TOKEN_PRESERVATION=LOSSLESS_REQUIRED
 CANONICAL_TOKEN_FORM=raw source token; base-plus-stress is a lossless derived view only
-UNKNOWN_TOKEN_POLICY=retain evidence and fail closed as CMUDICT_ARPABET_TOKEN_UNSUPPORTED or CMUDICT_SOURCE_LINE_MALFORMED
-MALFORMED_TOKEN_POLICY=do not repair or reinterpret; fail closed as CMUDICT_SOURCE_LINE_MALFORMED
+UNKNOWN_TOKEN_POLICY=retain evidence and fail closed as CMUDICT_ARPABET_TOKEN_UNSUPPORTED
+MALFORMED_TOKEN_POLICY=do not repair or reinterpret; malformed source-line or field grammar -> CMUDICT_SOURCE_LINE_MALFORMED; malformed terminal stress digit -> CMUDICT_STRESS_DIGIT_MALFORMED
 DUPLICATE_PATH_POLICY=preserve all variants; no path winner; unresolved disagreement remains Null
 VARIANT_PRESERVATION=preserve source form, variant identity, and source variant order
 ```
