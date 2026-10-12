@@ -250,6 +250,16 @@ describe("CMUdict candidate Voice projection v0.1", () => {
 
   });
 
+  it("rejects an inconsistent source Null status/reason pair", () => {
+    const inconsistent = mutateEvidence("stone", (current) => {
+      current.status = "null";
+      current.reasonCode = null;
+    });
+    const result = projectCmuDictCandidateVoiceProjectionV0_1(inconsistent);
+    expect(result.status).toBe("null");
+    expect(result.reasonCode).toBe("CMUDICT_CANDIDATE_AUTHORITY_INVARIANT_VIOLATION");
+  });
+
   it("reports malformed stress and unsupported ARPABET deterministically", () => {
     const malformed = mutateEvidence("stone", (current) => {
       const variant = current.variants[0];

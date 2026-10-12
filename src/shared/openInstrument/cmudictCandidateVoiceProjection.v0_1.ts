@@ -298,6 +298,13 @@ function sourceEvidenceReasonV0_1(
     return "CMUDICT_CANDIDATE_AUTHORITY_INVARIANT_VIOLATION";
   }
 
+  if (
+    (evidence.status === "defined" && evidence.reasonCode !== null) ||
+    (evidence.status === "null" && evidence.reasonCode === null)
+  ) {
+    return "CMUDICT_CANDIDATE_AUTHORITY_INVARIANT_VIOLATION";
+  }
+
   if (evidence.status !== "defined" || evidence.reasonCode !== null) {
     return evidence.reasonCode === "PRONUNCIATION_VARIANT_AMBIGUOUS"
       ? "CMUDICT_CANDIDATE_VOICE_PROJECTION_INVARIANT_VIOLATION"
