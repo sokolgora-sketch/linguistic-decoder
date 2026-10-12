@@ -304,6 +304,30 @@ describe("CMUdict candidate Voice projection v0.1", () => {
     );
   });
 
+  it("fails closed for malformed top-level deserialized evidence", () => {
+    const malformedValues: readonly unknown[] = [
+      null,
+      undefined,
+      "malformed",
+      7,
+      [],
+    ];
+
+    for (const value of malformedValues) {
+      const result = projectCmuDictCandidateVoiceProjectionV0_1(value);
+      expect(result.status).toBe("null");
+      expect(result.reasonCode).toBe(
+        "CMUDICT_CANDIDATE_AUTHORITY_INVARIANT_VIOLATION",
+      );
+      expect(result.variants).toEqual([]);
+      expect(result.sourceEvidence.status).toBe("null");
+      expect(result.sourceEvidence.reasonCode).toBe(
+        "CMUDICT_CANDIDATE_AUTHORITY_INVARIANT_VIOLATION",
+      );
+      expect(result.candidateId).toBe("");
+    }
+  });
+
   it("fails closed for malformed source variant elements", () => {
     const malformed = mutateEvidence("stone", (current) => {
       current.variants = [null] as never;
