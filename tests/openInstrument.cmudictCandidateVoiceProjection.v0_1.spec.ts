@@ -306,6 +306,16 @@ describe("CMUdict candidate Voice projection v0.1", () => {
     const result = projectCmuDictCandidateVoiceProjectionV0_1(malformed);
     expect(result.status).toBe("null");
     expect(result.reasonCode).toBe("CMUDICT_CANDIDATE_AUTHORITY_INVARIANT_VIOLATION");
+    expect(result.sourceEvidence.variants).toEqual([]);
+  });
+
+  it("accepts an explicitly undefined optional annotation", () => {
+    const explicitUndefined = mutateEvidence("stone", (current) => {
+      current.variants[0].opaqueAnnotationText = undefined;
+    });
+    expect(projectCmuDictCandidateVoiceProjectionV0_1(explicitUndefined).status).toBe(
+      "defined",
+    );
   });
 
   it("reports malformed stress and unsupported ARPABET deterministically", () => {

@@ -157,7 +157,7 @@ function candidateEnvelopeV0_1(
     candidateSourceProvenance: deepCloneAndFreezeV0_1(
       evidence.candidateSourceProvenance,
     ),
-    sourceEvidence: deepCloneAndFreezeV0_1(evidence),
+    sourceEvidence: sourceEvidenceForOutputV0_1(evidence),
     sourceEvidenceStatus: evidence.status,
     sourceEvidenceReasonCode: evidence.reasonCode,
     authorityTag:
@@ -426,11 +426,23 @@ function isSourceEvidenceVariantShapeV0_1(
       );
     }) ||
     ("opaqueAnnotationText" in variant &&
+      variant.opaqueAnnotationText !== undefined &&
       typeof variant.opaqueAnnotationText !== "string")
   ) {
     return false;
   }
   return true;
+}
+
+function sourceEvidenceForOutputV0_1(
+  evidence: CmuDictCandidatePronunciationEvidenceV0_1,
+): CmuDictCandidatePronunciationEvidenceV0_1 {
+  const variants =
+    Array.isArray(evidence.variants) &&
+    evidence.variants.every(isSourceEvidenceVariantShapeV0_1)
+      ? evidence.variants
+      : [];
+  return deepCloneAndFreezeV0_1({ ...evidence, variants });
 }
 
 function mapParsedSourceReasonV0_1(
