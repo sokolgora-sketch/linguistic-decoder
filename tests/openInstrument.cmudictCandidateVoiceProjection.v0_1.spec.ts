@@ -94,7 +94,13 @@ describe("CMUdict candidate Voice projection v0.1", () => {
   it("preserves duplicate physical records and identical paths as distinct records", () => {
     const value = evidence();
     const original = firstVariant(value);
-    const duplicate = { ...copy(original), variantId: "duplicate", variantOrder: 1 };
+    const duplicate = {
+      ...copy(original),
+      sourceForm: "stone(2)",
+      rawSourceLine: `stone(2) ${original.rawPronunciation}`,
+      variantId: "2",
+      variantOrder: 1,
+    };
     const duplicated = copy(value);
     duplicated.variants = [original, duplicate] as typeof duplicated.variants;
     const result = projectCmuDictCandidateVoiceProjectionV0_1(duplicated);
@@ -113,6 +119,18 @@ describe("CMUdict candidate Voice projection v0.1", () => {
     expect(result).not.toHaveProperty("canonicalVoicePath");
     expect(result.variants.map((variant) => variant.canonicalVoicePath)).toEqual(
       expect.arrayContaining([["E"], ["I"]]),
+    );
+  });
+
+  it("rejects pronunciation-token divergence from preserved source evidence", () => {
+    const tampered = mutateEvidence("stone", (current) => {
+      current.variants[0].orderedRawArpabetTokens = ["AA1"];
+      current.variants[0].losslessBaseStressViews = [
+        { rawToken: "AA1", baseToken: "AA", stress: "1" },
+      ];
+    });
+    expect(projectCmuDictCandidateVoiceProjectionV0_1(tampered).reasonCode).toBe(
+      "CMUDICT_CANDIDATE_AUTHORITY_INVARIANT_VIOLATION",
     );
   });
 
@@ -138,9 +156,12 @@ describe("CMUdict candidate Voice projection v0.1", () => {
     const value = evidence("stone");
     const stressed = copy(value);
     const variant = firstVariant(stressed);
-    variant.orderedRawArpabetTokens = variant.orderedRawArpabetTokens.map((token) =>
+    const stressedTokens = variant.orderedRawArpabetTokens.map((token) =>
       token.replace(/[012]$/u, "2"),
     );
+    variant.rawPronunciation = stressedTokens.join(" ");
+    variant.rawSourceLine = `${variant.sourceForm} ${variant.rawPronunciation}`;
+    variant.orderedRawArpabetTokens = stressedTokens;
     variant.losslessBaseStressViews = variant.losslessBaseStressViews.map((view) => ({
       ...view,
       rawToken: view.rawToken.replace(/[012]$/u, "2"),
@@ -212,34 +233,51 @@ describe("CMUdict candidate Voice projection v0.1", () => {
     expect(sourceResult.sourceEvidenceReasonCode).toBe("CMUDICT_SOURCE_ARTIFACT_MISMATCH");
     expect(sourceResult.reasonCode).toBe("CMUDICT_CANDIDATE_VOICE_PROJECTION_INVARIANT_VIOLATION");
 
-    const unsupported = mutateEvidence("stone", (current) => {
-      const variant = current.variants[0];
-      variant.orderedRawArpabetTokens = ["AX1"];
-      variant.losslessBaseStressViews = [{ rawToken: "AX1", baseToken: "AX", stress: "1" }];
-    });
-    expect(projectCmuDictCandidateVoiceProjectionV0_1(unsupported).reasonCode).toBe(
-      "CMUDICT_CANDIDATE_VOICE_PROJECTION_MAPPING_GAP",
-    );
   });
 
   it("reports malformed stress and unsupported ARPABET deterministically", () => {
     const malformed = mutateEvidence("stone", (current) => {
-      current.variants[0].orderedRawArpabetTokens = ["AA3"];
-      current.variants[0].losslessBaseStressViews = [
-        { rawToken: "AA3", baseToken: "AA3", stress: null },
-      ];
+      const variant = current.variants[0];
+      variant.rawPronunciation = "AA3";
+      variant.rawSourceLine = `${variant.sourceForm} AA3`;
+      variant.orderedRawArpabetTokens = ["AA3"];
+      variant.losslessBaseStressViews = [{ rawToken: "AA3", baseToken: "AA", stress: "3" as never }];
     });
     const unsupported = mutateEvidence("stone", (current) => {
-      current.variants[0].orderedRawArpabetTokens = ["AX1"];
-      current.variants[0].losslessBaseStressViews = [
-        { rawToken: "AX1", baseToken: "AX", stress: "1" },
-      ];
+      const variant = current.variants[0];
+      variant.rawPronunciation = "AX1";
+      variant.rawSourceLine = `${variant.sourceForm} AX1`;
+      variant.orderedRawArpabetTokens = ["AX1"];
+      variant.losslessBaseStressViews = [{ rawToken: "AX1", baseToken: "AX", stress: "1" }];
     });
     expect(projectCmuDictCandidateVoiceProjectionV0_1(malformed).reasonCode).toBe(
       "CMUDICT_STRESS_DIGIT_MALFORMED",
     );
     expect(projectCmuDictCandidateVoiceProjectionV0_1(unsupported).reasonCode).toBe(
       "CMUDICT_CANDIDATE_VOICE_PROJECTION_MAPPING_GAP",
+    );
+  });
+
+  it("rejects unknown bases and stressed consonants using source-adapter authority", () => {
+    const unknownBase = mutateEvidence("stone", (current) => {
+      const variant = current.variants[0];
+      variant.rawPronunciation = "ZZZ";
+      variant.rawSourceLine = `${variant.sourceForm} ZZZ`;
+      variant.orderedRawArpabetTokens = ["ZZZ"];
+      variant.losslessBaseStressViews = [{ rawToken: "ZZZ", baseToken: "ZZZ", stress: null }];
+    });
+    const stressedConsonant = mutateEvidence("stone", (current) => {
+      const variant = current.variants[0];
+      variant.rawPronunciation = "S1";
+      variant.rawSourceLine = `${variant.sourceForm} S1`;
+      variant.orderedRawArpabetTokens = ["S1"];
+      variant.losslessBaseStressViews = [{ rawToken: "S1", baseToken: "S", stress: "1" }];
+    });
+    expect(projectCmuDictCandidateVoiceProjectionV0_1(unknownBase).reasonCode).toBe(
+      "CMUDICT_CANDIDATE_VOICE_PROJECTION_MAPPING_GAP",
+    );
+    expect(projectCmuDictCandidateVoiceProjectionV0_1(stressedConsonant).reasonCode).toBe(
+      "CMUDICT_STRESS_DIGIT_MALFORMED",
     );
   });
 

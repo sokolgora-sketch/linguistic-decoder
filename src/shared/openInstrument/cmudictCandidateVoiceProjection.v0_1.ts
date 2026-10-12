@@ -8,10 +8,12 @@ import {
   CMUDICT_SOURCE_REVISION_V0_1,
   type CmuDictPronunciationVariantV0_1,
 } from "./cmudictArpabetPronunciation.v0_1";
-import type {
-  CmuDictCandidateAdapterReasonCodeV0_1,
-  CmuDictCandidatePronunciationEvidenceV0_1,
-  CmuDictCandidatePronunciationEvidenceVariantV0_1,
+import {
+  parseCmuDictCandidateSourceRecordsV0_1,
+  type CmuDictCandidateAdapterReasonCodeV0_1,
+  type CmuDictCandidateParsedSourceRecordV0_1,
+  type CmuDictCandidatePronunciationEvidenceV0_1,
+  type CmuDictCandidatePronunciationEvidenceVariantV0_1,
 } from "./cmudictCandidateSourceAdapter.v0_1";
 import {
   PRONUNCIATION_TO_VOICE_PROFILE_V0_1,
@@ -200,6 +202,58 @@ function sourceEvidenceReasonV0_1(
   return null;
 }
 
+function mapParsedSourceReasonV0_1(
+  reasonCode: Extract<
+    CmuDictCandidateParsedSourceRecordV0_1,
+    { kind: "invalid" }
+  >["reasonCode"],
+): CmuDictCandidateVoiceProjectionReasonCodeV0_1 {
+  switch (reasonCode) {
+    case "CMUDICT_SOURCE_LINE_MALFORMED":
+      return "CMUDICT_SOURCE_LINE_MALFORMED";
+    case "CMUDICT_ARPABET_TOKEN_UNSUPPORTED":
+      return "CMUDICT_CANDIDATE_VOICE_PROJECTION_MAPPING_GAP";
+    case "CMUDICT_STRESS_DIGIT_MALFORMED":
+      return "CMUDICT_STRESS_DIGIT_MALFORMED";
+  }
+}
+
+function sourceVariantConsistencyReasonV0_1(
+  variant: CmuDictCandidatePronunciationEvidenceVariantV0_1,
+): CmuDictCandidateVoiceProjectionReasonCodeV0_1 | null {
+  if (
+    variant.rawPronunciation !== variant.orderedRawArpabetTokens.join(" ")
+  ) {
+    return "CMUDICT_CANDIDATE_AUTHORITY_INVARIANT_VIOLATION";
+  }
+
+  const parsedRecords = parseCmuDictCandidateSourceRecordsV0_1(
+    variant.rawSourceLine,
+  );
+  if (parsedRecords.length !== 1) {
+    return "CMUDICT_CANDIDATE_AUTHORITY_INVARIANT_VIOLATION";
+  }
+
+  const parsed = parsedRecords[0];
+  if (parsed.kind === "invalid") return mapParsedSourceReasonV0_1(parsed.reasonCode);
+
+  if (
+    parsed.sourceForm !== variant.sourceForm ||
+    parsed.baseSourceForm !== variant.baseSourceForm ||
+    parsed.variantId !== variant.variantId ||
+    parsed.rawPronunciation !== variant.rawPronunciation ||
+    JSON.stringify(parsed.orderedRawArpabetTokens) !==
+      JSON.stringify(variant.orderedRawArpabetTokens) ||
+    JSON.stringify(parsed.losslessBaseStressViews) !==
+      JSON.stringify(variant.losslessBaseStressViews) ||
+    parsed.opaqueAnnotationText !== variant.opaqueAnnotationText
+  ) {
+    return "CMUDICT_CANDIDATE_AUTHORITY_INVARIANT_VIOLATION";
+  }
+
+  return null;
+}
+
 function variantEvidenceReasonV0_1(
   variant: CmuDictCandidatePronunciationEvidenceVariantV0_1,
 ): CmuDictCandidateVoiceProjectionReasonCodeV0_1 | null {
@@ -236,6 +290,9 @@ function variantEvidenceReasonV0_1(
   ) {
     return "CMUDICT_CANDIDATE_AUTHORITY_INVARIANT_VIOLATION";
   }
+
+  const consistencyReason = sourceVariantConsistencyReasonV0_1(variant);
+  if (consistencyReason !== null) return consistencyReason;
 
   for (const [index, token] of variant.orderedRawArpabetTokens.entries()) {
     const view = variant.losslessBaseStressViews[index];
