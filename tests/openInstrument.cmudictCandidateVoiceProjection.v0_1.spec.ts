@@ -260,6 +260,26 @@ describe("CMUdict candidate Voice projection v0.1", () => {
     expect(result.reasonCode).toBe("CMUDICT_CANDIDATE_AUTHORITY_INVARIANT_VIOLATION");
   });
 
+  it("rejects an unknown source status before projection", () => {
+    const unknownStatus = mutateEvidence("stone", (current) => {
+      current.status = "bogus" as never;
+      current.reasonCode = null;
+    });
+    const result = projectCmuDictCandidateVoiceProjectionV0_1(unknownStatus);
+    expect(result.status).toBe("null");
+    expect(result.reasonCode).toBe("CMUDICT_CANDIDATE_AUTHORITY_INVARIANT_VIOLATION");
+  });
+
+  it("rejects an unknown source reason before projection", () => {
+    const unknownReason = mutateEvidence("stone", (current) => {
+      current.status = "null";
+      current.reasonCode = "BOGUS_SOURCE_REASON" as never;
+    });
+    const result = projectCmuDictCandidateVoiceProjectionV0_1(unknownReason);
+    expect(result.status).toBe("null");
+    expect(result.reasonCode).toBe("CMUDICT_CANDIDATE_AUTHORITY_INVARIANT_VIOLATION");
+  });
+
   it("reports malformed stress and unsupported ARPABET deterministically", () => {
     const malformed = mutateEvidence("stone", (current) => {
       const variant = current.variants[0];

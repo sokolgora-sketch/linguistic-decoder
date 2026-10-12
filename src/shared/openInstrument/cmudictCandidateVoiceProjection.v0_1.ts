@@ -298,6 +298,15 @@ function sourceEvidenceReasonV0_1(
     return "CMUDICT_CANDIDATE_AUTHORITY_INVARIANT_VIOLATION";
   }
 
+  if (evidence.status !== "defined" && evidence.status !== "null") {
+    return "CMUDICT_CANDIDATE_AUTHORITY_INVARIANT_VIOLATION";
+  }
+  if (
+    evidence.reasonCode !== null &&
+    !isKnownCmuDictCandidateAdapterReasonCodeV0_1(evidence.reasonCode)
+  ) {
+    return "CMUDICT_CANDIDATE_AUTHORITY_INVARIANT_VIOLATION";
+  }
   if (
     (evidence.status === "defined" && evidence.reasonCode !== null) ||
     (evidence.status === "null" && evidence.reasonCode === null)
@@ -336,6 +345,27 @@ function sourceEvidenceReasonV0_1(
   }
 
   return null;
+}
+
+function isKnownCmuDictCandidateAdapterReasonCodeV0_1(
+  value: unknown,
+): value is CmuDictCandidateAdapterReasonCodeV0_1 {
+  switch (value) {
+    case "PRONUNCIATION_NOT_FOUND":
+    case "PRONUNCIATION_JOIN_COLLISION":
+    case "CMUDICT_SOURCE_LINE_MALFORMED":
+    case "CMUDICT_ARPABET_TOKEN_UNSUPPORTED":
+    case "CMUDICT_STRESS_DIGIT_MALFORMED":
+    case "CMUDICT_CANDIDATE_NOTATION_UNAUTHORIZED":
+    case "CMUDICT_SOURCE_ARTIFACT_MISMATCH":
+    case "CMUDICT_SOURCE_REVISION_MISMATCH":
+    case "PRONUNCIATION_VARIANT_AMBIGUOUS":
+    case "CMUDICT_CANDIDATE_AUTHORITY_INVARIANT_VIOLATION":
+    case "PRONUNCIATION_PROVENANCE_UNRESOLVED":
+      return true;
+    default:
+      return false;
+  }
 }
 
 function mapParsedSourceReasonV0_1(
