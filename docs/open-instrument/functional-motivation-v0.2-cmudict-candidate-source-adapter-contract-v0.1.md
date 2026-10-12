@@ -153,6 +153,7 @@ join substitute.
 ```text
 PROPOSED_CANDIDATE_SOURCE_PARSER_REQUIREMENT=Parse each non-comment, non-blank line as sourceForm SP pronunciationToken (SP pronunciationToken)* (SP # SP annotationText)?. Preserve exact sourceForm, terminal numeric variant suffix, base source form, physical source order, raw pronunciation, ordered raw ARPABET tokens, exact raw source line, artifact-relative 1-based source line number, and opaque annotation suffix. Validate every token against the ratified uppercase ARPABET inventory with optional terminal stress 0|1|2; reject missing pronunciations, unknown tokens, malformed stress digits, invalid annotation boundaries, and other grammar violations with explicit Null reasons. Bind every result to exact profile, revision, byte count, SHA-256, notation, and locator.
 CURRENT_INPUT_LOADER_REUSABLE_AS_IS=NO
+PROPOSED_RAW_PRONUNCIATION_SLICE_RULE=rawPronunciation is the exact source-line substring after sourceForm and its single separating SP and before the separate SP # SP annotation delimiter when present; it excludes that delimiter, the # marker, and annotationText, and is not trimmed or normalized. For an unannotated row it extends to end-of-line. opaqueAnnotationText is the exact end-of-line substring after the SP # SP delimiter, excluding the delimiter and # marker; orderedRawArpabetTokens are parsed only from rawPronunciation.
 ```
 
 The current loader is permissive: it trims, silently skips malformed material,
@@ -177,7 +178,7 @@ for semantic identity.
 ## Source-evidence output record
 
 ```text
-PROPOSED_CANDIDATE_PRONUNCIATION_EVIDENCE_RECORD=One immutable adapter result envelope per existing candidate containing candidateId, candidate source identity/provenance, candidateSourceForm, candidateJoinKey, status, reasonCode, and an ordered variants array. Each variant contains sourceProfileId, sourceRevision, sourceNotation, sourceArtifactBytes, sourceArtifactSha256, sourceLineNumber, rawSourceLine, sourceForm, baseSourceForm, variantId, variantOrder, rawPronunciation, orderedRawArpabetTokens, lossless base/stress views, opaque annotationText when present, and authorityStatus=RATIFIED_SOURCE_EVIDENCE_ONLY. N physical matching CMUdict records yield N evidence members; no field asserts sense-specific pronunciation. Null uses variants=[] and an exact reason.
+PROPOSED_CANDIDATE_PRONUNCIATION_EVIDENCE_RECORD=One immutable adapter result envelope per existing candidate containing candidateId, candidate source identity/provenance, candidateSourceForm, candidateJoinKey, status, reasonCode, and an ordered variants array. Each variant contains sourceProfileId, sourceRevision, sourceNotation, sourceArtifactBytes, sourceArtifactSha256, sourceLineNumber, rawSourceLine, sourceForm, baseSourceForm, variantId, variantOrder, rawPronunciation as defined by PROPOSED_RAW_PRONUNCIATION_SLICE_RULE, orderedRawArpabetTokens, lossless base/stress views, opaqueAnnotationText when present, and authorityStatus=RATIFIED_SOURCE_EVIDENCE_ONLY. N physical matching CMUdict records yield N evidence members; no field asserts sense-specific pronunciation. Null uses variants=[] and an exact reason.
 PROPOSED_OUTPUT_RECORD_COMPLETE=YES
 ```
 
