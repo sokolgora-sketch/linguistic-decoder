@@ -21,6 +21,7 @@ import {
   type CmuDictCandidateVoiceProjectionV0_1,
   type CmuDictCandidateVoiceProjectionVariantV0_1,
 } from "./cmudictCandidateVoiceProjection.v0_1";
+import { projectCmuDictCandidateVoiceProjectionV0_1 } from "./cmudictCandidateVoiceProjection.v0_1";
 import type {
   ArpabetNucleusV0_1,
   NormalizedArpabetSegmentV0_1,
@@ -307,9 +308,6 @@ function emptySourceEvidenceV0_1(): CmuDictCandidatePronunciationEvidenceV0_1 {
 function sourceReasonToGammaReasonV0_1(
   reasonCode: CmuDictCandidatePronunciationEvidenceV0_1["reasonCode"],
 ): CmuDictCandidateGammaProjectionReasonCodeV0_1 {
-  if (reasonCode === "PRONUNCIATION_VARIANT_AMBIGUOUS") {
-    return "CMUDICT_CANDIDATE_VOICE_PROJECTION_INVARIANT_VIOLATION";
-  }
   return reasonCode as CmuDictCandidateGammaProjectionReasonCodeV0_1;
 }
 
@@ -491,7 +489,10 @@ function derivedRegionsV0_1(
         segment.nucleusIndex !== index ||
         segment.sourceUnits.length !== 1 ||
         segment.sourceUnits[0] !== nuclei[index].sourceToken ||
-        segment.sourceProfileId !== source.sourceProfileId,
+        segment.sourceProfileId !== source.sourceProfileId ||
+        segment.baseCategory !== nuclei[index].baseCategory ||
+        segment.stress !== nuclei[index].stress ||
+        !sameJsonV0_1(segment.voiceAnchors, nuclei[index].voiceAnchors),
     )
   ) {
     return null;
@@ -609,6 +610,23 @@ function validatedInputV0_1(
   if (!voiceEnvelopeV0_1(input)) return false;
   const source = input.sourceEvidence;
   if (!sameSourceIdentityV0_1(input, source)) return false;
+  const verifiedVoice = projectCmuDictCandidateVoiceProjectionV0_1(source);
+  if (
+    !sameJsonV0_1(verifiedVoice.sourceEvidence, source) ||
+    verifiedVoice.variants.length !== input.variants.length
+  ) {
+    return false;
+  }
+  const everyVariantDefined = input.variants.every(
+    (variant) => variant.status === "defined",
+  );
+  if (
+    everyVariantDefined &&
+    (verifiedVoice.status !== input.status ||
+      verifiedVoice.reasonCode !== input.reasonCode)
+  ) {
+    return false;
+  }
   if (input.variants.length !== source.variants.length) return false;
   if (source.status === "null") return input.variants.length === 0;
 
@@ -628,11 +646,19 @@ function validatedInputV0_1(
 
   for (const [index, variant] of input.variants.entries()) {
     const sourceVariant = source.variants[index];
+    const verifiedVariant = verifiedVoice.variants[index];
     if (
       sourceVariant === undefined ||
+      verifiedVariant === undefined ||
       !sameRegionSourceVariantV0_1(sourceVariant, variant) ||
       variant.sourceEvidence.variantOrder !== index ||
       variant.sourceEvidence.sourceLineNumber < 1
+    ) {
+      return false;
+    }
+    if (
+      variant.status === "defined" &&
+      !sameJsonV0_1(verifiedVariant, variant)
     ) {
       return false;
     }

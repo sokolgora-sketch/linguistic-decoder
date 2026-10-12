@@ -315,6 +315,32 @@ describe("CMUdict candidate Gamma projection v0.1", () => {
     expect(projectCmuDictCandidateGammaProjectionV0_1(value).status).toBe("null");
   });
 
+  it("fails closed when duplicated source locators disagree with the frozen artifact", () => {
+    const value = copy(voice());
+    value.sourceEvidence.variants[0].sourceLineNumber = 1;
+    value.variants[0].sourceEvidence.sourceLineNumber = 1;
+    expect(projectCmuDictCandidateGammaProjectionV0_1(value).status).toBe("null");
+  });
+
+  it("preserves an ambiguous source Null reason exactly", () => {
+    const source = copy(evidence("stone"));
+    source.status = "null";
+    source.reasonCode = "PRONUNCIATION_VARIANT_AMBIGUOUS";
+    source.variants = [];
+    const input = projectCmuDictCandidateVoiceProjectionV0_1(source);
+    const result = projectCmuDictCandidateGammaProjectionV0_1(input);
+    expect(result.status).toBe("null");
+    expect(result.reasonCode).toBe("PRONUNCIATION_VARIANT_AMBIGUOUS");
+  });
+
+  it("fails closed when nucleus metadata is not bound to its normalized segment", () => {
+    const value = copy(voice());
+    value.variants[0].normalizedSegments[2].voiceAnchors = ["E"];
+    value.variants[0].nuclei[0].voiceAnchors = ["E"];
+    value.variants[0].canonicalVoicePath = ["E"];
+    expect(projectCmuDictCandidateGammaProjectionV0_1(value).status).toBe("null");
+  });
+
   it("fails closed for unauthorized Voice state", () => {
     const value = copy(voice());
     value.authorityTag = "UNAUTHORIZED";
