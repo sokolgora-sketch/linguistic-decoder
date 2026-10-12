@@ -130,7 +130,10 @@ through a strictly additive presentation/authority boundary only.
 ENGLISH_LEXICAL_TO_CMUDICT_RELATION_CLASSIFICATION=EXACT_FORM_JOIN
 PROPOSED_JOIN_KEY=NFC -> locale-independent English lowercase using en-US -> NFC
 PROPOSED_JOIN_AUTHORITY=separate ratified candidate-role contract bound to the exact artifact, revision, notation, byte count, and SHA-256
-JOIN_AMBIGUITY_POLICY=preserve every matching lexical source record and every matching CMUdict variant; no winner; unresolved normalization or collision ambiguity -> Null
+JOIN_AMBIGUITY_POLICY=preserve every matching lexical source record and every matching CMUdict variant; no winner; a CMUdict normalized-key collision is explicitly ambiguous and the pronunciation attachment is Null
+CMUDICT_CASE_COLLISION_PREDICATE=two or more distinct CMUdict base sourceForm strings, compared before locale-independent lowercase, produce the same NFC/en-US-lowercase/NFC key
+CMUDICT_CASE_COLLISION_OUTCOME=retain all lexical source records and their provenance, attach no CMUdict pronunciation, emit exact reason PRONUNCIATION_JOIN_COLLISION, and do not choose a representative spelling
+LEXICAL_SOURCE_MULTIPLICITY_OUTCOME=multiple lexical records sharing a normalized key remain separate postings; multiplicity alone does not select, filter, rank, or merge records
 PRONUNCIATION_ATTACHMENT_IDENTITY=LEXICAL_FORM_AND_CMUDICT_SOURCE_RECORD
 SENSE_BINDING_AUTHORIZED=NO
 ```
@@ -153,10 +156,20 @@ CANDIDATE_NORMALIZATION_AUTHORITY_NOW=NO
 
 The current parser inventory contains source rows with apostrophes and hyphens,
 many terminal numeric variants, and a small set of rows with trailing inline
-annotations. A future candidate-role implementation must define the exact
-source-line grammar, preserve authorized trailing annotation data as
-provenance, and fail closed for malformed or unrecognized trailing material.
-It must not silently treat annotation tokens as pronunciation units.
+annotations. The proposed source-line grammar is frozen for DF review as:
+
+```text
+CMUDICT_SOURCE_LINE_GRAMMAR=sourceForm SP pronunciationToken (SP pronunciationToken)* (SP # SP annotationText)?; sourceForm is one non-whitespace token; pronunciationToken is an uppercase ARPABET symbol with optional terminal stress digit 0, 1, or 2; # begins the optional annotation suffix only when it is a separate token after at least one pronunciationToken; annotationText is preserved opaquely through end-of-line and is not a pronunciation unit
+CMUDICT_SOURCE_LINE_ANNOTATION_POLICY=preserve the exact annotation suffix as source-line provenance; exclude # and annotationText from sourceUnits; do not interpret, normalize, or use annotationText for candidate matching
+CMUDICT_SOURCE_LINE_FAILURE_POLICY=if the line has no pronunciationToken, an unknown token before #, a # that is not a separate suffix token, or any other grammar violation, reject that source record with exact reason CMUDICT_SOURCE_LINE_MALFORMED; do not silently reinterpret the material
+```
+
+This grammar accounts for rows such as `aalborg AO1 L B AO0 R G # place,
+danish`: the ARPABET tokens are source units and `# place, danish` is opaque
+provenance. A future candidate-role implementation must use the same predicate
+and outcome for normalized-key collisions above. It must not silently treat
+annotation tokens as pronunciation units or resolve a case-fold collision by
+spelling preference.
 
 ## Explicit non-authorizations
 
@@ -191,4 +204,3 @@ NEXT_ACTION=AWAIT_DF_DECISION
 DF should ratify or reject the proposed candidate role as a separate contract.
 Until ratification, the only active CMUdict role remains the existing English
 spoken-input pronunciation role.
-
