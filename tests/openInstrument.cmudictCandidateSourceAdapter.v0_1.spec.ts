@@ -92,6 +92,17 @@ describe("CMUdict candidate source adapter v0.1", () => {
     });
   });
 
+  it("rejects text between the source form and the required separator", () => {
+    const parsed = parseCmuDictCandidateSourceRecordsV0_1(
+      "word\tjunk W ER1 D\n",
+    );
+    expect(parsed[0]).toMatchObject({
+      kind: "invalid",
+      sourceForm: "word",
+      reasonCode: "CMUDICT_SOURCE_LINE_MALFORMED",
+    });
+  });
+
   it("removes only a terminal numeric CMUdict source-form suffix", () => {
     const parsed = parseCmuDictCandidateSourceRecordsV0_1(
       "read R EH1 D\nread(2) R IY1 D\n",
@@ -367,6 +378,26 @@ describe("CMUdict candidate source adapter v0.1", () => {
     expect(first.variants).toEqual(second.variants);
     expect(first.candidateId).not.toBe(second.candidateId);
     expect(first.candidateSourceRecordId).not.toBe(second.candidateSourceRecordId);
+    expect(first).toMatchObject({
+      senseId: "sense-one-id",
+      gloss: "a fixture gloss; not used for joining",
+    });
+    expect(second).toMatchObject({
+      senseId: "sense-two-id",
+      gloss: "a fixture gloss; not used for joining",
+    });
+
+    const nullResult = adaptCmuDictCandidateSourceEvidenceV0_1(
+      candidate("zzzzzzzz", {
+        senseId: "missing-sense-id",
+        gloss: "missing gloss",
+      }),
+    );
+    expect(nullResult).toMatchObject({
+      status: "null",
+      senseId: "missing-sense-id",
+      gloss: "missing gloss",
+    });
   });
 
   it("is deterministic and deeply immutable", () => {

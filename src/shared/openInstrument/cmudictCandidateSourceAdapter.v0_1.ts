@@ -143,6 +143,8 @@ export type CmuDictCandidatePronunciationEvidenceV0_1 = Readonly<{
   candidateSourceForm: string;
   candidateJoinKey: string;
   candidateSourceProvenance: Readonly<Record<string, unknown>>;
+  senseId?: string;
+  gloss?: string;
   status: "defined" | "null";
   reasonCode: CmuDictCandidateAdapterReasonCodeV0_1 | null;
   variants: readonly CmuDictCandidatePronunciationEvidenceVariantV0_1[];
@@ -299,6 +301,7 @@ function parseSourceLineV0_1(
     separator <= 0 ||
     sourceForm === null ||
     !/^\S+$/u.test(sourceForm) ||
+    separator !== sourceForm.length ||
     rawSourceLine.startsWith(" ")
   ) {
     return invalidRecordV0_1(
@@ -441,6 +444,8 @@ function resultBaseV0_1(
   candidateSourceForm: string;
   candidateJoinKey: string;
   candidateSourceProvenance: Readonly<Record<string, unknown>>;
+  senseId?: string;
+  gloss?: string;
 } {
   return {
     candidateId: input.candidateId,
@@ -450,6 +455,8 @@ function resultBaseV0_1(
     candidateSourceForm: input.sourceForm,
     candidateJoinKey,
     candidateSourceProvenance: copyValueV0_1(input.sourceProvenance),
+    ...(input.senseId === undefined ? {} : { senseId: input.senseId }),
+    ...(input.gloss === undefined ? {} : { gloss: input.gloss }),
   };
 }
 
