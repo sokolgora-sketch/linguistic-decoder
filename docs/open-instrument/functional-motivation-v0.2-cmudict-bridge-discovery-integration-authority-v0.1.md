@@ -110,6 +110,14 @@ projectCmuDictCandidateZcProjectionV0_1
 buildCmuDictProductionSpokenBridgePrerequisitesV0_1
 ```
 
+The production prerequisite envelope is already implemented on the accepted
+baseline. Its per-production-variant envelope exposes the original lexical
+input, normalized key, exact artifact bytes/hash, physical locator and raw
+line, source revision/notation/profile, parser and normalization identities,
+mapping identity/table, normalized segments, nuclei, Voice path, status, and
+reason. This contract treats that envelope as an existing upstream authority;
+it does not propose implementing it again.
+
 `buildMotivationEngineDiscoveryV0_1` currently uses Albanian and S1 Latin
 generic functional witness adapters. No production caller connects the CMUdict
 candidate chain or the production prerequisite envelope to that function, to
@@ -323,10 +331,10 @@ candidate source artifact; source revision; source notation; source profile; sou
 | Tampered provenance | `REJECT_ENVELOPE`. |
 | Unknown schema | `REJECT_ENVELOPE`. |
 | Unknown representation domain | `REJECT_ENVELOPE`. |
-| Gate 1 authority absent | `PRESERVE_AS_BLOCKED`; no candidate classification. |
-| SAME authority absent | `PRESERVE_AS_BLOCKED`; no SAME mapping. |
-| Voice relationship authority absent | `PRESERVE_AS_BLOCKED`; use no comparable relationship. |
-| Gate 4 evidence absent | `PRESERVE_AS_BLOCKED`; no structural support is manufactured. |
+| Gate 1 authority absent | `PRESERVE_BRIDGE_STATUS; DEFER_GATE_BLOCK_TO_FUTURE_CONSUMER`; transport emits no candidate classification. |
+| SAME authority absent | `PRESERVE_BRIDGE_STATUS; DEFER_GATE_BLOCK_TO_FUTURE_CONSUMER`; transport emits no SAME mapping. |
+| Voice relationship authority absent | `PRESERVE_BRIDGE_STATUS; DEFER_GATE_BLOCK_TO_FUTURE_CONSUMER`; transport emits no comparable relationship. |
+| Gate 4 evidence absent | `PRESERVE_BRIDGE_STATUS; DEFER_GATE_BLOCK_TO_FUTURE_CONSUMER`; transport manufactures no structural support. |
 | No condition | `NOT_APPLICABLE`. |
 
 ```text
@@ -378,7 +386,7 @@ authorized by this documentation lane.
 ## Implementability assessment
 
 ```text
-INTEGRATION_IMPLEMENTABLE_FROM_CURRENT_DATA=PARTIAL
+INTEGRATION_IMPLEMENTABLE_FROM_CURRENT_DATA=YES_FOR_ISOLATED_BRIDGE_AND_TRANSPORT; NO_FOR_RUNTIME_DISCOVERY_CONSUMPTION
 INTEGRATION_REQUIRES_BRIDGE_IMPLEMENTATION_FIRST=YES
 INTEGRATION_REQUIRES_SAME_AUTHORITY_FIRST=NO
 INTEGRATION_REQUIRES_VOICE_RELATIONSHIP_AUTHORITY_FIRST=NO
@@ -387,14 +395,14 @@ INTEGRATION_REQUIRES_GATE4_AUTHORITY_FIRST=NO
 INTEGRATION_REQUIRES_DISCOVERY_TYPE_CHANGE=YES
 INTEGRATION_REQUIRES_NEW_RUNTIME_REASON_CODES=NO
 INTEGRATION_REQUIRES_UPSTREAM_CANDIDATE_CHANGE=NO
-INTEGRATION_REQUIRES_UPSTREAM_PRODUCTION_CHANGE=YES, an additive per-production-variant authority envelope is required because the current result omits exact artifact bytes/hash, physical locator/raw line, parser/normalization/mapping identity, and original lexical input at the resolver boundary
+INTEGRATION_REQUIRES_UPSTREAM_PRODUCTION_CHANGE=NO; the additive production prerequisite envelope is already implemented and supplies the required production-side identity/provenance inputs
 ```
 
-The candidate-side records are sufficient for transport. The production side
-has the same checked-in artifact and shared mapping implementation, but its
-current result does not expose every required identity field and has a known
-terminal-annotation boundary mismatch on 22 records. The future envelope and
-Bridge implementation must therefore precede any Discovery integration.
+The candidate-side records and the implemented production prerequisite
+envelope are sufficient to implement the isolated Bridge/transport boundary.
+The known terminal-annotation boundary mismatch on 22 records remains a
+fail-closed Bridge condition. Runtime Discovery consumption still requires a
+separate future authority lane.
 
 ## Explicit forbidden authority
 
@@ -420,9 +428,9 @@ TWO_MODE_DESIGN_AUTHORIZED=NO
 
 ```text
 INTEGRATION_AUTHORITY_ASSESSMENT=DEFENSIBLE
-INTEGRATION_AUTHORITY_ASSESSMENT_REASON=Repository truth supports one isolated typed transport boundary that preserves both physical ledgers and exact provenance while avoiding the generic witness and current structural-comparison semantics. The missing production envelope and the 22 annotation-contaminated records remain explicit fail-closed blockers; no doctrine decision is required to freeze this transport-only boundary.
-NEXT_RECOMMENDED_LANE=CMUDICT_BRIDGE_DISCOVERY_INTEGRATION_PREREQUISITE_IMPLEMENTATION
-NEXT_RECOMMENDED_LANE_REASON=Implement the additive production envelope and isolated Bridge/transport validation first. Do not implement Discovery wiring, SAME_REPRESENTATION, Voice relationship authority, Gate 1, Gate 4, API/UI, positive control, false-null diagnostics, or two-mode design in that lane.
+INTEGRATION_AUTHORITY_ASSESSMENT_REASON=Repository truth supports one isolated typed transport boundary that preserves both physical ledgers and exact provenance while avoiding the generic witness and current structural-comparison semantics. The production prerequisite envelope is already implemented; the 22 annotation-contaminated records remain explicit fail-closed Bridge conditions, and no doctrine decision is required to freeze this transport-only boundary.
+NEXT_RECOMMENDED_LANE=REPRESENTATION_BRIDGE_IMPLEMENTATION
+NEXT_RECOMMENDED_LANE_REASON=The existing production prerequisite envelope supplies the required production-side identity/provenance inputs, so the ratified Bridge and transport can be implemented in isolation without changing Discovery. Do not implement Discovery wiring, SAME_REPRESENTATION, Voice relationship authority, Gate 1, Gate 4, API/UI, positive control, false-null diagnostics, or two-mode design in that lane.
 NEXT_RECOMMENDED_LANE_IMPLEMENTATION_REQUIRED=YES
 NEXT_RECOMMENDED_LANE_MUTATION_REQUIRED=YES
 ```
