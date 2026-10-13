@@ -216,6 +216,17 @@ describe("CMUdict production spoken bridge prerequisites v0.1", () => {
     expect(validateCmuDictProductionSpokenBridgePrerequisitesV0_1(null)).toBe(false);
   });
 
+  it("rejects candidate-controlled serialization instead of trusting toJSON", () => {
+    const result = buildCmuDictProductionSpokenBridgePrerequisitesV0_1("stone");
+    const crafted = {
+      originalLexicalInput: result.originalLexicalInput,
+      toJSON: () => result,
+    };
+    expect(
+      validateCmuDictProductionSpokenBridgePrerequisitesV0_1(crafted),
+    ).toBe(false);
+  });
+
   it("audits every physical source form with the canonical normalizers", () => {
     const audit = auditCmuDictNormalizationDomainV0_1();
     expect(audit).toEqual({

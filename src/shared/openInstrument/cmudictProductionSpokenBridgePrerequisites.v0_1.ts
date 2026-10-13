@@ -175,6 +175,63 @@ function deepCloneAndFreezeV0_1<T>(
   return copy as T;
 }
 
+function sanitizeOwnDataForValidationV0_1(
+  value: unknown,
+  seen = new WeakSet<object>(),
+): unknown {
+  if (value === null) return null;
+  if (typeof value === "string" || typeof value === "number" || typeof value === "boolean") {
+    return value;
+  }
+  if (typeof value !== "object") {
+    throw new Error("validation value contains unsupported data");
+  }
+  if (seen.has(value)) throw new Error("validation value contains a cycle");
+  seen.add(value);
+
+  if (Array.isArray(value)) {
+    const ownKeys = Object.getOwnPropertyNames(value);
+    if (
+      ownKeys.some(
+        (key) => key !== "length" && !/^(?:0|[1-9]\d*)$/u.test(key),
+      ) ||
+      Object.getOwnPropertySymbols(value).length > 0
+    ) {
+      throw new Error("validation array contains unsupported properties");
+    }
+    const result = Array.from({ length: value.length }, (_, index) => {
+      const descriptor = Object.getOwnPropertyDescriptor(value, String(index));
+      if (descriptor === undefined || !("value" in descriptor)) {
+        throw new Error("validation array contains a hole or accessor");
+      }
+      return sanitizeOwnDataForValidationV0_1(descriptor.value, seen);
+    });
+    seen.delete(value);
+    return result;
+  }
+
+  const prototype = Object.getPrototypeOf(value);
+  if (prototype !== Object.prototype && prototype !== null) {
+    throw new Error("validation object has an unsupported prototype");
+  }
+  const result: Record<string, unknown> = {};
+  for (const key of Object.keys(value).sort()) {
+    if (key === "toJSON") {
+      throw new Error("validation object contains serialization behavior");
+    }
+    const descriptor = Object.getOwnPropertyDescriptor(value, key);
+    if (descriptor === undefined || !("value" in descriptor)) {
+      throw new Error("validation object contains an accessor");
+    }
+    result[key] = sanitizeOwnDataForValidationV0_1(descriptor.value, seen);
+  }
+  if (Object.getOwnPropertySymbols(value).length > 0) {
+    throw new Error("validation object contains symbol properties");
+  }
+  seen.delete(value);
+  return result;
+}
+
 function readFrozenArtifactV0_1(): ArtifactReadV0_1 {
   let text: string;
   try {
@@ -490,8 +547,17 @@ export function validateCmuDictProductionSpokenBridgePrerequisitesV0_1(
     value === null ||
     typeof value !== "object" ||
     Array.isArray(value) ||
-    typeof (value as { originalLexicalInput?: unknown }).originalLexicalInput !==
-      "string"
+    (() => {
+      const descriptor = Object.getOwnPropertyDescriptor(
+        value,
+        "originalLexicalInput",
+      );
+      return (
+        descriptor === undefined ||
+        !("value" in descriptor) ||
+        typeof descriptor.value !== "string"
+      );
+    })()
   ) {
     return false;
   }
@@ -501,7 +567,10 @@ export function validateCmuDictProductionSpokenBridgePrerequisitesV0_1(
     candidate.originalLexicalInput,
   );
   try {
-    return JSON.stringify(candidate) === JSON.stringify(rebuilt);
+    return (
+      JSON.stringify(sanitizeOwnDataForValidationV0_1(candidate)) ===
+      JSON.stringify(sanitizeOwnDataForValidationV0_1(rebuilt))
+    );
   } catch {
     return false;
   }
