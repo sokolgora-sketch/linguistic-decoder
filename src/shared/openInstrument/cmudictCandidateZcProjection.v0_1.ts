@@ -20,6 +20,11 @@ import {
   type CmuDictCandidateGammaProjectionV0_1,
   type CmuDictCandidateGammaProjectionVariantV0_1,
 } from "./cmudictCandidateGammaProjection.v0_1";
+import { isVowelVoice, type VowelVoice } from "../vowels/vowelVoices.v0.1";
+import {
+  CMUDICT_CANDIDATE_VOICE_PROJECTION_MAPPING_ID_V0_1,
+  CMUDICT_CANDIDATE_VOICE_PROJECTION_MAPPING_TABLE_V0_1,
+} from "./cmudictCandidateVoiceProjection.v0_1";
 import {
   PRONUNCIATION_TO_VOICE_PROFILE_V0_1,
   type ArpabetNucleusV0_1,
@@ -66,6 +71,7 @@ export type CmuDictCandidateZcProjectionVariantV0_1 = Readonly<{
 
 export type CmuDictCandidateZcProjectionV0_1 = Readonly<{
   schemaVersion: typeof CMUDICT_CANDIDATE_ZC_PROJECTION_SCHEMA_V0_1;
+  zcSchemaVersion: typeof ZERO_CONSONANTAL_STRUCTURAL_COMPOSITION_SCHEMA_V0_1;
   projectorId: typeof CMUDICT_CANDIDATE_ZC_PROJECTION_PROJECTOR_ID_V0_1;
   gammaSchemaVersion: typeof CMUDICT_CANDIDATE_GAMMA_PROJECTION_SCHEMA_V0_1;
   gammaProjectorId: typeof CMUDICT_CANDIDATE_GAMMA_PROJECTION_PROJECTOR_ID_V0_1;
@@ -161,6 +167,10 @@ function validStressV0_1(value: unknown): value is "0" | "1" | "2" | null {
 
 function stringArrayV0_1(value: unknown): value is readonly string[] {
   return Array.isArray(value) && value.every((item) => typeof item === "string");
+}
+
+function voiceArrayV0_1(value: unknown): value is readonly VowelVoice[] {
+  return Array.isArray(value) && value.every(isVowelVoice);
 }
 
 function knownReasonV0_1(
@@ -273,7 +283,7 @@ function validNormalizedSegmentV0_1(
         value.nucleusIndex >= 0)) &&
     value.sourceProfileId === PRONUNCIATION_TO_VOICE_PROFILE_V0_1 &&
     (value.baseCategory === null || typeof value.baseCategory === "string") &&
-    (value.voiceAnchors === null || stringArrayV0_1(value.voiceAnchors))
+    (value.voiceAnchors === null || voiceArrayV0_1(value.voiceAnchors))
   );
 }
 
@@ -287,7 +297,7 @@ function validNucleusV0_1(value: unknown): value is ArpabetNucleusV0_1 {
     typeof value.baseCategory === "string" &&
     validStressV0_1(value.stress) &&
     (value.kind === "monophthong_nucleus" || value.kind === "moving_nucleus") &&
-    stringArrayV0_1(value.voiceAnchors) &&
+    voiceArrayV0_1(value.voiceAnchors) &&
     value.voiceAnchors.length > 0 &&
     (value.observationAuthority === null || isRecord(value.observationAuthority)) &&
     (value.canonicalization === null || isRecord(value.canonicalization))
@@ -355,7 +365,7 @@ function gammaRegionTopologyV0_1(
     nuclei.length === 0 ||
     regions.length !== nuclei.length + 1 ||
     variant.canonicalVoicePath === null ||
-    !stringArrayV0_1(variant.canonicalVoicePath) ||
+    !voiceArrayV0_1(variant.canonicalVoicePath) ||
     variant.canonicalVoicePath.length === 0
   ) {
     return false;
@@ -532,6 +542,8 @@ function validGammaEnvelopeV0_1(
       CMUDICT_CANDIDATE_GAMMA_PROJECTION_RUNTIME_AUTHORITY_TAG_V0_1 ||
     value.configurationAuthority !==
       CMUDICT_CANDIDATE_GAMMA_PROJECTION_CONFIGURATION_AUTHORITY_V0_1 ||
+    value.mappingId !== CMUDICT_CANDIDATE_VOICE_PROJECTION_MAPPING_ID_V0_1 ||
+    value.mappingTable !== CMUDICT_CANDIDATE_VOICE_PROJECTION_MAPPING_TABLE_V0_1 ||
     typeof value.candidateId !== "string" ||
     typeof value.candidateSourceId !== "string" ||
     typeof value.candidateSourceFamilyId !== "string" ||
@@ -578,6 +590,20 @@ function validGammaEnvelopeV0_1(
   }
 
   if (value.status === "defined") {
+    const firstVariant = value.variants[0];
+    if (
+      firstVariant === undefined ||
+      value.sourceProfileId !== firstVariant.sourceProfileId ||
+      value.sourceNotation !== firstVariant.sourceNotation ||
+      value.sourceRevision !== firstVariant.sourceRevision ||
+      value.sourceArtifactBytes !== firstVariant.sourceArtifactBytes ||
+      value.sourceArtifactSha256 !== firstVariant.sourceArtifactSha256
+    ) {
+      return false;
+    }
+  }
+
+  if (value.status === "defined") {
     return (
       value.reasonCode === null &&
       value.sourceEvidence.status === "defined" &&
@@ -618,6 +644,7 @@ function nullProjectionV0_1(
 ): CmuDictCandidateZcProjectionV0_1 {
   return {
     schemaVersion: CMUDICT_CANDIDATE_ZC_PROJECTION_SCHEMA_V0_1,
+    zcSchemaVersion: ZERO_CONSONANTAL_STRUCTURAL_COMPOSITION_SCHEMA_V0_1,
     projectorId: CMUDICT_CANDIDATE_ZC_PROJECTION_PROJECTOR_ID_V0_1,
     gammaSchemaVersion: CMUDICT_CANDIDATE_GAMMA_PROJECTION_SCHEMA_V0_1,
     gammaProjectorId: CMUDICT_CANDIDATE_GAMMA_PROJECTION_PROJECTOR_ID_V0_1,
@@ -649,6 +676,7 @@ function baseProjectionV0_1(
 ): Omit<CmuDictCandidateZcProjectionV0_1, "variants" | "status" | "reasonCode"> {
   return {
     schemaVersion: CMUDICT_CANDIDATE_ZC_PROJECTION_SCHEMA_V0_1,
+    zcSchemaVersion: ZERO_CONSONANTAL_STRUCTURAL_COMPOSITION_SCHEMA_V0_1,
     projectorId: CMUDICT_CANDIDATE_ZC_PROJECTION_PROJECTOR_ID_V0_1,
     gammaSchemaVersion: input.schemaVersion,
     gammaProjectorId: input.projectorId,

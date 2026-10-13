@@ -10,6 +10,7 @@ import {
   type CmuDictCandidateAdapterInputV0_1,
 } from "@/shared/openInstrument/cmudictCandidateSourceAdapter.v0_1";
 import {
+  CMUDICT_CANDIDATE_GAMMA_PROJECTION_CONFIGURATION_AUTHORITY_V0_1,
   CMUDICT_CANDIDATE_GAMMA_PROJECTION_PROJECTOR_ID_V0_1,
   CMUDICT_CANDIDATE_GAMMA_PROJECTION_RUNTIME_AUTHORITY_TAG_V0_1,
   projectCmuDictCandidateGammaProjectionV0_1,
@@ -21,6 +22,7 @@ import {
   CMUDICT_CANDIDATE_ZC_PROJECTION_VARIANT_SCHEMA_V0_1,
   projectCmuDictCandidateZcProjectionV0_1,
 } from "@/shared/openInstrument/cmudictCandidateZcProjection.v0_1";
+import { ZERO_CONSONANTAL_STRUCTURAL_COMPOSITION_SCHEMA_V0_1 } from "@/shared/openInstrument/zeroConsonantalStructuralComposition.v0_1";
 import { normalizeEnglishLexicalJoinKeyV0_1 } from "@/shared/openInstrument/englishLexicalSenseSourceContract.v0_1";
 import { projectCmuDictCandidateVoiceProjectionV0_1 } from "@/shared/openInstrument/cmudictCandidateVoiceProjection.v0_1";
 
@@ -87,6 +89,9 @@ describe("CMUdict candidate ZC projection v0.1", () => {
     const result = projectCmuDictCandidateZcProjectionV0_1(gamma());
     expect(result.projectorId).toBe(CMUDICT_CANDIDATE_ZC_PROJECTION_PROJECTOR_ID_V0_1);
     expect(result.schemaVersion).toBe(CMUDICT_CANDIDATE_ZC_PROJECTION_SCHEMA_V0_1);
+    expect(result.zcSchemaVersion).toBe(
+      ZERO_CONSONANTAL_STRUCTURAL_COMPOSITION_SCHEMA_V0_1,
+    );
     expect(result.variants[0].schemaVersion).toBe(
       CMUDICT_CANDIDATE_ZC_PROJECTION_VARIANT_SCHEMA_V0_1,
     );
@@ -97,6 +102,13 @@ describe("CMUdict candidate ZC projection v0.1", () => {
       CMUDICT_CANDIDATE_GAMMA_PROJECTION_RUNTIME_AUTHORITY_TAG_V0_1,
     );
     expect(result).not.toHaveProperty("runtimeAuthorityTag");
+
+    const nullResult = projectCmuDictCandidateZcProjectionV0_1(
+      gamma("word-that-is-not-in-cmudict"),
+    );
+    expect(nullResult.zcSchemaVersion).toBe(
+      ZERO_CONSONANTAL_STRUCTURAL_COMPOSITION_SCHEMA_V0_1,
+    );
   });
 
   it("projects P, I, S, D, A from Gamma regions only", () => {
@@ -246,6 +258,10 @@ describe("CMUdict candidate ZC projection v0.1", () => {
     ["source notation", (value: CmuDictCandidateGammaProjectionV0_1) => { value.variants[0].sourceNotation = "wrong"; }],
     ["source revision", (value: CmuDictCandidateGammaProjectionV0_1) => { value.variants[0].sourceRevision = "wrong"; }],
     ["source artifact", (value: CmuDictCandidateGammaProjectionV0_1) => { value.variants[0].sourceArtifactSha256 = "wrong"; }],
+    ["Voice path vocabulary", (value: CmuDictCandidateGammaProjectionV0_1) => { value.variants[0].canonicalVoicePath = ["INVALID_VOICE"]; }],
+    ["Gamma mapping id", (value: CmuDictCandidateGammaProjectionV0_1) => { value.mappingId = "wrong"; }],
+    ["Gamma mapping table", (value: CmuDictCandidateGammaProjectionV0_1) => { value.mappingTable = "wrong"; }],
+    ["defined source metadata", (value: CmuDictCandidateGammaProjectionV0_1) => { value.sourceArtifactSha256 = "wrong"; }],
     ["invalid region topology", (value: CmuDictCandidateGammaProjectionV0_1) => { value.variants[0].consonantRegions[0].sourceSegmentIndices = [999]; }],
     ["invalid source segment index", (value: CmuDictCandidateGammaProjectionV0_1) => { value.variants[0].normalizedSegments[0].segmentIndex = 99; }],
     ["invalid recurrence source structure", (value: CmuDictCandidateGammaProjectionV0_1) => { value.variants[0].normalizedSegments[0].sourceUnits = []; }],
