@@ -270,7 +270,7 @@ per-variant records, and must never select a winner.
 
 ```text
 PRODUCTION_STATUS_REASON_MODEL=status defined|null; top-level reasonCode is null or one of PRONUNCIATION_NOT_FOUND; PRONUNCIATION_SOURCE_UNSUPPORTED; PRONUNCIATION_VARIANT_AMBIGUOUS; PRONUNCIATION_VOWEL_CATEGORY_UNSUPPORTED; SPOKEN_NUCLEUS_STRUCTURE_UNRESOLVED; VOICE_FAMILY_AUTHORITY_MISSING; MOVING_NUCLEUS_AUTHORITY_MISSING. Each variant carries its own reasonCode and canonicalVoicePath.
-CANDIDATE_STATUS_REASON_MODEL=Source evidence status defined|null with source-adapter reasonCode, followed by candidate Voice status defined|null with source/projection reason codes; each physical variant retains its own evidence and projection reason, including malformed/unsupported/artifact/revision/provenance failures.
+CANDIDATE_STATUS_REASON_MODEL=Source evidence status defined|null with source-adapter reasonCode, followed by candidate Voice status defined|null with source/projection reason codes; valid physical variants retain their own evidence and projection reason, while malformed/unsupported/artifact/revision/provenance failures remain top-level source/projection reasons with an empty variant ledger.
 PREREQUISITE_REASON_TAXONOMY_REQUIRED=NO
 PROPOSED_PREREQUISITE_REASON_CODES=NONE; this contract creates no runtime result. Preserve existing nested source/projection reasons. A later bridge contract may use its separately ratified bridge-level blocked codes for artifact identity, normalization, provenance, mapping, and variant-policy failures.
 ```
