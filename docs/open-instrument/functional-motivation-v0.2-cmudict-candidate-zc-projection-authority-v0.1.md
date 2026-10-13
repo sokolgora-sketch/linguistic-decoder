@@ -222,7 +222,7 @@ source segment for P/I/S; R is defined over source-segment identities.
 
 ```text
 ZC_D_AUTHORITY_SOURCE=docs/open-instrument/zero-consonantal-structural-composition-v0.1.md §3 and canonical deriveZeroConsonantalStructuralCompositionV0_1
-ZC_D_REQUIRED_INPUT=Gamma P and ordered I values
+ZC_D_REQUIRED_INPUT=Gamma P, ordered I values, and Gamma S suffix load
 ZC_D_CANDIDATE_DERIVATION_DEFENSIBLE=YES
 ZC_A_AUTHORITY_SOURCE=docs/open-instrument/zero-consonantal-structural-composition-v0.1.md §3 and canonical deriveZeroConsonantalStructuralCompositionV0_1
 ZC_A_REQUIRED_INPUT=Gamma P and S values
@@ -336,7 +336,7 @@ MERGING_THIS_ARTIFACT_DOES_NOT_AUTHORIZE_CANDIDATE_ZC_PROJECTION=YES
 
 ```text
 AUTHORITY_ARTIFACT=docs/open-instrument/functional-motivation-v0.2-cmudict-candidate-zc-projection-authority-v0.1.md
-AUTHORITY_ARTIFACT_SHA256=aa35692feb5c522e08354bec6fc6242b3b296947d65f74ae72aa9711827e84b3
+AUTHORITY_ARTIFACT_SHA256=7f8b5529b9e67e98d06c1e7d2e1bd56cfdac145e4d98236fc8c9ebe2ef9a9fac
 FINAL_CHANGED_FILE_COUNT=1
 PRODUCTION_CODE_CHANGED=NO
 TEST_BEHAVIOR_CHANGED=NO
