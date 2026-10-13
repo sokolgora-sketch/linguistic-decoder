@@ -218,6 +218,7 @@ not establish representation-domain compatibility.
 | Voice vocabulary | Seven canonical Voice values | Seven canonical Voice values | YES | Require exact Voice vocabulary and mapping identity | `vowelVoices.v0.1.ts` and Voice profile |
 | Voice mapping | `CMUDICT_ARPABET_VOICE_PROFILE_V0_1` with candidate mapping identity/table | Shared pronunciation-to-Voice profile | YES conditionally | Carry exact mapping ID/table and authority tag | Candidate Voice projection and pronunciation resolver |
 | stress treatment | Raw stress preserved; base/stress view is lossless | Stress parsed into normalized segment/nucleus metadata | YES conditionally | Preserve raw stress and require same stress policy | Candidate parser and pronunciation resolver |
+| annotation parsing and segmentation | Candidate parser excludes terminal `#` annotation text from pronunciation tokens while preserving the raw line and annotation | Current production loader can retain terminal `#` annotation text in `sourcePronunciation` and `sourceUnits` | NO for affected records | Require explicit production annotation parsing/segmentation alignment before compatibility; otherwise block the bridge | Candidate source adapter and `cmudictArpabetPronunciation.v0_1.ts` |
 | variant identity | Physical source record, variant ID, and order preserved | Resolver preserves physical lookup variants and order | YES conditionally | One-to-one variant ledger; no collapse or winner | Candidate adapter and pronunciation resolver |
 | variant order | Physical artifact order | Loader insertion order | YES only if same artifact and loader order | Compare source identity and preserve order | CMUdict loader and candidate adapter |
 | Gamma definition | Candidate consonant regions derived from candidate Gamma contract | No universal production Gamma gate in Heart | UNKNOWN for later structure | Define separately if structural comparison later requires it | Candidate Gamma contract and Functional Motivation gate |
@@ -363,7 +364,7 @@ The tag deliberately does not contain `SAME_REPRESENTATION`, `EQUIVALENCE`,
 
 ```text
 BRIDGE_IMPLEMENTABLE_FROM_CURRENT_DATA=NO
-BRIDGE_REQUIRED_DATA_MISSING=Explicit production-side bridge envelope carrying exact artifact identity, compatible normalization/lexical identity policy, mapping identity/table, bridge status, bridge reason, and the required runtime authority tag
+BRIDGE_REQUIRED_DATA_MISSING=Explicit production-side bridge envelope carrying exact artifact identity, compatible normalization/lexical identity policy, aligned annotation parsing/segmentation semantics, mapping identity/table, bridge status, bridge reason, and the required runtime authority tag
 BRIDGE_REQUIRES_UPSTREAM_PRODUCTION_CHANGE=YES
 BRIDGE_REQUIRES_CANDIDATE_PROJECTION_CHANGE=NO
 BRIDGE_REQUIRES_SOURCE_REPARSE=NO
@@ -382,8 +383,8 @@ lane or to silently weaken the bridge.
 ## Future bridge conformance test matrix
 
 ```text
-FUTURE_BRIDGE_TEST_MATRIX_ITEM_COUNT=26
-FUTURE_BRIDGE_TEST_NAMES_IN_ORDER=exactSourceAuthority; exactProductionAuthority; exactArtifactIdentity; notationCompatibility; normalizationCompatibility; voiceMappingCompatibility; movingNucleusBoundaryPreserved; variantMultiplicityPreserved; duplicatePhysicalVariantsNotCollapsed; provenanceLossless; sourceNullFailsClosed; voiceNullFailsClosed; gammaNullRemainsOptional; zcNullRemainsOptional; unknownRemainsUnknown; malformedInputFailsClosed; tamperedArtifactOrRevisionFailsClosed; tamperedMappingFailsClosed; tamperedRepresentationKindFailsClosed; stressTreatmentPreserved; noWinnerSelection; noAggregation; noSemanticLeakage; noSameRepresentationLeakage; noCrossLanguageLeakage; deterministicDeepFrozenRepeatability
+FUTURE_BRIDGE_TEST_MATRIX_ITEM_COUNT=27
+FUTURE_BRIDGE_TEST_NAMES_IN_ORDER=exactSourceAuthority; exactProductionAuthority; exactArtifactIdentity; notationCompatibility; normalizationCompatibility; annotationParsingAlignment; voiceMappingCompatibility; movingNucleusBoundaryPreserved; variantMultiplicityPreserved; duplicatePhysicalVariantsNotCollapsed; provenanceLossless; sourceNullFailsClosed; voiceNullFailsClosed; gammaNullRemainsOptional; zcNullRemainsOptional; unknownRemainsUnknown; malformedInputFailsClosed; tamperedArtifactOrRevisionFailsClosed; tamperedMappingFailsClosed; tamperedRepresentationKindFailsClosed; stressTreatmentPreserved; noWinnerSelection; noAggregation; noSemanticLeakage; noSameRepresentationLeakage; noCrossLanguageLeakage; deterministicDeepFrozenRepeatability
 ```
 
 The matrix covers the exact source and production contracts, notation and
