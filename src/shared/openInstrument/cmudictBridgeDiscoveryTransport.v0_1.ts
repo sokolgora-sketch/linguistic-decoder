@@ -39,8 +39,8 @@ export type CmuDictBridgeDiscoveryTransportEnvelopeV0_1 = Readonly<{
   bridgeStatus: CmuDictCandidateProductionSpokenRepresentationBridgeStatusV0_1;
   bridgeReason: CmuDictCandidateProductionSpokenRepresentationBridgeReasonCodeV0_1 | null;
   preservedBridgeAuthorityTag: typeof CMUDICT_CANDIDATE_PRODUCTION_SPOKEN_REPRESENTATION_BRIDGE_RUNTIME_AUTHORITY_TAG_V0_1;
-  candidateLedger: CmuDictCandidateVoiceProjectionV0_1;
-  productionLedger: CmuDictProductionSpokenBridgePrerequisitesV0_1;
+  candidateLedger: CmuDictCandidateVoiceProjectionV0_1 | null;
+  productionLedger: CmuDictProductionSpokenBridgePrerequisitesV0_1 | null;
   candidateGammaProjection: CmuDictCandidateGammaProjectionV0_1 | null;
   candidateZcProjection: CmuDictCandidateZcProjectionV0_1 | null;
   units: readonly CmuDictBridgeDiscoveryTransportUnitV0_1[];
@@ -110,6 +110,75 @@ function sameDataV0_1(left: unknown, right: unknown): boolean {
   );
 }
 
+function validNullableBridgeV0_1(
+  value: RecordValue,
+): value is CmuDictCandidateProductionSpokenRepresentationBridgeV0_1 {
+  const canonicalNull =
+    projectCmuDictCandidateProductionSpokenRepresentationBridgeV0_1(null);
+  const candidateLedger = value.candidateLedger;
+  const productionLedger = value.productionLedger;
+  const candidateValid =
+    candidateLedger === null ||
+    (isRecordV0_1(candidateLedger) &&
+      sameDataV0_1(
+        projectCmuDictCandidateProductionSpokenRepresentationBridgeV0_1({
+          candidateVoiceProjection: candidateLedger,
+          productionPrerequisites: null,
+        }).candidateLedger,
+        candidateLedger,
+      ));
+  const productionValid =
+    productionLedger === null || isRecordV0_1(productionLedger);
+  const candidateVariantCount =
+    isRecordV0_1(candidateLedger) && Array.isArray(candidateLedger.variants)
+      ? candidateLedger.variants.length
+      : 0;
+  const productionVariantCount =
+    isRecordV0_1(productionLedger) && Array.isArray(productionLedger.variants)
+      ? productionLedger.variants.length
+      : 0;
+  if (
+    value.status !== "NULL" ||
+    typeof value.reasonCode !== "string" ||
+    !Array.isArray(value.variantPairs) ||
+    value.variantPairs.length !== 0 ||
+    value.candidateGammaProjection !== null ||
+    value.candidateZcProjection !== null ||
+    !candidateValid ||
+    !productionValid ||
+    value.exactArtifactIdentity === null ||
+    !isRecordV0_1(value.exactArtifactIdentity) ||
+    value.exactArtifactIdentity.sourcePath !==
+      canonicalNull.exactArtifactIdentity.sourcePath ||
+    value.exactArtifactIdentity.bytes !== canonicalNull.exactArtifactIdentity.bytes ||
+    value.exactArtifactIdentity.sha256 !== canonicalNull.exactArtifactIdentity.sha256 ||
+    value.exactArtifactIdentity.verifiedOnBothLedgers !== false ||
+    value.provenanceCompleteness !== false ||
+    !isRecordV0_1(value.variantCardinality) ||
+    value.variantCardinality.candidate !== candidateVariantCount ||
+    value.variantCardinality.production !== productionVariantCount ||
+    value.variantCardinality.paired !== 0 ||
+    value.variantCardinality.oneToOne !== false ||
+    value.variantCardinality.recordsLost !== 0
+  ) {
+    return false;
+  }
+  if (isRecordV0_1(productionLedger)) {
+    if (
+      !sameDataV0_1(
+        projectCmuDictCandidateProductionSpokenRepresentationBridgeV0_1({
+          candidateVoiceProjection: null,
+          productionPrerequisites: productionLedger,
+        }).productionLedger,
+        productionLedger,
+      )
+    ) {
+      return false;
+    }
+  }
+  return true;
+}
+
 function validBridgeV0_1(
   value: unknown,
 ): value is CmuDictCandidateProductionSpokenRepresentationBridgeV0_1 {
@@ -122,11 +191,30 @@ function validBridgeV0_1(
     value.runtimeAuthorityTag !==
       CMUDICT_CANDIDATE_PRODUCTION_SPOKEN_REPRESENTATION_BRIDGE_RUNTIME_AUTHORITY_TAG_V0_1 ||
     value.representationDomain !==
-      CMUDICT_CANDIDATE_PRODUCTION_SPOKEN_REPRESENTATION_DOMAIN_V0_1 ||
-    !isRecordV0_1(value.candidateLedger) ||
-    !isRecordV0_1(value.productionLedger)
+      CMUDICT_CANDIDATE_PRODUCTION_SPOKEN_REPRESENTATION_DOMAIN_V0_1
   ) {
     return false;
+  }
+  if (
+    value.candidateLedger === null &&
+    value.productionLedger === null
+  ) {
+    return sameDataV0_1(
+      projectCmuDictCandidateProductionSpokenRepresentationBridgeV0_1(null),
+      value,
+    );
+  }
+  if (
+    (value.candidateLedger !== null && !isRecordV0_1(value.candidateLedger)) ||
+    (value.productionLedger !== null && !isRecordV0_1(value.productionLedger))
+  ) {
+    return false;
+  }
+  if (
+    value.candidateLedger === null ||
+    value.productionLedger === null
+  ) {
+    return validNullableBridgeV0_1(value);
   }
   const rebuilt =
     projectCmuDictCandidateProductionSpokenRepresentationBridgeV0_1({
@@ -143,9 +231,6 @@ export function projectCmuDictBridgeDiscoveryTransportV0_1(
 ): CmuDictBridgeDiscoveryTransportEnvelopeV0_1 | null {
   try {
     if (!validBridgeV0_1(input)) return null;
-    if (input.candidateLedger === null || input.productionLedger === null) {
-      return null;
-    }
     return deepCloneAndFreezeV0_1({
       schemaVersion: CMUDICT_BRIDGE_DISCOVERY_TRANSPORT_SCHEMA_V0_1,
       unitSchemaVersion: CMUDICT_BRIDGE_DISCOVERY_TRANSPORT_UNIT_SCHEMA_V0_1,

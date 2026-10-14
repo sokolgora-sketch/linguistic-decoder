@@ -373,6 +373,8 @@ function buildResultV0_1(
   const artifactVerified =
     candidate !== null &&
     production !== null &&
+    candidate.sourceEvidenceStatus === "defined" &&
+    candidate.variants.length > 0 &&
     production.artifactIdentityVerified &&
     production.artifactBytes === CMUDICT_DATA_BYTES_V0_1 &&
     production.artifactSha256 === CMUDICT_DATA_SHA256_V0_1 &&
@@ -459,15 +461,20 @@ function projectImplV0_1(
   }
   const candidateValue = input.candidateVoiceProjection;
   const productionValue = input.productionPrerequisites;
-  if (
-    !validCandidateVoiceV0_1(candidateValue) ||
-    !validateCmuDictProductionSpokenBridgePrerequisitesV0_1(productionValue)
-  ) {
+  const candidateLedger = validCandidateVoiceV0_1(candidateValue)
+    ? candidateValue
+    : null;
+  const productionLedger = validateCmuDictProductionSpokenBridgePrerequisitesV0_1(
+    productionValue,
+  )
+    ? productionValue
+    : null;
+  if (candidateLedger === null || productionLedger === null) {
     return buildResultV0_1(
       "NULL",
       preliminarilyClassifyInvalidInputV0_1(input),
-      null,
-      null,
+      candidateLedger,
+      productionLedger,
       null,
       null,
     );
@@ -475,140 +482,140 @@ function projectImplV0_1(
   const gammaValue = input.candidateGammaProjection;
   const zcValue = input.candidateZcProjection;
   if (
-    !validOptionalGammaV0_1(gammaValue, candidateValue) ||
+    !validOptionalGammaV0_1(gammaValue, candidateLedger) ||
     !validOptionalZcV0_1(zcValue, gammaValue)
   ) {
     return buildResultV0_1(
       "NULL",
       "BRIDGE_PROVENANCE_INCOMPLETE",
-      candidateValue,
-      productionValue,
+      candidateLedger,
+      productionLedger,
       null,
       null,
     );
   }
   const gamma = gammaValue ?? null;
   const zc = zcValue ?? null;
-  if (candidateValue.sourceEvidenceStatus === "null") {
+  if (candidateLedger.sourceEvidenceStatus === "null") {
     return buildResultV0_1(
       "NULL",
-      candidateSourceFailureReasonV0_1(candidateValue),
-      candidateValue,
-      productionValue,
+      candidateSourceFailureReasonV0_1(candidateLedger),
+      candidateLedger,
+      productionLedger,
       gamma,
       zc,
     );
   }
   if (
-    productionValue.artifactIdentityVerified !== true ||
-    productionValue.artifactBytes !== CMUDICT_DATA_BYTES_V0_1 ||
-    productionValue.artifactSha256 !== CMUDICT_DATA_SHA256_V0_1
+    productionLedger.artifactIdentityVerified !== true ||
+    productionLedger.artifactBytes !== CMUDICT_DATA_BYTES_V0_1 ||
+    productionLedger.artifactSha256 !== CMUDICT_DATA_SHA256_V0_1
   ) {
     return buildResultV0_1(
       "BLOCKED_BY_MISSING_AUTHORITY",
       "BRIDGE_ARTIFACT_IDENTITY_UNVERIFIED",
-      candidateValue,
-      productionValue,
+      candidateLedger,
+      productionLedger,
       gamma,
       zc,
     );
   }
   if (
-    productionValue.sourceRevision !== CMUDICT_SOURCE_REVISION_V0_1 ||
-    productionValue.sourceNotation !== CMUDICT_SOURCE_NOTATION_V0_1 ||
-    productionValue.sourceProfileId !== CMUDICT_SOURCE_PROFILE_ID_V0_1 ||
-    productionValue.representationKind !==
+    productionLedger.sourceRevision !== CMUDICT_SOURCE_REVISION_V0_1 ||
+    productionLedger.sourceNotation !== CMUDICT_SOURCE_NOTATION_V0_1 ||
+    productionLedger.sourceProfileId !== CMUDICT_SOURCE_PROFILE_ID_V0_1 ||
+    productionLedger.representationKind !==
       CMUDICT_PRODUCTION_SPOKEN_BRIDGE_PREREQUISITES_REPRESENTATION_KIND_V0_1
   ) {
     return buildResultV0_1(
       "BLOCKED_BY_MISSING_AUTHORITY",
       "BRIDGE_REPRESENTATION_DOMAIN_MISMATCH",
-      candidateValue,
-      productionValue,
+      candidateLedger,
+      productionLedger,
       gamma,
       zc,
     );
   }
   if (
-    candidateValue.mappingId !== productionValue.voiceMappingId ||
-    candidateValue.mappingTable !== productionValue.voiceMappingTable
+    candidateLedger.mappingId !== productionLedger.voiceMappingId ||
+    candidateLedger.mappingTable !== productionLedger.voiceMappingTable
   ) {
     return buildResultV0_1(
       "BLOCKED_BY_MISSING_AUTHORITY",
       "BRIDGE_MAPPING_AUTHORITY_MISMATCH",
-      candidateValue,
-      productionValue,
+      candidateLedger,
+      productionLedger,
       gamma,
       zc,
     );
   }
   if (
-    productionValue.variants.some(
+    productionLedger.variants.some(
       (variant) => variant.annotationContamination.detected,
     )
   ) {
     return buildResultV0_1(
       "BLOCKED_BY_MISSING_AUTHORITY",
       "BRIDGE_REPRESENTATION_DOMAIN_MISMATCH",
-      candidateValue,
-      productionValue,
+      candidateLedger,
+      productionLedger,
       gamma,
       zc,
     );
   }
   if (
-    candidateValue.status === "null" ||
-    productionValue.reasonCode === "PRONUNCIATION_VARIANT_AMBIGUOUS"
+    candidateLedger.status === "null" ||
+    productionLedger.reasonCode === "PRONUNCIATION_VARIANT_AMBIGUOUS"
   ) {
     const reason =
-      candidateValue.sourceEvidenceReasonCode ===
+      candidateLedger.sourceEvidenceReasonCode ===
         "PRONUNCIATION_VARIANT_AMBIGUOUS" ||
-      productionValue.reasonCode === "PRONUNCIATION_VARIANT_AMBIGUOUS"
+      productionLedger.reasonCode === "PRONUNCIATION_VARIANT_AMBIGUOUS"
         ? "BRIDGE_VARIANT_POLICY_UNRESOLVED"
-        : candidateSourceFailureReasonV0_1(candidateValue);
+        : candidateSourceFailureReasonV0_1(candidateLedger);
     return buildResultV0_1(
       "BLOCKED_BY_MISSING_AUTHORITY",
       reason,
-      candidateValue,
-      productionValue,
+      candidateLedger,
+      productionLedger,
       gamma,
       zc,
     );
   }
-  if (productionValue.status === "null") {
+  if (productionLedger.status === "null") {
     return buildResultV0_1(
       "BLOCKED_BY_MISSING_AUTHORITY",
       "BRIDGE_PRODUCTION_AUTHORITY_MISSING",
-      candidateValue,
-      productionValue,
+      candidateLedger,
+      productionLedger,
       gamma,
       zc,
     );
   }
   if (
-    candidateValue.candidateJoinKey !==
-    productionValue.productionNormalizedLexicalKey
+    candidateLedger.candidateJoinKey !==
+    productionLedger.productionNormalizedLexicalKey
   ) {
     return buildResultV0_1(
       "BLOCKED_BY_MISSING_AUTHORITY",
       "BRIDGE_NORMALIZATION_MISMATCH",
-      candidateValue,
-      productionValue,
+      candidateLedger,
+      productionLedger,
       gamma,
       zc,
     );
   }
   const oneToOne =
-    candidateValue.variants.length === productionValue.variants.length &&
-    candidateValue.variants.every((variant, index) =>
-      variantsPairExactlyV0_1(variant, productionValue.variants[index]),
+    candidateLedger.variants.length === productionLedger.variants.length &&
+    candidateLedger.variants.every((variant, index) =>
+      variantsPairExactlyV0_1(variant, productionLedger.variants[index]),
     );
   if (!oneToOne) {
     return buildResultV0_1(
       "BLOCKED_BY_MISSING_AUTHORITY",
       "BRIDGE_VARIANT_POLICY_UNRESOLVED",
-      candidateValue,
-      productionValue,
+      candidateLedger,
+      productionLedger,
       gamma,
       zc,
     );
@@ -616,8 +623,8 @@ function projectImplV0_1(
   return buildResultV0_1(
     "COMPATIBLE_FOR_SUBSEQUENT_RELATION_EVALUATION",
     null,
-    candidateValue,
-    productionValue,
+    candidateLedger,
+    productionLedger,
     gamma,
     zc,
   );

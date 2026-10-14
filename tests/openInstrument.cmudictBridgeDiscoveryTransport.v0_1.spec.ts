@@ -110,6 +110,36 @@ describe("CMUdict Bridge to Discovery evidence-only transport v0.1", () => {
     );
   });
 
+  it("transports canonical nullable Bridge Null and independently retained ledgers", () => {
+    const canonicalNull =
+      projectCmuDictCandidateProductionSpokenRepresentationBridgeV0_1(null);
+    const nullTransport =
+      projectCmuDictBridgeDiscoveryTransportV0_1(canonicalNull);
+    expect(nullTransport).toMatchObject({
+      bridgeStatus: "NULL",
+      bridgeReason: "BRIDGE_PROVENANCE_INCOMPLETE",
+      candidateLedger: null,
+      productionLedger: null,
+      units: [],
+    });
+
+    const malformed = copy(bridgeInput()) as unknown as {
+      candidateVoiceProjection: {
+        sourceEvidence: { variants: Array<Record<string, unknown>> };
+      };
+    };
+    delete malformed.candidateVoiceProjection.sourceEvidence.variants[0].rawSourceLine;
+    const retainedBridge =
+      projectCmuDictCandidateProductionSpokenRepresentationBridgeV0_1(
+        malformed,
+      );
+    const retainedTransport =
+      projectCmuDictBridgeDiscoveryTransportV0_1(retainedBridge);
+    expect(retainedTransport?.candidateLedger).toBeNull();
+    expect(retainedTransport?.productionLedger).not.toBeNull();
+    expect(retainedTransport?.bridgeStatus).toBe("NULL");
+  });
+
   it("preserves a blocked Bridge without evaluating downstream gates", () => {
     const blocked = bridge("stone", "tone");
     const transport = projectCmuDictBridgeDiscoveryTransportV0_1(blocked);

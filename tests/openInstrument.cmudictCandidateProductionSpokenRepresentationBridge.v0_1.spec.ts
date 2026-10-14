@@ -178,6 +178,7 @@ describe("CMUdict candidate to production_spoken Representation Bridge v0.1", ()
     expect(bridge.candidateLedger?.sourceEvidenceReasonCode).toBe(
       "PRONUNCIATION_NOT_FOUND",
     );
+    expect(bridge.exactArtifactIdentity.verifiedOnBothLedgers).toBe(false);
   });
 
   it("preserves production Null without converting it to compatibility", () => {
@@ -264,6 +265,34 @@ describe("CMUdict candidate to production_spoken Representation Bridge v0.1", ()
       projectCmuDictCandidateProductionSpokenRepresentationBridgeV0_1(tampered);
     expect(bridge.status).toBe("NULL");
     expect(bridge.reasonCode).toBe("BRIDGE_PROVENANCE_INCOMPLETE");
+  });
+
+  it("retains the independently valid ledger when the peer ledger fails validation", () => {
+    const candidateInvalid = copy(input("stone", "stone", false)) as unknown as {
+      candidateVoiceProjection: {
+        sourceEvidence: { variants: Array<Record<string, unknown>> };
+      };
+    };
+    delete candidateInvalid.candidateVoiceProjection.sourceEvidence.variants[0].rawSourceLine;
+    const candidateInvalidBridge =
+      projectCmuDictCandidateProductionSpokenRepresentationBridgeV0_1(
+        candidateInvalid,
+      );
+    expect(candidateInvalidBridge.status).toBe("NULL");
+    expect(candidateInvalidBridge.candidateLedger).toBeNull();
+    expect(candidateInvalidBridge.productionLedger).not.toBeNull();
+
+    const productionInvalid = copy(input("stone", "stone", false)) as unknown as {
+      productionPrerequisites: Record<string, unknown>;
+    };
+    delete productionInvalid.productionPrerequisites.artifactSha256;
+    const productionInvalidBridge =
+      projectCmuDictCandidateProductionSpokenRepresentationBridgeV0_1(
+        productionInvalid,
+      );
+    expect(productionInvalidBridge.status).toBe("NULL");
+    expect(productionInvalidBridge.candidateLedger).not.toBeNull();
+    expect(productionInvalidBridge.productionLedger).toBeNull();
   });
 
   it("fails closed for malformed/deserialized input", () => {
