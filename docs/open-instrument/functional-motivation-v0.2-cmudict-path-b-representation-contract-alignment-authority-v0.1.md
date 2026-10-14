@@ -270,6 +270,7 @@ type CmuDictSharedSourcePronunciationInstanceV0_1 = Readonly<{
     inputFingerprint: string;
     outputFingerprint: string;
   }>;
+  alignmentAuthorityTag: "CMUDICT_PATH_B_REPRESENTATION_CONTRACT_ALIGNMENT_AUTHORITY_V0_1";
 }>;
 ```
 
@@ -294,8 +295,8 @@ PRODUCTION_CAN_INDEPENDENTLY_INSTANTIATE_SHARED_CONTRACT=PARTIAL
 PRODUCTION_SHARED_INSTANCE_PRODUCER=buildCmuDictProductionSpokenBridgePrerequisitesV0_1 physical source index and prerequisite envelope
 PRODUCTION_SHARED_INSTANCE_INPUT=frozen CMUdict source text and original lexical input
 PRODUCTION_SHARED_INSTANCE_REQUIRED_FIELDS=all proposed shared instance fields, including explicit contract identity and deterministic fingerprints
-PRODUCTION_SHARED_INSTANCE_EXISTING_FIELDS=source artifact identity; physicalRecordId; source line/raw line; source form/base form; variant ID/order; raw physical pronunciation; ordered production source units; opaque annotation; annotation eligibility; production source provenance
-PRODUCTION_SHARED_INSTANCE_MISSING_FIELDS=canonical shared contract ID/version/revision; alignment authority tag; typed input/output fingerprints; direct shared instance type
+PRODUCTION_SHARED_INSTANCE_EXISTING_FIELDS=source artifact identity; physicalRecordId; source line/raw line; source form/base form; variant ID/order; raw physical pronunciation; ordered production source units (role-specific, not the shared raw-token field); opaque annotation; annotation eligibility; production source provenance
+PRODUCTION_SHARED_INSTANCE_MISSING_FIELDS=canonical shared contract ID/version/revision; ordered raw ARPABET tokens derived directly from raw physical pronunciation (separate from annotated production source units); alignment authority tag; typed input/output fingerprints; direct shared instance type
 PRODUCTION_SHARED_INSTANCE_REQUIRES_NEW_SOURCE_DATA=NO
 PRODUCTION_SHARED_INSTANCE_REQUIRES_EXISTING_EVIDENCE_EXPOSURE=YES
 PRODUCTION_SHARED_INSTANCE_REQUIRES_RUNTIME_SEMANTIC_CHANGE=NO
@@ -380,7 +381,7 @@ required.
 
 CONTRACT_ALIGNMENT_DECISION_MATRIX_BEGIN
 DIMENSION | SHARED_BOUNDARY_VALUE | CANDIDATE_STATUS | PRODUCTION_STATUS | ROLE_SPECIFIC_DOWNSTREAM | BLOCKS_SHARED_CONTRACT | NEW_DATA_REQUIRED | NEW_AUTHORITY_REQUIRED | RUNTIME_SEMANTIC_CHANGE_REQUIRED | RESULT
-CONTRACT_ID | open-instrument.cmudict-shared-source-pronunciation.v0.1 | absent | absent | NO | YES_FOR_CURRENT_RUNTIME | NO | YES | NO | SHARED_IDENTITY_CAN_BE_RATIFIED_FROM_EXISTING_EVIDENCE
+CONTRACT_ID | open-instrument.cmudict-shared-source-pronunciation.v0_1 | absent | absent | NO | YES_FOR_CURRENT_RUNTIME | NO | YES | NO | SHARED_IDENTITY_CAN_BE_RATIFIED_FROM_EXISTING_EVIDENCE
 CONTRACT_VERSION | v0.1 | absent | absent | NO | YES_FOR_CURRENT_RUNTIME | NO | YES | NO | SHARED_IDENTITY_CAN_BE_RATIFIED_FROM_EXISTING_EVIDENCE
 SCHEMA | shared physical record schema | role-specific schemas | role-specific schemas | NO | YES_FOR_CURRENT_RUNTIME | NO | YES | NO | EXISTING_EVIDENCE_EXPOSURE_REQUIRED
 LANGUAGE_SCOPE | English | exact | exact | NO | NO | NO | NO | NO | EXACT_EXISTING_SHARED_IDENTITY
