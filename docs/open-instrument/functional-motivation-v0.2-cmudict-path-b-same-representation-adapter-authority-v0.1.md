@@ -118,9 +118,10 @@ SAME_COMPARISON_REPRESENTATION_LEVEL_REASON=The candidate and production sides a
 ## 5. Normalization, variants, ambiguity, and provenance
 
 NORMALIZATION_CONTRACT_IDENTITY_RELATION=COMPATIBLE_BUT_DISTINCT
-NORMALIZATION_REASON=Candidate join normalization is `NFC->en-US-lowercase->NFC:no-trim`; production normalization is `NFC->trim->lowercase`. The frozen shared artifact places all valid physical source forms in the intended lexical domain, but domain overlap is not exact contract identity. A future adapter must require exact equality of independently computed outputs for every input and variant and must reject non-equal identities without coercion.
+NORMALIZATION_REASON=Candidate join normalization is `NFC->en-US-lowercase->NFC:no-trim`; production normalization is `NFC->trim->lowercase`. The frozen shared artifact places all valid physical source forms in the intended lexical domain, but domain overlap is not exact contract identity. A future adapter must require one shared normalization-contract identity and version, plus exact equality of independently computed outputs for every input and variant; it must reject non-equal identities without coercion.
 NORMALIZATION_ALIGNMENT_STRATEGY=Leave both existing normalizers unchanged; require exact equality outputs at the future adapter boundary.
 NORMALIZATION_OUTPUT_EQUAL_ON_FROZEN_DOMAIN=YES_ON_THE_FROZEN_CMUDICT_ARTIFACT_DOMAIN; NOT_SUFFICIENT_FOR_CONTRACT_IDENTITY
+NORMALIZATION_CONTRACT_IDENTITY_REQUIRED=YES
 NORMALIZATION_CAN_SUPPORT_SAME_EXACT_IDENTITY=NO
 NORMALIZATION_SEMANTICS_CHANGED_BY_THIS_ARTIFACT=NO
 
@@ -153,8 +154,8 @@ CANDIDATE_SOURCE_PROVENANCE_COMPLETE=YES_WITHIN_CURRENT_CANDIDATE_SOURCE_EVIDENC
 PRODUCTION_SOURCE_PROVENANCE_COMPLETE=NO_AT_CURRENT_RESOLVER_RESULT_BOUNDARY
 CANDIDATE_DETERMINISTIC_REPRODUCIBILITY_COMPLETE=NO
 PRODUCTION_DETERMINISTIC_REPRODUCIBILITY_COMPLETE=NO
-CANDIDATE_REPRESENTATION_INSTANCE_MISSING_FIELDS=single canonical candidate contract ID; comparison-level role binding; typed input/output fingerprints; Path B comparison authority tag
-PRODUCTION_REPRESENTATION_INSTANCE_MISSING_FIELDS=comparison-level role binding at resolver result boundary; typed input/output fingerprints; Path B comparison authority tag; complete comparison-level contract identity
+CANDIDATE_REPRESENTATION_INSTANCE_MISSING_FIELDS=single canonical candidate contract ID; contract version/revision; comparison-level role binding; normalization contract identity/version; typed input/output fingerprints; Path B comparison authority tag
+PRODUCTION_REPRESENTATION_INSTANCE_MISSING_FIELDS=comparison-level role binding at resolver result boundary; contract version/revision; normalization contract identity/version; typed input/output fingerprints; Path B comparison authority tag; complete comparison-level contract identity
 
 ## 6. Path B authority contract
 
@@ -182,11 +183,15 @@ PROPOSED_FUTURE_REPRESENTATION_INSTANCE_TYPE_SIGNATURE=
 type CmuDictPathBRepresentationInstanceEvidenceV0_1 = Readonly<{
   role: "candidate_source_pronunciation_derived" | "production_spoken";
   contractId: string;
+  contractVersion: string;
+  contractRevision: string;
   schemaVersion: string;
   languageScope: "English";
   varietyScope: "en-US";
   notation: "ARPABET";
   normalizationIdentity: string;
+  normalizationContractIdentity: string;
+  normalizationContractVersion: string;
   segmentationIdentity: string;
   orderingIdentity: string;
   projectionMethodology: string;
@@ -216,6 +221,8 @@ type CmuDictPathBSameReasonCodeV0_1 =
   | "CMUDICT_PATH_B_SAME_CANDIDATE_CONTRACT_ID_UNESTABLISHED"
   | "CMUDICT_PATH_B_SAME_PRODUCTION_CONTRACT_ID_MISSING"
   | "CMUDICT_PATH_B_SAME_CONTRACT_ID_MISMATCH"
+  | "CMUDICT_PATH_B_SAME_CONTRACT_VERSION_MISMATCH"
+  | "CMUDICT_PATH_B_SAME_CONTRACT_REVISION_MISMATCH"
   | "CMUDICT_PATH_B_SAME_SCHEMA_MISMATCH"
   | "CMUDICT_PATH_B_SAME_SOURCE_IDENTITY_MISMATCH"
   | "CMUDICT_PATH_B_SAME_LANGUAGE_SCOPE_MISMATCH"
@@ -293,7 +300,7 @@ HISTORICAL_S5_CHANGE_AUTHORIZED=NO
 FUTURE_ISOLATED_PATH_B_SAME_ADAPTER_IMPLEMENTATION_AUTHORIZED_BY_THIS_CONTRACT=NO
 FUTURE_DISCOVERY_CONSUMER_AUTHORIZED_BY_THIS_CONTRACT=NO
 FUTURE_GATE2_DIRECT_EMISSION_AUTHORIZED_BY_THIS_CONTRACT=NO
-FUTURE_SAME_IMPLEMENTATION_PRECONDITION=DF must first ratify a single candidate representation contract identity, an explicit comparison-level envelope, exact per-input normalization equality, one-to-one variant/ambiguity policy, complete provenance, and deterministic fingerprints.
+FUTURE_SAME_IMPLEMENTATION_PRECONDITION=DF must first ratify a single candidate representation contract ID, contract version, and contract revision; an explicit comparison-level envelope; one shared normalization-contract identity and version with exact per-input normalization equality; one-to-one variant/ambiguity policy; complete provenance; and deterministic fingerprints.
 FUTURE_IMPLEMENTATION_ALLOWED_FILES=Only a separately authorized Path B authority module and its focused contract tests after DF ratification; no existing candidate/production/Voice/Gamma/ZC/Bridge/Discovery implementation files are authorized by this artifact.
 FUTURE_IMPLEMENTATION_FORBIDDEN=Candidate generation changes; source parser changes; production parser changes; normalizer changes; source acquisition; provider/network calls; Voice/Gamma/ZC changes; Bridge authority broadening; Discovery/API/UI wiring; semantic, functional, historical, or cross-language claims; winner/ranking/selection; physical-record collapse.
 
