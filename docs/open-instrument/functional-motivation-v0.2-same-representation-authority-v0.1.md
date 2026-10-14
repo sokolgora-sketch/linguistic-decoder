@@ -157,21 +157,22 @@ the existence of a string field:
 | Runtime branch | Kind | Source and authority | Notation | Normalization | Segmentation/order | Projection | Variant policy | Provenance |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | Non-Albanian input with a defined canonical spoken path | `production_spoken` | `HeartInstrumentV1.spokenPronunciation`, resolved by `resolveCmuDictPronunciationToVoiceV0_1` and the existing pronunciation-to-Voice contract | CMUdict ARPAbet, source notation `CMUDICT_SOURCE_NOTATION_V0_1` | Existing CMUdict lexical normalization `NFC->trim->lowercase`; exact identity is carried by the pronunciation result | Ordered normalized ARPAbet segments and ordered nuclei; canonical path is derived only when all retained variants agree | `PRONUNCIATION_TO_VOICE_PROFILE_V0_1` | All physical variants are retained; differing canonical paths produce Null/ambiguous status | Source profile, revision, variant IDs, source units, normalized segments, nuclei, mapping/provenance fields |
-| Albanian profile branch | `albanian_profile` | `analysis.primaryPath` and the Albanian profile path; existing profile authority only, explicitly not production pronunciation authority | Repository Albanian profile representation; no compatible production-spoken contract is established by this path | Profile/analysis normalization as emitted by the analysis contract; no cross-contract equality is inferred | Ordered profile-derived slots/path, not an authorized spoken segmentation | Existing profile-derived path and Gamma helper | Existing profile behavior; no production pronunciation variant authority | Analysis/profile output, but not a complete SAME representation-instance authority |
+| Explicitly validated Albanian profile binding (`inputProfile === "albanian"` plus the actual profile contract) | `albanian_profile` | `analysis.primaryPath` and the Albanian profile path; existing profile authority only, explicitly not production pronunciation authority | Repository Albanian profile representation; no compatible production-spoken contract is established by this path | Profile/analysis normalization as emitted by the analysis contract; no cross-contract equality is inferred | Ordered profile-derived slots/path, not an authorized spoken segmentation | Existing profile-derived path and Gamma helper | Existing profile behavior; no production pronunciation variant authority | Analysis/profile output, but not a complete SAME representation-instance authority |
+| Language-only Albanian runtime branch (`inputLanguage === "sq"` without validated explicit profile identity) | `unknown` for SAME authority | The current builder enters its Albanian branch, but the language label does not establish profile authority | Unknown for SAME authority | Unknown for SAME authority | Unknown for SAME authority | None for SAME authority | Unknown | Unbound for SAME authority; the current runtime label must not be promoted |
 | No bound branch | `unknown` | No source binding | Unknown | Unknown | Unknown | None | Unknown | Not bound |
 
 The conditional field values required by the contract are therefore:
 
 ```text
-PATH_A_INPUT_REPRESENTATION_KIND=production_spoken | albanian_profile | unknown (runtime branch)
+PATH_A_INPUT_REPRESENTATION_KIND=production_spoken | albanian_profile (only validated explicit profile identity) | unknown (language-only sq or unbound branch)
 PATH_A_INPUT_REPRESENTATION_SOURCE=HeartInstrumentV1.spokenPronunciation or analysis.primaryPath/profile branch
-PATH_A_INPUT_REPRESENTATION_AUTHORITY=CMUdict pronunciation-to-Voice authority for production_spoken; profile-only authority for albanian_profile; none for unknown
-PATH_A_INPUT_NOTATION=CMUDICT_SOURCE_NOTATION_V0_1 for production_spoken; profile notation for albanian_profile; unknown otherwise
-PATH_A_INPUT_NORMALIZATION=CMUdict NFC->trim->lowercase for production_spoken; profile-emitted normalization for albanian_profile; unknown otherwise
-PATH_A_INPUT_SEGMENTATION=ordered normalized ARPAbet segments/nuclei for production_spoken; profile-derived ordered slots for albanian_profile; unknown otherwise
-PATH_A_INPUT_PROJECTION=PRONUNCIATION_TO_VOICE_PROFILE_V0_1 for production_spoken; existing profile path projection for albanian_profile; none otherwise
-PATH_A_INPUT_VARIANT_POLICY=retain physical variants and fail closed on differing canonical paths; profile policy otherwise; unknown for unbound input
-PATH_A_INPUT_PROVENANCE=pronunciation result source profile/revision/variant/segment/mapping provenance for production_spoken; analysis/profile provenance for albanian_profile; absent for unknown
+PATH_A_INPUT_REPRESENTATION_AUTHORITY=CMUdict pronunciation-to-Voice authority for production_spoken; profile-only authority only after explicit profile validation; none for language-only sq or unknown
+PATH_A_INPUT_NOTATION=CMUDICT_SOURCE_NOTATION_V0_1 for production_spoken; profile notation only after explicit profile validation; unknown otherwise
+PATH_A_INPUT_NORMALIZATION=CMUdict NFC->trim->lowercase for production_spoken; profile-emitted normalization only after explicit profile validation; unknown otherwise
+PATH_A_INPUT_SEGMENTATION=ordered normalized ARPAbet segments/nuclei for production_spoken; profile-derived ordered slots only after explicit profile validation; unknown otherwise
+PATH_A_INPUT_PROJECTION=PRONUNCIATION_TO_VOICE_PROFILE_V0_1 for production_spoken; existing profile path projection only after explicit profile validation; none otherwise
+PATH_A_INPUT_VARIANT_POLICY=retain physical variants and fail closed on differing canonical paths; profile policy only after explicit profile validation; unknown for language-only sq or unbound input
+PATH_A_INPUT_PROVENANCE=pronunciation result source profile/revision/variant/segment/mapping provenance for production_spoken; analysis/profile provenance only after explicit profile validation; absent for language-only sq or unknown
 ```
 
 ### 6.2 Candidate side
@@ -243,19 +244,44 @@ type SameRepresentationAuthorityV0_1 = Readonly<{
   runtimeAuthorityTag: "SAME_REPRESENTATION_AUTHORITY_V0_1";
   status: "AUTHORIZED" | "BLOCKED" | "NULL";
   representationRelation: "SAME_REPRESENTATION" | null;
-  inputRepresentationInstance: Readonly<{
-    contractId: string;
-    contractVersion: string;
-    provenanceRefs: readonly string[];
-  }> | null;
-  candidateRepresentationInstance: Readonly<{
-    contractId: string;
-    contractVersion: string;
-    provenanceRefs: readonly string[];
-  }> | null;
+  inputRepresentationInstance: RepresentationInstanceEvidenceV0_1 | null;
+  candidateRepresentationInstance: RepresentationInstanceEvidenceV0_1 | null;
   reasonCode: SameRepresentationReasonCodeV0_1;
 }>;
+
+type RepresentationInstanceEvidenceV0_1 = Readonly<{
+  instanceId: string;
+  contractId: string;
+  contractVersion: string;
+  schemaVersion: string;
+  languageScope: string;
+  varietyScope: string | null;
+  notation: string;
+  normalizationIdentity: string;
+  segmentationIdentity: string;
+  orderingIdentity: string;
+  projectionMethodology: string;
+  projectionProfileVersion: string;
+  variantPolicy: string;
+  ambiguityPolicy: string;
+  sourceOrProducerAuthority: string;
+  authorityProvenanceRefs: readonly string[];
+  sourceProvenanceRefs: readonly string[];
+  deterministicReproducibility: Readonly<{
+    algorithmIdentity: string;
+    inputFingerprint: string;
+    outputFingerprint: string;
+  }>;
+}>;
 ```
+
+`RepresentationInstanceEvidenceV0_1` is intentionally lossless at the
+authority boundary: it carries the exact contract, schema/version, scope,
+notation, normalization, segmentation/order, projection/profile, variant and
+ambiguity policies, producer authority, provenance, and deterministic
+reproducibility evidence required by the shared core. A future implementation
+may use an immutable typed reference instead only if that reference uniquely
+and losslessly identifies the complete evidence record.
 
 The adapter may validate and preserve existing authority. It may not create
 candidate pronunciation, infer provenance, grant Voice, grant Gate 1 or Gate
@@ -342,6 +368,7 @@ SAME_REPRESENTATION_AUTHORIZED
 SAME_REPRESENTATION_CONTRACT_MISSING
 SAME_REPRESENTATION_KIND_UNKNOWN
 SAME_REPRESENTATION_AUTHORITY_MISSING
+SAME_REPRESENTATION_CONTRACT_ID_MISMATCH
 SAME_REPRESENTATION_SCHEMA_MISMATCH
 SAME_REPRESENTATION_VERSION_MISMATCH
 SAME_REPRESENTATION_LANGUAGE_SCOPE_MISMATCH
@@ -367,6 +394,7 @@ SAME_REPRESENTATION_UNKNOWN_FIELD
 | Missing representation contract | `BLOCKED` / `SAME_REPRESENTATION_CONTRACT_MISSING` |
 | Unknown representation kind | `NULL` / `SAME_REPRESENTATION_KIND_UNKNOWN` |
 | Missing authority | `BLOCKED` / `SAME_REPRESENTATION_AUTHORITY_MISSING` |
+| Different contract IDs | `BLOCKED` / `SAME_REPRESENTATION_CONTRACT_ID_MISMATCH` |
 | Schema mismatch | `BLOCKED` / `SAME_REPRESENTATION_SCHEMA_MISMATCH` |
 | Unsupported version | `BLOCKED` / `SAME_REPRESENTATION_VERSION_MISMATCH` |
 | Language mismatch | `BLOCKED` / `SAME_REPRESENTATION_LANGUAGE_SCOPE_MISMATCH` |
