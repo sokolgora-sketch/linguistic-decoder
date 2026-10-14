@@ -117,25 +117,47 @@ The future comparison input is option D: transport plus a distinct, explicitly t
 ```ts
 type CmuDictAwareComparisonInputV0_1 = Readonly<{
   schemaVersion: "open-instrument.cmudict-aware-comparison-input.v0_1";
+  comparisonAuthorityTag:
+    "CMUDICT_AWARE_PREAUTHORIZATION_COMPARISON_AUTHORITY_V0_1";
   transport: CmuDictBridgeDiscoveryTransportEnvelopeV0_1;
   independentlyAuthorizedGate4Evidence:
     readonly CmuDictAwareIndependentGate4EvidenceV0_1[];
 }>;
 
-type CmuDictAwareIndependentGate4EvidenceV0_1 = Readonly<{
-  sourceType: "STRUCTURAL_HYPOTHESIS_V0_1" | "MIN_ROOT_HYPOTHESIS_V1";
-  producer: "discoverStructuralHypothesesV0_1" | "buildMinRootHypotheses";
-  producerModule: string;
-  producerSchemaVersion: string | null;
+type CmuDictAwareIndependentGate4EvidenceBaseV0_1 = Readonly<{
   targetBinding: Readonly<{
     candidateSourceId: string;
     candidateVariantId: string;
     productionVariantId: string;
   }>;
-  evidence: Readonly<Record<string, unknown>>;
   authorityProvenance: readonly string[];
   evidenceSha256: string;
 }>;
+
+type CmuDictAwareStructuralHypothesisEvidenceV0_1 =
+  CmuDictAwareIndependentGate4EvidenceBaseV0_1 &
+    Readonly<{
+      sourceType: "STRUCTURAL_HYPOTHESIS_V0_1";
+      producer: "discoverStructuralHypothesesV0_1";
+      producerModule:
+        "src/shared/structuralHypothesisDiscovery.v0_1.ts";
+      producerSchemaVersion: "z-zero.structural-hypothesis.v0_1";
+      evidence: StructuralHypothesisV0_1;
+    }>;
+
+type CmuDictAwareMinRootHypothesisEvidenceV0_1 =
+  CmuDictAwareIndependentGate4EvidenceBaseV0_1 &
+    Readonly<{
+      sourceType: "MIN_ROOT_HYPOTHESIS_V1";
+      producer: "buildMinRootHypotheses";
+      producerModule: "src/shared/deepRoot.minRoots.v1.ts";
+      producerSchemaVersion: null;
+      evidence: MinRootHypothesis;
+    }>;
+
+type CmuDictAwareIndependentGate4EvidenceV0_1 =
+  | CmuDictAwareStructuralHypothesisEvidenceV0_1
+  | CmuDictAwareMinRootHypothesisEvidenceV0_1;
 ```
 
 The future input unit is one ordered `CmuDictBridgeDiscoveryTransportUnitV0_1`, therefore one physical candidate/production Bridge variant pair. The input must require the comparison authority tag, a compatible Bridge status for a ready result, complete candidate and production ledgers for a non-blocked result, and preserve an empty external-evidence array as a valid no-evidence state.
@@ -153,6 +175,7 @@ Therefore:
 | --- | --- |
 | `CMUDICT_AWARE_COMPARISON_INPUT_TYPE` | `CmuDictAwareComparisonInputV0_1` = transport plus explicitly typed independently authorized Gate 4 evidence |
 | `CMUDICT_AWARE_COMPARISON_INPUT_UNIT` | One ordered Bridge transport unit / physical variant pair |
+| `INPUT_REQUIRES_COMPARISON_AUTHORITY_TAG` | `YES`; exact value is `CMUDICT_AWARE_PREAUTHORIZATION_COMPARISON_AUTHORITY_V0_1` |
 | `INPUT_REQUIRES_TRANSPORT_AUTHORITY_TAG` | `YES` |
 | `INPUT_REQUIRES_BRIDGE_STATUS_COMPATIBLE` | `YES` for `PREAUTHORIZATION_READY`; blocked/NULL may only emit corresponding blocked/NULL output |
 | `INPUT_REQUIRES_COMPLETE_CANDIDATE_LEDGER` | `YES` for a non-blocked output |
@@ -169,7 +192,8 @@ The proposed output is `CmuDictAwarePreauthorizationComparisonV0_1`. It is one r
 type CmuDictAwarePreauthorizationComparisonV0_1 = Readonly<{
   schemaVersion: "open-instrument.cmudict-aware-preauthorization-comparison.v0_1";
   runtimeAuthorityTag: "CMUDICT_AWARE_PREAUTHORIZATION_COMPARISON_AUTHORITY_V0_1";
-  unit: CmuDictBridgeDiscoveryTransportUnitV0_1;
+  // Bridge NULL is an envelope-level result because the transport has no unit.
+  unit: CmuDictBridgeDiscoveryTransportUnitV0_1 | null;
   bridgeDomain: Readonly<{
     status: "COMPATIBLE" | "BLOCKED" | "NULL";
     upstreamStatus: CmuDictCandidateProductionSpokenRepresentationBridgeStatusV0_1;
@@ -268,7 +292,7 @@ The future implementation may share low-level immutable copying or validation ut
 
 ## Variant and unit policy
 
-Comparison occurs per ordered Bridge transport unit / physical variant pair. Physical order and duplicates are preserved. Identical projection collapse is forbidden; variant collapse is forbidden; winner selection is forbidden; candidate-level aggregation is forbidden. The future comparison must preserve one output record per input unit, including duplicate physical records, and must not create pseudoreplication or a winner posture.
+Comparison occurs per ordered Bridge transport unit / physical variant pair. Physical order and duplicates are preserved. Identical projection collapse is forbidden; variant collapse is forbidden; winner selection is forbidden; candidate-level aggregation is forbidden. The future comparison must preserve one output record per input unit, including duplicate physical records, and must not create pseudoreplication or a winner posture. A Bridge `NULL` input is the sole envelope-level exception: it emits one unitless comparison result with `unit=null` because the upstream transport has no physical unit to carry forward.
 
 | Policy | Frozen value |
 | --- | --- |
@@ -294,8 +318,9 @@ Comparison occurs per ordered Bridge transport unit / physical variant pair. Phy
 | Annotated Bridge-ineligible records | Preserve ineligibility and emit blocked/NULL |
 | Ambiguous production variants | `NULL` with `COMPARISON_VARIANT_UNIT_INVALID` |
 | Missing candidate or production variant | `NULL` with `COMPARISON_VARIANT_UNIT_INVALID` |
-| Missing future representation/Voice/Gate 1/Gate 4 authority | `BLOCKED_BY_MISSING_AUTHORITY`; never infer a relation |
-| Compatible transport with complete provenance | `PREAUTHORIZATION_READY` with all downstream authority dimensions explicitly unestablished |
+| Missing authority required by this preauthorization boundary (comparison tag, transport tag, complete ledgers, or required provenance) | `BLOCKED_BY_MISSING_AUTHORITY` or `NULL` with the exact closed comparison reason; never infer a relation |
+| Downstream representation, Voice, Gate 1, or Gate 4 authority remains unestablished | Do not classify this as an input failure; preserve the explicit precursor/eligibility fields and remain blocked from downstream relation authority |
+| Compatible transport with complete provenance and no unresolved preauthorization input failure | `PREAUTHORIZATION_READY` with all downstream authority dimensions explicitly unestablished |
 
 Blocked evidence must not become a positive comparison. No upstream reason code may be reused for a semantically different downstream condition. `NEW_COMPARISON_REASON_CODES_REQUIRED=YES`, with the closed taxonomy listed above.
 
