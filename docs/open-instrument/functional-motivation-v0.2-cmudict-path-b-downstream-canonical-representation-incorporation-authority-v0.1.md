@@ -232,11 +232,15 @@ projectionReasonCode
 The first source fields are the existing Level A fields. `rawPronunciation` and
 `orderedRawArpabetTokens` exclude the opaque annotation exactly as the shared
 contract requires; `opaqueAnnotationText` preserves it separately. An
-annotation-bearing record is retained but has
-`annotationEligibility=INELIGIBLE` and a canonical projection Null. Its
-role-specific computed values remain outside this exact canonical comparison
-object; no producer may strip the annotation and claim that its original
-parser output changed.
+annotation-bearing record is retained but has the exact canonical Null payload
+`annotationEligibility=INELIGIBLE`, `normalizedSegments=[]`, `nuclei=[]`,
+`canonicalVoicePath=null`, `projectionStatus=NULL`, and
+`projectionReasonCode=CMUDICT_PATH_B_CANONICAL_ANNOTATION_INELIGIBLE`. Its
+role-specific computed values remain evidence outside this exact canonical
+comparison object; no producer may strip the annotation and claim that its
+original parser output changed. A malformed annotation boundary instead uses
+the existing `CMUDICT_PATH_B_SHARED_EVIDENCE_ANNOTATION_EVIDENCE_MALFORMED`
+reason and the higher-priority malformed-input rule in §5.3.
 
 For an eligible record, projection input is exactly the ordered raw ARPABET
 token sequence. The proposed methodology is the existing reviewed resolver
@@ -254,7 +258,24 @@ path, status, and reason fields. Equal paths alone are not sufficient.
 
 ### 5.3 Aggregate-resolution layer
 
-`aggregate` is attached to the same exact physical group and contains:
+The top-level canonical result is a tagged union. It contains
+`canonicalResultKind=PHYSICAL_GROUP` or `canonicalResultKind=ABSENT_PRONUNCIATION`,
+and `lookupBaseSourceForm`. For `PHYSICAL_GROUP`, `variants` is the nonempty
+array below and `aggregate` is attached to the same exact physical group. For
+`ABSENT_PRONUNCIATION`, `variants=[]`, `aggregate=null`, and the exact
+`absence` object is required:
+
+```text
+absence.reasonCode=PRONUNCIATION_NOT_FOUND
+absence.sourceArtifactSha256
+absence.lookupBaseSourceForm
+```
+
+No synthetic physical record or source-line fields may be created for the
+absence variant. This is the canonical representation of the missing-
+pronunciation control; it is not an empty physical group.
+
+For `PHYSICAL_GROUP`, `aggregate` contains:
 
 ```text
 groupBaseSourceForm
@@ -266,6 +287,31 @@ aggregateReasonCode
 aggregateCanonicalVoicePath
 ```
 
+The aggregate reason taxonomy and precedence are fixed for this proposal:
+
+```text
+CMUDICT_PATH_B_CANONICAL_INPUT_INVALID
+CMUDICT_PATH_B_CANONICAL_PROVENANCE_INCOMPLETE
+CMUDICT_PATH_B_SHARED_EVIDENCE_ANNOTATION_EVIDENCE_MALFORMED
+CMUDICT_PATH_B_CANONICAL_ANNOTATION_INELIGIBLE
+CMUDICT_PATH_B_CANONICAL_VARIANT_PROJECTION_NULL
+PRONUNCIATION_VARIANT_AMBIGUOUS
+PRONUNCIATION_NOT_FOUND
+```
+
+The first matching condition in this order wins, and only that one code is
+serialized in `aggregateReasonCode`; `aggregateReasonCode=null` is permitted
+only for `DEFINED`. `CMUDICT_PATH_B_CANONICAL_INPUT_INVALID` covers empty or
+reordered physical arrays, lost duplicates, cardinality mismatch, malformed
+source/token evidence, and artifact identity mismatch. The absence variant is
+handled before aggregate evaluation and uses only
+`PRONUNCIATION_NOT_FOUND`. Incomplete provenance outranks annotation and
+projection findings; malformed annotation outranks a valid annotation's
+ineligibility; annotation ineligibility outranks per-variant projection Null;
+projection Null outranks divergent defined paths. This precedence applies even
+when several conditions coexist, so independently conforming producers cannot
+choose different Null reasons for the same group.
+
 The aggregate rule is deterministic and fail closed:
 
 - `DEFINED` is allowed only when every retained variant is canonical,
@@ -274,9 +320,10 @@ The aggregate rule is deterministic and fail closed:
 - `NULL` with `PRONUNCIATION_VARIANT_AMBIGUOUS` is required when two eligible
   defined variants have different ordered Voice paths.
 - `NULL` with an annotation, per-variant Null, malformed evidence, or
-  incomplete provenance uses the corresponding deterministic reason code.
-- `NULL` with `PRONUNCIATION_NOT_FOUND` is distinct from an unresolved
-  multi-variant group; absent pronunciation is not ambiguity.
+  incomplete provenance uses the first applicable code from the fixed
+  precedence above.
+- `PRONUNCIATION_NOT_FOUND` is represented only by the tagged absence variant;
+  it is distinct from an unresolved multi-variant group and is not ambiguity.
 - Empty, reordered, duplicated-without-source-evidence, or cardinality-
   inconsistent arrays fail closed and never become a positive result.
 
