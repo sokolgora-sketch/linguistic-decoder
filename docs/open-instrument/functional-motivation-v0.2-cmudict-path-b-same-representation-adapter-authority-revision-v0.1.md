@@ -16,6 +16,11 @@ FUNCTIONAL_GATE2_SAME_AUTHORITY=NOT_ESTABLISHED
 RUNTIME_SAME_REPRESENTATION_AUTHORIZED=NO
 SAME_DOCTRINE_WEAKENING_AUTHORIZED=NO
 EQUIVALENCE_CLASS_POLICY=FORBIDDEN_BY_THIS_CONTRACT
+GATE2_SAME_REQUIRES_VOICE_RELATIONSHIP_AUTHORITY=NO
+GATE3_VOICE_RELATIONSHIP_AUTHORITY=SEPARATE
+VOICE_OUTPUT_EQUALITY_REQUIRED_FOR_SAME=NO
+VOICE_OUTPUT_EQUALITY_SUFFICIENT_FOR_SAME=NO
+FOUR_GATE_EXPERIMENT_REQUIRES_INDEPENDENT_GATE2_AND_GATE3_AUTHORITY=YES
 ```
 
 The decision has two deliberately separate levels:
@@ -29,8 +34,9 @@ The decision has two deliberately separate levels:
 2. **Level B — Functional Motivation candidate/production comparison.** Level A
    is only an upstream evidence representation. It does not identify the
    candidate-derived and production-spoken representations that Gate 2 would
-   compare after role-specific parsing, normalization, projection, variant
-   treatment, and Voice authority. Gate 2 remains blocked.
+   compare after role-specific parsing, normalization, applicable projection
+   methodology/profile authority, and variant treatment. Gate 2 remains
+   blocked.
 
 Therefore:
 
@@ -159,6 +165,12 @@ REPRODUCIBILITY=SHA-256_OVER_FIXED_CANONICAL_ARRAYS
 These values are frozen in the runtime contract object at
 `cmudictSharedRepresentationEvidenceExposure.v0_1.ts:227-256` and are
 validated against exact own-key arrays at `:258-338` and `:960-1065`.
+That validation claim is limited to the shared-instance fields and their
+exact own-key arrays.  The contract-only policies above (normalization,
+segmentation, ordering, projection, variant, and ambiguity) remain frozen
+authority metadata; this document does not claim that the runtime validator
+revalidates those policies as per-instance values or that a separate
+contract-object validator exists.
 
 ### Level A dimension determination
 
@@ -214,6 +226,13 @@ The current generic builder does not consume the Level A shared object. It
 assigns known representations to `CROSS_REPRESENTATION`, candidate-side
 representation to `orthographic_profile_derived`, and Voice relation to
 `NOT_COMPARABLE_ACROSS_REPRESENTATIONS` (`motivationEngineDiscovery.v0_1.ts:334-388`).
+That current Voice value is a downstream Gate 3/runtime observation; it is not
+a prerequisite for defining Gate 2 `SAME_REPRESENTATION`.
+The downstream `structuralRelationAuthorizedV0_2` guard rejects only
+`NOT_COMPARABLE_ACROSS_REPRESENTATIONS` among the Voice values; its other
+checks can therefore admit an `UNKNOWN` or `NO_AUTHORIZED_VOICE_RELATION`
+value. That guard does not establish Voice relationship authority or Gate 2
+SAME authority.
 
 The CMUdict-aware comparison authority explicitly defines a separate
 preauthorization output and forbids reuse of the generic comparison shape:
@@ -237,8 +256,8 @@ evidence do not establish Gate 1, Gate 2, Gate 3, or Gate 4.
 | Normalizer contract identity equality | `STILL_BLOCKED` | Equal outputs are not sufficient and no common downstream normalization contract is ratified. |
 | Candidate parser authority | `STILL_BLOCKED` | Role-specific parser identity is intentionally outside Level A. |
 | Production parser authority | `STILL_BLOCKED` | Role-specific parser identity is intentionally outside Level A. |
-| Candidate Voice projection | `STILL_BLOCKED` | Candidate Voice projection exists, but its authority is not a Gate 2 relation. |
-| Production Voice projection | `STILL_BLOCKED` | Production Voice data exists in prerequisites, but no comparable Voice authority exists. |
+| Candidate projection methodology/profile authority | `STILL_BLOCKED` | The candidate-side applicable projection methodology/profile authority is not yet bound to the Gate 2 representation contract. |
+| Production projection methodology/profile authority | `STILL_BLOCKED` | The production-side applicable projection methodology/profile authority is not yet bound to the Gate 2 representation contract. |
 | Ordered nuclei/moving-nucleus treatment | `PARTIALLY_RESOLVED` | Raw physical token order is preserved; downstream role-specific nucleus alignment is not established. |
 | Variant pairing | `PARTIALLY_RESOLVED` | Level A preserves physical pairing; downstream candidate/production ambiguity policy remains separate. |
 | Role-specific provenance | `PARTIALLY_RESOLVED` | Source provenance is complete at Level A; downstream producer and projection provenance remain separate. |
@@ -271,12 +290,13 @@ Motivation Gate 2 predicate.
 | Variant and ambiguity differences | `RESOLVED_AT_SHARED_BOUNDARY` / `PARTIALLY_RESOLVED` | Physical variant and annotation policy is exact; downstream eligibility and pairing remain separate. | Preserve one ordered unit per physical variant in comparison. |
 | Incomplete comparison provenance | `RESOLVED_AT_SHARED_BOUNDARY` / `STILL_BLOCKED_FOR_GATE2` | Shared artifact/record refs and fingerprints are complete; role-level comparison provenance is absent. | Dedicated comparison authority and output provenance. |
 | Missing deterministic fingerprints | `RESOLVED_AT_SHARED_BOUNDARY` | Input/output fingerprints are implemented and tamper-validated. | Reuse as upstream evidence; do not call them SAME. |
-| Missing SAME adapter authority | `STILL_BLOCKED` | #2189 explicitly does not authorize SAME and no adapter exists. | First implement the already-ratified CMUdict-aware preauthorization seam. |
+| Missing SAME adapter authority | `STILL_BLOCKED` | #2189 explicitly does not authorize SAME and no adapter exists. | Use the already-ratified CMUdict-aware preauthorization seam as an optional evidence-transport step, or proceed to separately authorize the exact role-specific Gate 2 relation. |
 
 No new source data is required for the Level A result. The unresolved Level B
 items require deterministic contract/authority work and independent evidence,
 not source acquisition. A substantive authority decision is still required for
-the role-specific representation relation and Voice relationship.
+the role-specific representation relation. Gate 3 Voice relationship
+authority is a separate decision and is not required to define Gate 2 SAME.
 
 ## 8. Gate 2 decision fields
 
@@ -287,7 +307,12 @@ PATH_B_GATE2_REPRESENTATION_LEVEL=DOWNSTREAM_ROLE_SPECIFIC_CANDIDATE_PRODUCTION_
 PATH_B_GATE2_SAME_CURRENTLY_AUTHORIZED=NO
 PATH_B_GATE2_SAME_EVIDENCE_SUFFICIENT=NO
 PATH_B_SAME_ADAPTER_IMPLEMENTATION_READY=BLOCKED
-REMAINING_GATE2_BLOCKERS=Role-specific normalization identity; parser authority; projection methodology/profile; downstream variant and ambiguity alignment; role-specific provenance; comparison-level authority; separate Voice relationship authority.
+REMAINING_GATE2_BLOCKERS=Role-specific normalization identity; parser authority; applicable candidate/production projection methodology/profile authority; downstream variant and ambiguity alignment; role-specific provenance; comparison-level authority.
+GATE2_SAME_REQUIRES_VOICE_RELATIONSHIP_AUTHORITY=NO
+GATE3_VOICE_RELATIONSHIP_AUTHORITY=SEPARATE_AND_NOT_REQUIRED_TO_DEFINE_GATE2_SAME
+VOICE_OUTPUT_EQUALITY_REQUIRED_FOR_SAME=NO
+VOICE_OUTPUT_EQUALITY_SUFFICIENT_FOR_SAME=NO
+FOUR_GATE_EXPERIMENT_REQUIRES_INDEPENDENT_GATE2_AND_GATE3_AUTHORITY=YES
 NEXT_MINIMAL_SEAM=CMUDICT_AWARE_COMPARISON_IMPLEMENTATION
 ```
 
@@ -295,11 +320,20 @@ The proposed comparison implementation is not a SAME adapter. Its existing
 authority contract permits a separate preauthorization projector consuming the
 frozen transport, while explicitly keeping Gate 1, Gate 2, Gate 3, and Gate 4
 unresolved (`functional-motivation-v0.2-cmudict-aware-comparison-authority-v0.1.md:362-400`).
+It is not a strict prerequisite for a future Path B SAME adapter: the SAME
+adapter may consume independently authorized candidate and production
+representation evidence directly, provided the exact contract identity,
+applicable projection methodology/profile authority, provenance, variant and
+ambiguity policy, and deterministic reproducibility requirements are satisfied.
+The comparison projector remains an authorized, useful evidence-transport
+option because it preserves the frozen Bridge ledger and exposes a bounded
+preauthorization result without granting Gate 1, Gate 2, Gate 3, or Gate 4.
 
 ## 9. Proposed future seam, without runtime authorization
 
-The smallest permissible next implementation is the already specified
-`CMUDICT_AWARE_COMPARISON_IMPLEMENTATION` lane. It should:
+The already specified `CMUDICT_AWARE_COMPARISON_IMPLEMENTATION` lane is an
+authorized, useful engineering option, not a strict prerequisite for a future
+Path B SAME adapter. It should:
 
 1. Consume one ordered Bridge transport unit.
 2. Preserve candidate and production ledgers independently.
@@ -315,7 +349,14 @@ The smallest permissible next implementation is the already specified
 The applicable future test matrix is already frozen at
 `functional-motivation-v0.2-cmudict-aware-comparison-authority-v0.1.md:377-381`.
 This revision does not define a second comparison API and does not authorize
-its implementation.
+its implementation. It remains the best immediate next lane only if DF wants
+the bounded preauthorization/evidence-transport result first; otherwise the
+actual remaining scientific Gate 2 lane is a separately authorized Path B SAME
+representation adapter authority/implementation that proves the exact
+representation-contract identity and applicable projection methodology/profile
+authority. Neither option may emit SAME without that authority. Gate 3 Voice
+relationship authority remains separate, and Voice output equality is neither
+required nor sufficient for SAME.
 
 ## 10. Scientific firewalls
 
@@ -338,6 +379,12 @@ The valid output for an unresolved downstream requirement remains blocked or
 Null with an explicit reason. Equal raw-source evidence must not be promoted
 through any implicit equivalence class.
 
+Gate 2 exact representation identity and Gate 3 Voice relationship authority
+remain separate independently authorized gates. The complete four-gate
+experiment requires both gates, but Gate 3 is not a prerequisite for defining
+Gate 2 `SAME_REPRESENTATION`; Voice output equality is neither required nor
+sufficient for SAME.
+
 ## 11. Ratification state and next lane
 
 ```text
@@ -345,7 +392,7 @@ AUTHORITY_REVISION_RATIFICATION_STATUS=PENDING_DF_REVIEW
 RUNTIME_AUTHORITY_TAG_ISSUED_BY_THIS_REVISION=NO
 SAME_ADAPTER_AUTHORIZED_BY_THIS_REVISION=NO
 NEXT_RECOMMENDED_LANE=CMUDICT_AWARE_COMPARISON_IMPLEMENTATION
-NEXT_RECOMMENDED_LANE_REASON=The shared raw-source identity is established, while the earliest unsatisfied downstream seam is the already specified isolated comparison boundary; implementing it exposes a precise preauthorization result without granting SAME or activating any gate.
+NEXT_RECOMMENDED_LANE_REASON=The shared raw-source identity is established, while the earliest unsatisfied Gate 2 work is exact downstream representation-contract identity and applicable projection methodology/profile authority. CMUDICT_AWARE_COMPARISON_IMPLEMENTATION remains the best immediate engineering option only when DF wants its bounded evidence-transport/preauthorization result first; it is not a strict prerequisite for a future Path B SAME adapter and it grants no Gate 1, Gate 2, Gate 3, or Gate 4 authority.
 NEXT_ACTION=AWAIT_DF_REVIEW
 ```
 
