@@ -1,6 +1,8 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 
+import { createHash } from "node:crypto";
+
 import {
   adaptCmuDictCandidateSourceEvidenceV0_1,
   type CmuDictCandidatePronunciationEvidenceVariantV0_1,
@@ -165,6 +167,11 @@ describe("CMUdict Path B downstream normalization conformance validator v0.1", (
       );
       expect(first.deterministicReproducibility.inputFingerprint).toMatch(/^[0-9a-f]{64}$/u);
       expect(first.deterministicReproducibility.outputFingerprint).toMatch(/^[0-9a-f]{64}$/u);
+      expect(
+        createHash("sha256")
+          .update(serializeCmuDictPathBNormalizationConformanceEvidenceV0_1(first), "utf8")
+          .digest("hex"),
+      ).toBe(first.deterministicReproducibility.outputFingerprint);
       expect(first.deterministicReproducibility).toEqual(
         second.deterministicReproducibility,
       );

@@ -453,12 +453,7 @@ function canonicalInputArrayV0_1(
 }
 
 function canonicalOutputArrayV0_1(
-  result: Omit<CmuDictPathBNormalizationConformanceEvidenceV0_1, "deterministicReproducibility"> & {
-    deterministicReproducibility: Omit<
-      CmuDictPathBNormalizationConformanceEvidenceV0_1["deterministicReproducibility"],
-      "outputFingerprint"
-    > & { outputFingerprint: string };
-  },
+  result: CmuDictPathBNormalizationConformanceEvidenceV0_1,
 ): readonly unknown[] {
   return [
     "CMUDICT_PATH_B_NORMALIZATION_CONFORMANCE_OUTPUT_V0_1",
@@ -474,7 +469,6 @@ function canonicalOutputArrayV0_1(
     result.deterministicReproducibility.algorithm,
     result.deterministicReproducibility.canonicalization,
     result.deterministicReproducibility.inputFingerprint,
-    result.deterministicReproducibility.outputFingerprint,
   ];
 }
 
