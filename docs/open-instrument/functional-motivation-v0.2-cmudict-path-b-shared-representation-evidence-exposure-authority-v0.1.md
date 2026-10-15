@@ -96,6 +96,12 @@ SHARED_CONTRACT_PROJECTION=NOT_APPLICABLE_AT_SHARED_BOUNDARY
 SHARED_CONTRACT_VARIANT_POLICY=PRESERVE_PHYSICAL_RECORDS_AND_VARIANTS
 SHARED_CONTRACT_AMBIGUITY_POLICY=PRESERVE_ANNOTATION_AND_MULTIPLICITY_FAIL_CLOSED
 SHARED_CONTRACT_SOURCE_AUTHORITY=RATIFIED_CMUDICT_SOURCE_ARTIFACT
+SOURCE_PROVENANCE_REFS_AUTHORIZED=YES
+SOURCE_PROVENANCE_REFS_FORMAT=Each reference is an ASCII UTF-8 string with one of the two exact prefixes CMUDICT_SOURCE_ARTIFACT_V0_1| or CMUDICT_SOURCE_RECORD_V0_1| and only the declared key/value fields below
+SOURCE_PROVENANCE_REFS_DERIVATION=Derive exactly two references from the same instance fields: CMUDICT_SOURCE_ARTIFACT_V0_1|path=<sourcePath>|revision=<sourceRevision>|bytes=<sourceArtifactBytes>|sha256=<sourceArtifactSha256> and CMUDICT_SOURCE_RECORD_V0_1|artifactSha256=<sourceArtifactSha256>|line=<sourceLineNumber>
+SOURCE_PROVENANCE_REFS_ORDER=The two exact references above in ascending UTF-8 byte order; no other order is valid
+SOURCE_PROVENANCE_REFS_UNKNOWN_OR_EXTRA=Reject with CMUDICT_PATH_B_SHARED_EVIDENCE_SOURCE_PROVENANCE_INCOMPLETE when either reference is missing, malformed, duplicated, non-ASCII, contains an extra field, or does not derive exactly from the instance fields
+SOURCE_PROVENANCE_REFS_CROSS_SIDE_EQUALITY_REQUIRED=YES
 
 The boundary is before candidate normalization, production normalization,
 Voice, Gamma, ZC, Bridge compatibility, role-specific ambiguity, and SAME.
@@ -298,9 +304,10 @@ Copying a completed instance across roles is forbidden.
 
 ## 11. Cross-side fail-closed checks
 
-CROSS_SIDE_EXACT_MATCH_FIELDS=contractId,contractVersion,contractRevision,schemaVersion,languageScope,varietyScope,notation,sourcePath,sourceRevision,sourceArtifactBytes,sourceArtifactSha256,physicalRecordId,sourceLineNumber,rawSourceLine,sourceForm,baseSourceForm,variantId,variantOrder,rawPronunciation,orderedRawArpabetTokens,opaqueAnnotationText,annotationEligibility,sourceAuthority,alignmentAuthorityTag,evidenceExposureAuthorityTag,deterministicReproducibility.algorithm,deterministicReproducibility.canonicalization,deterministicReproducibility.inputFingerprint,deterministicReproducibility.outputFingerprint
+CROSS_SIDE_EXACT_MATCH_FIELDS=contractId,contractVersion,contractRevision,schemaVersion,languageScope,varietyScope,notation,sourcePath,sourceRevision,sourceArtifactBytes,sourceArtifactSha256,physicalRecordId,sourceLineNumber,rawSourceLine,sourceForm,baseSourceForm,variantId,variantOrder,rawPronunciation,orderedRawArpabetTokens,opaqueAnnotationText,annotationEligibility,sourceAuthority,sourceProvenanceRefs,alignmentAuthorityTag,evidenceExposureAuthorityTag,deterministicReproducibility.algorithm,deterministicReproducibility.canonicalization,deterministicReproducibility.inputFingerprint,deterministicReproducibility.outputFingerprint
 CROSS_SIDE_ALLOWED_ROLE_SPECIFIC_FIELDS=NONE inside the shared instance; candidate/production parser identity, lexical normalization identity, Voice/Gamma/ZC projection, production status/reason, mapping identity, Bridge status, and role labels remain outside this shared object and are not SAME evidence
-CROSS_SIDE_MISMATCH_RESULT=Return CMUDICT_PATH_B_SHARED_EVIDENCE_<specific mismatch code>, preserve both source-side records outside the shared instance, and do not degrade the mismatch into SAME_REPRESENTATION, equivalence, compatibility, ranking, or selection
+CROSS_SIDE_COMPARISON_ORDER=Compare the fields in CROSS_SIDE_EXACT_MATCH_FIELDS order, then compare array elements in declared order; return the first deterministic mismatch reason code
+CROSS_SIDE_MISMATCH_RESULT=The paired comparison API returns CMUDICT_PATH_B_SHARED_EVIDENCE_<specific mismatch code>, preserves both source-side records outside the shared instance, and does not degrade the mismatch into SAME_REPRESENTATION, equivalence, compatibility, ranking, or selection
 
 The exact shared fields above must match before any later, separately
 authorized SAME adapter may consume the pair. This contract itself never
@@ -313,6 +320,7 @@ SHARED_EVIDENCE_REASON_CODES=
 CMUDICT_PATH_B_SHARED_EVIDENCE_AUTHORIZED
 CMUDICT_PATH_B_SHARED_EVIDENCE_SOURCE_ARTIFACT_MISMATCH
 CMUDICT_PATH_B_SHARED_EVIDENCE_SOURCE_PROVENANCE_INCOMPLETE
+CMUDICT_PATH_B_SHARED_EVIDENCE_SOURCE_PROVENANCE_MISMATCH
 CMUDICT_PATH_B_SHARED_EVIDENCE_SOURCE_LINE_MISSING
 CMUDICT_PATH_B_SHARED_EVIDENCE_RAW_SOURCE_LINE_MISMATCH
 CMUDICT_PATH_B_SHARED_EVIDENCE_SOURCE_FORM_MISMATCH
@@ -338,6 +346,7 @@ type CmuDictPathBSharedRepresentationEvidenceExposureReasonCodeV0_1 =
   | "CMUDICT_PATH_B_SHARED_EVIDENCE_AUTHORIZED"
   | "CMUDICT_PATH_B_SHARED_EVIDENCE_SOURCE_ARTIFACT_MISMATCH"
   | "CMUDICT_PATH_B_SHARED_EVIDENCE_SOURCE_PROVENANCE_INCOMPLETE"
+  | "CMUDICT_PATH_B_SHARED_EVIDENCE_SOURCE_PROVENANCE_MISMATCH"
   | "CMUDICT_PATH_B_SHARED_EVIDENCE_SOURCE_LINE_MISSING"
   | "CMUDICT_PATH_B_SHARED_EVIDENCE_RAW_SOURCE_LINE_MISMATCH"
   | "CMUDICT_PATH_B_SHARED_EVIDENCE_SOURCE_FORM_MISMATCH"
@@ -365,7 +374,7 @@ non-deterministic re-run fails closed.
 
 ## 13. Future API authority
 
-PROPOSED_FUTURE_API_COUNT=6
+PROPOSED_FUTURE_API_COUNT=7
 
 PROPOSED_FUTURE_API_SIGNATURES_BEGIN
 type CmuDictSharedSourcePronunciationExposureResultV0_1 =
@@ -392,6 +401,19 @@ type CmuDictSharedSourcePronunciationInputFingerprintInputV0_1 = Readonly<{
   sourceLineNumber: number;
   rawSourceLine: string;
 }>;
+
+type CmuDictSharedSourcePronunciationComparisonResultV0_1 =
+  | Readonly<{
+      status: "match";
+      reasonCode: "CMUDICT_PATH_B_SHARED_EVIDENCE_AUTHORIZED";
+    }>
+  | Readonly<{
+      status: "mismatch";
+      reasonCode: Exclude<
+        CmuDictPathBSharedRepresentationEvidenceExposureReasonCodeV0_1,
+        "CMUDICT_PATH_B_SHARED_EVIDENCE_AUTHORIZED"
+      >;
+    }>;
 
 export const CMUDICT_SHARED_SOURCE_PRONUNCIATION_CONTRACT_V0_1:
   CmuDictSharedSourcePronunciationRepresentationContractV0_1;
@@ -441,11 +463,20 @@ INPUT_AUTHORITY=Untrusted candidate or production shared-instance value.
 OUTPUT_AUTHORITY=AUTHORIZED or one exact closed shared-evidence reason code.
 FAILURE_BEHAVIOR=Fail closed for unknown fields, accessors, cycles, malformed values, tag mismatch, fingerprint mismatch, or non-deterministic reproduction.
 SIDE_EFFECTS=NONE
+
+export function compareCmuDictSharedSourcePronunciationInstancesV0_1(
+  candidate: CmuDictSharedSourcePronunciationInstanceV0_1,
+  production: CmuDictSharedSourcePronunciationInstanceV0_1,
+): CmuDictSharedSourcePronunciationComparisonResultV0_1;
+INPUT_AUTHORITY=Two independently built and individually validated shared instances; the first argument is the candidate-side result and the second is the production-side result
+OUTPUT_AUTHORITY=Match only when every CROSS_SIDE_EXACT_MATCH_FIELDS value and both deterministic fingerprints are equal; otherwise the first deterministic mismatch reason code in CROSS_SIDE_COMPARISON_ORDER
+FAILURE_BEHAVIOR=Return mismatch with CMUDICT_PATH_B_SHARED_EVIDENCE_SOURCE_PROVENANCE_MISMATCH for unequal derived provenance references, preserve both inputs, and fail closed for any other exact-field mismatch; never emit SAME_REPRESENTATION or an equivalence result
+SIDE_EFFECTS=NONE
 PROPOSED_FUTURE_API_SIGNATURES_END
 
 No SAME comparator, Discovery consumer, API route, UI adapter, Bridge
-authority broadener, or semantic matcher is authorized. Exact field equality
-for later work is a consumer-side guard, not a SAME result from this lane.
+authority broadener, or semantic matcher is authorized. The paired comparison
+API is an evidence-integrity guard only; it does not produce a SAME result.
 
 ## 14. Future implementation authorization
 
