@@ -24,7 +24,7 @@ export const CMUDICT_SHARED_SOURCE_PRONUNCIATION_CONTRACT_VERSION_V0_1 =
 export const CMUDICT_SHARED_SOURCE_PRONUNCIATION_CONTRACT_REVISION_V0_1 =
   "representation-contract-alignment-authority-v0.1" as const;
 export const CMUDICT_SHARED_SOURCE_PRONUNCIATION_SCHEMA_V0_1 =
-  "open-instrument.cmudict-shared-source-pronunciation.v0.1" as const;
+  "open-instrument.cmudict-shared-source-pronunciation.v0_1" as const;
 export const CMUDICT_SHARED_SOURCE_PRONUNCIATION_SOURCE_PATH_V0_1 =
   "src/data/openInstrument/pronunciation/cmudict.dict" as const;
 export const CMUDICT_SHARED_SOURCE_PRONUNCIATION_SOURCE_AUTHORITY_V0_1 =
@@ -471,6 +471,15 @@ function derivePhysicalRecordIdV0_1(
   return `cmudict-physical-v0_1|sha256=${sourceArtifactSha256}|line=${sourceLineNumber}`;
 }
 
+function deriveVariantIdentityV0_1(sourceForm: string): {
+  baseSourceForm: string;
+  variantId: string;
+} {
+  const match = /^(.*)\((\d+)\)$/u.exec(sourceForm);
+  if (!match) return { baseSourceForm: sourceForm, variantId: "1" };
+  return { baseSourceForm: match[1], variantId: match[2] };
+}
+
 function deriveProvenanceRefsV0_1(
   sourcePath: string,
   sourceRevision: string,
@@ -714,6 +723,13 @@ function buildCandidateInstanceV0_1(
     failV0_1(REASON.sourceForm);
   }
   if (!isSafeStringV0_1(input.variantId)) failV0_1(REASON.variantIdentity);
+  const expectedVariantIdentity = deriveVariantIdentityV0_1(input.sourceForm);
+  if (
+    input.baseSourceForm !== expectedVariantIdentity.baseSourceForm ||
+    input.variantId !== expectedVariantIdentity.variantId
+  ) {
+    failV0_1(REASON.variantIdentity);
+  }
   if (!isNonNegativeSafeIntegerV0_1(input.variantOrder)) failV0_1(REASON.variantOrder);
   if (!isSafeStringV0_1(input.rawPronunciation) || input.rawPronunciation.length === 0) {
     failV0_1(REASON.rawMissing);
@@ -776,6 +792,13 @@ function buildProductionInstanceV0_1(
     failV0_1(REASON.sourceForm);
   }
   if (!isSafeStringV0_1(physical.variantId)) failV0_1(REASON.variantIdentity);
+  const expectedVariantIdentity = deriveVariantIdentityV0_1(physical.sourceForm);
+  if (
+    physical.baseSourceForm !== expectedVariantIdentity.baseSourceForm ||
+    physical.variantId !== expectedVariantIdentity.variantId
+  ) {
+    failV0_1(REASON.variantIdentity);
+  }
   if (!isNonNegativeSafeIntegerV0_1(physical.variantOrder)) failV0_1(REASON.variantOrder);
   if (!isSafeStringV0_1(physical.rawPhysicalPronunciation) || physical.rawPhysicalPronunciation.length === 0) {
     failV0_1(REASON.rawMissing);
@@ -992,6 +1015,16 @@ export function validateCmuDictSharedSourcePronunciationInstanceV0_1(
   if (value.opaqueAnnotationText === "") return REASON.annotationMalformed;
   const expectedEligibility = value.opaqueAnnotationText === null ? "ELIGIBLE" : "INELIGIBLE";
   if (value.annotationEligibility !== expectedEligibility) return REASON.annotationMismatch;
+  const expectedRawSourceLine =
+    value.opaqueAnnotationText === null
+      ? `${value.sourceForm} ${value.rawPronunciation}`
+      : `${value.sourceForm} ${value.rawPronunciation} # ${value.opaqueAnnotationText}`;
+  if (value.rawSourceLine !== expectedRawSourceLine) return REASON.rawLine;
+  const expectedVariantIdentity = deriveVariantIdentityV0_1(value.sourceForm);
+  if (
+    value.baseSourceForm !== expectedVariantIdentity.baseSourceForm ||
+    value.variantId !== expectedVariantIdentity.variantId
+  ) return REASON.variantIdentity;
   if (!validSha256V0_1(value.sourceArtifactSha256)) return REASON.artifact;
   if (value.physicalRecordId !== derivePhysicalRecordIdV0_1(value.sourceArtifactSha256, value.sourceLineNumber)) return REASON.physicalId;
   let refs: readonly string[];

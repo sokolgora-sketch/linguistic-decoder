@@ -56,7 +56,7 @@ describe("CMUdict Path B shared representation evidence exposure v0.1", () => {
       contractId: "open-instrument.cmudict-shared-source-pronunciation.v0_1",
       contractVersion: "v0.1",
       contractRevision: "representation-contract-alignment-authority-v0.1",
-      schemaVersion: "open-instrument.cmudict-shared-source-pronunciation.v0.1",
+      schemaVersion: "open-instrument.cmudict-shared-source-pronunciation.v0_1",
       languageScope: "English",
       varietyScope: "en-US",
       notation: "ARPABET",
@@ -247,6 +247,45 @@ describe("CMUdict Path B shared representation evidence exposure v0.1", () => {
     expect(validateCmuDictSharedSourcePronunciationInstanceV0_1(tampered)).toBe(
       "CMUDICT_PATH_B_SHARED_EVIDENCE_OUTPUT_FINGERPRINT_FAILURE",
     );
+
+    const rawLineTampered = JSON.parse(JSON.stringify(result.instance)) as typeof result.instance;
+    rawLineTampered.rawSourceLine = "stone S T AA1 N";
+    expect(validateCmuDictSharedSourcePronunciationInstanceV0_1(rawLineTampered)).toBe(
+      "CMUDICT_PATH_B_SHARED_EVIDENCE_RAW_SOURCE_LINE_MISMATCH",
+    );
+  });
+
+  it("derives and verifies the physical variant identity on both construction paths", () => {
+    const candidate = candidateVariant();
+    const malformedCandidate = {
+      ...candidate,
+      sourceForm: "stone(2)",
+      baseSourceForm: "stone",
+      variantId: "1",
+      rawSourceLine: "stone(2) S T OW1 N",
+    } as unknown as CmuDictCandidatePronunciationEvidenceVariantV0_1;
+    expect(buildCmuDictCandidateSharedSourcePronunciationInstanceV0_1(malformedCandidate)).toMatchObject({
+      status: "null",
+      reasonCode: "CMUDICT_PATH_B_SHARED_EVIDENCE_VARIANT_IDENTITY_MISMATCH",
+      instance: null,
+    });
+
+    const production = productionVariant();
+    const malformedProduction = {
+      ...production,
+      physicalEvidence: {
+        ...production.physicalEvidence,
+        sourceForm: "stone(2)",
+        baseSourceForm: "stone",
+        variantId: "1",
+        rawSourceLine: "stone(2) S T OW1 N",
+      },
+    } as unknown as CmuDictProductionSpokenBridgePrerequisiteVariantV0_1;
+    expect(buildCmuDictProductionSharedSourcePronunciationInstanceV0_1(malformedProduction)).toMatchObject({
+      status: "null",
+      reasonCode: "CMUDICT_PATH_B_SHARED_EVIDENCE_VARIANT_IDENTITY_MISMATCH",
+      instance: null,
+    });
   });
 
   it("returns deterministic first mismatch reasons without emitting SAME", () => {
