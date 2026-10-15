@@ -11,11 +11,16 @@ This lane resolves the normalization question at the narrowest defensible
 boundary: the verified physical CMUdict source-form domain already carried by
 the Level A shared source-pronunciation contract.
 
-The existing candidate and production algorithms remain distinct. They are
-not renamed, replaced, coerced, or declared algorithmically identical. A new
-proposed downstream conformance contract may permit both producers to satisfy
-one exact contract only for the explicitly frozen CMUdict domain, with a
-fail-closed validator and complete source-domain provenance.
+The existing candidate and production algorithms remain distinct. Their
+original declared normalization contracts also remain distinct. They are not
+renamed, replaced, coerced, or declared algorithmically identical. A proposed
+bounded producer-conformance contract may permit both producers to conform
+within the explicitly frozen CMUdict domain only after an authorized validator
+verifies the exact domain, source identity, normalized outputs, and provenance.
+That bounded conformance result is not itself a Gate 2
+`SAME_REPRESENTATION` contract-identity result. Future Gate 2 authority must
+independently determine whether this bounded conformance contract can be
+incorporated into one exact canonical downstream representation contract.
 
 ```text
 NORMALIZATION_ALGORITHM_IDENTITY=NO
@@ -23,6 +28,9 @@ NORMALIZATION_DECLARED_CONTRACT_IDENTITY=NO
 NORMALIZATION_FROZEN_DOMAIN_OUTPUT_EQUALITY=YES
 COMMON_NORMALIZATION_CONTRACT_FEASIBLE=YES
 COMMON_NORMALIZATION_CONTRACT_CURRENTLY_AUTHORIZED=NO
+BOUNDED_CONFORMANCE_FEASIBLE=YES
+BOUNDED_CONFORMANCE_CURRENTLY_AUTHORIZED=NO
+NORMALIZATION_GATE2_IDENTITY_STATUS=CONDITIONALLY_RESOLVABLE_BY_AUTHORIZED_CONFORMANCE
 NEW_NORMALIZER_REQUIRED=NO
 NEW_CONFORMANCE_VALIDATOR_REQUIRED=YES
 NEW_EVIDENCE_EXPOSURE_REQUIRED=YES
@@ -31,10 +39,13 @@ EXPLICIT_DF_AUTHORITY_DECISION_REQUIRED=YES
 GATE2_SAME_CURRENTLY_AUTHORIZED=NO
 ```
 
-The proposal is a contract-conformance boundary, not an equivalence class.
-Every accepted result remains bound to one verified physical source record and
+The proposal is a bounded producer-conformance boundary, not an equivalence
+class and not a canonical Gate 2 representation contract. Every accepted
+conformance result remains bound to one verified physical source record and
 one exact normalized output string. Inputs outside the domain return blocked
-or Null; they are never coerced into the domain.
+or Null; they are never coerced into the domain. Successful conformance does
+not authorize SAME, select a winner, substitute Voice output, or remove the
+need for future Gate 2 representation authority.
 
 ## 2. Frozen authority and scope
 
@@ -211,9 +222,12 @@ whitespace and zero non-ASCII source-form code points. This makes the restricted
 domain explicit and independently testable; it does not silently hide a
 disagreement in an open lexical domain.
 
-## 7. Proposed exact conformance contract
+## 7. Proposed bounded producer-conformance contract
 
-The following contract is proposed, not authorized:
+The following bounded producer-conformance contract is proposed, not
+authorized. It establishes only conditional conformance evidence after the
+validator succeeds; it does not establish exact Gate 2 downstream
+representation identity:
 
 ```text
 CMUDICT_PATH_B_DOWNSTREAM_NORMALIZATION_CONTRACT_ID_V0_1=
@@ -222,6 +236,12 @@ CMUDICT_PATH_B_DOWNSTREAM_NORMALIZATION_CONTRACT_VERSION_V0_1=v0.1
 CMUDICT_PATH_B_DOWNSTREAM_NORMALIZATION_STATUS=PROPOSED_PENDING_DF_REVIEW
 CMUDICT_PATH_B_DOWNSTREAM_NORMALIZATION_SCOPE=VERIFIED_CMUDICT_BASE_SOURCE_FORM_DOMAIN_ONLY
 ```
+
+Future Gate 2 authority must separately decide whether the verified bounded
+conformance evidence can be incorporated into one exact canonical downstream
+representation contract. Until that decision, the normalization dimension is
+`CONDITIONALLY_RESOLVABLE_BY_AUTHORIZED_CONFORMANCE`, not
+`EXACT_GATE2_CONTRACT_IDENTITY_ESTABLISHED`.
 
 ### 7.1 Input-domain authority
 
@@ -256,10 +276,11 @@ productionKey = normalizeCmuDictLexicalWordV0_1(s)
 candidateKey === productionKey
 ```
 
-The common contract output is that exact string. It is not a set of strings,
+The conformance record's shared compared value is that exact string. It is not
+a canonical downstream representation envelope, a set of strings,
 case-folding class, whitespace-insensitive class, pronunciation class, or
 equivalence class. It does not authorize normalization of an input outside
-the domain.
+the domain or establish Gate 2 SAME.
 
 ### 7.3 Validation, Null, and reason codes
 
@@ -279,7 +300,8 @@ CMUDICT_PATH_B_NORMALIZATION_AUTHORITY_NOT_APPROVED
 ```
 
 These are proposed authority vocabulary only. No runtime reason-code or gate
-predicate is changed by this document.
+predicate is changed by this document. Validator success would establish only
+bounded producer conformance; it would not establish Gate 2 contract identity.
 
 ### 7.4 Evidence and reproducibility requirements
 
@@ -304,18 +326,20 @@ part of this normalization contract.
 | Alternative | Decision | Reason |
 | --- | --- | --- |
 | A. Reuse one existing exact contract | Reject | Existing candidate and production contracts differ in trim, operation declaration, runtime invalid-input behavior, and role authority. |
-| B. Explicit restricted-domain conformance | Select as proposal | The frozen artifact identity and exact source-form domain are explicit, stable, independently audited, and output-equal for every accepted physical record. |
+| B. Explicit restricted-domain conformance | Select as conditional proposal | The frozen artifact identity and exact source-form domain are explicit, stable, independently audited, and output-equal for every accepted physical record; the result remains bounded producer conformance pending separate Gate 2 authority. |
 | C. New shared normalization algorithm | Not required | A new algorithm would change or duplicate existing semantics without evidence. The required seam is validation/conformance, not replacement. |
 | D. Fully blocked | Not selected | Current evidence supports future feasibility, but authority and implementation are still pending. |
 
 The selected option is B implemented through an additive conformance boundary.
 It does not authorize existing role contracts to be renamed or treated as
-identical outside the frozen domain.
+identical outside the frozen domain, and it does not itself establish a single
+canonical downstream representation for Gate 2.
 
 ## 9. Remaining Gate 2 blockers
 
-This proposal resolves only the normalization question conditionally. Gate 2
-remains blocked by:
+This proposal resolves only the normalization question conditionally. It does
+not establish `EXACT_GATE2_CONTRACT_IDENTITY_ESTABLISHED`. Gate 2 remains
+blocked by:
 
 - parser identity/conformance;
 - candidate and production projection-envelope identity;
@@ -332,15 +356,21 @@ sufficient.
 NORMALIZATION_AUTHORITY_DECISION=
   PROPOSE_RESTRICTED_FROZEN_CMUDICT_DOMAIN_CONFORMANCE_NO_NEW_NORMALIZER
 NORMALIZATION_CONFORMANCE_AUTHORIZED_NOW=NO
+BOUNDED_CONFORMANCE_FEASIBLE=YES
+BOUNDED_CONFORMANCE_CURRENTLY_AUTHORIZED=NO
+NORMALIZATION_GATE2_IDENTITY_STATUS=CONDITIONALLY_RESOLVABLE_BY_AUTHORIZED_CONFORMANCE
 GATE2_SAME_CURRENTLY_AUTHORIZED=NO
 ```
 
 ## 10. Minimal next implementation seam
 
 After DF review, the smallest implementation would be one additive validator
-and focused tests for the contract above. It would consume existing Level A
-physical evidence and existing normalizers, expose no new normalization
-semantics, and fail closed on artifact/domain/output/provenance mismatch.
+and focused tests for the bounded conformance contract above. It would consume
+existing Level A physical evidence and existing normalizers, expose no new
+normalization semantics, and fail closed on artifact/domain/output/provenance
+mismatch. Validator success would still require a later independent Gate 2
+authority decision before any canonical downstream representation identity is
+claimed.
 
 It must not:
 
@@ -384,6 +414,9 @@ NORMALIZATION_DECLARED_CONTRACT_IDENTITY=NO
 NORMALIZATION_FROZEN_DOMAIN_OUTPUT_EQUALITY=YES
 COMMON_NORMALIZATION_CONTRACT_FEASIBLE=YES
 COMMON_NORMALIZATION_CONTRACT_CURRENTLY_AUTHORIZED=NO
+BOUNDED_CONFORMANCE_FEASIBLE=YES
+BOUNDED_CONFORMANCE_CURRENTLY_AUTHORIZED=NO
+NORMALIZATION_GATE2_IDENTITY_STATUS=CONDITIONALLY_RESOLVABLE_BY_AUTHORIZED_CONFORMANCE
 NEW_NORMALIZER_REQUIRED=NO
 NEW_CONFORMANCE_VALIDATOR_REQUIRED=YES
 NEW_EVIDENCE_EXPOSURE_REQUIRED=YES
