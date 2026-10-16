@@ -1,6 +1,20 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 
+import {
+  GET_REQUEST_TARGET_MAX_UTF8_BYTES_V0_1,
+  POST_BODY_MAX_UTF8_BYTES_V0_1,
+  readBoundedRequestBodyV0_1,
+  readPublicBetaModeV0_1,
+  requestTargetUtf8ByteLengthV0_1,
+  validateAnalyzeInputSizesV0_1,
+  type AnalyzeInputSizeFailureReasonV0_1,
+} from "@/shared/openInstrument/publicBetaSafety.v0_1";
+import {
+  publicBetaInvalidConfigurationResponseV0_1,
+  publicBetaRequestTooLargeResponseV0_1,
+} from "@/lib/publicBetaRouteGuard.v0_1";
+
 import { runAnalysisDeterministic } from "@/lib/runAnalysisDeterministic";
 import type { Alphabet } from "@/shared/analysisResult.v1";
 import { enginePayloadToAnalysisResult } from "@/shared/analysisAdapter";
@@ -80,7 +94,9 @@ type AnalyzeV1InvalidRequestReasonV0_1 =
   | "MISSING_WORD"
   | "INVALID_MODE"
   | "INVALID_ALPHABET"
-  | "INVALID_PROVIDER_EXECUTION";
+  | "INVALID_PROVIDER_EXECUTION"
+  | "REQUEST_TOO_LARGE"
+  | AnalyzeInputSizeFailureReasonV0_1;
 
 function invalidRequestResponseV0_1(
   error: string,
@@ -976,6 +992,7 @@ type AnalyzeV1OrchestrationInput = {
   targetSenseId: string;
   targetSenseLabel: string;
   providerExecution: AnalyzeV1ProviderExecution;
+  publicBetaDeterministicOnly: boolean;
   seedFallbackEnabled: boolean;
   gatesOn: boolean | null;
   preserveMalformedEvidencePackageFallback: boolean;
@@ -997,6 +1014,7 @@ async function runAnalyzeV1Orchestration(
     targetSenseId,
     targetSenseLabel,
     providerExecution,
+    publicBetaDeterministicOnly,
     seedFallbackEnabled,
     gatesOn,
     preserveMalformedEvidencePackageFallback,
@@ -1364,7 +1382,7 @@ async function runAnalyzeV1Orchestration(
         analysis: final as any,
         heart: heartInstrumentV1,
       };
-      const discoveryResult = providerExecution === "disabled"
+      const discoveryResult = !publicBetaDeterministicOnly && providerExecution === "disabled"
         ? {
             discovery: projectMotivationEngineDiscoverySourceFamiliesV0_1(
               buildMotivationEngineDiscoveryV0_1(discoveryInput),
@@ -1415,16 +1433,41 @@ async function runAnalyzeV1Orchestration(
 }
 
 export async function POST(req: Request) {
+  const publicBetaMode = readPublicBetaModeV0_1();
+  if (publicBetaMode.status === "INVALID") {
+    return publicBetaInvalidConfigurationResponseV0_1();
+  }
+  const publicBetaDeterministicOnly = publicBetaMode.status === "ENABLED";
   const gatesOn = applyDevOriginClaimGates(req.url);
 
   let body: unknown;
-  try {
-    body = await req.json();
-  } catch {
-    return invalidRequestResponseV0_1(
-      'Invalid JSON body. Expected: { word: string, mode?: "strict"|"open", alphabet?: string }',
-      "MALFORMED_JSON",
+  if (req.body === undefined && typeof (req as Request & { json?: unknown }).json === "function") {
+    // Preserve compatibility with minimal test doubles; real Request objects
+    // use the bounded byte-stream path below.
+    try {
+      body = await (req as Request & { json: () => Promise<unknown> }).json();
+    } catch {
+      return invalidRequestResponseV0_1(
+        'Invalid JSON body. Expected: { word: string, mode?: "strict"|"open", alphabet?: string }',
+        "MALFORMED_JSON",
+      );
+    }
+  } else {
+    const boundedBody = await readBoundedRequestBodyV0_1(
+      req,
+      POST_BODY_MAX_UTF8_BYTES_V0_1,
     );
+    if (!boundedBody.ok) {
+      return publicBetaRequestTooLargeResponseV0_1(boundedBody.reason);
+    }
+    try {
+      body = JSON.parse(boundedBody.text) as unknown;
+    } catch {
+      return invalidRequestResponseV0_1(
+        'Invalid JSON body. Expected: { word: string, mode?: "strict"|"open", alphabet?: string }',
+        "MALFORMED_JSON",
+      );
+    }
   }
 
   const parsed = BodySchema.safeParse(body);
@@ -1445,6 +1488,17 @@ export async function POST(req: Request) {
     targetSenseLabel: targetSenseLabelRaw,
     providerExecution: providerExecutionRaw,
   } = parsed.data;
+
+  const inputSize = validateAnalyzeInputSizesV0_1({
+    word,
+    ipa: ipaRaw,
+    targetSenseId: targetSenseIdRaw,
+    targetSenseLabel: targetSenseLabelRaw,
+    language: languageRaw,
+  });
+  if (!inputSize.ok) {
+    return publicBetaRequestTooLargeResponseV0_1(inputSize.reason);
+  }
 
   const ipa =
     typeof ipaRaw === "string"
@@ -1494,7 +1548,9 @@ export async function POST(req: Request) {
       "INVALID_PROVIDER_EXECUTION",
     );
   }
-  const providerExecution = normalizedProviderExecution.value;
+  const providerExecution = publicBetaDeterministicOnly
+    ? "disabled"
+    : normalizedProviderExecution.value;
 
 
 
@@ -1532,6 +1588,7 @@ export async function POST(req: Request) {
     targetSenseId,
     targetSenseLabel,
     providerExecution,
+    publicBetaDeterministicOnly,
     seedFallbackEnabled,
     gatesOn,
     preserveMalformedEvidencePackageFallback: false,
@@ -1539,10 +1596,19 @@ export async function POST(req: Request) {
 }
 
 export async function GET(req: Request) {
+  const publicBetaMode = readPublicBetaModeV0_1();
+  if (publicBetaMode.status === "INVALID") {
+    return publicBetaInvalidConfigurationResponseV0_1();
+  }
+  const publicBetaDeterministicOnly = publicBetaMode.status === "ENABLED";
+  if (requestTargetUtf8ByteLengthV0_1(req.url) > GET_REQUEST_TARGET_MAX_UTF8_BYTES_V0_1) {
+    return publicBetaRequestTooLargeResponseV0_1("REQUEST_TOO_LARGE");
+  }
   const gatesOn = applyDevOriginClaimGates(req.url);
 
   const url = new URL(req.url);
-  const word = (url.searchParams.get("word") ?? "").trim();
+  const wordRaw = url.searchParams.get("word") ?? "";
+  const word = wordRaw.trim();
   const mode = (url.searchParams.get("mode") ?? "").trim();
   const alphabet = (url.searchParams.get("alphabet") ?? "").trim();
 
@@ -1559,6 +1625,17 @@ export async function GET(req: Request) {
       url.searchParams.get("providerExecution") ?? "";
     const targetSenseId =
       targetSenseIdRaw || deriveTargetSenseIdV0_1(targetSenseLabel);
+
+  const inputSize = validateAnalyzeInputSizesV0_1({
+    word: wordRaw,
+    ipa,
+    targetSenseId: targetSenseIdRaw,
+    targetSenseLabel,
+    language,
+  });
+  if (!inputSize.ok) {
+    return publicBetaRequestTooLargeResponseV0_1(inputSize.reason);
+  }
 // Seed fallback flag (BRAIN-0.2)
     const seedFallbackEnabled =
       url.searchParams.get("seed") === "1" ||
@@ -1598,7 +1675,9 @@ if (!word) {
       "INVALID_PROVIDER_EXECUTION",
     );
   }
-  const providerExecution = normalizedProviderExecution.value;
+  const providerExecution = publicBetaDeterministicOnly
+    ? "disabled"
+    : normalizedProviderExecution.value;
 
   return runAnalyzeV1Orchestration({
     word,
@@ -1613,6 +1692,7 @@ if (!word) {
     targetSenseId,
     targetSenseLabel,
     providerExecution,
+    publicBetaDeterministicOnly,
     seedFallbackEnabled,
     gatesOn,
     preserveMalformedEvidencePackageFallback: true,

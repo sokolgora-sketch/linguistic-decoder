@@ -1,3 +1,7 @@
+import {
+  assertExternalModelExecutionAllowedV0_1,
+} from "@/shared/openInstrument/publicBetaSafety.v0_1";
+
 export type ProposerProviderIdV0_2 =
   | "mock"
   | "mock_reject_ops"
@@ -146,6 +150,8 @@ async function proposeMockSemantic(
 }
 
 async function proposeOpenAICompat(req: ProposerRequestV0_2): Promise<ProposerResultV0_2> {
+  assertExternalModelExecutionAllowedV0_1();
+
   // Optional provider: OpenAI-compatible Chat Completions API.
   // Requires env:
   // - OPENAI_API_KEY
