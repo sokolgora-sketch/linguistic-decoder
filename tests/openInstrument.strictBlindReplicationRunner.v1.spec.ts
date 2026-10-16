@@ -1,9 +1,17 @@
+import { createHash } from "node:crypto";
+import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+
 import {
   InMemoryStrictBlindDurabilityStoreV1,
+  STRICT_BLIND_FROZEN_BASELINE_ARTIFACT_PATH_V1,
+  STRICT_BLIND_FROZEN_BASELINE_ARTIFACT_SHA256_V1,
   buildStrictBlindReadinessReportV1,
   defaultStrictBlindArtifactPathsV1,
   runStrictBlindSyntheticCaseV1,
   verifyStrictBlindFrozenArtifactsV1,
+  verifyStrictBlindFrozenBaselineMetadataV1,
   type StrictBlindCorrespondenceEvaluationV1,
   type StrictBlindPreRevealContextV1,
 } from "../src/shared/openInstrument/strictBlindReplicationRunner.v1";
@@ -72,6 +80,50 @@ describe("strict blind replication runner v1", () => {
     expect(first.preregistrationSha256).toBe(second.preregistrationSha256);
     expect(second.preregistrationSha256).toBe(third.preregistrationSha256);
     expect(first.payloadSha256["SBR-01"]).toMatch(/^[a-f0-9]{64}$/);
+  });
+
+  test("accepts frozen baseline metadata without freezing the current product fixture", () => {
+    const metadata = verifyStrictBlindFrozenBaselineMetadataV1(paths);
+    const currentBaselineSha256 = createHash("sha256")
+      .update(
+        readFileSync(
+          join(process.cwd(), STRICT_BLIND_FROZEN_BASELINE_ARTIFACT_PATH_V1),
+        ),
+      )
+      .digest("hex");
+
+    expect(metadata).toEqual({
+      artifactPath: STRICT_BLIND_FROZEN_BASELINE_ARTIFACT_PATH_V1,
+      artifactSha256: STRICT_BLIND_FROZEN_BASELINE_ARTIFACT_SHA256_V1,
+    });
+    expect(currentBaselineSha256).not.toBe(metadata.artifactSha256);
+  });
+
+  test("rejects tampered or missing frozen baseline metadata", () => {
+    const directory = mkdtempSync(join(tmpdir(), "open-instrument-strict-blind-metadata-"));
+    try {
+      const preregistrationPath = join(directory, "preregistration.json");
+      const preregistration = JSON.parse(
+        readFileSync(paths.preregistrationPath, "utf8"),
+      ) as { repository: { baselineArtifactSha256: string } };
+      preregistration.repository.baselineArtifactSha256 = "0".repeat(64);
+      writeFileSync(preregistrationPath, JSON.stringify(preregistration));
+
+      expect(() =>
+        verifyStrictBlindFrozenBaselineMetadataV1({
+          ...paths,
+          preregistrationPath,
+        }),
+      ).toThrow("FROZEN_BASELINE_METADATA_MISMATCH");
+      expect(() =>
+        verifyStrictBlindFrozenBaselineMetadataV1({
+          ...paths,
+          preregistrationPath: join(directory, "missing.json"),
+        }),
+      ).toThrow("PREREGISTRATION_ARTIFACT_MISSING");
+    } finally {
+      rmSync(directory, { recursive: true, force: true });
+    }
   });
 
   test("runs a synthetic positive only after pre-reveal freeze and durability", () => {
@@ -355,19 +407,46 @@ describe("strict blind replication runner v1", () => {
     expect(result.preRevealArtifact.frozenDecision.kind).toBe("FUNCTION");
   });
 
-  test("readiness verifier reports all synthetic/integrity checks", () => {
+  test("reports synthetic integrity separately from real execution readiness", () => {
     const report = buildStrictBlindReadinessReportV1({
       preregistrationHashMatch: true,
       payloadHashesMatch: true,
       workerEnvelopeValid: true,
       sourceUniverseFrozen: true,
+      frozenBaselineIdentityVerified: true,
       runnerTestsPass: true,
       realExecutionLockActive: true,
+      realSourceAcquisitionReady: false,
       productionFirewallActive: true,
       durabilityGateActive: true,
       revealGateActive: true,
-      baselineUnchanged: true,
     });
-    expect(report.status).toBe("READY_FOR_CONTROLLED_STRICT_BLIND_EXECUTION");
+    expect(report.frozenArtifactIntegrity).toBe(true);
+    expect(report.syntheticRunnerIntegrity).toBe(true);
+    expect(report.syntheticIntegrityStatus).toBe("PASS");
+    expect(report.realSourceAcquisitionReady).toBe(false);
+    expect(report.realExecutionAuthorized).toBe(false);
+    expect(report.realExecutionReady).toBe(false);
+    expect(report.status).toBe("NOT_READY_FOR_CONTROLLED_STRICT_BLIND_EXECUTION");
+  });
+
+  test("does not report real readiness when acquisition is absent even without an active lock", () => {
+    const report = buildStrictBlindReadinessReportV1({
+      preregistrationHashMatch: true,
+      payloadHashesMatch: true,
+      workerEnvelopeValid: true,
+      sourceUniverseFrozen: true,
+      frozenBaselineIdentityVerified: true,
+      runnerTestsPass: true,
+      realExecutionLockActive: false,
+      realSourceAcquisitionReady: false,
+      productionFirewallActive: true,
+      durabilityGateActive: true,
+      revealGateActive: true,
+    });
+
+    expect(report.syntheticIntegrityStatus).toBe("PASS");
+    expect(report.realExecutionReady).toBe(false);
+    expect(report.status).toBe("NOT_READY_FOR_CONTROLLED_STRICT_BLIND_EXECUTION");
   });
 });
