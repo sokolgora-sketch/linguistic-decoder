@@ -12,6 +12,12 @@ export const STRICT_BLIND_REPLICATION_RUNNER_SCHEMA_V1 =
 
 export const STRICT_BLIND_REAL_EXECUTION_AUTHORIZED_V1 = false as const;
 
+export const STRICT_BLIND_FROZEN_BASELINE_ARTIFACT_PATH_V1 =
+  "tests/fixtures/openInstrument/analysis-capability-baseline.v1.json" as const;
+
+export const STRICT_BLIND_FROZEN_BASELINE_ARTIFACT_SHA256_V1 =
+  "12a92a4fe5faec0516b30d3a7e86e75924f9c68349b905a2c07d61289d406650" as const;
+
 export const STRICT_BLIND_REPLICATION_OUTCOME_V1 = [
   "FUNCTIONAL_CORRESPONDENCE",
   "LEXICAL_EQUIVALENCE",
@@ -31,12 +37,13 @@ export type StrictBlindReadinessCheckV1 = Readonly<{
   payloadHashesMatch: boolean;
   workerEnvelopeValid: boolean;
   sourceUniverseFrozen: boolean;
+  frozenBaselineIdentityVerified: boolean;
   runnerTestsPass: boolean;
   realExecutionLockActive: boolean;
+  realSourceAcquisitionReady: boolean;
   productionFirewallActive: boolean;
   durabilityGateActive: boolean;
   revealGateActive: boolean;
-  baselineUnchanged: boolean;
 }>;
 
 export type StrictBlindReadinessReportV1 = Readonly<{
@@ -44,6 +51,17 @@ export type StrictBlindReadinessReportV1 = Readonly<{
     | "READY_FOR_CONTROLLED_STRICT_BLIND_EXECUTION"
     | "NOT_READY_FOR_CONTROLLED_STRICT_BLIND_EXECUTION";
   checks: StrictBlindReadinessCheckV1;
+  frozenArtifactIntegrity: boolean;
+  syntheticRunnerIntegrity: boolean;
+  syntheticIntegrityStatus: "PASS" | "FAIL";
+  realSourceAcquisitionReady: boolean;
+  realExecutionAuthorized: boolean;
+  realExecutionReady: boolean;
+}>;
+
+export type StrictBlindFrozenBaselineMetadataV1 = Readonly<{
+  artifactPath: typeof STRICT_BLIND_FROZEN_BASELINE_ARTIFACT_PATH_V1;
+  artifactSha256: typeof STRICT_BLIND_FROZEN_BASELINE_ARTIFACT_SHA256_V1;
 }>;
 
 export type StrictBlindFrozenArtifactPathsV1 = Readonly<{
@@ -60,6 +78,8 @@ export type StrictBlindFrozenArtifactIdentityV1 = Readonly<{
   preregistrationSha256: string;
   workerEnvelopeSha256: string;
   payloadSha256: Readonly<Record<string, string>>;
+  baselineArtifactPath: typeof STRICT_BLIND_FROZEN_BASELINE_ARTIFACT_PATH_V1;
+  baselineArtifactSha256: typeof STRICT_BLIND_FROZEN_BASELINE_ARTIFACT_SHA256_V1;
   experimentId: string;
   sourcePolicyId: string;
   searchPolicyVersion: string;
@@ -366,6 +386,44 @@ function exactSourceObservationIsValidV1(
   );
 }
 
+/**
+ * Verifies the historical baseline identity recorded by the frozen strict-blind
+ * preregistration. This deliberately reads preregistration metadata only; it
+ * does not read or require the current evolving product fixture bytes.
+ */
+export function verifyStrictBlindFrozenBaselineMetadataV1(
+  paths: StrictBlindFrozenArtifactPathsV1,
+): StrictBlindFrozenBaselineMetadataV1 {
+  if (!existsSync(paths.preregistrationPath)) {
+    throw new Error("PREREGISTRATION_ARTIFACT_MISSING");
+  }
+
+  const preregistration = JSON.parse(
+    readFileSync(paths.preregistrationPath, "utf8"),
+  ) as {
+    repository?: {
+      identity?: unknown;
+      baselineArtifactPath?: unknown;
+      baselineArtifactSha256?: unknown;
+    };
+  };
+  const repository = preregistration.repository;
+  if (
+    repository?.identity !== "sokolgora-sketch/linguistic-decoder" ||
+    repository.baselineArtifactPath !==
+      STRICT_BLIND_FROZEN_BASELINE_ARTIFACT_PATH_V1 ||
+    repository.baselineArtifactSha256 !==
+      STRICT_BLIND_FROZEN_BASELINE_ARTIFACT_SHA256_V1
+  ) {
+    throw new Error("FROZEN_BASELINE_METADATA_MISMATCH");
+  }
+
+  return Object.freeze({
+    artifactPath: STRICT_BLIND_FROZEN_BASELINE_ARTIFACT_PATH_V1,
+    artifactSha256: STRICT_BLIND_FROZEN_BASELINE_ARTIFACT_SHA256_V1,
+  });
+}
+
 function assertFrozenArtifactBytesV1(
   paths: StrictBlindFrozenArtifactPathsV1,
   replicationSlot: string,
@@ -386,6 +444,7 @@ function assertFrozenArtifactBytesV1(
   if (workerEnvelopeSha256 !== paths.expectedWorkerEnvelopeSha256) {
     throw new Error("WORKER_ENVELOPE_HASH_MISMATCH");
   }
+  const baselineMetadata = verifyStrictBlindFrozenBaselineMetadataV1(paths);
 
   const preregistration = JSON.parse(preregistrationBytes.toString("utf8")) as {
     experimentId: string;
@@ -497,6 +556,8 @@ function assertFrozenArtifactBytesV1(
     preregistrationSha256,
     workerEnvelopeSha256,
     payloadSha256: { [replicationSlot]: payloadSha256 },
+    baselineArtifactPath: baselineMetadata.artifactPath,
+    baselineArtifactSha256: baselineMetadata.artifactSha256,
     experimentId: preregistration.experimentId,
     sourcePolicyId: "open-instrument-m7-common-source-universe-v1",
     searchPolicyVersion: "open-instrument-m7-search-s0-s4-v1",
@@ -836,12 +897,35 @@ export function runStrictBlindSyntheticCaseV1(
 export function buildStrictBlindReadinessReportV1(
   checks: StrictBlindReadinessCheckV1,
 ): StrictBlindReadinessReportV1 {
-  const ready = Object.values(checks).every(Boolean);
+  const frozenArtifactIntegrity =
+    checks.preregistrationHashMatch &&
+    checks.payloadHashesMatch &&
+    checks.workerEnvelopeValid &&
+    checks.sourceUniverseFrozen &&
+    checks.frozenBaselineIdentityVerified;
+  const syntheticRunnerIntegrity =
+    frozenArtifactIntegrity &&
+    checks.runnerTestsPass &&
+    checks.productionFirewallActive &&
+    checks.durabilityGateActive &&
+    checks.revealGateActive;
+  const realExecutionAuthorized = STRICT_BLIND_REAL_EXECUTION_AUTHORIZED_V1;
+  const realExecutionReady =
+    syntheticRunnerIntegrity &&
+    checks.realSourceAcquisitionReady &&
+    !checks.realExecutionLockActive &&
+    realExecutionAuthorized;
   return {
-    status: ready
+    status: realExecutionReady
       ? "READY_FOR_CONTROLLED_STRICT_BLIND_EXECUTION"
       : "NOT_READY_FOR_CONTROLLED_STRICT_BLIND_EXECUTION",
     checks,
+    frozenArtifactIntegrity,
+    syntheticRunnerIntegrity,
+    syntheticIntegrityStatus: syntheticRunnerIntegrity ? "PASS" : "FAIL",
+    realSourceAcquisitionReady: checks.realSourceAcquisitionReady,
+    realExecutionAuthorized,
+    realExecutionReady,
   };
 }
 
