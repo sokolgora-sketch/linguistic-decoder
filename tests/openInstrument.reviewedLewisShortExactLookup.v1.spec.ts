@@ -87,7 +87,7 @@ describe("Open Instrument bounded Lewis & Short exact lookup v1", () => {
     );
   });
 
-  it("returns AMBIGUOUS without selecting a winner when exact source forms collide", () => {
+  it("rejects a caller-controlled collision slice instead of returning fabricated provenance", () => {
     const ambiguousSyntheticSlice = sourceSlice.replace(
       "<orth lang=\"la\" extent=\"full\">ăbactor</orth>",
       "<orth lang=\"la\" extent=\"full\">Ăărōn</orth>",
@@ -103,12 +103,10 @@ describe("Open Instrument bounded Lewis & Short exact lookup v1", () => {
       },
     });
 
-    expect(result.status).toBe("AMBIGUOUS");
-    expect(result.attestations).toHaveLength(1);
-    expect(result.attestations[0]?.entrySelectionStatus).toBe("UNRESOLVED");
-    expect(result.reasonCodes).toEqual([
-      "AMBIGUOUS_ENTRY_OR_SENSE_SELECTION",
-    ]);
+    expect(result.status).toBe("SOURCE_UNAVAILABLE");
+    expect(result.attestations).toEqual([]);
+    expect(result.sourceArtifact).toBeNull();
+    expect(result.reasonCodes).toEqual(["SOURCE_SLICE_HASH_MISMATCH"]);
   });
 
   it.each([

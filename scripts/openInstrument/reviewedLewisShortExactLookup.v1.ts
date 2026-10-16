@@ -4,6 +4,7 @@ import {
   type ReviewedLewisShortEntryAttestationManifestV1,
 } from "./reviewedLewisShortEntryAttestationImport.v1";
 import type { SourceEntryAttestationV1 } from "../../src/shared/openInstrument/sourceEntryAttestation.v1";
+import trustedManifestJson from "./sourceBatches/lewis-short-bounded-slice.v1.manifest.json";
 import {
   REVIEWED_LEWIS_SHORT_SOURCE_TRADITION_ID_V1,
   importReviewedLewisShortBatchV1,
@@ -15,6 +16,9 @@ export const REVIEWED_LEWIS_SHORT_EXACT_LOOKUP_VERSION_V1 =
 
 export const REVIEWED_LEWIS_SHORT_EXACT_LOOKUP_SOURCE_SCOPE_V1 =
   "EXISTING_BOUNDED_SLICE_ONLY" as const;
+
+const TRUSTED_REVIEWED_LEWIS_SHORT_MANIFEST_V1 =
+  trustedManifestJson as unknown as ReviewedLewisShortBatchManifestV1;
 
 export type ReviewedLewisShortExactLookupStatusV1 =
   | "FOUND"
@@ -303,9 +307,20 @@ export function lookupReviewedLewisShortExactV1(
         importedReasonCodesV1(batch),
       );
     }
+    if (
+      batch.inputSha256 !==
+      TRUSTED_REVIEWED_LEWIS_SHORT_MANIFEST_V1.sourceSliceSha256
+    ) {
+      return unavailableV1(
+        sourceTraditionId,
+        queryForm,
+        normalizedQueryForm,
+        ["SOURCE_SLICE_HASH_MISMATCH"],
+      );
+    }
     imported = importReviewedLewisShortEntryAttestationsV1(
       input.sourceSlice,
-      attestationManifestV1(manifest),
+      attestationManifestV1(TRUSTED_REVIEWED_LEWIS_SHORT_MANIFEST_V1),
     );
   } catch {
     return unavailableV1(
@@ -325,7 +340,7 @@ export function lookupReviewedLewisShortExactV1(
     );
   }
 
-  const artifact = sourceArtifactV1(manifest);
+  const artifact = sourceArtifactV1(TRUSTED_REVIEWED_LEWIS_SHORT_MANIFEST_V1);
   const matches = imported.attestations.filter(
     (attestation) =>
       attestation.sourceForm.normalize("NFC") === normalizedQueryForm,
