@@ -61,12 +61,21 @@ VOICE_PATH_EQUALITY_REQUIRED_FOR_SAME=NO
 GATE2_SAME_AUTHORIZED=NO
 ```
 
-The canonical comparison material is not lexical spelling alone, normalized
-string output alone, a Voice path, a Gamma/ZC value, Bridge compatibility, or
-a common source artifact. Exact identity requires the fixed contract,
-schema, field order, values, Null semantics, variant order, policy fields,
-provenance, and deterministic fingerprints to match. No semantic, functional,
-historical, etymological, or phonetic resemblance is authority.
+`SAME_REPRESENTATION_REQUIRES_OUTPUT_VALUE_EQUALITY=NO`. The canonical
+comparison material is not lexical spelling alone, normalized string output
+alone, a Voice path, a Gamma/ZC value, Bridge compatibility, or a common source
+artifact. Representation identity is established by independent authorization
+under the same exact contract, schema, scope, policy, provenance, and
+reproducibility rules. A valid candidate and production instance may therefore
+contain different source words, physical records, raw pronunciations,
+normalized segments, nuclei, Voice paths, or serialized payloads when the
+contract scope permits those differences; those differences are not by
+themselves incompatibility. Conversely, equal payloads do not establish
+contract identity without that authority. A bounded same-record parity control
+may require exact value equality for the same frozen physical record or group,
+but that is reproducibility evidence and is not the definition of Gate 2 SAME.
+No semantic, functional, historical, etymological, or phonetic resemblance is
+authority.
 
 This document is limited to the CMUdict Path B downstream representation
 boundary. It changes no frozen authority, runtime gate predicate, source data,
@@ -176,20 +185,41 @@ role is forbidden.
 ```text
 contractId=OPEN_INSTRUMENT_CMUDICT_PATH_B_DOWNSTREAM_CANONICAL_REPRESENTATION_V0_1
 contractVersion=v0.1
-contractRevision=PROPOSED_PENDING_DF_REVIEW
+contractRevision=R0
 schemaVersion=open-instrument.cmudict-path-b-downstream-canonical-representation.v0_1
 languageScope=English
 varietyScope=en-US
 notation=ARPABET
 sourceArtifact=src/data/openInstrument/pronunciation/cmudict.dict
+documentReviewStatus=PROPOSED_PENDING_DF_REVIEW
+runtimeImplementationStatus=NOT_IMPLEMENTED
+gate2AuthorizationStatus=NOT_AUTHORIZED
 ```
 
-The contract is scoped to physical records from the frozen CMUdict artifact.
-Group membership is derived from the exact Level A `baseSourceForm` and
-physical record identity, not from an open-ended set of strings that happen to
-normalize equally. Candidate and production normalized lexical outputs are
-retained as role provenance and must pass the already proposed bounded
-conformance validator; they are not silently renamed as one algorithm.
+`contractId`, `contractVersion`, and `contractRevision=R0` are the immutable
+identity of this proposed contract revision. Review status, runtime
+implementation status, and Gate 2 authorization are separate status fields and
+must not be encoded into the contract identity. The contract is scoped to
+physical records from the frozen CMUdict artifact. Group membership is derived
+from the exact Level A `baseSourceForm` and physical record identity, not from
+an open-ended set of strings that happen to normalize equally. Candidate and
+production normalized lexical outputs are retained as role provenance and must
+pass the already proposed bounded conformance validator; they are not silently
+renamed as one algorithm.
+
+The positive representation-instance authority applies only to
+`canonicalResultKind=PHYSICAL_GROUP`. `ABSENT_PRONUNCIATION` is a typed Null
+lookup-result envelope, not an empty physical group and not a positive
+representation instance. A valid absence request must be in the reviewed
+CMUdict source-form lookup domain, preserve the exact request form, retain both
+role-specific normalization identities and outputs, verify the frozen artifact
+identity and lookup-index identity, and prove zero matching physical records.
+The domain is not broadened to arbitrary strings merely because a normalizer
+accepts them. An invalid/out-of-domain request, malformed source, missing or
+mismatched artifact, missing provenance, or unresolved lookup index is a
+different typed Null reason and must not be relabeled `PRONUNCIATION_NOT_FOUND`.
+No physical line, raw-source locator, variant, or fabricated record may be
+created for absence.
 
 ### 5.2 Per-physical-variant layer
 
@@ -244,11 +274,13 @@ reason and the higher-priority malformed-input rule in §5.3.
 
 For an eligible record, projection input is exactly the ordered raw ARPABET
 token sequence. The proposed methodology is the existing reviewed resolver
-profile and mapping, not a new projection:
+profile and mapping, not a new projection. The concrete identities are bound to
+the exported values in `pronunciationToVoice.v0_1.ts:19,40-68` and the
+candidate/production mapping declarations:
 
 ```text
-projectionMethodologyId=pronunciation-to-voice.<existing-profile>.v0_1
-projectionProfileVersion=PRONUNCIATION_TO_VOICE_PROFILE_V0_1
+projectionMethodologyId=pronunciation-to-voice.open-instrument.cmudict-arpabet-en-us.v0_1.v0_1
+projectionProfileVersion=open-instrument.cmudict-arpabet-en-us.v0_1
 mappingTable=CMUDICT_ARPABET_VOICE_PROFILE_V0_1
 ```
 
@@ -267,13 +299,32 @@ array below and `aggregate` is attached to the same exact physical group. For
 
 ```text
 absence.reasonCode=PRONUNCIATION_NOT_FOUND
+absence.lookupRequestForm
+absence.candidateNormalizedLookupKey
+absence.productionNormalizedLookupKey
+absence.candidateNormalizerIdentity
+absence.productionNormalizerIdentity
+absence.sourceArtifactBytes
+absence.sourceArtifactRevision
 absence.sourceArtifactSha256
 absence.lookupBaseSourceForm
+absence.lookupIndexRevision
+absence.lookupIndexFingerprint
+absence.verifiedPhysicalMatchCount=0
+absence.absenceInputFingerprint
+absence.absenceOutputFingerprint
 ```
 
+`absence.lookupRequestForm` is the exact validated caller form; the two
+normalized lookup keys and their identities are evidence, not a permission to
+silently trim, coerce, or merge the role-specific algorithms. The artifact and
+lookup-index fields must be verified before a zero-match result is accepted.
 No synthetic physical record or source-line fields may be created for the
-absence variant. This is the canonical representation of the missing-
-pronunciation control; it is not an empty physical group.
+absence variant. This is the typed Null representation of the
+missing-pronunciation control; it is not an empty physical group. If any
+required artifact, domain, provenance, or index evidence is missing or
+unresolved, the validator emits the applicable invalid/provenance Null reason
+instead of `PRONUNCIATION_NOT_FOUND`.
 
 For `PHYSICAL_GROUP`, `aggregate` contains:
 
@@ -348,25 +399,81 @@ normalizerIdentity
 normalizerContractIdentity
 projectionInvocationMode
 sourceEvidenceFingerprint
+fingerprintScope
 canonicalInputFingerprint
 canonicalOutputFingerprint
 ```
 
 The candidate and production values for these role fields must remain
-distinct and visible. A canonical comparison can succeed only after both
-producer envelopes are independently validated and their common material is
-equal field-for-field. The role fields authenticate independent construction;
-they do not become an equivalence class or a substitute for common contract
-identity.
+distinct and visible. Independent producer conformance validates each producer's
+own complete object against this exact schema; it does not require arbitrary
+candidate and production instances to have equal values. When the same frozen
+physical record or group is deliberately paired as a reproducibility control,
+the paired canonical fields may be required to match exactly. That parity
+control is separate from contract identity and from Gate 2 authorization. The
+role fields authenticate independent construction; they do not become an
+equivalence class or a substitute for common contract identity.
 
-Canonical serialization must be a fixed-order UTF-8 JSON array/object
-projection defined by the future implementation, with fingerprints computed
-over material that excludes the fingerprint fields themselves. The input
-fingerprint covers the exact artifact identity, source line, raw line, and
-physical locator. The output fingerprint covers every canonical field in
-declared order, including Null/reason and aggregate fields. SHA-256 is
-required. No existing Level A fingerprint may be relabeled as a downstream
-projection fingerprint.
+The proposed serialization is fixed now rather than deferred to a future
+implementation. The top-level canonical JSON object has exactly this key order:
+
+```text
+contractId
+contractVersion
+contractRevision
+schemaVersion
+languageScope
+varietyScope
+notation
+sourcePath
+sourceRevision
+sourceArtifactBytes
+sourceArtifactSha256
+canonicalResultKind
+lookupBaseSourceForm
+variants
+aggregate
+absence
+```
+
+The per-variant, aggregate, and absence key orders are the field lists in
+§5.2, §5.3, and the absence list above, respectively. The lists are closed:
+all listed fields are required, typed Null uses the JSON `null` literal where
+specified, arrays retain their declared order, and unknown or omitted fields
+are rejected. Strings are serialized as the exact UTF-8 JSON strings supplied
+by the contract; serialization performs no additional Unicode normalization.
+RFC 8259 escaping and no insignificant whitespace are required; integer counts
+use their decimal JSON form; object member order is the declared order. This is
+a versioned canonical byte representation, not a semantic equivalence rule.
+
+The fingerprint scopes are also fixed and are never interchangeable:
+
+1. `fingerprintScope=PHYSICAL_VARIANT` sets
+   `canonicalInputFingerprint` to SHA-256 over the ordered physical input
+   fields: source artifact path/revision/bytes/SHA-256, physical record ID,
+   source line number, raw source line, source/base form, variant ID/order, raw
+   pronunciation, ordered raw tokens, and opaque annotation/eligibility. It
+   does not use an aggregate or absence preimage.
+2. `fingerprintScope=AGGREGATE_GROUP` sets
+   `canonicalInputFingerprint` to SHA-256 over the ordered group form, retained
+   physical-record IDs and variant order, each validated physical-variant input
+   fingerprint, and the aggregate policy identity. It does not invent a
+   physical locator.
+3. `fingerprintScope=ABSENT_LOOKUP` sets
+   `canonicalInputFingerprint` to SHA-256 over the exact validated lookup form,
+   both normalization identities and outputs, frozen artifact identity,
+   lookup-index revision/fingerprint, verified zero-match count, and the
+   absence reason. It contains no physical line or raw-source locator.
+
+`canonicalOutputFingerprint` is SHA-256 over the complete canonical object in
+declared order after excluding all fingerprint fields and the role-specific
+evidence envelope itself; it includes ordered variants, aggregate/absence
+fields, typed Null values, and the selected reason code. All SHA-256 inputs are
+the exact UTF-8 bytes of their specified serialization. There is no
+self-reference. `sourceEvidenceFingerprint` remains the existing Level A
+source-evidence fingerprint and must not be relabeled as any downstream
+projection fingerprint. The proposal does not claim that this serialization or
+fingerprinting is implemented or validated at runtime.
 
 ## 6. Conformance requirements and Null boundaries
 
@@ -385,6 +492,15 @@ validator over the exact Level A base form and retain both role identities and
 outputs. It must fail closed for artifact/domain/variant-base/output/role/
 provenance/authority errors. No trim, coercion, hidden Unicode normalization,
 or input-domain expansion is permitted.
+
+This validator establishes bounded producer conformance only after it verifies
+the exact reviewed domain, frozen source identity, both normalized outputs, and
+all required provenance. It does not establish downstream Gate 2
+`SAME_REPRESENTATION` contract identity. A later Gate 2 authority must
+independently decide whether this bounded conformance contract is incorporated
+into one exact canonical downstream representation contract. Gate 3 Voice
+relationship authority remains independent and is neither required to define
+this contract nor supplied by it.
 
 ### 6.2 Parser and annotation
 
@@ -449,8 +565,9 @@ adapter/validator plus focused tests. It should:
    evidence;
 5. derive the aggregate ledger with the explicit fail-closed rule;
 6. compute and validate canonical input/output fingerprints; and
-7. compare common fields exactly while retaining role-specific evidence and
-   first deterministic mismatch reason.
+7. validate each producer independently, and use exact same-record value parity
+   only for explicitly paired reproducibility controls while retaining
+   role-specific evidence and the first deterministic mismatch reason.
 
 No shared parser, new normalizer, new projection methodology, annotation
 stripping, source-data change, winner selection, equivalence class, Bridge
@@ -492,6 +609,8 @@ Remaining scientific blockers are:
   serialization;
 - additive independent construction and validation by both producers;
 - explicit comparison-level contract/schema/revision and fingerprints;
+- exact validated absence lookup-domain, artifact/index, and typed-Null
+  evidence, without fabricating a physical source locator;
 - proof that role-specific parser and normalizer provenance satisfies the
   proposed canonical adapter without semantic coercion;
 - proof of per-variant projection-envelope conformance, including the 22
@@ -505,7 +624,8 @@ for SAME.
 
 ## 10. Validation and lane boundary
 
-This artifact is documentation only. In this lane:
+This artifact is documentation only. The following lane boundaries remain in
+force:
 
 ```text
 RUNTIME_FILES_CHANGED=NO
@@ -519,12 +639,12 @@ LINEAR_UPDATED=NO
 DF_BRAIN_UPDATED=NO
 ```
 
-The focused existing CMUdict suite was run before this document was created:
-5 suites passed, 109 tests passed, 0 snapshots. `git diff --check`, frozen
-authority hash verification, protected-S5 verification, and clean-worktree
-preflight passed before the branch/document mutation. Full repository gates
-and hosted CI are required for the resulting documentation PR and must be
-reported with their actual terminal states; no gate result is inferred here.
+The focused existing CMUdict suite was run before the original document was
+created: 5 suites passed, 109 tests passed, 0 snapshots. The repository and
+validation values in the original authoring checkpoint were historical
+pre-PR observations; they are not current PR state and must not be read as
+current CI or merge evidence. The resulting correction's actual checks and
+hosted CI are reported outside this authority artifact.
 
 ## 11. Final classification
 
@@ -532,8 +652,9 @@ reported with their actual terminal states; no gate result is inferred here.
 REPOSITORY=sokolgora-sketch/linguistic-decoder
 BASE_MAIN_SHA=7ced5e08f1f587ec56e12da2958ad20f750e6848
 BRANCH=codex/cmudict-path-b-downstream-canonical-representation-incorporation-v0-1
-HEAD=7ced5e08f1f587ec56e12da2958ad20f750e6848
-WORKTREE_STATUS=ONE_PROPOSED_MARKDOWN_DOCUMENT_PENDING_VALIDATION
+REPORTING_METADATA_STATUS=HISTORICAL_PRE_PR_AUTHORING_CHECKPOINT
+HISTORICAL_HEAD=7ced5e08f1f587ec56e12da2958ad20f750e6848
+HISTORICAL_WORKTREE_STATUS=ONE_PROPOSED_MARKDOWN_DOCUMENT_PENDING_VALIDATION
 SCIENTIFIC_AUTHORITY_DECISION=PROPOSE_LAYERED_CANONICAL_DOWNSTREAM_CONTRACT_PENDING_DF_REVIEW
 CANONICAL_REPRESENTATION_BOUNDARY_SELECTED=PER_PHYSICAL_VARIANT_EVIDENCE_PLUS_EXPLICIT_AGGREGATE_RESOLUTION_LEDGER
 CANONICAL_REPRESENTATION_CONTRACT_ID=OPEN_INSTRUMENT_CMUDICT_PATH_B_DOWNSTREAM_CANONICAL_REPRESENTATION_V0_1
@@ -553,9 +674,9 @@ CANONICAL_DOWNSTREAM_GATE2_CONTRACT_IDENTITY=NOT_ESTABLISHED
 GATE2_SAME_AUTHORIZED=NO
 FOUR_GATE_REACHABILITY_ESTABLISHED=NO
 FILES_CHANGED=ONE_MARKDOWN_DOCUMENT
-PR_STATUS=NOT_YET_OPENED
-CI_REQUIRED_CHECKS=NOT_YET_RUN
+HISTORICAL_PR_STATUS=NOT_YET_OPENED
+HISTORICAL_CI_REQUIRED_CHECKS=NOT_YET_RUN
 MERGED=NO
 NEXT_RECOMMENDED_LANE=DF_REVIEW_OF_PROPOSED_LAYERED_CANONICAL_CONTRACT_THEN_ADDITIVE_CONFORMANCE_IMPLEMENTATION
-NEXT_ACTION=AWAIT_DF_REVIEW
+NEXT_ACTION=AWAIT_DF_FINAL_SCIENTIFIC_REVIEW
 ```
