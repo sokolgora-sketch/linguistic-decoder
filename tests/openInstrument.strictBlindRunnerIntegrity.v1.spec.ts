@@ -1,4 +1,4 @@
-import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
@@ -386,6 +386,42 @@ describe("strict-blind pre-reveal completion marker recovery", () => {
       hashMatches: true,
       independentlyRecovered: true,
     });
+    expect(readFileSync(join(fixture.directory, "pre-reveal.finalized"), "utf8")).toBe(
+      `${fixture.preRevealArtifactSha256}\n`,
+    );
+  });
+
+  test.each([
+    ["primary temporary write", "PRIMARY_TEMP_WRITE"],
+    ["primary file synchronization", "PRIMARY_FILE_SYNC"],
+    ["after primary rename", "AFTER_PRIMARY_RENAME"],
+    ["secondary persistence", "SECONDARY_FILE_SYNC"],
+    ["manifest persistence", "MANIFEST_FILE_SYNC"],
+    ["before finalization", "BEFORE_FINALIZATION"],
+    ["completion-marker synchronization", "COMPLETION_MARKER_FILE_SYNC"],
+    ["final directory synchronization", "FINAL_DIRECTORY_SYNC"],
+  ])("fails closed on %s", (_label, failurePoint) => {
+    const directory = makeDirectory();
+    expect(() =>
+      writeStrictBlindIntegrityPreRevealV1(
+        directory,
+        {
+          caseOpaqueId: "synthetic.marker.case.v1",
+          payloadSha256: "a".repeat(64),
+          artifact: {
+            schemaVersion: "synthetic.marker.v1",
+            artifactType: "synthetic_pre_reveal",
+            caseOpaqueId: "synthetic.marker.case.v1",
+            value: "synthetic-only",
+          },
+        },
+        { failurePoint },
+      ),
+    ).toThrow(`PERSISTENCE_FAILURE_INJECTED:${failurePoint}`);
+    expect(existsSync(join(directory, "pre-reveal.finalized"))).toBe(false);
+    expect(() => recoverStrictBlindIntegrityPreRevealV1(directory)).toThrow(
+      "PRE_REVEAL_DURABILITY_RECOVERY_FAILED",
+    );
   });
 
   test("rejects a missing completion marker", () => {

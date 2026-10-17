@@ -2,11 +2,14 @@ import { createHash } from "node:crypto";
 import {
   closeSync,
   existsSync,
+  fsyncSync,
   mkdirSync,
   openSync,
   readFileSync,
   renameSync,
+  unlinkSync,
   writeFileSync,
+  writeSync,
 } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -25,6 +28,31 @@ export const STRICT_BLIND_RUNNER_INTEGRITY_SCHEMA_V1 =
 
 export const STRICT_BLIND_INTEGRITY_ACQUISITION_MODE_V1 =
   "SYNTHETIC_TEST_FIXTURE" as const;
+
+export const STRICT_BLIND_INTEGRITY_PERSISTENCE_FAILURE_POINTS_V1 = [
+  "PRIMARY_TEMP_WRITE",
+  "PRIMARY_FILE_SYNC",
+  "PRIMARY_RENAME",
+  "AFTER_PRIMARY_RENAME",
+  "SECONDARY_TEMP_WRITE",
+  "SECONDARY_FILE_SYNC",
+  "SECONDARY_RENAME",
+  "MANIFEST_TEMP_WRITE",
+  "MANIFEST_FILE_SYNC",
+  "MANIFEST_RENAME",
+  "BEFORE_FINALIZATION",
+  "COMPLETION_MARKER_TEMP_WRITE",
+  "COMPLETION_MARKER_FILE_SYNC",
+  "COMPLETION_MARKER_RENAME",
+  "FINAL_DIRECTORY_SYNC",
+] as const;
+
+export type StrictBlindIntegrityPersistenceFailurePointV1 =
+  (typeof STRICT_BLIND_INTEGRITY_PERSISTENCE_FAILURE_POINTS_V1)[number];
+
+export type StrictBlindIntegrityPersistenceOptionsV1 = Readonly<{
+  failurePoint?: StrictBlindIntegrityPersistenceFailurePointV1;
+}>;
 
 export type StrictBlindIntegrityAcquisitionModeV1 =
   | typeof STRICT_BLIND_INTEGRITY_ACQUISITION_MODE_V1
@@ -530,10 +558,79 @@ async function runIsolatedWorkerV1(
   });
 }
 
-function writeAtomicV1(path: string, bytes: Buffer): void {
+function failAtPersistencePointV1(
+  options: StrictBlindIntegrityPersistenceOptionsV1,
+  failurePoint: StrictBlindIntegrityPersistenceFailurePointV1,
+): void {
+  if (options.failurePoint === failurePoint) {
+    throw new Error(`PERSISTENCE_FAILURE_INJECTED:${failurePoint}`);
+  }
+}
+
+type StrictBlindIntegrityAtomicWriteLabelV1 =
+  | "PRIMARY"
+  | "SECONDARY"
+  | "MANIFEST"
+  | "COMPLETION_MARKER";
+
+function writeAtomicV1(
+  path: string,
+  bytes: Buffer,
+  options: StrictBlindIntegrityPersistenceOptionsV1,
+  label: StrictBlindIntegrityAtomicWriteLabelV1,
+): void {
   const temporary = `${path}.${process.pid}.${Date.now()}.tmp`;
-  writeFileSync(temporary, bytes, { flag: "wx" });
-  renameSync(temporary, path);
+  let fileDescriptor: number | undefined;
+  try {
+    fileDescriptor = openSync(temporary, "wx");
+    failAtPersistencePointV1(
+      options,
+      `${label}_TEMP_WRITE` as StrictBlindIntegrityPersistenceFailurePointV1,
+    );
+    writeSync(fileDescriptor, bytes, 0, bytes.length, 0);
+    failAtPersistencePointV1(
+      options,
+      `${label}_FILE_SYNC` as StrictBlindIntegrityPersistenceFailurePointV1,
+    );
+    fsyncSync(fileDescriptor);
+    closeSync(fileDescriptor);
+    fileDescriptor = undefined;
+    failAtPersistencePointV1(
+      options,
+      `${label}_RENAME` as StrictBlindIntegrityPersistenceFailurePointV1,
+    );
+    renameSync(temporary, path);
+  } catch (error) {
+    if (fileDescriptor !== undefined) {
+      try {
+        closeSync(fileDescriptor);
+      } catch {
+        // Preserve the original persistence failure.
+      }
+    }
+    if (existsSync(temporary)) {
+      try {
+        unlinkSync(temporary);
+      } catch {
+        // Preserve the original persistence failure; recovery remains fail-closed.
+      }
+    }
+    throw error;
+  }
+}
+
+function syncDirectoryV1(
+  directory: string,
+  options: StrictBlindIntegrityPersistenceOptionsV1,
+  failurePoint: StrictBlindIntegrityPersistenceFailurePointV1 | null = null,
+): void {
+  const directoryDescriptor = openSync(directory, "r");
+  try {
+    if (failurePoint !== null) failAtPersistencePointV1(options, failurePoint);
+    fsyncSync(directoryDescriptor);
+  } finally {
+    closeSync(directoryDescriptor);
+  }
 }
 
 export function writeStrictBlindIntegrityPreRevealV1(
@@ -543,6 +640,7 @@ export function writeStrictBlindIntegrityPreRevealV1(
     payloadSha256: string;
     artifact: Readonly<Record<string, unknown>>;
   }>,
+  options: StrictBlindIntegrityPersistenceOptionsV1 = {},
 ): Readonly<{ preRevealArtifactSha256: string; manifest: StrictBlindIntegrityManifestV1 }> {
   mkdirSync(directory, { recursive: true });
   const primaryPath = join(directory, "pre-reveal.primary.json");
@@ -564,10 +662,35 @@ export function writeStrictBlindIntegrityPreRevealV1(
     revealGateStatus: "FORBIDDEN_UNTIL_DURABILITY_GATE",
     postRevealRewrite: "FORBIDDEN",
   };
-  writeAtomicV1(primaryPath, bytes);
-  writeAtomicV1(secondaryPath, bytes);
-  writeAtomicV1(manifestPath, canonicalJsonV1(manifest));
-  writeFileSync(finalizedPath, `${artifactSha256}\n`, { flag: "wx" });
+  writeAtomicV1(primaryPath, bytes, options, "PRIMARY");
+  failAtPersistencePointV1(options, "AFTER_PRIMARY_RENAME");
+  writeAtomicV1(secondaryPath, bytes, options, "SECONDARY");
+  writeAtomicV1(manifestPath, canonicalJsonV1(manifest), options, "MANIFEST");
+  syncDirectoryV1(directory, options);
+  failAtPersistencePointV1(options, "BEFORE_FINALIZATION");
+  try {
+    writeAtomicV1(
+      finalizedPath,
+      Buffer.from(`${artifactSha256}\n`, "utf8"),
+      options,
+      "COMPLETION_MARKER",
+    );
+    syncDirectoryV1(directory, options, "FINAL_DIRECTORY_SYNC");
+  } catch (error) {
+    if (existsSync(finalizedPath)) {
+      try {
+        unlinkSync(finalizedPath);
+      } catch {
+        // Recovery must remain fail-closed if cleanup cannot complete.
+      }
+      try {
+        syncDirectoryV1(directory, {});
+      } catch {
+        // Do not replace the original failure with best-effort cleanup failure.
+      }
+    }
+    throw error;
+  }
   return { preRevealArtifactSha256: artifactSha256, manifest };
 }
 
@@ -583,11 +706,14 @@ export function recoverStrictBlindIntegrityPreRevealV1(
     independentlyRecovered: true;
   }>;
 }> {
-  const primaryBytes = readFileSync(join(directory, "pre-reveal.primary.json"));
-  const secondaryBytes = readFileSync(join(directory, "pre-reveal.secondary.json"));
-  const manifestBytes = readFileSync(join(directory, "pre-reveal.manifest.json"));
+  let primaryBytes: Buffer;
+  let secondaryBytes: Buffer;
+  let manifestBytes: Buffer;
   let completionMarker: string;
   try {
+    primaryBytes = readFileSync(join(directory, "pre-reveal.primary.json"));
+    secondaryBytes = readFileSync(join(directory, "pre-reveal.secondary.json"));
+    manifestBytes = readFileSync(join(directory, "pre-reveal.manifest.json"));
     completionMarker = readFileSync(join(directory, "pre-reveal.finalized"), "utf8");
   } catch {
     throw new Error("PRE_REVEAL_DURABILITY_RECOVERY_FAILED");
