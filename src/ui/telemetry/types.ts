@@ -13,6 +13,7 @@ import type {
   AlbanianKaikkiExactLexicalSourceFactV0_1,
   AlbanianKaikkiExactLexicalSourceStatusV0_1,
 } from "@/shared/openInstrument/albanianKaikkiServerOnlyExactLexicalSource.v0_1";
+import type { AlbanianKaikkiSourceIpaSevenVoiceAnalysisV0_1 } from "@/shared/openInstrument/albanianKaikkiSourceIpaSevenVoiceProductInterpretation.v0_1";
 
 /**
  * UI contract for vowel chips. Keep this as the only allowed vowel set.
@@ -433,6 +434,7 @@ export type MotivationDiscoveryV0_1VM = Readonly<{
   }>;
   exactLexicalSourceStatus?: AlbanianKaikkiExactLexicalSourceStatusV0_1;
   exactLexicalSourceFacts?: readonly AlbanianKaikkiExactLexicalSourceFactV0_1[];
+  sourceIpaSevenVoiceAnalyses?: readonly AlbanianKaikkiSourceIpaSevenVoiceAnalysisV0_1[];
   derivedStructure: Readonly<{
     layer: "DERIVED_STRUCTURE";
     voicePath: string[];
