@@ -14,6 +14,10 @@ import {
   type AlbanianKaikkiExactLexicalSourceFactV0_1,
   type AlbanianKaikkiServerOnlyExactLexicalSourceProviderV0_1,
 } from "@/shared/openInstrument/albanianKaikkiServerOnlyExactLexicalSource.v0_1";
+import {
+  projectAlbanianKaikkiFactSourceIpaToSevenVoicesV0_1,
+  projectAlbanianKaikkiFactsSourceIpaToSevenVoicesV0_1,
+} from "@/shared/openInstrument/albanianKaikkiSourceIpaSevenVoiceProductInterpretation.v0_1";
 import { adaptAnalysisToTelemetryVM } from "@/ui/instrument/contractAdapter";
 import { MotivationDiscoveryCardV0_1 } from "@/ui/instrument/sections/MotivationDiscoveryCard.v0_1";
 import { createElement } from "react";
@@ -252,6 +256,38 @@ describe("real Albanian exact lexical source integration v0.1", () => {
     expect(result.discovery.derivedStructure.voicePathSource).toBe("albanian_profile");
     expect(result.discovery.derivedStructure.gamma.status).toBe("profile_derived");
     expect(result.discovery.candidates.every((candidate) => candidate.candidateForm !== "nënë")).toBe(true);
+    expect(result.discovery.sourceIpaSevenVoiceAnalyses).toMatchObject([{
+      rawIpa: "/nənə/",
+      status: "SUPPORTED",
+      voicePath: ["Ë", "Ë"],
+      authorityBoundary: "CURRENT_KAIKKI_IPA_SOURCE_DERIVED_PRODUCT_INTERPRETATION_NOT_FROZEN_PRONUNCIATION_AUTHORITY",
+      sourceRecordId: "kaikki-albanian-jsonl:word=nënë:ordinal=0",
+    }]);
+  });
+
+  it("maps supported source IPA and preserves explicit Null for glide and missing observations", () => {
+    const analyses = projectAlbanianKaikkiFactSourceIpaToSevenVoicesV0_1(fixtureFact({
+      ipaObservations: [
+        { soundIndex: 0, ipa: "/nənə/", tags: [] },
+        { soundIndex: 1, ipa: "/ujə/", tags: ["variant"] },
+        { soundIndex: 2, ipa: null, tags: ["missing"] },
+      ],
+    }));
+
+    expect(analyses[0]).toMatchObject({ status: "SUPPORTED", voicePath: ["Ë", "Ë"], nucleusStructure: "SEQUENTIAL_NUCLEI" });
+    expect(analyses[1]).toMatchObject({
+      status: "NULL",
+      voicePath: [],
+      nucleusStructure: "UNRESOLVED_NUCLEUS_STRUCTURE",
+      reasonCodes: ["NUCLEUS_STRUCTURE_UNRESOLVED"],
+      tags: ["variant"],
+    });
+    expect(analyses[2]).toMatchObject({
+      status: "NULL",
+      rawIpa: null,
+      reasonCodes: ["IPA_OBSERVATION_MISSING"],
+      tags: ["missing"],
+    });
   });
 
   it("renders exact Albanian source facts as a separate UI section", () => {
@@ -275,6 +311,7 @@ describe("real Albanian exact lexical source integration v0.1", () => {
         reasonCode: null,
       },
       exactLexicalSourceFacts: [fixtureFact()],
+      sourceIpaSevenVoiceAnalyses: projectAlbanianKaikkiFactsSourceIpaToSevenVoicesV0_1([fixtureFact()]),
       derivedStructure: {
         layer: "DERIVED_STRUCTURE" as const,
         voicePath: ["A", "I"],
@@ -300,8 +337,11 @@ describe("real Albanian exact lexical source integration v0.1", () => {
     expect(screen.getByTestId("albanian-exact-lexical-source-facts")).toBeInTheDocument();
     expect(screen.getAllByText("nënë").length).toBeGreaterThanOrEqual(2);
     expect(screen.getByText("mother · grandmother")).toBeInTheDocument();
-    expect(screen.getByText("/nənə/", { exact: false })).toBeInTheDocument();
+    expect(screen.getAllByText("/nənə/", { exact: false }).length).toBeGreaterThanOrEqual(2);
     expect(screen.getByText(/CURRENT_KAIKKI_RECORD_ONLY_UNBOUND_TO_FROZEN_PROFILE/)).toBeInTheDocument();
+    expect(screen.getByTestId("albanian-source-ipa-seven-voices")).toBeInTheDocument();
+    expect(screen.getByText("Ë → Ë", { exact: false })).toBeInTheDocument();
+    expect(screen.getByText(/CURRENT_KAIKKI_IPA_SOURCE_DERIVED_PRODUCT_INTERPRETATION_NOT_FROZEN_PRONUNCIATION_AUTHORITY/)).toBeInTheDocument();
     expect(screen.getByTestId("motivation-discovery-card")).toHaveTextContent("albanian_profile");
   });
 });

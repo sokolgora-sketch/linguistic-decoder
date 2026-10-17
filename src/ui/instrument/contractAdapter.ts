@@ -930,6 +930,56 @@ function parseMotivationDiscoveryV0_1(
       fact.sourceSnapshot.bytes === 67438537
     );
   };
+  const validSourceIpaSevenVoiceAnalysis = (analysis: unknown): boolean => {
+    if (!isRecord(analysis) || !isRecord(analysis.sourceSnapshot) || !isRecord(analysis.nonVoiceFeatures) || !Array.isArray(analysis.nuclei)) {
+      return false;
+    }
+    const validNucleus = (nucleus: unknown): boolean =>
+      isRecord(nucleus) &&
+      typeof nucleus.order === "number" &&
+      Number.isInteger(nucleus.order) &&
+      nucleus.order >= 0 &&
+      typeof nucleus.raw === "string" &&
+      typeof nucleus.baseSymbol === "string" &&
+      isStringArray(nucleus.combiningMarks) &&
+      (nucleus.category === null || typeof nucleus.category === "string") &&
+      (nucleus.voice === null || typeof nucleus.voice === "string") &&
+      (nucleus.status === "SUPPORTED" || nucleus.status === "NULL") &&
+      isStringArray(nucleus.reasonCodes);
+    const valid = (
+      analysis.schemaVersion === "open-instrument.albanian-kaikki-source-ipa-seven-voice-product-interpretation.v0_1" &&
+      analysis.interpretationId === "ALBANIAN_KAIKKI_SOURCE_IPA_SEVEN_VOICE_PRODUCT_INTERPRETATION_V0_1" &&
+      (analysis.status === "SUPPORTED" || analysis.status === "NULL") &&
+      analysis.authorityBoundary === "CURRENT_KAIKKI_IPA_SOURCE_DERIVED_PRODUCT_INTERPRETATION_NOT_FROZEN_PRONUNCIATION_AUTHORITY" &&
+      analysis.sourcePronunciationAuthority === "CURRENT_KAIKKI_RECORD_ONLY_UNBOUND_TO_FROZEN_PROFILE" &&
+      typeof analysis.sourceRecordId === "string" &&
+      typeof analysis.entryLocator === "string" &&
+      typeof analysis.physicalRecordOrdinal === "number" &&
+      Number.isInteger(analysis.physicalRecordOrdinal) &&
+      analysis.physicalRecordOrdinal >= 0 &&
+      typeof analysis.form === "string" &&
+      typeof analysis.soundIndex === "number" &&
+      Number.isInteger(analysis.soundIndex) &&
+      analysis.soundIndex >= 0 &&
+      isStringArray(analysis.tags) &&
+      (analysis.rawIpa === null || typeof analysis.rawIpa === "string") &&
+      (analysis.pronunciationBody === null || typeof analysis.pronunciationBody === "string") &&
+      (analysis.notationKind === "PHONEMIC" || analysis.notationKind === "PHONETIC" || analysis.notationKind === "UNSPECIFIED" || analysis.notationKind === "NULL") &&
+      isStringArray(analysis.nonVoiceFeatures.stressMarkers) &&
+      isStringArray(analysis.nonVoiceFeatures.lengthMarkers) &&
+      isStringArray(analysis.nonVoiceFeatures.nasalizationMarks) &&
+      (analysis.nucleusStructure === "MONOPHTHONG_NUCLEUS" || analysis.nucleusStructure === "SEQUENTIAL_NUCLEI" || analysis.nucleusStructure === "UNRESOLVED_NUCLEUS_STRUCTURE" || analysis.nucleusStructure === "NULL") &&
+      isStringArray(analysis.voicePath) &&
+      isStringArray(analysis.reasonCodes) &&
+      isStringArray(analysis.authorityRefs) &&
+      typeof analysis.sourceSnapshot.sourceFamilyId === "string" &&
+      typeof analysis.sourceSnapshot.sourceUrl === "string" &&
+      typeof analysis.sourceSnapshot.sha256 === "string" &&
+      analysis.sourceSnapshot.bytes === 67438537 &&
+      analysis.nuclei.every(validNucleus)
+    );
+    return valid;
+  };
 
   if (
     (sourceFact.layer !== "SOURCE_FACT") ||
@@ -965,7 +1015,9 @@ function parseMotivationDiscoveryV0_1(
         (exactLexicalSourceStatus.queryForm !== null && typeof exactLexicalSourceStatus.queryForm !== "string") ||
         (exactLexicalSourceStatus.reasonCode !== null && typeof exactLexicalSourceStatus.reasonCode !== "string"))) ||
     (exactLexicalSourceFacts !== undefined &&
-      (!Array.isArray(exactLexicalSourceFacts) || !exactLexicalSourceFacts.every(validExactLexicalSourceFact)))
+      (!Array.isArray(exactLexicalSourceFacts) || !exactLexicalSourceFacts.every(validExactLexicalSourceFact))) ||
+    (value.sourceIpaSevenVoiceAnalyses !== undefined &&
+      (!Array.isArray(value.sourceIpaSevenVoiceAnalyses) || !value.sourceIpaSevenVoiceAnalyses.every(validSourceIpaSevenVoiceAnalysis)))
   ) {
     return missing("malformed", "motivationDiscoveryV0_1 derived structure invalid");
   }

@@ -16,6 +16,10 @@ import {
   type AlbanianKaikkiServerOnlyExactLexicalSourceProviderV0_1,
 } from "@/shared/openInstrument/albanianKaikkiServerOnlyExactLexicalSource.v0_1";
 import {
+  projectAlbanianKaikkiFactsSourceIpaToSevenVoicesV0_1,
+  type AlbanianKaikkiSourceIpaSevenVoiceAnalysisV0_1,
+} from "@/shared/openInstrument/albanianKaikkiSourceIpaSevenVoiceProductInterpretation.v0_1";
+import {
   normalizeEnglishLexicalJoinKeyV0_1,
 } from "@/shared/openInstrument/englishLexicalSenseSourceContract.v0_1";
 import {
@@ -47,6 +51,8 @@ export type MotivationEngineDiscoveryWithAlbanianLexicalFactsV0_1 = Readonly<
     /** Additive exact-input source facts; never structural candidates or Voice authority. */
     exactLexicalSourceStatus: AlbanianKaikkiExactLexicalSourceStatusV0_1;
     exactLexicalSourceFacts: readonly AlbanianKaikkiExactLexicalSourceFactV0_1[];
+    /** Separate current-source IPA interpretation; never the canonical/profile-derived path. */
+    sourceIpaSevenVoiceAnalyses: readonly AlbanianKaikkiSourceIpaSevenVoiceAnalysisV0_1[];
   }
 >;
 
@@ -308,13 +314,16 @@ export async function buildMotivationEngineDiscoveryServerOnlyV0_1(input: {
   );
 
   const discovery = attachSourceFamilyProjectionV0_1(buildMotivationEngineDiscoveryV0_1({
-      word: input.word,
-      inputLanguage: input.inputLanguage,
-      inputProfile: input.inputProfile,
-      analysis: input.analysis,
-      heart: input.heart,
-      sourceAdapters: recordingSourceAdapters,
-    }), sourceFamilyBySourceId);
+    word: input.word,
+    inputLanguage: input.inputLanguage,
+    inputProfile: input.inputProfile,
+    analysis: input.analysis,
+    heart: input.heart,
+    sourceAdapters: recordingSourceAdapters,
+  }), sourceFamilyBySourceId);
+  const exactLexicalSourceFacts = albanianLexicalSourceResult?.status === "MATCHES_FOUND"
+    ? albanianLexicalSourceResult.facts
+    : Object.freeze([]) as readonly AlbanianKaikkiExactLexicalSourceFactV0_1[];
   return Object.freeze({
     discovery: Object.freeze({
       ...discovery,
@@ -329,9 +338,10 @@ export async function buildMotivationEngineDiscoveryServerOnlyV0_1(input: {
             queryForm: null,
             reasonCode: "NOT_ALBANIAN_INPUT",
           },
-      exactLexicalSourceFacts: albanianLexicalSourceResult?.status === "MATCHES_FOUND"
-        ? albanianLexicalSourceResult.facts
-        : Object.freeze([]),
+      exactLexicalSourceFacts,
+      sourceIpaSevenVoiceAnalyses: projectAlbanianKaikkiFactsSourceIpaToSevenVoicesV0_1(
+        exactLexicalSourceFacts,
+      ),
     }),
     englishProvider: resolved.operationalStatus,
   });
