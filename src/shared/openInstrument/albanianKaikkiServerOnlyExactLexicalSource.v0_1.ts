@@ -1,5 +1,6 @@
 import { createHash } from "node:crypto";
-import { readFile } from "node:fs/promises";
+import { createReadStream } from "node:fs";
+import { createInterface } from "node:readline";
 
 export const ALBANIAN_KAIKKI_SERVER_ONLY_EXACT_LEXICAL_SOURCE_PROVIDER_ID_V0_1 =
   "open-instrument.albanian-kaikki-server-only-exact-lexical-source.v0.1" as const;
@@ -232,51 +233,69 @@ function providerFromFactsV0_1(
   });
 }
 
-function recordFromJsonLineV0_1(
-  line: string,
-  physicalRecordOrdinal: number,
-  matchOrdinalByKey: Map<string, number>,
-): AlbanianKaikkiExactLexicalSourceFactV0_1 | null {
-  let parsed: unknown;
-  try {
-    parsed = JSON.parse(line) as unknown;
-  } catch {
-    throw new Error("ALBANIAN_SOURCE_RECORD_FAILURE");
-  }
-  if (!isRecordV0_1(parsed)) throw new Error("ALBANIAN_SOURCE_RECORD_FAILURE");
-  const form = textV0_1(parsed.word);
-  if (!form || parsed.lang_code !== "sq") return null;
-  const key = lookupKeyV0_1(form);
-  const matchOrdinal = matchOrdinalByKey.get(key) ?? 0;
-  matchOrdinalByKey.set(key, matchOrdinal + 1);
-  return sourceFactV0_1(parsed, physicalRecordOrdinal, matchOrdinal);
-}
-
-async function loadFactsV0_1(
+async function lookupSourceFileV0_1(
   sourcePath: string,
-): Promise<readonly AlbanianKaikkiExactLexicalSourceFactV0_1[]> {
-  let bytes: Buffer;
+  queryForm: string,
+): Promise<AlbanianKaikkiExactLexicalSourceLookupResultV0_1> {
+  const stream = createReadStream(sourcePath);
+  const hash = createHash("sha256");
+  let byteCount = 0;
+  stream.on("data", (chunk: string | Buffer) => {
+    byteCount += typeof chunk === "string" ? Buffer.byteLength(chunk) : chunk.byteLength;
+    hash.update(chunk);
+  });
+
+  const reader = createInterface({ input: stream, crlfDelay: Infinity });
+  const queryKey = lookupKeyV0_1(queryForm);
+  const facts: AlbanianKaikkiExactLexicalSourceFactV0_1[] = [];
+  let physicalRecordOrdinal = 0;
+  let matchOrdinal = 0;
+
   try {
-    bytes = await readFile(sourcePath);
-  } catch {
-    throw new Error("ALBANIAN_SOURCE_READ_FAILURE");
+    for await (const line of reader) {
+      const currentPhysicalRecordOrdinal = physicalRecordOrdinal;
+      physicalRecordOrdinal += 1;
+      if (!line) continue;
+
+      let parsed: unknown;
+      try {
+        parsed = JSON.parse(line) as unknown;
+      } catch {
+        throw new Error("ALBANIAN_SOURCE_RECORD_FAILURE");
+      }
+      if (!isRecordV0_1(parsed)) throw new Error("ALBANIAN_SOURCE_RECORD_FAILURE");
+      const form = textV0_1(parsed.word);
+      if (!form || parsed.lang_code !== "sq" || lookupKeyV0_1(form) !== queryKey) {
+        continue;
+      }
+      const fact = sourceFactV0_1(parsed, currentPhysicalRecordOrdinal, matchOrdinal);
+      if (fact) {
+        facts.push(fact);
+        matchOrdinal += 1;
+      }
+    }
+  } finally {
+    reader.close();
   }
 
-  const sha256 = createHash("sha256").update(bytes).digest("hex");
-  if (bytes.byteLength !== ALBANIAN_KAIKKI_LEXICAL_SOURCE_BYTES_V0_1 || sha256 !== ALBANIAN_KAIKKI_LEXICAL_SOURCE_SHA256_V0_1) {
+  const sha256 = hash.digest("hex");
+  if (byteCount !== ALBANIAN_KAIKKI_LEXICAL_SOURCE_BYTES_V0_1 || sha256 !== ALBANIAN_KAIKKI_LEXICAL_SOURCE_SHA256_V0_1) {
     throw new Error("ALBANIAN_SOURCE_IDENTITY_MISMATCH");
   }
 
-  const facts: AlbanianKaikkiExactLexicalSourceFactV0_1[] = [];
-  const matchOrdinalByKey = new Map<string, number>();
-  const lines = bytes.toString("utf8").split("\n");
-  for (let physicalRecordOrdinal = 0; physicalRecordOrdinal < lines.length; physicalRecordOrdinal += 1) {
-    const line = lines[physicalRecordOrdinal]?.replace(/\r$/u, "");
-    if (!line) continue;
-    const fact = recordFromJsonLineV0_1(line, physicalRecordOrdinal, matchOrdinalByKey);
-    if (fact) facts.push(fact);
-  }
-  return Object.freeze(facts);
+  return facts.length > 0
+    ? Object.freeze({
+        status: "MATCHES_FOUND" as const,
+        queryForm,
+        facts: Object.freeze(facts),
+        reasonCode: null,
+      })
+    : Object.freeze({
+        status: "SOURCE_NOT_FOUND" as const,
+        queryForm,
+        facts: Object.freeze([]) as readonly [],
+        reasonCode: "ALBANIAN_EXACT_FORM_NOT_FOUND" as const,
+      });
 }
 
 export async function createAlbanianKaikkiServerOnlyExactLexicalSourceProviderV0_1(
@@ -290,21 +309,33 @@ export async function createAlbanianKaikkiServerOnlyExactLexicalSourceProviderV0
     });
   }
 
-  try {
-    return providerFromFactsV0_1(await loadFactsV0_1(sourcePath));
-  } catch (error) {
-    const reasonCode = error instanceof Error &&
-        (error.message === "ALBANIAN_SOURCE_IDENTITY_MISMATCH" ||
-          error.message === "ALBANIAN_SOURCE_READ_FAILURE" ||
-          error.message === "ALBANIAN_SOURCE_RECORD_FAILURE")
-      ? error.message
-      : "ALBANIAN_SOURCE_READ_FAILURE";
-    return Object.freeze({
-      providerId: ALBANIAN_KAIKKI_SERVER_ONLY_EXACT_LEXICAL_SOURCE_PROVIDER_ID_V0_1,
-      runtimeBoundary: "SERVER_ONLY" as const,
-      query: async () => unavailableV0_1(reasonCode),
-    });
-  }
+  return Object.freeze({
+    providerId: ALBANIAN_KAIKKI_SERVER_ONLY_EXACT_LEXICAL_SOURCE_PROVIDER_ID_V0_1,
+    runtimeBoundary: "SERVER_ONLY" as const,
+    query: async (query: unknown) => {
+      const queryForm = queryFormV0_1(query);
+      if (!queryForm) {
+        return Object.freeze({
+          status: "SOURCE_NOT_FOUND" as const,
+          queryForm: null,
+          facts: Object.freeze([]) as readonly [],
+          reasonCode: "ALBANIAN_EXACT_FORM_INVALID_QUERY" as const,
+        });
+      }
+
+      try {
+        return await lookupSourceFileV0_1(sourcePath, queryForm);
+      } catch (error) {
+        const reasonCode = error instanceof Error &&
+            (error.message === "ALBANIAN_SOURCE_IDENTITY_MISMATCH" ||
+              error.message === "ALBANIAN_SOURCE_READ_FAILURE" ||
+              error.message === "ALBANIAN_SOURCE_RECORD_FAILURE")
+          ? error.message
+          : "ALBANIAN_SOURCE_READ_FAILURE";
+        return unavailableV0_1(reasonCode);
+      }
+    },
+  });
 }
 
 export function createAlbanianKaikkiServerOnlyExactLexicalSourceProviderForSyntheticFixtureV0_1(
