@@ -57,6 +57,20 @@ async function analysisFor(word: string) {
   return enginePayloadToAnalysisResult(payload);
 }
 
+async function discoveryForFactV0_1(fact: AlbanianKaikkiExactLexicalSourceFactV0_1) {
+  const word = fact.form;
+  const provider = createAlbanianKaikkiServerOnlyExactLexicalSourceProviderForSyntheticFixtureV0_1({ facts: [fact] });
+  const result = await buildMotivationEngineDiscoveryServerOnlyV0_1({
+    word,
+    inputLanguage: "sq",
+    inputProfile: "albanian",
+    analysis: await analysisFor(word),
+    heart: buildHeartInstrumentV1(word),
+    albanianLexicalSourceProvider: provider,
+  });
+  return result.discovery;
+}
+
 type SyntheticSourceRecordV0_1 = Readonly<{
   word: string;
   lang_code: "sq";
@@ -271,6 +285,10 @@ describe("real Albanian exact lexical source integration v0.1", () => {
         { soundIndex: 0, ipa: "/nənə/", tags: [] },
         { soundIndex: 1, ipa: "/ujə/", tags: ["variant"] },
         { soundIndex: 2, ipa: null, tags: ["missing"] },
+        { soundIndex: 3, ipa: "/pi.a/", tags: ["explicit-boundary"] },
+        { soundIndex: 4, ipa: "/pia/", tags: ["unresolved-adjacency"] },
+        { soundIndex: 5, ipa: "/ˈpi·a/", tags: ["stress-explicit-boundary"] },
+        { soundIndex: 6, ipa: "/sy/", tags: ["y"] },
       ],
     }));
 
@@ -287,6 +305,99 @@ describe("real Albanian exact lexical source integration v0.1", () => {
       rawIpa: null,
       reasonCodes: ["IPA_OBSERVATION_MISSING"],
       tags: ["missing"],
+    });
+    expect(analyses[3]).toMatchObject({
+      status: "SUPPORTED",
+      voicePath: ["I", "A"],
+      nucleusStructure: "SEQUENTIAL_NUCLEI",
+      pronunciationBody: "pia",
+    });
+    expect(analyses[4]).toMatchObject({
+      status: "NULL",
+      voicePath: [],
+      nucleusStructure: "UNRESOLVED_NUCLEUS_STRUCTURE",
+      reasonCodes: ["NUCLEUS_STRUCTURE_UNRESOLVED", "PLAIN_IPA_ADJACENCY_INSUFFICIENT"],
+    });
+    expect(analyses[5]).toMatchObject({ status: "SUPPORTED", voicePath: ["I", "A"] });
+    expect(analyses[6]).toMatchObject({ status: "SUPPORTED", voicePath: ["Y"] });
+  });
+
+  it("accepts canonical source Voice paths and rejects malformed Voice/category payloads", async () => {
+    const neneDiscovery = await discoveryForFactV0_1(fixtureFact());
+    const yDiscovery = await discoveryForFactV0_1(fixtureFact({
+      sourceRecordId: "kaikki-albanian-jsonl:word=sy:ordinal=0",
+      entryLocator: "jsonl://word/sy/match/0",
+      form: "sy",
+      ipaObservations: [{ soundIndex: 0, ipa: "/sy/", tags: [] }],
+    }));
+    const nullDiscovery = await discoveryForFactV0_1(fixtureFact({
+      sourceRecordId: "kaikki-albanian-jsonl:word=ujë:ordinal=0",
+      entryLocator: "jsonl://word/ujë/match/0",
+      form: "ujë",
+      ipaObservations: [{ soundIndex: 0, ipa: "/ujə/", tags: [] }],
+    }));
+
+    expect(adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: neneDiscovery }).motivationDiscoveryV0_1).toMatchObject({ kind: "present" });
+    expect(adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: yDiscovery }).motivationDiscoveryV0_1).toMatchObject({ kind: "present" });
+    expect(adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: nullDiscovery }).motivationDiscoveryV0_1).toMatchObject({ kind: "present" });
+
+    const yAnalysis = yDiscovery.sourceIpaSevenVoiceAnalyses?.[0];
+    const neneAnalysis = neneDiscovery.sourceIpaSevenVoiceAnalyses?.[0];
+    expect(yAnalysis?.voicePath).toEqual(["Y"]);
+    expect(neneAnalysis?.voicePath).toEqual(["Ë", "Ë"]);
+
+    const invalidVoicePath = {
+      ...yDiscovery,
+      sourceIpaSevenVoiceAnalyses: yDiscovery.sourceIpaSevenVoiceAnalyses?.map((analysis) => ({
+        ...analysis,
+        voicePath: ["X"],
+      })),
+    };
+    expect(adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: invalidVoicePath }).motivationDiscoveryV0_1).toMatchObject({
+      kind: "missing",
+      missing: "malformed",
+    });
+
+    const invalidNucleusVoice = {
+      ...neneDiscovery,
+      sourceIpaSevenVoiceAnalyses: neneDiscovery.sourceIpaSevenVoiceAnalyses?.map((analysis) => ({
+        ...analysis,
+        nuclei: analysis.nuclei.map((nucleus) => ({ ...nucleus, voice: "X" })),
+      })),
+    };
+    expect(adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: invalidNucleusVoice }).motivationDiscoveryV0_1).toMatchObject({
+      kind: "missing",
+      missing: "malformed",
+    });
+
+    const invalidCategoryVoicePair = {
+      ...neneDiscovery,
+      sourceIpaSevenVoiceAnalyses: neneDiscovery.sourceIpaSevenVoiceAnalyses?.map((analysis) => ({
+        ...analysis,
+        nuclei: analysis.nuclei.map((nucleus) => ({
+          ...nucleus,
+          category: "HIGH_FRONT_UNROUNDED",
+        })),
+      })),
+    };
+    expect(adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: invalidCategoryVoicePair }).motivationDiscoveryV0_1).toMatchObject({
+      kind: "missing",
+      missing: "malformed",
+    });
+
+    const invalidNucleusCategory = {
+      ...neneDiscovery,
+      sourceIpaSevenVoiceAnalyses: neneDiscovery.sourceIpaSevenVoiceAnalyses?.map((analysis) => ({
+        ...analysis,
+        nuclei: analysis.nuclei.map((nucleus) => ({
+          ...nucleus,
+          category: "INVALID_CATEGORY",
+        })),
+      })),
+    };
+    expect(adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: invalidNucleusCategory }).motivationDiscoveryV0_1).toMatchObject({
+      kind: "missing",
+      missing: "malformed",
     });
   });
 

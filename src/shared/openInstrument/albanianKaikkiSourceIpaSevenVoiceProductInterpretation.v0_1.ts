@@ -74,6 +74,7 @@ export type AlbanianKaikkiSourceIpaSevenVoiceAnalysisV0_1 = Readonly<{
 const STRESS_MARKERS_V0_1 = new Set(["ˈ", "ˌ"]);
 const LENGTH_MARKERS_V0_1 = new Set(["ː", "ˑ"]);
 const NASALIZATION_MARK_V0_1 = "\u0303";
+const SYLLABLE_BOUNDARY_SENTINEL_V0_1 = "\uE000";
 
 function sortedReasonsV0_1(
   reasons: readonly AlbanianKaikkiSourceIpaSevenVoiceProductReasonCodeV0_1[],
@@ -167,7 +168,14 @@ function projectObservationV0_1(
 
   const notation = notationAndBodyV0_1(observation.ipa);
   const body = normalizeIpaV0_1(notation.body);
-  const segments = classifyIpaSegmentsV0_1(body);
+  // Keep explicit source syllable boundaries in the classification-only input.
+  // The public normalized body remains the existing boundary-free form, while
+  // the sentinel prevents an asserted boundary from being mistaken for plain
+  // adjacent vowels. It is classified as `other` and never becomes a nucleus.
+  const boundaryPreservingBody = normalizeIpaV0_1(
+    notation.body.replace(/[.·]/gu, SYLLABLE_BOUNDARY_SENTINEL_V0_1),
+  );
+  const segments = classifyIpaSegmentsV0_1(boundaryPreservingBody);
   const vowelSegments = segments.filter((segment) => segment.cls === "vowel");
   const adjacentVowels = hasAdjacentVowelSegmentsV0_1(segments);
   const adjacentGlide = hasAdjacentGlideVowelV0_1(segments);

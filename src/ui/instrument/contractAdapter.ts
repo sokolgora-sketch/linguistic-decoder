@@ -1,6 +1,11 @@
 "use client";
 
 import { normalizePrinciplesToLabels } from "@/v1/principles.vocab.v0.1";
+import {
+  SEVEN_VOICE_CATEGORY_TO_VOICE_V0_1,
+  SEVEN_VOICE_PHONOLOGICAL_CATEGORY_VALUES_V0_1,
+} from "@/shared/openInstrument/sevenVoicePhonologicalCategoryAuthority.v0_1";
+import { isVowelVoice } from "@/shared/vowels/vowelVoices.v0.1";
 /**
  * UI contract adapter: raw analyze-v1 payload → TelemetryViewModel (VM).
  *
@@ -934,6 +939,10 @@ function parseMotivationDiscoveryV0_1(
     if (!isRecord(analysis) || !isRecord(analysis.sourceSnapshot) || !isRecord(analysis.nonVoiceFeatures) || !Array.isArray(analysis.nuclei)) {
       return false;
     }
+    const canonicalCategories = new Set<string>(SEVEN_VOICE_PHONOLOGICAL_CATEGORY_VALUES_V0_1);
+    const isCanonicalVoice = (voice: unknown): boolean => isVowelVoice(voice);
+    const isCanonicalCategory = (category: unknown): boolean =>
+      typeof category === "string" && canonicalCategories.has(category);
     const validNucleus = (nucleus: unknown): boolean =>
       isRecord(nucleus) &&
       typeof nucleus.order === "number" &&
@@ -942,10 +951,29 @@ function parseMotivationDiscoveryV0_1(
       typeof nucleus.raw === "string" &&
       typeof nucleus.baseSymbol === "string" &&
       isStringArray(nucleus.combiningMarks) &&
-      (nucleus.category === null || typeof nucleus.category === "string") &&
-      (nucleus.voice === null || typeof nucleus.voice === "string") &&
+      (nucleus.category === null || isCanonicalCategory(nucleus.category)) &&
+      (nucleus.voice === null || isCanonicalVoice(nucleus.voice)) &&
       (nucleus.status === "SUPPORTED" || nucleus.status === "NULL") &&
-      isStringArray(nucleus.reasonCodes);
+      isStringArray(nucleus.reasonCodes) &&
+      (nucleus.status === "SUPPORTED"
+        ? nucleus.category !== null &&
+          nucleus.voice !== null &&
+          nucleus.reasonCodes.length === 0 &&
+          SEVEN_VOICE_CATEGORY_TO_VOICE_V0_1[nucleus.category as keyof typeof SEVEN_VOICE_CATEGORY_TO_VOICE_V0_1] === nucleus.voice
+        : nucleus.category === null &&
+          nucleus.voice === null &&
+          nucleus.reasonCodes.length > 0);
+    const nuclei = analysis.nuclei;
+    const voicePath = analysis.voicePath;
+    const hasCanonicalVoicePath = isStringArray(voicePath) && voicePath.every(isCanonicalVoice);
+    const hasValidStatusRelationship =
+      analysis.status === "SUPPORTED"
+        ? hasCanonicalVoicePath &&
+          voicePath.length > 0 &&
+          voicePath.length === nuclei.length &&
+          nuclei.every((nucleus) => isRecord(nucleus) && nucleus.status === "SUPPORTED") &&
+          nuclei.every((nucleus, index) => nucleus.voice === voicePath[index])
+        : hasCanonicalVoicePath && voicePath.length === 0;
     const valid = (
       analysis.schemaVersion === "open-instrument.albanian-kaikki-source-ipa-seven-voice-product-interpretation.v0_1" &&
       analysis.interpretationId === "ALBANIAN_KAIKKI_SOURCE_IPA_SEVEN_VOICE_PRODUCT_INTERPRETATION_V0_1" &&
@@ -969,8 +997,9 @@ function parseMotivationDiscoveryV0_1(
       isStringArray(analysis.nonVoiceFeatures.lengthMarkers) &&
       isStringArray(analysis.nonVoiceFeatures.nasalizationMarks) &&
       (analysis.nucleusStructure === "MONOPHTHONG_NUCLEUS" || analysis.nucleusStructure === "SEQUENTIAL_NUCLEI" || analysis.nucleusStructure === "UNRESOLVED_NUCLEUS_STRUCTURE" || analysis.nucleusStructure === "NULL") &&
-      isStringArray(analysis.voicePath) &&
+      hasValidStatusRelationship &&
       isStringArray(analysis.reasonCodes) &&
+      (analysis.status === "SUPPORTED" ? analysis.reasonCodes.length === 0 : analysis.reasonCodes.length > 0) &&
       isStringArray(analysis.authorityRefs) &&
       typeof analysis.sourceSnapshot.sourceFamilyId === "string" &&
       typeof analysis.sourceSnapshot.sourceUrl === "string" &&
