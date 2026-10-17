@@ -99,6 +99,21 @@ function representationLabel(value: string): string {
   }
 }
 
+function exactLexicalSourceStatusLabel(
+  status: NonNullable<MotivationDiscoveryV0_1VM["exactLexicalSourceStatus"]>["status"],
+): string {
+  switch (status) {
+    case "MATCHES_FOUND":
+      return "Exact source records found";
+    case "SOURCE_NOT_FOUND":
+      return "No exact source record found";
+    case "UNAVAILABLE":
+      return "Source unavailable";
+    case "NOT_QUERIED":
+      return "Not queried for this input language";
+  }
+}
+
 function representationBoundary(candidate: MotivationDiscoveryCandidateV0_1VM): string | null {
   const comparison = candidate.structuralComparison;
   if (
@@ -369,6 +384,7 @@ export function MotivationDiscoveryCardV0_1({
   const lexicalSelfMatchCount = primaryWitnesses.filter(
     (witness) => witness.representative.structuralComparison.presentationClassification === "LEXICAL_ENTRY_CONFIRMATION",
   ).length;
+  const exactLexicalSourceFacts = value.exactLexicalSourceFacts ?? [];
 
   return (
     <section
@@ -458,6 +474,58 @@ export function MotivationDiscoveryCardV0_1({
           </div>
         </details>
       </div>
+
+      {value.exactLexicalSourceStatus ? (
+        <div
+          data-testid="albanian-exact-lexical-source-facts"
+          className="mt-3 rounded-lg border border-[#3f5368] bg-[#10161c] p-3 text-xs leading-5 text-[#c5ced8]"
+        >
+          <div className="font-semibold uppercase tracking-[0.12em] text-[#b8cce0]">
+            EXACT ALBANIAN LEXICAL SOURCE FACTS
+          </div>
+          <div className="mt-1 text-sm text-[#f5f7fb]">
+            {exactLexicalSourceStatusLabel(value.exactLexicalSourceStatus.status)}
+          </div>
+          <div className="mt-1 break-words font-mono text-[10px] text-[#9fb1bf]">
+            query: {value.exactLexicalSourceStatus.queryForm ?? "Null"} · reason: {value.exactLexicalSourceStatus.reasonCode ?? "none"}
+          </div>
+          {exactLexicalSourceFacts.length ? (
+            <div className="mt-3 space-y-3">
+              {exactLexicalSourceFacts.map((fact) => (
+                <article
+                  key={fact.sourceRecordId}
+                  className="rounded border border-[#303843] bg-[#0d1117] p-2"
+                >
+                  <div className="flex flex-wrap items-baseline gap-2">
+                    <div className="font-mono text-sm font-semibold text-[#f5f7fb]">{fact.form}</div>
+                    <div className="text-[#9fb1bf]">{fact.language} · {fact.partOfSpeech ?? "part of speech Null"}</div>
+                  </div>
+                  <div className="mt-1 text-[#d7dde7]">
+                    {fact.senses.flatMap((sense) => sense.glosses).join(" · ") || "No gloss recorded"}
+                  </div>
+                  <div className="mt-2 break-words text-[#9fb1bf]">
+                    IPA source data: {fact.ipaObservations.map((observation) => observation.ipa ?? "Null").join(" · ") || "Null"}
+                  </div>
+                  <div className="break-words text-[#9fb1bf]">
+                    Pronunciation authority: {fact.pronunciationAuthority}
+                  </div>
+                  <div className="break-words text-[#9fb1bf]">
+                    Source record: {fact.sourceRecordId} · {fact.entryLocator}
+                  </div>
+                  <div className="break-words text-[#9fb1bf]">
+                    Snapshot: {fact.sourceSnapshot.sha256} · {fact.sourceSnapshot.bytes} bytes
+                  </div>
+                  <div className="mt-1 text-[10px] text-[#7f8b99]">
+                    Exact lexical source fact only; IPA is not promoted to the canonical Voice path.
+                  </div>
+                </article>
+              ))}
+            </div>
+          ) : (
+            <div className="mt-2 text-[#d5c28f]">No exact lexical facts are available; Null is valid.</div>
+          )}
+        </div>
+      ) : null}
 
       {interpretation?.kind === "present" ? (
         <div

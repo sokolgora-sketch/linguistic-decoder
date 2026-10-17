@@ -892,6 +892,44 @@ function parseMotivationDiscoveryV0_1(
     : null;
   const isStringArray = (value: unknown): value is string[] =>
     Array.isArray(value) && value.every((item) => typeof item === "string");
+  const exactLexicalSourceStatus = value.exactLexicalSourceStatus;
+  const exactLexicalSourceFacts = value.exactLexicalSourceFacts;
+  const validExactLexicalSourceFact = (fact: unknown): boolean => {
+    if (!isRecord(fact) || !isRecord(fact.sourceSnapshot) || !Array.isArray(fact.senses) || !Array.isArray(fact.ipaObservations)) {
+      return false;
+    }
+    return (
+      typeof fact.sourceRecordId === "string" &&
+      typeof fact.entryLocator === "string" &&
+      typeof fact.physicalRecordOrdinal === "number" &&
+      Number.isInteger(fact.physicalRecordOrdinal) &&
+      fact.physicalRecordOrdinal >= 0 &&
+      fact.language === "Albanian" &&
+      fact.languageCode === "sq" &&
+      typeof fact.form === "string" &&
+      (fact.partOfSpeech === null || typeof fact.partOfSpeech === "string") &&
+      fact.senses.every((sense) =>
+        isRecord(sense) &&
+        (sense.senseId === null || typeof sense.senseId === "string") &&
+        isStringArray(sense.glosses)
+      ) &&
+      fact.ipaObservations.every((observation) =>
+        isRecord(observation) &&
+        typeof observation.soundIndex === "number" &&
+        Number.isInteger(observation.soundIndex) &&
+        observation.soundIndex >= 0 &&
+        (observation.ipa === null || typeof observation.ipa === "string") &&
+        isStringArray(observation.tags)
+      ) &&
+      fact.sourceStatus === "observed_external_snapshot" &&
+      fact.attestationTruth === "fact" &&
+      fact.pronunciationAuthority === "CURRENT_KAIKKI_RECORD_ONLY_UNBOUND_TO_FROZEN_PROFILE" &&
+      fact.sourceSnapshot.sourceFamilyId === "kaikki-albanian-jsonl-v0.1" &&
+      typeof fact.sourceSnapshot.sourceUrl === "string" &&
+      typeof fact.sourceSnapshot.sha256 === "string" &&
+      fact.sourceSnapshot.bytes === 67438537
+    );
+  };
 
   if (
     (sourceFact.layer !== "SOURCE_FACT") ||
@@ -917,7 +955,17 @@ function parseMotivationDiscoveryV0_1(
     (gamma.status !== "source_pronunciation" && gamma.status !== "profile_derived" && gamma.status !== "NULL") ||
     !isStringArray(gamma.orderedUnits) ||
     (zc.status !== "source_pronunciation" && zc.status !== "NULL") ||
-    !Array.isArray(zc.variants)
+    !Array.isArray(zc.variants) ||
+    (exactLexicalSourceStatus !== undefined &&
+      (!isRecord(exactLexicalSourceStatus) ||
+        (exactLexicalSourceStatus.status !== "MATCHES_FOUND" &&
+          exactLexicalSourceStatus.status !== "SOURCE_NOT_FOUND" &&
+          exactLexicalSourceStatus.status !== "UNAVAILABLE" &&
+          exactLexicalSourceStatus.status !== "NOT_QUERIED") ||
+        (exactLexicalSourceStatus.queryForm !== null && typeof exactLexicalSourceStatus.queryForm !== "string") ||
+        (exactLexicalSourceStatus.reasonCode !== null && typeof exactLexicalSourceStatus.reasonCode !== "string"))) ||
+    (exactLexicalSourceFacts !== undefined &&
+      (!Array.isArray(exactLexicalSourceFacts) || !exactLexicalSourceFacts.every(validExactLexicalSourceFact)))
   ) {
     return missing("malformed", "motivationDiscoveryV0_1 derived structure invalid");
   }
