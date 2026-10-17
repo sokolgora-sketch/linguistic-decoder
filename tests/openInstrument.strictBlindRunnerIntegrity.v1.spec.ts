@@ -452,6 +452,80 @@ describe("strict-blind pre-reveal completion marker recovery", () => {
     expect(readFileSync(finalizedPath, "utf8")).toBe("existing-marker\n");
   });
 
+  test("preserves a competing marker published after the initial existence check", () => {
+    const directory = makeDirectory();
+    const finalizedPath = join(directory, "pre-reveal.finalized");
+
+    expect(() =>
+      writeStrictBlindIntegrityPreRevealV1(
+        directory,
+        {
+          caseOpaqueId: "synthetic.marker.case.v1",
+          payloadSha256: "a".repeat(64),
+          artifact: {
+            schemaVersion: "synthetic.marker.v1",
+            artifactType: "synthetic_pre_reveal",
+            caseOpaqueId: "synthetic.marker.case.v1",
+            value: "synthetic-only",
+          },
+        },
+        {
+          onBeforeCompletionMarkerPublication: (artifactSha256) => {
+            writeFileSync(finalizedPath, `${artifactSha256}\n`, { flag: "wx" });
+          },
+        },
+      ),
+    ).toThrow();
+    expect(readFileSync(finalizedPath, "utf8")).toMatch(/^[a-f0-9]{64}\n$/u);
+    expect(existsSync(join(directory, "pre-reveal.primary.json"))).toBe(false);
+    expect(existsSync(join(directory, "pre-reveal.secondary.json"))).toBe(false);
+    expect(existsSync(join(directory, "pre-reveal.manifest.json"))).toBe(false);
+  });
+
+  test("prevents competing different artifacts from both reporting success", () => {
+    const directory = makeDirectory();
+    let competingWriterSucceeded = false;
+
+    expect(() =>
+      writeStrictBlindIntegrityPreRevealV1(
+        directory,
+        {
+          caseOpaqueId: "synthetic.marker.case.v1",
+          payloadSha256: "a".repeat(64),
+          artifact: {
+            schemaVersion: "synthetic.marker.v1",
+            artifactType: "synthetic_pre_reveal",
+            caseOpaqueId: "synthetic.marker.case.v1",
+            value: "first-artifact",
+          },
+        },
+        {
+          onBeforeCompletionMarkerPublication: () => {
+            try {
+              writeStrictBlindIntegrityPreRevealV1(directory, {
+                caseOpaqueId: "synthetic.marker.case.v1",
+                payloadSha256: "b".repeat(64),
+                artifact: {
+                  schemaVersion: "synthetic.marker.v1",
+                  artifactType: "synthetic_pre_reveal",
+                  caseOpaqueId: "synthetic.marker.case.v1",
+                  value: "competing-artifact",
+                },
+              });
+              competingWriterSucceeded = true;
+            } catch {
+              // The first successful primary publication owns the transaction.
+            }
+          },
+        },
+      ),
+    ).not.toThrow();
+    expect(competingWriterSucceeded).toBe(false);
+    expect(recoverStrictBlindIntegrityPreRevealV1(directory).artifact).toMatchObject({
+      value: "first-artifact",
+    });
+  });
+
   test("rejects an empty completion marker", () => {
     const fixture = makeMarkerFixture();
     writeFileSync(join(fixture.directory, "pre-reveal.finalized"), "");

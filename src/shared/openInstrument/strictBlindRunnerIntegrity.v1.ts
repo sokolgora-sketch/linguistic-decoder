@@ -53,6 +53,8 @@ export type StrictBlindIntegrityPersistenceFailurePointV1 =
 
 export type StrictBlindIntegrityPersistenceOptionsV1 = Readonly<{
   failurePoint?: StrictBlindIntegrityPersistenceFailurePointV1;
+  /** Synthetic-only deterministic coordination hook; production callers omit it. */
+  onBeforeCompletionMarkerPublication?: (artifactSha256: string) => void;
 }>;
 
 export type StrictBlindIntegrityAcquisitionModeV1 =
@@ -574,16 +576,11 @@ type StrictBlindIntegrityAtomicWriteLabelV1 =
   | "MANIFEST"
   | "COMPLETION_MARKER";
 
-type StrictBlindIntegrityAtomicWriteOptionsV1 = Readonly<{
-  noClobber?: boolean;
-}>;
-
 function writeAtomicV1(
   path: string,
   bytes: Buffer,
   options: StrictBlindIntegrityPersistenceOptionsV1,
   label: StrictBlindIntegrityAtomicWriteLabelV1,
-  atomicOptions: StrictBlindIntegrityAtomicWriteOptionsV1 = {},
 ): void {
   const temporary = `${path}.${process.pid}.${Date.now()}.tmp`;
   let fileDescriptor: number | undefined;
@@ -606,13 +603,11 @@ function writeAtomicV1(
       options,
       `${label}_RENAME` as StrictBlindIntegrityPersistenceFailurePointV1,
     );
-    if (atomicOptions.noClobber === true) {
-      linkSync(temporary, path);
-      destinationPublished = true;
-      unlinkSync(temporary);
-    } else {
-      renameSync(temporary, path);
-    }
+    // Same-directory link publication is atomic and refuses an existing
+    // destination. There is intentionally no rename/replace fallback.
+    linkSync(temporary, path);
+    destinationPublished = true;
+    unlinkSync(temporary);
   } catch (error) {
     if (fileDescriptor !== undefined) {
       try {
@@ -682,34 +677,45 @@ export function writeStrictBlindIntegrityPreRevealV1(
     revealGateStatus: "FORBIDDEN_UNTIL_DURABILITY_GATE",
     postRevealRewrite: "FORBIDDEN",
   };
-  writeAtomicV1(primaryPath, bytes, options, "PRIMARY");
-  failAtPersistencePointV1(options, "AFTER_PRIMARY_RENAME");
-  writeAtomicV1(secondaryPath, bytes, options, "SECONDARY");
-  writeAtomicV1(manifestPath, canonicalJsonV1(manifest), options, "MANIFEST");
-  syncDirectoryV1(directory, options);
-  failAtPersistencePointV1(options, "BEFORE_FINALIZATION");
-  try {
-    writeAtomicV1(
-      finalizedPath,
-      Buffer.from(`${artifactSha256}\n`, "utf8"),
-      options,
-      "COMPLETION_MARKER",
-      { noClobber: true },
-    );
-    syncDirectoryV1(directory, options, "FINAL_DIRECTORY_SYNC");
-  } catch (error) {
-    if (existsSync(finalizedPath)) {
+  const ownedPaths: string[] = [];
+  const publishOwned = (
+    path: string,
+    content: Buffer,
+    label: StrictBlindIntegrityAtomicWriteLabelV1,
+  ): void => {
+    writeAtomicV1(path, content, options, label);
+    ownedPaths.push(path);
+  };
+  const cleanupOwned = (): void => {
+    let removed = false;
+    for (const path of ownedPaths.toReversed()) {
       try {
-        unlinkSync(finalizedPath);
+        unlinkSync(path);
+        removed = true;
       } catch {
-        // Recovery must remain fail-closed if cleanup cannot complete.
+        // Preserve the original persistence failure; recovery remains fail-closed.
       }
+    }
+    if (removed) {
       try {
         syncDirectoryV1(directory, {});
       } catch {
         // Do not replace the original failure with best-effort cleanup failure.
       }
     }
+  };
+  try {
+    publishOwned(primaryPath, bytes, "PRIMARY");
+    failAtPersistencePointV1(options, "AFTER_PRIMARY_RENAME");
+    publishOwned(secondaryPath, bytes, "SECONDARY");
+    publishOwned(manifestPath, canonicalJsonV1(manifest), "MANIFEST");
+    syncDirectoryV1(directory, options);
+    failAtPersistencePointV1(options, "BEFORE_FINALIZATION");
+    options.onBeforeCompletionMarkerPublication?.(artifactSha256);
+    publishOwned(finalizedPath, Buffer.from(`${artifactSha256}\n`, "utf8"), "COMPLETION_MARKER");
+    syncDirectoryV1(directory, options, "FINAL_DIRECTORY_SYNC");
+  } catch (error) {
+    cleanupOwned();
     throw error;
   }
   return { preRevealArtifactSha256: artifactSha256, manifest };
