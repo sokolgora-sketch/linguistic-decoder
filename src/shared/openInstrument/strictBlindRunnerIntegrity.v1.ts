@@ -586,6 +586,12 @@ export function recoverStrictBlindIntegrityPreRevealV1(
   const primaryBytes = readFileSync(join(directory, "pre-reveal.primary.json"));
   const secondaryBytes = readFileSync(join(directory, "pre-reveal.secondary.json"));
   const manifestBytes = readFileSync(join(directory, "pre-reveal.manifest.json"));
+  let completionMarker: string;
+  try {
+    completionMarker = readFileSync(join(directory, "pre-reveal.finalized"), "utf8");
+  } catch {
+    throw new Error("PRE_REVEAL_DURABILITY_RECOVERY_FAILED");
+  }
   let manifest: StrictBlindIntegrityManifestV1;
   let artifact: Readonly<Record<string, unknown>>;
   try {
@@ -595,13 +601,16 @@ export function recoverStrictBlindIntegrityPreRevealV1(
     throw new Error("PRE_REVEAL_DURABILITY_RECOVERY_FAILED");
   }
   const expectedManifest = JSON.parse(canonicalJsonV1(manifest).toString("utf8"));
+  const primarySha256 = sha256V1(primaryBytes);
   if (
     hasForbiddenTargetFieldV1(artifact) ||
     !primaryBytes.equals(secondaryBytes) ||
     JSON.stringify(manifest) !== JSON.stringify(expectedManifest) ||
-    sha256V1(primaryBytes) !== manifest.preRevealArtifactSha256 ||
-    sha256V1(primaryBytes) !== manifest.primarySha256 ||
+    primarySha256 !== manifest.preRevealArtifactSha256 ||
+    primarySha256 !== manifest.primarySha256 ||
     sha256V1(secondaryBytes) !== manifest.secondarySha256 ||
+    !/^[a-f0-9]{64}\n$/u.test(completionMarker) ||
+    completionMarker.slice(0, -1) !== primarySha256 ||
     manifest.targetRevealStatus !== "NOT_REQUESTED_AND_NOT_PERFORMED" ||
     manifest.revealGateStatus !== "FORBIDDEN_UNTIL_DURABILITY_GATE" ||
     manifest.postRevealRewrite !== "FORBIDDEN"

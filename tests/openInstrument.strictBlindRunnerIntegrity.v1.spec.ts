@@ -11,6 +11,7 @@ import {
   recoverStrictBlindIntegrityPreRevealV1,
   runStrictBlindIntegritySyntheticCaseV1,
   verifyStrictBlindIntegrityPackageV1,
+  writeStrictBlindIntegrityPreRevealV1,
   type StrictBlindIntegritySyntheticCaseInputV1,
   type StrictBlindIntegritySyntheticSourceAccessV1,
   type SyntheticSourceResultV1,
@@ -358,5 +359,98 @@ describe("strict-blind runner integrity repair v1", () => {
     const first = await runStrictBlindIntegritySyntheticCaseV1(firstInput);
     const second = await runStrictBlindIntegritySyntheticCaseV1(secondInput);
     expect(first).toEqual(second);
+  });
+});
+
+describe("strict-blind pre-reveal completion marker recovery", () => {
+  function makeMarkerFixture() {
+    const directory = makeDirectory();
+    const written = writeStrictBlindIntegrityPreRevealV1(directory, {
+      caseOpaqueId: "synthetic.marker.case.v1",
+      payloadSha256: "a".repeat(64),
+      artifact: {
+        schemaVersion: "synthetic.marker.v1",
+        artifactType: "synthetic_pre_reveal",
+        caseOpaqueId: "synthetic.marker.case.v1",
+        value: "synthetic-only",
+      },
+    });
+    return { directory, preRevealArtifactSha256: written.preRevealArtifactSha256 };
+  }
+
+  test("recovers a completed synthetic artifact with a valid marker", () => {
+    const fixture = makeMarkerFixture();
+    expect(recoverStrictBlindIntegrityPreRevealV1(fixture.directory).proof).toEqual({
+      primaryAndSecondaryMatch: true,
+      manifestMatches: true,
+      hashMatches: true,
+      independentlyRecovered: true,
+    });
+  });
+
+  test("rejects a missing completion marker", () => {
+    const fixture = makeMarkerFixture();
+    rmSync(join(fixture.directory, "pre-reveal.finalized"));
+    expect(() => recoverStrictBlindIntegrityPreRevealV1(fixture.directory)).toThrow(
+      "PRE_REVEAL_DURABILITY_RECOVERY_FAILED",
+    );
+  });
+
+  test("rejects an empty completion marker", () => {
+    const fixture = makeMarkerFixture();
+    writeFileSync(join(fixture.directory, "pre-reveal.finalized"), "");
+    expect(() => recoverStrictBlindIntegrityPreRevealV1(fixture.directory)).toThrow(
+      "PRE_REVEAL_DURABILITY_RECOVERY_FAILED",
+    );
+  });
+
+  test("rejects an incorrect completion-marker digest", () => {
+    const fixture = makeMarkerFixture();
+    writeFileSync(join(fixture.directory, "pre-reveal.finalized"), `${"0".repeat(64)}\n`);
+    expect(() => recoverStrictBlindIntegrityPreRevealV1(fixture.directory)).toThrow(
+      "PRE_REVEAL_DURABILITY_RECOVERY_FAILED",
+    );
+  });
+
+  test.each([
+    ["malformed", "not-a-sha\n"],
+    ["truncated", `${"a".repeat(63)}\n`],
+  ])("rejects a %s completion marker", (_label, marker) => {
+    const fixture = makeMarkerFixture();
+    writeFileSync(join(fixture.directory, "pre-reveal.finalized"), marker);
+    expect(() => recoverStrictBlindIntegrityPreRevealV1(fixture.directory)).toThrow(
+      "PRE_REVEAL_DURABILITY_RECOVERY_FAILED",
+    );
+  });
+
+  test("rejects unexpected additional completion-marker content", () => {
+    const fixture = makeMarkerFixture();
+    writeFileSync(
+      join(fixture.directory, "pre-reveal.finalized"),
+      `${fixture.preRevealArtifactSha256}\nextra\n`,
+    );
+    expect(() => recoverStrictBlindIntegrityPreRevealV1(fixture.directory)).toThrow(
+      "PRE_REVEAL_DURABILITY_RECOVERY_FAILED",
+    );
+  });
+
+  test("preserves primary, secondary, and manifest mismatch rejection", () => {
+    const primaryMismatch = makeMarkerFixture();
+    writeFileSync(join(primaryMismatch.directory, "pre-reveal.primary.json"), "tampered");
+    expect(() => recoverStrictBlindIntegrityPreRevealV1(primaryMismatch.directory)).toThrow(
+      "PRE_REVEAL_DURABILITY_RECOVERY_FAILED",
+    );
+
+    const secondaryMismatch = makeMarkerFixture();
+    writeFileSync(join(secondaryMismatch.directory, "pre-reveal.secondary.json"), "tampered");
+    expect(() => recoverStrictBlindIntegrityPreRevealV1(secondaryMismatch.directory)).toThrow(
+      "PRE_REVEAL_DURABILITY_RECOVERY_FAILED",
+    );
+
+    const manifestMismatch = makeMarkerFixture();
+    writeFileSync(join(manifestMismatch.directory, "pre-reveal.manifest.json"), "{}");
+    expect(() => recoverStrictBlindIntegrityPreRevealV1(manifestMismatch.directory)).toThrow(
+      "PRE_REVEAL_DURABILITY_RECOVERY_FAILED",
+    );
   });
 });
