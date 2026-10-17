@@ -22,9 +22,6 @@ import {
 import {
   getReviewedExternalLexiconProductionSourceRowsV0_1,
 } from "@/shared/reviewedExternalLexiconSourceRowRegistry.v0_1";
-import type {
-  AlbanianKaikkiExactLexicalSourceFactV0_1,
-} from "@/shared/openInstrument/albanianKaikkiServerOnlyExactLexicalSource.v0_1";
 import type { HeartInstrumentV1 } from "@/v1/heartInstrument.v1";
 
 export const MOTIVATION_ENGINE_DISCOVERY_SCHEMA_V0_1 =
@@ -52,12 +49,6 @@ export type MotivationFunctionalInterpretationEvidenceKindV0_1 =
   | "reviewed_functional_evidence"
   | "lexical_gloss_plus_structural_match"
   | "none";
-
-export type MotivationExactLexicalSourceStatusV0_1 = Readonly<{
-  status: "MATCHES_FOUND" | "SOURCE_NOT_FOUND" | "UNAVAILABLE" | "NOT_QUERIED";
-  queryForm: string | null;
-  reasonCode: string | null;
-}>;
 
 export type MotivationStructuralComparisonV0_1 = Readonly<{
   matchClassification:
@@ -151,9 +142,6 @@ export type MotivationEngineDiscoveryV0_1 = Readonly<{
     sourceStatus: string;
     authorityBoundary: string;
   }>;
-  /** Additive exact-input source facts; never structural candidates or Voice authority. */
-  exactLexicalSourceStatus?: MotivationExactLexicalSourceStatusV0_1;
-  exactLexicalSourceFacts?: readonly AlbanianKaikkiExactLexicalSourceFactV0_1[];
   derivedStructure: Readonly<{
     layer: "DERIVED_STRUCTURE";
     voicePath: readonly string[];

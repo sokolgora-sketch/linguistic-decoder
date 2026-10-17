@@ -11,6 +11,8 @@ import {
 } from "@/shared/openInstrument/englishKaikkiServerOnlyExactIndexProvider.v0_1";
 import {
   createAlbanianKaikkiServerOnlyExactLexicalSourceProviderV0_1,
+  type AlbanianKaikkiExactLexicalSourceFactV0_1,
+  type AlbanianKaikkiExactLexicalSourceStatusV0_1,
   type AlbanianKaikkiServerOnlyExactLexicalSourceProviderV0_1,
 } from "@/shared/openInstrument/albanianKaikkiServerOnlyExactLexicalSource.v0_1";
 import {
@@ -40,8 +42,16 @@ export type EnglishKaikkiProviderOperationalStatusV0_1 = Readonly<{
   failureReasonCodes: readonly string[];
 }>;
 
+export type MotivationEngineDiscoveryWithAlbanianLexicalFactsV0_1 = Readonly<
+  MotivationEngineDiscoveryV0_1 & {
+    /** Additive exact-input source facts; never structural candidates or Voice authority. */
+    exactLexicalSourceStatus: AlbanianKaikkiExactLexicalSourceStatusV0_1;
+    exactLexicalSourceFacts: readonly AlbanianKaikkiExactLexicalSourceFactV0_1[];
+  }
+>;
+
 export type MotivationEngineDiscoveryServerOnlyResultV0_1 = Readonly<{
-  discovery: MotivationEngineDiscoveryV0_1;
+  discovery: MotivationEngineDiscoveryWithAlbanianLexicalFactsV0_1;
   englishProvider: EnglishKaikkiProviderOperationalStatusV0_1;
 }>;
 

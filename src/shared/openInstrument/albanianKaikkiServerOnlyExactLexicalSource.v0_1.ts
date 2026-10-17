@@ -47,6 +47,12 @@ export type AlbanianKaikkiExactLexicalSourceFactV0_1 = Readonly<{
   }>;
 }>;
 
+export type AlbanianKaikkiExactLexicalSourceStatusV0_1 = Readonly<{
+  status: "MATCHES_FOUND" | "SOURCE_NOT_FOUND" | "UNAVAILABLE" | "NOT_QUERIED";
+  queryForm: string | null;
+  reasonCode: string | null;
+}>;
+
 export type AlbanianKaikkiExactLexicalSourceLookupResultV0_1 = Readonly<
   | {
       status: "MATCHES_FOUND";

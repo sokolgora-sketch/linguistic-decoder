@@ -11,6 +11,7 @@ import type {
 } from "@/shared/openInstrument/functionalMotivationInterpretation.v0_2";
 import type {
   AlbanianKaikkiExactLexicalSourceFactV0_1,
+  AlbanianKaikkiExactLexicalSourceStatusV0_1,
 } from "@/shared/openInstrument/albanianKaikkiServerOnlyExactLexicalSource.v0_1";
 
 /**
@@ -430,11 +431,7 @@ export type MotivationDiscoveryV0_1VM = Readonly<{
     sourceStatus: string;
     authorityBoundary: string;
   }>;
-  exactLexicalSourceStatus?: Readonly<{
-    status: "MATCHES_FOUND" | "SOURCE_NOT_FOUND" | "UNAVAILABLE" | "NOT_QUERIED";
-    queryForm: string | null;
-    reasonCode: string | null;
-  }>;
+  exactLexicalSourceStatus?: AlbanianKaikkiExactLexicalSourceStatusV0_1;
   exactLexicalSourceFacts?: readonly AlbanianKaikkiExactLexicalSourceFactV0_1[];
   derivedStructure: Readonly<{
     layer: "DERIVED_STRUCTURE";
