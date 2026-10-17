@@ -10,6 +10,10 @@ import {
   type EnglishKaikkiServerOnlyExactIndexProviderV0_1,
 } from "@/shared/openInstrument/englishKaikkiServerOnlyExactIndexProvider.v0_1";
 import {
+  createAlbanianKaikkiServerOnlyExactLexicalSourceProviderV0_1,
+  type AlbanianKaikkiServerOnlyExactLexicalSourceProviderV0_1,
+} from "@/shared/openInstrument/albanianKaikkiServerOnlyExactLexicalSource.v0_1";
+import {
   normalizeEnglishLexicalJoinKeyV0_1,
 } from "@/shared/openInstrument/englishLexicalSenseSourceContract.v0_1";
 import {
@@ -43,11 +47,28 @@ export type MotivationEngineDiscoveryServerOnlyResultV0_1 = Readonly<{
 
 let productionProviderPromise:
   Promise<EnglishKaikkiServerOnlyExactIndexProviderV0_1> | undefined;
+let productionAlbanianLexicalSourceProviderPromise:
+  Promise<AlbanianKaikkiServerOnlyExactLexicalSourceProviderV0_1> | undefined;
 
 function getProductionProviderV0_1(): Promise<EnglishKaikkiServerOnlyExactIndexProviderV0_1> {
   productionProviderPromise ??=
     createEnglishKaikkiServerOnlyExactIndexProviderV0_1();
   return productionProviderPromise;
+}
+
+function getProductionAlbanianLexicalSourceProviderV0_1(): Promise<AlbanianKaikkiServerOnlyExactLexicalSourceProviderV0_1> {
+  productionAlbanianLexicalSourceProviderPromise ??=
+    createAlbanianKaikkiServerOnlyExactLexicalSourceProviderV0_1();
+  return productionAlbanianLexicalSourceProviderPromise;
+}
+
+function isAlbanianInputV0_1(input: {
+  inputLanguage: string;
+  inputProfile: string;
+}): boolean {
+  const language = input.inputLanguage.normalize("NFC").trim().toLocaleLowerCase("en-US");
+  const profile = input.inputProfile.normalize("NFC").trim().toLocaleLowerCase("en-US");
+  return language === "sq" || language === "albanian" || profile === "sq" || profile === "albanian";
 }
 
 function createResolvedEnglishAdapterV0_1(
@@ -257,10 +278,14 @@ export async function buildMotivationEngineDiscoveryServerOnlyV0_1(input: {
   analysis: AnalyzeWordResultV1;
   heart: HeartInstrumentV1;
   provider?: EnglishKaikkiServerOnlyExactIndexProviderV0_1;
+  albanianLexicalSourceProvider?: AlbanianKaikkiServerOnlyExactLexicalSourceProviderV0_1;
 }): Promise<MotivationEngineDiscoveryServerOnlyResultV0_1> {
   const provider = input.provider ?? await getProductionProviderV0_1();
   const queryForms = getMotivationEngineDiscoveryQueryFormsV0_1(input);
   const resolved = await resolveEnglishRecordsV0_1(provider, queryForms);
+  const albanianLexicalSourceResult = isAlbanianInputV0_1(input)
+    ? await (input.albanianLexicalSourceProvider ?? await getProductionAlbanianLexicalSourceProviderV0_1()).query(input.word)
+    : null;
   const sourceAdapters: readonly GenericFunctionalWitnessSourceAdapterV1[] = [
     createAlbanianLexicalSubstrateWitnessAdapterV0_1(),
     createMultilingualDiscoverySubstrateS1LatinWitnessAdapterV0_2(),
@@ -272,15 +297,32 @@ export async function buildMotivationEngineDiscoveryServerOnlyV0_1(input: {
     sourceFamilyRecordingAdapterV0_1(adapter, sourceFamilyBySourceId),
   );
 
-  return Object.freeze({
-    discovery: attachSourceFamilyProjectionV0_1(buildMotivationEngineDiscoveryV0_1({
+  const discovery = attachSourceFamilyProjectionV0_1(buildMotivationEngineDiscoveryV0_1({
       word: input.word,
       inputLanguage: input.inputLanguage,
       inputProfile: input.inputProfile,
       analysis: input.analysis,
       heart: input.heart,
       sourceAdapters: recordingSourceAdapters,
-    }), sourceFamilyBySourceId),
+    }), sourceFamilyBySourceId);
+  return Object.freeze({
+    discovery: Object.freeze({
+      ...discovery,
+      exactLexicalSourceStatus: albanianLexicalSourceResult
+        ? {
+            status: albanianLexicalSourceResult.status,
+            queryForm: albanianLexicalSourceResult.queryForm,
+            reasonCode: albanianLexicalSourceResult.reasonCode,
+          }
+        : {
+            status: "NOT_QUERIED" as const,
+            queryForm: null,
+            reasonCode: "NOT_ALBANIAN_INPUT",
+          },
+      exactLexicalSourceFacts: albanianLexicalSourceResult?.status === "MATCHES_FOUND"
+        ? albanianLexicalSourceResult.facts
+        : Object.freeze([]),
+    }),
     englishProvider: resolved.operationalStatus,
   });
 }
