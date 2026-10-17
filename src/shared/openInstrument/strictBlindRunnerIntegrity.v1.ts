@@ -3,6 +3,7 @@ import {
   closeSync,
   existsSync,
   fsyncSync,
+  linkSync,
   mkdirSync,
   openSync,
   readFileSync,
@@ -573,14 +574,20 @@ type StrictBlindIntegrityAtomicWriteLabelV1 =
   | "MANIFEST"
   | "COMPLETION_MARKER";
 
+type StrictBlindIntegrityAtomicWriteOptionsV1 = Readonly<{
+  noClobber?: boolean;
+}>;
+
 function writeAtomicV1(
   path: string,
   bytes: Buffer,
   options: StrictBlindIntegrityPersistenceOptionsV1,
   label: StrictBlindIntegrityAtomicWriteLabelV1,
+  atomicOptions: StrictBlindIntegrityAtomicWriteOptionsV1 = {},
 ): void {
   const temporary = `${path}.${process.pid}.${Date.now()}.tmp`;
   let fileDescriptor: number | undefined;
+  let destinationPublished = false;
   try {
     fileDescriptor = openSync(temporary, "wx");
     failAtPersistencePointV1(
@@ -599,7 +606,13 @@ function writeAtomicV1(
       options,
       `${label}_RENAME` as StrictBlindIntegrityPersistenceFailurePointV1,
     );
-    renameSync(temporary, path);
+    if (atomicOptions.noClobber === true) {
+      linkSync(temporary, path);
+      destinationPublished = true;
+      unlinkSync(temporary);
+    } else {
+      renameSync(temporary, path);
+    }
   } catch (error) {
     if (fileDescriptor !== undefined) {
       try {
@@ -611,6 +624,13 @@ function writeAtomicV1(
     if (existsSync(temporary)) {
       try {
         unlinkSync(temporary);
+      } catch {
+        // Preserve the original persistence failure; recovery remains fail-closed.
+      }
+    }
+    if (destinationPublished && existsSync(path)) {
+      try {
+        unlinkSync(path);
       } catch {
         // Preserve the original persistence failure; recovery remains fail-closed.
       }
@@ -674,6 +694,7 @@ export function writeStrictBlindIntegrityPreRevealV1(
       Buffer.from(`${artifactSha256}\n`, "utf8"),
       options,
       "COMPLETION_MARKER",
+      { noClobber: true },
     );
     syncDirectoryV1(directory, options, "FINAL_DIRECTORY_SYNC");
   } catch (error) {

@@ -432,6 +432,26 @@ describe("strict-blind pre-reveal completion marker recovery", () => {
     );
   });
 
+  test("does not clobber an existing completion marker", () => {
+    const directory = makeDirectory();
+    const finalizedPath = join(directory, "pre-reveal.finalized");
+    writeFileSync(finalizedPath, "existing-marker\n", { flag: "wx" });
+
+    expect(() =>
+      writeStrictBlindIntegrityPreRevealV1(directory, {
+        caseOpaqueId: "synthetic.marker.case.v1",
+        payloadSha256: "a".repeat(64),
+        artifact: {
+          schemaVersion: "synthetic.marker.v1",
+          artifactType: "synthetic_pre_reveal",
+          caseOpaqueId: "synthetic.marker.case.v1",
+          value: "synthetic-only",
+        },
+      }),
+    ).toThrow();
+    expect(readFileSync(finalizedPath, "utf8")).toBe("existing-marker\n");
+  });
+
   test("rejects an empty completion marker", () => {
     const fixture = makeMarkerFixture();
     writeFileSync(join(fixture.directory, "pre-reveal.finalized"), "");
