@@ -385,6 +385,7 @@ export function MotivationDiscoveryCardV0_1({
     (witness) => witness.representative.structuralComparison.presentationClassification === "LEXICAL_ENTRY_CONFIRMATION",
   ).length;
   const exactLexicalSourceFacts = value.exactLexicalSourceFacts ?? [];
+  const sourceIpaSevenVoiceAnalyses = value.sourceIpaSevenVoiceAnalyses ?? [];
 
   return (
     <section
@@ -524,6 +525,51 @@ export function MotivationDiscoveryCardV0_1({
           ) : (
             <div className="mt-2 text-[#d5c28f]">No exact lexical facts are available; Null is valid.</div>
           )}
+        </div>
+      ) : null}
+
+      {sourceIpaSevenVoiceAnalyses.length > 0 ? (
+        <div
+          data-testid="albanian-source-ipa-seven-voices"
+          className="mt-3 rounded-lg border border-[#4d4768] bg-[#11101a] p-3 text-xs leading-5 text-[#c5ced8]"
+        >
+          <div className="font-semibold uppercase tracking-[0.12em] text-[#c7b9ef]">
+            SOURCE IPA → SEVEN VOICES
+          </div>
+          <div className="mt-1 text-sm text-[#f5f7fb]">
+            Current Kaikki IPA interpreted through the existing Seven-Voice reference quantizer
+          </div>
+          <div className="mt-1 text-[10px] text-[#9fb1bf]">
+            Product interpretation only; this does not promote current-source IPA to frozen pronunciation authority or replace the separate profile-derived path.
+          </div>
+          <div className="mt-3 space-y-3">
+            {sourceIpaSevenVoiceAnalyses.map((analysis) => (
+              <article
+                key={`${analysis.sourceRecordId}:${analysis.soundIndex}`}
+                className="rounded border border-[#39334f] bg-[#0d0d14] p-2"
+              >
+                <div className="flex flex-wrap items-baseline gap-2">
+                  <div className="font-mono text-sm font-semibold text-[#f5f7fb]">{analysis.form}</div>
+                  <div className="text-[#9fb1bf]">sound {analysis.soundIndex} · {analysis.status}</div>
+                </div>
+                <div className="mt-1 break-words font-mono text-[#d7cffa]">
+                  IPA: {analysis.rawIpa ?? "Null"} · Voice path: {pathText(analysis.voicePath)}
+                </div>
+                <div className="break-words text-[#9fb1bf]">
+                  Nuclei: {analysis.nuclei.map((nucleus) => `${nucleus.raw} → ${nucleus.voice ?? "Null"}`).join(" · ") || "Null"}
+                </div>
+                <div className="break-words text-[#9fb1bf]">
+                  Reasons: {analysis.reasonCodes.join(", ") || "none"}
+                </div>
+                <div className="break-words text-[#9fb1bf]">
+                  Source record: {analysis.sourceRecordId} · ordinal {analysis.physicalRecordOrdinal}
+                </div>
+                <div className="break-words text-[10px] text-[#7f8b99]">
+                  Snapshot: {analysis.sourceSnapshot.sha256} · boundary: {analysis.authorityBoundary}
+                </div>
+              </article>
+            ))}
+          </div>
         </div>
       ) : null}
 
