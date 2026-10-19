@@ -5,12 +5,18 @@ import {
   selectFirstEligibleSyntheticM2CandidateV0_1,
 } from "../src/shared/openInstrument/oneEmbryoProofM2Preregistration.v0_1";
 import {
+  buildM2ControllerPrivateStructuralFreezeRecordV0_1,
+  computeM2SharedStructuralFingerprintV0_1,
+  findForbiddenM2OperatorVisibleProjectionKeysV0_1,
   buildSyntheticM2ArtifactCoreV0_1,
+  projectM2ControllerPrivateStructuralFreezeToOperatorV0_1,
+  serializeM2OperatorVisiblePayloadV0_1,
   findForbiddenM2BlindPayloadContentV0_1,
   validateM2SyntheticEligibilityPoolV0_1,
   type M2SyntheticCandidateEligibilityDeclarationV0_1,
   type M2SyntheticArtifactCoreInputV0_1,
 } from "../src/shared/openInstrument/m2SyntheticArtifactBuilderCore.v0_1";
+import { discoverStructuralHypothesesV0_1 } from "../src/shared/structuralHypothesisDiscovery.v0_1";
 
 const root = process.cwd();
 const pool = JSON.parse(
@@ -184,8 +190,24 @@ describe("Open Instrument M2 synthetic artifact builder core", () => {
     expect(result.payloadSha256).toBeDefined();
     expect(result.reasonCodes).toContain("SYNTHETIC_PAYLOAD_CORE_BUILT");
     expect(result.reasonCodes).toContain(
-      "M2_STRUCTURAL_FREEZE_BLINDNESS_CONTRACT_CONFLICT",
+      "M2_CONTROLLER_PRIVATE_RECORD_BUILT",
     );
+    expect(result.structuralFreeze.ready).toBe(true);
+    expect(Object.keys(result)).toEqual([
+      "status",
+      "selectedCandidate",
+      "structural",
+      "structuralFreeze",
+      "blindPayload",
+      "payloadBytes",
+      "payloadSha256",
+      "payloadByteLength",
+      "reasonCodes",
+    ]);
+    expect(JSON.stringify(result)).not.toContain("structuralHypothesis");
+    expect(JSON.stringify(result)).not.toContain("reductionSteps");
+    expect(JSON.stringify(result)).not.toContain("expansionChain");
+    expect(JSON.stringify(result)).not.toContain("controllerArtifactSha256");
     const repeat = buildSyntheticM2ArtifactCoreV0_1(
       syntheticInput("qay", {
         candidateDeclarations: [
@@ -199,6 +221,208 @@ describe("Open Instrument M2 synthetic artifact builder core", () => {
       true,
     );
     expect(JSON.stringify(result.blindPayload)).not.toContain("targetWord");
+    expect(JSON.stringify(result.blindPayload)).not.toContain("hypothesisId");
+    expect(JSON.stringify(result.blindPayload)).not.toContain("expansionChain");
+    expect(JSON.stringify(result.blindPayload)).not.toContain("reductionSteps");
+  });
+
+  test("binds a private structural record to a limited operator projection", () => {
+    const result = buildSyntheticM2ArtifactCoreV0_1(syntheticInput("qay"));
+    const hypothesis = discoverStructuralHypothesesV0_1("qay")[0];
+    expect(hypothesis).toBeDefined();
+    const privateRecord = buildM2ControllerPrivateStructuralFreezeRecordV0_1(
+      hypothesis as NonNullable<typeof hypothesis>,
+    );
+    expect(privateRecord.structuralHypothesis).toEqual(
+      expect.objectContaining({ basis: "qay", embryo: expect.any(String) }),
+    );
+    expect(privateRecord.controllerArtifactSha256).toMatch(/^[0-9a-f]{64}$/u);
+    expect(privateRecord.controllerArtifactByteLength).toBeGreaterThan(0);
+    expect(privateRecord.controllerArtifactSha256).not.toBe(
+      privateRecord.structuralFingerprint,
+    );
+    expect(privateRecord.structuralFingerprint).toBe(
+      computeM2SharedStructuralFingerprintV0_1(
+        privateRecord.structuralHypothesis.embryo,
+        result.blindPayload?.voicePath ?? [],
+      ),
+    );
+
+    const projection = projectM2ControllerPrivateStructuralFreezeToOperatorV0_1(
+      privateRecord,
+      {
+        caseOpaqueId: "synthetic:payload",
+        sourceUniverseId: "synthetic-source-universe-v0_1",
+        searchPolicyId: "synthetic-search-policy-v0_1",
+        stopRuleId: "synthetic-stop-rule-v0_1",
+        claimBoundary: ["research_only", "no_single_winner", "user_decides"],
+      },
+    );
+
+    expect(projection.status).toBe("PROJECTED");
+    expect(projection.operatorPayload).toEqual(result.blindPayload);
+    expect(projection.payloadSha256).toBe(result.payloadSha256);
+    expect(projection.payloadByteLength).toBe(result.payloadByteLength);
+    expect(projection.reasonCodes).toEqual(
+      expect.arrayContaining([
+        "M2_CONTROLLER_PRIVATE_RECORD_BUILT",
+        "M2_OPERATOR_PROJECTION_BUILT",
+      ]),
+    );
+
+    const privateKeys = findForbiddenM2OperatorVisibleProjectionKeysV0_1(
+      privateRecord?.structuralHypothesis,
+    );
+    expect(privateKeys).toEqual(
+      expect.arrayContaining([
+        "$.hypothesisId",
+        "$.basis",
+        "$.reductionSteps",
+        "$.expansionChain",
+      ]),
+    );
+    expect(findForbiddenM2OperatorVisibleProjectionKeysV0_1(
+      projection.operatorPayload,
+    )).toEqual([]);
+    expect(Object.keys(projection)).toEqual([
+      "status",
+      "operatorPayload",
+      "payloadBytes",
+      "payloadSha256",
+      "payloadByteLength",
+      "reasonCodes",
+    ]);
+    expect(JSON.stringify(projection)).not.toContain("structuralHypothesis");
+    expect(JSON.stringify(projection)).not.toContain("controllerArtifactSha256");
+    expect(JSON.stringify({ ...projection })).not.toContain("PRIVATE_HYPOTHESIS");
+    expect(JSON.stringify({ ...projection })).not.toContain("PRIVATE_BASIS");
+
+    const tampered = projectM2ControllerPrivateStructuralFreezeToOperatorV0_1(
+      {
+        ...privateRecord,
+        structuralFingerprint: "0".repeat(64),
+      },
+      {
+        caseOpaqueId: "synthetic:payload",
+        sourceUniverseId: "synthetic-source-universe-v0_1",
+        searchPolicyId: "synthetic-search-policy-v0_1",
+        stopRuleId: "synthetic-stop-rule-v0_1",
+        claimBoundary: ["research_only"],
+      },
+    );
+    expect(tampered.status).toBe("BLOCKED");
+    expect(tampered.operatorPayload).toBeNull();
+    expect(tampered.reasonCodes).toContain(
+      "M2_CONTROLLER_PRIVATE_RECORD_INVALID",
+    );
+
+    const malformed = projectM2ControllerPrivateStructuralFreezeToOperatorV0_1(
+      null as unknown as typeof privateRecord,
+      null as unknown as Parameters<
+        typeof projectM2ControllerPrivateStructuralFreezeToOperatorV0_1
+      >[1],
+    );
+    expect(malformed.status).toBe("BLOCKED");
+    expect(malformed.reasonCodes).toContain(
+      "M2_CONTROLLER_PRIVATE_RECORD_INVALID",
+    );
+  });
+
+  test("isolates private-artifact changes from the shared fingerprint and rejects extra operator keys", () => {
+    const hypothesis = discoverStructuralHypothesesV0_1("qay")[0];
+    expect(hypothesis).toBeDefined();
+    const privateRecord = buildM2ControllerPrivateStructuralFreezeRecordV0_1(
+      hypothesis as NonNullable<typeof hypothesis>,
+    );
+    const privateHypothesis = privateRecord.structuralHypothesis;
+    expect(privateHypothesis.reductionSteps.length).toBeGreaterThan(0);
+    const privateOnlyVariants = [
+      {
+        basis: "PRIVATE_BASIS_SENTINEL",
+      },
+      {
+        hypothesisId: "PRIVATE_HYPOTHESIS_SENTINEL",
+      },
+      {
+        evidenceRefs: [
+          ...privateHypothesis.evidenceRefs,
+          "PRIVATE_EVIDENCE_SENTINEL",
+        ],
+      },
+      {
+        reductionSteps: privateHypothesis.reductionSteps.map((step, index) =>
+          index === 0
+            ? {
+                ...step,
+                removedOrChanged: `${step.removedOrChanged}:PRIVATE`,
+              }
+            : step,
+        ),
+      },
+      {
+        expansionChain: [
+          ...privateHypothesis.expansionChain,
+          "PRIVATE_EXPANSION_SENTINEL",
+        ],
+      },
+    ];
+    for (const privateOnlyVariant of privateOnlyVariants) {
+      const alteredRecord =
+        buildM2ControllerPrivateStructuralFreezeRecordV0_1({
+          ...privateHypothesis,
+          ...privateOnlyVariant,
+        });
+      expect(alteredRecord.structuralFingerprint).toBe(
+        privateRecord.structuralFingerprint,
+      );
+      expect(alteredRecord.controllerArtifactSha256).not.toBe(
+        privateRecord.controllerArtifactSha256,
+      );
+    }
+
+    const visibleAlteredRecord =
+      buildM2ControllerPrivateStructuralFreezeRecordV0_1({
+        ...privateRecord.structuralHypothesis,
+        embryo: "AU",
+      });
+    expect(visibleAlteredRecord.structuralFingerprint).not.toBe(
+      privateRecord.structuralFingerprint,
+    );
+    expect(
+      computeM2SharedStructuralFingerprintV0_1(
+        privateHypothesis.embryo,
+        ["A"],
+      ),
+    ).not.toBe(privateRecord.structuralFingerprint);
+
+    const projection = projectM2ControllerPrivateStructuralFreezeToOperatorV0_1(
+      privateRecord,
+      {
+        caseOpaqueId: "synthetic:payload",
+        sourceUniverseId: "synthetic-source-universe-v0_1",
+        searchPolicyId: "synthetic-search-policy-v0_1",
+        stopRuleId: "synthetic-stop-rule-v0_1",
+        claimBoundary: ["research_only"],
+      },
+    );
+    const extraKey = {
+      ...projection.operatorPayload,
+      hypothesisId: "PRIVATE_HYPOTHESIS_SENTINEL",
+    };
+    const rejected = serializeM2OperatorVisiblePayloadV0_1(extraKey);
+    expect(rejected.status).toBe("BLOCKED");
+    expect(rejected.operatorPayload).toBeNull();
+    expect(rejected.payloadBytes).toBeNull();
+    expect(rejected.reasonCodes).toEqual(
+      expect.arrayContaining([
+        "M2_OPERATOR_PROJECTION_FORBIDDEN_KEY",
+        "M2_OPERATOR_PAYLOAD_SCHEMA_INVALID",
+      ]),
+    );
+    expect(JSON.stringify(rejected)).not.toContain("PRIVATE_HYPOTHESIS_SENTINEL");
+    expect(JSON.stringify(projection.operatorPayload)).not.toContain(
+      "PRIVATE_BASIS_SENTINEL",
+    );
   });
 
   test("preserves structural Null and does not replace the selected candidate", () => {
