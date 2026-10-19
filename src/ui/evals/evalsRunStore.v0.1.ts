@@ -116,31 +116,9 @@ export function readLocalPersistedEvalsRunStateV0_1(): EvalsPersistedRunStateV0_
 }
 
 export function shouldUseRemotePersistedEvalsRunStateV0_1(): boolean {
-  if (typeof window === "undefined") return false;
-  if (typeof process !== "undefined") {
-    if (process.env.NODE_ENV === "test") return false;
-    if (typeof process.env.JEST_WORKER_ID === "string") return false;
-  }
-  return true;
-}
-
-async function fetchRemotePersistedStateV0_1(): Promise<EvalsPersistedRunStateV0_1> {
-  const res = await fetch("/api/evals/state", {
-    method: "GET",
-    cache: "no-store",
-  });
-
-  const data = await res.json().catch(() => null);
-
-  if (!res.ok || !data?.ok) {
-    throw new Error(
-      typeof data?.message === "string"
-        ? data.message
-        : `Could not load shared evals state (HTTP ${res.status}).`,
-    );
-  }
-
-  return normalizePersistedState(data);
+  // Public Evals persistence is intentionally browser-local until shared
+  // state has an explicit ownership and authorization contract.
+  return false;
 }
 
 export async function savePersistedEvalsRunStateV0_1(
@@ -150,61 +128,11 @@ export async function savePersistedEvalsRunStateV0_1(
 
   writeSavedRuns(normalized.savedRuns);
   writeRunSeries(normalized.runSeries);
-
-  if (!shouldUseRemotePersistedEvalsRunStateV0_1()) {
-    return normalized;
-  }
-
-  try {
-    const res = await fetch("/api/evals/state", {
-      method: "POST",
-      headers: {
-        "content-type": "application/json",
-      },
-      body: JSON.stringify(normalized),
-    });
-
-    const data = await res.json().catch(() => null);
-
-    if (!res.ok || !data?.ok) {
-      throw new Error(
-        typeof data?.message === "string"
-          ? data.message
-          : `Could not save shared evals state (HTTP ${res.status}).`,
-      );
-    }
-
-    const persisted = normalizePersistedState(data);
-    writeSavedRuns(persisted.savedRuns);
-    writeRunSeries(persisted.runSeries);
-    return persisted;
-  } catch {
-    return normalized;
-  }
+  return normalized;
 }
 
 export async function loadPersistedEvalsRunStateV0_1(): Promise<EvalsPersistedRunStateV0_1> {
-  const local = readLocalPersistedEvalsRunStateV0_1();
-
-  if (!shouldUseRemotePersistedEvalsRunStateV0_1()) {
-    return local;
-  }
-
-  try {
-    const remote = await fetchRemotePersistedStateV0_1();
-    const remoteHasData = remote.savedRuns.length > 0 || remote.runSeries.length > 0;
-    const localHasData = local.savedRuns.length > 0 || local.runSeries.length > 0;
-
-    if (!remoteHasData && localHasData) {
-      return savePersistedEvalsRunStateV0_1(local);
-    }
-
-    writeSavedRuns(remote.savedRuns);
-    writeRunSeries(remote.runSeries);
-    return remote;
-  } catch {
-    return local;
-  }
+  return readLocalPersistedEvalsRunStateV0_1();
 }
 
 export function makeSavedRunId() {
