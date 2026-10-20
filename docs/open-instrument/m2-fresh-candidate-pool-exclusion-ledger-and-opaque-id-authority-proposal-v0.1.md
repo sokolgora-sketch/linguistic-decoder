@@ -173,9 +173,13 @@ accepted.
 No real opaque IDs are assigned here. The smallest proposed authority is a
 sealed controller-private registry with these properties:
 
-1. The ID is generated from the canonical candidate identity through a
-   controller-private namespace mechanism, not from the word, sense ID,
-   definition, source locator, expected function or insertion order.
+1. The ID is derived from the sealed canonical candidate identity through a
+   proposed controller-private keyed namespace mechanism. That identity may
+   contain the lexical form, source profile and authoritative sense ID; the
+   resulting opaque ID must not disclose those fields to the blind operator
+   or enable their practical recovery without controller-private material.
+   Expected function, structural hypotheses and insertion order must not
+   influence ID assignment.
 2. The registry records the canonical identity preimage, assignment method
    version, registry version, and exact registry hash for independent review by
    an authorized reviewer. The namespace secret, if required by the approved
@@ -304,8 +308,11 @@ leakage is an unresolved DF authority decision.
 The minimum proposed non-target-semantic pool-definition schema is limited to
 schema/version, artifact identity, frozen M2 contract ID and SHA-256,
 normalization and deduplication policy IDs, declared coverage-review status,
-serialization profile, exact byte length, artifact SHA-256, freeze state and
-the approved registry-linkage mode. Candidate words, senses, locators,
+serialization profile, freeze state and the approved registry-linkage mode.
+The pool-definition artifact's own exact byte length and SHA-256 must be
+recorded in a separate, controller-private hash-pinned manifest after the
+pool-definition bytes are finalized; they must not be embedded in the bytes
+they fingerprint. Candidate words, senses, locators,
 opaque-ID mappings and target-bearing records remain controller-private. A
 candidate count is not required by this proposal because cardinality can be a
 linkage signal; adding it requires DF review.
