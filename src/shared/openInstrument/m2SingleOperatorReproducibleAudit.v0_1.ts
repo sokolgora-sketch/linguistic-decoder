@@ -504,7 +504,15 @@ export function verifyM2SingleOperatorReproducibleAuditV0_1(
     !isNonEmptyTextV0_1(scope.scopeVersion) ||
     !Array.isArray(scope.evidenceArtifactIds) ||
     !Array.isArray(scope.exclusionCategories) ||
-    scope.priorUsePolicy !== "UNKNOWN_OR_CONFLICTING_FAIL_CLOSED"
+    scope.priorUsePolicy !== "UNKNOWN_OR_CONFLICTING_FAIL_CLOSED" ||
+    scope.evidenceArtifactIds.some((artifactId) => !isNonEmptyTextV0_1(artifactId)) ||
+    scope.exclusionCategories.some(
+      (category) =>
+        typeof category !== "string" ||
+        !M2_SINGLE_OPERATOR_EXCLUSION_CATEGORIES_V0_1.includes(
+          category as ExclusionCategoryV0_1,
+        ),
+    )
   ) {
     addReasonV0_1(reasons, "EVIDENCE_SCOPE_INCOMPLETE");
   }
@@ -524,11 +532,12 @@ export function verifyM2SingleOperatorReproducibleAuditV0_1(
     }
     reasons.push(...artifactReasons);
   }
-  const declaredArtifactIds = new Set(
-    isRecordV0_1(scope) && Array.isArray(scope.evidenceArtifactIds)
-      ? scope.evidenceArtifactIds.filter((value): value is string => typeof value === "string")
-      : [],
-  );
+  const declaredArtifactIds = new Set<string>();
+  if (isRecordV0_1(scope) && Array.isArray(scope.evidenceArtifactIds)) {
+    for (const artifactId of scope.evidenceArtifactIds) {
+      if (isNonEmptyTextV0_1(artifactId)) declaredArtifactIds.add(artifactId);
+    }
+  }
   for (const artifact of artifacts) {
     if (isRecordV0_1(artifact) && typeof artifact.artifactId === "string" && !declaredArtifactIds.has(artifact.artifactId)) {
       addReasonV0_1(reasons, "EVIDENCE_ARTIFACT_UNDECLARED");
@@ -588,10 +597,18 @@ export function verifyM2SingleOperatorReproducibleAuditV0_1(
   const requiredCategories = isRecordV0_1(scope) && Array.isArray(scope.exclusionCategories)
     ? scope.exclusionCategories
     : [];
+  const validRequiredCategories = requiredCategories.filter(
+    (category): category is ExclusionCategoryV0_1 =>
+      typeof category === "string" &&
+      M2_SINGLE_OPERATOR_EXCLUSION_CATEGORIES_V0_1.includes(
+        category as ExclusionCategoryV0_1,
+      ),
+  );
   if (
-    sortedUniqueV0_1(requiredCategories as string[]).join("\u0000") !==
+    validRequiredCategories.length !== requiredCategories.length ||
+    sortedUniqueV0_1(validRequiredCategories).join("\u0000") !==
       sortedUniqueV0_1([...M2_SINGLE_OPERATOR_EXCLUSION_CATEGORIES_V0_1]).join("\u0000") ||
-    requiredCategories.some((category) => !coveredCategories.has(String(category)))
+    validRequiredCategories.some((category) => !coveredCategories.has(category))
   ) {
     addReasonV0_1(reasons, "EVIDENCE_SCOPE_INCOMPLETE");
   }
@@ -627,13 +644,16 @@ export function verifyM2SingleOperatorReproducibleAuditV0_1(
       !OPAQUE_ID_PATTERN_V0_1.test(candidate.opaqueCandidateId)
     ) {
       addReasonV0_1(reasons, "OPAQUE_CANDIDATE_ID_INVALID");
+      continue;
     }
-    if (typeof candidate.opaqueCandidateId === "string") {
-      if (candidateIds.has(candidate.opaqueCandidateId)) addReasonV0_1(reasons, "DUPLICATE_OPAQUE_CANDIDATE_ID");
-      candidateIds.add(candidate.opaqueCandidateId);
-    }
+    if (candidateIds.has(candidate.opaqueCandidateId)) addReasonV0_1(reasons, "DUPLICATE_OPAQUE_CANDIDATE_ID");
+    candidateIds.add(candidate.opaqueCandidateId);
     if (candidate.manualPreference !== false) addReasonV0_1(reasons, "MANUAL_PREFERENCE_FORBIDDEN");
-    const sourceArtifact = artifactById.get(String(candidate.sourceArtifactId));
+    if (!isNonEmptyTextV0_1(candidate.sourceArtifactId)) {
+      addReasonV0_1(reasons, "SOURCE_ARTIFACT_REFERENCE_INVALID");
+      continue;
+    }
+    const sourceArtifact = artifactById.get(candidate.sourceArtifactId);
     const attestationResult = validateSourceEntryAttestationV1(candidate.sourceAttestation);
     const referencedEntry = attestationResult.ok
       ? attestationResult.attestation.entries.find(
@@ -676,13 +696,18 @@ export function verifyM2SingleOperatorReproducibleAuditV0_1(
     if (expected.decision === "UNKNOWN") {
       addReasonV0_1(reasons, "PRIOR_USE_UNKNOWN_OR_CONFLICTING");
     }
-    const declaredReasons = Array.isArray(candidate.declaredReasonCodes)
-      ? sortedUniqueV0_1(candidate.declaredReasonCodes)
-      : [];
+    if (
+      !Array.isArray(candidate.declaredReasonCodes) ||
+      candidate.declaredReasonCodes.some((reason) => typeof reason !== "string")
+    ) {
+      addReasonV0_1(reasons, "CANDIDATE_RECORD_SHAPE_INVALID");
+      continue;
+    }
+    const declaredReasons = sortedUniqueV0_1(candidate.declaredReasonCodes);
     if (expected.decision !== candidate.declaredDecision) addReasonV0_1(reasons, "CANDIDATE_DECISION_MISMATCH");
     if (declaredReasons.join("\u0000") !== expected.reasonCodes.join("\u0000")) addReasonV0_1(reasons, "DECLARED_REASON_CODES_MISMATCH");
     exclusionDecisions.push({
-      opaqueCandidateId: String(candidate.opaqueCandidateId),
+      opaqueCandidateId: candidate.opaqueCandidateId,
       decision: expected.decision,
       reasonCodes: expected.reasonCodes,
     });

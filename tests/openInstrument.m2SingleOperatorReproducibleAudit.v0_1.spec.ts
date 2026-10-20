@@ -416,6 +416,85 @@ describe("M2 single-operator reproducible audit", () => {
     expect(result.reasonCodes).toContain("SOURCE_ARTIFACT_REFERENCE_INVALID");
   });
 
+  test("rejects non-string exclusion category members", () => {
+    const input = baseAudit();
+    const malformed = {
+      ...input,
+      declaredScope: {
+        ...input.declaredScope,
+        exclusionCategories: [
+          ["baseline"],
+          ...input.declaredScope.exclusionCategories.slice(1),
+        ],
+      },
+    } as unknown as M2SingleOperatorReproducibleAuditInputV0_1;
+    const result = verify(refingerprint(malformed));
+    expectBlockedWithoutAuthorization(result);
+    expect(result.reasonCodes).toContain("EVIDENCE_SCOPE_INCOMPLETE");
+  });
+
+  test("rejects a non-string source artifact reference", () => {
+    const input = baseAudit();
+    const malformed = {
+      ...input,
+      candidateRecords: [{
+        ...input.candidateRecords[0],
+        sourceArtifactId: ["source-1"],
+      }],
+    } as unknown as M2SingleOperatorReproducibleAuditInputV0_1;
+    const result = verify(refingerprint(malformed));
+    expectBlockedWithoutAuthorization(result);
+    expect(result.reasonCodes).toContain("SOURCE_ARTIFACT_REFERENCE_INVALID");
+  });
+
+  test("does not echo an invalid opaque candidate ID", () => {
+    const input = baseAudit();
+    const privateValue = "private-target-bearing-candidate";
+    const malformed = {
+      ...input,
+      candidateRecords: [{
+        ...input.candidateRecords[0],
+        opaqueCandidateId: privateValue,
+      }],
+    } as unknown as M2SingleOperatorReproducibleAuditInputV0_1;
+    const result = verify(refingerprint(malformed));
+    expectBlockedWithoutAuthorization(result);
+    expect(result.reasonCodes).toContain("OPAQUE_CANDIDATE_ID_INVALID");
+    expect(result.exclusionDecisions).toEqual([]);
+    expect(JSON.stringify(result)).not.toContain(privateValue);
+  });
+
+  test("rejects malformed evidence artifact ID members instead of filtering them", () => {
+    const input = baseAudit();
+    const malformed = {
+      ...input,
+      declaredScope: {
+        ...input.declaredScope,
+        evidenceArtifactIds: [
+          ...input.declaredScope.evidenceArtifactIds,
+          ["private-artifact-id"],
+        ],
+      },
+    } as unknown as M2SingleOperatorReproducibleAuditInputV0_1;
+    const result = verify(refingerprint(malformed));
+    expectBlockedWithoutAuthorization(result);
+    expect(result.reasonCodes).toContain("EVIDENCE_SCOPE_INCOMPLETE");
+  });
+
+  test("rejects nested declared reason-code members", () => {
+    const input = baseAudit();
+    const malformed = {
+      ...input,
+      candidateRecords: [{
+        ...input.candidateRecords[0],
+        declaredReasonCodes: [["ELIGIBLE_AFTER_FAIL_CLOSED_AUDIT"]],
+      }],
+    } as unknown as M2SingleOperatorReproducibleAuditInputV0_1;
+    const result = verify(refingerprint(malformed));
+    expectBlockedWithoutAuthorization(result);
+    expect(result.reasonCodes).toContain("CANDIDATE_RECORD_SHAPE_INVALID");
+  });
+
   test("requires exclusion categories to come from an exclusion inventory", () => {
     const input = baseAudit();
     const result = verify(
