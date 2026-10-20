@@ -199,6 +199,17 @@ const refingerprint = (
   };
 };
 
+const expectBlockedWithoutAuthorization = (
+  result: ReturnType<typeof verifyM2SingleOperatorReproducibleAuditV0_1>,
+) => {
+  expect(result.status).toBe("BLOCKED");
+  expect(result.realCandidateIntakeAuthorized).toBe(false);
+  expect(result.realSelectionExecuted).toBe(false);
+  expect(result.realExecutionAuthorized).toBe(false);
+  expect(JSON.stringify(result)).not.toContain("synthetic-form");
+  expect(JSON.stringify(result)).not.toContain("substantive synthetic sense");
+};
+
 describe("M2 single-operator reproducible audit", () => {
   test("verifies synthetic evidence without claiming independent review or authorization", () => {
     const result = verify(baseAudit());
@@ -303,6 +314,98 @@ describe("M2 single-operator reproducible audit", () => {
     expect(result.status).toBe("BLOCKED");
     expect(result.reasonCodes).toContain("PUBLIC_TARGET_SEMANTICS_EXPOSED");
     expect(JSON.stringify(result)).not.toContain("must-not-leak");
+  });
+
+  test("rejects nested public metadata and scope mismatches", () => {
+    const input = baseAudit();
+    const projection = JSON.parse(input.publicProjection.serializedBytes) as Record<string, unknown>;
+    projection.scopeId = { sourceForm: "synthetic-form", text: "substantive synthetic sense" };
+    const serializedBytes = `${JSON.stringify(projection, Object.keys(projection).sort())}\n`;
+    const unsigned = {
+      ...input,
+      publicProjection: {
+        serializedBytes,
+        sha256: hash(serializedBytes),
+        byteLength: length(serializedBytes),
+        frozen: true as const,
+      },
+    };
+    const result = verify(refingerprint(unsigned));
+    expectBlockedWithoutAuthorization(result);
+    expect(result.reasonCodes).toContain("PUBLIC_PROJECTION_INVALID");
+  });
+
+  test("binds the candidate sense to the referenced source entry", () => {
+    const input = baseAudit();
+    const attestation = sourceAttestation();
+    const secondEntry = {
+      ...attestation.entries[0],
+      entryId: "entry-2",
+      entryKey: "other-form",
+      entryLocator: "entry-2",
+      sourceForm: "other-form",
+      senses: [{ ...attestation.entries[0].senses[0], senseId: "sense-2", senseLocator: "sense-2" }],
+      selectedSenseId: "sense-2",
+    };
+    const result = verify(refingerprint({
+      ...input,
+      candidateRecords: [{
+        ...input.candidateRecords[0],
+        sourceSenseReference: "sense-2",
+        sourceAttestation: {
+          ...attestation,
+          entries: [...attestation.entries, secondEntry],
+        },
+      }],
+    }));
+    expectBlockedWithoutAuthorization(result);
+    expect(result.reasonCodes).toContain("SOURCE_ARTIFACT_REFERENCE_INVALID");
+  });
+
+  test("requires exclusion categories to come from an exclusion inventory", () => {
+    const input = baseAudit();
+    const result = verify(
+      refingerprint({
+        ...input,
+        declaredScope: {
+          ...input.declaredScope,
+          evidenceArtifactIds: ["source-1"],
+        },
+        evidenceArtifacts: [{
+          ...input.evidenceArtifacts[0],
+          declaredCategories: [...M2_SINGLE_OPERATOR_EXCLUSION_CATEGORIES_V0_1],
+        }] as typeof input.evidenceArtifacts,
+      }),
+      [{ artifactId: "source-1", bytes: sourceBytes }],
+    );
+    expectBlockedWithoutAuthorization(result);
+    expect(result.reasonCodes).toContain("EVIDENCE_SCOPE_INCOMPLETE");
+  });
+
+  test("rejects a missing audit mode before applying mode-specific rules", () => {
+    const input = baseAudit();
+    const malformed = { ...input } as M2SingleOperatorReproducibleAuditInputV0_1 & Record<string, unknown>;
+    delete malformed.auditMode;
+    const result = verify(refingerprint(malformed));
+    expectBlockedWithoutAuthorization(result);
+    expect(result.reasonCodes).toContain("AUDIT_MODE_INVALID");
+  });
+
+  test("rejects missing and non-array candidate collections", () => {
+    const input = baseAudit();
+    const missing = { ...input } as M2SingleOperatorReproducibleAuditInputV0_1 & Record<string, unknown>;
+    delete missing.candidateRecords;
+    const missingResult = verify(refingerprint(missing));
+    expectBlockedWithoutAuthorization(missingResult);
+    expect(missingResult.reasonCodes).toContain("CANDIDATE_RECORD_SHAPE_INVALID");
+
+    const nonArray = refingerprint({
+      ...input,
+      candidateRecords: null as unknown as M2SingleOperatorReproducibleAuditInputV0_1["candidateRecords"],
+    });
+    const nonArrayResult = verify(nonArray);
+    expectBlockedWithoutAuthorization(nonArrayResult);
+    expect(nonArrayResult.reasonCodes).toContain("CANDIDATE_RECORD_SHAPE_INVALID");
   });
 
   test("rejects manual preference and unauthorized execution flags", () => {

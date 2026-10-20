@@ -118,6 +118,7 @@ export type M2SingleOperatorObservedArtifactV0_1 = Readonly<{
 export type M2SingleOperatorAuditReasonCodeV0_1 =
   | "AUDIT_INPUT_MALFORMED"
   | "AUDIT_SCHEMA_INVALID"
+  | "AUDIT_MODE_INVALID"
   | "AUDIT_CLASSIFICATION_INVALID"
   | "CONTROLLER_REFERENCE_MISSING"
   | "SELF_REVIEW_PROVENANCE_MISSING"
@@ -310,6 +311,7 @@ function validateArtifactShapeV0_1(
 
 function validatePublicProjectionV0_1(
   value: unknown,
+  declaredScope: Record<string, unknown> | undefined,
   reasons: M2SingleOperatorAuditReasonCodeV0_1[],
 ): boolean {
   const parsedValue = isRecordV0_1(value) && value.serializedBytes;
@@ -360,13 +362,32 @@ function validatePublicProjectionV0_1(
   ];
   if (
     !hasExactKeysV0_1(parsed, expectedKeys) ||
+    typeof parsed.schemaVersion !== "string" ||
+    parsed.schemaVersion !== "m2-public-pool-definition.v0.1" ||
+    typeof parsed.serializationProfile !== "string" ||
+    parsed.serializationProfile !== "canonical-json-v0.1" ||
+    typeof parsed.scopeId !== "string" ||
+    typeof parsed.scopeVersion !== "string" ||
+    !declaredScope ||
+    typeof declaredScope.scopeId !== "string" ||
+    typeof declaredScope.scopeVersion !== "string" ||
+    parsed.scopeId !== declaredScope.scopeId ||
+    parsed.scopeVersion !== declaredScope.scopeVersion ||
+    typeof parsed.containsTargetSemantics !== "boolean" ||
     parsed.containsTargetSemantics !== false ||
+    typeof parsed.targetBearingFieldCount !== "number" ||
+    !Number.isInteger(parsed.targetBearingFieldCount) ||
     parsed.targetBearingFieldCount !== 0 ||
+    typeof parsed.auditClassification !== "string" ||
     parsed.auditClassification !==
       M2_SINGLE_OPERATOR_REPRODUCIBLE_AUDIT_CLASSIFICATION_V0_1 ||
+    typeof parsed.selectionPolicyId !== "string" ||
     parsed.selectionPolicyId !== M2_FROZEN_OPAQUE_ID_SELECTOR_V0_1 ||
+    typeof parsed.selectionExecuted !== "boolean" ||
     parsed.selectionExecuted !== false ||
+    typeof parsed.realCandidateIntakeAuthorized !== "boolean" ||
     parsed.realCandidateIntakeAuthorized !== false ||
+    typeof parsed.realExecutionAuthorized !== "boolean" ||
     parsed.realExecutionAuthorized !== false
   ) {
     addReasonV0_1(reasons, "PUBLIC_PROJECTION_INVALID");
@@ -428,6 +449,12 @@ export function verifyM2SingleOperatorReproducibleAuditV0_1(
   const audit = input as Partial<M2SingleOperatorReproducibleAuditInputV0_1>;
   if (audit.schemaVersion !== M2_SINGLE_OPERATOR_REPRODUCIBLE_AUDIT_SCHEMA_V0_1) {
     addReasonV0_1(reasons, "AUDIT_SCHEMA_INVALID");
+  }
+  if (
+    audit.auditMode !== "SYNTHETIC_FIXTURE" &&
+    audit.auditMode !== "PRIVATE_REAL_INPUT"
+  ) {
+    addReasonV0_1(reasons, "AUDIT_MODE_INVALID");
   }
   if (audit.classification !== M2_SINGLE_OPERATOR_REPRODUCIBLE_AUDIT_CLASSIFICATION_V0_1) {
     addReasonV0_1(reasons, "AUDIT_CLASSIFICATION_INVALID");
@@ -549,6 +576,7 @@ export function verifyM2SingleOperatorReproducibleAuditV0_1(
 
   const coveredCategories = new Set<string>();
   for (const artifact of artifactById.values()) {
+    if (artifact.kind !== "EXCLUSION_INVENTORY") continue;
     for (const category of artifact.declaredCategories) coveredCategories.add(category);
   }
   const requiredCategories = isRecordV0_1(scope) && Array.isArray(scope.exclusionCategories)
@@ -562,6 +590,9 @@ export function verifyM2SingleOperatorReproducibleAuditV0_1(
     addReasonV0_1(reasons, "EVIDENCE_SCOPE_INCOMPLETE");
   }
 
+  if (!Array.isArray(audit.candidateRecords)) {
+    addReasonV0_1(reasons, "CANDIDATE_RECORD_SHAPE_INVALID");
+  }
   const candidates = Array.isArray(audit.candidateRecords) ? audit.candidateRecords : [];
   const candidateIds = new Set<string>();
   for (const value of candidates) {
@@ -603,9 +634,9 @@ export function verifyM2SingleOperatorReproducibleAuditV0_1(
         attestationResult.ok &&
         attestationResult.attestation.sourceHashOrArchiveHash === sourceArtifact.expectedSha256 &&
         attestationResult.attestation.selectedEntryId === candidate.sourceEntryReference &&
-        attestationResult.attestation.entries.some(
-          (entry) => entry.selectedSenseId === candidate.sourceSenseReference,
-        ),
+        attestationResult.attestation.entries.find(
+          (entry) => entry.entryId === candidate.sourceEntryReference,
+        )?.selectedSenseId === candidate.sourceSenseReference,
     );
     if (!sourceValid) {
       addReasonV0_1(reasons, "SOURCE_ARTIFACT_REFERENCE_INVALID");
@@ -691,7 +722,11 @@ export function verifyM2SingleOperatorReproducibleAuditV0_1(
     addReasonV0_1(reasons, "SELECTION_EXECUTED_UNAUTHORIZED");
   }
 
-  const publicProjectionValid = validatePublicProjectionV0_1(audit.publicProjection, reasons);
+  const publicProjectionValid = validatePublicProjectionV0_1(
+    audit.publicProjection,
+    scope,
+    reasons,
+  );
   const auditIntegrity = audit.auditIntegrity as Record<string, unknown> | undefined;
   let observedAuditSha256: string | null = null;
   let observedAuditByteLength: number | null = null;
