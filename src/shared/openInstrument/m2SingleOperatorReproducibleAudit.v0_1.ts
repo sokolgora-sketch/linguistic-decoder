@@ -214,8 +214,14 @@ const isRecordV0_1 = (value: unknown): value is Record<string, unknown> =>
 const hasExactKeysV0_1 = (
   value: Record<string, unknown>,
   keys: readonly string[],
-): boolean =>
-  Object.keys(value).sort().join("\u0000") === [...keys].sort().join("\u0000");
+): boolean => {
+  const actualKeys = Object.keys(value).sort();
+  const expectedKeys = [...keys].sort();
+  return (
+    actualKeys.length === expectedKeys.length &&
+    actualKeys.every((key, index) => key === expectedKeys[index])
+  );
+};
 
 const isNonEmptyTextV0_1 = (value: unknown): value is string =>
   typeof value === "string" && value.trim().length > 0;

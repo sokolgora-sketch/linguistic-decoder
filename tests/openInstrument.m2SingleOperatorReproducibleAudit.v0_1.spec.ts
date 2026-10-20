@@ -416,6 +416,28 @@ describe("M2 single-operator reproducible audit", () => {
     expect(result.reasonCodes).toContain("SOURCE_ARTIFACT_REFERENCE_INVALID");
   });
 
+  test("rejects delimiter-collision prior-use keys", () => {
+    const input = baseAudit();
+    const malformed = {
+      ...input,
+      candidateRecords: [{
+        ...input.candidateRecords[0],
+        priorUse: {
+          "baseline\u0000embryoOrReplication": "ABSENT",
+          priorTarget: "ABSENT",
+          priorReveal: "ABSENT",
+          priorControl: "ABSENT",
+          priorResearch: "ABSENT",
+        },
+      }],
+    } as unknown as M2SingleOperatorReproducibleAuditInputV0_1;
+    const result = verify(refingerprint(malformed));
+    expectBlockedWithoutAuthorization(result);
+    expect(result.reasonCodes).toContain("CANDIDATE_RECORD_SHAPE_INVALID");
+    expect(result.exclusionDecisions).toEqual([]);
+    expect(JSON.stringify(result)).not.toContain("baseline\u0000embryoOrReplication");
+  });
+
   test("rejects non-string exclusion category members", () => {
     const input = baseAudit();
     const malformed = {
