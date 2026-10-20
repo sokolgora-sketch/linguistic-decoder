@@ -146,6 +146,32 @@ describe("M2 fresh candidate-pool B/C/D authority boundary", () => {
     expect(result.reasonCodes).toContain("OPAQUE_ID_NAMESPACE_UNCOMMITTED");
   });
 
+  test("rejects truthy non-boolean namespace commitment and freeze flags", () => {
+    for (const field of ["committedBeforeIntake", "frozen"] as const) {
+      for (const invalidValue of ["false", 1]) {
+        const input = validSyntheticAuthority();
+        const result = validateM2FreshCandidatePoolAuthorityBoundaryV0_1({
+          ...input,
+          opaqueIdAuthority: {
+            ...input.opaqueIdAuthority,
+            namespaceCommitment: {
+              ...input.opaqueIdAuthority.namespaceCommitment,
+              [field]: invalidValue,
+            } as unknown as typeof input.opaqueIdAuthority.namespaceCommitment,
+          },
+        });
+        expect(result.status).toBe("BLOCKED");
+        expect(result.reasonCodes).toContain(
+          field === "committedBeforeIntake"
+            ? "OPAQUE_ID_NAMESPACE_UNCOMMITTED"
+            : "OPAQUE_ID_NAMESPACE_NOT_FROZEN",
+        );
+        expect(result.realCandidateIntakeAuthorized).toBe(false);
+        expect(result.realExecutionAuthorized).toBe(false);
+      }
+    }
+  });
+
   test("rejects unreviewed or conflicting exclusion coverage", () => {
     const input = validSyntheticAuthority();
     const result = validateM2FreshCandidatePoolAuthorityBoundaryV0_1({
