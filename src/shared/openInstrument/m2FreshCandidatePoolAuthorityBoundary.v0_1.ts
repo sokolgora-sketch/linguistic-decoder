@@ -286,11 +286,11 @@ const validateOpaqueIdAuthorityV0_1 = (
     reasons.push("OPAQUE_ID_NAMESPACE_HASH_INVALID");
     valid = false;
   } else {
-    if (!namespace.committedBeforeIntake) {
+    if (namespace.committedBeforeIntake !== true) {
       reasons.push("OPAQUE_ID_NAMESPACE_UNCOMMITTED");
       valid = false;
     }
-    if (!namespace.frozen) {
+    if (namespace.frozen !== true) {
       reasons.push("OPAQUE_ID_NAMESPACE_NOT_FROZEN");
       valid = false;
     }
