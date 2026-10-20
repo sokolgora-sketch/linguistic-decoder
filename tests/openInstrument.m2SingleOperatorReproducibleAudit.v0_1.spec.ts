@@ -362,6 +362,60 @@ describe("M2 single-operator reproducible audit", () => {
     expect(result.reasonCodes).toContain("SOURCE_ARTIFACT_REFERENCE_INVALID");
   });
 
+  test.each(["PRESENT", "UNKNOWN", "CONFLICTING"] as const)(
+    "rejects array-valued prior-use status %s",
+    (status) => {
+      const input = baseAudit();
+      const malformed = {
+        ...input,
+        candidateRecords: [{
+          ...input.candidateRecords[0],
+          priorUse: {
+            ...input.candidateRecords[0].priorUse,
+            baseline: [status],
+          },
+        }],
+      } as unknown as M2SingleOperatorReproducibleAuditInputV0_1;
+      const result = verify(refingerprint(malformed));
+      expectBlockedWithoutAuthorization(result);
+      expect(result.reasonCodes).toContain("CANDIDATE_RECORD_SHAPE_INVALID");
+    },
+  );
+
+  test("rejects an unresolved multi-sense attestation with a null sense reference", () => {
+    const input = baseAudit();
+    const attestation = sourceAttestation();
+    const unresolvedAttestation = {
+      ...attestation,
+      entries: [{
+        ...attestation.entries[0],
+        senses: [
+          ...attestation.entries[0].senses,
+          {
+            ...attestation.entries[0].senses[0],
+            senseId: "sense-2",
+            senseLocator: "sense-2",
+          },
+        ],
+        senseSelectionStatus: "UNRESOLVED" as const,
+        selectedSenseId: null,
+      }],
+    };
+    const malformed = {
+      ...input,
+      candidateRecords: [{
+        ...input.candidateRecords[0],
+        sourceSenseReference: null,
+        sourceAttestation: unresolvedAttestation,
+        declaredDecision: "UNKNOWN" as const,
+        declaredReasonCodes: ["PRIOR_USE_UNKNOWN_OR_CONFLICTING"],
+      }],
+    } as unknown as M2SingleOperatorReproducibleAuditInputV0_1;
+    const result = verify(refingerprint(malformed));
+    expectBlockedWithoutAuthorization(result);
+    expect(result.reasonCodes).toContain("SOURCE_ARTIFACT_REFERENCE_INVALID");
+  });
+
   test("requires exclusion categories to come from an exclusion inventory", () => {
     const input = baseAudit();
     const result = verify(

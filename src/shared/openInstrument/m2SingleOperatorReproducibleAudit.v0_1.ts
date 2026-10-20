@@ -26,6 +26,12 @@ export const M2_SINGLE_OPERATOR_EXCLUSION_CATEGORIES_V0_1 = [
 type ExclusionCategoryV0_1 =
   (typeof M2_SINGLE_OPERATOR_EXCLUSION_CATEGORIES_V0_1)[number];
 type PriorUseStatusV0_1 = "ABSENT" | "PRESENT" | "UNKNOWN" | "CONFLICTING";
+const PRIOR_USE_STATUS_VALUES_V0_1: readonly PriorUseStatusV0_1[] = [
+  "ABSENT",
+  "PRESENT",
+  "UNKNOWN",
+  "CONFLICTING",
+];
 
 export type M2SingleOperatorAuditArtifactV0_1 = Readonly<{
   artifactId: string;
@@ -629,14 +635,23 @@ export function verifyM2SingleOperatorReproducibleAuditV0_1(
     if (candidate.manualPreference !== false) addReasonV0_1(reasons, "MANUAL_PREFERENCE_FORBIDDEN");
     const sourceArtifact = artifactById.get(String(candidate.sourceArtifactId));
     const attestationResult = validateSourceEntryAttestationV1(candidate.sourceAttestation);
+    const referencedEntry = attestationResult.ok
+      ? attestationResult.attestation.entries.find(
+          (entry) => entry.entryId === candidate.sourceEntryReference,
+        )
+      : undefined;
     const sourceValid = Boolean(
       sourceArtifact?.kind === "SOURCE" &&
         attestationResult.ok &&
         attestationResult.attestation.sourceHashOrArchiveHash === sourceArtifact.expectedSha256 &&
         attestationResult.attestation.selectedEntryId === candidate.sourceEntryReference &&
-        attestationResult.attestation.entries.find(
-          (entry) => entry.entryId === candidate.sourceEntryReference,
-        )?.selectedSenseId === candidate.sourceSenseReference,
+        isNonEmptyTextV0_1(candidate.sourceSenseReference) &&
+        referencedEntry?.senseSelectionStatus === "EXPLICITLY_RESOLVED" &&
+        isNonEmptyTextV0_1(referencedEntry.selectedSenseId) &&
+        referencedEntry.selectedSenseId === candidate.sourceSenseReference &&
+        referencedEntry.senses.some(
+          (sense) => sense.senseId === referencedEntry.selectedSenseId,
+        ),
     );
     if (!sourceValid) {
       addReasonV0_1(reasons, "SOURCE_ARTIFACT_REFERENCE_INVALID");
@@ -649,7 +664,9 @@ export function verifyM2SingleOperatorReproducibleAuditV0_1(
       !priorUse ||
       !hasExactKeysV0_1(priorUse, REQUIRED_PRIOR_USE_KEYS_V0_1) ||
       Object.values(priorUse).some(
-        (status) => !["ABSENT", "PRESENT", "UNKNOWN", "CONFLICTING"].includes(String(status)),
+        (status) =>
+          typeof status !== "string" ||
+          !PRIOR_USE_STATUS_VALUES_V0_1.includes(status as PriorUseStatusV0_1),
       )
     ) {
       addReasonV0_1(reasons, "CANDIDATE_RECORD_SHAPE_INVALID");
