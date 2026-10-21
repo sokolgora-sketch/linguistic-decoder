@@ -1,4 +1,5 @@
 import { classifyIpaSegmentsV0_1 } from "@/shared/ipa/ipaClassify.v0.1";
+import { normalizeIpaV0_1 } from "@/shared/ipa/ipaNormalize.v0.1";
 import type { VowelVoice } from "@/shared/vowels/vowelVoices.v0.1";
 
 import {
@@ -31,6 +32,7 @@ export type AlbanianSourceOrderContextSignatureReasonCodeV0_1 =
   | "SOURCE_IPA_MISSING"
   | "IPA_SYMBOL_UNSUPPORTED"
   | "OPTIONAL_MARKER_INVALID"
+  | "OPTIONAL_NUCLEUS_UNCONFIRMED"
   | "NUCLEUS_STRUCTURE_UNRESOLVED"
   | "ANALYSIS_NULL";
 
@@ -119,6 +121,17 @@ function isStringArrayV0_1(value: unknown): value is readonly string[] {
   return Array.isArray(value) && value.every((item) => typeof item === "string");
 }
 
+function normalizedSourceBodyV0_1(rawIpa: string): string {
+  const trimmed = rawIpa.trim();
+  const body =
+    trimmed.length >= 2 &&
+    ((trimmed.startsWith("/") && trimmed.endsWith("/")) ||
+      (trimmed.startsWith("[") && trimmed.endsWith("]")))
+      ? trimmed.slice(1, -1).trim()
+      : trimmed;
+  return normalizeIpaV0_1(body);
+}
+
 function sortedReasonsV0_1(
   reasons: readonly AlbanianSourceOrderContextSignatureReasonCodeV0_1[],
 ): readonly AlbanianSourceOrderContextSignatureReasonCodeV0_1[] {
@@ -169,6 +182,8 @@ function analysisShapeValidV0_1(
       Number.isInteger(nucleus.order) &&
       isNonEmptyStringV0_1(nucleus.raw) &&
       isNonEmptyStringV0_1(nucleus.baseSymbol) &&
+      Array.isArray(nucleus.combiningMarks) &&
+      isStringArrayV0_1(nucleus.combiningMarks) &&
       (nucleus.voice === null || CANONICAL_VOICES_V0_1.has(nucleus.voice as VowelVoice)) &&
       (nucleus.status === "SUPPORTED" || nucleus.status === "NULL") &&
       Array.isArray(nucleus.reasonCodes) &&
@@ -274,6 +289,7 @@ function nullResultV0_1(
   analysis: RecordV0_1 | null,
   reasonCodes: readonly AlbanianSourceOrderContextSignatureReasonCodeV0_1[],
   sourceSegments: readonly AlbanianSourceOrderContextSegmentV0_1[] = [],
+  optionalNucleusOrders: readonly number[] = [],
 ): AlbanianSourceOrderContextSignatureV0_1 {
   const safeFact = fact ?? {};
   const safeAnalysis = analysis ?? {};
@@ -317,7 +333,7 @@ function nullResultV0_1(
       : Object.freeze({ stressMarkers: [], lengthMarkers: [], nasalizationMarks: [] }),
     sourceSegments: Object.freeze([...sourceSegments]),
     voicePath: Object.freeze([]),
-    optionalNucleusOrders: Object.freeze([]),
+    optionalNucleusOrders: Object.freeze([...optionalNucleusOrders]),
     prefixConsonants: null,
     interNucleusRegions: null,
     suffixConsonants: null,
@@ -376,6 +392,9 @@ export function projectAlbanianSourceOrderContextSignatureV0_1(
   ) {
     return nullResultV0_1(fact, analysis, ["SOURCE_IPA_MISSING"]);
   }
+  if (normalizedSourceBodyV0_1(typedAnalysis.rawIpa) !== typedAnalysis.pronunciationBody) {
+    return nullResultV0_1(fact, analysis, ["SOURCE_RECORD_ANALYSIS_MISMATCH"]);
+  }
 
   const parsed = sourceSegmentsV0_1(typedAnalysis.pronunciationBody);
   if (parsed.reasonCodes.length > 0) {
@@ -388,7 +407,12 @@ export function projectAlbanianSourceOrderContextSignatureV0_1(
   for (const [order, segment] of parsed.segments.entries()) {
     if (segment.sourceClass === "vowel") {
       const nucleus = nuclei[nucleusIndex];
-      if (!nucleus || nucleus.order !== nucleusIndex) {
+      if (
+        !nucleus ||
+        nucleus.order !== nucleusIndex ||
+        nucleus.raw !== segment.raw ||
+        nucleus.baseSymbol !== segment.base
+      ) {
         return nullResultV0_1(fact, analysis, ["NUCLEUS_STRUCTURE_UNRESOLVED"]);
       }
       sourceSegments.push(Object.freeze({
@@ -420,6 +444,22 @@ export function projectAlbanianSourceOrderContextSignatureV0_1(
     return nullResultV0_1(fact, analysis, ["NUCLEUS_STRUCTURE_UNRESOLVED"], sourceSegments);
   }
 
+  if (typedAnalysis.status === "SUPPORTED" && typedAnalysis.reasonCodes.length === 0) {
+    const expectedVoicePath = nuclei.map((nucleus) => nucleus.voice);
+    if (
+      nuclei.some(
+        (nucleus) =>
+          nucleus.status !== "SUPPORTED" ||
+          nucleus.voice === null ||
+          nucleus.reasonCodes.length > 0,
+      ) ||
+      expectedVoicePath.length !== typedAnalysis.voicePath.length ||
+      expectedVoicePath.some((voice, index) => voice !== typedAnalysis.voicePath[index])
+    ) {
+      return nullResultV0_1(fact, analysis, ["SOURCE_RECORD_ANALYSIS_MISMATCH"], sourceSegments);
+    }
+  }
+
   const optionalNucleusOrders = Object.freeze(
     sourceSegments
       .filter((segment) => segment.class === "vowel" && segment.optional)
@@ -432,6 +472,16 @@ export function projectAlbanianSourceOrderContextSignatureV0_1(
   }
   if (firstNucleusOrder < 0 || lastNucleusOrder < 0) {
     return nullResultV0_1(fact, analysis, ["NUCLEUS_STRUCTURE_UNRESOLVED"], sourceSegments);
+  }
+
+  if (optionalNucleusOrders.length > 0) {
+    return nullResultV0_1(
+      fact,
+      analysis,
+      ["OPTIONAL_NUCLEUS_UNCONFIRMED"],
+      sourceSegments,
+      optionalNucleusOrders,
+    );
   }
 
   const prefixConsonants = Object.freeze(

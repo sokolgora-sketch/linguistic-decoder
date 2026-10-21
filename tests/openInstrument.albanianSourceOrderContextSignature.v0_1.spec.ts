@@ -70,9 +70,40 @@ describe("Albanian source-order context signature v0.1", () => {
 
   it("preserves ditë optionality without choosing an unconditional final schwa", () => {
     const result = project("ditë", "[ˈdit(ə)]").result;
-    expect(result).toMatchObject({ status: "SUPPORTED", voicePath: ["I", "Ë"] });
+    expect(result).toMatchObject({ status: "NULL", voicePath: [], structuralSignature: null });
     expect(result.optionalNucleusOrders).toEqual([1]);
     expect(result.sourceSegments.find((segment) => segment.baseSymbol === "ə")).toMatchObject({ optional: true });
+    expect(result.reasonCodes).toEqual(["OPTIONAL_NUCLEUS_UNCONFIRMED"]);
+  });
+
+  it("fails closed when pronunciationBody disagrees with the source raw IPA", () => {
+    const { sourceFact, analysis } = project("mal", "[mal]");
+    const result = projectAlbanianSourceOrderContextSignatureV0_1({
+      fact: sourceFact,
+      analysis: { ...analysis, pronunciationBody: "bal" },
+    });
+    expect(result).toMatchObject({
+      status: "NULL",
+      structuralSignature: null,
+      reasonCodes: ["SOURCE_RECORD_ANALYSIS_MISMATCH"],
+    });
+  });
+
+  it("fails closed when a nucleus identity disagrees with the parsed source segment", () => {
+    const { sourceFact, analysis } = project("mal", "[mal]");
+    const result = projectAlbanianSourceOrderContextSignatureV0_1({
+      fact: sourceFact,
+      analysis: {
+        ...analysis,
+        nuclei: [{ ...analysis.nuclei[0], raw: "e", baseSymbol: "e", voice: "E" }],
+        voicePath: ["E"],
+      },
+    });
+    expect(result).toMatchObject({
+      status: "NULL",
+      structuralSignature: null,
+      reasonCodes: ["NUCLEUS_STRUCTURE_UNRESOLVED"],
+    });
   });
 
   it("keeps sy as an S consonant and Y nucleus without inserting Ë", () => {
