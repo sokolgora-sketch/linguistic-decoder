@@ -275,6 +275,11 @@ const isIsoUtcTimestamp = (value: unknown): value is string =>
   typeof value === "string" &&
   /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{3})?Z$/u.test(value) &&
   Number.isFinite(Date.parse(value));
+const utcTimestampMillis = (value: unknown): number | null => {
+  if (!isIsoUtcTimestamp(value)) return null;
+  const millis = Date.parse(value);
+  return Number.isFinite(millis) ? millis : null;
+};
 const isExactProjectionV0_1 = (value: unknown): value is Record<string, unknown> => {
   if (!isRecord(value) || !exactKeys(value, REQUIRED_PROJECTION_KEYS)) return false;
   return (
@@ -298,8 +303,11 @@ const safeRelativePath = (value: unknown): value is string => {
   const normalized = normalize(value);
   return !isAbsolute(value) && normalized === value && !value.split("/").some((part) => part === "." || part === "..");
 };
-const inside = (child: string, parent: string) =>
-  child === parent || child.startsWith(parent + sep);
+const inside = (child: string, parent: string) => {
+  if (child === parent) return true;
+  const boundary = parent.endsWith(sep) ? parent : parent + sep;
+  return child.startsWith(boundary);
+};
 const canonicalComparisonPath = (value: string): string | null => {
   try {
     return realpathSync(value);
@@ -571,7 +579,9 @@ export function verifyM2ControllerPrivateBoundaryV0_1(
   let manifest: Record<string, unknown>;
   try {
     const text = manifestBytes.toString("utf8");
-    manifest = JSON.parse(text) as Record<string, unknown>;
+    const parsedManifest = JSON.parse(text) as unknown;
+    if (!isRecord(parsedManifest)) throw new Error("manifest must be an object");
+    manifest = parsedManifest;
     if (canonical(manifest) + "\n" !== text) throw new Error("non-canonical");
   } catch {
     return fail(["MANIFEST_INVALID"], storageFlags);
@@ -634,7 +644,9 @@ export function verifyM2ControllerPrivateBoundaryV0_1(
       if (!bytes) return fail(["PUBLIC_POOL_METADATA_INVALID"], storageFlags);
       try {
         const text = bytes.toString("utf8");
-        publicPool = JSON.parse(text) as Record<string, unknown>;
+        const parsedPool = JSON.parse(text) as unknown;
+        if (!isRecord(parsedPool)) throw new Error("public pool must be an object");
+        publicPool = parsedPool;
         if (canonical(publicPool) + "\n" !== text) throw new Error("non-canonical");
       } catch {
         return fail(["PUBLIC_POOL_METADATA_INVALID"], storageFlags);
@@ -681,6 +693,10 @@ export function verifyM2ControllerPrivateBoundaryV0_1(
     ) {
       return fail(["COMMITMENT_CHRONOLOGY_INVALID"], storageFlags);
     }
+    const occurredAtMillis = utcTimestampMillis(value.occurredAt);
+    if (occurredAtMillis === null) {
+      return fail(["COMMITMENT_CHRONOLOGY_INVALID"], storageFlags);
+    }
     const artifact = metadata.get(value.artifactId);
     if (
       !artifact ||
@@ -691,10 +707,10 @@ export function verifyM2ControllerPrivateBoundaryV0_1(
       return fail(["COMMITMENT_CHRONOLOGY_INVALID"], storageFlags);
     }
     const previousEntry = entries[index - 1] as Record<string, unknown> | undefined;
+    const previousOccurredAtMillis = utcTimestampMillis(previousEntry?.occurredAt);
     if (
       index > 0 &&
-      typeof previousEntry?.occurredAt === "string" &&
-      value.occurredAt <= previousEntry.occurredAt
+      (previousOccurredAtMillis === null || occurredAtMillis <= previousOccurredAtMillis)
     ) {
       return fail(["COMMITMENT_ORDER_INVALID"], storageFlags);
     }

@@ -9,7 +9,7 @@ import {
   unlinkSync,
   writeFileSync,
 } from "node:fs";
-import { join } from "node:path";
+import { dirname, join } from "node:path";
 import { tmpdir } from "node:os";
 import { createHash } from "node:crypto";
 import {
@@ -265,6 +265,44 @@ describe("M2 controller-private boundary", () => {
     }
   });
 
+  it("uses component-aware forbidden-root containment", () => {
+    const cases = [
+      ["filesystem root", "/", true],
+      ["exact same root", "same", true],
+      ["parent root", "parent", true],
+      ["child root", "child", true],
+      ["similarly named sibling", "sibling", false],
+    ] as const;
+    for (const [label, relation, overlaps] of cases) {
+      const fixture = makeFixtureV0_1();
+      try {
+        const forbiddenRoot =
+          relation === "same"
+            ? fixture.root
+            : relation === "parent"
+              ? dirname(fixture.root)
+              : relation === "child"
+                ? join(fixture.root, "child")
+                : relation === "sibling"
+                  ? `${fixture.root}-sibling`
+                  : "/";
+        const result = verifyM2ControllerPrivateBoundaryV0_1({
+          ...fixture.input,
+          forbiddenRoots: [forbiddenRoot],
+        });
+        if (overlaps) {
+          expect(result.reasonCodes).toContain("PRIVATE_ROOT_OVERLAPS_FORBIDDEN_ROOT");
+        } else {
+          expect(result.reasonCodes).not.toContain("PRIVATE_ROOT_OVERLAPS_FORBIDDEN_ROOT");
+          expect(result.status).toBe("SYNTHETIC_BOUNDARY_READY");
+        }
+        expect(label).toBeTruthy();
+      } finally {
+        fixture.cleanup();
+      }
+    }
+  });
+
   it("blocks traversal in an artifact path", () => {
     const fixture = makeFixtureV0_1();
     try {
@@ -355,6 +393,35 @@ describe("M2 controller-private boundary", () => {
     }
   });
 
+  it("blocks canonical null sealed-manifest and public-pool artifacts", () => {
+    for (const artifactId of ["manifest", "pool"] as const) {
+      const fixture = makeFixtureV0_1();
+      try {
+        const input = cloneInputV0_1(fixture.input);
+        rewriteArtifactBytesV0_1(fixture, input, artifactId, Buffer.from("null\n"));
+        if (artifactId === "manifest") {
+          expectBlockedV0_1({ ...fixture, input }, () => {}, "MANIFEST_INVALID");
+        } else {
+          const manifestPath = join(fixture.root, "sealed-manifest.json");
+          const manifest = JSON.parse(readFileSync(manifestPath, "utf8")) as Record<string, unknown>;
+          const dependencies = manifest.dependencies as Array<Record<string, unknown>>;
+          const poolDependency = dependencies.find((dependency) => dependency.artifactId === "pool")!;
+          poolDependency.sha256 = input.artifacts.find((artifact) => artifact.artifactId === "pool")!.expectedSha256;
+          poolDependency.byteLength = input.artifacts.find((artifact) => artifact.artifactId === "pool")!.expectedByteLength;
+          const manifestBytes = Buffer.from(canonical(manifest) + "\n");
+          writeFileSync(manifestPath, manifestBytes, { mode: 0o600 });
+          chmodSync(manifestPath, 0o600);
+          const manifestArtifact = input.artifacts.find((artifact) => artifact.artifactId === "manifest")!;
+          manifestArtifact.expectedSha256 = hash(manifestBytes);
+          manifestArtifact.expectedByteLength = manifestBytes.length;
+          expectBlockedV0_1({ ...fixture, input }, () => {}, "PUBLIC_POOL_METADATA_INVALID");
+        }
+      } finally {
+        fixture.cleanup();
+      }
+    }
+  });
+
   it("rejects coerced manifest dependency identifiers", () => {
     const fixture = makeFixtureV0_1();
     try {
@@ -429,6 +496,32 @@ describe("M2 controller-private boundary", () => {
       expectBlockedV0_1(fixture, (input) => {
         input.chronology.entries[0].occurredAt = "controller-says-before";
       }, "COMMITMENT_CHRONOLOGY_INVALID");
+    } finally {
+      fixture.cleanup();
+    }
+  });
+
+  it("orders chronology by UTC instants across timestamp precision", () => {
+    const fixture = makeFixtureV0_1();
+    try {
+      const input = cloneInputV0_1(fixture.input);
+      input.chronology.entries[0].occurredAt = "2026-10-20T00:00:00Z";
+      input.chronology.entries[1].occurredAt = "2026-10-20T00:00:00.100Z";
+      expect(verifyM2ControllerPrivateBoundaryV0_1(input).status).toBe("SYNTHETIC_BOUNDARY_READY");
+
+      expectBlockedV0_1(fixture, (candidate) => {
+        candidate.chronology.entries[0].occurredAt = "2026-10-20T00:00:00.900Z";
+        candidate.chronology.entries[1].occurredAt = "2026-10-20T00:00:00.100Z";
+      }, "COMMITMENT_ORDER_INVALID");
+
+      const laterInput = cloneInputV0_1(fixture.input);
+      laterInput.chronology.entries[0].occurredAt = "2026-10-20T00:00:00.900Z";
+      laterInput.chronology.entries[1].occurredAt = "2026-10-20T00:00:01Z";
+      expect(verifyM2ControllerPrivateBoundaryV0_1(laterInput).status).toBe("SYNTHETIC_BOUNDARY_READY");
+
+      expectBlockedV0_1(fixture, (candidate) => {
+        candidate.chronology.entries[1].occurredAt = "2026-10-20T00:00:00Z";
+      }, "COMMITMENT_ORDER_INVALID");
     } finally {
       fixture.cleanup();
     }
