@@ -586,6 +586,65 @@ describe("M2 controller-private boundary", () => {
     }
   });
 
+  it("blocks noncanonical public-pool bytes with coherent fingerprints", () => {
+    const fixture = makeFixtureV0_1();
+    try {
+      const input = cloneInputV0_1(fixture.input);
+      const poolPath = join(fixture.root, "public-pool.json");
+      const pool = JSON.parse(readFileSync(poolPath, "utf8")) as Record<string, unknown>;
+      const nonCanonicalPoolBytes = Buffer.from(
+        JSON.stringify({
+          frozen: pool.frozen,
+          linkageMode: pool.linkageMode,
+          schemaVersion: pool.schemaVersion,
+          serializationProfile: pool.serializationProfile,
+          containsTargetSemantics: pool.containsTargetSemantics,
+          targetBearingFieldCount: pool.targetBearingFieldCount,
+        }) + "\n",
+      );
+      rewriteArtifactBytesV0_1(fixture, input, "pool", nonCanonicalPoolBytes);
+
+      const manifestPath = join(fixture.root, "sealed-manifest.json");
+      const manifest = JSON.parse(readFileSync(manifestPath, "utf8")) as Record<string, unknown>;
+      const dependencies = manifest.dependencies as Array<Record<string, unknown>>;
+      const poolDependency = dependencies.find((dependency) => dependency.artifactId === "pool")!;
+      poolDependency.sha256 = hash(nonCanonicalPoolBytes);
+      poolDependency.byteLength = nonCanonicalPoolBytes.length;
+      rewriteArtifactBytesV0_1(
+        fixture,
+        input,
+        "manifest",
+        Buffer.from(canonical(manifest) + "\n"),
+      );
+
+      expectBlockedV0_1({ ...fixture, input }, () => {}, "PUBLIC_POOL_METADATA_INVALID");
+    } finally {
+      fixture.cleanup();
+    }
+  });
+
+  it("blocks unexpected nested private files", () => {
+    const fixture = makeFixtureV0_1();
+    try {
+      writeFileSync(join(fixture.root, "unexpected.bin"), "unexpected\n", { mode: 0o600 });
+      expectBlockedV0_1(fixture, () => {}, "UNEXPECTED_PRIVATE_PATH");
+    } finally {
+      fixture.cleanup();
+    }
+  });
+
+  it("blocks malformed runtime input without exposing private details", () => {
+    const result = verifyM2ControllerPrivateBoundaryV0_1(null);
+    expect(result.status).toBe("BLOCKED");
+    expect(result.reasonCodes).toEqual(["INPUT_MALFORMED"]);
+    expect(result.privateDataExposed).toBe(false);
+    expect(result.realCandidateIntakeAuthorized).toBe(false);
+    expect(result.realKeyCreated).toBe(false);
+    expect(result.realIdsAssigned).toBe(false);
+    expect(result.realSelectionExecuted).toBe(false);
+    expect(result.realExecutionAuthorized).toBe(false);
+  });
+
   it("blocks false independent-review, real-key and real-selection claims", () => {
     const fixture = makeFixtureV0_1();
     try {
