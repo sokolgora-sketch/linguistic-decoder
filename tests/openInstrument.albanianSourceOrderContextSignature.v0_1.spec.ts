@@ -76,6 +76,38 @@ describe("Albanian source-order context signature v0.1", () => {
     expect(result.reasonCodes).toEqual(["OPTIONAL_NUCLEUS_UNCONFIRMED"]);
   });
 
+  it("does not treat an optional vowel inside a bracketed IPA wrapper as definite A", () => {
+    const result = project("a", "[(a)]").result;
+    expect(result).toMatchObject({
+      status: "NULL",
+      rawIpa: "[(a)]",
+      voicePath: [],
+      structuralSignature: null,
+      optionalNucleusOrders: [0],
+      reasonCodes: ["OPTIONAL_NUCLEUS_UNCONFIRMED"],
+    });
+    expect(result.sourceSegments).toEqual([
+      expect.objectContaining({ baseSymbol: "a", optional: true, voiceAnchors: ["A"] }),
+    ]);
+  });
+
+  it("preserves multiple optional groups instead of normalizing them into malformed support", () => {
+    const result = project("mal", "[(ma)(l)]").result;
+    expect(result).toMatchObject({
+      status: "NULL",
+      rawIpa: "[(ma)(l)]",
+      voicePath: [],
+      structuralSignature: null,
+      optionalNucleusOrders: [0],
+      reasonCodes: ["OPTIONAL_NUCLEUS_UNCONFIRMED"],
+    });
+    expect(result.sourceSegments.map((segment) => [segment.baseSymbol, segment.optional])).toEqual([
+      ["m", true],
+      ["a", true],
+      ["l", true],
+    ]);
+  });
+
   it("fails closed when pronunciationBody disagrees with the source raw IPA", () => {
     const { sourceFact, analysis } = project("mal", "[mal]");
     const result = projectAlbanianSourceOrderContextSignatureV0_1({

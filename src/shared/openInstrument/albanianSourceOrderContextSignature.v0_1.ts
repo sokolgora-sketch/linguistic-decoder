@@ -121,15 +121,32 @@ function isStringArrayV0_1(value: unknown): value is readonly string[] {
   return Array.isArray(value) && value.every((item) => typeof item === "string");
 }
 
-function normalizedSourceBodyV0_1(rawIpa: string): string {
+const OPTIONAL_GROUP_OPEN_SENTINEL_V0_1 = "\uE001";
+const OPTIONAL_GROUP_CLOSE_SENTINEL_V0_1 = "\uE002";
+
+function sourceBodiesV0_1(rawIpa: string): Readonly<{
+  normalized: string;
+  optionalPreserving: string;
+}> {
   const trimmed = rawIpa.trim();
-  const body =
+  const wrapped =
     trimmed.length >= 2 &&
     ((trimmed.startsWith("/") && trimmed.endsWith("/")) ||
       (trimmed.startsWith("[") && trimmed.endsWith("]")))
-      ? trimmed.slice(1, -1).trim()
-      : trimmed;
-  return normalizeIpaV0_1(body);
+      ? true
+      : false;
+  const body = wrapped ? trimmed.slice(1, -1).trim() : trimmed;
+  const protectedOptionalBody = wrapped
+    ? body
+        .replace(/\(/gu, OPTIONAL_GROUP_OPEN_SENTINEL_V0_1)
+        .replace(/\)/gu, OPTIONAL_GROUP_CLOSE_SENTINEL_V0_1)
+    : body;
+  return Object.freeze({
+    normalized: normalizeIpaV0_1(body),
+    optionalPreserving: normalizeIpaV0_1(protectedOptionalBody)
+      .replace(new RegExp(OPTIONAL_GROUP_OPEN_SENTINEL_V0_1, "gu"), "(")
+      .replace(new RegExp(OPTIONAL_GROUP_CLOSE_SENTINEL_V0_1, "gu"), ")"),
+  });
 }
 
 function sortedReasonsV0_1(
@@ -228,7 +245,20 @@ function sourceSegmentsV0_1(
   const reasons: AlbanianSourceOrderContextSignatureReasonCodeV0_1[] = [];
   let optionalDepth = 0;
 
-  for (const segment of classifyIpaSegmentsV0_1(body)) {
+  const protectedBody = body
+    .replace(/\(/gu, OPTIONAL_GROUP_OPEN_SENTINEL_V0_1)
+    .replace(/\)/gu, OPTIONAL_GROUP_CLOSE_SENTINEL_V0_1);
+  const classifiedSegments = classifyIpaSegmentsV0_1(protectedBody).map((segment) => {
+    if (segment.base === OPTIONAL_GROUP_OPEN_SENTINEL_V0_1) {
+      return { ...segment, raw: "(", base: "(" };
+    }
+    if (segment.base === OPTIONAL_GROUP_CLOSE_SENTINEL_V0_1) {
+      return { ...segment, raw: ")", base: ")" };
+    }
+    return segment;
+  });
+
+  for (const segment of classifiedSegments) {
     if (segment.base === "(") {
       if (optionalDepth !== 0) reasons.push("OPTIONAL_MARKER_INVALID");
       optionalDepth += 1;
@@ -392,11 +422,12 @@ export function projectAlbanianSourceOrderContextSignatureV0_1(
   ) {
     return nullResultV0_1(fact, analysis, ["SOURCE_IPA_MISSING"]);
   }
-  if (normalizedSourceBodyV0_1(typedAnalysis.rawIpa) !== typedAnalysis.pronunciationBody) {
+  const sourceBodies = sourceBodiesV0_1(typedAnalysis.rawIpa);
+  if (sourceBodies.normalized !== typedAnalysis.pronunciationBody) {
     return nullResultV0_1(fact, analysis, ["SOURCE_RECORD_ANALYSIS_MISMATCH"]);
   }
 
-  const parsed = sourceSegmentsV0_1(typedAnalysis.pronunciationBody);
+  const parsed = sourceSegmentsV0_1(sourceBodies.optionalPreserving);
   if (parsed.reasonCodes.length > 0) {
     return nullResultV0_1(fact, analysis, parsed.reasonCodes, []);
   }
