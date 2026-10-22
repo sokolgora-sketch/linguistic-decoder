@@ -31,7 +31,7 @@ Read these before designing a new source adapter, rule, dataset or statistic:
 
 - docs/open-instrument/research-artifacts/m2-one-embryo-proof-v1/preregistration.json — the normative frozen M2 procedure.
 - docs/open-instrument/research-artifacts/m2-one-embryo-proof-v1/README.md — explanatory preregistration and hash/reveal requirements.
-- src/shared/openInstrument/structuralHypothesisDiscovery.v0_1.ts — the existing M2 structural-embryo authority, subject to direct current-file inspection.
+- src/shared/structuralHypothesisDiscovery.v0_1.ts — the existing M2 structural-embryo authority, subject to direct current-file inspection.
 - docs/open-instrument/zhero-seven-voices-sound-first-theory-v0.1.md — USER_DOCTRINE_WITH_EXPLICIT_UNTESTED_MECHANISMS, not science proof.
 - docs/open-instrument/zheji-semantic-transparency-layer-v0.1.md and docs/open-instrument/milestones/zheji-semantic-transparency-layer-v0.1.md — historical passive/interpretive design boundaries, not primary textual proof of Petro Zheji.
 - docs/open-instrument/z-zero-seven-voice-functional-recurrence-statistics-research-design-v0.1.md — existing unit, sample, baseline, preregistration, controls and holdout guidance; do not reinvent it.
