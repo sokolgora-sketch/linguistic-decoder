@@ -10,7 +10,8 @@ permissions:
   contents: read
 
 jobs:
-  lint-test-build:
+  core_validation:
+    name: core-validation
     runs-on: ubuntu-latest
     timeout-minutes: 40
 
@@ -59,8 +60,62 @@ jobs:
           NEXT_TELEMETRY_DISABLED: "1"
         run: npm run build
 
-      - name: Install Chromium for Open Instrument browser smoke
-        run: npx playwright install --with-deps chromium
+  browser_smoke:
+    name: browser-smoke
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    container:
+      image: mcr.microsoft.com/playwright:v1.63.0-noble
+      options: --ipc=host
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      - name: Verify Playwright version alignment
+        run: |
+          node <<'NODE'
+          const version = require("playwright/package.json").version;
+          if (version !== "1.63.0") {
+            console.error(`Expected Playwright 1.63.0, found ${version}`);
+            process.exit(1);
+          }
+          console.log(`Playwright version: ${version}`);
+          NODE
+
+      - name: Build for Open Instrument browser smoke
+        env:
+          NEXT_TELEMETRY_DISABLED: "1"
+        run: npm run build
 
       - name: Open Instrument browser handoff smoke
         run: npm run open-instrument:browser-smoke
+
+  lint-test-build:
+    name: lint-test-build
+    if: ${{ always() }}
+    needs: [core_validation, browser_smoke]
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Require core and browser validation
+        env:
+          CORE_RESULT: ${{ needs.core_validation.result }}
+          BROWSER_RESULT: ${{ needs.browser_smoke.result }}
+        run: |
+          set -eu
+          test "$CORE_RESULT" = "success"
+          test "$BROWSER_RESULT" = "success"
+          echo "Core validation: $CORE_RESULT"
+          echo "Browser smoke: $BROWSER_RESULT"
+          echo "lint-test-build aggregate: PASS"
