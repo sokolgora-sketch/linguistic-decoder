@@ -331,6 +331,24 @@ function distinctGlossesV0_1(
   )]);
 }
 
+function hasConservativePrimaryIlluminationEvidenceV0_1(
+  fact: AlbanianKaikkiExactLexicalSourceFactV0_1,
+): boolean {
+  const glosses = distinctGlossesV0_1([fact]);
+  const illuminationGlossCount = glosses.filter((gloss) =>
+    /\b(?:light|daylight|illumination|illuminat(?:e|ed|ing)|bright(?:ness)?)\b/iu.test(gloss),
+  ).length;
+  const competingOrUnrelatedGloss = glosses.some((gloss) =>
+    /\b(?:weight|not\s+heavy|easy|opening|access|knowledge|vision|clarity|clear)\b/iu.test(gloss),
+  );
+
+  // This is deliberately a conservative source-bound product gate: only the
+  // primary fact's own glosses count, two or more compatible illumination
+  // glosses are required, and explicit alternate senses fail closed. Related
+  // forms never create an interpretation for the queried word.
+  return illuminationGlossCount >= 2 && !competingOrUnrelatedGloss;
+}
+
 async function buildAlbanianLexicalReadingV0_1(input: Readonly<{
   word: string;
   facts: readonly AlbanianKaikkiExactLexicalSourceFactV0_1[];
@@ -370,7 +388,7 @@ async function buildAlbanianLexicalReadingV0_1(input: Readonly<{
         : null;
       return Object.freeze({
         form: relation.form,
-        entryLocator: relation.entryLocator,
+        entryLocator: resolved?.entryLocator ?? relation.entryLocator,
         relation: relation.relation,
         resolution: resolved ? "RESOLVED" as const : "UNRESOLVED" as const,
         sourceRecordId: resolved?.sourceRecordId ?? null,
@@ -391,17 +409,14 @@ async function buildAlbanianLexicalReadingV0_1(input: Readonly<{
   }));
 
   const meaningGlosses = distinctGlossesV0_1([primary]);
-  const relatedMeaningGlosses = relatedResults.flatMap((item) => item.meaningGlosses);
-  const hasLightMeaning = [...meaningGlosses, ...relatedMeaningGlosses].some((gloss) =>
-    /\b(light|illumin|bright|clarity|clear|vision|opening|access)\b/iu.test(gloss),
-  );
+  const hasLightMeaning = hasConservativePrimaryIlluminationEvidenceV0_1(primary);
   const hasSupportedPath = sourcePronunciation?.status === "SUPPORTED" &&
     sourcePronunciation.voicePath.length > 0;
   const voicePath = sourcePronunciation?.voicePath.join(" → ") ?? "Null";
   const interpretation = hasLightMeaning && hasSupportedPath
     ? Object.freeze({
         status: "EXPLORATORY_ZHEJI_READING" as const,
-        statement: `The attested source meaning is placed beside the source-derived ${voicePath} path. As a Zheji-inspired product prompt, this can invite an illumination → clarity reading; the prompt is exploratory and does not claim causation, etymology, or a universal Voice meaning.`,
+        statement: `The attested primary-source meaning is placed beside the source-derived ${voicePath} path. As a Zheji-inspired product prompt, this can invite an illumination → clarity reading; the prompt is exploratory and does not claim causation, etymology, or a universal Voice meaning.`,
         alternatives: Object.freeze([
           "The source-linked forms may reflect ordinary lexical or morphological relations.",
           "The Voice path may be only a phonological observation with no semantic force.",
@@ -409,7 +424,7 @@ async function buildAlbanianLexicalReadingV0_1(input: Readonly<{
         basis: Object.freeze([
           "ATTESTED_SOURCE_GLOSSES",
           "SOURCE_DERIVED_IPA_VOICE_PATH",
-          "SOURCE_RELATED_FORM_LINKS",
+          "PRIMARY_SOURCE_GLOSS_EVIDENCE",
         ]),
         claimBoundary: "Exploratory product interpretation only; no historical-origin claim, semantic proof, or winner selection.",
       })

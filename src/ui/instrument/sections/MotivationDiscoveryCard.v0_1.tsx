@@ -610,9 +610,9 @@ export function MotivationDiscoveryCardV0_1({
             </div>
           ) : null}
           <div className="mt-3">
-            <div className="font-semibold text-[#f5f7fb]">Source-linked forms and meaning extensions</div>
+            <div className="font-semibold text-[#f5f7fb]">Source-linked form candidates</div>
             <div className="mt-1 text-[#9fbdb5]">
-              These are source-provided links, not an automatic historical-family claim.
+              These are source-provided form links, not verified family, etymology, or meaning-extension claims.
             </div>
             <div className="mt-2 flex flex-wrap gap-2">
               {albanianLexicalReading.relatedForms.map((related) => (
