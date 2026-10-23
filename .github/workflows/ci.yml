@@ -80,7 +80,7 @@ jobs:
         run: npm ci
 
       - name: Test unit shard
-        run: npm test -- --ci --silent --runInBand --shard=${{ matrix.shard }}/4
+        run: npm test -- --ci --silent --maxWorkers=2 --shard=${{ matrix.shard }}/4
 
   browser_smoke:
     name: browser-smoke
