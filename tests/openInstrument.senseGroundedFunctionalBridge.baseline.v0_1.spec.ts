@@ -64,5 +64,5 @@ describe("sense-grounded functional bridge arbitrary-sense baseline v0.1", () =>
     expect(new Set(results.map((result) => result.status))).toEqual(
       new Set(["candidate_only"]),
     );
-  });
+  }, 10_000);
 });

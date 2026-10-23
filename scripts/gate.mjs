@@ -19,7 +19,7 @@ function run(cmd, cmdArgs) {
 }
 
 run("npm", ["run", "lint"]);
-run("npm", ["test"]);
+run("npm", quick ? ["test", "--", "--ci", "--runInBand"] : ["test"]);
 run("npm", ["run", "test:integration"]);
 
 if (!quick) run("npm", ["run", "build"]);

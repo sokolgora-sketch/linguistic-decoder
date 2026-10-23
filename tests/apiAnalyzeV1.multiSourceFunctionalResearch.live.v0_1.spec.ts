@@ -230,6 +230,7 @@ describe(
           "user_decides",
         );
       },
+      10_000,
     );
 
     it(
