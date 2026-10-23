@@ -27,6 +27,12 @@ export type AlbanianKaikkiExactLexicalSourceIpaObservationV0_1 = Readonly<{
   tags: readonly string[];
 }>;
 
+export type AlbanianKaikkiExactLexicalSourceRelatedFormV0_1 = Readonly<{
+  form: string;
+  relation: "SOURCE_RELATED_FORM";
+  entryLocator: string;
+}>;
+
 export type AlbanianKaikkiExactLexicalSourceFactV0_1 = Readonly<{
   sourceRecordId: string;
   entryLocator: string;
@@ -37,6 +43,7 @@ export type AlbanianKaikkiExactLexicalSourceFactV0_1 = Readonly<{
   partOfSpeech: string | null;
   senses: readonly AlbanianKaikkiExactLexicalSourceSenseV0_1[];
   ipaObservations: readonly AlbanianKaikkiExactLexicalSourceIpaObservationV0_1[];
+  relatedForms?: readonly AlbanianKaikkiExactLexicalSourceRelatedFormV0_1[];
   sourceStatus: "observed_external_snapshot";
   attestationTruth: "fact";
   pronunciationAuthority: typeof ALBANIAN_KAIKKI_LEXICAL_PRONUNCIATION_AUTHORITY_V0_1;
@@ -213,6 +220,19 @@ function sourceFactV0_1(
   const ipaObservations = Array.isArray(record.sounds)
     ? Object.freeze(record.sounds.map(projectSoundV0_1))
     : Object.freeze([]);
+  const relatedForms = Array.isArray(record.related)
+    ? Object.freeze(record.related.flatMap((value) => {
+        const relatedRecord = isRecordV0_1(value) ? value : null;
+        const relatedForm = relatedRecord ? textV0_1(relatedRecord.word) : null;
+        if (!relatedForm) return [];
+        const relatedEncodedForm = encodeURIComponent(relatedForm);
+        return [{
+          form: relatedForm,
+          relation: "SOURCE_RELATED_FORM" as const,
+          entryLocator: `jsonl://word/${relatedEncodedForm}`,
+        }];
+      }))
+    : undefined;
   const encodedForm = encodeURIComponent(form);
 
   return Object.freeze({
@@ -225,6 +245,7 @@ function sourceFactV0_1(
     partOfSpeech: textV0_1(record.pos),
     senses,
     ipaObservations,
+    ...(relatedForms ? { relatedForms } : {}),
     sourceStatus: "observed_external_snapshot",
     attestationTruth: "fact",
     pronunciationAuthority: ALBANIAN_KAIKKI_LEXICAL_PRONUNCIATION_AUTHORITY_V0_1,

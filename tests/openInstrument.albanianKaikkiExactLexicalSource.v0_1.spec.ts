@@ -140,6 +140,73 @@ const indexedFixtureRecordsV0_1: readonly SyntheticSourceRecordV0_1[] = [
 ];
 
 describe("real Albanian exact lexical source integration v0.1", () => {
+  it("builds a source-bound Albanian reading with computed IPA Voices and related-form extensions", async () => {
+    const drite = fixtureFact({
+      sourceRecordId: "kaikki-albanian-jsonl:word=drit%C3%AB:ordinal=0",
+      entryLocator: "jsonl://word/drit%C3%AB/match/0",
+      physicalRecordOrdinal: 3461,
+      form: "dritë",
+      senses: [{ senseId: "drite-light", glosses: ["light", "light (such as a lamp)"] }],
+      ipaObservations: [{ soundIndex: 0, ipa: "/ˈdɾitə/", tags: [] }],
+      relatedForms: [{
+        form: "dritare",
+        relation: "SOURCE_RELATED_FORM",
+        entryLocator: "jsonl://word/dritare",
+      }],
+    });
+    const dritare = fixtureFact({
+      sourceRecordId: "kaikki-albanian-jsonl:word=dritare:ordinal=0",
+      entryLocator: "jsonl://word/dritare/match/0",
+      physicalRecordOrdinal: 3462,
+      form: "dritare",
+      senses: [{ senseId: "dritare-window", glosses: ["window"] }],
+      ipaObservations: [{ soundIndex: 0, ipa: "/dɾitˈaɾe/", tags: [] }],
+    });
+    const provider = createAlbanianKaikkiServerOnlyExactLexicalSourceProviderForSyntheticFixtureV0_1({
+      facts: [drite, dritare],
+    });
+    const result = await buildMotivationEngineDiscoveryServerOnlyV0_1({
+      word: "dritë",
+      inputLanguage: "sq",
+      inputProfile: "albanian",
+      analysis: await analysisFor("dritë"),
+      heart: buildHeartInstrumentV1("dritë"),
+      albanianLexicalSourceProvider: provider,
+    });
+
+    expect(result.discovery.albanianLexicalReading).toMatchObject({
+      status: "SUPPORTED",
+      primarySourceFact: {
+        form: "dritë",
+        meaningGlosses: ["light", "light (such as a lamp)"],
+      },
+      sourcePronunciation: {
+        rawIpa: "/ˈdɾitə/",
+        status: "SUPPORTED",
+        voicePath: ["I", "Ë"],
+      },
+      relatedForms: [{
+        form: "dritare",
+        resolution: "RESOLVED",
+        meaningGlosses: ["window"],
+      }],
+      interpretation: { status: "EXPLORATORY_ZHEJI_READING" },
+    });
+
+    const vm = adaptAnalysisToTelemetryVM({
+      word: "dritë",
+      sanitized: "dritë",
+      engineVersion: "fixture",
+      primaryPath: { voicePath: ["I", "Ë"] },
+      candidates: [],
+      motivationDiscoveryV0_1: result.discovery,
+    });
+    expect(vm.motivationDiscoveryV0_1).toMatchObject({ kind: "present" });
+    if (vm.motivationDiscoveryV0_1?.kind === "present") {
+      expect(vm.motivationDiscoveryV0_1.value.albanianLexicalReading?.sourcePronunciation?.voicePath).toEqual(["I", "Ë"]);
+    }
+  });
+
   it("verifies once, indexes exact records, and reuses the index for different words", async () => {
     await withSyntheticSourceFileV0_1(indexedFixtureRecordsV0_1, async ({ provider, sourceBytes }) => {
       const nene = await provider.queryWithMetrics("NËNË");
