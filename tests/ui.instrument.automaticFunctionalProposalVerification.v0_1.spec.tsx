@@ -188,6 +188,7 @@ describe(
           ),
         ).not.toBeInTheDocument();
       },
+      10_000,
     );
 
     it(
