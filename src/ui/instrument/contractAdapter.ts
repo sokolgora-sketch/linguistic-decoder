@@ -1163,6 +1163,40 @@ function parseMotivationDiscoveryV0_1(
         ) &&
         record.pronunciationVariants.every(validSourceLinkedPronunciation);
     };
+    const sourceLinkedComponentReading = reading.sourceLinkedComponentReading;
+    const validSourceLinkedComponentReading = sourceLinkedComponentReading === undefined || sourceLinkedComponentReading === null || (() => {
+      if (!isRecord(sourceLinkedComponentReading) ||
+        (sourceLinkedComponentReading.status !== "SUPPORTED" && sourceLinkedComponentReading.status !== "NULL") ||
+        !isStringArray(sourceLinkedComponentReading.reasonCodes) ||
+        !isRecord(sourceLinkedComponentReading.relation) ||
+        sourceLinkedComponentReading.relation.relation !== "SOURCE_EXPLICIT_TWO_COMPONENT_COMPOUND" ||
+        typeof sourceLinkedComponentReading.relation.primarySourceRecordId !== "string" ||
+        typeof sourceLinkedComponentReading.relation.primaryEntryLocator !== "string" ||
+        (sourceLinkedComponentReading.relation.sourceAuthoredExplanation !== null &&
+          typeof sourceLinkedComponentReading.relation.sourceAuthoredExplanation !== "string") ||
+        !Array.isArray(sourceLinkedComponentReading.relation.references) ||
+        !sourceLinkedComponentReading.relation.references.every((reference) =>
+          isRecord(reference) &&
+          typeof reference.sourceForm === "string" &&
+          reference.sourceForm.length > 0 &&
+          (reference.reference === null || typeof reference.reference === "string"),
+        ) ||
+        !validSourceLinkedRecord(sourceLinkedComponentReading.primary) ||
+        !Array.isArray(sourceLinkedComponentReading.components) ||
+        !sourceLinkedComponentReading.components.every(validSourceLinkedRecord) ||
+        (sourceLinkedComponentReading.status === "SUPPORTED" && sourceLinkedComponentReading.components.length !== 2) ||
+        !isRecord(sourceLinkedComponentReading.exploratoryRelationship) ||
+        (sourceLinkedComponentReading.exploratoryRelationship.status !== "EXPLORATORY_SOURCE_COMPONENT_RELATION" &&
+          sourceLinkedComponentReading.exploratoryRelationship.status !== "UNKNOWN_OR_NULL") ||
+        (sourceLinkedComponentReading.exploratoryRelationship.statement !== null &&
+          typeof sourceLinkedComponentReading.exploratoryRelationship.statement !== "string") ||
+        !isStringArray(sourceLinkedComponentReading.exploratoryRelationship.alternatives) ||
+        typeof sourceLinkedComponentReading.exploratoryRelationship.claimBoundary !== "string" ||
+        typeof sourceLinkedComponentReading.claimBoundary !== "string") {
+        return false;
+      }
+      return true;
+    })();
     const sourceLinkedComparison = reading.sourceLinkedComparison;
     const validSourceLinkedComparison = sourceLinkedComparison === undefined || sourceLinkedComparison === null || (
       isRecord(sourceLinkedComparison) &&
@@ -1257,6 +1291,7 @@ function parseMotivationDiscoveryV0_1(
     })();
     return validPrimary && validPronunciation && validRelated &&
       validComposition &&
+      validSourceLinkedComponentReading &&
       validSourceLinkedComparison &&
       validFunctionalMeaningBridge &&
       (reading.interpretation.status === "EXPLORATORY_ZHEJI_READING" || reading.interpretation.status === "UNKNOWN_OR_NULL") &&

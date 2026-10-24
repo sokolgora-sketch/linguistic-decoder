@@ -1379,4 +1379,179 @@ describe("real Albanian exact lexical source integration v0.1", () => {
     expect(screen.getByText(/CURRENT_KAIKKI_IPA_SOURCE_DERIVED_PRODUCT_INTERPRETATION_NOT_FROZEN_PRONUNCIATION_AUTHORITY/)).toBeInTheDocument();
     expect(screen.getByTestId("motivation-discovery-card")).toHaveTextContent("albanian_profile");
   });
+
+  it("renders a source-authored two-component Albanian reading without promoting IPA or composition", async () => {
+    const primary = fixtureFact({
+      sourceRecordId: "kaikki-albanian-jsonl:word=drit%C3%ABshkrim:ordinal=0",
+      entryLocator: "jsonl://word/drit%C3%ABshkrim/match/0",
+      physicalRecordOrdinal: 11429,
+      form: "dritëshkrim",
+      senses: [{ senseId: "driteshkrim-photo", glosses: ["photograph"] }],
+      ipaObservations: [],
+      etymologyText: "From dritë (“light”) + shkrim. Coined by Albanian linguist Faik Konica.",
+      etymologyLinks: [
+        { sourceForm: "dritë", reference: "dritë#Albanian" },
+        { sourceForm: "shkrim", reference: "shkrim#Albanian" },
+      ],
+      etymologyTemplates: [{
+        name: "compound",
+        args: { "1": "sq", "2": "dritë", "3": "shkrim", t1: "light" },
+        expansion: "dritë (“light”) + shkrim",
+      }],
+    });
+    const light = fixtureFact({
+      sourceRecordId: "kaikki-albanian-jsonl:word=drit%C3%AB:ordinal=0",
+      entryLocator: "jsonl://word/drit%C3%AB/match/0",
+      physicalRecordOrdinal: 3461,
+      form: "dritë",
+      senses: [{ senseId: "drite-light", glosses: ["light"] }],
+      ipaObservations: [],
+    });
+    const writing = fixtureFact({
+      sourceRecordId: "kaikki-albanian-jsonl:word=shkrim:ordinal=0",
+      entryLocator: "jsonl://word/shkrim/match/0",
+      physicalRecordOrdinal: 5056,
+      form: "shkrim",
+      senses: [{ senseId: "shkrim-writing", glosses: ["writing"] }],
+      ipaObservations: [],
+    });
+    const discovery = await discoveryForFactsV0_1([primary, light, writing], "dritëshkrim");
+    const reading = discovery.albanianLexicalReading;
+
+    expect(reading).toMatchObject({
+      status: "SUPPORTED",
+      sourcePronunciation: null,
+      sourceLinkedComponentReading: {
+        status: "SUPPORTED",
+        relation: {
+          relation: "SOURCE_EXPLICIT_TWO_COMPONENT_COMPOUND",
+          references: [
+            { sourceForm: "dritë", reference: "dritë#Albanian" },
+            { sourceForm: "shkrim", reference: "shkrim#Albanian" },
+          ],
+        },
+        primary: { form: "dritëshkrim", meaningGlosses: ["photograph"], pronunciationVariants: [] },
+        components: [
+          { form: "dritë", meaningGlosses: ["light"], pronunciationVariants: [] },
+          { form: "shkrim", meaningGlosses: ["writing"], pronunciationVariants: [] },
+        ],
+        exploratoryRelationship: { status: "EXPLORATORY_SOURCE_COMPONENT_RELATION" },
+      },
+      composition: { status: "NULL" },
+      functionalMeaningBridge: { status: "NULL" },
+    });
+
+    const vm = adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: discovery });
+    expect(vm.motivationDiscoveryV0_1).toMatchObject({ kind: "present" });
+    if (vm.motivationDiscoveryV0_1?.kind === "present") {
+      render(createElement(MotivationDiscoveryCardV0_1, { discovery: vm.motivationDiscoveryV0_1 }));
+      const card = screen.getByTestId("albanian-source-linked-component-reading");
+      expect(card).toHaveTextContent("photograph");
+      expect(card).toHaveTextContent("dritë");
+      expect(card).toHaveTextContent("light");
+      expect(card).toHaveTextContent("shkrim");
+      expect(card).toHaveTextContent("writing");
+      expect(card).toHaveTextContent("dritë#Albanian");
+      expect(card).toHaveTextContent("shkrim#Albanian");
+      expect(card).toHaveTextContent("IPA variants: Null");
+      expect(card).toHaveTextContent("engine does not independently prove");
+      expect(screen.getByTestId("albanian-reading-composition-null")).toHaveTextContent("Null");
+    }
+  });
+
+  it.each([
+    {
+      label: "missing component record",
+      facts: (primary: AlbanianKaikkiExactLexicalSourceFactV0_1) => [primary],
+      reasonCode: "SOURCE_COMPONENT_RECORD_NOT_FOUND",
+    },
+    {
+      label: "foreign-language component reference",
+      facts: (primary: AlbanianKaikkiExactLexicalSourceFactV0_1) => [
+        primary,
+        fixtureFact({ form: "dritë", senses: [{ senseId: "light", glosses: ["light"] }], ipaObservations: [] }),
+        fixtureFact({ form: "shkrim", senses: [{ senseId: "writing", glosses: ["writing"] }], ipaObservations: [] }),
+      ],
+      reasonCode: "SOURCE_COMPONENT_REFERENCE_IDENTITY_INVALID",
+    },
+    {
+      label: "component with missing meaning",
+      facts: (primary: AlbanianKaikkiExactLexicalSourceFactV0_1) => [
+        primary,
+        fixtureFact({ form: "dritë", senses: [], ipaObservations: [] }),
+        fixtureFact({ form: "shkrim", senses: [{ senseId: "writing", glosses: ["writing"] }], ipaObservations: [] }),
+      ],
+      reasonCode: "SOURCE_COMPONENT_MEANING_EVIDENCE_MISSING",
+    },
+  ])("fails closed for a $label", async ({ facts, reasonCode, label }) => {
+    const primary = fixtureFact({
+      sourceRecordId: "kaikki-albanian-jsonl:word=drit%C3%ABshkrim:ordinal=0",
+      entryLocator: "jsonl://word/drit%C3%ABshkrim/match/0",
+      physicalRecordOrdinal: 11429,
+      form: "dritëshkrim",
+      senses: [{ senseId: "driteshkrim-photo", glosses: ["photograph"] }],
+      ipaObservations: [],
+      etymologyText: "From dritë + shkrim.",
+      etymologyLinks: [
+        { sourceForm: "dritë", reference: label === "foreign-language component reference" ? "dritë#French" : "dritë#Albanian" },
+        { sourceForm: "shkrim", reference: "shkrim#Albanian" },
+      ],
+      etymologyTemplates: [{
+        name: "compound",
+        args: { "1": "sq", "2": "dritë", "3": "shkrim" },
+        expansion: "dritë + shkrim",
+      }],
+    });
+    const discovery = await discoveryForFactsV0_1(facts(primary), "dritëshkrim");
+    expect(discovery.albanianLexicalReading?.sourceLinkedComponentReading).toMatchObject({
+      status: "NULL",
+      reasonCodes: expect.arrayContaining([reasonCode]),
+    });
+    expect(discovery.albanianLexicalReading?.composition.status).toBe("NULL");
+  });
+
+  it("does not treat two spelling-like links without a compound template as a component reading", async () => {
+    const primary = fixtureFact({
+      form: "dritëshkrim",
+      senses: [{ senseId: "photo", glosses: ["photograph"] }],
+      ipaObservations: [],
+      etymologyLinks: [
+        { sourceForm: "dritë", reference: "dritë#Albanian" },
+        { sourceForm: "shkrim", reference: "shkrim#Albanian" },
+      ],
+    });
+    const discovery = await discoveryForFactsV0_1([
+      primary,
+      fixtureFact({ form: "dritë", senses: [{ senseId: "light", glosses: ["light"] }], ipaObservations: [] }),
+      fixtureFact({ form: "shkrim", senses: [{ senseId: "writing", glosses: ["writing"] }], ipaObservations: [] }),
+    ], "dritëshkrim");
+    expect(discovery.albanianLexicalReading?.sourceLinkedComponentReading).toBeNull();
+  });
+
+  it("fails closed when a component source form resolves to multiple Albanian records", async () => {
+    const primary = fixtureFact({
+      form: "dritëshkrim",
+      senses: [{ senseId: "photo", glosses: ["photograph"] }],
+      ipaObservations: [],
+      etymologyLinks: [
+        { sourceForm: "dritë", reference: "dritë#Albanian" },
+        { sourceForm: "shkrim", reference: "shkrim#Albanian" },
+      ],
+      etymologyTemplates: [{
+        name: "compound",
+        args: { "1": "sq", "2": "dritë", "3": "shkrim" },
+        expansion: "dritë + shkrim",
+      }],
+    });
+    const discovery = await discoveryForFactsV0_1([
+      primary,
+      fixtureFact({ form: "dritë", senses: [{ senseId: "light-1", glosses: ["light"] }], ipaObservations: [] }),
+      fixtureFact({ form: "dritë", senses: [{ senseId: "light-2", glosses: ["firefly"] }], ipaObservations: [] }),
+      fixtureFact({ form: "shkrim", senses: [{ senseId: "writing", glosses: ["writing"] }], ipaObservations: [] }),
+    ], "dritëshkrim");
+    expect(discovery.albanianLexicalReading?.sourceLinkedComponentReading).toMatchObject({
+      status: "NULL",
+      reasonCodes: expect.arrayContaining(["SOURCE_COMPONENT_RECORD_AMBIGUOUS"]),
+    });
+  });
 });

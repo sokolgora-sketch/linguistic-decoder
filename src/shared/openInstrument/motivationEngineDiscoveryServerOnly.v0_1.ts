@@ -83,6 +83,7 @@ export type AlbanianLexicalReadingV0_1 = Readonly<{
     /** Source-authored prose; displayed as attribution, never as machine relation proof. */
     etymologyText: string | null;
   }>[];
+  sourceLinkedComponentReading?: AlbanianSourceLinkedComponentReadingV0_1 | null;
   sourceLinkedComparison?: AlbanianSourceLinkedComparisonV0_1 | null;
   /** Additive product bridge; this never upgrades source evidence into morphology or proof. */
   functionalMeaningBridge: AlbanianFunctionalMeaningBridgeV0_1;
@@ -214,6 +215,30 @@ export type AlbanianSourceLinkedComparisonV0_1 = Readonly<{
       | "DIFFERENT_SUPPORTED_CONTEXTS"
       | "UNKNOWN";
     text: string;
+  }>;
+  claimBoundary: string;
+}>;
+
+export type AlbanianSourceLinkedComponentReadingV0_1 = Readonly<{
+  status: "SUPPORTED" | "NULL";
+  reasonCodes: readonly string[];
+  relation: Readonly<{
+    relation: "SOURCE_EXPLICIT_TWO_COMPONENT_COMPOUND";
+    primarySourceRecordId: string;
+    primaryEntryLocator: string;
+    sourceAuthoredExplanation: string | null;
+    references: readonly Readonly<{
+      sourceForm: string;
+      reference: string | null;
+    }>[];
+  }>;
+  primary: AlbanianSourceLinkedRecordV0_1;
+  components: readonly AlbanianSourceLinkedRecordV0_1[];
+  exploratoryRelationship: Readonly<{
+    status: "EXPLORATORY_SOURCE_COMPONENT_RELATION" | "UNKNOWN_OR_NULL";
+    statement: string | null;
+    alternatives: readonly string[];
+    claimBoundary: string;
   }>;
   claimBoundary: string;
 }>;
@@ -580,6 +605,191 @@ function sourceRecordProjectionV0_1(
     etymologyLinks: Object.freeze([...(fact.etymologyLinks ?? [])]),
     etymologyTemplates: Object.freeze([...(fact.etymologyTemplates ?? [])]),
     pronunciationVariants: sourceRecordPronunciationV0_1(fact, analyses),
+  });
+}
+
+function exactAlbanianComponentReferenceV0_1(
+  link: AlbanianKaikkiExactLexicalSourceEtymologyLinkV0_1,
+): boolean {
+  const sourceForm = normalizedAlbanianFormV0_1(link.sourceForm);
+  const reference = link.reference.normalize("NFC").trim();
+  const separatorIndex = reference.indexOf("#");
+  if (!sourceForm || separatorIndex <= 0 || separatorIndex !== reference.lastIndexOf("#")) return false;
+  return normalizedAlbanianFormV0_1(reference.slice(0, separatorIndex)) === sourceForm &&
+    reference.slice(separatorIndex + 1) === "Albanian";
+}
+
+function compoundComponentReferencesV0_1(
+  primary: AlbanianKaikkiExactLexicalSourceFactV0_1,
+): Readonly<{
+  componentForms: readonly string[];
+  references: readonly Readonly<{ sourceForm: string; reference: string | null }>[];
+  reasonCodes: readonly string[];
+}> | null {
+  const compoundTemplates = (primary.etymologyTemplates ?? []).filter((template) =>
+    template.name === "compound" && template.args["1"] === "sq",
+  );
+  if (compoundTemplates.length === 0) return null;
+
+  const reasons = new Set<string>();
+  if (compoundTemplates.length !== 1) reasons.add("SOURCE_COMPOUND_TEMPLATE_AMBIGUOUS");
+  const template = compoundTemplates[0];
+  const componentForms = template
+    ? [template.args["2"] ?? "", template.args["3"] ?? ""].map((form) => form.normalize("NFC").trim())
+    : [];
+  if (componentForms.length !== 2 || componentForms.some((form) => !form) ||
+    componentForms.some((form, index) => componentForms.indexOf(form) !== index) ||
+    componentForms.some((form) => normalizedAlbanianFormV0_1(form) === normalizedAlbanianFormV0_1(primary.form))) {
+    reasons.add("SOURCE_COMPONENT_FORMS_INVALID");
+  }
+
+  const links = primary.etymologyLinks ?? [];
+  const references = componentForms.map((componentForm) => {
+    const matching = links.filter((link) =>
+      normalizedAlbanianFormV0_1(link.sourceForm) === normalizedAlbanianFormV0_1(componentForm),
+    );
+    if (matching.length !== 1) {
+      reasons.add(matching.length === 0
+        ? "SOURCE_COMPONENT_REFERENCE_NOT_PRESENT"
+        : "SOURCE_COMPONENT_REFERENCE_AMBIGUOUS");
+    }
+    const link = matching[0];
+    if (link && !exactAlbanianComponentReferenceV0_1(link)) {
+      reasons.add("SOURCE_COMPONENT_REFERENCE_IDENTITY_INVALID");
+    }
+    return Object.freeze({
+      sourceForm: componentForm,
+      reference: link?.reference ?? null,
+    });
+  });
+
+  return Object.freeze({
+    componentForms: Object.freeze(componentForms),
+    references: Object.freeze(references),
+    reasonCodes: Object.freeze([...reasons]),
+  });
+}
+
+function nullSourceLinkedComponentReadingV0_1(input: Readonly<{
+  primary: AlbanianKaikkiExactLexicalSourceFactV0_1;
+  primaryAnalyses: readonly AlbanianKaikkiSourceIpaSevenVoiceAnalysisV0_1[];
+  componentForms: readonly string[];
+  references: readonly Readonly<{ sourceForm: string; reference: string | null }>[];
+  components: readonly AlbanianSourceLinkedRecordV0_1[];
+  reasonCodes: readonly string[];
+}>): AlbanianSourceLinkedComponentReadingV0_1 {
+  return Object.freeze({
+    status: "NULL",
+    reasonCodes: Object.freeze([...new Set(input.reasonCodes)]),
+    relation: Object.freeze({
+      relation: "SOURCE_EXPLICIT_TWO_COMPONENT_COMPOUND" as const,
+      primarySourceRecordId: input.primary.sourceRecordId,
+      primaryEntryLocator: input.primary.entryLocator,
+      sourceAuthoredExplanation: input.primary.etymologyText ?? null,
+      references: input.references,
+    }),
+    primary: sourceRecordProjectionV0_1(input.primary, input.primaryAnalyses),
+    components: input.components,
+    exploratoryRelationship: Object.freeze({
+      status: "UNKNOWN_OR_NULL" as const,
+      statement: null,
+      alternatives: Object.freeze([]),
+      claimBoundary: "The source component evidence is incomplete or ambiguous; no component reading is claimed.",
+    }),
+    claimBoundary: "Source-authored component references remain attributed evidence only; no engine-proven derivation, semantic operation, or functional composition is claimed.",
+  });
+}
+
+async function buildSourceLinkedComponentReadingV0_1(input: Readonly<{
+  primary: AlbanianKaikkiExactLexicalSourceFactV0_1;
+  primaryAnalyses: readonly AlbanianKaikkiSourceIpaSevenVoiceAnalysisV0_1[];
+  provider: AlbanianKaikkiServerOnlyExactLexicalSourceProviderV0_1;
+}>): Promise<AlbanianSourceLinkedComponentReadingV0_1 | null> {
+  const componentEvidence = compoundComponentReferencesV0_1(input.primary);
+  if (!componentEvidence) return null;
+
+  const components: AlbanianSourceLinkedRecordV0_1[] = [];
+  const reasons = [...componentEvidence.reasonCodes];
+  for (const componentForm of componentEvidence.componentForms) {
+    try {
+      const result = await input.provider.query(componentForm);
+      const matches = result.status === "MATCHES_FOUND"
+        ? result.facts.filter((fact) =>
+            fact.languageCode === "sq" &&
+            fact.language === "Albanian" &&
+            normalizedAlbanianFormV0_1(fact.form) === normalizedAlbanianFormV0_1(componentForm) &&
+            fact.partOfSpeech !== "name",
+          )
+        : [];
+      if (matches.length === 0) {
+        reasons.push("SOURCE_COMPONENT_RECORD_NOT_FOUND");
+      } else if (matches.length > 1) {
+        reasons.push("SOURCE_COMPONENT_RECORD_AMBIGUOUS");
+      } else {
+        components.push(sourceRecordProjectionV0_1(
+          matches[0],
+          projectAlbanianKaikkiFactSourceIpaToSevenVoicesV0_1(matches[0]),
+        ));
+      }
+    } catch {
+      reasons.push("SOURCE_COMPONENT_RECORD_LOOKUP_FAILED");
+    }
+  }
+
+  if (components.length !== componentEvidence.componentForms.length) {
+    return nullSourceLinkedComponentReadingV0_1({
+      primary: input.primary,
+      primaryAnalyses: input.primaryAnalyses,
+      componentForms: componentEvidence.componentForms,
+      references: componentEvidence.references,
+      components: Object.freeze(components),
+      reasonCodes: reasons,
+    });
+  }
+
+  if (!hasMeaningEvidenceV0_1(distinctGlossesV0_1([input.primary]))) {
+    reasons.push("PRIMARY_MEANING_EVIDENCE_MISSING");
+  }
+  if (components.some((component) => !hasMeaningEvidenceV0_1(component.meaningGlosses))) {
+    reasons.push("SOURCE_COMPONENT_MEANING_EVIDENCE_MISSING");
+  }
+  if (reasons.length > 0) {
+    return nullSourceLinkedComponentReadingV0_1({
+      primary: input.primary,
+      primaryAnalyses: input.primaryAnalyses,
+      componentForms: componentEvidence.componentForms,
+      references: componentEvidence.references,
+      components: Object.freeze(components),
+      reasonCodes: reasons,
+    });
+  }
+
+  const componentText = components.map((component) =>
+    `${component.form} (“${component.meaningGlosses.join("; ")}”)`,
+  ).join(" + ");
+  return Object.freeze({
+    status: "SUPPORTED",
+    reasonCodes: Object.freeze([]),
+    relation: Object.freeze({
+      relation: "SOURCE_EXPLICIT_TWO_COMPONENT_COMPOUND" as const,
+      primarySourceRecordId: input.primary.sourceRecordId,
+      primaryEntryLocator: input.primary.entryLocator,
+      sourceAuthoredExplanation: input.primary.etymologyText ?? null,
+      references: componentEvidence.references,
+    }),
+    primary: sourceRecordProjectionV0_1(input.primary, input.primaryAnalyses),
+    components: Object.freeze(components),
+    exploratoryRelationship: Object.freeze({
+      status: "EXPLORATORY_SOURCE_COMPONENT_RELATION" as const,
+      statement: `The source records ${input.primary.form} (“${distinctGlossesV0_1([input.primary]).join("; ")}") as a compound of ${componentText}. This is a source-attributed component reading; the engine does not independently prove the derivation or add a semantic operation.`,
+      alternatives: Object.freeze([
+        "The source-authored compound account may be descriptive or historically contestable.",
+        "The available records do not establish a universal sound-to-meaning rule.",
+        "The absent IPA for one or more records leaves phonetic comparison unresolved.",
+      ]),
+      claimBoundary: "Exploratory product relationship only; source-authored etymology remains attributed and no morphology, causation, or Voice semantics is asserted.",
+    }),
+    claimBoundary: "The exact source-authored compound template and Albanian references are preserved. IPA and Voice structure remain Null when the source supplies no pronunciation; composition remains separately Null.",
   });
 }
 
@@ -998,6 +1208,7 @@ async function buildAlbanianLexicalReadingV0_1(input: Readonly<{
       primarySourceFact: null,
       sourcePronunciation: null,
       relatedForms: Object.freeze([]),
+      sourceLinkedComponentReading: null,
       sourceLinkedComparison: null,
       functionalMeaningBridge: nullFunctionalMeaningBridgeV0_1({
         sourceFacts: null,
@@ -1094,6 +1305,11 @@ async function buildAlbanianLexicalReadingV0_1(input: Readonly<{
     primary: primaryProjection,
     comparison: null,
   });
+  const sourceLinkedComponentReading = await buildSourceLinkedComponentReadingV0_1({
+    primary,
+    primaryAnalyses: input.analyses,
+    provider: input.provider,
+  });
 
   const compositionCandidate = relatedResultsWithFacts.find(({ resolved }) => resolved !== null);
   const relatedFact = compositionCandidate?.resolved ?? null;
@@ -1151,6 +1367,7 @@ async function buildAlbanianLexicalReadingV0_1(input: Readonly<{
         })
       : null,
     relatedForms: Object.freeze(relatedResults),
+    sourceLinkedComponentReading,
     sourceLinkedComparison,
     functionalMeaningBridge,
     composition,

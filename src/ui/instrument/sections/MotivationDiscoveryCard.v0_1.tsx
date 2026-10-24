@@ -9,6 +9,7 @@ import type {
 } from "@/ui/telemetry/types";
 import type {
   AlbanianSourceLinkedConsonantSegmentV0_1,
+  AlbanianSourceLinkedComponentReadingV0_1,
   AlbanianSourceLinkedComparisonV0_1,
   AlbanianSourceLinkedRecordV0_1,
 } from "@/shared/openInstrument/motivationEngineDiscoveryServerOnly.v0_1";
@@ -79,6 +80,14 @@ function sourceLinkedComparisonSummaryV0_1(
   return comparison.status === "SUPPORTED"
     ? comparison.summary.text
     : `Null — ${comparison.summary.text} Reason: ${comparison.reasonCodes.join(", ") || "SOURCE_LINK_NOT_VERIFIED"}.`;
+}
+
+function sourceLinkedComponentReadingSummaryV0_1(
+  reading: AlbanianSourceLinkedComponentReadingV0_1,
+): string {
+  return reading.status === "SUPPORTED"
+    ? reading.exploratoryRelationship.statement ?? "Source-linked component relationship recorded."
+    : `Null — ${reading.reasonCodes.join(", ") || "SOURCE_COMPONENT_RELATION_NOT_VERIFIED"}.`;
 }
 
 function zcText(value: unknown): string {
@@ -712,6 +721,50 @@ export function MotivationDiscoveryCardV0_1({
                 <div className="mt-2 text-[#d5c28f]">{sourceLinkedComparisonSummaryV0_1(albanianLexicalReading.sourceLinkedComparison)}</div>
               )}
               <div className="mt-2 text-[10px] text-[#91aebb]">{albanianLexicalReading.sourceLinkedComparison.claimBoundary}</div>
+            </div>
+          ) : null}
+          {albanianLexicalReading.sourceLinkedComponentReading ? (
+            <div
+              data-testid="albanian-source-linked-component-reading"
+              className="mt-3 rounded border border-[#3f5368] bg-[#111a21] p-3 text-xs leading-5 text-[#d5e8f3]"
+            >
+              <div className="font-semibold uppercase tracking-[0.1em] text-[#b7d7e8]">SOURCE-LINKED COMPONENT READING</div>
+              <div className="mt-1 text-[#a9c3d0]">
+                Source-authored component relation: {albanianLexicalReading.sourceLinkedComponentReading.relation.references
+                  .map((reference) => `${reference.sourceForm} → ${reference.reference ?? "Null"}`)
+                  .join(" · ") || "Null"}
+              </div>
+              <div className="mt-1 break-words text-[#d5c28f]">
+                Source-authored explanation (attributed): {albanianLexicalReading.sourceLinkedComponentReading.relation.sourceAuthoredExplanation ?? "Null"}
+              </div>
+              <div className="mt-3 grid gap-2 sm:grid-cols-3">
+                {sourceLinkedRecordCardV0_1(
+                  "Primary source record",
+                  albanianLexicalReading.sourceLinkedComponentReading.primary,
+                )}
+                {albanianLexicalReading.sourceLinkedComponentReading.components.map((component) => (
+                  <div key={component.sourceRecordId}>
+                    {sourceLinkedRecordCardV0_1("Component source record", component)}
+                  </div>
+                ))}
+              </div>
+              <div className="mt-3 rounded border border-[#355a72] bg-[#0d151c] p-2">
+                <div className="font-semibold text-[#f5f7fb]">Exploratory relationship</div>
+                <div className="mt-1 text-sm">
+                  {sourceLinkedComponentReadingSummaryV0_1(albanianLexicalReading.sourceLinkedComponentReading)}
+                </div>
+                {albanianLexicalReading.sourceLinkedComponentReading.status === "SUPPORTED" ? (
+                  <div className="mt-1 text-[#d5c28f]">
+                    Alternatives: {albanianLexicalReading.sourceLinkedComponentReading.exploratoryRelationship.alternatives.join(" ")}
+                  </div>
+                ) : null}
+              </div>
+              <div className="mt-2 text-[10px] text-[#91aebb]">
+                {albanianLexicalReading.sourceLinkedComponentReading.claimBoundary}
+                {albanianLexicalReading.sourceLinkedComponentReading.reasonCodes.length
+                  ? ` Reasons: ${albanianLexicalReading.sourceLinkedComponentReading.reasonCodes.join(", ")}.`
+                  : ""}
+              </div>
             </div>
           ) : null}
           <div
