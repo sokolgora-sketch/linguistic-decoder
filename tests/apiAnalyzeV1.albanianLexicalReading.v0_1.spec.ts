@@ -8,27 +8,54 @@ jest.mock("@/shared/openInstrument/motivationEngineDiscoveryServerOnly.v0_1", ()
     "@/shared/openInstrument/albanianKaikkiServerOnlyExactLexicalSource.v0_1",
   );
   const drite = {
-    sourceRecordId: "synthetic-albanian:word=drite:ordinal=0",
-    entryLocator: "synthetic://albanian/drite/0",
-    physicalRecordOrdinal: 0,
+    sourceRecordId: "kaikki-albanian-jsonl:word=drit%C3%AB:ordinal=0",
+    entryLocator: "jsonl://word/drit%C3%AB/match/0",
+    physicalRecordOrdinal: 3461,
     language: "Albanian",
     languageCode: "sq",
     form: "dritë",
     partOfSpeech: "noun",
     senses: [{ senseId: "drite-light", glosses: ["light", "light (such as a lamp)"] }],
     ipaObservations: [{ soundIndex: 0, ipa: "/ˈdɾitə/", tags: [] }],
+    relatedForms: [{
+      form: "dritare",
+      relation: "SOURCE_RELATED_FORM",
+      entryLocator: "jsonl://word/dritare",
+    }],
+    etymologyText: null,
     sourceStatus: "observed_external_snapshot",
     attestationTruth: "fact",
     pronunciationAuthority: "CURRENT_KAIKKI_RECORD_ONLY_UNBOUND_TO_FROZEN_PROFILE",
     sourceSnapshot: {
-      sourceFamilyId: "synthetic-albanian-v0.1",
-      sourceUrl: "synthetic://albanian",
-      sha256: "synthetic-sha256",
-      bytes: 1,
+      sourceFamilyId: "kaikki-albanian-jsonl-v0.1",
+      sourceUrl: "https://kaikki.org/dictionary/Albanian/kaikki.org-dictionary-Albanian.jsonl",
+      sha256: "7a84eca776ebfac752e7251bb0822edc9cd1701d1d58060d4f8ef4b76a208fcc",
+      bytes: 67438537,
+    },
+  };
+  const dritare = {
+    sourceRecordId: "kaikki-albanian-jsonl:word=dritare:ordinal=0",
+    entryLocator: "jsonl://word/dritare/match/0",
+    physicalRecordOrdinal: 2171,
+    language: "Albanian",
+    languageCode: "sq",
+    form: "dritare",
+    partOfSpeech: "noun",
+    senses: [{ senseId: "dritare-window", glosses: ["window", "access to knowledge"] }],
+    ipaObservations: [{ soundIndex: 0, ipa: "/dɾiˈtaɾɛ/", tags: [] }],
+    etymologyText: "From dritë (“light”) + -are (“-er”), meaning to let light through or similar.",
+    sourceStatus: "observed_external_snapshot",
+    attestationTruth: "fact",
+    pronunciationAuthority: "CURRENT_KAIKKI_RECORD_ONLY_UNBOUND_TO_FROZEN_PROFILE",
+    sourceSnapshot: {
+      sourceFamilyId: "kaikki-albanian-jsonl-v0.1",
+      sourceUrl: "https://kaikki.org/dictionary/Albanian/kaikki.org-dictionary-Albanian.jsonl",
+      sha256: "7a84eca776ebfac752e7251bb0822edc9cd1701d1d58060d4f8ef4b76a208fcc",
+      bytes: 67438537,
     },
   };
   const albanianProvider = lexicalSource.createAlbanianKaikkiServerOnlyExactLexicalSourceProviderForSyntheticFixtureV0_1({
-    facts: [drite],
+    facts: [drite, dritare],
   });
   const englishProvider = {
     query: async (query: unknown) => ({
@@ -84,6 +111,11 @@ describe("analyze-v1 Albanian lexical reading reachability", () => {
       status: "SUPPORTED",
       primarySourceFact: { form: "dritë" },
       interpretation: { status: "EXPLORATORY_ZHEJI_READING" },
+      composition: {
+        status: "SUPPORTED",
+        relatedForm: "dritare",
+        interpretation: { status: "EXPLORATORY_ZHEJI_READING" },
+      },
     });
   });
 });

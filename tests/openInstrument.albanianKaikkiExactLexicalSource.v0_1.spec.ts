@@ -161,6 +161,7 @@ describe("real Albanian exact lexical source integration v0.1", () => {
       form: "dritare",
       senses: [{ senseId: "dritare-window", glosses: ["window"] }],
       ipaObservations: [{ soundIndex: 0, ipa: "/dɾitˈaɾe/", tags: [] }],
+      etymologyText: "From dritë (“light”) + -are (“-er”), meaning to let light through or similar.",
     });
     const provider = createAlbanianKaikkiServerOnlyExactLexicalSourceProviderForSyntheticFixtureV0_1({
       facts: [drite, dritare],
@@ -191,6 +192,27 @@ describe("real Albanian exact lexical source integration v0.1", () => {
         meaningGlosses: ["window"],
       }],
       interpretation: { status: "EXPLORATORY_ZHEJI_READING" },
+      composition: {
+        status: "SUPPORTED",
+        relatedForm: "dritare",
+        sourceRelation: {
+          status: "SOURCE_EXPLICIT_RELATION",
+          sourceRecordId: "kaikki-albanian-jsonl:word=dritare:ordinal=0",
+        },
+        primaryStructure: {
+          rawIpa: "/ˈdɾitə/",
+          voicePath: ["I", "Ë"],
+          prefixConsonants: ["d", "ɾ"],
+          interNucleusConsonants: [["t"]],
+        },
+        relatedStructure: {
+          rawIpa: "/dɾitˈaɾe/",
+          voicePath: ["I", "A", "E"],
+          prefixConsonants: ["d", "ɾ"],
+          interNucleusConsonants: [["t"], ["ɾ"]],
+        },
+        interpretation: { status: "EXPLORATORY_ZHEJI_READING" },
+      },
     });
 
     const vm = adaptAnalysisToTelemetryVM({
@@ -204,6 +226,9 @@ describe("real Albanian exact lexical source integration v0.1", () => {
     expect(vm.motivationDiscoveryV0_1).toMatchObject({ kind: "present" });
     if (vm.motivationDiscoveryV0_1?.kind === "present") {
       expect(vm.motivationDiscoveryV0_1.value.albanianLexicalReading?.sourcePronunciation?.voicePath).toEqual(["I", "Ë"]);
+      render(createElement(MotivationDiscoveryCardV0_1, { discovery: vm.motivationDiscoveryV0_1 }));
+      expect(screen.getByTestId("albanian-lexical-composition")).toBeInTheDocument();
+      expect(screen.getByTestId("albanian-reading-composition")).toHaveTextContent("source-grounded composition prompt");
     }
   });
 
@@ -271,10 +296,92 @@ describe("real Albanian exact lexical source integration v0.1", () => {
     });
 
     expect(result.discovery.albanianLexicalReading?.interpretation.status).toBe("UNKNOWN_OR_NULL");
+    expect(result.discovery.albanianLexicalReading?.composition).toMatchObject({
+      status: "NULL",
+      sourceRelation: { status: "SOURCE_RELATION_NOT_VERIFIED" },
+    });
     expect(result.discovery.albanianLexicalReading?.relatedForms[0]).toMatchObject({
       resolution: "RESOLVED",
       entryLocator: "jsonl://word/drit%C3%AB/match/1",
     });
+  });
+
+  it("keeps a source-linked form without source relation evidence Null", async () => {
+    const shqiptar = await discoveryForFactV0_1(fixtureFact({
+      form: "shqiptar",
+      senses: [{ senseId: "shqiptar-1", glosses: ["Albanian"] }],
+      ipaObservations: [{ soundIndex: 0, ipa: "/ʃciptaɾ/", tags: [] }],
+      relatedForms: [{
+        form: "shqip",
+        relation: "SOURCE_RELATED_FORM",
+        entryLocator: "jsonl://word/shqip",
+      }],
+    }));
+    expect(shqiptar.albanianLexicalReading?.composition).toMatchObject({
+      status: "NULL",
+      relatedForm: null,
+      sourceRelation: { status: "SOURCE_RELATION_NOT_VERIFIED" },
+    });
+  });
+
+  it("returns a Null lexical composition for an unsupported Albanian word", async () => {
+    const provider = createAlbanianKaikkiServerOnlyExactLexicalSourceProviderForSyntheticFixtureV0_1({
+      facts: [fixtureFact({ form: "shqiptar" })],
+    });
+    const result = await buildMotivationEngineDiscoveryServerOnlyV0_1({
+      word: "shqiptarx",
+      inputLanguage: "sq",
+      inputProfile: "albanian",
+      analysis: await analysisFor("shqiptarx"),
+      heart: buildHeartInstrumentV1("shqiptarx"),
+      albanianLexicalSourceProvider: provider,
+    });
+    expect(result.discovery.albanianLexicalReading).toMatchObject({
+      status: "NULL",
+      composition: { status: "NULL", relatedForm: null },
+    });
+  });
+
+  it("derives composition from source relation evidence rather than a dritë-specific rule", async () => {
+    const mal = fixtureFact({
+      sourceRecordId: "kaikki-albanian-jsonl:word=mal:ordinal=0",
+      entryLocator: "jsonl://word/mal/match/0",
+      form: "mal",
+      senses: [{ senseId: "mal-1", glosses: ["mountain"] }],
+      ipaObservations: [{ soundIndex: 0, ipa: "/ˈmal/", tags: [] }],
+      relatedForms: [{
+        form: "malor",
+        relation: "SOURCE_RELATED_FORM",
+        entryLocator: "jsonl://word/malor",
+      }],
+    });
+    const malor = fixtureFact({
+      sourceRecordId: "kaikki-albanian-jsonl:word=malor:ordinal=0",
+      entryLocator: "jsonl://word/malor/match/0",
+      form: "malor",
+      senses: [{ senseId: "malor-1", glosses: ["mountainous"] }],
+      ipaObservations: [{ soundIndex: 0, ipa: "/maˈloɾ/", tags: [] }],
+      etymologyText: "From mal + -or, meaning related to a mountain.",
+    });
+    const provider = createAlbanianKaikkiServerOnlyExactLexicalSourceProviderForSyntheticFixtureV0_1({
+      facts: [mal, malor],
+    });
+    const result = await buildMotivationEngineDiscoveryServerOnlyV0_1({
+      word: "mal",
+      inputLanguage: "sq",
+      inputProfile: "albanian",
+      analysis: await analysisFor("mal"),
+      heart: buildHeartInstrumentV1("mal"),
+      albanianLexicalSourceProvider: provider,
+    });
+    expect(result.discovery.albanianLexicalReading?.composition).toMatchObject({
+      status: "SUPPORTED",
+      relatedForm: "malor",
+      sourceRelation: { status: "SOURCE_EXPLICIT_RELATION" },
+      primaryStructure: { voicePath: ["A"] },
+      relatedStructure: { voicePath: ["A", "O"] },
+    });
+    expect(result.discovery.albanianLexicalReading?.composition.interpretation.statement).toContain("malor");
   });
 
   it("verifies once, indexes exact records, and reuses the index for different words", async () => {

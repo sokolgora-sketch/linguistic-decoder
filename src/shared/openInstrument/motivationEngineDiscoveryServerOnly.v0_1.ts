@@ -20,6 +20,10 @@ import {
   type AlbanianKaikkiSourceIpaSevenVoiceAnalysisV0_1,
 } from "@/shared/openInstrument/albanianKaikkiSourceIpaSevenVoiceProductInterpretation.v0_1";
 import {
+  projectAlbanianSourceOrderContextSignatureV0_1,
+  type AlbanianSourceOrderContextSignatureV0_1,
+} from "@/shared/openInstrument/albanianSourceOrderContextSignature.v0_1";
+import {
   normalizeEnglishLexicalJoinKeyV0_1,
 } from "@/shared/openInstrument/englishLexicalSenseSourceContract.v0_1";
 import {
@@ -72,6 +76,41 @@ export type AlbanianLexicalReadingV0_1 = Readonly<{
     partOfSpeech: string | null;
     meaningGlosses: readonly string[];
   }>[];
+  composition: AlbanianLexicalCompositionV0_1;
+  interpretation: Readonly<{
+    status: "EXPLORATORY_ZHEJI_READING" | "UNKNOWN_OR_NULL";
+    statement: string | null;
+    alternatives: readonly string[];
+    basis: readonly string[];
+    claimBoundary: string;
+  }>;
+}>;
+
+export type AlbanianLexicalCompositionStructureV0_1 = Readonly<{
+  sourceRecordId: string;
+  entryLocator: string;
+  form: string;
+  soundIndex: number;
+  rawIpa: string;
+  voicePath: readonly string[];
+  prefixConsonants: readonly string[];
+  interNucleusConsonants: readonly (readonly string[])[];
+  suffixConsonants: readonly string[];
+  structuralSignature: string;
+  authorityBoundary: string;
+}>;
+
+export type AlbanianLexicalCompositionV0_1 = Readonly<{
+  status: "SUPPORTED" | "NULL";
+  relatedForm: string | null;
+  sourceRelation: Readonly<{
+    status: "SOURCE_EXPLICIT_RELATION" | "SOURCE_RELATION_NOT_VERIFIED";
+    sourceRecordId: string | null;
+    entryLocator: string | null;
+    evidenceText: string | null;
+  }>;
+  primaryStructure: AlbanianLexicalCompositionStructureV0_1 | null;
+  relatedStructure: AlbanianLexicalCompositionStructureV0_1 | null;
   interpretation: Readonly<{
     status: "EXPLORATORY_ZHEJI_READING" | "UNKNOWN_OR_NULL";
     statement: string | null;
@@ -349,6 +388,112 @@ function hasConservativePrimaryIlluminationEvidenceV0_1(
   return illuminationGlossCount >= 2 && !competingOrUnrelatedGloss;
 }
 
+function sourceRelationEvidenceV0_1(
+  primary: AlbanianKaikkiExactLexicalSourceFactV0_1,
+  related: AlbanianKaikkiExactLexicalSourceFactV0_1,
+): Readonly<{
+  status: "SOURCE_EXPLICIT_RELATION" | "SOURCE_RELATION_NOT_VERIFIED";
+  sourceRecordId: string | null;
+  entryLocator: string | null;
+  evidenceText: string | null;
+}> {
+  const primaryNeedle = normalizedAlbanianFormV0_1(primary.form);
+  const relatedNeedle = normalizedAlbanianFormV0_1(related.form);
+  const relatedText = related.etymologyText ?? null;
+  const primaryText = primary.etymologyText ?? null;
+  const hasSourceRelationMarker = (value: string | null): boolean =>
+    value !== null && /\b(?:from|derived\s+from|originating\s+from)\b/iu.test(value);
+  const relatedNamesPrimary = hasSourceRelationMarker(relatedText) &&
+    (relatedText?.normalize("NFC").toLocaleLowerCase("sq-AL").includes(primaryNeedle) ?? false);
+  const primaryNamesRelated = hasSourceRelationMarker(primaryText) &&
+    (primaryText?.normalize("NFC").toLocaleLowerCase("sq-AL").includes(relatedNeedle) ?? false);
+  if (relatedNamesPrimary) {
+    return Object.freeze({
+      status: "SOURCE_EXPLICIT_RELATION",
+      sourceRecordId: related.sourceRecordId,
+      entryLocator: related.entryLocator,
+      evidenceText: relatedText,
+    });
+  }
+  if (primaryNamesRelated) {
+    return Object.freeze({
+      status: "SOURCE_EXPLICIT_RELATION",
+      sourceRecordId: primary.sourceRecordId,
+      entryLocator: primary.entryLocator,
+      evidenceText: primaryText,
+    });
+  }
+  return Object.freeze({
+    status: "SOURCE_RELATION_NOT_VERIFIED",
+    sourceRecordId: null,
+    entryLocator: null,
+    evidenceText: null,
+  });
+}
+
+function structureSummaryV0_1(
+  signature: AlbanianSourceOrderContextSignatureV0_1 | null,
+): AlbanianLexicalCompositionStructureV0_1 | null {
+  if (signature?.status !== "SUPPORTED" || !signature.rawIpa || !signature.structuralSignature) return null;
+  const consonants = (segments: readonly { baseSymbol: string }[] | null): readonly string[] =>
+    Object.freeze((segments ?? []).map((segment) => segment.baseSymbol));
+  return Object.freeze({
+    sourceRecordId: signature.source.sourceRecordId,
+    entryLocator: signature.source.entryLocator,
+    form: signature.source.form,
+    soundIndex: signature.source.soundIndex,
+    rawIpa: signature.rawIpa,
+    voicePath: Object.freeze([...signature.voicePath]),
+    prefixConsonants: consonants(signature.prefixConsonants),
+    interNucleusConsonants: Object.freeze(
+      (signature.interNucleusRegions ?? []).map((region) => consonants(region.consonants)),
+    ),
+    suffixConsonants: consonants(signature.suffixConsonants),
+    structuralSignature: signature.structuralSignature,
+    authorityBoundary: signature.authorityBoundary,
+  });
+}
+
+function selectSupportedStructureV0_1(
+  fact: AlbanianKaikkiExactLexicalSourceFactV0_1,
+  analyses: readonly AlbanianKaikkiSourceIpaSevenVoiceAnalysisV0_1[],
+): AlbanianLexicalCompositionStructureV0_1 | null {
+  const supported = analyses
+    .filter((analysis) => analysis.sourceRecordId === fact.sourceRecordId && analysis.status === "SUPPORTED")
+    .sort((left, right) => left.soundIndex - right.soundIndex);
+  const summaries = supported
+    .map((analysis) => structureSummaryV0_1(projectAlbanianSourceOrderContextSignatureV0_1({ fact, analysis })))
+    .filter((summary): summary is AlbanianLexicalCompositionStructureV0_1 => summary !== null);
+  if (summaries.length === 0) return null;
+  const first = summaries[0];
+  return summaries.every((summary) => summary.structuralSignature === first.structuralSignature) ? first : null;
+}
+
+function nullCompositionV0_1(
+  relatedForm: string | null = null,
+  sourceRelation: AlbanianLexicalCompositionV0_1["sourceRelation"] = Object.freeze({
+    status: "SOURCE_RELATION_NOT_VERIFIED",
+    sourceRecordId: null,
+    entryLocator: null,
+    evidenceText: null,
+  }),
+): AlbanianLexicalCompositionV0_1 {
+  return Object.freeze({
+    status: "NULL",
+    relatedForm,
+    sourceRelation,
+    primaryStructure: null,
+    relatedStructure: null,
+    interpretation: Object.freeze({
+      status: "UNKNOWN_OR_NULL",
+      statement: null,
+      alternatives: Object.freeze([]),
+      basis: Object.freeze([]),
+      claimBoundary: "A source-explicit lexical relation and two supported source-order structures are required; Null is preserved.",
+    }),
+  });
+}
+
 async function buildAlbanianLexicalReadingV0_1(input: Readonly<{
   word: string;
   facts: readonly AlbanianKaikkiExactLexicalSourceFactV0_1[];
@@ -366,6 +511,7 @@ async function buildAlbanianLexicalReadingV0_1(input: Readonly<{
       primarySourceFact: null,
       sourcePronunciation: null,
       relatedForms: Object.freeze([]),
+      composition: nullCompositionV0_1(),
       interpretation: Object.freeze({
         status: "UNKNOWN_OR_NULL",
         statement: null,
@@ -380,13 +526,13 @@ async function buildAlbanianLexicalReadingV0_1(input: Readonly<{
     analysis.sourceRecordId === primary.sourceRecordId && analysis.status === "SUPPORTED",
   ) ?? input.analyses.find((analysis) => analysis.sourceRecordId === primary.sourceRecordId) ?? null;
   const related = primary.relatedForms ?? [];
-  const relatedResults = await Promise.all(related.slice(0, 8).map(async (relation) => {
+  const relatedResultsWithFacts = await Promise.all(related.slice(0, 8).map(async (relation) => {
     try {
       const result = await input.provider.query(relation.form);
       const resolved = result.status === "MATCHES_FOUND"
         ? result.facts.find((fact) => fact.partOfSpeech !== "name") ?? result.facts[0] ?? null
         : null;
-      return Object.freeze({
+      const publicResult = Object.freeze({
         form: relation.form,
         entryLocator: resolved?.entryLocator ?? relation.entryLocator,
         relation: relation.relation,
@@ -395,8 +541,10 @@ async function buildAlbanianLexicalReadingV0_1(input: Readonly<{
         partOfSpeech: resolved?.partOfSpeech ?? null,
         meaningGlosses: resolved ? distinctGlossesV0_1([resolved]) : Object.freeze([]),
       });
+      return Object.freeze({ publicResult, resolved });
     } catch {
       return Object.freeze({
+        publicResult: Object.freeze({
         form: relation.form,
         entryLocator: relation.entryLocator,
         relation: relation.relation,
@@ -404,9 +552,57 @@ async function buildAlbanianLexicalReadingV0_1(input: Readonly<{
         sourceRecordId: null,
         partOfSpeech: null,
         meaningGlosses: Object.freeze([]),
+        }),
+        resolved: null,
       });
     }
   }));
+  const relatedResults = Object.freeze(relatedResultsWithFacts.map(({ publicResult }) => publicResult));
+
+  const compositionCandidate = relatedResultsWithFacts.find(({ resolved }) =>
+    resolved !== null && sourceRelationEvidenceV0_1(primary, resolved).status === "SOURCE_EXPLICIT_RELATION",
+  ) ?? relatedResultsWithFacts.find(({ resolved }) => resolved !== null);
+  const relatedFact = compositionCandidate?.resolved ?? null;
+  const relationEvidence = relatedFact
+    ? sourceRelationEvidenceV0_1(primary, relatedFact)
+    : Object.freeze({
+        status: "SOURCE_RELATION_NOT_VERIFIED" as const,
+        sourceRecordId: null,
+        entryLocator: null,
+        evidenceText: null,
+      });
+  const primaryStructure = selectSupportedStructureV0_1(primary, input.analyses);
+  const relatedAnalyses = relatedFact
+    ? projectAlbanianKaikkiFactsSourceIpaToSevenVoicesV0_1([relatedFact])
+    : Object.freeze([]) as readonly AlbanianKaikkiSourceIpaSevenVoiceAnalysisV0_1[];
+  const relatedStructure = relatedFact ? selectSupportedStructureV0_1(relatedFact, relatedAnalyses) : null;
+  const primaryGloss = distinctGlossesV0_1([primary]).join("; ") || "Null";
+  const relatedGloss = relatedFact ? distinctGlossesV0_1([relatedFact]).join("; ") || "Null" : "Null";
+  const composition = relationEvidence.status === "SOURCE_EXPLICIT_RELATION" && primaryStructure && relatedStructure && relatedFact
+    ? Object.freeze({
+        status: "SUPPORTED" as const,
+        relatedForm: relatedFact.form,
+        sourceRelation: relationEvidence,
+        primaryStructure,
+        relatedStructure,
+        interpretation: Object.freeze({
+          status: "EXPLORATORY_ZHEJI_READING" as const,
+          statement: `The source explicitly relates ${relatedFact.form} to ${primary.form} and records ${primary.form} as “${primaryGloss}” and ${relatedFact.form} as “${relatedGloss}”. The computed source structures are ${primaryStructure.voicePath.join(" → ")} with consonant frame ${primaryStructure.prefixConsonants.join(" ") || "∅"}–${primaryStructure.interNucleusConsonants.map((region) => region.join(" ") || "∅").join(" / ") || "∅"} and ${relatedStructure.voicePath.join(" → ")} with consonant frame ${relatedStructure.prefixConsonants.join(" ") || "∅"}–${relatedStructure.interNucleusConsonants.map((region) => region.join(" ") || "∅").join(" / ") || "∅"}. This is a source-grounded composition prompt, not proof that sound causes meaning.`,
+          alternatives: Object.freeze([
+            "The source-authored relation may reflect ordinary lexical or morphological history rather than a functional composition.",
+            "The computed Voice paths and consonant regions are pronunciation observations; they may carry no semantic force.",
+            "The source etymology entry may be incomplete or represent a historical proposal rather than a settled derivation.",
+          ]),
+          basis: Object.freeze([
+            "SOURCE_EXPLICIT_ETYMOLOGY_TEXT",
+            "ATTESTED_SOURCE_GLOSSES",
+            "SOURCE_DERIVED_IPA_VOICE_PATHS",
+            "SOURCE_ORDER_CONSONANT_CONTEXT_SIGNATURES",
+          ]),
+          claimBoundary: "Exploratory product interpretation only; source attribution, structural inference and functional hypothesis remain separate. No universal Voice meaning, sound causation or independently reviewed etymology is claimed.",
+        }),
+      })
+    : nullCompositionV0_1(relatedFact?.form ?? null, relationEvidence);
 
   const meaningGlosses = distinctGlossesV0_1([primary]);
   const hasLightMeaning = hasConservativePrimaryIlluminationEvidenceV0_1(primary);
@@ -459,6 +655,7 @@ async function buildAlbanianLexicalReadingV0_1(input: Readonly<{
         })
       : null,
     relatedForms: Object.freeze(relatedResults),
+    composition,
     interpretation,
   });
 }

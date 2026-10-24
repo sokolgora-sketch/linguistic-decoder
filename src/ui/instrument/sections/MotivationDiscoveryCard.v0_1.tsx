@@ -641,6 +641,31 @@ export function MotivationDiscoveryCardV0_1({
               </div>
             ) : null}
           </div>
+          {albanianLexicalReading.composition.status === "SUPPORTED" ? (
+            <div
+              data-testid="albanian-lexical-composition"
+              className="mt-3 rounded border border-[#4d6070] bg-[#111a21] p-2 text-[#d5e8f3]"
+            >
+              <div className="font-semibold uppercase tracking-[0.1em] text-[#b7d7e8]">SOURCE-GROUNDED FUNCTIONAL COMPOSITION PROMPT</div>
+              <div className="mt-2 text-xs text-[#a9c3d0]">
+                <span className="font-semibold text-[#f5f7fb]">Source confirms:</span>{" "}
+                {albanianLexicalReading.composition.sourceRelation.evidenceText ?? "Null"}
+              </div>
+              <div className="mt-2 text-xs text-[#a9c3d0]">
+                <span className="font-semibold text-[#f5f7fb]">Engine computes:</span>{" "}
+                {albanianLexicalReading.composition.primaryStructure?.rawIpa ?? "Null"} · {albanianLexicalReading.composition.primaryStructure?.voicePath.join(" → ") ?? "Null"} · consonants {albanianLexicalReading.composition.primaryStructure?.prefixConsonants.join(" ") || "∅"} / {albanianLexicalReading.composition.primaryStructure?.interNucleusConsonants.map((region) => region.join(" ") || "∅").join(" · ") || "∅"}; compared with {albanianLexicalReading.composition.relatedStructure?.rawIpa ?? "Null"} · {albanianLexicalReading.composition.relatedStructure?.voicePath.join(" → ") ?? "Null"}.
+              </div>
+              <div data-testid="albanian-reading-composition" className="mt-2 text-sm text-[#e1f2ed]">
+                {albanianLexicalReading.composition.interpretation.statement}
+              </div>
+              <div className="mt-1 text-xs text-[#b9ced8]">
+                Alternatives: {albanianLexicalReading.composition.interpretation.alternatives.join(" ")}
+              </div>
+              <div className="mt-1 text-xs text-[#91aebb]">
+                {albanianLexicalReading.composition.interpretation.claimBoundary}
+              </div>
+            </div>
+          ) : null}
         </div>
       ) : null}
 
