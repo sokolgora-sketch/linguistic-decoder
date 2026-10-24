@@ -803,7 +803,7 @@ async function buildSourceLinkedComponentReadingV0_1(input: Readonly<{
       alternatives: Object.freeze([
         "The source-authored compound account may be descriptive or historically contestable.",
         "The available records do not establish a universal sound-to-meaning rule.",
-        "The absent IPA for one or more records leaves phonetic comparison unresolved.",
+        "Component phonetic and Voice comparison is not performed in this reading.",
       ]),
       claimBoundary: "Exploratory product relationship only; source-authored etymology remains attributed and no morphology, causation, or Voice semantics is asserted.",
     }),
@@ -1159,11 +1159,11 @@ function buildDirectionalFunctionalHypothesisV0_1(input: Readonly<{
       : [],
   });
   const relatedHasOpeningMeaning = /\b(?:window|opening|access)\b/iu.test(relatedMeaningText);
-  const sourceDescribesTransmission =
-    /\b(?:light|daylight|illumination)\b/iu.test(sourceExplanationText) &&
-    /\b(?:through|enter|let)\b/iu.test(sourceExplanationText);
+  const negatesTransmission = /\b(?:does\s+not|do\s+not|did\s+not|doesn't|don't|didn't|never|cannot|can't|won't|not)\s+(?:\w+\s+){0,2}(?:let|lets|allow|allows|permit|permits|enable|enables|admit|admits)\b/iu.test(sourceExplanationText);
+  const sourceDescribesAffirmativeTransmission =
+    !negatesTransmission && /\b(?:let|lets|allow|allows|permit|permits|enable|enables|admit|admits)\s+(?:the\s+)?(?:light|daylight|illumination)\s+(?:through|to\s+(?:enter|pass)|enter|pass)\b/iu.test(sourceExplanationText);
 
-  if (!primaryHasIlluminationMeaning || !relatedHasOpeningMeaning || !sourceDescribesTransmission) {
+  if (!primaryHasIlluminationMeaning || !relatedHasOpeningMeaning || !sourceDescribesAffirmativeTransmission) {
     return null;
   }
 

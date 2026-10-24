@@ -98,6 +98,27 @@ async function discoveryForMalorRelationTextV0_1(etymologyText: string | null | 
   return discoveryForFactsV0_1([mal, malor], "mal");
 }
 
+async function discoveryForDriteDritareRelationTextV0_1(etymologyText: string) {
+  const drite = fixtureFact({
+    sourceRecordId: "kaikki-albanian-jsonl:word=drit%C3%AB:ordinal=0",
+    entryLocator: "jsonl://word/drit%C3%AB/match/0",
+    form: "dritë",
+    senses: [{ senseId: "drite-light", glosses: ["light", "light (such as a lamp)"] }],
+    ipaObservations: [{ soundIndex: 0, ipa: "/ˈdɾitə/", tags: [] }],
+    relatedForms: [{ form: "dritare", relation: "SOURCE_RELATED_FORM", entryLocator: "jsonl://word/dritare" }],
+  });
+  const dritare = fixtureFact({
+    sourceRecordId: "kaikki-albanian-jsonl:word=dritare:ordinal=0",
+    entryLocator: "jsonl://word/dritare/match/0",
+    form: "dritare",
+    senses: [{ senseId: "dritare-window", glosses: ["window", "opening"] }],
+    ipaObservations: [{ soundIndex: 0, ipa: "/dɾiˈtaɾɛ/", tags: [] }],
+    etymologyText,
+    etymologyLinks: [{ sourceForm: "dritë", reference: "dritë#Albanian" }],
+  });
+  return discoveryForFactsV0_1([drite, dritare], "dritë");
+}
+
 type SyntheticSourceRecordV0_1 = Readonly<{
   word: string;
   lang_code: "sq";
@@ -1462,6 +1483,80 @@ describe("real Albanian exact lexical source integration v0.1", () => {
       expect(card).toHaveTextContent("engine does not independently prove");
       expect(screen.getByTestId("albanian-reading-composition-null")).toHaveTextContent("Null");
     }
+  });
+
+  it("keeps supported component pronunciation evidence while using a neutral comparison boundary", async () => {
+    const primary = fixtureFact({
+      sourceRecordId: "kaikki-albanian-jsonl:word=drit%C3%ABshkrim:ordinal=0",
+      entryLocator: "jsonl://word/drit%C3%ABshkrim/match/0",
+      form: "dritëshkrim",
+      senses: [{ senseId: "driteshkrim-photo", glosses: ["photograph"] }],
+      ipaObservations: [{ soundIndex: 0, ipa: "/dɾitəʃkɾim/", tags: [] }],
+      etymologyText: "From dritë (“light”) + shkrim.",
+      etymologyLinks: [
+        { sourceForm: "dritë", reference: "dritë#Albanian" },
+        { sourceForm: "shkrim", reference: "shkrim#Albanian" },
+      ],
+      etymologyTemplates: [{
+        name: "compound",
+        args: { "1": "sq", "2": "dritë", "3": "shkrim" },
+        expansion: "dritë + shkrim",
+      }],
+    });
+    const light = fixtureFact({
+      sourceRecordId: "kaikki-albanian-jsonl:word=drit%C3%AB:ordinal=0",
+      entryLocator: "jsonl://word/drit%C3%AB/match/0",
+      form: "dritë",
+      senses: [{ senseId: "drite-light", glosses: ["light"] }],
+      ipaObservations: [{ soundIndex: 0, ipa: "/ˈdɾitə/", tags: [] }],
+    });
+    const writing = fixtureFact({
+      sourceRecordId: "kaikki-albanian-jsonl:word=shkrim:ordinal=0",
+      entryLocator: "jsonl://word/shkrim/match/0",
+      form: "shkrim",
+      senses: [{ senseId: "shkrim-writing", glosses: ["writing"] }],
+      ipaObservations: [{ soundIndex: 0, ipa: "/ʃkɾim/", tags: [] }],
+    });
+    const reading = (await discoveryForFactsV0_1([primary, light, writing], "dritëshkrim")).albanianLexicalReading;
+
+    expect(reading).toMatchObject({
+      status: "SUPPORTED",
+      sourceLinkedComponentReading: {
+        status: "SUPPORTED",
+        components: [
+          { form: "dritë", pronunciationVariants: [{ status: "SUPPORTED" }] },
+          { form: "shkrim", pronunciationVariants: [{ status: "SUPPORTED" }] },
+        ],
+        exploratoryRelationship: {
+          alternatives: expect.arrayContaining(["Component phonetic and Voice comparison is not performed in this reading."]),
+        },
+      },
+      composition: { status: "NULL" },
+    });
+    const alternatives = reading?.sourceLinkedComponentReading?.exploratoryRelationship.alternatives ?? [];
+    expect(alternatives.join(" ")).not.toContain("absent IPA");
+  });
+
+  it.each([
+    ["historical transmission", "From dritë (“light”), through an unattested intermediate form."],
+    ["historical route", "From dritë via Proto-Albanian, through later forms."],
+    ["explicit negation", "dritare does not let light through."],
+    ["negative transmission", "dritare never allows light to enter."],
+    ["unrelated keyword groups", "The source mentions light and an opening through historical transmission."],
+    ["missing operation evidence", "From dritë (“light”) + -are (“-er”)."],
+  ])("keeps %s source prose Null instead of inferring functional transmission", async (_label, etymologyText) => {
+    const reading = (await discoveryForDriteDritareRelationTextV0_1(etymologyText)).albanianLexicalReading;
+
+    expect(reading).toMatchObject({
+      status: "SUPPORTED",
+      sourceLinkedComparison: { status: "SUPPORTED", relation: { relatedForm: "dritare" } },
+      functionalMeaningBridge: {
+        status: "NULL",
+        relatedForm: "dritare",
+        reasonCodes: ["FUNCTIONAL_OPERATION_NOT_SUPPORTED"],
+        functionalHypothesis: { status: "UNKNOWN_OR_NULL", statement: null },
+      },
+    });
   });
 
   it("fails closed for source-authored compounds with three or more components", async () => {
