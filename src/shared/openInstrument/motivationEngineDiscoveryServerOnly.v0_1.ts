@@ -1018,7 +1018,22 @@ async function buildAlbanianLexicalReadingV0_1(input: Readonly<{
     analysis.sourceRecordId === primary.sourceRecordId && analysis.status === "SUPPORTED",
   ) ?? input.analyses.find((analysis) => analysis.sourceRecordId === primary.sourceRecordId) ?? null;
   const related = primary.relatedForms ?? [];
-  const relatedResultsWithFacts = await Promise.all(related.slice(0, 8).map(async (relation) => {
+  const relatedResultsWithFacts = await Promise.all(related.map(async (relation, index) => {
+    if (index >= 8) {
+      return Object.freeze({
+        publicResult: Object.freeze({
+          form: relation.form,
+          entryLocator: relation.entryLocator,
+          relation: relation.relation,
+          resolution: "UNRESOLVED" as const,
+          sourceRecordId: null,
+          partOfSpeech: null,
+          meaningGlosses: Object.freeze([]),
+          etymologyText: null,
+        }),
+        resolved: null,
+      });
+    }
     try {
       const result = await input.provider.query(relation.form);
       const resolved = result.status === "MATCHES_FOUND"
@@ -1052,19 +1067,32 @@ async function buildAlbanianLexicalReadingV0_1(input: Readonly<{
     }
   }));
   const relatedResults = Object.freeze(relatedResultsWithFacts.map(({ publicResult }) => publicResult));
-  const firstRelatedForm = related[0] ?? null;
-  const firstRelatedResolved = relatedResultsWithFacts[0]?.resolved ?? null;
-  const sourceLinkedComparison = firstRelatedForm
-    ? buildSourceLinkedComparisonV0_1({
-        primary,
-        primaryAnalyses: input.analyses,
-        relatedForm: firstRelatedForm,
-        related: firstRelatedResolved,
-      })
-    : null;
-  const functionalMeaningBridge = buildAlbanianFunctionalMeaningBridgeV0_1({
-    primary: sourceRecordProjectionV0_1(primary, input.analyses),
-    comparison: sourceLinkedComparison,
+  const primaryProjection = sourceRecordProjectionV0_1(primary, input.analyses);
+  const relatedCandidateEvaluations = relatedResultsWithFacts.map(({ resolved }, index) => {
+    const relatedForm = related[index];
+    const comparison = relatedForm
+      ? buildSourceLinkedComparisonV0_1({
+          primary,
+          primaryAnalyses: input.analyses,
+          relatedForm,
+          related: resolved,
+        })
+      : null;
+    const bridge = buildAlbanianFunctionalMeaningBridgeV0_1({
+      primary: primaryProjection,
+      comparison,
+    });
+    return Object.freeze({ comparison, bridge });
+  });
+  const selectedRelatedCandidate = relatedCandidateEvaluations.find(({ comparison, bridge }) =>
+    comparison?.status === "SUPPORTED" && bridge.status === "SUPPORTED",
+  ) ?? relatedCandidateEvaluations.find(({ comparison }) => comparison?.status === "SUPPORTED")
+    ?? relatedCandidateEvaluations[0]
+    ?? null;
+  const sourceLinkedComparison = selectedRelatedCandidate?.comparison ?? null;
+  const functionalMeaningBridge = selectedRelatedCandidate?.bridge ?? buildAlbanianFunctionalMeaningBridgeV0_1({
+    primary: primaryProjection,
+    comparison: null,
   });
 
   const compositionCandidate = relatedResultsWithFacts.find(({ resolved }) => resolved !== null);
