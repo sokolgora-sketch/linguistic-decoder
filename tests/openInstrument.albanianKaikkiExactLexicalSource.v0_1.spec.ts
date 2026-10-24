@@ -299,7 +299,9 @@ describe("real Albanian exact lexical source integration v0.1", () => {
       expect(screen.getByTestId("albanian-reading-related-form")).toHaveTextContent("source-authored etymology (attributed): From dritë");
       expect(screen.getByTestId("albanian-source-linked-comparison")).toHaveTextContent("dritë#Albanian");
       expect(screen.getByTestId("albanian-source-linked-comparison")).toHaveTextContent("SHARED_INITIAL_VOICE_DIFFERENT_LATER_PATH");
-      expect(screen.getByTestId("albanian-reading-functional-bridge")).toHaveTextContent("let light through");
+      expect(screen.getByTestId("albanian-reading-functional-bridge")).toHaveTextContent("Directional functional interpretation");
+      expect(screen.getByTestId("albanian-reading-functional-bridge")).toHaveTextContent("enabling input");
+      expect(screen.getByTestId("albanian-reading-functional-bridge-basis")).toHaveTextContent("SOURCE_AUTHORED_TRANSMISSION_EXPLANATION");
       expect(screen.getByTestId("albanian-reading-composition-null")).toHaveTextContent("Null");
     }
   });
@@ -819,7 +821,7 @@ describe("real Albanian exact lexical source integration v0.1", () => {
     });
   });
 
-  it("selects the first later candidate with supported comparison and bridge", async () => {
+  it("selects the first later candidate with supported comparison while preserving an unsupported operation as Null", async () => {
     const primary = fixtureFact({
       sourceRecordId: "kaikki-albanian-jsonl:word=mal:ordinal=0",
       entryLocator: "jsonl://word/mal/match/0",
@@ -849,12 +851,14 @@ describe("real Albanian exact lexical source integration v0.1", () => {
       relation: { relatedForm: "malor" },
     });
     expect(result.albanianLexicalReading?.functionalMeaningBridge).toMatchObject({
-      status: "SUPPORTED",
+      status: "NULL",
       relatedForm: "malor",
+      reasonCodes: ["FUNCTIONAL_OPERATION_NOT_SUPPORTED"],
+      functionalHypothesis: { status: "UNKNOWN_OR_NULL", statement: null },
     });
   });
 
-  it("prefers a later supported bridge over an earlier comparison-only candidate", async () => {
+  it("keeps the first source-linked comparison when no directional functional operation is supported", async () => {
     const primary = fixtureFact({
       sourceRecordId: "kaikki-albanian-jsonl:word=mal:ordinal=0",
       entryLocator: "jsonl://word/mal/match/0",
@@ -886,11 +890,12 @@ describe("real Albanian exact lexical source integration v0.1", () => {
 
     expect(result.albanianLexicalReading?.sourceLinkedComparison).toMatchObject({
       status: "SUPPORTED",
-      relation: { relatedForm: "malet" },
+      relation: { relatedForm: "malor" },
     });
     expect(result.albanianLexicalReading?.functionalMeaningBridge).toMatchObject({
-      status: "SUPPORTED",
-      relatedForm: "malet",
+      status: "NULL",
+      relatedForm: "malor",
+      reasonCodes: ["RELATED_MEANING_EVIDENCE_MISSING"],
     });
   });
 
