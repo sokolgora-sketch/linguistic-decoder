@@ -362,6 +362,34 @@ function normalizedAlbanianFormV0_1(value: string): string {
   return value.normalize("NFC").trim().toLocaleLowerCase("sq-AL");
 }
 
+function escapeRegExpV0_1(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function sourceRelationClauseContainsExactFormV0_1(
+  sourceText: string,
+  form: string,
+): boolean {
+  const normalizedForm = normalizedAlbanianFormV0_1(form);
+  if (!normalizedForm) return false;
+  const normalizedText = sourceText.normalize("NFC").toLocaleLowerCase("sq-AL");
+  const relationMarkerPattern = /(?<![\p{L}\p{M}\p{N}])(?:from|derived\s+from|originating\s+from)(?![\p{L}\p{M}\p{N}])/iu;
+  const ambiguousRelationPattern = /(?<![\p{L}\p{M}\p{N}-])(?:possibly|perhaps|maybe|uncertain|unclear|or|alternatively|compare|cf\.?)(?![\p{L}\p{M}\p{N}-])/iu;
+  const exactFormPattern = new RegExp(
+    `(?<![\\p{L}\\p{M}\\p{N}])${escapeRegExpV0_1(normalizedForm)}(?![\\p{L}\\p{M}\\p{N}])`,
+    "iu",
+  );
+  return normalizedText
+    .split(/[,.;:!?()\[\]{}\n]+/u)
+    .map((clause) => clause.trim())
+    .filter((clause) => clause.length > 0)
+    .some((clause) =>
+      relationMarkerPattern.test(clause) &&
+      !ambiguousRelationPattern.test(clause) &&
+      exactFormPattern.test(clause),
+    );
+}
+
 function distinctGlossesV0_1(
   facts: readonly AlbanianKaikkiExactLexicalSourceFactV0_1[],
 ): readonly string[] {
@@ -397,16 +425,10 @@ function sourceRelationEvidenceV0_1(
   entryLocator: string | null;
   evidenceText: string | null;
 }> {
-  const primaryNeedle = normalizedAlbanianFormV0_1(primary.form);
-  const relatedNeedle = normalizedAlbanianFormV0_1(related.form);
   const relatedText = related.etymologyText ?? null;
   const primaryText = primary.etymologyText ?? null;
-  const hasSourceRelationMarker = (value: string | null): boolean =>
-    value !== null && /\b(?:from|derived\s+from|originating\s+from)\b/iu.test(value);
-  const relatedNamesPrimary = hasSourceRelationMarker(relatedText) &&
-    (relatedText?.normalize("NFC").toLocaleLowerCase("sq-AL").includes(primaryNeedle) ?? false);
-  const primaryNamesRelated = hasSourceRelationMarker(primaryText) &&
-    (primaryText?.normalize("NFC").toLocaleLowerCase("sq-AL").includes(relatedNeedle) ?? false);
+  const relatedNamesPrimary = relatedText !== null && sourceRelationClauseContainsExactFormV0_1(relatedText, primary.form);
+  const primaryNamesRelated = primaryText !== null && sourceRelationClauseContainsExactFormV0_1(primaryText, related.form);
   if (relatedNamesPrimary) {
     return Object.freeze({
       status: "SOURCE_EXPLICIT_RELATION",

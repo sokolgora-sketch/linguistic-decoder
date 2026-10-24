@@ -648,7 +648,7 @@ export function MotivationDiscoveryCardV0_1({
             >
               <div className="font-semibold uppercase tracking-[0.1em] text-[#b7d7e8]">SOURCE-GROUNDED FUNCTIONAL COMPOSITION PROMPT</div>
               <div className="mt-2 text-xs text-[#a9c3d0]">
-                <span className="font-semibold text-[#f5f7fb]">Source confirms:</span>{" "}
+                <span className="font-semibold text-[#f5f7fb]">Source records:</span>{" "}
                 {albanianLexicalReading.composition.sourceRelation.evidenceText ?? "Null"}
               </div>
               <div className="mt-2 text-xs text-[#a9c3d0]">
