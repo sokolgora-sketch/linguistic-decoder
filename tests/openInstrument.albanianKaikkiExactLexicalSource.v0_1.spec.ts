@@ -387,6 +387,77 @@ describe("real Albanian exact lexical source integration v0.1", () => {
     });
   });
 
+  it.each([
+    ["no senses", []],
+    ["empty gloss array", [{ senseId: "mal-empty", glosses: [] }]],
+    ["whitespace-only glosses", [{ senseId: "mal-whitespace", glosses: [" ", "\t"] }]],
+  ] as const)("blocks the bridge when the primary record has %s", async (_label, senses) => {
+    const primary = fixtureFact({
+      sourceRecordId: "kaikki-albanian-jsonl:word=mal:ordinal=0",
+      entryLocator: "jsonl://word/mal/match/0",
+      form: "mal",
+      senses,
+      ipaObservations: [{ soundIndex: 0, ipa: "/ˈmal/", tags: [] }],
+      relatedForms: [{ form: "malor", relation: "SOURCE_RELATED_FORM", entryLocator: "jsonl://word/malor" }],
+    });
+    const related = fixtureFact({
+      sourceRecordId: "kaikki-albanian-jsonl:word=malor:ordinal=0",
+      entryLocator: "jsonl://word/malor/match/0",
+      form: "malor",
+      senses: [{ senseId: "malor-1", glosses: ["mountainous"] }],
+      ipaObservations: [{ soundIndex: 0, ipa: "/maˈloɾ/", tags: [] }],
+      etymologyText: "From mal, meaning mountainous.",
+      etymologyLinks: [{ sourceForm: "mal", reference: "mal#Albanian" }],
+    });
+    const result = await discoveryForFactsV0_1([primary, related], "mal");
+    expect(result.albanianLexicalReading?.functionalMeaningBridge).toMatchObject({
+      status: "NULL",
+      sourceFacts: {
+        primary: { meaningGlosses: senses.flatMap((sense) => sense.glosses) },
+        related: { meaningGlosses: ["mountainous"] },
+      },
+      derivedStructure: expect.any(Object),
+      functionalHypothesis: {
+        status: "UNKNOWN_OR_NULL",
+        statement: null,
+        basis: [],
+      },
+      reasonCodes: expect.arrayContaining(["PRIMARY_MEANING_EVIDENCE_MISSING"]),
+    });
+    expect(result.albanianLexicalReading?.functionalMeaningBridge.functionalHypothesis.basis)
+      .not.toContain("SOURCE_ATTESTED_PRIMARY_MEANING");
+    expect(result.albanianLexicalReading?.composition.status).toBe("NULL");
+  });
+
+  it("blocks the bridge when both primary and related meanings are missing", async () => {
+    const primary = fixtureFact({
+      sourceRecordId: "kaikki-albanian-jsonl:word=mal:ordinal=0",
+      entryLocator: "jsonl://word/mal/match/0",
+      form: "mal",
+      senses: [],
+      ipaObservations: [{ soundIndex: 0, ipa: "/ˈmal/", tags: [] }],
+      relatedForms: [{ form: "malor", relation: "SOURCE_RELATED_FORM", entryLocator: "jsonl://word/malor" }],
+    });
+    const related = fixtureFact({
+      sourceRecordId: "kaikki-albanian-jsonl:word=malor:ordinal=0",
+      entryLocator: "jsonl://word/malor/match/0",
+      form: "malor",
+      senses: [{ senseId: "malor-empty", glosses: [] }],
+      ipaObservations: [{ soundIndex: 0, ipa: "/maˈloɾ/", tags: [] }],
+      etymologyText: "From mal, meaning mountainous.",
+      etymologyLinks: [{ sourceForm: "mal", reference: "mal#Albanian" }],
+    });
+    const result = await discoveryForFactsV0_1([primary, related], "mal");
+    expect(result.albanianLexicalReading?.functionalMeaningBridge).toMatchObject({
+      status: "NULL",
+      functionalHypothesis: { status: "UNKNOWN_OR_NULL", statement: null },
+      reasonCodes: expect.arrayContaining([
+        "PRIMARY_MEANING_EVIDENCE_MISSING",
+        "RELATED_MEANING_EVIDENCE_MISSING",
+      ]),
+    });
+  });
+
   it("rejects ambiguous duplicate Albanian references while preserving the exact positive case", async () => {
     const primary = fixtureFact({
       sourceRecordId: "kaikki-albanian-jsonl:word=mal:ordinal=0",

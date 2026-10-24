@@ -909,6 +909,10 @@ function nullFunctionalMeaningBridgeV0_1(input: Readonly<{
   });
 }
 
+function hasMeaningEvidenceV0_1(glosses: readonly string[]): boolean {
+  return glosses.some((gloss) => gloss.trim().length > 0);
+}
+
 export function buildAlbanianFunctionalMeaningBridgeV0_1(input: Readonly<{
   primary: AlbanianSourceLinkedRecordV0_1;
   comparison: AlbanianSourceLinkedComparisonV0_1 | null;
@@ -923,6 +927,9 @@ export function buildAlbanianFunctionalMeaningBridgeV0_1(input: Readonly<{
   }
   if (related !== null && related.meaningGlosses.length === 0) {
     reasons.push("RELATED_MEANING_EVIDENCE_MISSING");
+  }
+  if (!hasMeaningEvidenceV0_1(input.primary.meaningGlosses)) {
+    reasons.push("PRIMARY_MEANING_EVIDENCE_MISSING");
   }
   if (related !== null && !related.etymologyText?.trim()) {
     reasons.push("SOURCE_AUTHORED_FUNCTIONAL_EXPLANATION_MISSING");
