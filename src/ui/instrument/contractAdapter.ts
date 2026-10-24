@@ -1108,8 +1108,17 @@ function parseMotivationDiscoveryV0_1(
     const validSourceLinkedPronunciation = (variant: unknown): boolean => {
       if (!isRecord(variant) || !isRecord(variant.consonantalContext)) return false;
       const context = variant.consonantalContext;
+      const validConsonantSegment = (value: unknown): boolean =>
+        isRecord(value) &&
+        typeof value.raw === "string" &&
+        value.raw.length > 0 &&
+        typeof value.baseSymbol === "string" &&
+        value.baseSymbol.length > 0 &&
+        typeof value.optional === "boolean";
+      const validConsonantSegmentArray = (value: unknown): boolean =>
+        Array.isArray(value) && value.every(validConsonantSegment);
       const validStringArrayOrNull = (value: unknown): boolean =>
-        value === null || isStringArray(value);
+        value === null || validConsonantSegmentArray(value);
       return typeof variant.soundIndex === "number" &&
         Number.isInteger(variant.soundIndex) &&
         variant.soundIndex >= 0 &&
@@ -1123,7 +1132,7 @@ function parseMotivationDiscoveryV0_1(
         validStringArrayOrNull(context.prefixConsonants) &&
         (context.interNucleusConsonants === null || (
           Array.isArray(context.interNucleusConsonants) &&
-          context.interNucleusConsonants.every(isStringArray)
+          context.interNucleusConsonants.every(validConsonantSegmentArray)
         )) &&
         validStringArrayOrNull(context.suffixConsonants) &&
         (context.structuralSignature === null || typeof context.structuralSignature === "string") &&

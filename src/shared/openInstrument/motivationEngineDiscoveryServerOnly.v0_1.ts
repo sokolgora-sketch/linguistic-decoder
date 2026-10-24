@@ -104,12 +104,18 @@ export type AlbanianSourceLinkedPronunciationV0_1 = Readonly<{
   consonantalContext: Readonly<{
     status: "SUPPORTED" | "NULL";
     authorityBoundary: string;
-    prefixConsonants: readonly string[] | null;
-    interNucleusConsonants: readonly (readonly string[])[] | null;
-    suffixConsonants: readonly string[] | null;
+    prefixConsonants: readonly AlbanianSourceLinkedConsonantSegmentV0_1[] | null;
+    interNucleusConsonants: readonly (readonly AlbanianSourceLinkedConsonantSegmentV0_1[])[] | null;
+    suffixConsonants: readonly AlbanianSourceLinkedConsonantSegmentV0_1[] | null;
     structuralSignature: string | null;
     reasonCodes: readonly string[];
   }>;
+}>;
+
+export type AlbanianSourceLinkedConsonantSegmentV0_1 = Readonly<{
+  raw: string;
+  baseSymbol: string;
+  optional: boolean;
 }>;
 
 export type AlbanianSourceLinkedRecordV0_1 = Readonly<{
@@ -455,11 +461,29 @@ function sourceRecordPronunciationV0_1(
       ? Object.freeze({
           status: context.status,
           authorityBoundary: context.authorityBoundary,
-          prefixConsonants: context.prefixConsonants?.map((segment) => segment.baseSymbol) ?? null,
-          interNucleusConsonants: context.interNucleusRegions?.map((region) =>
-            region.consonants.map((segment) => segment.baseSymbol),
-          ) ?? null,
-          suffixConsonants: context.suffixConsonants?.map((segment) => segment.baseSymbol) ?? null,
+          prefixConsonants: context.prefixConsonants
+            ? Object.freeze(context.prefixConsonants.map((segment) => Object.freeze({
+                raw: segment.raw,
+                baseSymbol: segment.baseSymbol,
+                optional: segment.optional,
+              })))
+            : null,
+          interNucleusConsonants: context.interNucleusRegions
+            ? Object.freeze(context.interNucleusRegions.map((region) => Object.freeze(
+                region.consonants.map((segment) => Object.freeze({
+                  raw: segment.raw,
+                  baseSymbol: segment.baseSymbol,
+                  optional: segment.optional,
+                })),
+              )))
+            : null,
+          suffixConsonants: context.suffixConsonants
+            ? Object.freeze(context.suffixConsonants.map((segment) => Object.freeze({
+                raw: segment.raw,
+                baseSymbol: segment.baseSymbol,
+                optional: segment.optional,
+              })))
+            : null,
           structuralSignature: context.structuralSignature,
           reasonCodes: context.reasonCodes,
         })
@@ -525,6 +549,23 @@ function supportedContextKeysV0_1(
         suffix: variant.consonantalContext.suffixConsonants,
       })),
   )].sort());
+}
+
+function exactAlbanianSourceReferenceV0_1(
+  link: AlbanianKaikkiExactLexicalSourceEtymologyLinkV0_1,
+  primaryForm: string,
+): boolean {
+  const normalizedPrimaryForm = normalizedAlbanianFormV0_1(primaryForm);
+  if (normalizedAlbanianFormV0_1(link.sourceForm) !== normalizedPrimaryForm) return false;
+
+  const reference = link.reference.normalize("NFC").trim();
+  const separatorIndex = reference.indexOf("#");
+  if (separatorIndex <= 0 || separatorIndex !== reference.lastIndexOf("#")) return false;
+
+  const referencedForm = reference.slice(0, separatorIndex);
+  const languageSection = reference.slice(separatorIndex + 1);
+  return normalizedAlbanianFormV0_1(referencedForm) === normalizedPrimaryForm &&
+    languageSection === "Albanian";
 }
 
 function sourceLinkedSummaryV0_1(
@@ -627,16 +668,23 @@ function buildSourceLinkedComparisonV0_1(input: Readonly<{
     );
   }
 
-  const matchingLinks = (input.related.etymologyLinks ?? []).filter((link) =>
+  const sourceFormMatchingLinks = (input.related.etymologyLinks ?? []).filter((link) =>
     normalizedAlbanianFormV0_1(link.sourceForm) === normalizedAlbanianFormV0_1(input.primary.form),
   );
-  if (matchingLinks.length !== 1) {
+  const matchingLinks = sourceFormMatchingLinks.filter((link) =>
+    exactAlbanianSourceReferenceV0_1(link, input.primary.form),
+  );
+  if (sourceFormMatchingLinks.length !== 1 || matchingLinks.length !== 1) {
     return nullSourceLinkedComparisonV0_1(
       input.primary,
       input.relatedForm.form,
       input.related.sourceRecordId,
       input.related.entryLocator,
-      matchingLinks.length === 0 ? "SOURCE_FORM_REFERENCE_NOT_PRESENT" : "SOURCE_FORM_REFERENCE_AMBIGUOUS",
+      sourceFormMatchingLinks.length === 0
+        ? "SOURCE_FORM_REFERENCE_NOT_PRESENT"
+        : sourceFormMatchingLinks.length !== 1 || matchingLinks.length > 1
+          ? "SOURCE_FORM_REFERENCE_AMBIGUOUS"
+          : "SOURCE_FORM_REFERENCE_IDENTITY_INVALID",
       input.primaryAnalyses,
     );
   }

@@ -8,6 +8,7 @@ import type {
   PresentOrMissing,
 } from "@/ui/telemetry/types";
 import type {
+  AlbanianSourceLinkedConsonantSegmentV0_1,
   AlbanianSourceLinkedComparisonV0_1,
   AlbanianSourceLinkedRecordV0_1,
 } from "@/shared/openInstrument/motivationEngineDiscoveryServerOnly.v0_1";
@@ -28,10 +29,14 @@ function sourceLinkedContextTextV0_1(
   if (context.status !== "SUPPORTED") {
     return `Null (${context.reasonCodes.join(", ") || "no reason recorded"})`;
   }
+  const segmentText = (segment: AlbanianSourceLinkedConsonantSegmentV0_1): string =>
+    `${segment.baseSymbol}${segment.optional ? " (optional)" : ""}`;
+  const regionText = (region: readonly AlbanianSourceLinkedConsonantSegmentV0_1[]): string =>
+    region.map(segmentText).join(" ") || "∅";
   const inter = context.interNucleusConsonants
-    ?.map((region) => region.join(" ") || "∅")
+    ?.map((region) => regionText(region))
     .join(" · ") ?? "Null";
-  return `prefix ${context.prefixConsonants?.join(" ") || "∅"} · inter ${inter} · suffix ${context.suffixConsonants?.join(" ") || "∅"}`;
+  return `prefix ${context.prefixConsonants?.map(segmentText).join(" ") || "∅"} · inter ${inter} · suffix ${context.suffixConsonants?.map(segmentText).join(" ") || "∅"}`;
 }
 
 function sourceLinkedRecordCardV0_1(
