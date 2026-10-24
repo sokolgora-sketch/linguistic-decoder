@@ -219,11 +219,15 @@ export type AlbanianSourceLinkedComparisonV0_1 = Readonly<{
   claimBoundary: string;
 }>;
 
+type AlbanianSourceLinkedComponentRelationV0_1 =
+  | "SOURCE_EXPLICIT_TWO_COMPONENT_COMPOUND"
+  | "SOURCE_COMPOUND_ARITY_UNSUPPORTED";
+
 export type AlbanianSourceLinkedComponentReadingV0_1 = Readonly<{
   status: "SUPPORTED" | "NULL";
   reasonCodes: readonly string[];
   relation: Readonly<{
-    relation: "SOURCE_EXPLICIT_TWO_COMPONENT_COMPOUND";
+    relation: AlbanianSourceLinkedComponentRelationV0_1;
     primarySourceRecordId: string;
     primaryEntryLocator: string;
     sourceAuthoredExplanation: string | null;
@@ -622,6 +626,7 @@ function exactAlbanianComponentReferenceV0_1(
 function compoundComponentReferencesV0_1(
   primary: AlbanianKaikkiExactLexicalSourceFactV0_1,
 ): Readonly<{
+  relation: AlbanianSourceLinkedComponentRelationV0_1;
   componentForms: readonly string[];
   references: readonly Readonly<{ sourceForm: string; reference: string | null }>[];
   reasonCodes: readonly string[];
@@ -634,10 +639,17 @@ function compoundComponentReferencesV0_1(
   const reasons = new Set<string>();
   if (compoundTemplates.length !== 1) reasons.add("SOURCE_COMPOUND_TEMPLATE_AMBIGUOUS");
   const template = compoundTemplates[0];
-  const componentForms = template
-    ? [template.args["2"] ?? "", template.args["3"] ?? ""].map((form) => form.normalize("NFC").trim())
+  const componentArgumentEntries = template
+    ? Object.entries(template.args)
+      .filter(([argument]) => /^\d+$/.test(argument) && Number(argument) >= 2)
+      .sort(([left], [right]) => Number(left) - Number(right))
     : [];
-  if (componentForms.length !== 2 || componentForms.some((form) => !form) ||
+  const componentForms = componentArgumentEntries.map(([, form]) => form.normalize("NFC").trim());
+  const relation: AlbanianSourceLinkedComponentRelationV0_1 = componentForms.length > 2
+    ? "SOURCE_COMPOUND_ARITY_UNSUPPORTED"
+    : "SOURCE_EXPLICIT_TWO_COMPONENT_COMPOUND";
+  if (componentForms.length > 2) reasons.add("SOURCE_COMPOUND_ARITY_UNSUPPORTED");
+  if (componentForms.length < 2 || componentForms.some((form) => !form) ||
     componentForms.some((form, index) => componentForms.indexOf(form) !== index) ||
     componentForms.some((form) => normalizedAlbanianFormV0_1(form) === normalizedAlbanianFormV0_1(primary.form))) {
     reasons.add("SOURCE_COMPONENT_FORMS_INVALID");
@@ -664,6 +676,7 @@ function compoundComponentReferencesV0_1(
   });
 
   return Object.freeze({
+    relation,
     componentForms: Object.freeze(componentForms),
     references: Object.freeze(references),
     reasonCodes: Object.freeze([...reasons]),
@@ -673,6 +686,7 @@ function compoundComponentReferencesV0_1(
 function nullSourceLinkedComponentReadingV0_1(input: Readonly<{
   primary: AlbanianKaikkiExactLexicalSourceFactV0_1;
   primaryAnalyses: readonly AlbanianKaikkiSourceIpaSevenVoiceAnalysisV0_1[];
+  relation: AlbanianSourceLinkedComponentRelationV0_1;
   componentForms: readonly string[];
   references: readonly Readonly<{ sourceForm: string; reference: string | null }>[];
   components: readonly AlbanianSourceLinkedRecordV0_1[];
@@ -682,7 +696,7 @@ function nullSourceLinkedComponentReadingV0_1(input: Readonly<{
     status: "NULL",
     reasonCodes: Object.freeze([...new Set(input.reasonCodes)]),
     relation: Object.freeze({
-      relation: "SOURCE_EXPLICIT_TWO_COMPONENT_COMPOUND" as const,
+      relation: input.relation,
       primarySourceRecordId: input.primary.sourceRecordId,
       primaryEntryLocator: input.primary.entryLocator,
       sourceAuthoredExplanation: input.primary.etymologyText ?? null,
@@ -740,6 +754,7 @@ async function buildSourceLinkedComponentReadingV0_1(input: Readonly<{
     return nullSourceLinkedComponentReadingV0_1({
       primary: input.primary,
       primaryAnalyses: input.primaryAnalyses,
+      relation: componentEvidence.relation,
       componentForms: componentEvidence.componentForms,
       references: componentEvidence.references,
       components: Object.freeze(components),
@@ -757,6 +772,7 @@ async function buildSourceLinkedComponentReadingV0_1(input: Readonly<{
     return nullSourceLinkedComponentReadingV0_1({
       primary: input.primary,
       primaryAnalyses: input.primaryAnalyses,
+      relation: componentEvidence.relation,
       componentForms: componentEvidence.componentForms,
       references: componentEvidence.references,
       components: Object.freeze(components),
@@ -771,7 +787,7 @@ async function buildSourceLinkedComponentReadingV0_1(input: Readonly<{
     status: "SUPPORTED",
     reasonCodes: Object.freeze([]),
     relation: Object.freeze({
-      relation: "SOURCE_EXPLICIT_TWO_COMPONENT_COMPOUND" as const,
+      relation: componentEvidence.relation,
       primarySourceRecordId: input.primary.sourceRecordId,
       primaryEntryLocator: input.primary.entryLocator,
       sourceAuthoredExplanation: input.primary.etymologyText ?? null,

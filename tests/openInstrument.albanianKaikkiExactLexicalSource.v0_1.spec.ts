@@ -1459,6 +1459,62 @@ describe("real Albanian exact lexical source integration v0.1", () => {
     }
   });
 
+  it("fails closed for source-authored compounds with three or more components", async () => {
+    const primary = fixtureFact({
+      sourceRecordId: "kaikki-albanian-jsonl:word=triword:ordinal=0",
+      entryLocator: "jsonl://word/triword/match/0",
+      form: "triword",
+      senses: [{ senseId: "triword-term", glosses: ["three-part term"] }],
+      ipaObservations: [],
+      etymologyText: "From alpha + beta + gamma.",
+      etymologyLinks: [
+        { sourceForm: "alpha", reference: "alpha#Albanian" },
+        { sourceForm: "beta", reference: "beta#Albanian" },
+        { sourceForm: "gamma", reference: "gamma#Albanian" },
+      ],
+      etymologyTemplates: [{
+        name: "compound",
+        args: { "1": "sq", "2": "alpha", "3": "beta", "4": "gamma" },
+        expansion: "alpha + beta + gamma",
+      }],
+    });
+    const component = (form: string, gloss: string) => fixtureFact({
+      sourceRecordId: `kaikki-albanian-jsonl:word=${form}:ordinal=0`,
+      entryLocator: `jsonl://word/${form}/match/0`,
+      form,
+      senses: [{ senseId: form, glosses: [gloss] }],
+      ipaObservations: [],
+    });
+
+    const discovery = await discoveryForFactsV0_1([
+      primary,
+      component("alpha", "first"),
+      component("beta", "second"),
+      component("gamma", "third"),
+    ], "triword");
+    const reading = discovery.albanianLexicalReading?.sourceLinkedComponentReading;
+
+    expect(reading).toMatchObject({
+      status: "NULL",
+      reasonCodes: expect.arrayContaining(["SOURCE_COMPOUND_ARITY_UNSUPPORTED"]),
+      relation: {
+        relation: "SOURCE_COMPOUND_ARITY_UNSUPPORTED",
+        references: [
+          { sourceForm: "alpha", reference: "alpha#Albanian" },
+          { sourceForm: "beta", reference: "beta#Albanian" },
+          { sourceForm: "gamma", reference: "gamma#Albanian" },
+        ],
+      },
+      components: [
+        { form: "alpha" },
+        { form: "beta" },
+        { form: "gamma" },
+      ],
+    });
+    expect(reading?.relation.relation).not.toBe("SOURCE_EXPLICIT_TWO_COMPONENT_COMPOUND");
+    expect(discovery.albanianLexicalReading?.composition.status).toBe("NULL");
+  });
+
   it.each([
     {
       label: "missing component record",
