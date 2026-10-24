@@ -926,6 +926,14 @@ function parseMotivationDiscoveryV0_1(
         (observation.ipa === null || typeof observation.ipa === "string") &&
         isStringArray(observation.tags)
       ) &&
+      (fact.relatedForms === undefined || (
+        Array.isArray(fact.relatedForms) && fact.relatedForms.every((relation) =>
+          isRecord(relation) &&
+          typeof relation.form === "string" &&
+          relation.relation === "SOURCE_RELATED_FORM" &&
+          typeof relation.entryLocator === "string"
+        )
+      )) &&
       fact.sourceStatus === "observed_external_snapshot" &&
       fact.attestationTruth === "fact" &&
       fact.pronunciationAuthority === "CURRENT_KAIKKI_RECORD_ONLY_UNBOUND_TO_FROZEN_PROFILE" &&
@@ -1009,6 +1017,47 @@ function parseMotivationDiscoveryV0_1(
     );
     return valid;
   };
+  const validAlbanianLexicalReading = (reading: unknown): boolean => {
+    if (!isRecord(reading) || (reading.status !== "SUPPORTED" && reading.status !== "NULL") || !Array.isArray(reading.relatedForms) || !isRecord(reading.interpretation)) {
+      return false;
+    }
+    const primary = reading.primarySourceFact;
+    const pronunciation = reading.sourcePronunciation;
+    const validPrimary = primary === null || (
+      isRecord(primary) &&
+      typeof primary.sourceRecordId === "string" &&
+      typeof primary.entryLocator === "string" &&
+      typeof primary.form === "string" &&
+      (primary.partOfSpeech === null || typeof primary.partOfSpeech === "string") &&
+      isStringArray(primary.meaningGlosses)
+    );
+    const validPronunciation = pronunciation === null || (
+      isRecord(pronunciation) &&
+      typeof pronunciation.sourceRecordId === "string" &&
+      typeof pronunciation.soundIndex === "number" &&
+      Number.isInteger(pronunciation.soundIndex) &&
+      (pronunciation.rawIpa === null || typeof pronunciation.rawIpa === "string") &&
+      (pronunciation.status === "SUPPORTED" || pronunciation.status === "NULL") &&
+      isStringArray(pronunciation.voicePath) &&
+      isStringArray(pronunciation.reasonCodes)
+    );
+    const validRelated = reading.relatedForms.every((relation) =>
+      isRecord(relation) &&
+      typeof relation.form === "string" &&
+      typeof relation.entryLocator === "string" &&
+      relation.relation === "SOURCE_RELATED_FORM" &&
+      (relation.resolution === "RESOLVED" || relation.resolution === "UNRESOLVED") &&
+      (relation.sourceRecordId === null || typeof relation.sourceRecordId === "string") &&
+      (relation.partOfSpeech === null || typeof relation.partOfSpeech === "string") &&
+      isStringArray(relation.meaningGlosses)
+    );
+    return validPrimary && validPronunciation && validRelated &&
+      (reading.interpretation.status === "EXPLORATORY_ZHEJI_READING" || reading.interpretation.status === "UNKNOWN_OR_NULL") &&
+      (reading.interpretation.statement === null || typeof reading.interpretation.statement === "string") &&
+      isStringArray(reading.interpretation.alternatives) &&
+      isStringArray(reading.interpretation.basis) &&
+      typeof reading.interpretation.claimBoundary === "string";
+  };
 
   if (
     (sourceFact.layer !== "SOURCE_FACT") ||
@@ -1047,6 +1096,7 @@ function parseMotivationDiscoveryV0_1(
       (!Array.isArray(exactLexicalSourceFacts) || !exactLexicalSourceFacts.every(validExactLexicalSourceFact))) ||
     (value.sourceIpaSevenVoiceAnalyses !== undefined &&
       (!Array.isArray(value.sourceIpaSevenVoiceAnalyses) || !value.sourceIpaSevenVoiceAnalyses.every(validSourceIpaSevenVoiceAnalysis)))
+      || (value.albanianLexicalReading !== undefined && !validAlbanianLexicalReading(value.albanianLexicalReading))
   ) {
     return missing("malformed", "motivationDiscoveryV0_1 derived structure invalid");
   }

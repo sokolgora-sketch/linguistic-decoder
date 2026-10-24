@@ -386,6 +386,7 @@ export function MotivationDiscoveryCardV0_1({
   ).length;
   const exactLexicalSourceFacts = value.exactLexicalSourceFacts ?? [];
   const sourceIpaSevenVoiceAnalyses = value.sourceIpaSevenVoiceAnalyses ?? [];
+  const albanianLexicalReading = value.albanianLexicalReading;
 
   return (
     <section
@@ -569,6 +570,76 @@ export function MotivationDiscoveryCardV0_1({
                 </div>
               </article>
             ))}
+          </div>
+        </div>
+      ) : null}
+
+      {albanianLexicalReading?.status === "SUPPORTED" ? (
+        <div
+          data-testid="albanian-lexical-reading"
+          className="mt-3 rounded-lg border border-[#385b55] bg-[#0f1a19] p-3 text-xs leading-5 text-[#d5ece5]"
+        >
+          <div className="font-semibold uppercase tracking-[0.12em] text-[#9dd7c4]">
+            ALBANIAN WORD READING · SOURCE-BOUND PRODUCT VIEW
+          </div>
+          {albanianLexicalReading.primarySourceFact ? (
+            <div className="mt-2 grid gap-2 sm:grid-cols-2">
+              <div className="rounded border border-[#28443f] bg-[#0c1514] p-2">
+                <div className="font-semibold text-[#f5f7fb]">Attested meaning</div>
+                <div data-testid="albanian-reading-meaning" className="mt-1 text-sm text-[#e1f2ed]">
+                  {albanianLexicalReading.primarySourceFact.meaningGlosses.join("; ") || "Null"}
+                </div>
+                <div className="mt-1 break-words text-[#9fbdb5]">
+                  {albanianLexicalReading.primarySourceFact.form} · {albanianLexicalReading.primarySourceFact.partOfSpeech ?? "POS unavailable"}
+                </div>
+                <div className="mt-1 break-words font-mono text-[10px] text-[#7fa69d]">
+                  {albanianLexicalReading.primarySourceFact.sourceRecordId} · {albanianLexicalReading.primarySourceFact.entryLocator}
+                </div>
+              </div>
+              <div className="rounded border border-[#28443f] bg-[#0c1514] p-2">
+                <div className="font-semibold text-[#f5f7fb]">Computed source structure</div>
+                <div data-testid="albanian-reading-voice-path" className="mt-1 font-mono text-sm text-[#e1f2ed]">
+                  {albanianLexicalReading.sourcePronunciation?.voicePath.length
+                    ? albanianLexicalReading.sourcePronunciation.voicePath.join(" → ")
+                    : "Null"}
+                </div>
+                <div className="mt-1 break-words text-[#9fbdb5]">
+                  IPA: {albanianLexicalReading.sourcePronunciation?.rawIpa ?? "Null"} · pronunciation authority remains current-source product evidence
+                </div>
+              </div>
+            </div>
+          ) : null}
+          <div className="mt-3">
+            <div className="font-semibold text-[#f5f7fb]">Source-linked form candidates</div>
+            <div className="mt-1 text-[#9fbdb5]">
+              These are source-provided form links, not verified family, etymology, or meaning-extension claims.
+            </div>
+            <div className="mt-2 flex flex-wrap gap-2">
+              {albanianLexicalReading.relatedForms.map((related) => (
+                <span
+                  key={`${related.form}:${related.entryLocator}`}
+                  data-testid="albanian-reading-related-form"
+                  className="rounded border border-[#355a52] bg-[#12211e] px-2 py-1 text-[#c8e6dc]"
+                >
+                  <span className="font-mono">{related.form}</span>
+                  {related.meaningGlosses.length ? ` · ${related.meaningGlosses.join("; ")}` : " · source link unresolved"}
+                </span>
+              ))}
+            </div>
+          </div>
+          <div className="mt-3 rounded border border-[#66532e] bg-[#1b180f] p-2 text-[#f0ddb0]">
+            <div className="font-semibold uppercase tracking-[0.1em]">EXPLORATORY ZHEJI-INSPIRED READING</div>
+            <div data-testid="albanian-reading-interpretation" className="mt-1 text-sm">
+              {albanianLexicalReading.interpretation.statement ?? "No bounded product interpretation is currently authorized; Null is valid."}
+            </div>
+            <div className="mt-1 text-xs text-[#d5c28f]">
+              {albanianLexicalReading.interpretation.claimBoundary}
+            </div>
+            {albanianLexicalReading.interpretation.alternatives.length ? (
+              <div className="mt-2 text-xs text-[#d5c28f]">
+                Alternatives: {albanianLexicalReading.interpretation.alternatives.join(" ")}
+              </div>
+            ) : null}
           </div>
         </div>
       ) : null}

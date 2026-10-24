@@ -46,6 +46,41 @@ export type EnglishKaikkiProviderOperationalStatusV0_1 = Readonly<{
   failureReasonCodes: readonly string[];
 }>;
 
+export type AlbanianLexicalReadingV0_1 = Readonly<{
+  status: "SUPPORTED" | "NULL";
+  primarySourceFact: Readonly<{
+    sourceRecordId: string;
+    entryLocator: string;
+    form: string;
+    partOfSpeech: string | null;
+    meaningGlosses: readonly string[];
+  }> | null;
+  sourcePronunciation: Readonly<{
+    sourceRecordId: string;
+    soundIndex: number;
+    rawIpa: string | null;
+    status: "SUPPORTED" | "NULL";
+    voicePath: readonly string[];
+    reasonCodes: readonly string[];
+  }> | null;
+  relatedForms: readonly Readonly<{
+    form: string;
+    entryLocator: string;
+    relation: "SOURCE_RELATED_FORM";
+    resolution: "RESOLVED" | "UNRESOLVED";
+    sourceRecordId: string | null;
+    partOfSpeech: string | null;
+    meaningGlosses: readonly string[];
+  }>[];
+  interpretation: Readonly<{
+    status: "EXPLORATORY_ZHEJI_READING" | "UNKNOWN_OR_NULL";
+    statement: string | null;
+    alternatives: readonly string[];
+    basis: readonly string[];
+    claimBoundary: string;
+  }>;
+}>;
+
 export type MotivationEngineDiscoveryWithAlbanianLexicalFactsV0_1 = Readonly<
   MotivationEngineDiscoveryV0_1 & {
     /** Additive exact-input source facts; never structural candidates or Voice authority. */
@@ -53,6 +88,8 @@ export type MotivationEngineDiscoveryWithAlbanianLexicalFactsV0_1 = Readonly<
     exactLexicalSourceFacts: readonly AlbanianKaikkiExactLexicalSourceFactV0_1[];
     /** Separate current-source IPA interpretation; never the canonical/profile-derived path. */
     sourceIpaSevenVoiceAnalyses: readonly AlbanianKaikkiSourceIpaSevenVoiceAnalysisV0_1[];
+    /** Additive Albanian product reading; source facts and exploratory symbolism stay separated. */
+    albanianLexicalReading: AlbanianLexicalReadingV0_1;
   }
 >;
 
@@ -282,6 +319,150 @@ async function resolveEnglishRecordsV0_1(
   });
 }
 
+function normalizedAlbanianFormV0_1(value: string): string {
+  return value.normalize("NFC").trim().toLocaleLowerCase("sq-AL");
+}
+
+function distinctGlossesV0_1(
+  facts: readonly AlbanianKaikkiExactLexicalSourceFactV0_1[],
+): readonly string[] {
+  return Object.freeze([...new Set(
+    facts.flatMap((fact) => fact.senses.flatMap((sense) => sense.glosses)),
+  )]);
+}
+
+function hasConservativePrimaryIlluminationEvidenceV0_1(
+  fact: AlbanianKaikkiExactLexicalSourceFactV0_1,
+): boolean {
+  const glosses = distinctGlossesV0_1([fact]);
+  const illuminationGlossCount = glosses.filter((gloss) =>
+    /\b(?:light|daylight|illumination|illuminat(?:e|ed|ing)|bright(?:ness)?)\b/iu.test(gloss),
+  ).length;
+  const competingOrUnrelatedGloss = glosses.some((gloss) =>
+    /\b(?:weight|not\s+heavy|easy|opening|access|knowledge|vision|clarity|clear)\b/iu.test(gloss),
+  );
+
+  // This is deliberately a conservative source-bound product gate: only the
+  // primary fact's own glosses count, two or more compatible illumination
+  // glosses are required, and explicit alternate senses fail closed. Related
+  // forms never create an interpretation for the queried word.
+  return illuminationGlossCount >= 2 && !competingOrUnrelatedGloss;
+}
+
+async function buildAlbanianLexicalReadingV0_1(input: Readonly<{
+  word: string;
+  facts: readonly AlbanianKaikkiExactLexicalSourceFactV0_1[];
+  analyses: readonly AlbanianKaikkiSourceIpaSevenVoiceAnalysisV0_1[];
+  provider: AlbanianKaikkiServerOnlyExactLexicalSourceProviderV0_1;
+}>): Promise<AlbanianLexicalReadingV0_1> {
+  const primary = input.facts.find((fact) =>
+    normalizedAlbanianFormV0_1(fact.form) === normalizedAlbanianFormV0_1(input.word) &&
+    fact.partOfSpeech !== "name",
+  ) ?? input.facts[0] ?? null;
+
+  if (!primary) {
+    return Object.freeze({
+      status: "NULL",
+      primarySourceFact: null,
+      sourcePronunciation: null,
+      relatedForms: Object.freeze([]),
+      interpretation: Object.freeze({
+        status: "UNKNOWN_OR_NULL",
+        statement: null,
+        alternatives: Object.freeze([]),
+        basis: Object.freeze([]),
+        claimBoundary: "No exact Albanian source fact is available; no product reading is claimed.",
+      }),
+    });
+  }
+
+  const sourcePronunciation = input.analyses.find((analysis) =>
+    analysis.sourceRecordId === primary.sourceRecordId && analysis.status === "SUPPORTED",
+  ) ?? input.analyses.find((analysis) => analysis.sourceRecordId === primary.sourceRecordId) ?? null;
+  const related = primary.relatedForms ?? [];
+  const relatedResults = await Promise.all(related.slice(0, 8).map(async (relation) => {
+    try {
+      const result = await input.provider.query(relation.form);
+      const resolved = result.status === "MATCHES_FOUND"
+        ? result.facts.find((fact) => fact.partOfSpeech !== "name") ?? result.facts[0] ?? null
+        : null;
+      return Object.freeze({
+        form: relation.form,
+        entryLocator: resolved?.entryLocator ?? relation.entryLocator,
+        relation: relation.relation,
+        resolution: resolved ? "RESOLVED" as const : "UNRESOLVED" as const,
+        sourceRecordId: resolved?.sourceRecordId ?? null,
+        partOfSpeech: resolved?.partOfSpeech ?? null,
+        meaningGlosses: resolved ? distinctGlossesV0_1([resolved]) : Object.freeze([]),
+      });
+    } catch {
+      return Object.freeze({
+        form: relation.form,
+        entryLocator: relation.entryLocator,
+        relation: relation.relation,
+        resolution: "UNRESOLVED" as const,
+        sourceRecordId: null,
+        partOfSpeech: null,
+        meaningGlosses: Object.freeze([]),
+      });
+    }
+  }));
+
+  const meaningGlosses = distinctGlossesV0_1([primary]);
+  const hasLightMeaning = hasConservativePrimaryIlluminationEvidenceV0_1(primary);
+  const hasSupportedPath = sourcePronunciation?.status === "SUPPORTED" &&
+    sourcePronunciation.voicePath.length > 0;
+  const voicePath = sourcePronunciation?.voicePath.join(" → ") ?? "Null";
+  const interpretation = hasLightMeaning && hasSupportedPath
+    ? Object.freeze({
+        status: "EXPLORATORY_ZHEJI_READING" as const,
+        statement: `The attested primary-source meaning is placed beside the source-derived ${voicePath} path. As a Zheji-inspired product prompt, this can invite an illumination → clarity reading; the prompt is exploratory and does not claim causation, etymology, or a universal Voice meaning.`,
+        alternatives: Object.freeze([
+          "The source-linked forms may reflect ordinary lexical or morphological relations.",
+          "The Voice path may be only a phonological observation with no semantic force.",
+        ]),
+        basis: Object.freeze([
+          "ATTESTED_SOURCE_GLOSSES",
+          "SOURCE_DERIVED_IPA_VOICE_PATH",
+          "PRIMARY_SOURCE_GLOSS_EVIDENCE",
+        ]),
+        claimBoundary: "Exploratory product interpretation only; no historical-origin claim, semantic proof, or winner selection.",
+      })
+    : Object.freeze({
+        status: "UNKNOWN_OR_NULL" as const,
+        statement: null,
+        alternatives: Object.freeze([]),
+        basis: Object.freeze([
+          "ATTESTED_SOURCE_GLOSSES",
+          ...(sourcePronunciation ? ["SOURCE_DERIVED_IPA_VOICE_PATH"] : []),
+        ]),
+        claimBoundary: "The available source evidence does not authorize a bounded product interpretation; Null is preserved.",
+      });
+
+  return Object.freeze({
+    status: "SUPPORTED",
+    primarySourceFact: Object.freeze({
+      sourceRecordId: primary.sourceRecordId,
+      entryLocator: primary.entryLocator,
+      form: primary.form,
+      partOfSpeech: primary.partOfSpeech,
+      meaningGlosses,
+    }),
+    sourcePronunciation: sourcePronunciation
+      ? Object.freeze({
+          sourceRecordId: sourcePronunciation.sourceRecordId,
+          soundIndex: sourcePronunciation.soundIndex,
+          rawIpa: sourcePronunciation.rawIpa,
+          status: sourcePronunciation.status,
+          voicePath: sourcePronunciation.voicePath,
+          reasonCodes: sourcePronunciation.reasonCodes,
+        })
+      : null,
+    relatedForms: Object.freeze(relatedResults),
+    interpretation,
+  });
+}
+
 /**
  * Server-only orchestration seam for the production route and fixture proof.
  * The provider performs async bounded filesystem lookup here; the resulting
@@ -324,6 +505,9 @@ export async function buildMotivationEngineDiscoveryServerOnlyV0_1(input: {
   const exactLexicalSourceFacts = albanianLexicalSourceResult?.status === "MATCHES_FOUND"
     ? albanianLexicalSourceResult.facts
     : Object.freeze([]) as readonly AlbanianKaikkiExactLexicalSourceFactV0_1[];
+  const sourceIpaSevenVoiceAnalyses = projectAlbanianKaikkiFactsSourceIpaToSevenVoicesV0_1(
+    exactLexicalSourceFacts,
+  );
   return Object.freeze({
     discovery: Object.freeze({
       ...discovery,
@@ -339,9 +523,13 @@ export async function buildMotivationEngineDiscoveryServerOnlyV0_1(input: {
             reasonCode: "NOT_ALBANIAN_INPUT",
           },
       exactLexicalSourceFacts,
-      sourceIpaSevenVoiceAnalyses: projectAlbanianKaikkiFactsSourceIpaToSevenVoicesV0_1(
-        exactLexicalSourceFacts,
-      ),
+      sourceIpaSevenVoiceAnalyses,
+      albanianLexicalReading: await buildAlbanianLexicalReadingV0_1({
+        word: input.word,
+        facts: exactLexicalSourceFacts,
+        analyses: sourceIpaSevenVoiceAnalyses,
+        provider: input.albanianLexicalSourceProvider ?? await getProductionAlbanianLexicalSourceProviderV0_1(),
+      }),
     }),
     englishProvider: resolved.operationalStatus,
   });

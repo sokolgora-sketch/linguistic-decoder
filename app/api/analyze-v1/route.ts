@@ -1382,7 +1382,11 @@ async function runAnalyzeV1Orchestration(
         analysis: final as any,
         heart: heartInstrumentV1,
       };
-      const discoveryResult = !publicBetaDeterministicOnly && providerExecution === "disabled"
+      const isAlbanianDiscoveryInput = [discoveryInputLanguage, discoveryInputProfile].some((value) =>
+        value.normalize("NFC").trim().toLocaleLowerCase("en-US") === "sq" ||
+        value.normalize("NFC").trim().toLocaleLowerCase("en-US") === "albanian",
+      );
+      const discoveryResult = !publicBetaDeterministicOnly && providerExecution === "disabled" && !isAlbanianDiscoveryInput
         ? {
             discovery: projectMotivationEngineDiscoverySourceFamiliesV0_1(
               buildMotivationEngineDiscoveryV0_1(discoveryInput),
