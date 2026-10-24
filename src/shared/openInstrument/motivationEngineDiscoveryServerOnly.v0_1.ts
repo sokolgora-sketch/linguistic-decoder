@@ -84,6 +84,8 @@ export type AlbanianLexicalReadingV0_1 = Readonly<{
     etymologyText: string | null;
   }>[];
   sourceLinkedComparison?: AlbanianSourceLinkedComparisonV0_1 | null;
+  /** Additive product bridge; this never upgrades source evidence into morphology or proof. */
+  functionalMeaningBridge: AlbanianFunctionalMeaningBridgeV0_1;
   composition: AlbanianLexicalCompositionV0_1;
   interpretation: Readonly<{
     status: "EXPLORATORY_ZHEJI_READING" | "UNKNOWN_OR_NULL";
@@ -92,6 +94,60 @@ export type AlbanianLexicalReadingV0_1 = Readonly<{
     basis: readonly string[];
     claimBoundary: string;
   }>;
+}>;
+
+export type AlbanianFunctionalMeaningBridgeTruthLayerV0_1 =
+  | "SOURCE_FACT"
+  | "DERIVED_STRUCTURE"
+  | "EXPLORATORY_FUNCTIONAL_HYPOTHESIS"
+  | "UNKNOWN_OR_NULL";
+
+export type AlbanianFunctionalMeaningBridgeV0_1 = Readonly<{
+  status: "SUPPORTED" | "NULL";
+  truthLayers: readonly AlbanianFunctionalMeaningBridgeTruthLayerV0_1[];
+  relatedForm: string | null;
+  sourceFacts: Readonly<{
+    primary: Readonly<{
+      sourceRecordId: string;
+      entryLocator: string;
+      form: string;
+      meaningGlosses: readonly string[];
+    }>;
+    related: Readonly<{
+      sourceRecordId: string;
+      entryLocator: string;
+      form: string;
+      meaningGlosses: readonly string[];
+      sourceAuthoredExplanation: string | null;
+    }> | null;
+    structuredReference: Readonly<{
+      referencedForm: string | null;
+      reference: string | null;
+    }>;
+  }> | null;
+  derivedStructure: Readonly<{
+    primary: Readonly<{
+      rawIpa: string | null;
+      voicePaths: readonly string[];
+      consonantalContexts: readonly string[];
+    }>;
+    related: Readonly<{
+      rawIpa: string | null;
+      voicePaths: readonly string[];
+      consonantalContexts: readonly string[];
+    }>;
+    voicePathRelationship: AlbanianSourceLinkedComparisonV0_1["summary"]["voicePathRelationship"];
+    consonantalContextRelationship: AlbanianSourceLinkedComparisonV0_1["summary"]["consonantalContextRelationship"];
+  }> | null;
+  functionalHypothesis: Readonly<{
+    status: "EXPLORATORY_FUNCTIONAL_HYPOTHESIS" | "UNKNOWN_OR_NULL";
+    statement: string | null;
+    alternatives: readonly string[];
+    basis: readonly string[];
+    claimBoundary: string;
+  }>;
+  reasonCodes: readonly string[];
+  claimBoundary: string;
 }>;
 
 export type AlbanianSourceLinkedPronunciationV0_1 = Readonly<{
@@ -756,6 +812,175 @@ function nullCompositionV0_1(
   });
 }
 
+function sourceContextTextV0_1(
+  variant: AlbanianSourceLinkedPronunciationV0_1,
+): string {
+  const context = variant.consonantalContext;
+  if (context.status !== "SUPPORTED") {
+    return `Null (${context.reasonCodes.join(", ") || "SOURCE_ORDER_CONTEXT_NOT_SUPPORTED"})`;
+  }
+  const segmentText = (segment: AlbanianSourceLinkedConsonantSegmentV0_1): string =>
+    `${segment.baseSymbol}${segment.optional ? " (optional)" : ""}`;
+  const regionText = (region: readonly AlbanianSourceLinkedConsonantSegmentV0_1[]): string =>
+    region.map(segmentText).join(" ") || "∅";
+  const inter = context.interNucleusConsonants?.map(regionText).join(" · ") ?? "Null";
+  return `prefix ${context.prefixConsonants?.map(segmentText).join(" ") || "∅"} · inter ${inter} · suffix ${context.suffixConsonants?.map(segmentText).join(" ") || "∅"}`;
+}
+
+function bridgeRecordFactsV0_1(
+  primary: AlbanianSourceLinkedRecordV0_1,
+  related: AlbanianSourceLinkedRecordV0_1 | null,
+  comparison: AlbanianSourceLinkedComparisonV0_1 | null,
+): AlbanianFunctionalMeaningBridgeV0_1["sourceFacts"] {
+  return Object.freeze({
+    primary: Object.freeze({
+      sourceRecordId: primary.sourceRecordId,
+      entryLocator: primary.entryLocator,
+      form: primary.form,
+      meaningGlosses: primary.meaningGlosses,
+    }),
+    related: related
+      ? Object.freeze({
+          sourceRecordId: related.sourceRecordId,
+          entryLocator: related.entryLocator,
+          form: related.form,
+          meaningGlosses: related.meaningGlosses,
+          sourceAuthoredExplanation: related.etymologyText,
+        })
+      : null,
+    structuredReference: Object.freeze({
+      referencedForm: comparison?.relation.referencedForm ?? null,
+      reference: comparison?.relation.reference ?? null,
+    }),
+  });
+}
+
+function bridgeDerivedStructureV0_1(
+  comparison: AlbanianSourceLinkedComparisonV0_1,
+): AlbanianFunctionalMeaningBridgeV0_1["derivedStructure"] {
+  if (comparison.status !== "SUPPORTED" || comparison.related === null) return null;
+  const supportedVariants = (record: AlbanianSourceLinkedRecordV0_1) => record.pronunciationVariants.filter((variant) =>
+    variant.status === "SUPPORTED" && variant.consonantalContext.status === "SUPPORTED",
+  );
+  const primaryVariants = supportedVariants(comparison.primary);
+  const relatedVariants = supportedVariants(comparison.related);
+  if (primaryVariants.length === 0 || relatedVariants.length === 0) return null;
+  return Object.freeze({
+    primary: Object.freeze({
+      rawIpa: primaryVariants[0]?.rawIpa ?? null,
+      voicePaths: Object.freeze(primaryVariants.map((variant) => variant.voicePath.join(" → "))),
+      consonantalContexts: Object.freeze(primaryVariants.map(sourceContextTextV0_1)),
+    }),
+    related: Object.freeze({
+      rawIpa: relatedVariants[0]?.rawIpa ?? null,
+      voicePaths: Object.freeze(relatedVariants.map((variant) => variant.voicePath.join(" → "))),
+      consonantalContexts: Object.freeze(relatedVariants.map(sourceContextTextV0_1)),
+    }),
+    voicePathRelationship: comparison.summary.voicePathRelationship,
+    consonantalContextRelationship: comparison.summary.consonantalContextRelationship,
+  });
+}
+
+function nullFunctionalMeaningBridgeV0_1(input: Readonly<{
+  relatedForm?: string | null;
+  sourceFacts: AlbanianFunctionalMeaningBridgeV0_1["sourceFacts"];
+  derivedStructure?: AlbanianFunctionalMeaningBridgeV0_1["derivedStructure"];
+  reasonCodes: readonly string[];
+}>): AlbanianFunctionalMeaningBridgeV0_1 {
+  return Object.freeze({
+    status: "NULL",
+    truthLayers: Object.freeze([
+      ...(input.sourceFacts ? ["SOURCE_FACT" as const] : []),
+      ...(input.derivedStructure ? ["DERIVED_STRUCTURE" as const] : []),
+      "UNKNOWN_OR_NULL" as const,
+    ]),
+    relatedForm: input.relatedForm ?? null,
+    sourceFacts: input.sourceFacts,
+    derivedStructure: input.derivedStructure ?? null,
+    functionalHypothesis: Object.freeze({
+      status: "UNKNOWN_OR_NULL" as const,
+      statement: null,
+      alternatives: Object.freeze([]),
+      basis: Object.freeze([]),
+      claimBoundary: "The source or structure is incomplete for a bounded functional product prompt; Null is preserved.",
+    }),
+    reasonCodes: Object.freeze([...input.reasonCodes]),
+    claimBoundary: "Source facts and derived structure remain separate from functional meaning; no morphology, etymology, causation, or Voice semantics is asserted.",
+  });
+}
+
+function hasMeaningEvidenceV0_1(glosses: readonly string[]): boolean {
+  return glosses.some((gloss) => gloss.trim().length > 0);
+}
+
+export function buildAlbanianFunctionalMeaningBridgeV0_1(input: Readonly<{
+  primary: AlbanianSourceLinkedRecordV0_1;
+  comparison: AlbanianSourceLinkedComparisonV0_1 | null;
+}>): AlbanianFunctionalMeaningBridgeV0_1 {
+  const related = input.comparison?.related ?? null;
+  const sourceFacts = bridgeRecordFactsV0_1(input.primary, related, input.comparison);
+  const derivedStructure = input.comparison ? bridgeDerivedStructureV0_1(input.comparison) : null;
+  const reasons: string[] = [];
+
+  if (!input.comparison || input.comparison.status !== "SUPPORTED" || related === null) {
+    reasons.push("SOURCE_LINKED_RELATION_NOT_SUPPORTED");
+  }
+  if (related !== null && related.meaningGlosses.length === 0) {
+    reasons.push("RELATED_MEANING_EVIDENCE_MISSING");
+  }
+  if (!hasMeaningEvidenceV0_1(input.primary.meaningGlosses)) {
+    reasons.push("PRIMARY_MEANING_EVIDENCE_MISSING");
+  }
+  if (related !== null && !related.etymologyText?.trim()) {
+    reasons.push("SOURCE_AUTHORED_FUNCTIONAL_EXPLANATION_MISSING");
+  }
+  if (derivedStructure === null) {
+    reasons.push("DERIVED_STRUCTURE_NOT_SUPPORTED_FOR_BOTH_RECORDS");
+  }
+  if (reasons.length > 0) {
+    return nullFunctionalMeaningBridgeV0_1({
+      relatedForm: related?.form ?? input.comparison?.relation.relatedForm ?? null,
+      sourceFacts,
+      derivedStructure,
+      reasonCodes: Object.freeze([...new Set(reasons)]),
+    });
+  }
+
+  const primaryMeaning = input.primary.meaningGlosses.join("; ");
+  const relatedMeaning = related?.meaningGlosses.join("; ") ?? "Null";
+  const sourceExplanation = related?.etymologyText ?? "Null";
+  return Object.freeze({
+    status: "SUPPORTED",
+    truthLayers: Object.freeze([
+      "SOURCE_FACT",
+      "DERIVED_STRUCTURE",
+      "EXPLORATORY_FUNCTIONAL_HYPOTHESIS",
+    ] as const satisfies readonly AlbanianFunctionalMeaningBridgeTruthLayerV0_1[]),
+    relatedForm: related?.form ?? null,
+    sourceFacts,
+    derivedStructure,
+    functionalHypothesis: Object.freeze({
+      status: "EXPLORATORY_FUNCTIONAL_HYPOTHESIS" as const,
+      statement: `Source-attributed functional prompt: the entry for ${related?.form ?? "the linked form"} describes its relation to ${input.primary.form} as: “${sourceExplanation}” This invites exploration of how the source-attested meanings “${primaryMeaning}” and “${relatedMeaning}” relate in use. The engine does not add a semantic operation or assert morphology, historical derivation, causation, or Voice semantics.`,
+      alternatives: Object.freeze([
+        "The source-authored explanation may be approximate, contested, or ordinary lexical description rather than a demonstrated derivation.",
+        "The computed Voice paths and consonantal contexts are phonological observations and may have no semantic force.",
+        "A meaningful functional relation may remain unsupported even when the source records both forms.",
+      ]),
+      basis: Object.freeze([
+        "SOURCE_ATTESTED_PRIMARY_MEANING",
+        "SOURCE_ATTESTED_RELATED_MEANING",
+        "SOURCE_AUTHORED_RELATION_EXPLANATION",
+        "SOURCE_DERIVED_VOICE_PATHS",
+        "SOURCE_DERIVED_CONSONANTAL_CONTEXTS",
+      ]),
+      claimBoundary: "Exploratory product interpretation only; source-authored explanation remains attributed evidence and is not engine-proven morphology, etymology, causation, or universal Voice meaning.",
+    }),
+    reasonCodes: Object.freeze([]),
+    claimBoundary: "The four truth layers are kept separate: source facts, derived structure, an exploratory functional prompt, and explicit alternatives/limits. No historical or semantic authority is promoted.",
+  });
+}
+
 async function buildAlbanianLexicalReadingV0_1(input: Readonly<{
   word: string;
   facts: readonly AlbanianKaikkiExactLexicalSourceFactV0_1[];
@@ -774,6 +999,10 @@ async function buildAlbanianLexicalReadingV0_1(input: Readonly<{
       sourcePronunciation: null,
       relatedForms: Object.freeze([]),
       sourceLinkedComparison: null,
+      functionalMeaningBridge: nullFunctionalMeaningBridgeV0_1({
+        sourceFacts: null,
+        reasonCodes: Object.freeze(["PRIMARY_SOURCE_RECORD_NOT_FOUND"]),
+      }),
       composition: nullCompositionV0_1(),
       interpretation: Object.freeze({
         status: "UNKNOWN_OR_NULL",
@@ -833,6 +1062,10 @@ async function buildAlbanianLexicalReadingV0_1(input: Readonly<{
         related: firstRelatedResolved,
       })
     : null;
+  const functionalMeaningBridge = buildAlbanianFunctionalMeaningBridgeV0_1({
+    primary: sourceRecordProjectionV0_1(primary, input.analyses),
+    comparison: sourceLinkedComparison,
+  });
 
   const compositionCandidate = relatedResultsWithFacts.find(({ resolved }) => resolved !== null);
   const relatedFact = compositionCandidate?.resolved ?? null;
@@ -891,6 +1124,7 @@ async function buildAlbanianLexicalReadingV0_1(input: Readonly<{
       : null,
     relatedForms: Object.freeze(relatedResults),
     sourceLinkedComparison,
+    functionalMeaningBridge,
     composition,
     interpretation,
   });

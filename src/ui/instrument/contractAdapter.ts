@@ -1191,9 +1191,74 @@ function parseMotivationDiscoveryV0_1(
       typeof sourceLinkedComparison.summary.text === "string" &&
       typeof sourceLinkedComparison.claimBoundary === "string"
     );
+    const validFunctionalMeaningBridge = (() => {
+      const bridge = reading.functionalMeaningBridge;
+      if (!isRecord(bridge) || (bridge.status !== "SUPPORTED" && bridge.status !== "NULL")) return false;
+      if (!isStringArray(bridge.truthLayers) || bridge.truthLayers.some((layer) =>
+        layer !== "SOURCE_FACT" &&
+        layer !== "DERIVED_STRUCTURE" &&
+        layer !== "EXPLORATORY_FUNCTIONAL_HYPOTHESIS" &&
+        layer !== "UNKNOWN_OR_NULL",
+      )) return false;
+      if (bridge.relatedForm !== null && typeof bridge.relatedForm !== "string") return false;
+      const sourceFacts = bridge.sourceFacts;
+      if (sourceFacts !== null) {
+        if (!isRecord(sourceFacts) || !isRecord(sourceFacts.primary) || !isRecord(sourceFacts.structuredReference)) return false;
+        const validBridgeRecord = (record: unknown): boolean =>
+          isRecord(record) &&
+          typeof record.sourceRecordId === "string" &&
+          typeof record.entryLocator === "string" &&
+          typeof record.form === "string" &&
+          isStringArray(record.meaningGlosses);
+        if (!validBridgeRecord(sourceFacts.primary)) return false;
+        const relatedBridgeRecord = sourceFacts.related;
+        if (relatedBridgeRecord !== null) {
+          if (!isRecord(relatedBridgeRecord) || !validBridgeRecord(relatedBridgeRecord)) return false;
+          if (
+            relatedBridgeRecord.sourceAuthoredExplanation !== null &&
+            typeof relatedBridgeRecord.sourceAuthoredExplanation !== "string"
+          ) return false;
+        }
+        if (
+          (sourceFacts.structuredReference.referencedForm !== null && typeof sourceFacts.structuredReference.referencedForm !== "string") ||
+          (sourceFacts.structuredReference.reference !== null && typeof sourceFacts.structuredReference.reference !== "string")
+        ) return false;
+      }
+      const derivedStructure = bridge.derivedStructure;
+      if (derivedStructure !== null) {
+        if (!isRecord(derivedStructure) || !isRecord(derivedStructure.primary) || !isRecord(derivedStructure.related)) return false;
+        const validBridgeStructure = (structure: unknown): boolean =>
+          isRecord(structure) &&
+          (structure.rawIpa === null || typeof structure.rawIpa === "string") &&
+          isStringArray(structure.voicePaths) &&
+          isStringArray(structure.consonantalContexts);
+        if (!validBridgeStructure(derivedStructure.primary) || !validBridgeStructure(derivedStructure.related)) return false;
+        if (
+          derivedStructure.voicePathRelationship !== "EXACT_SUPPORTED_PATH_SET_MATCH" &&
+          derivedStructure.voicePathRelationship !== "SHARED_INITIAL_VOICE_DIFFERENT_LATER_PATH" &&
+          derivedStructure.voicePathRelationship !== "DIFFERENT_SUPPORTED_VOICE_PATHS" &&
+          derivedStructure.voicePathRelationship !== "UNKNOWN"
+        ) return false;
+        if (
+          derivedStructure.consonantalContextRelationship !== "EXACT_SUPPORTED_CONTEXT_SET_MATCH" &&
+          derivedStructure.consonantalContextRelationship !== "DIFFERENT_SUPPORTED_CONTEXTS" &&
+          derivedStructure.consonantalContextRelationship !== "UNKNOWN"
+        ) return false;
+      }
+      const hypothesis = bridge.functionalHypothesis;
+      return isRecord(hypothesis) &&
+        (hypothesis.status === "EXPLORATORY_FUNCTIONAL_HYPOTHESIS" || hypothesis.status === "UNKNOWN_OR_NULL") &&
+        (hypothesis.statement === null || typeof hypothesis.statement === "string") &&
+        isStringArray(hypothesis.alternatives) &&
+        isStringArray(hypothesis.basis) &&
+        typeof hypothesis.claimBoundary === "string" &&
+        isStringArray(bridge.reasonCodes) &&
+        typeof bridge.claimBoundary === "string";
+    })();
     return validPrimary && validPronunciation && validRelated &&
       validComposition &&
       validSourceLinkedComparison &&
+      validFunctionalMeaningBridge &&
       (reading.interpretation.status === "EXPLORATORY_ZHEJI_READING" || reading.interpretation.status === "UNKNOWN_OR_NULL") &&
       (reading.interpretation.statement === null || typeof reading.interpretation.statement === "string") &&
       isStringArray(reading.interpretation.alternatives) &&

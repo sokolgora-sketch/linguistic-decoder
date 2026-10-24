@@ -266,6 +266,22 @@ describe("real Albanian exact lexical source integration v0.1", () => {
           voicePathRelationship: "SHARED_INITIAL_VOICE_DIFFERENT_LATER_PATH",
         },
       },
+      functionalMeaningBridge: {
+        status: "SUPPORTED",
+        truthLayers: ["SOURCE_FACT", "DERIVED_STRUCTURE", "EXPLORATORY_FUNCTIONAL_HYPOTHESIS"],
+        relatedForm: "dritare",
+        sourceFacts: {
+          primary: { form: "dritë", meaningGlosses: ["light", "light (such as a lamp)"] },
+          related: {
+            form: "dritare",
+            meaningGlosses: ["window"],
+            sourceAuthoredExplanation: "From dritë (“light”) + -are (“-er”), meaning to let light through or similar.",
+          },
+        },
+        functionalHypothesis: {
+          status: "EXPLORATORY_FUNCTIONAL_HYPOTHESIS",
+        },
+      },
     });
 
     const vm = adaptAnalysisToTelemetryVM({
@@ -283,6 +299,7 @@ describe("real Albanian exact lexical source integration v0.1", () => {
       expect(screen.getByTestId("albanian-reading-related-form")).toHaveTextContent("source-authored etymology (attributed): From dritë");
       expect(screen.getByTestId("albanian-source-linked-comparison")).toHaveTextContent("dritë#Albanian");
       expect(screen.getByTestId("albanian-source-linked-comparison")).toHaveTextContent("SHARED_INITIAL_VOICE_DIFFERENT_LATER_PATH");
+      expect(screen.getByTestId("albanian-reading-functional-bridge")).toHaveTextContent("let light through");
       expect(screen.getByTestId("albanian-reading-composition-null")).toHaveTextContent("Null");
     }
   });
@@ -314,6 +331,130 @@ describe("real Albanian exact lexical source integration v0.1", () => {
       status: "NULL",
       reasonCodes: [reasonCode],
       related: null,
+    });
+    expect(result.albanianLexicalReading?.functionalMeaningBridge).toMatchObject({
+      status: "NULL",
+      functionalHypothesis: { status: "UNKNOWN_OR_NULL", statement: null },
+    });
+  });
+
+  it("requires source meaning, source relation and supported structure before emitting the bridge", async () => {
+    const primary = fixtureFact({
+      sourceRecordId: "kaikki-albanian-jsonl:word=mal:ordinal=0",
+      entryLocator: "jsonl://word/mal/match/0",
+      form: "mal",
+      senses: [{ senseId: "mal-1", glosses: ["mountain"] }],
+      ipaObservations: [{ soundIndex: 0, ipa: "/ˈmal/", tags: [] }],
+      relatedForms: [{ form: "formal", relation: "SOURCE_RELATED_FORM", entryLocator: "jsonl://word/formal" }],
+    });
+    const relatedWithoutMeaning = fixtureFact({
+      sourceRecordId: "kaikki-albanian-jsonl:word=formal:ordinal=0",
+      entryLocator: "jsonl://word/formal/match/0",
+      form: "formal",
+      senses: [{ senseId: "formal-1", glosses: [] }],
+      ipaObservations: [{ soundIndex: 0, ipa: "/foɾˈmal/", tags: [] }],
+      etymologyText: "A source-authored note mentions the related-looking spelling without stating a relation.",
+      etymologyLinks: [{ sourceForm: "mal", reference: "mal#Albanian" }],
+    });
+    const missingMeaning = await discoveryForFactsV0_1([primary, relatedWithoutMeaning], "mal");
+    expect(missingMeaning.albanianLexicalReading?.functionalMeaningBridge).toMatchObject({
+      status: "NULL",
+      reasonCodes: expect.arrayContaining(["RELATED_MEANING_EVIDENCE_MISSING"]),
+    });
+    expect(missingMeaning.albanianLexicalReading?.functionalMeaningBridge.functionalHypothesis.statement).toBeNull();
+
+    const unsupportedRelated = fixtureFact({
+      ...relatedWithoutMeaning,
+      senses: [{ senseId: "formal-1", glosses: ["formal"] }],
+      ipaObservations: [{ soundIndex: 0, ipa: "[?]", tags: [] }],
+      etymologyText: "From mal, meaning related to a mountain.",
+    });
+    const unsupportedStructure = await discoveryForFactsV0_1([primary, unsupportedRelated], "mal");
+    expect(unsupportedStructure.albanianLexicalReading?.functionalMeaningBridge).toMatchObject({
+      status: "NULL",
+      reasonCodes: expect.arrayContaining(["DERIVED_STRUCTURE_NOT_SUPPORTED_FOR_BOTH_RECORDS"]),
+    });
+
+    const orthographicOnly = await discoveryForFactsV0_1([fixtureFact({
+      form: "mal",
+      senses: [{ senseId: "mal-1", glosses: ["mountain"] }],
+      ipaObservations: [{ soundIndex: 0, ipa: "/ˈmal/", tags: [] }],
+      relatedForms: [{ form: "formal", relation: "SOURCE_RELATED_FORM", entryLocator: "jsonl://word/formal" }],
+    })], "mal");
+    expect(orthographicOnly.albanianLexicalReading?.functionalMeaningBridge).toMatchObject({
+      status: "NULL",
+      reasonCodes: expect.arrayContaining(["SOURCE_LINKED_RELATION_NOT_SUPPORTED"]),
+    });
+  });
+
+  it.each([
+    ["no senses", []],
+    ["empty gloss array", [{ senseId: "mal-empty", glosses: [] }]],
+    ["whitespace-only glosses", [{ senseId: "mal-whitespace", glosses: [" ", "\t"] }]],
+  ] as const)("blocks the bridge when the primary record has %s", async (_label, senses) => {
+    const primary = fixtureFact({
+      sourceRecordId: "kaikki-albanian-jsonl:word=mal:ordinal=0",
+      entryLocator: "jsonl://word/mal/match/0",
+      form: "mal",
+      senses,
+      ipaObservations: [{ soundIndex: 0, ipa: "/ˈmal/", tags: [] }],
+      relatedForms: [{ form: "malor", relation: "SOURCE_RELATED_FORM", entryLocator: "jsonl://word/malor" }],
+    });
+    const related = fixtureFact({
+      sourceRecordId: "kaikki-albanian-jsonl:word=malor:ordinal=0",
+      entryLocator: "jsonl://word/malor/match/0",
+      form: "malor",
+      senses: [{ senseId: "malor-1", glosses: ["mountainous"] }],
+      ipaObservations: [{ soundIndex: 0, ipa: "/maˈloɾ/", tags: [] }],
+      etymologyText: "From mal, meaning mountainous.",
+      etymologyLinks: [{ sourceForm: "mal", reference: "mal#Albanian" }],
+    });
+    const result = await discoveryForFactsV0_1([primary, related], "mal");
+    expect(result.albanianLexicalReading?.functionalMeaningBridge).toMatchObject({
+      status: "NULL",
+      sourceFacts: {
+        primary: { meaningGlosses: senses.flatMap((sense) => sense.glosses) },
+        related: { meaningGlosses: ["mountainous"] },
+      },
+      derivedStructure: expect.any(Object),
+      functionalHypothesis: {
+        status: "UNKNOWN_OR_NULL",
+        statement: null,
+        basis: [],
+      },
+      reasonCodes: expect.arrayContaining(["PRIMARY_MEANING_EVIDENCE_MISSING"]),
+    });
+    expect(result.albanianLexicalReading?.functionalMeaningBridge.functionalHypothesis.basis)
+      .not.toContain("SOURCE_ATTESTED_PRIMARY_MEANING");
+    expect(result.albanianLexicalReading?.composition.status).toBe("NULL");
+  });
+
+  it("blocks the bridge when both primary and related meanings are missing", async () => {
+    const primary = fixtureFact({
+      sourceRecordId: "kaikki-albanian-jsonl:word=mal:ordinal=0",
+      entryLocator: "jsonl://word/mal/match/0",
+      form: "mal",
+      senses: [],
+      ipaObservations: [{ soundIndex: 0, ipa: "/ˈmal/", tags: [] }],
+      relatedForms: [{ form: "malor", relation: "SOURCE_RELATED_FORM", entryLocator: "jsonl://word/malor" }],
+    });
+    const related = fixtureFact({
+      sourceRecordId: "kaikki-albanian-jsonl:word=malor:ordinal=0",
+      entryLocator: "jsonl://word/malor/match/0",
+      form: "malor",
+      senses: [{ senseId: "malor-empty", glosses: [] }],
+      ipaObservations: [{ soundIndex: 0, ipa: "/maˈloɾ/", tags: [] }],
+      etymologyText: "From mal, meaning mountainous.",
+      etymologyLinks: [{ sourceForm: "mal", reference: "mal#Albanian" }],
+    });
+    const result = await discoveryForFactsV0_1([primary, related], "mal");
+    expect(result.albanianLexicalReading?.functionalMeaningBridge).toMatchObject({
+      status: "NULL",
+      functionalHypothesis: { status: "UNKNOWN_OR_NULL", statement: null },
+      reasonCodes: expect.arrayContaining([
+        "PRIMARY_MEANING_EVIDENCE_MISSING",
+        "RELATED_MEANING_EVIDENCE_MISSING",
+      ]),
     });
   });
 
@@ -553,6 +694,26 @@ describe("real Albanian exact lexical source integration v0.1", () => {
     expect(result.discovery.albanianLexicalReading).toMatchObject({
       status: "NULL",
       composition: { status: "NULL", relatedForm: null },
+    });
+  });
+
+  it("keeps the currently absent dritëshkurtër source record as Null", async () => {
+    const result = await buildMotivationEngineDiscoveryServerOnlyV0_1({
+      word: "dritëshkurtër",
+      inputLanguage: "sq",
+      inputProfile: "albanian",
+      analysis: await analysisFor("dritëshkurtër"),
+      heart: buildHeartInstrumentV1("dritëshkurtër"),
+      albanianLexicalSourceProvider: createAlbanianKaikkiServerOnlyExactLexicalSourceProviderForSyntheticFixtureV0_1({
+        facts: [fixtureFact({ form: "dritë" })],
+      }),
+    });
+    expect(result.discovery.albanianLexicalReading).toMatchObject({
+      status: "NULL",
+      functionalMeaningBridge: {
+        status: "NULL",
+        reasonCodes: ["PRIMARY_SOURCE_RECORD_NOT_FOUND"],
+      },
     });
   });
 

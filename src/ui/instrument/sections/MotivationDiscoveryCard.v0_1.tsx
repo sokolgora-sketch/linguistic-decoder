@@ -714,6 +714,58 @@ export function MotivationDiscoveryCardV0_1({
               <div className="mt-2 text-[10px] text-[#91aebb]">{albanianLexicalReading.sourceLinkedComparison.claimBoundary}</div>
             </div>
           ) : null}
+          <div
+            data-testid="albanian-functional-meaning-bridge"
+            className="mt-3 rounded border border-[#66532e] bg-[#1b180f] p-3 text-[#f0ddb0]"
+          >
+            <div className="font-semibold uppercase tracking-[0.1em]">FUNCTIONAL MEANING BRIDGE · EXPLORATORY ONLY</div>
+            {albanianLexicalReading.functionalMeaningBridge.status === "SUPPORTED" &&
+            albanianLexicalReading.functionalMeaningBridge.sourceFacts &&
+            albanianLexicalReading.functionalMeaningBridge.derivedStructure ? (
+              <>
+                <div className="mt-2 rounded border border-[#594a2b] bg-[#211c12] p-2 text-xs">
+                  <div className="font-semibold text-[#f5f7fb]">SOURCE_FACT</div>
+                  <div className="mt-1">
+                    {albanianLexicalReading.functionalMeaningBridge.sourceFacts.primary.form}: {albanianLexicalReading.functionalMeaningBridge.sourceFacts.primary.meaningGlosses.join("; ") || "Null"}
+                  </div>
+                  <div className="mt-1">
+                    {albanianLexicalReading.functionalMeaningBridge.sourceFacts.related?.form ?? "Null"}: {albanianLexicalReading.functionalMeaningBridge.sourceFacts.related?.meaningGlosses.join("; ") || "Null"}
+                  </div>
+                  <div className="mt-1 break-words text-[#d5c28f]">
+                    Source-authored explanation (attributed): {albanianLexicalReading.functionalMeaningBridge.sourceFacts.related?.sourceAuthoredExplanation ?? "Null"}
+                  </div>
+                </div>
+                <div className="mt-2 rounded border border-[#594a2b] bg-[#211c12] p-2 text-xs">
+                  <div className="font-semibold text-[#f5f7fb]">DERIVED_STRUCTURE</div>
+                  <div className="mt-1 break-words">
+                    {albanianLexicalReading.functionalMeaningBridge.sourceFacts.primary.form}: {albanianLexicalReading.functionalMeaningBridge.derivedStructure.primary.voicePaths.join(" | ") || "Null"} · {albanianLexicalReading.functionalMeaningBridge.derivedStructure.primary.consonantalContexts.join(" | ") || "Null"}
+                  </div>
+                  <div className="mt-1 break-words">
+                    {albanianLexicalReading.functionalMeaningBridge.sourceFacts.related?.form ?? "Null"}: {albanianLexicalReading.functionalMeaningBridge.derivedStructure.related.voicePaths.join(" | ") || "Null"} · {albanianLexicalReading.functionalMeaningBridge.derivedStructure.related.consonantalContexts.join(" | ") || "Null"}
+                  </div>
+                  <div className="mt-1 text-[#d5c28f]">
+                    Voice relation: {albanianLexicalReading.functionalMeaningBridge.derivedStructure.voicePathRelationship} · consonantal relation: {albanianLexicalReading.functionalMeaningBridge.derivedStructure.consonantalContextRelationship}
+                  </div>
+                </div>
+                <div className="mt-2 rounded border border-[#594a2b] bg-[#211c12] p-2 text-xs">
+                  <div className="font-semibold text-[#f5f7fb]">EXPLORATORY_FUNCTIONAL_HYPOTHESIS</div>
+                  <div data-testid="albanian-reading-functional-bridge" className="mt-1 text-sm">
+                    {albanianLexicalReading.functionalMeaningBridge.functionalHypothesis.statement}
+                  </div>
+                  <div className="mt-1 text-[#d5c28f]">
+                    Alternatives: {albanianLexicalReading.functionalMeaningBridge.functionalHypothesis.alternatives.join(" ")}
+                  </div>
+                </div>
+              </>
+            ) : (
+              <div data-testid="albanian-functional-meaning-bridge-null" className="mt-2 text-sm">
+                UNKNOWN_OR_NULL — no source-supported functional prompt is available. Reasons: {albanianLexicalReading.functionalMeaningBridge.reasonCodes.join(", ") || "not recorded"}.
+              </div>
+            )}
+            <div className="mt-2 text-[10px] text-[#d5c28f]">
+              {albanianLexicalReading.functionalMeaningBridge.claimBoundary}
+            </div>
+          </div>
           <div className="mt-3">
             <div className="font-semibold text-[#f5f7fb]">Source-linked form candidates</div>
             <div className="mt-1 text-[#9fbdb5]">
