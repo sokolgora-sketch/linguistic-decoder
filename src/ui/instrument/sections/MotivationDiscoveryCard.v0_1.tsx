@@ -595,6 +595,12 @@ export function MotivationDiscoveryCardV0_1({
                 <div className="mt-1 break-words font-mono text-[10px] text-[#7fa69d]">
                   {albanianLexicalReading.primarySourceFact.sourceRecordId} · {albanianLexicalReading.primarySourceFact.entryLocator}
                 </div>
+                {albanianLexicalReading.primarySourceFact.etymologyText ? (
+                  <div data-testid="albanian-reading-source-etymology" className="mt-2 break-words text-[#b6d0c8]">
+                    <span className="font-semibold text-[#f5f7fb]">Source-authored etymology (attributed):</span>{" "}
+                    {albanianLexicalReading.primarySourceFact.etymologyText}
+                  </div>
+                ) : null}
               </div>
               <div className="rounded border border-[#28443f] bg-[#0c1514] p-2">
                 <div className="font-semibold text-[#f5f7fb]">Computed source structure</div>
@@ -623,6 +629,7 @@ export function MotivationDiscoveryCardV0_1({
                 >
                   <span className="font-mono">{related.form}</span>
                   {related.meaningGlosses.length ? ` · ${related.meaningGlosses.join("; ")}` : " · source link unresolved"}
+                  {related.etymologyText ? ` · source-authored etymology (attributed): ${related.etymologyText}` : ""}
                 </span>
               ))}
             </div>
@@ -665,7 +672,15 @@ export function MotivationDiscoveryCardV0_1({
                 {albanianLexicalReading.composition.interpretation.claimBoundary}
               </div>
             </div>
-          ) : null}
+          ) : (
+            <div
+              data-testid="albanian-reading-composition-null"
+              className="mt-3 rounded border border-[#4d6070] bg-[#111a21] p-2 text-xs text-[#b9ced8]"
+            >
+              <span className="font-semibold text-[#f5f7fb]">Computed composition:</span>{" "}
+              Null — no directionally meaningful structured source relation is verified. Source-authored text remains attributed evidence only; pronunciation and Voice structure remain separate observations.
+            </div>
+          )}
         </div>
       ) : null}
 

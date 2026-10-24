@@ -1030,6 +1030,7 @@ function parseMotivationDiscoveryV0_1(
       typeof primary.entryLocator === "string" &&
       typeof primary.form === "string" &&
       (primary.partOfSpeech === null || typeof primary.partOfSpeech === "string") &&
+      (primary.etymologyText === null || typeof primary.etymologyText === "string") &&
       isStringArray(primary.meaningGlosses)
     );
     const validPronunciation = pronunciation === null || (
@@ -1050,6 +1051,7 @@ function parseMotivationDiscoveryV0_1(
       (relation.resolution === "RESOLVED" || relation.resolution === "UNRESOLVED") &&
       (relation.sourceRecordId === null || typeof relation.sourceRecordId === "string") &&
       (relation.partOfSpeech === null || typeof relation.partOfSpeech === "string") &&
+      (relation.etymologyText === null || typeof relation.etymologyText === "string") &&
       isStringArray(relation.meaningGlosses)
     );
     const validCompositionStructure = (structure: unknown): boolean => {

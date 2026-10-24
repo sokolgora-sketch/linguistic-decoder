@@ -109,12 +109,16 @@ describe("analyze-v1 Albanian lexical reading reachability", () => {
     expect(result.body.motivationDiscoveryV0_1.exactLexicalSourceStatus.status).toBe("MATCHES_FOUND");
     expect(result.body.motivationDiscoveryV0_1.albanianLexicalReading).toMatchObject({
       status: "SUPPORTED",
-      primarySourceFact: { form: "dritë" },
+      primarySourceFact: { form: "dritë", etymologyText: null },
+      relatedForms: [{
+        form: "dritare",
+        etymologyText: "From dritë (“light”) + -are (“-er”), meaning to let light through or similar.",
+      }],
       interpretation: { status: "EXPLORATORY_ZHEJI_READING" },
       composition: {
-        status: "SUPPORTED",
+        status: "NULL",
         relatedForm: "dritare",
-        interpretation: { status: "EXPLORATORY_ZHEJI_READING" },
+        sourceRelation: { status: "SOURCE_RELATION_NOT_VERIFIED" },
       },
     });
   });

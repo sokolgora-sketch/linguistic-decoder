@@ -206,6 +206,7 @@ describe("real Albanian exact lexical source integration v0.1", () => {
       primarySourceFact: {
         form: "dritë",
         meaningGlosses: ["light", "light (such as a lamp)"],
+        etymologyText: null,
       },
       sourcePronunciation: {
         rawIpa: "/ˈdɾitə/",
@@ -216,28 +217,15 @@ describe("real Albanian exact lexical source integration v0.1", () => {
         form: "dritare",
         resolution: "RESOLVED",
         meaningGlosses: ["window"],
+        etymologyText: "From dritë (“light”) + -are (“-er”), meaning to let light through or similar.",
       }],
       interpretation: { status: "EXPLORATORY_ZHEJI_READING" },
       composition: {
-        status: "SUPPORTED",
+        status: "NULL",
         relatedForm: "dritare",
         sourceRelation: {
-          status: "SOURCE_EXPLICIT_RELATION",
-          sourceRecordId: "kaikki-albanian-jsonl:word=dritare:ordinal=0",
+          status: "SOURCE_RELATION_NOT_VERIFIED",
         },
-        primaryStructure: {
-          rawIpa: "/ˈdɾitə/",
-          voicePath: ["I", "Ë"],
-          prefixConsonants: ["d", "ɾ"],
-          interNucleusConsonants: [["t"]],
-        },
-        relatedStructure: {
-          rawIpa: "/dɾitˈaɾe/",
-          voicePath: ["I", "A", "E"],
-          prefixConsonants: ["d", "ɾ"],
-          interNucleusConsonants: [["t"], ["ɾ"]],
-        },
-        interpretation: { status: "EXPLORATORY_ZHEJI_READING" },
       },
     });
 
@@ -253,8 +241,8 @@ describe("real Albanian exact lexical source integration v0.1", () => {
     if (vm.motivationDiscoveryV0_1?.kind === "present") {
       expect(vm.motivationDiscoveryV0_1.value.albanianLexicalReading?.sourcePronunciation?.voicePath).toEqual(["I", "Ë"]);
       render(createElement(MotivationDiscoveryCardV0_1, { discovery: vm.motivationDiscoveryV0_1 }));
-      expect(screen.getByTestId("albanian-lexical-composition")).toBeInTheDocument();
-      expect(screen.getByTestId("albanian-reading-composition")).toHaveTextContent("source-grounded composition prompt");
+      expect(screen.getByTestId("albanian-reading-related-form")).toHaveTextContent("source-authored etymology (attributed): From dritë");
+      expect(screen.getByTestId("albanian-reading-composition-null")).toHaveTextContent("Null");
     }
   });
 
@@ -368,7 +356,7 @@ describe("real Albanian exact lexical source integration v0.1", () => {
     });
   });
 
-  it("derives composition from source relation evidence rather than a dritë-specific rule", async () => {
+  it("keeps source-authored relation prose attributed without deriving machine composition", async () => {
     const mal = fixtureFact({
       sourceRecordId: "kaikki-albanian-jsonl:word=mal:ordinal=0",
       entryLocator: "jsonl://word/mal/match/0",
@@ -400,22 +388,54 @@ describe("real Albanian exact lexical source integration v0.1", () => {
       heart: buildHeartInstrumentV1("mal"),
       albanianLexicalSourceProvider: provider,
     });
-    expect(result.discovery.albanianLexicalReading?.composition).toMatchObject({
-      status: "SUPPORTED",
-      relatedForm: "malor",
-      sourceRelation: { status: "SOURCE_EXPLICIT_RELATION" },
-      primaryStructure: { voicePath: ["A"] },
-      relatedStructure: { voicePath: ["A", "O"] },
+    expect(result.discovery.albanianLexicalReading?.relatedForms[0]).toMatchObject({
+      form: "malor",
+      etymologyText: "From mal + -or, meaning related to a mountain.",
     });
-    expect(result.discovery.albanianLexicalReading?.composition.interpretation.statement).toContain("malor");
+    expect(result.discovery.albanianLexicalReading?.composition).toMatchObject({
+      status: "NULL",
+      relatedForm: "malor",
+      sourceRelation: { status: "SOURCE_RELATION_NOT_VERIFIED" },
+    });
   });
 
-  it("rejects a primary form found only as a substring of another word", async () => {
-    const result = await discoveryForMalorRelationTextV0_1(
-      "From formal, referring to an unrelated explanatory form.",
-    );
+  it.each([
+    ["substring", "From formal, referring to an unrelated explanatory form."],
+    ["unrelated clause", "From an unrelated root, the explanatory clause mentions mal."],
+    ["missing relation marker", "A formal note mentions mal but does not state a derivation."],
+    ["negated from", "Not from mal."],
+    ["negated derived from", "Not derived from mal."],
+    ["rather than", "From another root rather than mal."],
+    ["unlike", "Unlike mal."],
+    ["not related", "Not related to mal."],
+    ["possibly", "Possibly from mal."],
+    ["perhaps", "Perhaps from mal."],
+    ["may be", "May be from mal."],
+    ["from X not mal", "From X, not mal."],
+    ["not to be confused", "Not to be confused with mal."],
+    ["competing origins", "From mal or another root."],
+  ])("does not promote %s source prose into a machine relation", async (_label, etymologyText) => {
+    const result = await discoveryForMalorRelationTextV0_1(etymologyText);
     expect(result.albanianLexicalReading?.composition).toMatchObject({
       status: "NULL",
+      sourceRelation: { status: "SOURCE_RELATION_NOT_VERIFIED" },
+    });
+  });
+
+  it("keeps a missing related source record Null", async () => {
+    const mal = fixtureFact({
+      form: "mal",
+      relatedForms: [{ form: "malor", relation: "SOURCE_RELATED_FORM", entryLocator: "jsonl://word/malor" }],
+    });
+    const result = await discoveryForFactV0_1(mal);
+    expect(result.albanianLexicalReading?.relatedForms[0]).toMatchObject({
+      form: "malor",
+      resolution: "UNRESOLVED",
+      etymologyText: null,
+    });
+    expect(result.albanianLexicalReading?.composition).toMatchObject({
+      status: "NULL",
+      relatedForm: null,
       sourceRelation: { status: "SOURCE_RELATION_NOT_VERIFIED" },
     });
   });
