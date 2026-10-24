@@ -7,6 +7,10 @@ import type {
   MotivationDiscoveryV0_1VM,
   PresentOrMissing,
 } from "@/ui/telemetry/types";
+import type {
+  AlbanianSourceLinkedComparisonV0_1,
+  AlbanianSourceLinkedRecordV0_1,
+} from "@/shared/openInstrument/motivationEngineDiscoveryServerOnly.v0_1";
 import {
   aggregateMotivationDiscoveryCandidatesV0_1,
   measureMotivationDiscoveryAggregationV0_1,
@@ -15,6 +19,61 @@ import {
 
 function pathText(values: readonly string[]): string {
   return values.length ? values.join(" → ") : "Null";
+}
+
+function sourceLinkedContextTextV0_1(
+  variant: AlbanianSourceLinkedRecordV0_1["pronunciationVariants"][number],
+): string {
+  const context = variant.consonantalContext;
+  if (context.status !== "SUPPORTED") {
+    return `Null (${context.reasonCodes.join(", ") || "no reason recorded"})`;
+  }
+  const inter = context.interNucleusConsonants
+    ?.map((region) => region.join(" ") || "∅")
+    .join(" · ") ?? "Null";
+  return `prefix ${context.prefixConsonants?.join(" ") || "∅"} · inter ${inter} · suffix ${context.suffixConsonants?.join(" ") || "∅"}`;
+}
+
+function sourceLinkedRecordCardV0_1(
+  label: string,
+  record: AlbanianSourceLinkedRecordV0_1,
+) {
+  return (
+    <article className="rounded border border-[#28443f] bg-[#0c1514] p-2">
+      <div className="font-semibold text-[#f5f7fb]">{label}: <span className="font-mono">{record.form}</span></div>
+      <div className="mt-1 text-[#d7dde7]">{record.meaningGlosses.join(" · ") || "No gloss recorded"}</div>
+      <div className="mt-1 break-words text-[10px] text-[#7fa69d]">
+        {record.sourceRecordId} · {record.entryLocator} · ordinal {record.physicalRecordOrdinal}
+      </div>
+      {record.etymologyText ? (
+        <div className="mt-2 break-words text-[#b6d0c8]">
+          <span className="font-semibold text-[#f5f7fb]">Source-authored etymology (attributed):</span>{" "}
+          {record.etymologyText}
+        </div>
+      ) : null}
+      <div className="mt-2 break-words text-[#9fbdb5]">
+        Structured source references: {record.etymologyLinks.length
+          ? record.etymologyLinks.map((link) => `${link.sourceForm} → ${link.reference}`).join(" · ")
+          : "none recorded"}
+      </div>
+      <div className="mt-2 space-y-1 text-[#9fbdb5]">
+        {record.pronunciationVariants.length ? record.pronunciationVariants.map((variant) => (
+          <div key={`${record.sourceRecordId}:${variant.soundIndex}`} className="break-words">
+            <span className="font-mono">sound {variant.soundIndex}: {variant.rawIpa ?? "Null"}</span>{" · "}
+            Voice {pathText(variant.voicePath)} · {sourceLinkedContextTextV0_1(variant)}
+          </div>
+        )) : <div>IPA variants: Null</div>}
+      </div>
+    </article>
+  );
+}
+
+function sourceLinkedComparisonSummaryV0_1(
+  comparison: AlbanianSourceLinkedComparisonV0_1,
+): string {
+  return comparison.status === "SUPPORTED"
+    ? comparison.summary.text
+    : `Null — ${comparison.summary.text} Reason: ${comparison.reasonCodes.join(", ") || "SOURCE_LINK_NOT_VERIFIED"}.`;
 }
 
 function zcText(value: unknown): string {
@@ -613,6 +672,41 @@ export function MotivationDiscoveryCardV0_1({
                   IPA: {albanianLexicalReading.sourcePronunciation?.rawIpa ?? "Null"} · pronunciation authority remains current-source product evidence
                 </div>
               </div>
+            </div>
+          ) : null}
+          {albanianLexicalReading.sourceLinkedComparison ? (
+            <div
+              data-testid="albanian-source-linked-comparison"
+              className="mt-3 rounded border border-[#3f5368] bg-[#111a21] p-3 text-xs leading-5 text-[#d5e8f3]"
+            >
+              <div className="font-semibold uppercase tracking-[0.1em] text-[#b7d7e8]">SOURCE-LINKED WORD COMPARISON</div>
+              <div className="mt-1 text-[#a9c3d0]">
+                Source relation: {albanianLexicalReading.sourceLinkedComparison.relation.relatedForm}{" "}
+                · {albanianLexicalReading.sourceLinkedComparison.relation.direction}
+              </div>
+              <div className="mt-1 break-words text-[#a9c3d0]">
+                Structured source reference: {albanianLexicalReading.sourceLinkedComparison.relation.referencedForm ?? "Null"}{" "}
+                → {albanianLexicalReading.sourceLinkedComparison.relation.reference ?? "Null"}
+              </div>
+              {albanianLexicalReading.sourceLinkedComparison.status === "SUPPORTED" && albanianLexicalReading.sourceLinkedComparison.related ? (
+                <>
+                  <div className="mt-3 grid gap-2 sm:grid-cols-2">
+                    {sourceLinkedRecordCardV0_1("Primary source record", albanianLexicalReading.sourceLinkedComparison.primary)}
+                    {sourceLinkedRecordCardV0_1("Linked source record", albanianLexicalReading.sourceLinkedComparison.related)}
+                  </div>
+                  <div className="mt-3 rounded border border-[#355a72] bg-[#0d151c] p-2">
+                    <div className="font-semibold text-[#f5f7fb]">Engine comparison</div>
+                    <div className="mt-1 text-sm text-[#e1f2ed]">{albanianLexicalReading.sourceLinkedComparison.summary.text}</div>
+                    <div className="mt-1 break-words text-[#a9c3d0]">
+                      Voice relation: {albanianLexicalReading.sourceLinkedComparison.summary.voicePathRelationship}{" "}
+                      · consonantal relation: {albanianLexicalReading.sourceLinkedComparison.summary.consonantalContextRelationship}
+                    </div>
+                  </div>
+                </>
+              ) : (
+                <div className="mt-2 text-[#d5c28f]">{sourceLinkedComparisonSummaryV0_1(albanianLexicalReading.sourceLinkedComparison)}</div>
+              )}
+              <div className="mt-2 text-[10px] text-[#91aebb]">{albanianLexicalReading.sourceLinkedComparison.claimBoundary}</div>
             </div>
           ) : null}
           <div className="mt-3">

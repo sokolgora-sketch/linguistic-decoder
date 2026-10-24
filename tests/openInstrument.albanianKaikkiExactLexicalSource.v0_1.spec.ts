@@ -103,6 +103,13 @@ type SyntheticSourceRecordV0_1 = Readonly<{
   pos: string;
   senses: readonly Readonly<{ id: string; glosses: readonly string[] }>[];
   sounds: readonly Readonly<{ ipa: string; tags: readonly string[] }>[];
+  etymology_text?: string;
+  etymology_links?: readonly (readonly [string, string])[];
+  etymology_templates?: readonly Readonly<{
+    name: string;
+    args: Readonly<Record<string, string>>;
+    expansion: string;
+  }>[];
 }>;
 
 async function withSyntheticSourceFileV0_1(
@@ -188,6 +195,12 @@ describe("real Albanian exact lexical source integration v0.1", () => {
       senses: [{ senseId: "dritare-window", glosses: ["window"] }],
       ipaObservations: [{ soundIndex: 0, ipa: "/dɾitˈaɾe/", tags: [] }],
       etymologyText: "From dritë (“light”) + -are (“-er”), meaning to let light through or similar.",
+      etymologyLinks: [{ sourceForm: "dritë", reference: "dritë#Albanian" }],
+      etymologyTemplates: [{
+        name: "der",
+        args: { "1": "sq", "2": "dritë" },
+        expansion: "dritë",
+      }],
     });
     const provider = createAlbanianKaikkiServerOnlyExactLexicalSourceProviderForSyntheticFixtureV0_1({
       facts: [drite, dritare],
@@ -227,6 +240,31 @@ describe("real Albanian exact lexical source integration v0.1", () => {
           status: "SOURCE_RELATION_NOT_VERIFIED",
         },
       },
+      sourceLinkedComparison: {
+        status: "SUPPORTED",
+        relation: {
+          relatedForm: "dritare",
+          referencedForm: "dritë",
+          reference: "dritë#Albanian",
+        },
+        primary: {
+          form: "dritë",
+          sourceRecordId: "kaikki-albanian-jsonl:word=drit%C3%AB:ordinal=0",
+          pronunciationVariants: [{
+            rawIpa: "/ˈdɾitə/",
+            voicePath: ["I", "Ë"],
+            status: "SUPPORTED",
+          }],
+        },
+        related: {
+          form: "dritare",
+          etymologyLinks: [{ sourceForm: "dritë", reference: "dritë#Albanian" }],
+          etymologyTemplates: [{ name: "der" }],
+        },
+        summary: {
+          voicePathRelationship: "SHARED_INITIAL_VOICE_DIFFERENT_LATER_PATH",
+        },
+      },
     });
 
     const vm = adaptAnalysisToTelemetryVM({
@@ -242,6 +280,8 @@ describe("real Albanian exact lexical source integration v0.1", () => {
       expect(vm.motivationDiscoveryV0_1.value.albanianLexicalReading?.sourcePronunciation?.voicePath).toEqual(["I", "Ë"]);
       render(createElement(MotivationDiscoveryCardV0_1, { discovery: vm.motivationDiscoveryV0_1 }));
       expect(screen.getByTestId("albanian-reading-related-form")).toHaveTextContent("source-authored etymology (attributed): From dritë");
+      expect(screen.getByTestId("albanian-source-linked-comparison")).toHaveTextContent("dritë#Albanian");
+      expect(screen.getByTestId("albanian-source-linked-comparison")).toHaveTextContent("SHARED_INITIAL_VOICE_DIFFERENT_LATER_PATH");
       expect(screen.getByTestId("albanian-reading-composition-null")).toHaveTextContent("Null");
     }
   });
@@ -420,6 +460,24 @@ describe("real Albanian exact lexical source integration v0.1", () => {
       status: "NULL",
       sourceRelation: { status: "SOURCE_RELATION_NOT_VERIFIED" },
     });
+    expect(result.albanianLexicalReading?.sourceLinkedComparison).toMatchObject({
+      status: "NULL",
+      reasonCodes: ["SOURCE_FORM_REFERENCE_NOT_PRESENT"],
+    });
+  });
+
+  it("keeps a missing source-linked record and unsupported IPA comparison Null", async () => {
+    const primary = fixtureFact({
+      form: "mal",
+      relatedForms: [{ form: "malor", relation: "SOURCE_RELATED_FORM", entryLocator: "jsonl://word/malor" }],
+      ipaObservations: [{ soundIndex: 0, ipa: "/ˈmal/", tags: [] }],
+    });
+    const result = await discoveryForFactV0_1(primary);
+    expect(result.albanianLexicalReading?.sourceLinkedComparison).toMatchObject({
+      status: "NULL",
+      reasonCodes: ["SOURCE_LINK_UNRESOLVED"],
+      related: null,
+    });
   });
 
   it("keeps a missing related source record Null", async () => {
@@ -557,6 +615,36 @@ describe("real Albanian exact lexical source integration v0.1", () => {
           bytes: 67438537,
         },
       }],
+    });
+  });
+
+  it("preserves structured source-authored etymology references without promoting them", async () => {
+    await withSyntheticSourceFileV0_1([{
+      word: "dritare",
+      lang_code: "sq",
+      pos: "noun",
+      senses: [{ id: "dritare-1", glosses: ["window"] }],
+      sounds: [{ ipa: "/dɾiˈtaɾɛ/", tags: [] }],
+      etymology_text: "From dritë + -are.",
+      etymology_links: [["dritë", "dritë#Albanian"]],
+      etymology_templates: [{
+        name: "inh",
+        args: { "1": "sq", "2": "sqj-pro", "3": "*dritā" },
+        expansion: "Proto-Albanian *dritā",
+      }],
+    }], async ({ provider }) => {
+      await expect(provider.query("dritare")).resolves.toMatchObject({
+        status: "MATCHES_FOUND",
+        facts: [{
+          etymologyText: "From dritë + -are.",
+          etymologyLinks: [{ sourceForm: "dritë", reference: "dritë#Albanian" }],
+          etymologyTemplates: [{
+            name: "inh",
+            args: { "3": "*dritā" },
+            expansion: "Proto-Albanian *dritā",
+          }],
+        }],
+      });
     });
   });
 

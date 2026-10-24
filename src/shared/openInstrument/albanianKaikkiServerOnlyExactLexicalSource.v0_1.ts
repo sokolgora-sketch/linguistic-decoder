@@ -33,6 +33,17 @@ export type AlbanianKaikkiExactLexicalSourceRelatedFormV0_1 = Readonly<{
   entryLocator: string;
 }>;
 
+export type AlbanianKaikkiExactLexicalSourceEtymologyLinkV0_1 = Readonly<{
+  sourceForm: string;
+  reference: string;
+}>;
+
+export type AlbanianKaikkiExactLexicalSourceEtymologyTemplateV0_1 = Readonly<{
+  name: string;
+  args: Readonly<Record<string, string>>;
+  expansion: string;
+}>;
+
 export type AlbanianKaikkiExactLexicalSourceFactV0_1 = Readonly<{
   sourceRecordId: string;
   entryLocator: string;
@@ -45,6 +56,9 @@ export type AlbanianKaikkiExactLexicalSourceFactV0_1 = Readonly<{
   ipaObservations: readonly AlbanianKaikkiExactLexicalSourceIpaObservationV0_1[];
   /** Source-authored etymology text; descriptive evidence, not a derived claim. */
   etymologyText?: string | null;
+  /** Source-authored structured references; descriptive evidence, not a derived claim. */
+  etymologyLinks?: readonly AlbanianKaikkiExactLexicalSourceEtymologyLinkV0_1[];
+  etymologyTemplates?: readonly AlbanianKaikkiExactLexicalSourceEtymologyTemplateV0_1[];
   relatedForms?: readonly AlbanianKaikkiExactLexicalSourceRelatedFormV0_1[];
   sourceStatus: "observed_external_snapshot";
   attestationTruth: "fact";
@@ -187,6 +201,15 @@ function stringArrayV0_1(value: unknown): readonly string[] {
     : Object.freeze([]);
 }
 
+function stringRecordV0_1(value: unknown): Readonly<Record<string, string>> {
+  if (!isRecordV0_1(value)) return Object.freeze({});
+  const entries = Object.entries(value).flatMap(([key, item]) => {
+    const text = textV0_1(item);
+    return text === null ? [] : [[key, text] as const];
+  });
+  return Object.freeze(Object.fromEntries(entries));
+}
+
 function projectSenseV0_1(value: unknown): AlbanianKaikkiExactLexicalSourceSenseV0_1 {
   const sense = isRecordV0_1(value) ? value : {};
   return Object.freeze({
@@ -223,6 +246,23 @@ function sourceFactV0_1(
     ? Object.freeze(record.sounds.map(projectSoundV0_1))
     : Object.freeze([]);
   const etymologyText = textV0_1(record.etymology_text);
+  const etymologyLinks = Array.isArray(record.etymology_links)
+    ? Object.freeze(record.etymology_links.flatMap((value) => {
+        if (!Array.isArray(value) || value.length < 2) return [];
+        const sourceForm = textV0_1(value[0]);
+        const reference = textV0_1(value[1]);
+        return sourceForm && reference ? [{ sourceForm, reference }] : [];
+      }))
+    : undefined;
+  const etymologyTemplates = Array.isArray(record.etymology_templates)
+    ? Object.freeze(record.etymology_templates.flatMap((value) => {
+        if (!isRecordV0_1(value)) return [];
+        const name = textV0_1(value.name);
+        const expansion = textV0_1(value.expansion) ?? "";
+        if (!name) return [];
+        return [{ name, args: stringRecordV0_1(value.args), expansion }];
+      }))
+    : undefined;
   const relatedForms = Array.isArray(record.related)
     ? Object.freeze(record.related.flatMap((value) => {
         const relatedRecord = isRecordV0_1(value) ? value : null;
@@ -249,6 +289,8 @@ function sourceFactV0_1(
     senses,
     ipaObservations,
     etymologyText,
+    ...(etymologyLinks ? { etymologyLinks } : {}),
+    ...(etymologyTemplates ? { etymologyTemplates } : {}),
     ...(relatedForms ? { relatedForms } : {}),
     sourceStatus: "observed_external_snapshot",
     attestationTruth: "fact",

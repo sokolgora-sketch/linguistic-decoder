@@ -927,6 +927,22 @@ function parseMotivationDiscoveryV0_1(
         isStringArray(observation.tags)
       ) &&
       (fact.etymologyText === undefined || fact.etymologyText === null || typeof fact.etymologyText === "string") &&
+      (fact.etymologyLinks === undefined || (
+        Array.isArray(fact.etymologyLinks) && fact.etymologyLinks.every((link) =>
+          isRecord(link) &&
+          typeof link.sourceForm === "string" &&
+          typeof link.reference === "string"
+        )
+      )) &&
+      (fact.etymologyTemplates === undefined || (
+        Array.isArray(fact.etymologyTemplates) && fact.etymologyTemplates.every((template) =>
+          isRecord(template) &&
+          typeof template.name === "string" &&
+          isRecord(template.args) &&
+          Object.values(template.args).every((value) => typeof value === "string") &&
+          typeof template.expansion === "string"
+        )
+      )) &&
       (fact.relatedForms === undefined || (
         Array.isArray(fact.relatedForms) && fact.relatedForms.every((relation) =>
           isRecord(relation) &&
@@ -1089,8 +1105,86 @@ function parseMotivationDiscoveryV0_1(
       isStringArray(composition.interpretation.alternatives) &&
       isStringArray(composition.interpretation.basis) &&
       typeof composition.interpretation.claimBoundary === "string";
+    const validSourceLinkedPronunciation = (variant: unknown): boolean => {
+      if (!isRecord(variant) || !isRecord(variant.consonantalContext)) return false;
+      const context = variant.consonantalContext;
+      const validStringArrayOrNull = (value: unknown): boolean =>
+        value === null || isStringArray(value);
+      return typeof variant.soundIndex === "number" &&
+        Number.isInteger(variant.soundIndex) &&
+        variant.soundIndex >= 0 &&
+        (variant.rawIpa === null || typeof variant.rawIpa === "string") &&
+        isStringArray(variant.tags) &&
+        (variant.status === "SUPPORTED" || variant.status === "NULL") &&
+        isStringArray(variant.voicePath) &&
+        isStringArray(variant.reasonCodes) &&
+        (context.status === "SUPPORTED" || context.status === "NULL") &&
+        typeof context.authorityBoundary === "string" &&
+        validStringArrayOrNull(context.prefixConsonants) &&
+        (context.interNucleusConsonants === null || (
+          Array.isArray(context.interNucleusConsonants) &&
+          context.interNucleusConsonants.every(isStringArray)
+        )) &&
+        validStringArrayOrNull(context.suffixConsonants) &&
+        (context.structuralSignature === null || typeof context.structuralSignature === "string") &&
+        isStringArray(context.reasonCodes);
+    };
+    const validSourceLinkedRecord = (record: unknown): boolean => {
+      if (!isRecord(record) || !Array.isArray(record.etymologyLinks) || !Array.isArray(record.etymologyTemplates) || !Array.isArray(record.pronunciationVariants)) {
+        return false;
+      }
+      return typeof record.sourceRecordId === "string" &&
+        typeof record.entryLocator === "string" &&
+        typeof record.physicalRecordOrdinal === "number" &&
+        Number.isInteger(record.physicalRecordOrdinal) &&
+        record.physicalRecordOrdinal >= 0 &&
+        typeof record.form === "string" &&
+        (record.partOfSpeech === null || typeof record.partOfSpeech === "string") &&
+        isStringArray(record.meaningGlosses) &&
+        (record.etymologyText === null || typeof record.etymologyText === "string") &&
+        record.etymologyLinks.every((link) =>
+          isRecord(link) && typeof link.sourceForm === "string" && typeof link.reference === "string",
+        ) &&
+        record.etymologyTemplates.every((template) =>
+          isRecord(template) &&
+          typeof template.name === "string" &&
+          isRecord(template.args) &&
+          Object.values(template.args).every((value) => typeof value === "string") &&
+          typeof template.expansion === "string",
+        ) &&
+        record.pronunciationVariants.every(validSourceLinkedPronunciation);
+    };
+    const sourceLinkedComparison = reading.sourceLinkedComparison;
+    const validSourceLinkedComparison = sourceLinkedComparison === undefined || sourceLinkedComparison === null || (
+      isRecord(sourceLinkedComparison) &&
+      (sourceLinkedComparison.status === "SUPPORTED" || sourceLinkedComparison.status === "NULL") &&
+      isStringArray(sourceLinkedComparison.reasonCodes) &&
+      isRecord(sourceLinkedComparison.relation) &&
+      sourceLinkedComparison.relation.relation === "SOURCE_RELATED_FORM" &&
+      typeof sourceLinkedComparison.relation.primarySourceRecordId === "string" &&
+      typeof sourceLinkedComparison.relation.primaryEntryLocator === "string" &&
+      typeof sourceLinkedComparison.relation.relatedForm === "string" &&
+      (sourceLinkedComparison.relation.relatedSourceRecordId === null || typeof sourceLinkedComparison.relation.relatedSourceRecordId === "string") &&
+      typeof sourceLinkedComparison.relation.relatedEntryLocator === "string" &&
+      sourceLinkedComparison.relation.direction === "RELATED_FORM_TO_PRIMARY_ETYMLOGY_REFERENCE" &&
+      (sourceLinkedComparison.relation.referencedForm === null || typeof sourceLinkedComparison.relation.referencedForm === "string") &&
+      (sourceLinkedComparison.relation.reference === null || typeof sourceLinkedComparison.relation.reference === "string") &&
+      validSourceLinkedRecord(sourceLinkedComparison.primary) &&
+      (sourceLinkedComparison.related === null || validSourceLinkedRecord(sourceLinkedComparison.related)) &&
+      isRecord(sourceLinkedComparison.summary) &&
+      (sourceLinkedComparison.summary.voicePathRelationship === "EXACT_SUPPORTED_PATH_SET_MATCH" ||
+        sourceLinkedComparison.summary.voicePathRelationship === "SHARED_INITIAL_VOICE_DIFFERENT_LATER_PATH" ||
+        sourceLinkedComparison.summary.voicePathRelationship === "DIFFERENT_SUPPORTED_VOICE_PATHS" ||
+        sourceLinkedComparison.summary.voicePathRelationship === "UNKNOWN") &&
+      (sourceLinkedComparison.summary.consonantalContextRelationship === "EXACT_SUPPORTED_CONTEXT_SET_MATCH" ||
+        sourceLinkedComparison.summary.consonantalContextRelationship === "DIFFERENT_SUPPORTED_CONTEXTS" ||
+        sourceLinkedComparison.summary.consonantalContextRelationship === "UNKNOWN") &&
+      typeof sourceLinkedComparison.summary.text === "string" &&
+      typeof sourceLinkedComparison.claimBoundary === "string"
+    );
     return validPrimary && validPronunciation && validRelated &&
       validComposition &&
+      validSourceLinkedComparison &&
       (reading.interpretation.status === "EXPLORATORY_ZHEJI_READING" || reading.interpretation.status === "UNKNOWN_OR_NULL") &&
       (reading.interpretation.statement === null || typeof reading.interpretation.statement === "string") &&
       isStringArray(reading.interpretation.alternatives) &&
