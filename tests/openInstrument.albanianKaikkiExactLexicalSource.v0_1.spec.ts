@@ -1513,6 +1513,42 @@ describe("real Albanian exact lexical source integration v0.1", () => {
     });
     expect(reading?.relation.relation).not.toBe("SOURCE_EXPLICIT_TWO_COMPONENT_COMPOUND");
     expect(discovery.albanianLexicalReading?.composition.status).toBe("NULL");
+
+    const vm = adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: discovery });
+    expect(vm.motivationDiscoveryV0_1).toMatchObject({ kind: "present" });
+    if (vm.motivationDiscoveryV0_1?.kind === "present") {
+      expect(vm.motivationDiscoveryV0_1.value.albanianLexicalReading?.sourceLinkedComponentReading).toMatchObject({
+        status: "NULL",
+        reasonCodes: expect.arrayContaining(["SOURCE_COMPOUND_ARITY_UNSUPPORTED"]),
+        relation: { relation: "SOURCE_COMPOUND_ARITY_UNSUPPORTED" },
+      });
+      render(createElement(MotivationDiscoveryCardV0_1, { discovery: vm.motivationDiscoveryV0_1 }));
+      const card = screen.getByTestId("albanian-source-linked-component-reading");
+      expect(card).toHaveTextContent("Null — SOURCE_COMPOUND_ARITY_UNSUPPORTED.");
+      expect(card).toHaveTextContent("alpha → alpha#Albanian");
+      expect(card).toHaveTextContent("beta → beta#Albanian");
+      expect(card).toHaveTextContent("gamma → gamma#Albanian");
+      expect(screen.getByTestId("albanian-reading-composition-null")).toHaveTextContent("Null");
+    }
+
+    const cloneDiscovery = () => JSON.parse(JSON.stringify(discovery)) as Record<string, unknown>;
+    const malformedSupported = cloneDiscovery();
+    const malformedSupportedReading = (malformedSupported.albanianLexicalReading as Record<string, unknown>)
+      .sourceLinkedComponentReading as Record<string, unknown>;
+    malformedSupportedReading.status = "SUPPORTED";
+    expect(adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: malformedSupported }).motivationDiscoveryV0_1).toMatchObject({
+      kind: "missing",
+      missing: "malformed",
+    });
+
+    const malformedRelation = cloneDiscovery();
+    const malformedRelationReading = (malformedRelation.albanianLexicalReading as Record<string, unknown>)
+      .sourceLinkedComponentReading as Record<string, unknown>;
+    (malformedRelationReading.relation as Record<string, unknown>).relation = "SOURCE_EXPLICIT_TWO_COMPONENT_COMPOUND";
+    expect(adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: malformedRelation }).motivationDiscoveryV0_1).toMatchObject({
+      kind: "missing",
+      missing: "malformed",
+    });
   });
 
   it.each([

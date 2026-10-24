@@ -1165,11 +1165,41 @@ function parseMotivationDiscoveryV0_1(
     };
     const sourceLinkedComponentReading = reading.sourceLinkedComponentReading;
     const validSourceLinkedComponentReading = sourceLinkedComponentReading === undefined || sourceLinkedComponentReading === null || (() => {
+      const validRelationStatusCombination = (() => {
+        if (!isRecord(sourceLinkedComponentReading) ||
+          !isStringArray(sourceLinkedComponentReading.reasonCodes) ||
+          !isRecord(sourceLinkedComponentReading.relation) ||
+          !Array.isArray(sourceLinkedComponentReading.relation.references) ||
+          !Array.isArray(sourceLinkedComponentReading.components)) {
+          return false;
+        }
+        const relation = sourceLinkedComponentReading.relation.relation;
+        const reasonCodes = sourceLinkedComponentReading.reasonCodes;
+        const referenceCount = sourceLinkedComponentReading.relation.references.length;
+        const componentCount = sourceLinkedComponentReading.components.length;
+        if (sourceLinkedComponentReading.status === "SUPPORTED") {
+          return relation === "SOURCE_EXPLICIT_TWO_COMPONENT_COMPOUND" &&
+            reasonCodes.length === 0 &&
+            referenceCount === 2 &&
+            componentCount === 2;
+        }
+        if (sourceLinkedComponentReading.status !== "NULL") return false;
+        if (relation === "SOURCE_EXPLICIT_TWO_COMPONENT_COMPOUND") {
+          return !reasonCodes.includes("SOURCE_COMPOUND_ARITY_UNSUPPORTED") &&
+            reasonCodes.length > 0 &&
+            referenceCount === 2 &&
+            componentCount <= referenceCount;
+        }
+        return relation === "SOURCE_COMPOUND_ARITY_UNSUPPORTED" &&
+          reasonCodes.includes("SOURCE_COMPOUND_ARITY_UNSUPPORTED") &&
+          referenceCount > 2 &&
+          componentCount <= referenceCount;
+      })();
       if (!isRecord(sourceLinkedComponentReading) ||
         (sourceLinkedComponentReading.status !== "SUPPORTED" && sourceLinkedComponentReading.status !== "NULL") ||
         !isStringArray(sourceLinkedComponentReading.reasonCodes) ||
         !isRecord(sourceLinkedComponentReading.relation) ||
-        sourceLinkedComponentReading.relation.relation !== "SOURCE_EXPLICIT_TWO_COMPONENT_COMPOUND" ||
+        !validRelationStatusCombination ||
         typeof sourceLinkedComponentReading.relation.primarySourceRecordId !== "string" ||
         typeof sourceLinkedComponentReading.relation.primaryEntryLocator !== "string" ||
         (sourceLinkedComponentReading.relation.sourceAuthoredExplanation !== null &&
