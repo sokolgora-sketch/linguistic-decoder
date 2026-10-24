@@ -524,7 +524,9 @@ function normalizedAlbanianFormV0_1(value: string): string {
 }
 
 function distinctGlossesV0_1(
-  facts: readonly AlbanianKaikkiExactLexicalSourceFactV0_1[],
+  facts: readonly Readonly<{
+    senses: readonly Readonly<{ glosses: readonly string[] }>[];
+  }>[],
 ): readonly string[] {
   return Object.freeze([...new Set(
     facts.flatMap((fact) => fact.senses.flatMap((sense) => sense.glosses)),
@@ -801,7 +803,7 @@ async function buildSourceLinkedComponentReadingV0_1(input: Readonly<{
       alternatives: Object.freeze([
         "The source-authored compound account may be descriptive or historically contestable.",
         "The available records do not establish a universal sound-to-meaning rule.",
-        "The absent IPA for one or more records leaves phonetic comparison unresolved.",
+        "Component phonetic and Voice comparison is not performed in this reading.",
       ]),
       claimBoundary: "Exploratory product relationship only; source-authored etymology remains attributed and no morphology, causation, or Voice semantics is asserted.",
     }),
@@ -996,7 +998,7 @@ function buildSourceLinkedComparisonV0_1(input: Readonly<{
 }
 
 function hasConservativePrimaryIlluminationEvidenceV0_1(
-  fact: AlbanianKaikkiExactLexicalSourceFactV0_1,
+  fact: Readonly<{ senses: readonly Readonly<{ glosses: readonly string[] }>[] }>,
 ): boolean {
   const glosses = distinctGlossesV0_1([fact]);
   const illuminationGlossCount = glosses.filter((gloss) =>
@@ -1139,6 +1141,43 @@ function hasMeaningEvidenceV0_1(glosses: readonly string[]): boolean {
   return glosses.some((gloss) => gloss.trim().length > 0);
 }
 
+function buildDirectionalFunctionalHypothesisV0_1(input: Readonly<{
+  primary: AlbanianSourceLinkedRecordV0_1;
+  related: AlbanianSourceLinkedRecordV0_1;
+}>): Readonly<{
+  statement: string;
+  basis: readonly string[];
+}> | null {
+  const primaryMeaning = input.primary.meaningGlosses.join("; ");
+  const relatedMeaning = input.related.meaningGlosses.join("; ");
+  const sourceExplanation = input.related.etymologyText?.trim() ?? "";
+  const relatedMeaningText = relatedMeaning.toLocaleLowerCase("en-US");
+  const sourceExplanationText = sourceExplanation.toLocaleLowerCase("en-US");
+  const primaryHasIlluminationMeaning = hasConservativePrimaryIlluminationEvidenceV0_1({
+    senses: input.primary.meaningGlosses.length > 0
+      ? [{ glosses: input.primary.meaningGlosses }]
+      : [],
+  });
+  const relatedHasOpeningMeaning = /\b(?:window|opening|access)\b/iu.test(relatedMeaningText);
+  const negatesTransmission = /\b(?:does\s+not|do\s+not|did\s+not|doesn't|don't|didn't|never|cannot|can't|won't|not)\s+(?:\w+\s+){0,2}(?:let|lets|allow|allows|permit|permits|enable|enables|admit|admits)\b/iu.test(sourceExplanationText);
+  const sourceDescribesAffirmativeTransmission =
+    !negatesTransmission && /\b(?:let|lets|allow|allows|permit|permits|enable|enables|admit|admits)\s+(?:the\s+)?(?:light|daylight|illumination)\s+(?:through|to\s+(?:enter|pass)|enter|pass)\b/iu.test(sourceExplanationText);
+
+  if (!primaryHasIlluminationMeaning || !relatedHasOpeningMeaning || !sourceDescribesAffirmativeTransmission) {
+    return null;
+  }
+
+  return Object.freeze({
+    statement: `Directional functional interpretation (exploratory): the source relates ${input.primary.form} (“${primaryMeaning}”) to ${input.related.form} (“${relatedMeaning}”). Its source-authored explanation mentions letting light through, while the related meanings include a window, opening, or access function. The engine therefore models ${input.primary.form} as an enabling input and ${input.related.form} as a structure that lets that input enter or provides access. This is a falsifiable use-oriented model, not proof of morphology, etymology, causation, or Voice semantics.`,
+    basis: Object.freeze([
+      "SOURCE_ATTESTED_PRIMARY_MEANING",
+      "SOURCE_ATTESTED_RELATED_MEANING",
+      "SOURCE_AUTHORED_TRANSMISSION_EXPLANATION",
+      "SOURCE_DERIVED_PRONUNCIATION_STRUCTURE",
+    ]),
+  });
+}
+
 export function buildAlbanianFunctionalMeaningBridgeV0_1(input: Readonly<{
   primary: AlbanianSourceLinkedRecordV0_1;
   comparison: AlbanianSourceLinkedComparisonV0_1 | null;
@@ -1172,9 +1211,21 @@ export function buildAlbanianFunctionalMeaningBridgeV0_1(input: Readonly<{
     });
   }
 
-  const primaryMeaning = input.primary.meaningGlosses.join("; ");
-  const relatedMeaning = related?.meaningGlosses.join("; ") ?? "Null";
-  const sourceExplanation = related?.etymologyText ?? "Null";
+  const directionalHypothesis = related
+    ? buildDirectionalFunctionalHypothesisV0_1({
+        primary: input.comparison?.primary ?? input.primary,
+        related,
+      })
+    : null;
+  if (!directionalHypothesis) {
+    return nullFunctionalMeaningBridgeV0_1({
+      relatedForm: related?.form ?? input.comparison?.relation.relatedForm ?? null,
+      sourceFacts,
+      derivedStructure,
+      reasonCodes: ["FUNCTIONAL_OPERATION_NOT_SUPPORTED"],
+    });
+  }
+
   return Object.freeze({
     status: "SUPPORTED",
     truthLayers: Object.freeze([
@@ -1187,19 +1238,13 @@ export function buildAlbanianFunctionalMeaningBridgeV0_1(input: Readonly<{
     derivedStructure,
     functionalHypothesis: Object.freeze({
       status: "EXPLORATORY_FUNCTIONAL_HYPOTHESIS" as const,
-      statement: `Source-attributed functional prompt: the entry for ${related?.form ?? "the linked form"} describes its relation to ${input.primary.form} as: “${sourceExplanation}” This invites exploration of how the source-attested meanings “${primaryMeaning}” and “${relatedMeaning}” relate in use. The engine does not add a semantic operation or assert morphology, historical derivation, causation, or Voice semantics.`,
+      statement: directionalHypothesis.statement,
       alternatives: Object.freeze([
         "The source-authored explanation may be approximate, contested, or ordinary lexical description rather than a demonstrated derivation.",
+        "The opening or access sense may be figurative or context-specific rather than a physical transmission function.",
         "The computed Voice paths and consonantal contexts are phonological observations and may have no semantic force.",
-        "A meaningful functional relation may remain unsupported even when the source records both forms.",
       ]),
-      basis: Object.freeze([
-        "SOURCE_ATTESTED_PRIMARY_MEANING",
-        "SOURCE_ATTESTED_RELATED_MEANING",
-        "SOURCE_AUTHORED_RELATION_EXPLANATION",
-        "SOURCE_DERIVED_VOICE_PATHS",
-        "SOURCE_DERIVED_CONSONANTAL_CONTEXTS",
-      ]),
+      basis: directionalHypothesis.basis,
       claimBoundary: "Exploratory product interpretation only; source-authored explanation remains attributed evidence and is not engine-proven morphology, etymology, causation, or universal Voice meaning.",
     }),
     reasonCodes: Object.freeze([]),
