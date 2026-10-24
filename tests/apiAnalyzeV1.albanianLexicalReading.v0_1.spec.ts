@@ -44,6 +44,7 @@ jest.mock("@/shared/openInstrument/motivationEngineDiscoveryServerOnly.v0_1", ()
     senses: [{ senseId: "dritare-window", glosses: ["window", "access to knowledge"] }],
     ipaObservations: [{ soundIndex: 0, ipa: "/dɾiˈtaɾɛ/", tags: [] }],
     etymologyText: "From dritë (“light”) + -are (“-er”), meaning to let light through or similar.",
+    etymologyLinks: [{ sourceForm: "dritë", reference: "dritë#Albanian" }],
     sourceStatus: "observed_external_snapshot",
     attestationTruth: "fact",
     pronunciationAuthority: "CURRENT_KAIKKI_RECORD_ONLY_UNBOUND_TO_FROZEN_PROFILE",
@@ -114,6 +115,19 @@ describe("analyze-v1 Albanian lexical reading reachability", () => {
         form: "dritare",
         etymologyText: "From dritë (“light”) + -are (“-er”), meaning to let light through or similar.",
       }],
+      sourceLinkedComparison: {
+        status: "SUPPORTED",
+        relation: {
+          referencedForm: "dritë",
+          reference: "dritë#Albanian",
+        },
+      },
+      functionalMeaningBridge: {
+        status: "SUPPORTED",
+        truthLayers: ["SOURCE_FACT", "DERIVED_STRUCTURE", "EXPLORATORY_FUNCTIONAL_HYPOTHESIS"],
+        relatedForm: "dritare",
+        functionalHypothesis: { status: "EXPLORATORY_FUNCTIONAL_HYPOTHESIS" },
+      },
       interpretation: { status: "EXPLORATORY_ZHEJI_READING" },
       composition: {
         status: "NULL",
