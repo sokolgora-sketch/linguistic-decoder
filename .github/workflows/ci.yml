@@ -49,9 +49,6 @@ jobs:
       - name: Lint
         run: npm run lint
 
-      - name: Test
-        run: npm test --silent
-
       - name: Integration
         run: npm run test:integration
 
@@ -59,6 +56,31 @@ jobs:
         env:
           NEXT_TELEMETRY_DISABLED: "1"
         run: npm run build
+
+  unit_tests:
+    name: unit-tests-${{ matrix.shard }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3, 4]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      - name: Test unit shard
+        run: npm test -- --ci --silent --maxWorkers=2 --shard=${{ matrix.shard }}/4
 
   browser_smoke:
     name: browser-smoke
@@ -103,7 +125,7 @@ jobs:
   lint-test-build:
     name: lint-test-build
     if: ${{ always() }}
-    needs: [core_validation, browser_smoke]
+    needs: [core_validation, browser_smoke, unit_tests]
     runs-on: ubuntu-latest
     timeout-minutes: 5
 
@@ -112,10 +134,12 @@ jobs:
         env:
           CORE_RESULT: ${{ needs.core_validation.result }}
           BROWSER_RESULT: ${{ needs.browser_smoke.result }}
+          UNIT_RESULT: ${{ needs.unit_tests.result }}
         run: |
           set -eu
           test "$CORE_RESULT" = "success"
           test "$BROWSER_RESULT" = "success"
+          test "$UNIT_RESULT" = "success"
           echo "Core validation: $CORE_RESULT"
           echo "Browser smoke: $BROWSER_RESULT"
           echo "lint-test-build aggregate: PASS"
