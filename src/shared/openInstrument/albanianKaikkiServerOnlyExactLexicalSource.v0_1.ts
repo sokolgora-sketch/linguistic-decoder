@@ -43,6 +43,8 @@ export type AlbanianKaikkiExactLexicalSourceFactV0_1 = Readonly<{
   partOfSpeech: string | null;
   senses: readonly AlbanianKaikkiExactLexicalSourceSenseV0_1[];
   ipaObservations: readonly AlbanianKaikkiExactLexicalSourceIpaObservationV0_1[];
+  /** Source-authored etymology text; descriptive evidence, not a derived claim. */
+  etymologyText?: string | null;
   relatedForms?: readonly AlbanianKaikkiExactLexicalSourceRelatedFormV0_1[];
   sourceStatus: "observed_external_snapshot";
   attestationTruth: "fact";
@@ -220,6 +222,7 @@ function sourceFactV0_1(
   const ipaObservations = Array.isArray(record.sounds)
     ? Object.freeze(record.sounds.map(projectSoundV0_1))
     : Object.freeze([]);
+  const etymologyText = textV0_1(record.etymology_text);
   const relatedForms = Array.isArray(record.related)
     ? Object.freeze(record.related.flatMap((value) => {
         const relatedRecord = isRecordV0_1(value) ? value : null;
@@ -245,6 +248,7 @@ function sourceFactV0_1(
     partOfSpeech: textV0_1(record.pos),
     senses,
     ipaObservations,
+    etymologyText,
     ...(relatedForms ? { relatedForms } : {}),
     sourceStatus: "observed_external_snapshot",
     attestationTruth: "fact",

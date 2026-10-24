@@ -926,6 +926,7 @@ function parseMotivationDiscoveryV0_1(
         (observation.ipa === null || typeof observation.ipa === "string") &&
         isStringArray(observation.tags)
       ) &&
+      (fact.etymologyText === undefined || fact.etymologyText === null || typeof fact.etymologyText === "string") &&
       (fact.relatedForms === undefined || (
         Array.isArray(fact.relatedForms) && fact.relatedForms.every((relation) =>
           isRecord(relation) &&
@@ -1029,6 +1030,7 @@ function parseMotivationDiscoveryV0_1(
       typeof primary.entryLocator === "string" &&
       typeof primary.form === "string" &&
       (primary.partOfSpeech === null || typeof primary.partOfSpeech === "string") &&
+      (primary.etymologyText === null || typeof primary.etymologyText === "string") &&
       isStringArray(primary.meaningGlosses)
     );
     const validPronunciation = pronunciation === null || (
@@ -1049,9 +1051,46 @@ function parseMotivationDiscoveryV0_1(
       (relation.resolution === "RESOLVED" || relation.resolution === "UNRESOLVED") &&
       (relation.sourceRecordId === null || typeof relation.sourceRecordId === "string") &&
       (relation.partOfSpeech === null || typeof relation.partOfSpeech === "string") &&
+      (relation.etymologyText === null || typeof relation.etymologyText === "string") &&
       isStringArray(relation.meaningGlosses)
     );
+    const validCompositionStructure = (structure: unknown): boolean => {
+      if (structure === null) return true;
+      if (!isRecord(structure)) return false;
+      const validStringArray = (value: unknown): boolean =>
+        Array.isArray(value) && value.every((item) => typeof item === "string");
+      return typeof structure.sourceRecordId === "string" &&
+        typeof structure.entryLocator === "string" &&
+        typeof structure.form === "string" &&
+        typeof structure.soundIndex === "number" && Number.isInteger(structure.soundIndex) && structure.soundIndex >= 0 &&
+        typeof structure.rawIpa === "string" &&
+        validStringArray(structure.voicePath) &&
+        validStringArray(structure.prefixConsonants) &&
+        Array.isArray(structure.interNucleusConsonants) &&
+        structure.interNucleusConsonants.every(validStringArray) &&
+        validStringArray(structure.suffixConsonants) &&
+        typeof structure.structuralSignature === "string" &&
+        typeof structure.authorityBoundary === "string";
+    };
+    const composition = reading.composition;
+    const validComposition = isRecord(composition) &&
+      (composition.status === "SUPPORTED" || composition.status === "NULL") &&
+      (composition.relatedForm === null || typeof composition.relatedForm === "string") &&
+      isRecord(composition.sourceRelation) &&
+      (composition.sourceRelation.status === "SOURCE_EXPLICIT_RELATION" || composition.sourceRelation.status === "SOURCE_RELATION_NOT_VERIFIED") &&
+      (composition.sourceRelation.sourceRecordId === null || typeof composition.sourceRelation.sourceRecordId === "string") &&
+      (composition.sourceRelation.entryLocator === null || typeof composition.sourceRelation.entryLocator === "string") &&
+      (composition.sourceRelation.evidenceText === null || typeof composition.sourceRelation.evidenceText === "string") &&
+      validCompositionStructure(composition.primaryStructure) &&
+      validCompositionStructure(composition.relatedStructure) &&
+      isRecord(composition.interpretation) &&
+      (composition.interpretation.status === "EXPLORATORY_ZHEJI_READING" || composition.interpretation.status === "UNKNOWN_OR_NULL") &&
+      (composition.interpretation.statement === null || typeof composition.interpretation.statement === "string") &&
+      isStringArray(composition.interpretation.alternatives) &&
+      isStringArray(composition.interpretation.basis) &&
+      typeof composition.interpretation.claimBoundary === "string";
     return validPrimary && validPronunciation && validRelated &&
+      validComposition &&
       (reading.interpretation.status === "EXPLORATORY_ZHEJI_READING" || reading.interpretation.status === "UNKNOWN_OR_NULL") &&
       (reading.interpretation.statement === null || typeof reading.interpretation.statement === "string") &&
       isStringArray(reading.interpretation.alternatives) &&

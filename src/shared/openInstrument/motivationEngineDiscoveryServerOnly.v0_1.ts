@@ -54,6 +54,8 @@ export type AlbanianLexicalReadingV0_1 = Readonly<{
     form: string;
     partOfSpeech: string | null;
     meaningGlosses: readonly string[];
+    /** Source-authored prose; displayed as attribution, never as machine relation proof. */
+    etymologyText: string | null;
   }> | null;
   sourcePronunciation: Readonly<{
     sourceRecordId: string;
@@ -71,7 +73,44 @@ export type AlbanianLexicalReadingV0_1 = Readonly<{
     sourceRecordId: string | null;
     partOfSpeech: string | null;
     meaningGlosses: readonly string[];
+    /** Source-authored prose; displayed as attribution, never as machine relation proof. */
+    etymologyText: string | null;
   }>[];
+  composition: AlbanianLexicalCompositionV0_1;
+  interpretation: Readonly<{
+    status: "EXPLORATORY_ZHEJI_READING" | "UNKNOWN_OR_NULL";
+    statement: string | null;
+    alternatives: readonly string[];
+    basis: readonly string[];
+    claimBoundary: string;
+  }>;
+}>;
+
+export type AlbanianLexicalCompositionStructureV0_1 = Readonly<{
+  sourceRecordId: string;
+  entryLocator: string;
+  form: string;
+  soundIndex: number;
+  rawIpa: string;
+  voicePath: readonly string[];
+  prefixConsonants: readonly string[];
+  interNucleusConsonants: readonly (readonly string[])[];
+  suffixConsonants: readonly string[];
+  structuralSignature: string;
+  authorityBoundary: string;
+}>;
+
+export type AlbanianLexicalCompositionV0_1 = Readonly<{
+  status: "SUPPORTED" | "NULL";
+  relatedForm: string | null;
+  sourceRelation: Readonly<{
+    status: "SOURCE_EXPLICIT_RELATION" | "SOURCE_RELATION_NOT_VERIFIED";
+    sourceRecordId: string | null;
+    entryLocator: string | null;
+    evidenceText: string | null;
+  }>;
+  primaryStructure: AlbanianLexicalCompositionStructureV0_1 | null;
+  relatedStructure: AlbanianLexicalCompositionStructureV0_1 | null;
   interpretation: Readonly<{
     status: "EXPLORATORY_ZHEJI_READING" | "UNKNOWN_OR_NULL";
     statement: string | null;
@@ -349,6 +388,31 @@ function hasConservativePrimaryIlluminationEvidenceV0_1(
   return illuminationGlossCount >= 2 && !competingOrUnrelatedGloss;
 }
 
+function nullCompositionV0_1(
+  relatedForm: string | null = null,
+  sourceRelation: AlbanianLexicalCompositionV0_1["sourceRelation"] = Object.freeze({
+    status: "SOURCE_RELATION_NOT_VERIFIED",
+    sourceRecordId: null,
+    entryLocator: null,
+    evidenceText: null,
+  }),
+): AlbanianLexicalCompositionV0_1 {
+  return Object.freeze({
+    status: "NULL",
+    relatedForm,
+    sourceRelation,
+    primaryStructure: null,
+    relatedStructure: null,
+    interpretation: Object.freeze({
+      status: "UNKNOWN_OR_NULL",
+      statement: null,
+      alternatives: Object.freeze([]),
+      basis: Object.freeze([]),
+      claimBoundary: "No directionally meaningful structured source relation is available; source-authored prose and computed pronunciation structure remain separate, and Null is preserved.",
+    }),
+  });
+}
+
 async function buildAlbanianLexicalReadingV0_1(input: Readonly<{
   word: string;
   facts: readonly AlbanianKaikkiExactLexicalSourceFactV0_1[];
@@ -366,6 +430,7 @@ async function buildAlbanianLexicalReadingV0_1(input: Readonly<{
       primarySourceFact: null,
       sourcePronunciation: null,
       relatedForms: Object.freeze([]),
+      composition: nullCompositionV0_1(),
       interpretation: Object.freeze({
         status: "UNKNOWN_OR_NULL",
         statement: null,
@@ -380,13 +445,13 @@ async function buildAlbanianLexicalReadingV0_1(input: Readonly<{
     analysis.sourceRecordId === primary.sourceRecordId && analysis.status === "SUPPORTED",
   ) ?? input.analyses.find((analysis) => analysis.sourceRecordId === primary.sourceRecordId) ?? null;
   const related = primary.relatedForms ?? [];
-  const relatedResults = await Promise.all(related.slice(0, 8).map(async (relation) => {
+  const relatedResultsWithFacts = await Promise.all(related.slice(0, 8).map(async (relation) => {
     try {
       const result = await input.provider.query(relation.form);
       const resolved = result.status === "MATCHES_FOUND"
         ? result.facts.find((fact) => fact.partOfSpeech !== "name") ?? result.facts[0] ?? null
         : null;
-      return Object.freeze({
+      const publicResult = Object.freeze({
         form: relation.form,
         entryLocator: resolved?.entryLocator ?? relation.entryLocator,
         relation: relation.relation,
@@ -394,19 +459,30 @@ async function buildAlbanianLexicalReadingV0_1(input: Readonly<{
         sourceRecordId: resolved?.sourceRecordId ?? null,
         partOfSpeech: resolved?.partOfSpeech ?? null,
         meaningGlosses: resolved ? distinctGlossesV0_1([resolved]) : Object.freeze([]),
+        etymologyText: resolved?.etymologyText ?? null,
       });
+      return Object.freeze({ publicResult, resolved });
     } catch {
       return Object.freeze({
-        form: relation.form,
-        entryLocator: relation.entryLocator,
-        relation: relation.relation,
-        resolution: "UNRESOLVED" as const,
-        sourceRecordId: null,
-        partOfSpeech: null,
-        meaningGlosses: Object.freeze([]),
+        publicResult: Object.freeze({
+          form: relation.form,
+          entryLocator: relation.entryLocator,
+          relation: relation.relation,
+          resolution: "UNRESOLVED" as const,
+          sourceRecordId: null,
+          partOfSpeech: null,
+          meaningGlosses: Object.freeze([]),
+          etymologyText: null,
+        }),
+        resolved: null,
       });
     }
   }));
+  const relatedResults = Object.freeze(relatedResultsWithFacts.map(({ publicResult }) => publicResult));
+
+  const compositionCandidate = relatedResultsWithFacts.find(({ resolved }) => resolved !== null);
+  const relatedFact = compositionCandidate?.resolved ?? null;
+  const composition = nullCompositionV0_1(relatedFact?.form ?? null);
 
   const meaningGlosses = distinctGlossesV0_1([primary]);
   const hasLightMeaning = hasConservativePrimaryIlluminationEvidenceV0_1(primary);
@@ -447,6 +523,7 @@ async function buildAlbanianLexicalReadingV0_1(input: Readonly<{
       form: primary.form,
       partOfSpeech: primary.partOfSpeech,
       meaningGlosses,
+      etymologyText: primary.etymologyText ?? null,
     }),
     sourcePronunciation: sourcePronunciation
       ? Object.freeze({
@@ -459,6 +536,7 @@ async function buildAlbanianLexicalReadingV0_1(input: Readonly<{
         })
       : null,
     relatedForms: Object.freeze(relatedResults),
+    composition,
     interpretation,
   });
 }
