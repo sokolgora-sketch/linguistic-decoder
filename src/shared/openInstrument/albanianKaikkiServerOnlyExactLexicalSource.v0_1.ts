@@ -27,6 +27,23 @@ export type AlbanianKaikkiExactLexicalSourceIpaObservationV0_1 = Readonly<{
   tags: readonly string[];
 }>;
 
+export type AlbanianKaikkiExactLexicalSourceRelatedFormV0_1 = Readonly<{
+  form: string;
+  relation: "SOURCE_RELATED_FORM" | "SOURCE_DERIVED_FORM";
+  entryLocator: string;
+}>;
+
+export type AlbanianKaikkiExactLexicalSourceEtymologyLinkV0_1 = Readonly<{
+  sourceForm: string;
+  reference: string;
+}>;
+
+export type AlbanianKaikkiExactLexicalSourceEtymologyTemplateV0_1 = Readonly<{
+  name: string;
+  args: Readonly<Record<string, string>>;
+  expansion: string;
+}>;
+
 export type AlbanianKaikkiExactLexicalSourceFactV0_1 = Readonly<{
   sourceRecordId: string;
   entryLocator: string;
@@ -37,6 +54,12 @@ export type AlbanianKaikkiExactLexicalSourceFactV0_1 = Readonly<{
   partOfSpeech: string | null;
   senses: readonly AlbanianKaikkiExactLexicalSourceSenseV0_1[];
   ipaObservations: readonly AlbanianKaikkiExactLexicalSourceIpaObservationV0_1[];
+  /** Source-authored etymology text; descriptive evidence, not a derived claim. */
+  etymologyText?: string | null;
+  /** Source-authored structured references; descriptive evidence, not a derived claim. */
+  etymologyLinks?: readonly AlbanianKaikkiExactLexicalSourceEtymologyLinkV0_1[];
+  etymologyTemplates?: readonly AlbanianKaikkiExactLexicalSourceEtymologyTemplateV0_1[];
+  relatedForms?: readonly AlbanianKaikkiExactLexicalSourceRelatedFormV0_1[];
   sourceStatus: "observed_external_snapshot";
   attestationTruth: "fact";
   pronunciationAuthority: typeof ALBANIAN_KAIKKI_LEXICAL_PRONUNCIATION_AUTHORITY_V0_1;
@@ -73,6 +96,11 @@ export type AlbanianKaikkiExactLexicalSourceLookupResultV0_1 = Readonly<
       facts: readonly [];
       reasonCode:
         | "ALBANIAN_SOURCE_PATH_NOT_CONFIGURED"
+        | "ALBANIAN_SOURCE_DELIVERY_CONFIGURATION_INVALID"
+        | "ALBANIAN_SOURCE_OBJECT_ACCESS_FAILURE"
+        | "ALBANIAN_SOURCE_OBJECT_GENERATION_MISMATCH"
+        | "ALBANIAN_SOURCE_DOWNLOAD_FAILURE"
+        | "ALBANIAN_SOURCE_MATERIALIZATION_FAILURE"
         | "ALBANIAN_SOURCE_IDENTITY_MISMATCH"
         | "ALBANIAN_SOURCE_READ_FAILURE"
         | "ALBANIAN_SOURCE_RECORD_FAILURE";
@@ -178,6 +206,15 @@ function stringArrayV0_1(value: unknown): readonly string[] {
     : Object.freeze([]);
 }
 
+function stringRecordV0_1(value: unknown): Readonly<Record<string, string>> {
+  if (!isRecordV0_1(value)) return Object.freeze({});
+  const entries = Object.entries(value).flatMap(([key, item]) => {
+    const text = textV0_1(item);
+    return text === null ? [] : [[key, text] as const];
+  });
+  return Object.freeze(Object.fromEntries(entries));
+}
+
 function projectSenseV0_1(value: unknown): AlbanianKaikkiExactLexicalSourceSenseV0_1 {
   const sense = isRecordV0_1(value) ? value : {};
   return Object.freeze({
@@ -213,6 +250,46 @@ function sourceFactV0_1(
   const ipaObservations = Array.isArray(record.sounds)
     ? Object.freeze(record.sounds.map(projectSoundV0_1))
     : Object.freeze([]);
+  const etymologyText = textV0_1(record.etymology_text);
+  const etymologyLinks = Array.isArray(record.etymology_links)
+    ? Object.freeze(record.etymology_links.flatMap((value) => {
+        if (!Array.isArray(value) || value.length < 2) return [];
+        const sourceForm = textV0_1(value[0]);
+        const reference = textV0_1(value[1]);
+        return sourceForm && reference ? [{ sourceForm, reference }] : [];
+      }))
+    : undefined;
+  const etymologyTemplates = Array.isArray(record.etymology_templates)
+    ? Object.freeze(record.etymology_templates.flatMap((value) => {
+        if (!isRecordV0_1(value)) return [];
+        const name = textV0_1(value.name);
+        const expansion = textV0_1(value.expansion) ?? "";
+        if (!name) return [];
+        return [{ name, args: stringRecordV0_1(value.args), expansion }];
+      }))
+    : undefined;
+  const sourceFormLinksV0_1 = (
+    value: unknown,
+    relation: AlbanianKaikkiExactLexicalSourceRelatedFormV0_1["relation"],
+  ) => Array.isArray(value)
+    ? value.flatMap((item) => {
+        const relatedRecord = isRecordV0_1(item) ? item : null;
+        const relatedForm = relatedRecord ? textV0_1(relatedRecord.word) : null;
+        if (!relatedForm) return [];
+        const relatedEncodedForm = encodeURIComponent(relatedForm);
+        return [{
+          form: relatedForm,
+          relation,
+          entryLocator: `jsonl://word/${relatedEncodedForm}`,
+        }];
+      })
+    : [];
+  const relatedForms = Array.isArray(record.related) || Array.isArray(record.derived)
+    ? Object.freeze([
+        ...sourceFormLinksV0_1(record.related, "SOURCE_RELATED_FORM"),
+        ...sourceFormLinksV0_1(record.derived, "SOURCE_DERIVED_FORM"),
+      ])
+    : undefined;
   const encodedForm = encodeURIComponent(form);
 
   return Object.freeze({
@@ -225,10 +302,36 @@ function sourceFactV0_1(
     partOfSpeech: textV0_1(record.pos),
     senses,
     ipaObservations,
+    etymologyText,
+    ...(etymologyLinks ? { etymologyLinks } : {}),
+    ...(etymologyTemplates ? { etymologyTemplates } : {}),
+    ...(relatedForms ? { relatedForms } : {}),
     sourceStatus: "observed_external_snapshot",
     attestationTruth: "fact",
     pronunciationAuthority: ALBANIAN_KAIKKI_LEXICAL_PRONUNCIATION_AUTHORITY_V0_1,
     sourceSnapshot: sourceIdentity.sourceSnapshot,
+  });
+}
+
+export function createAlbanianKaikkiServerOnlyUnavailableProviderV0_1(
+  reasonCode: Extract<
+    AlbanianKaikkiExactLexicalSourceLookupResultV0_1,
+    { status: "UNAVAILABLE" }
+  >["reasonCode"],
+): AlbanianKaikkiServerOnlyExactLexicalSourceProviderV0_1 {
+  const queryWithMetrics = async (): Promise<Readonly<{
+    result: AlbanianKaikkiExactLexicalSourceLookupResultV0_1;
+    metrics: AlbanianKaikkiServerOnlyExactLexicalSourceLookupMetricsV0_1;
+  }>> => Object.freeze({
+    result: unavailableV0_1(reasonCode),
+    metrics: zeroLookupMetricsV0_1(),
+  });
+
+  return Object.freeze({
+    providerId: ALBANIAN_KAIKKI_SERVER_ONLY_EXACT_LEXICAL_SOURCE_PROVIDER_ID_V0_1,
+    runtimeBoundary: "SERVER_ONLY" as const,
+    query: async () => unavailableV0_1(reasonCode),
+    queryWithMetrics,
   });
 }
 

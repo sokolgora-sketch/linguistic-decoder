@@ -926,6 +926,31 @@ function parseMotivationDiscoveryV0_1(
         (observation.ipa === null || typeof observation.ipa === "string") &&
         isStringArray(observation.tags)
       ) &&
+      (fact.etymologyText === undefined || fact.etymologyText === null || typeof fact.etymologyText === "string") &&
+      (fact.etymologyLinks === undefined || (
+        Array.isArray(fact.etymologyLinks) && fact.etymologyLinks.every((link) =>
+          isRecord(link) &&
+          typeof link.sourceForm === "string" &&
+          typeof link.reference === "string"
+        )
+      )) &&
+      (fact.etymologyTemplates === undefined || (
+        Array.isArray(fact.etymologyTemplates) && fact.etymologyTemplates.every((template) =>
+          isRecord(template) &&
+          typeof template.name === "string" &&
+          isRecord(template.args) &&
+          Object.values(template.args).every((value) => typeof value === "string") &&
+          typeof template.expansion === "string"
+        )
+      )) &&
+      (fact.relatedForms === undefined || (
+        Array.isArray(fact.relatedForms) && fact.relatedForms.every((relation) =>
+          isRecord(relation) &&
+          typeof relation.form === "string" &&
+          (relation.relation === "SOURCE_RELATED_FORM" || relation.relation === "SOURCE_DERIVED_FORM") &&
+          typeof relation.entryLocator === "string"
+        )
+      )) &&
       fact.sourceStatus === "observed_external_snapshot" &&
       fact.attestationTruth === "fact" &&
       fact.pronunciationAuthority === "CURRENT_KAIKKI_RECORD_ONLY_UNBOUND_TO_FROZEN_PROFILE" &&
@@ -1009,6 +1034,302 @@ function parseMotivationDiscoveryV0_1(
     );
     return valid;
   };
+  const validAlbanianLexicalReading = (reading: unknown): boolean => {
+    if (!isRecord(reading) || (reading.status !== "SUPPORTED" && reading.status !== "NULL") || !Array.isArray(reading.relatedForms) || !isRecord(reading.interpretation)) {
+      return false;
+    }
+    const primary = reading.primarySourceFact;
+    const pronunciation = reading.sourcePronunciation;
+    const validPrimary = primary === null || (
+      isRecord(primary) &&
+      typeof primary.sourceRecordId === "string" &&
+      typeof primary.entryLocator === "string" &&
+      typeof primary.form === "string" &&
+      (primary.partOfSpeech === null || typeof primary.partOfSpeech === "string") &&
+      (primary.etymologyText === null || typeof primary.etymologyText === "string") &&
+      isStringArray(primary.meaningGlosses)
+    );
+    const validPronunciation = pronunciation === null || (
+      isRecord(pronunciation) &&
+      typeof pronunciation.sourceRecordId === "string" &&
+      typeof pronunciation.soundIndex === "number" &&
+      Number.isInteger(pronunciation.soundIndex) &&
+      (pronunciation.rawIpa === null || typeof pronunciation.rawIpa === "string") &&
+      (pronunciation.status === "SUPPORTED" || pronunciation.status === "NULL") &&
+      isStringArray(pronunciation.voicePath) &&
+      isStringArray(pronunciation.reasonCodes)
+    );
+    const validRelated = reading.relatedForms.every((relation) =>
+      isRecord(relation) &&
+      typeof relation.form === "string" &&
+      typeof relation.entryLocator === "string" &&
+      (relation.relation === "SOURCE_RELATED_FORM" || relation.relation === "SOURCE_DERIVED_FORM") &&
+      (relation.resolution === "RESOLVED" || relation.resolution === "UNRESOLVED") &&
+      (relation.sourceRecordId === null || typeof relation.sourceRecordId === "string") &&
+      (relation.partOfSpeech === null || typeof relation.partOfSpeech === "string") &&
+      (relation.etymologyText === null || typeof relation.etymologyText === "string") &&
+      isStringArray(relation.meaningGlosses)
+    );
+    const validCompositionStructure = (structure: unknown): boolean => {
+      if (structure === null) return true;
+      if (!isRecord(structure)) return false;
+      const validStringArray = (value: unknown): boolean =>
+        Array.isArray(value) && value.every((item) => typeof item === "string");
+      return typeof structure.sourceRecordId === "string" &&
+        typeof structure.entryLocator === "string" &&
+        typeof structure.form === "string" &&
+        typeof structure.soundIndex === "number" && Number.isInteger(structure.soundIndex) && structure.soundIndex >= 0 &&
+        typeof structure.rawIpa === "string" &&
+        validStringArray(structure.voicePath) &&
+        validStringArray(structure.prefixConsonants) &&
+        Array.isArray(structure.interNucleusConsonants) &&
+        structure.interNucleusConsonants.every(validStringArray) &&
+        validStringArray(structure.suffixConsonants) &&
+        typeof structure.structuralSignature === "string" &&
+        typeof structure.authorityBoundary === "string";
+    };
+    const composition = reading.composition;
+    const validComposition = isRecord(composition) &&
+      (composition.status === "SUPPORTED" || composition.status === "NULL") &&
+      (composition.relatedForm === null || typeof composition.relatedForm === "string") &&
+      isRecord(composition.sourceRelation) &&
+      (composition.sourceRelation.status === "SOURCE_EXPLICIT_RELATION" || composition.sourceRelation.status === "SOURCE_RELATION_NOT_VERIFIED") &&
+      (composition.sourceRelation.sourceRecordId === null || typeof composition.sourceRelation.sourceRecordId === "string") &&
+      (composition.sourceRelation.entryLocator === null || typeof composition.sourceRelation.entryLocator === "string") &&
+      (composition.sourceRelation.evidenceText === null || typeof composition.sourceRelation.evidenceText === "string") &&
+      validCompositionStructure(composition.primaryStructure) &&
+      validCompositionStructure(composition.relatedStructure) &&
+      isRecord(composition.interpretation) &&
+      (composition.interpretation.status === "EXPLORATORY_ZHEJI_READING" || composition.interpretation.status === "UNKNOWN_OR_NULL") &&
+      (composition.interpretation.statement === null || typeof composition.interpretation.statement === "string") &&
+      isStringArray(composition.interpretation.alternatives) &&
+      isStringArray(composition.interpretation.basis) &&
+      typeof composition.interpretation.claimBoundary === "string";
+    const validSourceLinkedPronunciation = (variant: unknown): boolean => {
+      if (!isRecord(variant) || !isRecord(variant.consonantalContext)) return false;
+      const context = variant.consonantalContext;
+      const validConsonantSegment = (value: unknown): boolean =>
+        isRecord(value) &&
+        typeof value.raw === "string" &&
+        value.raw.length > 0 &&
+        typeof value.baseSymbol === "string" &&
+        value.baseSymbol.length > 0 &&
+        typeof value.optional === "boolean";
+      const validConsonantSegmentArray = (value: unknown): boolean =>
+        Array.isArray(value) && value.every(validConsonantSegment);
+      const validStringArrayOrNull = (value: unknown): boolean =>
+        value === null || validConsonantSegmentArray(value);
+      return typeof variant.soundIndex === "number" &&
+        Number.isInteger(variant.soundIndex) &&
+        variant.soundIndex >= 0 &&
+        (variant.rawIpa === null || typeof variant.rawIpa === "string") &&
+        isStringArray(variant.tags) &&
+        (variant.status === "SUPPORTED" || variant.status === "NULL") &&
+        isStringArray(variant.voicePath) &&
+        isStringArray(variant.reasonCodes) &&
+        (context.status === "SUPPORTED" || context.status === "NULL") &&
+        typeof context.authorityBoundary === "string" &&
+        validStringArrayOrNull(context.prefixConsonants) &&
+        (context.interNucleusConsonants === null || (
+          Array.isArray(context.interNucleusConsonants) &&
+          context.interNucleusConsonants.every(validConsonantSegmentArray)
+        )) &&
+        validStringArrayOrNull(context.suffixConsonants) &&
+        (context.structuralSignature === null || typeof context.structuralSignature === "string") &&
+        isStringArray(context.reasonCodes);
+    };
+    const validSourceLinkedRecord = (record: unknown): boolean => {
+      if (!isRecord(record) || !Array.isArray(record.etymologyLinks) || !Array.isArray(record.etymologyTemplates) || !Array.isArray(record.pronunciationVariants)) {
+        return false;
+      }
+      return typeof record.sourceRecordId === "string" &&
+        typeof record.entryLocator === "string" &&
+        typeof record.physicalRecordOrdinal === "number" &&
+        Number.isInteger(record.physicalRecordOrdinal) &&
+        record.physicalRecordOrdinal >= 0 &&
+        typeof record.form === "string" &&
+        (record.partOfSpeech === null || typeof record.partOfSpeech === "string") &&
+        isStringArray(record.meaningGlosses) &&
+        (record.etymologyText === null || typeof record.etymologyText === "string") &&
+        record.etymologyLinks.every((link) =>
+          isRecord(link) && typeof link.sourceForm === "string" && typeof link.reference === "string",
+        ) &&
+        record.etymologyTemplates.every((template) =>
+          isRecord(template) &&
+          typeof template.name === "string" &&
+          isRecord(template.args) &&
+          Object.values(template.args).every((value) => typeof value === "string") &&
+          typeof template.expansion === "string",
+        ) &&
+        record.pronunciationVariants.every(validSourceLinkedPronunciation);
+    };
+    const sourceLinkedComponentReading = reading.sourceLinkedComponentReading;
+    const validSourceLinkedComponentReading = sourceLinkedComponentReading === undefined || sourceLinkedComponentReading === null || (() => {
+      const validRelationStatusCombination = (() => {
+        if (!isRecord(sourceLinkedComponentReading) ||
+          !isStringArray(sourceLinkedComponentReading.reasonCodes) ||
+          !isRecord(sourceLinkedComponentReading.relation) ||
+          !Array.isArray(sourceLinkedComponentReading.relation.references) ||
+          !Array.isArray(sourceLinkedComponentReading.components)) {
+          return false;
+        }
+        const relation = sourceLinkedComponentReading.relation.relation;
+        const reasonCodes = sourceLinkedComponentReading.reasonCodes;
+        const referenceCount = sourceLinkedComponentReading.relation.references.length;
+        const componentCount = sourceLinkedComponentReading.components.length;
+        if (sourceLinkedComponentReading.status === "SUPPORTED") {
+          return relation === "SOURCE_EXPLICIT_TWO_COMPONENT_COMPOUND" &&
+            reasonCodes.length === 0 &&
+            referenceCount === 2 &&
+            componentCount === 2;
+        }
+        if (sourceLinkedComponentReading.status !== "NULL") return false;
+        if (relation === "SOURCE_EXPLICIT_TWO_COMPONENT_COMPOUND") {
+          return !reasonCodes.includes("SOURCE_COMPOUND_ARITY_UNSUPPORTED") &&
+            reasonCodes.length > 0 &&
+            referenceCount === 2 &&
+            componentCount <= referenceCount;
+        }
+        return relation === "SOURCE_COMPOUND_ARITY_UNSUPPORTED" &&
+          reasonCodes.includes("SOURCE_COMPOUND_ARITY_UNSUPPORTED") &&
+          referenceCount > 2 &&
+          componentCount <= referenceCount;
+      })();
+      if (!isRecord(sourceLinkedComponentReading) ||
+        (sourceLinkedComponentReading.status !== "SUPPORTED" && sourceLinkedComponentReading.status !== "NULL") ||
+        !isStringArray(sourceLinkedComponentReading.reasonCodes) ||
+        !isRecord(sourceLinkedComponentReading.relation) ||
+        !validRelationStatusCombination ||
+        typeof sourceLinkedComponentReading.relation.primarySourceRecordId !== "string" ||
+        typeof sourceLinkedComponentReading.relation.primaryEntryLocator !== "string" ||
+        (sourceLinkedComponentReading.relation.sourceAuthoredExplanation !== null &&
+          typeof sourceLinkedComponentReading.relation.sourceAuthoredExplanation !== "string") ||
+        !Array.isArray(sourceLinkedComponentReading.relation.references) ||
+        !sourceLinkedComponentReading.relation.references.every((reference) =>
+          isRecord(reference) &&
+          typeof reference.sourceForm === "string" &&
+          reference.sourceForm.length > 0 &&
+          (reference.reference === null || typeof reference.reference === "string"),
+        ) ||
+        !validSourceLinkedRecord(sourceLinkedComponentReading.primary) ||
+        !Array.isArray(sourceLinkedComponentReading.components) ||
+        !sourceLinkedComponentReading.components.every(validSourceLinkedRecord) ||
+        (sourceLinkedComponentReading.status === "SUPPORTED" && sourceLinkedComponentReading.components.length !== 2) ||
+        !isRecord(sourceLinkedComponentReading.exploratoryRelationship) ||
+        (sourceLinkedComponentReading.exploratoryRelationship.status !== "EXPLORATORY_SOURCE_COMPONENT_RELATION" &&
+          sourceLinkedComponentReading.exploratoryRelationship.status !== "UNKNOWN_OR_NULL") ||
+        (sourceLinkedComponentReading.exploratoryRelationship.statement !== null &&
+          typeof sourceLinkedComponentReading.exploratoryRelationship.statement !== "string") ||
+        !isStringArray(sourceLinkedComponentReading.exploratoryRelationship.alternatives) ||
+        typeof sourceLinkedComponentReading.exploratoryRelationship.claimBoundary !== "string" ||
+        typeof sourceLinkedComponentReading.claimBoundary !== "string") {
+        return false;
+      }
+      return true;
+    })();
+    const sourceLinkedComparison = reading.sourceLinkedComparison;
+    const validSourceLinkedComparison = sourceLinkedComparison === undefined || sourceLinkedComparison === null || (
+      isRecord(sourceLinkedComparison) &&
+      (sourceLinkedComparison.status === "SUPPORTED" || sourceLinkedComparison.status === "NULL") &&
+      isStringArray(sourceLinkedComparison.reasonCodes) &&
+      isRecord(sourceLinkedComparison.relation) &&
+      (sourceLinkedComparison.relation.relation === "SOURCE_RELATED_FORM" || sourceLinkedComparison.relation.relation === "SOURCE_DERIVED_FORM") &&
+      typeof sourceLinkedComparison.relation.primarySourceRecordId === "string" &&
+      typeof sourceLinkedComparison.relation.primaryEntryLocator === "string" &&
+      typeof sourceLinkedComparison.relation.relatedForm === "string" &&
+      (sourceLinkedComparison.relation.relatedSourceRecordId === null || typeof sourceLinkedComparison.relation.relatedSourceRecordId === "string") &&
+      typeof sourceLinkedComparison.relation.relatedEntryLocator === "string" &&
+      sourceLinkedComparison.relation.direction === "RELATED_FORM_TO_PRIMARY_ETYMLOGY_REFERENCE" &&
+      (sourceLinkedComparison.relation.referencedForm === null || typeof sourceLinkedComparison.relation.referencedForm === "string") &&
+      (sourceLinkedComparison.relation.reference === null || typeof sourceLinkedComparison.relation.reference === "string") &&
+      validSourceLinkedRecord(sourceLinkedComparison.primary) &&
+      (sourceLinkedComparison.related === null || validSourceLinkedRecord(sourceLinkedComparison.related)) &&
+      isRecord(sourceLinkedComparison.summary) &&
+      (sourceLinkedComparison.summary.voicePathRelationship === "EXACT_SUPPORTED_PATH_SET_MATCH" ||
+        sourceLinkedComparison.summary.voicePathRelationship === "SHARED_INITIAL_VOICE_DIFFERENT_LATER_PATH" ||
+        sourceLinkedComparison.summary.voicePathRelationship === "DIFFERENT_SUPPORTED_VOICE_PATHS" ||
+        sourceLinkedComparison.summary.voicePathRelationship === "UNKNOWN") &&
+      (sourceLinkedComparison.summary.consonantalContextRelationship === "EXACT_SUPPORTED_CONTEXT_SET_MATCH" ||
+        sourceLinkedComparison.summary.consonantalContextRelationship === "DIFFERENT_SUPPORTED_CONTEXTS" ||
+        sourceLinkedComparison.summary.consonantalContextRelationship === "UNKNOWN") &&
+      typeof sourceLinkedComparison.summary.text === "string" &&
+      typeof sourceLinkedComparison.claimBoundary === "string"
+    );
+    const validFunctionalMeaningBridge = (() => {
+      const bridge = reading.functionalMeaningBridge;
+      if (!isRecord(bridge) || (bridge.status !== "SUPPORTED" && bridge.status !== "NULL")) return false;
+      if (!isStringArray(bridge.truthLayers) || bridge.truthLayers.some((layer) =>
+        layer !== "SOURCE_FACT" &&
+        layer !== "DERIVED_STRUCTURE" &&
+        layer !== "EXPLORATORY_FUNCTIONAL_HYPOTHESIS" &&
+        layer !== "UNKNOWN_OR_NULL",
+      )) return false;
+      if (bridge.relatedForm !== null && typeof bridge.relatedForm !== "string") return false;
+      const sourceFacts = bridge.sourceFacts;
+      if (sourceFacts !== null) {
+        if (!isRecord(sourceFacts) || !isRecord(sourceFacts.primary) || !isRecord(sourceFacts.structuredReference)) return false;
+        const validBridgeRecord = (record: unknown): boolean =>
+          isRecord(record) &&
+          typeof record.sourceRecordId === "string" &&
+          typeof record.entryLocator === "string" &&
+          typeof record.form === "string" &&
+          isStringArray(record.meaningGlosses);
+        if (!validBridgeRecord(sourceFacts.primary)) return false;
+        const relatedBridgeRecord = sourceFacts.related;
+        if (relatedBridgeRecord !== null) {
+          if (!isRecord(relatedBridgeRecord) || !validBridgeRecord(relatedBridgeRecord)) return false;
+          if (
+            relatedBridgeRecord.sourceAuthoredExplanation !== null &&
+            typeof relatedBridgeRecord.sourceAuthoredExplanation !== "string"
+          ) return false;
+        }
+        if (
+          (sourceFacts.structuredReference.referencedForm !== null && typeof sourceFacts.structuredReference.referencedForm !== "string") ||
+          (sourceFacts.structuredReference.reference !== null && typeof sourceFacts.structuredReference.reference !== "string")
+        ) return false;
+      }
+      const derivedStructure = bridge.derivedStructure;
+      if (derivedStructure !== null) {
+        if (!isRecord(derivedStructure) || !isRecord(derivedStructure.primary) || !isRecord(derivedStructure.related)) return false;
+        const validBridgeStructure = (structure: unknown): boolean =>
+          isRecord(structure) &&
+          (structure.rawIpa === null || typeof structure.rawIpa === "string") &&
+          isStringArray(structure.voicePaths) &&
+          isStringArray(structure.consonantalContexts);
+        if (!validBridgeStructure(derivedStructure.primary) || !validBridgeStructure(derivedStructure.related)) return false;
+        if (
+          derivedStructure.voicePathRelationship !== "EXACT_SUPPORTED_PATH_SET_MATCH" &&
+          derivedStructure.voicePathRelationship !== "SHARED_INITIAL_VOICE_DIFFERENT_LATER_PATH" &&
+          derivedStructure.voicePathRelationship !== "DIFFERENT_SUPPORTED_VOICE_PATHS" &&
+          derivedStructure.voicePathRelationship !== "UNKNOWN"
+        ) return false;
+        if (
+          derivedStructure.consonantalContextRelationship !== "EXACT_SUPPORTED_CONTEXT_SET_MATCH" &&
+          derivedStructure.consonantalContextRelationship !== "DIFFERENT_SUPPORTED_CONTEXTS" &&
+          derivedStructure.consonantalContextRelationship !== "UNKNOWN"
+        ) return false;
+      }
+      const hypothesis = bridge.functionalHypothesis;
+      return isRecord(hypothesis) &&
+        (hypothesis.status === "EXPLORATORY_FUNCTIONAL_HYPOTHESIS" || hypothesis.status === "UNKNOWN_OR_NULL") &&
+        (hypothesis.statement === null || typeof hypothesis.statement === "string") &&
+        isStringArray(hypothesis.alternatives) &&
+        isStringArray(hypothesis.basis) &&
+        typeof hypothesis.claimBoundary === "string" &&
+        isStringArray(bridge.reasonCodes) &&
+        typeof bridge.claimBoundary === "string";
+    })();
+    return validPrimary && validPronunciation && validRelated &&
+      validComposition &&
+      validSourceLinkedComponentReading &&
+      validSourceLinkedComparison &&
+      validFunctionalMeaningBridge &&
+      (reading.interpretation.status === "EXPLORATORY_ZHEJI_READING" || reading.interpretation.status === "UNKNOWN_OR_NULL") &&
+      (reading.interpretation.statement === null || typeof reading.interpretation.statement === "string") &&
+      isStringArray(reading.interpretation.alternatives) &&
+      isStringArray(reading.interpretation.basis) &&
+      typeof reading.interpretation.claimBoundary === "string";
+  };
 
   if (
     (sourceFact.layer !== "SOURCE_FACT") ||
@@ -1047,6 +1368,7 @@ function parseMotivationDiscoveryV0_1(
       (!Array.isArray(exactLexicalSourceFacts) || !exactLexicalSourceFacts.every(validExactLexicalSourceFact))) ||
     (value.sourceIpaSevenVoiceAnalyses !== undefined &&
       (!Array.isArray(value.sourceIpaSevenVoiceAnalyses) || !value.sourceIpaSevenVoiceAnalyses.every(validSourceIpaSevenVoiceAnalysis)))
+      || (value.albanianLexicalReading !== undefined && !validAlbanianLexicalReading(value.albanianLexicalReading))
   ) {
     return missing("malformed", "motivationDiscoveryV0_1 derived structure invalid");
   }

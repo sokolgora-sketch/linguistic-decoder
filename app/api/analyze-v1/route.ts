@@ -189,6 +189,19 @@ function normalizeAlphabetV0_1(value: unknown): NormalizedAlphabetV0_1 {
   return { ok: false };
 }
 
+const ALBANIAN_INPUT_MARKERS_V0_1 = new Set(["sq", "albanian"]);
+
+function isAlbanianAnalysisInputV0_1(input: {
+  language: string;
+  alphabet: string;
+}): boolean {
+  return [input.language, input.alphabet].some((value) =>
+    ALBANIAN_INPUT_MARKERS_V0_1.has(
+      value.normalize("NFC").trim().toLocaleLowerCase("en-US"),
+    ),
+  );
+}
+
 function deriveTargetSenseIdV0_1(label: string): string {
   const normalized = label.normalize("NFKC").trim().toLocaleLowerCase("en-US");
   const slug = normalized
@@ -1021,7 +1034,29 @@ async function runAnalyzeV1Orchestration(
   } = input;
 
   try {
-    const heartInstrumentV1 = buildHeartInstrumentV1(word);
+    const rawHeartInstrumentV1 = buildHeartInstrumentV1(word);
+    const heartInstrumentV1 = isAlbanianAnalysisInputV0_1({
+      language,
+      alphabet: payloadAlphabet,
+    }) && rawHeartInstrumentV1.spokenPronunciation.status === "defined"
+      ? {
+          ...rawHeartInstrumentV1,
+          // CMUdict is an English spoken source. It remains available for
+          // non-Albanian modes, but cannot become Albanian pronunciation
+          // authority merely because the input has Albanian alphabet/profile
+          // metadata. Preserve orthographic surface vowels separately.
+          canonicalSpokenVoicePath: null,
+          spokenPronunciation: {
+            ...rawHeartInstrumentV1.spokenPronunciation,
+            status: "null" as const,
+            reasonCode: "PRONUNCIATION_SOURCE_UNSUPPORTED" as const,
+            variants: [],
+            canonicalSpokenVoicePath: null,
+          },
+          spokenPrinciplesPath: [],
+          spokenMath7: null,
+        }
+      : rawHeartInstrumentV1;
     const doctrineProjection = projectDoctrineReadingV1(
       heartInstrumentV1.canonicalSpokenVoicePath,
     );
@@ -1035,6 +1070,14 @@ async function runAnalyzeV1Orchestration(
       mode: engineMode,
       alphabet: engineAlphabet,
     });
+    const albanianProfileVoicePath = isAlbanianAnalysisInputV0_1({
+      language,
+      alphabet: payloadAlphabet,
+    }) && Array.isArray((rawPayload as any)?.primaryPath?.voicePath)
+      ? (rawPayload as any).primaryPath.voicePath.filter(
+          (value: unknown): value is string => typeof value === "string",
+        )
+      : null;
     // Candidate/status authority is evaluated from the deterministic engine
     // payload exactly as before. The canonical spoken path is projected only
     // after that evaluation, so pronunciation provenance cannot change
@@ -1381,8 +1424,13 @@ async function runAnalyzeV1Orchestration(
         inputProfile: discoveryInputProfile,
         analysis: final as any,
         heart: heartInstrumentV1,
+        profileDerivedVoicePath: albanianProfileVoicePath,
       };
-      const discoveryResult = !publicBetaDeterministicOnly && providerExecution === "disabled"
+      const isAlbanianDiscoveryInput = [discoveryInputLanguage, discoveryInputProfile].some((value) =>
+        value.normalize("NFC").trim().toLocaleLowerCase("en-US") === "sq" ||
+        value.normalize("NFC").trim().toLocaleLowerCase("en-US") === "albanian",
+      );
+      const discoveryResult = !publicBetaDeterministicOnly && providerExecution === "disabled" && !isAlbanianDiscoveryInput
         ? {
             discovery: projectMotivationEngineDiscoverySourceFamiliesV0_1(
               buildMotivationEngineDiscoveryV0_1(discoveryInput),
