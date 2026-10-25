@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import { createReadStream } from "node:fs";
+import { createReadStream, readFileSync } from "node:fs";
 import { open, stat, type FileHandle } from "node:fs/promises";
 
 export const ALBANIAN_KAIKKI_SERVER_ONLY_EXACT_LEXICAL_SOURCE_PROVIDER_ID_V0_1 =
@@ -15,6 +15,139 @@ export const ALBANIAN_KAIKKI_LEXICAL_SOURCE_SHA256_V0_1 =
 export const ALBANIAN_KAIKKI_LEXICAL_SOURCE_BYTES_V0_1 = 67438537 as const;
 export const ALBANIAN_KAIKKI_LEXICAL_PRONUNCIATION_AUTHORITY_V0_1 =
   "CURRENT_KAIKKI_RECORD_ONLY_UNBOUND_TO_FROZEN_PROFILE" as const;
+export const ALBANIAN_KAIKKI_COLD_START_DIAGNOSTICS_ENV_V0_1 =
+  "OPEN_INSTRUMENT_ALBANIAN_COLD_START_DIAGNOSTICS" as const;
+
+export type AlbanianKaikkiSourceDiagnosticPhaseV0_1 =
+  | "metadata_verification"
+  | "download_hash_and_temporary_write"
+  | "file_synchronization"
+  | "disk_sha256_verification"
+  | "lexical_index_construction";
+
+type AlbanianKaikkiSourceDiagnosticMemoryV0_1 = Readonly<{
+  rssBytes: number;
+  linuxHighWaterRssBytes: number | null;
+}>;
+
+type AlbanianKaikkiSourceDiagnosticPhaseResultV0_1 = Readonly<{
+  durationMs: number;
+  endRssBytes: number;
+  endLinuxHighWaterRssBytes: number | null;
+}>;
+
+export type AlbanianKaikkiSourceDiagnosticContextV0_1 = Readonly<{
+  beginPhase: (phase: AlbanianKaikkiSourceDiagnosticPhaseV0_1) => bigint;
+  endPhase: (
+    phase: AlbanianKaikkiSourceDiagnosticPhaseV0_1,
+    startedAtNs: bigint,
+  ) => void;
+  emit: (
+    status: "MATERIALIZED" | "UNAVAILABLE",
+    reasonCode: string | null,
+  ) => void;
+}>;
+
+function diagnosticMemoryV0_1(): AlbanianKaikkiSourceDiagnosticMemoryV0_1 {
+  let linuxHighWaterRssBytes: number | null = null;
+  if (process.platform === "linux") {
+    try {
+      const status = readFileSync("/proc/self/status", "utf8");
+      const match = /^VmHWM:\s+(\d+)\s+kB$/mu.exec(status);
+      linuxHighWaterRssBytes = match ? Number(match[1]) * 1024 : null;
+    } catch {
+      try {
+        // Node reports resourceUsage().maxRSS in KiB on Linux.
+        const maxRss = process.resourceUsage().maxRSS;
+        linuxHighWaterRssBytes = Number.isFinite(maxRss) ? maxRss * 1024 : null;
+      } catch {
+        linuxHighWaterRssBytes = null;
+      }
+    }
+  }
+
+  return Object.freeze({
+    rssBytes: process.memoryUsage().rss,
+    linuxHighWaterRssBytes,
+  });
+}
+
+function diagnosticDurationMsV0_1(startedAtNs: bigint): number {
+  return Number(process.hrtime.bigint() - startedAtNs) / 1_000_000;
+}
+
+export function createAlbanianKaikkiSourceDiagnosticContextV0_1():
+  AlbanianKaikkiSourceDiagnosticContextV0_1 | undefined {
+  if (process.env[ALBANIAN_KAIKKI_COLD_START_DIAGNOSTICS_ENV_V0_1] !== "staging") {
+    return undefined;
+  }
+
+  const startedAtNs = process.hrtime.bigint();
+  const startMemory = diagnosticMemoryV0_1();
+  const phaseResults = new Map<
+    AlbanianKaikkiSourceDiagnosticPhaseV0_1,
+    AlbanianKaikkiSourceDiagnosticPhaseResultV0_1
+  >();
+  let maxObservedRssBytes = startMemory.rssBytes;
+  let maxObservedLinuxHighWaterRssBytes = startMemory.linuxHighWaterRssBytes;
+  let emitted = false;
+
+  const recordMemory = (memory: AlbanianKaikkiSourceDiagnosticMemoryV0_1): void => {
+    maxObservedRssBytes = Math.max(maxObservedRssBytes, memory.rssBytes);
+    if (memory.linuxHighWaterRssBytes !== null) {
+      maxObservedLinuxHighWaterRssBytes = maxObservedLinuxHighWaterRssBytes === null
+        ? memory.linuxHighWaterRssBytes
+        : Math.max(maxObservedLinuxHighWaterRssBytes, memory.linuxHighWaterRssBytes);
+    }
+  };
+
+  return Object.freeze({
+    beginPhase: () => process.hrtime.bigint(),
+    endPhase: (phase, phaseStartedAtNs) => {
+      const memory = diagnosticMemoryV0_1();
+      recordMemory(memory);
+      phaseResults.set(phase, Object.freeze({
+        durationMs: diagnosticDurationMsV0_1(phaseStartedAtNs),
+        endRssBytes: memory.rssBytes,
+        endLinuxHighWaterRssBytes: memory.linuxHighWaterRssBytes,
+      }));
+    },
+    emit: (status, reasonCode) => {
+      if (emitted) return;
+      emitted = true;
+      const endMemory = diagnosticMemoryV0_1();
+      recordMemory(endMemory);
+      const phase = (name: AlbanianKaikkiSourceDiagnosticPhaseV0_1) =>
+        phaseResults.get(name) ?? null;
+      console.info(JSON.stringify({
+        schemaVersion: "open-instrument.albanian-source-initialization-diagnostic.v0_1",
+        event: "open_instrument.albanian_source_initialization",
+        optIn: "staging",
+        status,
+        reasonCode,
+        overallDurationMs: diagnosticDurationMsV0_1(startedAtNs),
+        phases: {
+          metadataVerification: phase("metadata_verification"),
+          downloadHashAndTemporaryWrite: phase("download_hash_and_temporary_write"),
+          fileSynchronization: phase("file_synchronization"),
+          diskSha256Verification: phase("disk_sha256_verification"),
+          lexicalIndexConstruction: phase("lexical_index_construction"),
+        },
+        memory: {
+          scope: "process_only",
+          rssUnit: "bytes",
+          linuxHighWaterRssUnit: "bytes",
+          startRssBytes: startMemory.rssBytes,
+          endRssBytes: endMemory.rssBytes,
+          maxObservedRssBytes,
+          startLinuxHighWaterRssBytes: startMemory.linuxHighWaterRssBytes,
+          endLinuxHighWaterRssBytes: endMemory.linuxHighWaterRssBytes,
+          maxObservedLinuxHighWaterRssBytes,
+        },
+      }));
+    },
+  });
+}
 
 export type AlbanianKaikkiExactLexicalSourceSenseV0_1 = Readonly<{
   senseId: string | null;
@@ -449,6 +582,21 @@ function metricsForIndexV0_1(
 async function buildSourceIndexV0_1(
   sourcePath: string,
   sourceIdentity: SourceIdentityV0_1,
+  diagnosticContext?: AlbanianKaikkiSourceDiagnosticContextV0_1,
+): Promise<SourceIndexStateV0_1> {
+  const phaseStartedAtNs = diagnosticContext?.beginPhase("lexical_index_construction");
+  try {
+    return await buildSourceIndexBodyV0_1(sourcePath, sourceIdentity);
+  } finally {
+    if (phaseStartedAtNs !== undefined) {
+      diagnosticContext?.endPhase("lexical_index_construction", phaseStartedAtNs);
+    }
+  }
+}
+
+async function buildSourceIndexBodyV0_1(
+  sourcePath: string,
+  sourceIdentity: SourceIdentityV0_1,
 ): Promise<SourceIndexStateV0_1> {
   const expectedSnapshot = sourceIdentity.sourceSnapshot;
   const byLookupKey = new Map<string, SourceRecordRangeV0_1[]>();
@@ -547,6 +695,7 @@ function sourceIndexCacheKeyV0_1(
 function getSourceIndexV0_1(
   sourcePath: string,
   sourceIdentity: SourceIdentityV0_1,
+  diagnosticContext?: AlbanianKaikkiSourceDiagnosticContextV0_1,
 ): Promise<SourceIndexStateV0_1> {
   const cacheKey = sourceIndexCacheKeyV0_1(sourcePath, sourceIdentity);
   const existing = sourceIndexPromisesV0_1.get(cacheKey);
@@ -554,7 +703,7 @@ function getSourceIndexV0_1(
 
   const indexInitializationCount = (sourceIndexInitializationCountsV0_1.get(cacheKey) ?? 0) + 1;
   sourceIndexInitializationCountsV0_1.set(cacheKey, indexInitializationCount);
-  const indexPromise = buildSourceIndexV0_1(sourcePath, sourceIdentity).then((index) => Object.freeze({
+  const indexPromise = buildSourceIndexV0_1(sourcePath, sourceIdentity, diagnosticContext).then((index) => Object.freeze({
     ...index,
     indexInitializationCount,
   }));
@@ -665,6 +814,7 @@ function zeroLookupMetricsV0_1(): AlbanianKaikkiServerOnlyExactLexicalSourceLook
 function indexedProviderV0_1(
   sourcePath: string,
   sourceIdentity: SourceIdentityV0_1,
+  diagnosticContext?: AlbanianKaikkiSourceDiagnosticContextV0_1,
 ): AlbanianKaikkiServerOnlyExactLexicalSourceProviderV0_1 {
   const queryWithMetrics = async (
     query: unknown,
@@ -686,7 +836,8 @@ function indexedProviderV0_1(
     }
 
     try {
-      const index = await getSourceIndexV0_1(sourcePath, sourceIdentity);
+      const index = await getSourceIndexV0_1(sourcePath, sourceIdentity, diagnosticContext);
+      diagnosticContext?.emit("MATERIALIZED", null);
       return await lookupIndexedSourceFileV0_1(index, queryForm);
     } catch (error) {
       const reasonCode = error instanceof Error &&
@@ -695,10 +846,12 @@ function indexedProviderV0_1(
             error.message === "ALBANIAN_SOURCE_RECORD_FAILURE")
         ? error.message
         : "ALBANIAN_SOURCE_READ_FAILURE";
-      return Object.freeze({
+      const result = Object.freeze({
         result: unavailableV0_1(reasonCode),
         metrics: zeroLookupMetricsV0_1(),
       });
+      diagnosticContext?.emit("UNAVAILABLE", reasonCode);
+      return result;
     }
   };
 
@@ -712,6 +865,7 @@ function indexedProviderV0_1(
 
 export async function createAlbanianKaikkiServerOnlyExactLexicalSourceProviderV0_1(
   sourcePath = process.env[ALBANIAN_KAIKKI_LEXICAL_SOURCE_PATH_ENV_V0_1],
+  diagnosticContext?: AlbanianKaikkiSourceDiagnosticContextV0_1,
 ): Promise<AlbanianKaikkiServerOnlyExactLexicalSourceProviderV0_1> {
   if (!sourcePath) {
     const queryWithMetrics = async (): Promise<Readonly<{
@@ -729,7 +883,7 @@ export async function createAlbanianKaikkiServerOnlyExactLexicalSourceProviderV0
     });
   }
 
-  return indexedProviderV0_1(sourcePath, productionSourceIdentityV0_1);
+  return indexedProviderV0_1(sourcePath, productionSourceIdentityV0_1, diagnosticContext);
 }
 
 export function createAlbanianKaikkiServerOnlyExactLexicalSourceProviderForSyntheticSourceFileV0_1(
@@ -740,6 +894,7 @@ export function createAlbanianKaikkiServerOnlyExactLexicalSourceProviderForSynth
     sourceFamilyId?: string;
     sourceUrl?: string;
   }>,
+  diagnosticContext?: AlbanianKaikkiSourceDiagnosticContextV0_1,
 ): AlbanianKaikkiServerOnlyExactLexicalSourceProviderV0_1 {
   return indexedProviderV0_1(
     input.sourcePath,
@@ -751,6 +906,7 @@ export function createAlbanianKaikkiServerOnlyExactLexicalSourceProviderForSynth
         bytes: input.sourceBytes,
       }),
     }),
+    diagnosticContext,
   );
 }
 

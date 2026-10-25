@@ -9,9 +9,11 @@ import {
   ALBANIAN_KAIKKI_LEXICAL_SOURCE_BYTES_V0_1,
   ALBANIAN_KAIKKI_LEXICAL_SOURCE_PATH_ENV_V0_1,
   ALBANIAN_KAIKKI_LEXICAL_SOURCE_SHA256_V0_1,
+  createAlbanianKaikkiSourceDiagnosticContextV0_1,
   createAlbanianKaikkiServerOnlyExactLexicalSourceProviderV0_1,
   createAlbanianKaikkiServerOnlyUnavailableProviderV0_1,
   type AlbanianKaikkiExactLexicalSourceLookupResultV0_1,
+  type AlbanianKaikkiSourceDiagnosticContextV0_1,
   type AlbanianKaikkiServerOnlyExactLexicalSourceProviderV0_1,
 } from "@/shared/openInstrument/albanianKaikkiServerOnlyExactLexicalSource.v0_1";
 
@@ -80,6 +82,7 @@ export type MaterializationOptionsV0_1 = Readonly<{
   objectReaderFactory?: AlbanianKaikkiSourceObjectReaderFactoryV0_1;
   fileHandleFactory?: AlbanianKaikkiSourceFileHandleFactoryV0_1;
   beforeDiskVerification?: (path: string) => Promise<void> | void;
+  diagnosticContext?: AlbanianKaikkiSourceDiagnosticContextV0_1;
 }>;
 
 const materializationPromisesV0_1 = new Map<
@@ -191,34 +194,39 @@ async function cleanupStaleTemporaryFilesV0_1(root: string): Promise<void> {
 async function materializeOnceV0_1(
   config: AlbanianKaikkiGcsSourceDeliveryConfigV0_1,
   options: Required<Pick<MaterializationOptionsV0_1, "expectedBytes" | "expectedSha256">> &
-    Pick<MaterializationOptionsV0_1, "objectReaderFactory" | "fileHandleFactory" | "beforeDiskVerification">,
+    Pick<MaterializationOptionsV0_1, "objectReaderFactory" | "fileHandleFactory" | "beforeDiskVerification" | "diagnosticContext">,
 ): Promise<MaterializationResultV0_1> {
   const expectedBytes = options.expectedBytes;
   const expectedSha256 = options.expectedSha256;
   const objectReader = (options.objectReaderFactory ?? createGoogleCloudStorageObjectReaderV0_1)(config);
+  const diagnosticContext = options.diagnosticContext;
   let metadata: Readonly<{ generation: string | number | undefined; size: string | number | undefined }>;
+  const metadataPhaseStartedAtNs = diagnosticContext?.beginPhase("metadata_verification");
 
   try {
     metadata = await objectReader.getMetadata();
+    if (String(metadata.generation ?? "") !== config.generation) {
+      return Object.freeze({
+        status: "UNAVAILABLE" as const,
+        reasonCode: "ALBANIAN_SOURCE_OBJECT_GENERATION_MISMATCH" as const,
+      });
+    }
+
+    if (Number(metadata.size) !== expectedBytes) {
+      return Object.freeze({
+        status: "UNAVAILABLE" as const,
+        reasonCode: "ALBANIAN_SOURCE_IDENTITY_MISMATCH" as const,
+      });
+    }
   } catch (error) {
     return Object.freeze({
       status: "UNAVAILABLE" as const,
       reasonCode: metadataFailureReasonV0_1(error),
     });
-  }
-
-  if (String(metadata.generation ?? "") !== config.generation) {
-    return Object.freeze({
-      status: "UNAVAILABLE" as const,
-      reasonCode: "ALBANIAN_SOURCE_OBJECT_GENERATION_MISMATCH" as const,
-    });
-  }
-
-  if (Number(metadata.size) !== expectedBytes) {
-    return Object.freeze({
-      status: "UNAVAILABLE" as const,
-      reasonCode: "ALBANIAN_SOURCE_IDENTITY_MISMATCH" as const,
-    });
+  } finally {
+    if (metadataPhaseStartedAtNs !== undefined) {
+      diagnosticContext?.endPhase("metadata_verification", metadataPhaseStartedAtNs);
+    }
   }
 
   const targetPath = materializedPathV0_1(config);
@@ -238,6 +246,9 @@ async function materializeOnceV0_1(
     let streamByteCount = 0;
     let persistedByteCount = 0;
 
+    const downloadPhaseStartedAtNs = diagnosticContext?.beginPhase(
+      "download_hash_and_temporary_write",
+    );
     try {
       for await (const chunk of objectReader.createReadStream()) {
         const bytes = Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk);
@@ -269,6 +280,17 @@ async function materializeOnceV0_1(
           persistedByteCount += bytesWritten;
         }
       }
+      const incomingSha256 = hash.digest("hex");
+      if (
+        streamByteCount !== expectedBytes ||
+        persistedByteCount !== expectedBytes ||
+        incomingSha256 !== expectedSha256
+      ) {
+        return Object.freeze({
+          status: "UNAVAILABLE" as const,
+          reasonCode: "ALBANIAN_SOURCE_IDENTITY_MISMATCH" as const,
+        });
+      }
     } catch {
       if (persistedByteCount !== streamByteCount) {
         return Object.freeze({
@@ -280,49 +302,61 @@ async function materializeOnceV0_1(
         status: "UNAVAILABLE" as const,
         reasonCode: "ALBANIAN_SOURCE_DOWNLOAD_FAILURE" as const,
       });
-    }
-
-    const incomingSha256 = hash.digest("hex");
-    if (
-      streamByteCount !== expectedBytes ||
-      persistedByteCount !== expectedBytes ||
-      incomingSha256 !== expectedSha256
-    ) {
-      return Object.freeze({
-        status: "UNAVAILABLE" as const,
-        reasonCode: "ALBANIAN_SOURCE_IDENTITY_MISMATCH" as const,
-      });
+    } finally {
+      if (downloadPhaseStartedAtNs !== undefined) {
+        diagnosticContext?.endPhase(
+          "download_hash_and_temporary_write",
+          downloadPhaseStartedAtNs,
+        );
+      }
     }
 
     try {
-      await temporaryHandle.sync();
-      await temporaryHandle.close();
-      temporaryHandle = null;
-
-      await options.beforeDiskVerification?.(temporaryPath);
-      const diskDetails = await stat(temporaryPath);
-      if (diskDetails.size !== expectedBytes) {
-        return Object.freeze({
-          status: "UNAVAILABLE" as const,
-          reasonCode: "ALBANIAN_SOURCE_IDENTITY_MISMATCH" as const,
-        });
+      const syncPhaseStartedAtNs = diagnosticContext?.beginPhase("file_synchronization");
+      try {
+        await temporaryHandle.sync();
+        await temporaryHandle.close();
+        temporaryHandle = null;
+      } finally {
+        if (syncPhaseStartedAtNs !== undefined) {
+          diagnosticContext?.endPhase("file_synchronization", syncPhaseStartedAtNs);
+        }
       }
 
-      const diskHash = createHash("sha256");
+      const diskPhaseStartedAtNs = diagnosticContext?.beginPhase(
+        "disk_sha256_verification",
+      );
       let diskByteCount = 0;
-      for await (const chunk of createReadStream(temporaryPath)) {
-        const bytes = Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk);
-        diskByteCount += bytes.byteLength;
-        diskHash.update(bytes);
-      }
-      const diskSha256 = diskHash.digest("hex");
-      if (diskByteCount !== expectedBytes || diskSha256 !== expectedSha256) {
-        return Object.freeze({
-          status: "UNAVAILABLE" as const,
-          reasonCode: "ALBANIAN_SOURCE_IDENTITY_MISMATCH" as const,
-        });
-      }
+      let diskSha256 = "";
+      try {
+        await options.beforeDiskVerification?.(temporaryPath);
+        const diskDetails = await stat(temporaryPath);
+        if (diskDetails.size !== expectedBytes) {
+          return Object.freeze({
+            status: "UNAVAILABLE" as const,
+            reasonCode: "ALBANIAN_SOURCE_IDENTITY_MISMATCH" as const,
+          });
+        }
 
+        const diskHash = createHash("sha256");
+        for await (const chunk of createReadStream(temporaryPath)) {
+          const bytes = Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk);
+          diskByteCount += bytes.byteLength;
+          diskHash.update(bytes);
+        }
+        diskSha256 = diskHash.digest("hex");
+        if (diskByteCount !== expectedBytes || diskSha256 !== expectedSha256) {
+          return Object.freeze({
+            status: "UNAVAILABLE" as const,
+            reasonCode: "ALBANIAN_SOURCE_IDENTITY_MISMATCH" as const,
+          });
+        }
+
+      } finally {
+        if (diskPhaseStartedAtNs !== undefined) {
+          diagnosticContext?.endPhase("disk_sha256_verification", diskPhaseStartedAtNs);
+        }
+      }
       await rename(temporaryPath, targetPath);
       return Object.freeze({
         status: "MATERIALIZED" as const,
@@ -364,6 +398,7 @@ export function materializeAlbanianKaikkiSourceV0_1(
     objectReaderFactory: options.objectReaderFactory,
     fileHandleFactory: options.fileHandleFactory,
     beforeDiskVerification: options.beforeDiskVerification,
+    diagnosticContext: options.diagnosticContext,
   });
   materializationPromisesV0_1.set(key, promise);
   return promise;
@@ -372,27 +407,38 @@ export function materializeAlbanianKaikkiSourceV0_1(
 export async function createAlbanianKaikkiServerOnlyProductionProviderV0_1(
   options: MaterializationOptionsV0_1 = {},
 ): Promise<AlbanianKaikkiServerOnlyExactLexicalSourceProviderV0_1> {
+  const diagnosticContext = createAlbanianKaikkiSourceDiagnosticContextV0_1();
   const localSourcePath = textEnvV0_1(ALBANIAN_KAIKKI_LEXICAL_SOURCE_PATH_ENV_V0_1);
   if (localSourcePath) {
-    return createAlbanianKaikkiServerOnlyExactLexicalSourceProviderV0_1(localSourcePath);
+    return createAlbanianKaikkiServerOnlyExactLexicalSourceProviderV0_1(
+      localSourcePath,
+      diagnosticContext,
+    );
   }
 
   const delivery = readGcsConfigV0_1();
   if (delivery.reasonCode) {
+    diagnosticContext?.emit("UNAVAILABLE", delivery.reasonCode);
     return createAlbanianKaikkiServerOnlyUnavailableProviderV0_1(delivery.reasonCode);
   }
   if (!delivery.config) {
+    diagnosticContext?.emit("UNAVAILABLE", "ALBANIAN_SOURCE_PATH_NOT_CONFIGURED");
     return createAlbanianKaikkiServerOnlyUnavailableProviderV0_1(
       "ALBANIAN_SOURCE_PATH_NOT_CONFIGURED",
     );
   }
 
-  const materialized = await materializeAlbanianKaikkiSourceV0_1(delivery.config, options);
+  const materialized = await materializeAlbanianKaikkiSourceV0_1(delivery.config, {
+    ...options,
+    diagnosticContext,
+  });
   if (materialized.status !== "MATERIALIZED") {
+    diagnosticContext?.emit("UNAVAILABLE", materialized.reasonCode);
     return createAlbanianKaikkiServerOnlyUnavailableProviderV0_1(materialized.reasonCode);
   }
 
   return createAlbanianKaikkiServerOnlyExactLexicalSourceProviderV0_1(
     materialized.sourcePath,
+    diagnosticContext,
   );
 }
