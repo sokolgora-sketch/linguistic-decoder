@@ -1522,10 +1522,26 @@ export async function buildMotivationEngineDiscoveryServerOnlyV0_1(input: {
   inputProfile: string;
   analysis: AnalyzeWordResultV1;
   heart: HeartInstrumentV1;
+  profileDerivedVoicePath?: readonly string[] | null;
   provider?: EnglishKaikkiServerOnlyExactIndexProviderV0_1;
   albanianLexicalSourceProvider?: AlbanianKaikkiServerOnlyExactLexicalSourceProviderV0_1;
 }): Promise<MotivationEngineDiscoveryServerOnlyResultV0_1> {
   const provider = input.provider ?? await getProductionProviderV0_1();
+  // Keep the profile-derived path in the server/API integration seam. The
+  // public Discovery builder remains byte-identical to its S2-pinned contract;
+  // this internal view is never returned as API primaryPath.
+  const discoveryAnalysis = input.profileDerivedVoicePath?.length
+    ? {
+        ...input.analysis,
+        primaryPath: {
+          ...(input.analysis.primaryPath ?? {
+            levelPath: "",
+            ringPath: "",
+          }),
+          voicePath: input.profileDerivedVoicePath.join(" → "),
+        },
+      }
+    : input.analysis;
   const queryForms = getMotivationEngineDiscoveryQueryFormsV0_1(input);
   const resolved = await resolveEnglishRecordsV0_1(provider, queryForms);
   const albanianLexicalSourceResult = isAlbanianInputV0_1(input)
@@ -1546,7 +1562,7 @@ export async function buildMotivationEngineDiscoveryServerOnlyV0_1(input: {
     word: input.word,
     inputLanguage: input.inputLanguage,
     inputProfile: input.inputProfile,
-    analysis: input.analysis,
+    analysis: discoveryAnalysis,
     heart: input.heart,
     sourceAdapters: recordingSourceAdapters,
   }), sourceFamilyBySourceId);
