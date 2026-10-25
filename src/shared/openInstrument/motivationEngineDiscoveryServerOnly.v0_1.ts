@@ -10,13 +10,13 @@ import {
   type EnglishKaikkiServerOnlyExactIndexProviderV0_1,
 } from "@/shared/openInstrument/englishKaikkiServerOnlyExactIndexProvider.v0_1";
 import {
-  createAlbanianKaikkiServerOnlyExactLexicalSourceProviderV0_1,
   type AlbanianKaikkiExactLexicalSourceFactV0_1,
   type AlbanianKaikkiExactLexicalSourceEtymologyLinkV0_1,
   type AlbanianKaikkiExactLexicalSourceEtymologyTemplateV0_1,
   type AlbanianKaikkiExactLexicalSourceStatusV0_1,
   type AlbanianKaikkiServerOnlyExactLexicalSourceProviderV0_1,
 } from "@/shared/openInstrument/albanianKaikkiServerOnlyExactLexicalSource.v0_1";
+import { createAlbanianKaikkiServerOnlyProductionProviderV0_1 } from "@/shared/openInstrument/albanianKaikkiServerOnlySourceDelivery.v0_1";
 import {
   projectAlbanianKaikkiFactSourceIpaToSevenVoicesV0_1,
   projectAlbanianKaikkiFactsSourceIpaToSevenVoicesV0_1,
@@ -311,7 +311,7 @@ function getProductionProviderV0_1(): Promise<EnglishKaikkiServerOnlyExactIndexP
 
 function getProductionAlbanianLexicalSourceProviderV0_1(): Promise<AlbanianKaikkiServerOnlyExactLexicalSourceProviderV0_1> {
   productionAlbanianLexicalSourceProviderPromise ??=
-    createAlbanianKaikkiServerOnlyExactLexicalSourceProviderV0_1();
+    createAlbanianKaikkiServerOnlyProductionProviderV0_1();
   return productionAlbanianLexicalSourceProviderPromise;
 }
 

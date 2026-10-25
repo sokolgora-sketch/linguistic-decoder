@@ -96,6 +96,11 @@ export type AlbanianKaikkiExactLexicalSourceLookupResultV0_1 = Readonly<
       facts: readonly [];
       reasonCode:
         | "ALBANIAN_SOURCE_PATH_NOT_CONFIGURED"
+        | "ALBANIAN_SOURCE_DELIVERY_CONFIGURATION_INVALID"
+        | "ALBANIAN_SOURCE_OBJECT_ACCESS_FAILURE"
+        | "ALBANIAN_SOURCE_OBJECT_GENERATION_MISMATCH"
+        | "ALBANIAN_SOURCE_DOWNLOAD_FAILURE"
+        | "ALBANIAN_SOURCE_MATERIALIZATION_FAILURE"
         | "ALBANIAN_SOURCE_IDENTITY_MISMATCH"
         | "ALBANIAN_SOURCE_READ_FAILURE"
         | "ALBANIAN_SOURCE_RECORD_FAILURE";
@@ -305,6 +310,28 @@ function sourceFactV0_1(
     attestationTruth: "fact",
     pronunciationAuthority: ALBANIAN_KAIKKI_LEXICAL_PRONUNCIATION_AUTHORITY_V0_1,
     sourceSnapshot: sourceIdentity.sourceSnapshot,
+  });
+}
+
+export function createAlbanianKaikkiServerOnlyUnavailableProviderV0_1(
+  reasonCode: Extract<
+    AlbanianKaikkiExactLexicalSourceLookupResultV0_1,
+    { status: "UNAVAILABLE" }
+  >["reasonCode"],
+): AlbanianKaikkiServerOnlyExactLexicalSourceProviderV0_1 {
+  const queryWithMetrics = async (): Promise<Readonly<{
+    result: AlbanianKaikkiExactLexicalSourceLookupResultV0_1;
+    metrics: AlbanianKaikkiServerOnlyExactLexicalSourceLookupMetricsV0_1;
+  }>> => Object.freeze({
+    result: unavailableV0_1(reasonCode),
+    metrics: zeroLookupMetricsV0_1(),
+  });
+
+  return Object.freeze({
+    providerId: ALBANIAN_KAIKKI_SERVER_ONLY_EXACT_LEXICAL_SOURCE_PROVIDER_ID_V0_1,
+    runtimeBoundary: "SERVER_ONLY" as const,
+    query: async () => unavailableV0_1(reasonCode),
+    queryWithMetrics,
   });
 }
 
