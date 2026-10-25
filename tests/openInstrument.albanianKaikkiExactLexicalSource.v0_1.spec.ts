@@ -98,6 +98,34 @@ async function discoveryForMalorRelationTextV0_1(etymologyText: string | null | 
   return discoveryForFactsV0_1([mal, malor], "mal");
 }
 
+async function discoveryForMalorDerivedFunctionalRelationTextV0_1(etymologyText: string) {
+  const mal = fixtureFact({
+    sourceRecordId: "kaikki-albanian-jsonl:word=mal:ordinal=0",
+    entryLocator: "jsonl://word/mal/match/0",
+    form: "mal",
+    partOfSpeech: "noun",
+    senses: [{ senseId: "mal-1", glosses: ["mountain"] }],
+    ipaObservations: [{ soundIndex: 0, ipa: "/ˈmal/", tags: [] }],
+    relatedForms: [{ form: "malor", relation: "SOURCE_DERIVED_FORM", entryLocator: "jsonl://word/malor" }],
+  });
+  const malor = fixtureFact({
+    sourceRecordId: "kaikki-albanian-jsonl:word=malor:ordinal=0",
+    entryLocator: "jsonl://word/malor/match/0",
+    form: "malor",
+    partOfSpeech: "adj",
+    senses: [{ senseId: "malor-1", glosses: ["mountainous"] }],
+    ipaObservations: [],
+    etymologyText,
+    etymologyLinks: [{ sourceForm: "mal", reference: "mal#Albanian" }],
+    etymologyTemplates: [{
+      name: "suffix",
+      args: { "1": "sq", "2": "mal", "3": "-or" },
+      expansion: "mal + -or",
+    }],
+  });
+  return discoveryForFactsV0_1([mal, malor], "mal");
+}
+
 async function discoveryForDriteDritareRelationTextV0_1(etymologyText: string) {
   const drite = fixtureFact({
     sourceRecordId: "kaikki-albanian-jsonl:word=drit%C3%AB:ordinal=0",
@@ -568,6 +596,29 @@ describe("real Albanian exact lexical source integration v0.1", () => {
       expect(screen.getByTestId("albanian-reading-functional-bridge-derived-structure-null")).toHaveTextContent("no Voice or phonological semantic relation is claimed");
       expect(screen.getByTestId("albanian-reading-composition-null")).toHaveTextContent("Null");
     }
+  });
+
+  it.each([
+    ["negated", "Not from mal + -or.."],
+    ["qualified", "Possibly from mal + -or."],
+    ["contradictory", "From another root, not mal + -or."],
+  ])("fails closed for %s source-authored suffix explanation", async (_label, etymologyText) => {
+    const discovery = await discoveryForMalorDerivedFunctionalRelationTextV0_1(etymologyText);
+
+    expect(discovery.albanianLexicalReading).toMatchObject({
+      status: "SUPPORTED",
+      sourceLinkedComparison: {
+        status: "SUPPORTED",
+        relation: { relation: "SOURCE_DERIVED_FORM", relatedForm: "malor" },
+      },
+      functionalMeaningBridge: {
+        status: "NULL",
+        relatedForm: "malor",
+        reasonCodes: ["DERIVED_STRUCTURE_NOT_SUPPORTED_FOR_BOTH_RECORDS"],
+        functionalHypothesis: { status: "UNKNOWN_OR_NULL", statement: null },
+      },
+      composition: { status: "NULL" },
+    });
   });
 
   it.each([

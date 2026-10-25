@@ -1217,8 +1217,8 @@ function buildEntityToAttributedPropertyHypothesisV0_1(input: Readonly<{
   );
   const sourceExplanation = input.related.etymologyText?.trim() ?? "";
   const sourceExplanationText = sourceExplanation.toLocaleLowerCase("en-US").replace(/\s+/gu, " ");
-  const expectedSourcePhrase = `from ${input.primary.form.toLocaleLowerCase("en-US")} + -or`;
-  if (!suffixTemplate || !sourceExplanationText.includes(expectedSourcePhrase)) return null;
+  const expectedSourceExplanation = `from ${input.primary.form.toLocaleLowerCase("en-US")} + -or.`;
+  if (!suffixTemplate || sourceExplanationText !== expectedSourceExplanation) return null;
   const sourceExplanationStatement = sourceExplanation.replace(/[.!?]\s*$/u, "");
 
   const primaryMeaning = input.primary.meaningGlosses.join("; ");
