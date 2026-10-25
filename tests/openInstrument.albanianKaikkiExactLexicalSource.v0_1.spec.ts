@@ -322,7 +322,9 @@ describe("real Albanian exact lexical source integration v0.1", () => {
       expect(screen.getByTestId("albanian-source-linked-comparison")).toHaveTextContent("SHARED_INITIAL_VOICE_DIFFERENT_LATER_PATH");
       expect(screen.getByTestId("albanian-reading-functional-bridge")).toHaveTextContent("Directional functional interpretation");
       expect(screen.getByTestId("albanian-reading-functional-bridge")).toHaveTextContent("enabling input");
-      expect(screen.getByTestId("albanian-reading-functional-bridge-basis")).toHaveTextContent("SOURCE_AUTHORED_TRANSMISSION_EXPLANATION");
+      const functionalBridgeBasis = screen.getByTestId("albanian-reading-functional-bridge-basis");
+      expect(functionalBridgeBasis).toHaveTextContent("SOURCE_AUTHORED_TRANSMISSION_EXPLANATION");
+      expect(functionalBridgeBasis).toHaveClass("break-words");
       expect(screen.getByTestId("albanian-reading-composition-null")).toHaveTextContent("Null");
     }
   });
