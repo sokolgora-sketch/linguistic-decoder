@@ -8,7 +8,9 @@ import { buildHeartInstrumentV1 } from "@/v1/heartInstrument.v1";
 import { runAnalysisDeterministic } from "@/lib/runAnalysisDeterministic";
 import { enginePayloadToAnalysisResult } from "@/shared/analysisAdapter";
 import {
+  ALBANIAN_KAIKKI_COLD_START_DIAGNOSTICS_ENV_V0_1,
   createAlbanianKaikkiServerOnlyExactLexicalSourceProviderForSyntheticSourceFileV0_1,
+  createAlbanianKaikkiSourceDiagnosticContextV0_1,
 } from "@/shared/openInstrument/albanianKaikkiServerOnlyExactLexicalSource.v0_1";
 import {
   ALBANIAN_KAIKKI_GCS_BUCKET_ENV_V0_1,
@@ -101,6 +103,7 @@ async function freshRoot(): Promise<string> {
 describe("Albanian frozen source delivery v0.1", () => {
   const originalEnvironment = {
     local: process.env[LOCAL_SOURCE_ENV],
+    diagnostics: process.env[ALBANIAN_KAIKKI_COLD_START_DIAGNOSTICS_ENV_V0_1],
     bucket: process.env[ALBANIAN_KAIKKI_GCS_BUCKET_ENV_V0_1],
     object: process.env[ALBANIAN_KAIKKI_GCS_OBJECT_ENV_V0_1],
     generation: process.env[ALBANIAN_KAIKKI_GCS_GENERATION_ENV_V0_1],
@@ -109,6 +112,7 @@ describe("Albanian frozen source delivery v0.1", () => {
 
   beforeEach(() => {
     delete process.env[LOCAL_SOURCE_ENV];
+    delete process.env[ALBANIAN_KAIKKI_COLD_START_DIAGNOSTICS_ENV_V0_1];
     delete process.env[ALBANIAN_KAIKKI_GCS_BUCKET_ENV_V0_1];
     delete process.env[ALBANIAN_KAIKKI_GCS_OBJECT_ENV_V0_1];
     delete process.env[ALBANIAN_KAIKKI_GCS_GENERATION_ENV_V0_1];
@@ -118,6 +122,7 @@ describe("Albanian frozen source delivery v0.1", () => {
   afterAll(() => {
     for (const [name, value] of Object.entries({
       [LOCAL_SOURCE_ENV]: originalEnvironment.local,
+      [ALBANIAN_KAIKKI_COLD_START_DIAGNOSTICS_ENV_V0_1]: originalEnvironment.diagnostics,
       [ALBANIAN_KAIKKI_GCS_BUCKET_ENV_V0_1]: originalEnvironment.bucket,
       [ALBANIAN_KAIKKI_GCS_OBJECT_ENV_V0_1]: originalEnvironment.object,
       [ALBANIAN_KAIKKI_GCS_GENERATION_ENV_V0_1]: originalEnvironment.generation,
@@ -125,6 +130,71 @@ describe("Albanian frozen source delivery v0.1", () => {
     })) {
       if (value === undefined) delete process.env[name];
       else process.env[name] = value;
+    }
+  });
+
+  it("keeps cold-start diagnostics disabled unless staging explicitly opts in", () => {
+    expect(createAlbanianKaikkiSourceDiagnosticContextV0_1()).toBeUndefined();
+
+    process.env[ALBANIAN_KAIKKI_COLD_START_DIAGNOSTICS_ENV_V0_1] = "staging";
+    expect(createAlbanianKaikkiSourceDiagnosticContextV0_1()).toBeDefined();
+  });
+
+  it("emits one structured phase and process-memory event for an opted-in initialization", async () => {
+    const root = await freshRoot();
+    const log = jest.spyOn(console, "info").mockImplementation(() => undefined);
+    process.env[ALBANIAN_KAIKKI_COLD_START_DIAGNOSTICS_ENV_V0_1] = "staging";
+    try {
+      const diagnosticContext = createAlbanianKaikkiSourceDiagnosticContextV0_1();
+      expect(diagnosticContext).toBeDefined();
+      const result = await materializeAlbanianKaikkiSourceV0_1(config(root), {
+        expectedBytes: PAYLOAD.byteLength,
+        expectedSha256: digest(PAYLOAD),
+        objectReaderFactory: readerFactory({}),
+        diagnosticContext,
+      });
+      expect(result.status).toBe("MATERIALIZED");
+      if (result.status !== "MATERIALIZED" || diagnosticContext === undefined) {
+        throw new Error("diagnostic fixture did not materialize");
+      }
+
+      const provider = createAlbanianKaikkiServerOnlyExactLexicalSourceProviderForSyntheticSourceFileV0_1({
+        sourcePath: result.sourcePath,
+        sourceSha256: result.sha256,
+        sourceBytes: result.bytes,
+      }, diagnosticContext);
+      await expect(provider.query("mal")).resolves.toMatchObject({ status: "MATCHES_FOUND" });
+
+      expect(log).toHaveBeenCalledTimes(1);
+      const event = JSON.parse(String(log.mock.calls[0]?.[0]));
+      expect(event).toMatchObject({
+        schemaVersion: "open-instrument.albanian-source-initialization-diagnostic.v0_1",
+        event: "open_instrument.albanian_source_initialization",
+        optIn: "staging",
+        status: "MATERIALIZED",
+        reasonCode: null,
+        memory: {
+          scope: "process_only",
+          rssUnit: "bytes",
+          linuxHighWaterRssUnit: "bytes",
+        },
+      });
+      for (const phase of [
+        "metadataVerification",
+        "downloadHashAndTemporaryWrite",
+        "fileSynchronization",
+        "diskSha256Verification",
+        "lexicalIndexConstruction",
+      ]) {
+        expect(typeof event.phases[phase].durationMs).toBe("number");
+      }
+      expect(typeof event.overallDurationMs).toBe("number");
+      expect(typeof event.memory.startRssBytes).toBe("number");
+      expect(typeof event.memory.endRssBytes).toBe("number");
+      expect(typeof event.memory.maxObservedRssBytes).toBe("number");
+    } finally {
+      log.mockRestore();
+      await rm(root, { recursive: true, force: true });
     }
   });
 
