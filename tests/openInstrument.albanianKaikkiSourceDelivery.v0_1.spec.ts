@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import { mkdtemp, readFile, readdir, rm, utimes, writeFile } from "node:fs/promises";
+import { mkdtemp, open, readFile, readdir, rm, stat, utimes, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { Readable } from "node:stream";
@@ -18,6 +18,7 @@ import {
   createAlbanianKaikkiServerOnlyProductionProviderV0_1,
   materializeAlbanianKaikkiSourceV0_1,
   type AlbanianKaikkiGcsSourceDeliveryConfigV0_1,
+  type AlbanianKaikkiSourceFileHandleFactoryV0_1,
   type AlbanianKaikkiSourceObjectReaderFactoryV0_1,
 } from "@/shared/openInstrument/albanianKaikkiServerOnlySourceDelivery.v0_1";
 import { buildMotivationEngineDiscoveryServerOnlyV0_1 } from "@/shared/openInstrument/motivationEngineDiscoveryServerOnly.v0_1";
@@ -30,6 +31,30 @@ const PAYLOAD = Buffer.from(
 
 function digest(bytes: Buffer): string {
   return createHash("sha256").update(bytes).digest("hex");
+}
+
+function fileHandleFactory(input: Readonly<{
+  shortWrites?: boolean;
+  zeroProgress?: boolean;
+  throwAfterFirstWrite?: boolean;
+}>): AlbanianKaikkiSourceFileHandleFactoryV0_1 {
+  return async (path) => {
+    const actualHandle = await open(path, "wx", 0o600);
+    let writeCalls = 0;
+    return {
+      write: async (buffer, offset = 0, length = buffer.byteLength - offset, position = null) => {
+        if (input.zeroProgress) return { bytesWritten: 0, buffer };
+        if (input.throwAfterFirstWrite && writeCalls > 0) {
+          throw new Error("injected write failure");
+        }
+        writeCalls += 1;
+        const writeLength = input.shortWrites ? Math.min(3, length) : length;
+        return actualHandle.write(buffer, offset, writeLength, position);
+      },
+      sync: () => actualHandle.sync(),
+      close: () => actualHandle.close(),
+    };
+  };
 }
 
 function config(root: string, generation = "123456789"): AlbanianKaikkiGcsSourceDeliveryConfigV0_1 {
@@ -119,6 +144,8 @@ describe("Albanian frozen source delivery v0.1", () => {
       });
       if (result.status !== "MATERIALIZED") throw new Error("fixture did not materialize");
       await expect(readFile(result.sourcePath)).resolves.toEqual(PAYLOAD);
+      await expect(stat(result.sourcePath)).resolves.toMatchObject({ size: PAYLOAD.byteLength });
+      await expect(readFile(result.sourcePath).then(digest)).resolves.toBe(digest(PAYLOAD));
       await expect(readdir(root)).resolves.toEqual(["open-instrument-albanian-kaikki-v0.1.jsonl"]);
 
       const provider = createAlbanianKaikkiServerOnlyExactLexicalSourceProviderForSyntheticSourceFileV0_1({
@@ -130,6 +157,91 @@ describe("Albanian frozen source delivery v0.1", () => {
         status: "MATCHES_FOUND",
         queryForm: "mal",
       });
+    } finally {
+      await rm(root, { recursive: true, force: true });
+    }
+  });
+
+  it("recovers from positive short writes and publishes the complete disk artifact", async () => {
+    const root = await freshRoot();
+    try {
+      const result = await materializeAlbanianKaikkiSourceV0_1(config(root), {
+        expectedBytes: PAYLOAD.byteLength,
+        expectedSha256: digest(PAYLOAD),
+        objectReaderFactory: readerFactory({}),
+        fileHandleFactory: fileHandleFactory({ shortWrites: true }),
+      });
+
+      expect(result).toMatchObject({ status: "MATERIALIZED" });
+      if (result.status !== "MATERIALIZED") throw new Error("short-write fixture did not materialize");
+      await expect(readFile(result.sourcePath)).resolves.toEqual(PAYLOAD);
+      await expect(stat(result.sourcePath)).resolves.toMatchObject({ size: PAYLOAD.byteLength });
+      await expect(readFile(result.sourcePath).then(digest)).resolves.toBe(digest(PAYLOAD));
+    } finally {
+      await rm(root, { recursive: true, force: true });
+    }
+  });
+
+  it("fails closed on zero write progress and removes the temporary artifact", async () => {
+    const root = await freshRoot();
+    try {
+      const result = await materializeAlbanianKaikkiSourceV0_1(config(root), {
+        expectedBytes: PAYLOAD.byteLength,
+        expectedSha256: digest(PAYLOAD),
+        objectReaderFactory: readerFactory({}),
+        fileHandleFactory: fileHandleFactory({ zeroProgress: true }),
+      });
+
+      expect(result).toEqual({
+        status: "UNAVAILABLE",
+        reasonCode: "ALBANIAN_SOURCE_MATERIALIZATION_FAILURE",
+      });
+      await expect(readdir(root)).resolves.toEqual([]);
+    } finally {
+      await rm(root, { recursive: true, force: true });
+    }
+  });
+
+  it("fails closed on a write exception after partial progress", async () => {
+    const root = await freshRoot();
+    try {
+      const result = await materializeAlbanianKaikkiSourceV0_1(config(root), {
+        expectedBytes: PAYLOAD.byteLength,
+        expectedSha256: digest(PAYLOAD),
+        objectReaderFactory: readerFactory({}),
+        fileHandleFactory: fileHandleFactory({
+          shortWrites: true,
+          throwAfterFirstWrite: true,
+        }),
+      });
+
+      expect(result).toEqual({
+        status: "UNAVAILABLE",
+        reasonCode: "ALBANIAN_SOURCE_MATERIALIZATION_FAILURE",
+      });
+      await expect(readdir(root)).resolves.toEqual([]);
+    } finally {
+      await rm(root, { recursive: true, force: true });
+    }
+  });
+
+  it("rejects an on-disk integrity mismatch before publication", async () => {
+    const root = await freshRoot();
+    try {
+      const result = await materializeAlbanianKaikkiSourceV0_1(config(root), {
+        expectedBytes: PAYLOAD.byteLength,
+        expectedSha256: digest(PAYLOAD),
+        objectReaderFactory: readerFactory({}),
+        beforeDiskVerification: async (path) => {
+          await writeFile(path, Buffer.from("corrupted", "utf8"));
+        },
+      });
+
+      expect(result).toEqual({
+        status: "UNAVAILABLE",
+        reasonCode: "ALBANIAN_SOURCE_IDENTITY_MISMATCH",
+      });
+      await expect(readdir(root)).resolves.toEqual([]);
     } finally {
       await rm(root, { recursive: true, force: true });
     }

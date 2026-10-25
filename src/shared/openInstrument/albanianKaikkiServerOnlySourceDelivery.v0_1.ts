@@ -1,4 +1,5 @@
 import { createHash, randomUUID } from "node:crypto";
+import { createReadStream } from "node:fs";
 import { mkdir, open, readdir, rename, rm, stat } from "node:fs/promises";
 import { isAbsolute, join } from "node:path";
 
@@ -51,6 +52,15 @@ export type AlbanianKaikkiSourceObjectReaderFactoryV0_1 = (
   config: AlbanianKaikkiGcsSourceDeliveryConfigV0_1,
 ) => AlbanianKaikkiSourceObjectReaderV0_1;
 
+export type AlbanianKaikkiSourceFileHandleV0_1 = Pick<
+  Awaited<ReturnType<typeof open>>,
+  "write" | "sync" | "close"
+>;
+
+export type AlbanianKaikkiSourceFileHandleFactoryV0_1 = (
+  path: string,
+) => Promise<AlbanianKaikkiSourceFileHandleV0_1>;
+
 type MaterializationResultV0_1 = Readonly<
   | {
       status: "MATERIALIZED";
@@ -64,10 +74,12 @@ type MaterializationResultV0_1 = Readonly<
     }
 >;
 
-type MaterializationOptionsV0_1 = Readonly<{
+export type MaterializationOptionsV0_1 = Readonly<{
   expectedBytes?: number;
   expectedSha256?: string;
   objectReaderFactory?: AlbanianKaikkiSourceObjectReaderFactoryV0_1;
+  fileHandleFactory?: AlbanianKaikkiSourceFileHandleFactoryV0_1;
+  beforeDiskVerification?: (path: string) => Promise<void> | void;
 }>;
 
 const materializationPromisesV0_1 = new Map<
@@ -179,7 +191,7 @@ async function cleanupStaleTemporaryFilesV0_1(root: string): Promise<void> {
 async function materializeOnceV0_1(
   config: AlbanianKaikkiGcsSourceDeliveryConfigV0_1,
   options: Required<Pick<MaterializationOptionsV0_1, "expectedBytes" | "expectedSha256">> &
-    Pick<MaterializationOptionsV0_1, "objectReaderFactory">,
+    Pick<MaterializationOptionsV0_1, "objectReaderFactory" | "fileHandleFactory" | "beforeDiskVerification">,
 ): Promise<MaterializationResultV0_1> {
   const expectedBytes = options.expectedBytes;
   const expectedSha256 = options.expectedSha256;
@@ -214,37 +226,68 @@ async function materializeOnceV0_1(
     config.materializedRoot,
     `${TEMP_FILE_PREFIX_V0_1}${process.pid}-${randomUUID()}`,
   );
-  let temporaryHandle: Awaited<ReturnType<typeof open>> | null = null;
+  let temporaryHandle: AlbanianKaikkiSourceFileHandleV0_1 | null = null;
 
   try {
     await mkdir(config.materializedRoot, { recursive: true, mode: 0o700 });
     await cleanupStaleTemporaryFilesV0_1(config.materializedRoot);
-    temporaryHandle = await open(temporaryPath, "wx", 0o600);
+    const openFileHandle =
+      options.fileHandleFactory ?? ((path: string) => open(path, "wx", 0o600));
+    temporaryHandle = await openFileHandle(temporaryPath);
     const hash = createHash("sha256");
-    let byteCount = 0;
+    let streamByteCount = 0;
+    let persistedByteCount = 0;
 
     try {
       for await (const chunk of objectReader.createReadStream()) {
         const bytes = Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk);
-        byteCount += bytes.byteLength;
-        if (byteCount > expectedBytes) {
+        streamByteCount += bytes.byteLength;
+        if (streamByteCount > expectedBytes) {
           return Object.freeze({
             status: "UNAVAILABLE" as const,
             reasonCode: "ALBANIAN_SOURCE_IDENTITY_MISMATCH" as const,
           });
         }
         hash.update(bytes);
-        await temporaryHandle.write(bytes);
+        let offset = 0;
+        while (offset < bytes.byteLength) {
+          const remaining = bytes.byteLength - offset;
+          const { bytesWritten } = await temporaryHandle.write(
+            bytes,
+            offset,
+            remaining,
+            persistedByteCount,
+          );
+          if (
+            !Number.isInteger(bytesWritten) ||
+            bytesWritten <= 0 ||
+            bytesWritten > remaining
+          ) {
+            throw new Error("invalid file write progress");
+          }
+          offset += bytesWritten;
+          persistedByteCount += bytesWritten;
+        }
       }
     } catch {
+      if (persistedByteCount !== streamByteCount) {
+        return Object.freeze({
+          status: "UNAVAILABLE" as const,
+          reasonCode: "ALBANIAN_SOURCE_MATERIALIZATION_FAILURE" as const,
+        });
+      }
       return Object.freeze({
         status: "UNAVAILABLE" as const,
         reasonCode: "ALBANIAN_SOURCE_DOWNLOAD_FAILURE" as const,
       });
     }
 
-    const sha256 = hash.digest("hex");
-    if (byteCount !== expectedBytes || sha256 !== expectedSha256) {
+    const incomingSha256 = hash.digest("hex");
+    if (
+      streamByteCount !== expectedBytes ||
+      persistedByteCount !== expectedBytes ||
+      incomingSha256 !== expectedSha256
+    ) {
       return Object.freeze({
         status: "UNAVAILABLE" as const,
         reasonCode: "ALBANIAN_SOURCE_IDENTITY_MISMATCH" as const,
@@ -255,7 +298,38 @@ async function materializeOnceV0_1(
       await temporaryHandle.sync();
       await temporaryHandle.close();
       temporaryHandle = null;
+
+      await options.beforeDiskVerification?.(temporaryPath);
+      const diskDetails = await stat(temporaryPath);
+      if (diskDetails.size !== expectedBytes) {
+        return Object.freeze({
+          status: "UNAVAILABLE" as const,
+          reasonCode: "ALBANIAN_SOURCE_IDENTITY_MISMATCH" as const,
+        });
+      }
+
+      const diskHash = createHash("sha256");
+      let diskByteCount = 0;
+      for await (const chunk of createReadStream(temporaryPath)) {
+        const bytes = Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk);
+        diskByteCount += bytes.byteLength;
+        diskHash.update(bytes);
+      }
+      const diskSha256 = diskHash.digest("hex");
+      if (diskByteCount !== expectedBytes || diskSha256 !== expectedSha256) {
+        return Object.freeze({
+          status: "UNAVAILABLE" as const,
+          reasonCode: "ALBANIAN_SOURCE_IDENTITY_MISMATCH" as const,
+        });
+      }
+
       await rename(temporaryPath, targetPath);
+      return Object.freeze({
+        status: "MATERIALIZED" as const,
+        sourcePath: targetPath,
+        bytes: diskByteCount,
+        sha256: diskSha256,
+      });
     } catch {
       return Object.freeze({
         status: "UNAVAILABLE" as const,
@@ -263,12 +337,6 @@ async function materializeOnceV0_1(
       });
     }
 
-    return Object.freeze({
-      status: "MATERIALIZED" as const,
-      sourcePath: targetPath,
-      bytes: byteCount,
-      sha256,
-    });
   } catch {
     return Object.freeze({
       status: "UNAVAILABLE" as const,
@@ -294,6 +362,8 @@ export function materializeAlbanianKaikkiSourceV0_1(
     expectedBytes,
     expectedSha256,
     objectReaderFactory: options.objectReaderFactory,
+    fileHandleFactory: options.fileHandleFactory,
+    beforeDiskVerification: options.beforeDiskVerification,
   });
   materializationPromisesV0_1.set(key, promise);
   return promise;
