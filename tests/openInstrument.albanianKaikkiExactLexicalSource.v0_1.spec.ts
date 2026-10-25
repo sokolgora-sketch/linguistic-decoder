@@ -151,7 +151,11 @@ type SyntheticSourceRecordV0_1 = Readonly<{
   word: string;
   lang_code: "sq";
   pos: string;
-  senses: readonly Readonly<{ id: string; glosses: readonly string[] }>[];
+  senses: readonly Readonly<{
+    id: string;
+    glosses: readonly string[];
+    derived?: readonly Readonly<{ word: string }>[];
+  }>[];
   sounds: readonly Readonly<{ ipa: string; tags: readonly string[] }>[];
   related?: readonly Readonly<{ word: string }>[];
   derived?: readonly Readonly<{ word: string }>[];
@@ -225,6 +229,120 @@ const indexedFixtureRecordsV0_1: readonly SyntheticSourceRecordV0_1[] = [
 ];
 
 describe("real Albanian exact lexical source integration v0.1", () => {
+  it("preserves a nested source-derived link and exposes one bounded AGENT operation through the UI adapter", async () => {
+    await withSyntheticSourceFileV0_1([
+      {
+        word: "peshk",
+        lang_code: "sq",
+        pos: "noun",
+        senses: [{ id: "peshk-1", glosses: ["fish"], derived: [{ word: "peshkatar" }] }],
+        sounds: [{ ipa: "[pɛʃk]", tags: [] }],
+      },
+      {
+        word: "peshkatar",
+        lang_code: "sq",
+        pos: "noun",
+        senses: [{ id: "peshkatar-1", glosses: ["fisherman"] }],
+        sounds: [],
+      },
+    ], async ({ provider }) => {
+      const result = await buildMotivationEngineDiscoveryServerOnlyV0_1({
+        word: "peshk",
+        inputLanguage: "sq",
+        inputProfile: "albanian",
+        analysis: await analysisFor("peshk"),
+        heart: buildHeartInstrumentV1("peshk"),
+        albanianLexicalSourceProvider: provider,
+      });
+      const reading = result.discovery.albanianLexicalReading;
+
+      expect(reading).toMatchObject({
+        status: "SUPPORTED",
+        primarySourceFact: { form: "peshk", partOfSpeech: "noun", meaningGlosses: ["fish"] },
+        relatedForms: [{
+          form: "peshkatar",
+          relation: "SOURCE_DERIVED_FORM",
+          resolution: "RESOLVED",
+          partOfSpeech: "noun",
+          meaningGlosses: ["fisherman"],
+        }],
+        sourceLinkedComparison: {
+          status: "NULL",
+          reasonCodes: ["SOURCE_FORM_REFERENCE_NOT_PRESENT"],
+        },
+        functionalMeaningBridge: {
+          status: "SUPPORTED",
+          relatedForm: "peshkatar",
+          derivedStructure: null,
+          functionalHypothesis: {
+            status: "EXPLORATORY_FUNCTIONAL_HYPOTHESIS",
+            functionalOperation: "AGENT",
+            basis: [
+              "SOURCE_ATTESTED_PRIMARY_MEANING",
+              "SOURCE_ATTESTED_AGENT_MEANING",
+              "SOURCE_DERIVED_FORM_LINK",
+            ],
+          },
+        },
+        composition: { status: "NULL", relatedForm: "peshkatar" },
+        interpretation: { status: "UNKNOWN_OR_NULL" },
+      });
+
+      const vm = adaptAnalysisToTelemetryVM({
+        motivationDiscoveryV0_1: {
+          ...result.discovery,
+          exactLexicalSourceFacts: undefined,
+          sourceIpaSevenVoiceAnalyses: undefined,
+        },
+      });
+      expect(vm.motivationDiscoveryV0_1).toMatchObject({ kind: "present" });
+      if (vm.motivationDiscoveryV0_1?.kind === "present") {
+        render(createElement(MotivationDiscoveryCardV0_1, { discovery: vm.motivationDiscoveryV0_1 }));
+        expect(screen.getByTestId("albanian-reading-related-form")).toHaveTextContent("peshkatar");
+        expect(screen.getByTestId("albanian-reading-functional-bridge")).toHaveTextContent("Source-bounded functional operation AGENT");
+        expect(screen.getByTestId("albanian-reading-functional-bridge-operation")).toHaveTextContent("Functional operation: AGENT");
+        expect(screen.getByTestId("albanian-reading-functional-bridge-derived-structure-null")).toHaveTextContent("Null");
+      }
+    });
+  });
+
+  it("keeps AGENT Null when the source-derived related gloss is not an agent or profession", async () => {
+    await withSyntheticSourceFileV0_1([
+      {
+        word: "peshk",
+        lang_code: "sq",
+        pos: "noun",
+        senses: [{ id: "peshk-1", glosses: ["fish"], derived: [{ word: "peshkatar" }] }],
+        sounds: [{ ipa: "[pɛʃk]", tags: [] }],
+      },
+      {
+        word: "peshkatar",
+        lang_code: "sq",
+        pos: "noun",
+        senses: [{ id: "peshkatar-1", glosses: ["boat"] }],
+        sounds: [],
+      },
+    ], async ({ provider }) => {
+      const result = await buildMotivationEngineDiscoveryServerOnlyV0_1({
+        word: "peshk",
+        inputLanguage: "sq",
+        inputProfile: "albanian",
+        analysis: await analysisFor("peshk"),
+        heart: buildHeartInstrumentV1("peshk"),
+        albanianLexicalSourceProvider: provider,
+      });
+
+      expect(result.discovery.albanianLexicalReading?.functionalMeaningBridge).toMatchObject({
+        status: "NULL",
+        relatedForm: "peshkatar",
+        functionalHypothesis: {
+          status: "UNKNOWN_OR_NULL",
+          functionalOperation: null,
+        },
+      });
+    });
+  });
+
   it("builds a source-bound Albanian reading with computed IPA Voices and related-form extensions", async () => {
     const drite = fixtureFact({
       sourceRecordId: "kaikki-albanian-jsonl:word=drit%C3%AB:ordinal=0",

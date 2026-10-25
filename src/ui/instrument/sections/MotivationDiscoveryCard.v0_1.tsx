@@ -815,6 +815,9 @@ export function MotivationDiscoveryCardV0_1({
                   <div data-testid="albanian-reading-functional-bridge-basis" className="mt-1 break-words text-[#d5c28f]">
                     Generated because: {albanianLexicalReading.functionalMeaningBridge.functionalHypothesis.basis.join(" · ") || "no supported basis"}
                   </div>
+                  <div data-testid="albanian-reading-functional-bridge-operation" className="mt-1 text-[#d5c28f]">
+                    Functional operation: {albanianLexicalReading.functionalMeaningBridge.functionalHypothesis.functionalOperation ?? "none classified"}
+                  </div>
                   <div className="mt-1 text-[#d5c28f]">
                     Alternatives: {albanianLexicalReading.functionalMeaningBridge.functionalHypothesis.alternatives.join(" ")}
                   </div>

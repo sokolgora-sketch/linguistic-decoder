@@ -142,6 +142,7 @@ export type AlbanianFunctionalMeaningBridgeV0_1 = Readonly<{
   }> | null;
   functionalHypothesis: Readonly<{
     status: "EXPLORATORY_FUNCTIONAL_HYPOTHESIS" | "UNKNOWN_OR_NULL";
+    functionalOperation: "AGENT" | null;
     statement: string | null;
     alternatives: readonly string[];
     basis: readonly string[];
@@ -1134,6 +1135,7 @@ function nullFunctionalMeaningBridgeV0_1(input: Readonly<{
     derivedStructure: input.derivedStructure ?? null,
     functionalHypothesis: Object.freeze({
       status: "UNKNOWN_OR_NULL" as const,
+      functionalOperation: null,
       statement: null,
       alternatives: Object.freeze([]),
       basis: Object.freeze([]),
@@ -1149,6 +1151,7 @@ function hasMeaningEvidenceV0_1(glosses: readonly string[]): boolean {
 }
 
 type AlbanianFunctionalHypothesisV0_1 = Readonly<{
+  functionalOperation: "AGENT" | null;
   statement: string;
   basis: readonly string[];
   alternatives: readonly string[];
@@ -1178,6 +1181,7 @@ function buildDirectionalFunctionalHypothesisV0_1(input: Readonly<{
   }
 
   return Object.freeze({
+    functionalOperation: null,
     statement: `Directional functional interpretation (exploratory): the source relates ${input.primary.form} (“${primaryMeaning}”) to ${input.related.form} (“${relatedMeaning}”). Its source-authored explanation mentions letting light through, while the related meanings include a window, opening, or access function. The engine therefore models ${input.primary.form} as an enabling input and ${input.related.form} as a structure that lets that input enter or provides access. This is a falsifiable use-oriented model, not proof of morphology, etymology, causation, or Voice semantics.`,
     basis: Object.freeze([
       "SOURCE_ATTESTED_PRIMARY_MEANING",
@@ -1224,6 +1228,7 @@ function buildEntityToAttributedPropertyHypothesisV0_1(input: Readonly<{
   const primaryMeaning = input.primary.meaningGlosses.join("; ");
   const relatedMeaning = input.related.meaningGlosses.join("; ");
   return Object.freeze({
+    functionalOperation: null,
     statement: `Source-bounded functional interpretation (exploratory): the source links ${input.related.form} (“${relatedMeaning}”) to ${input.primary.form} (“${primaryMeaning}”) and attributes its form to ${sourceExplanationStatement}. The product therefore models an entity → attributed property relationship: ${input.primary.form} supplies the entity concept and ${input.related.form} supplies a related property. This is a source-bounded product prompt, not proof of morphology, etymology, causation, or Voice semantics.`,
     basis: Object.freeze([
       "SOURCE_ATTESTED_PRIMARY_MEANING",
@@ -1239,16 +1244,62 @@ function buildEntityToAttributedPropertyHypothesisV0_1(input: Readonly<{
   });
 }
 
+function buildAgentFunctionalHypothesisV0_1(input: Readonly<{
+  primary: AlbanianSourceLinkedRecordV0_1;
+  related: AlbanianSourceLinkedRecordV0_1;
+  sourceRelation: "SOURCE_RELATED_FORM" | "SOURCE_DERIVED_FORM" | null;
+}>): AlbanianFunctionalHypothesisV0_1 | null {
+  if (
+    input.sourceRelation !== "SOURCE_DERIVED_FORM" ||
+    input.primary.partOfSpeech !== "noun" ||
+    input.related.partOfSpeech !== "noun" ||
+    !hasMeaningEvidenceV0_1(input.primary.meaningGlosses) ||
+    !hasMeaningEvidenceV0_1(input.related.meaningGlosses) ||
+    !input.related.meaningGlosses.some((gloss) =>
+      /\b(?:fisher(?:man|woman)?|angler|farmer|hunter|seller|trader|worker|teacher|driver|operator|professional|practitioner)\b/iu.test(gloss),
+    )
+  ) {
+    return null;
+  }
+
+  const primaryMeaning = input.primary.meaningGlosses.join("; ");
+  const relatedMeaning = input.related.meaningGlosses.join("; ");
+  return Object.freeze({
+    functionalOperation: "AGENT" as const,
+    statement: `Source-bounded functional operation AGENT (exploratory): the source lists ${input.related.form} as a derived form of ${input.primary.form}; its glosses identify ${input.primary.form} as “${primaryMeaning}” and ${input.related.form} as “${relatedMeaning}”. The product models ${input.primary.form} as the entity or resource and ${input.related.form} as an agent or profession associated with that entity. This is a source-bounded product hypothesis, not proof of morphology, etymology, causation, or universal Voice semantics.`,
+    basis: Object.freeze([
+      "SOURCE_ATTESTED_PRIMARY_MEANING",
+      "SOURCE_ATTESTED_AGENT_MEANING",
+      "SOURCE_DERIVED_FORM_LINK",
+    ]),
+    alternatives: Object.freeze([
+      "The source-derived link is not a complete morphological or etymological analysis.",
+      "The profession gloss may describe an occupation without establishing a universal semantic operation.",
+      "The related record has no source IPA in this snapshot, so no Voice or phonological force is claimed.",
+    ]),
+  });
+}
+
 export function buildAlbanianFunctionalMeaningBridgeV0_1(input: Readonly<{
   primary: AlbanianSourceLinkedRecordV0_1;
   comparison: AlbanianSourceLinkedComparisonV0_1 | null;
+  related?: AlbanianSourceLinkedRecordV0_1 | null;
+  sourceRelation?: "SOURCE_RELATED_FORM" | "SOURCE_DERIVED_FORM" | null;
 }>): AlbanianFunctionalMeaningBridgeV0_1 {
-  const related = input.comparison?.related ?? null;
+  const related = input.related ?? input.comparison?.related ?? null;
+  const sourceRelation = input.sourceRelation ?? input.comparison?.relation.relation ?? null;
   const sourceFacts = bridgeRecordFactsV0_1(input.primary, related, input.comparison);
   const derivedStructure = input.comparison ? bridgeDerivedStructureV0_1(input.comparison) : null;
   const reasons: string[] = [];
+  const agentFunctionalHypothesis = related
+    ? buildAgentFunctionalHypothesisV0_1({
+        primary: input.primary,
+        related,
+        sourceRelation,
+      })
+    : null;
 
-  if (!input.comparison || input.comparison.status !== "SUPPORTED" || related === null) {
+  if (!agentFunctionalHypothesis && (!input.comparison || input.comparison.status !== "SUPPORTED" || related === null)) {
     reasons.push("SOURCE_LINKED_RELATION_NOT_SUPPORTED");
   }
   if (related !== null && related.meaningGlosses.length === 0) {
@@ -1257,7 +1308,7 @@ export function buildAlbanianFunctionalMeaningBridgeV0_1(input: Readonly<{
   if (!hasMeaningEvidenceV0_1(input.primary.meaningGlosses)) {
     reasons.push("PRIMARY_MEANING_EVIDENCE_MISSING");
   }
-  if (related !== null && !related.etymologyText?.trim()) {
+  if (!agentFunctionalHypothesis && related !== null && !related.etymologyText?.trim()) {
     reasons.push("SOURCE_AUTHORED_FUNCTIONAL_EXPLANATION_MISSING");
   }
   const entityToAttributedPropertyHypothesis = related && input.comparison
@@ -1267,7 +1318,7 @@ export function buildAlbanianFunctionalMeaningBridgeV0_1(input: Readonly<{
         related,
       })
     : null;
-  if (derivedStructure === null && entityToAttributedPropertyHypothesis === null) {
+  if (derivedStructure === null && entityToAttributedPropertyHypothesis === null && !agentFunctionalHypothesis) {
     reasons.push("DERIVED_STRUCTURE_NOT_SUPPORTED_FOR_BOTH_RECORDS");
   }
   if (reasons.length > 0) {
@@ -1285,7 +1336,7 @@ export function buildAlbanianFunctionalMeaningBridgeV0_1(input: Readonly<{
         related,
       })
     : null;
-  const functionalHypothesis = directionalHypothesis ?? entityToAttributedPropertyHypothesis;
+  const functionalHypothesis = directionalHypothesis ?? entityToAttributedPropertyHypothesis ?? agentFunctionalHypothesis;
   if (!functionalHypothesis) {
     return nullFunctionalMeaningBridgeV0_1({
       relatedForm: related?.form ?? input.comparison?.relation.relatedForm ?? null,
@@ -1307,6 +1358,7 @@ export function buildAlbanianFunctionalMeaningBridgeV0_1(input: Readonly<{
     derivedStructure,
     functionalHypothesis: Object.freeze({
       status: "EXPLORATORY_FUNCTIONAL_HYPOTHESIS" as const,
+      functionalOperation: functionalHypothesis.functionalOperation,
       statement: functionalHypothesis.statement,
       alternatives: functionalHypothesis.alternatives,
       basis: functionalHypothesis.basis,
@@ -1428,12 +1480,17 @@ async function buildAlbanianLexicalReadingV0_1(input: Readonly<{
     const bridge = buildAlbanianFunctionalMeaningBridgeV0_1({
       primary: primaryProjection,
       comparison,
+      related: resolved
+        ? sourceRecordProjectionV0_1(resolved, projectAlbanianKaikkiFactSourceIpaToSevenVoicesV0_1(resolved))
+        : null,
+      sourceRelation: relatedForm?.relation ?? null,
     });
     return Object.freeze({ comparison, bridge });
   });
   const selectedRelatedCandidate = relatedCandidateEvaluations.find(({ comparison, bridge }) =>
     comparison?.status === "SUPPORTED" && bridge.status === "SUPPORTED",
-  ) ?? relatedCandidateEvaluations.find(({ comparison }) => comparison?.status === "SUPPORTED")
+  ) ?? relatedCandidateEvaluations.find(({ bridge }) => bridge.status === "SUPPORTED")
+    ?? relatedCandidateEvaluations.find(({ comparison }) => comparison?.status === "SUPPORTED")
     ?? relatedCandidateEvaluations[0]
     ?? null;
   const sourceLinkedComparison = selectedRelatedCandidate?.comparison ?? null;

@@ -417,10 +417,17 @@ function sourceFactV0_1(
         }];
       })
     : [];
-  const relatedForms = Array.isArray(record.related) || Array.isArray(record.derived)
+  const senseDerivedForms = Array.isArray(record.senses)
+    ? record.senses.flatMap((value) => {
+        if (!isRecordV0_1(value)) return [];
+        return sourceFormLinksV0_1(value.derived, "SOURCE_DERIVED_FORM");
+      })
+    : [];
+  const relatedForms = Array.isArray(record.related) || Array.isArray(record.derived) || senseDerivedForms.length > 0
     ? Object.freeze([
         ...sourceFormLinksV0_1(record.related, "SOURCE_RELATED_FORM"),
         ...sourceFormLinksV0_1(record.derived, "SOURCE_DERIVED_FORM"),
+        ...senseDerivedForms,
       ])
     : undefined;
   const encodedForm = encodeURIComponent(form);
