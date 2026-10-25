@@ -1070,6 +1070,14 @@ async function runAnalyzeV1Orchestration(
       mode: engineMode,
       alphabet: engineAlphabet,
     });
+    const albanianProfileVoicePath = isAlbanianAnalysisInputV0_1({
+      language,
+      alphabet: payloadAlphabet,
+    }) && Array.isArray((rawPayload as any)?.primaryPath?.voicePath)
+      ? (rawPayload as any).primaryPath.voicePath.filter(
+          (value: unknown): value is string => typeof value === "string",
+        )
+      : null;
     // Candidate/status authority is evaluated from the deterministic engine
     // payload exactly as before. The canonical spoken path is projected only
     // after that evaluation, so pronunciation provenance cannot change
@@ -1416,6 +1424,7 @@ async function runAnalyzeV1Orchestration(
         inputProfile: discoveryInputProfile,
         analysis: final as any,
         heart: heartInstrumentV1,
+        profileDerivedVoicePath: albanianProfileVoicePath,
       };
       const isAlbanianDiscoveryInput = [discoveryInputLanguage, discoveryInputProfile].some((value) =>
         value.normalize("NFC").trim().toLocaleLowerCase("en-US") === "sq" ||
