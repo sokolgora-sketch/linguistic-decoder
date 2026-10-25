@@ -947,7 +947,7 @@ function parseMotivationDiscoveryV0_1(
         Array.isArray(fact.relatedForms) && fact.relatedForms.every((relation) =>
           isRecord(relation) &&
           typeof relation.form === "string" &&
-          relation.relation === "SOURCE_RELATED_FORM" &&
+          (relation.relation === "SOURCE_RELATED_FORM" || relation.relation === "SOURCE_DERIVED_FORM") &&
           typeof relation.entryLocator === "string"
         )
       )) &&
@@ -1063,7 +1063,7 @@ function parseMotivationDiscoveryV0_1(
       isRecord(relation) &&
       typeof relation.form === "string" &&
       typeof relation.entryLocator === "string" &&
-      relation.relation === "SOURCE_RELATED_FORM" &&
+      (relation.relation === "SOURCE_RELATED_FORM" || relation.relation === "SOURCE_DERIVED_FORM") &&
       (relation.resolution === "RESOLVED" || relation.resolution === "UNRESOLVED") &&
       (relation.sourceRecordId === null || typeof relation.sourceRecordId === "string") &&
       (relation.partOfSpeech === null || typeof relation.partOfSpeech === "string") &&
@@ -1233,7 +1233,7 @@ function parseMotivationDiscoveryV0_1(
       (sourceLinkedComparison.status === "SUPPORTED" || sourceLinkedComparison.status === "NULL") &&
       isStringArray(sourceLinkedComparison.reasonCodes) &&
       isRecord(sourceLinkedComparison.relation) &&
-      sourceLinkedComparison.relation.relation === "SOURCE_RELATED_FORM" &&
+      (sourceLinkedComparison.relation.relation === "SOURCE_RELATED_FORM" || sourceLinkedComparison.relation.relation === "SOURCE_DERIVED_FORM") &&
       typeof sourceLinkedComparison.relation.primarySourceRecordId === "string" &&
       typeof sourceLinkedComparison.relation.primaryEntryLocator === "string" &&
       typeof sourceLinkedComparison.relation.relatedForm === "string" &&

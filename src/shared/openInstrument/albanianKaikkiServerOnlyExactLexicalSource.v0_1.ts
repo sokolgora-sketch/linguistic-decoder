@@ -29,7 +29,7 @@ export type AlbanianKaikkiExactLexicalSourceIpaObservationV0_1 = Readonly<{
 
 export type AlbanianKaikkiExactLexicalSourceRelatedFormV0_1 = Readonly<{
   form: string;
-  relation: "SOURCE_RELATED_FORM";
+  relation: "SOURCE_RELATED_FORM" | "SOURCE_DERIVED_FORM";
   entryLocator: string;
 }>;
 
@@ -263,18 +263,27 @@ function sourceFactV0_1(
         return [{ name, args: stringRecordV0_1(value.args), expansion }];
       }))
     : undefined;
-  const relatedForms = Array.isArray(record.related)
-    ? Object.freeze(record.related.flatMap((value) => {
-        const relatedRecord = isRecordV0_1(value) ? value : null;
+  const sourceFormLinksV0_1 = (
+    value: unknown,
+    relation: AlbanianKaikkiExactLexicalSourceRelatedFormV0_1["relation"],
+  ) => Array.isArray(value)
+    ? value.flatMap((item) => {
+        const relatedRecord = isRecordV0_1(item) ? item : null;
         const relatedForm = relatedRecord ? textV0_1(relatedRecord.word) : null;
         if (!relatedForm) return [];
         const relatedEncodedForm = encodeURIComponent(relatedForm);
         return [{
           form: relatedForm,
-          relation: "SOURCE_RELATED_FORM" as const,
+          relation,
           entryLocator: `jsonl://word/${relatedEncodedForm}`,
         }];
-      }))
+      })
+    : [];
+  const relatedForms = Array.isArray(record.related) || Array.isArray(record.derived)
+    ? Object.freeze([
+        ...sourceFormLinksV0_1(record.related, "SOURCE_RELATED_FORM"),
+        ...sourceFormLinksV0_1(record.derived, "SOURCE_DERIVED_FORM"),
+      ])
     : undefined;
   const encodedForm = encodeURIComponent(form);
 

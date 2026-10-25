@@ -774,7 +774,7 @@ export function MotivationDiscoveryCardV0_1({
             <div className="font-semibold uppercase tracking-[0.1em]">FUNCTIONAL MEANING BRIDGE · EXPLORATORY ONLY</div>
             {albanianLexicalReading.functionalMeaningBridge.status === "SUPPORTED" &&
             albanianLexicalReading.functionalMeaningBridge.sourceFacts &&
-            albanianLexicalReading.functionalMeaningBridge.derivedStructure ? (
+            albanianLexicalReading.functionalMeaningBridge.functionalHypothesis.status === "EXPLORATORY_FUNCTIONAL_HYPOTHESIS" ? (
               <>
                 <div className="mt-2 rounded border border-[#594a2b] bg-[#211c12] p-2 text-xs">
                   <div className="font-semibold text-[#f5f7fb]">SOURCE_FACT</div>
@@ -788,18 +788,25 @@ export function MotivationDiscoveryCardV0_1({
                     Source-authored explanation (attributed): {albanianLexicalReading.functionalMeaningBridge.sourceFacts.related?.sourceAuthoredExplanation ?? "Null"}
                   </div>
                 </div>
-                <div className="mt-2 rounded border border-[#594a2b] bg-[#211c12] p-2 text-xs">
-                  <div className="font-semibold text-[#f5f7fb]">DERIVED_STRUCTURE</div>
-                  <div className="mt-1 break-words">
-                    {albanianLexicalReading.functionalMeaningBridge.sourceFacts.primary.form}: {albanianLexicalReading.functionalMeaningBridge.derivedStructure.primary.voicePaths.join(" | ") || "Null"} · {albanianLexicalReading.functionalMeaningBridge.derivedStructure.primary.consonantalContexts.join(" | ") || "Null"}
+                {albanianLexicalReading.functionalMeaningBridge.derivedStructure ? (
+                  <div className="mt-2 rounded border border-[#594a2b] bg-[#211c12] p-2 text-xs">
+                    <div className="font-semibold text-[#f5f7fb]">DERIVED_STRUCTURE</div>
+                    <div className="mt-1 break-words">
+                      {albanianLexicalReading.functionalMeaningBridge.sourceFacts.primary.form}: {albanianLexicalReading.functionalMeaningBridge.derivedStructure.primary.voicePaths.join(" | ") || "Null"} · {albanianLexicalReading.functionalMeaningBridge.derivedStructure.primary.consonantalContexts.join(" | ") || "Null"}
+                    </div>
+                    <div className="mt-1 break-words">
+                      {albanianLexicalReading.functionalMeaningBridge.sourceFacts.related?.form ?? "Null"}: {albanianLexicalReading.functionalMeaningBridge.derivedStructure.related.voicePaths.join(" | ") || "Null"} · {albanianLexicalReading.functionalMeaningBridge.derivedStructure.related.consonantalContexts.join(" | ") || "Null"}
+                    </div>
+                    <div className="mt-1 text-[#d5c28f]">
+                      Voice relation: {albanianLexicalReading.functionalMeaningBridge.derivedStructure.voicePathRelationship} · consonantal relation: {albanianLexicalReading.functionalMeaningBridge.derivedStructure.consonantalContextRelationship}
+                    </div>
                   </div>
-                  <div className="mt-1 break-words">
-                    {albanianLexicalReading.functionalMeaningBridge.sourceFacts.related?.form ?? "Null"}: {albanianLexicalReading.functionalMeaningBridge.derivedStructure.related.voicePaths.join(" | ") || "Null"} · {albanianLexicalReading.functionalMeaningBridge.derivedStructure.related.consonantalContexts.join(" | ") || "Null"}
+                ) : (
+                  <div data-testid="albanian-reading-functional-bridge-derived-structure-null" className="mt-2 rounded border border-[#594a2b] bg-[#211c12] p-2 text-xs">
+                    <div className="font-semibold text-[#f5f7fb]">DERIVED_STRUCTURE</div>
+                    <div className="mt-1">Null — source IPA is unavailable for one or both records; no Voice or phonological semantic relation is claimed.</div>
                   </div>
-                  <div className="mt-1 text-[#d5c28f]">
-                    Voice relation: {albanianLexicalReading.functionalMeaningBridge.derivedStructure.voicePathRelationship} · consonantal relation: {albanianLexicalReading.functionalMeaningBridge.derivedStructure.consonantalContextRelationship}
-                  </div>
-                </div>
+                )}
                 <div className="mt-2 rounded border border-[#594a2b] bg-[#211c12] p-2 text-xs">
                   <div className="font-semibold text-[#f5f7fb]">EXPLORATORY_FUNCTIONAL_HYPOTHESIS</div>
                   <div data-testid="albanian-reading-functional-bridge" className="mt-1 text-sm">

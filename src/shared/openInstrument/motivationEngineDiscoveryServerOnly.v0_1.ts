@@ -75,7 +75,7 @@ export type AlbanianLexicalReadingV0_1 = Readonly<{
   relatedForms: readonly Readonly<{
     form: string;
     entryLocator: string;
-    relation: "SOURCE_RELATED_FORM";
+    relation: "SOURCE_RELATED_FORM" | "SOURCE_DERIVED_FORM";
     resolution: "RESOLVED" | "UNRESOLVED";
     sourceRecordId: string | null;
     partOfSpeech: string | null;
@@ -192,7 +192,7 @@ export type AlbanianSourceLinkedComparisonV0_1 = Readonly<{
   status: "SUPPORTED" | "NULL";
   reasonCodes: readonly string[];
   relation: Readonly<{
-    relation: "SOURCE_RELATED_FORM";
+    relation: "SOURCE_RELATED_FORM" | "SOURCE_DERIVED_FORM";
     primarySourceRecordId: string;
     primaryEntryLocator: string;
     relatedForm: string;
@@ -904,7 +904,10 @@ function sourceLinkedSummaryV0_1(
 
 function nullSourceLinkedComparisonV0_1(
   primary: AlbanianKaikkiExactLexicalSourceFactV0_1,
-  relatedForm: string,
+  relatedForm: Readonly<{
+    form: string;
+    relation: "SOURCE_RELATED_FORM" | "SOURCE_DERIVED_FORM";
+  }>,
   relatedSourceRecordId: string | null,
   relatedEntryLocator: string,
   reasonCode: string,
@@ -914,10 +917,10 @@ function nullSourceLinkedComparisonV0_1(
     status: "NULL",
     reasonCodes: Object.freeze([reasonCode]),
     relation: Object.freeze({
-      relation: "SOURCE_RELATED_FORM" as const,
+      relation: relatedForm.relation,
       primarySourceRecordId: primary.sourceRecordId,
       primaryEntryLocator: primary.entryLocator,
-      relatedForm,
+      relatedForm: relatedForm.form,
       relatedSourceRecordId,
       relatedEntryLocator,
       direction: "RELATED_FORM_TO_PRIMARY_ETYMLOGY_REFERENCE" as const,
@@ -938,13 +941,17 @@ function nullSourceLinkedComparisonV0_1(
 function buildSourceLinkedComparisonV0_1(input: Readonly<{
   primary: AlbanianKaikkiExactLexicalSourceFactV0_1;
   primaryAnalyses: readonly AlbanianKaikkiSourceIpaSevenVoiceAnalysisV0_1[];
-  relatedForm: Readonly<{ form: string; entryLocator: string }>;
+  relatedForm: Readonly<{
+    form: string;
+    relation: "SOURCE_RELATED_FORM" | "SOURCE_DERIVED_FORM";
+    entryLocator: string;
+  }>;
   related: AlbanianKaikkiExactLexicalSourceFactV0_1 | null;
 }>): AlbanianSourceLinkedComparisonV0_1 {
   if (!input.related) {
     return nullSourceLinkedComparisonV0_1(
       input.primary,
-      input.relatedForm.form,
+      input.relatedForm,
       null,
       input.relatedForm.entryLocator,
       "SOURCE_LINK_UNRESOLVED",
@@ -961,7 +968,7 @@ function buildSourceLinkedComparisonV0_1(input: Readonly<{
   if (sourceFormMatchingLinks.length !== 1 || matchingLinks.length !== 1) {
     return nullSourceLinkedComparisonV0_1(
       input.primary,
-      input.relatedForm.form,
+      input.relatedForm,
       input.related.sourceRecordId,
       input.related.entryLocator,
       sourceFormMatchingLinks.length === 0
@@ -980,7 +987,7 @@ function buildSourceLinkedComparisonV0_1(input: Readonly<{
     status: "SUPPORTED",
     reasonCodes: Object.freeze([]),
     relation: Object.freeze({
-      relation: "SOURCE_RELATED_FORM" as const,
+      relation: input.relatedForm.relation,
       primarySourceRecordId: input.primary.sourceRecordId,
       primaryEntryLocator: input.primary.entryLocator,
       relatedForm: input.related.form,
@@ -1141,13 +1148,16 @@ function hasMeaningEvidenceV0_1(glosses: readonly string[]): boolean {
   return glosses.some((gloss) => gloss.trim().length > 0);
 }
 
+type AlbanianFunctionalHypothesisV0_1 = Readonly<{
+  statement: string;
+  basis: readonly string[];
+  alternatives: readonly string[];
+}>;
+
 function buildDirectionalFunctionalHypothesisV0_1(input: Readonly<{
   primary: AlbanianSourceLinkedRecordV0_1;
   related: AlbanianSourceLinkedRecordV0_1;
-}>): Readonly<{
-  statement: string;
-  basis: readonly string[];
-}> | null {
+}>): AlbanianFunctionalHypothesisV0_1 | null {
   const primaryMeaning = input.primary.meaningGlosses.join("; ");
   const relatedMeaning = input.related.meaningGlosses.join("; ");
   const sourceExplanation = input.related.etymologyText?.trim() ?? "";
@@ -1175,6 +1185,57 @@ function buildDirectionalFunctionalHypothesisV0_1(input: Readonly<{
       "SOURCE_AUTHORED_TRANSMISSION_EXPLANATION",
       "SOURCE_DERIVED_PRONUNCIATION_STRUCTURE",
     ]),
+    alternatives: Object.freeze([
+      "The source-authored explanation may be approximate, contested, or ordinary lexical description rather than a demonstrated derivation.",
+      "The opening or access sense may be figurative or context-specific rather than a physical transmission function.",
+      "The computed Voice paths and consonantal contexts are phonological observations and may have no semantic force.",
+    ]),
+  });
+}
+
+function buildEntityToAttributedPropertyHypothesisV0_1(input: Readonly<{
+  comparison: AlbanianSourceLinkedComparisonV0_1;
+  primary: AlbanianSourceLinkedRecordV0_1;
+  related: AlbanianSourceLinkedRecordV0_1;
+}>): AlbanianFunctionalHypothesisV0_1 | null {
+  if (
+    input.comparison.status !== "SUPPORTED" ||
+    input.comparison.relation.relation !== "SOURCE_DERIVED_FORM" ||
+    input.primary.partOfSpeech !== "noun" ||
+    input.related.partOfSpeech !== "adj" ||
+    !hasMeaningEvidenceV0_1(input.primary.meaningGlosses) ||
+    !hasMeaningEvidenceV0_1(input.related.meaningGlosses)
+  ) {
+    return null;
+  }
+
+  const suffixTemplate = input.related.etymologyTemplates.find((template) =>
+    template.name === "suffix" &&
+    template.args["1"] === "sq" &&
+    normalizedAlbanianFormV0_1(template.args["2"] ?? "") === normalizedAlbanianFormV0_1(input.primary.form) &&
+    template.args["3"] === "-or",
+  );
+  const sourceExplanation = input.related.etymologyText?.trim() ?? "";
+  const sourceExplanationText = sourceExplanation.toLocaleLowerCase("en-US").replace(/\s+/gu, " ");
+  const expectedSourcePhrase = `from ${input.primary.form.toLocaleLowerCase("en-US")} + -or`;
+  if (!suffixTemplate || !sourceExplanationText.includes(expectedSourcePhrase)) return null;
+  const sourceExplanationStatement = sourceExplanation.replace(/[.!?]\s*$/u, "");
+
+  const primaryMeaning = input.primary.meaningGlosses.join("; ");
+  const relatedMeaning = input.related.meaningGlosses.join("; ");
+  return Object.freeze({
+    statement: `Source-bounded functional interpretation (exploratory): the source links ${input.related.form} (“${relatedMeaning}”) to ${input.primary.form} (“${primaryMeaning}”) and attributes its form to ${sourceExplanationStatement}. The product therefore models an entity → attributed property relationship: ${input.primary.form} supplies the entity concept and ${input.related.form} supplies a related property. This is a source-bounded product prompt, not proof of morphology, etymology, causation, or Voice semantics.`,
+    basis: Object.freeze([
+      "SOURCE_ATTESTED_PRIMARY_MEANING",
+      "SOURCE_ATTESTED_PROPERTY_MEANING",
+      "SOURCE_AUTHORED_SUFFIX_EXPLANATION",
+      "SOURCE_STRUCTURED_FORM_REFERENCE",
+    ]),
+    alternatives: Object.freeze([
+      "The source-authored suffix account may be descriptive or historically contestable rather than a complete derivational analysis.",
+      "The adjective's ordinary contextual use may extend beyond the property gloss represented here.",
+      "The related record has no source IPA in this snapshot, so no Voice or phonological semantic force is claimed.",
+    ]),
   });
 }
 
@@ -1199,7 +1260,14 @@ export function buildAlbanianFunctionalMeaningBridgeV0_1(input: Readonly<{
   if (related !== null && !related.etymologyText?.trim()) {
     reasons.push("SOURCE_AUTHORED_FUNCTIONAL_EXPLANATION_MISSING");
   }
-  if (derivedStructure === null) {
+  const entityToAttributedPropertyHypothesis = related && input.comparison
+    ? buildEntityToAttributedPropertyHypothesisV0_1({
+        comparison: input.comparison,
+        primary: input.comparison.primary,
+        related,
+      })
+    : null;
+  if (derivedStructure === null && entityToAttributedPropertyHypothesis === null) {
     reasons.push("DERIVED_STRUCTURE_NOT_SUPPORTED_FOR_BOTH_RECORDS");
   }
   if (reasons.length > 0) {
@@ -1217,7 +1285,8 @@ export function buildAlbanianFunctionalMeaningBridgeV0_1(input: Readonly<{
         related,
       })
     : null;
-  if (!directionalHypothesis) {
+  const functionalHypothesis = directionalHypothesis ?? entityToAttributedPropertyHypothesis;
+  if (!functionalHypothesis) {
     return nullFunctionalMeaningBridgeV0_1({
       relatedForm: related?.form ?? input.comparison?.relation.relatedForm ?? null,
       sourceFacts,
@@ -1230,7 +1299,7 @@ export function buildAlbanianFunctionalMeaningBridgeV0_1(input: Readonly<{
     status: "SUPPORTED",
     truthLayers: Object.freeze([
       "SOURCE_FACT",
-      "DERIVED_STRUCTURE",
+      ...(derivedStructure ? ["DERIVED_STRUCTURE" as const] : []),
       "EXPLORATORY_FUNCTIONAL_HYPOTHESIS",
     ] as const satisfies readonly AlbanianFunctionalMeaningBridgeTruthLayerV0_1[]),
     relatedForm: related?.form ?? null,
@@ -1238,13 +1307,9 @@ export function buildAlbanianFunctionalMeaningBridgeV0_1(input: Readonly<{
     derivedStructure,
     functionalHypothesis: Object.freeze({
       status: "EXPLORATORY_FUNCTIONAL_HYPOTHESIS" as const,
-      statement: directionalHypothesis.statement,
-      alternatives: Object.freeze([
-        "The source-authored explanation may be approximate, contested, or ordinary lexical description rather than a demonstrated derivation.",
-        "The opening or access sense may be figurative or context-specific rather than a physical transmission function.",
-        "The computed Voice paths and consonantal contexts are phonological observations and may have no semantic force.",
-      ]),
-      basis: directionalHypothesis.basis,
+      statement: functionalHypothesis.statement,
+      alternatives: functionalHypothesis.alternatives,
+      basis: functionalHypothesis.basis,
       claimBoundary: "Exploratory product interpretation only; source-authored explanation remains attributed evidence and is not engine-proven morphology, etymology, causation, or universal Voice meaning.",
     }),
     reasonCodes: Object.freeze([]),
@@ -1290,8 +1355,18 @@ async function buildAlbanianLexicalReadingV0_1(input: Readonly<{
     analysis.sourceRecordId === primary.sourceRecordId && analysis.status === "SUPPORTED",
   ) ?? input.analyses.find((analysis) => analysis.sourceRecordId === primary.sourceRecordId) ?? null;
   const related = primary.relatedForms ?? [];
+  const relatedLookupIndexes = new Set<number>();
+  let relatedFormLookupCount = 0;
+  let derivedFormLookupCount = 0;
+  related.forEach((relation, index) => {
+    const lookupLimit = relation.relation === "SOURCE_DERIVED_FORM" ? 32 : 8;
+    const lookupCount = relation.relation === "SOURCE_DERIVED_FORM"
+      ? derivedFormLookupCount++
+      : relatedFormLookupCount++;
+    if (lookupCount < lookupLimit) relatedLookupIndexes.add(index);
+  });
   const relatedResultsWithFacts = await Promise.all(related.map(async (relation, index) => {
-    if (index >= 8) {
+    if (!relatedLookupIndexes.has(index)) {
       return Object.freeze({
         publicResult: Object.freeze({
           form: relation.form,
