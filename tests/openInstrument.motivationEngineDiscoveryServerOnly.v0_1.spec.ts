@@ -49,10 +49,10 @@ async function fixtureProvider(): Promise<EnglishKaikkiServerOnlyExactIndexProvi
   });
 }
 
-async function analysisFor(word: string): Promise<AnalyzeWordResultV1> {
+async function analysisFor(word: string, alphabet = "auto"): Promise<AnalyzeWordResultV1> {
   const payload = await runAnalysisDeterministic(word, {
     mode: "strict",
-    alphabet: "auto",
+    alphabet,
   });
   return enginePayloadToAnalysisResult(payload);
 }
@@ -115,6 +115,28 @@ function partiallyFailingProvider(): EnglishKaikkiServerOnlyExactIndexProviderV0
 }
 
 describe("server-only English Kaikki Discovery integration v0.1", () => {
+  it("preserves the Albanian profile path through the server-only seam after spoken projection", async () => {
+    const word = "zemër";
+    const heart = buildHeartInstrumentV1(word);
+    const analysis = await analysisFor(word, "albanian");
+    delete analysis.primaryPath;
+
+    const result = await buildMotivationEngineDiscoveryServerOnlyV0_1({
+      word,
+      inputLanguage: "sq",
+      inputProfile: "albanian",
+      analysis,
+      heart,
+      profileDerivedVoicePath: ["E", "Ë"],
+      provider: unavailableProvider(),
+    });
+
+    expect(result.discovery.derivedStructure.voicePath).toEqual(["E", "Ë"]);
+    expect(result.discovery.derivedStructure.voicePathSource).toBe("albanian_profile");
+    const self = result.discovery.candidates.find((candidate) => candidate.candidateForm === word);
+    expect(self?.structuralComparison.inputVoicePath).toEqual(["E", "Ë"]);
+  });
+
   it("projects exact fixture matches through generic Discovery with multiplicity and provenance", async () => {
     const word = "banana";
     const heart = buildHeartInstrumentV1(word);
