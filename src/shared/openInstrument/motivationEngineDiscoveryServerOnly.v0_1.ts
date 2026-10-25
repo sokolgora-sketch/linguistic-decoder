@@ -1264,6 +1264,7 @@ function buildAgentFunctionalHypothesisV0_1(input: Readonly<{
 
   const primaryMeaning = input.primary.meaningGlosses.join("; ");
   const relatedMeaning = input.related.meaningGlosses.join("; ");
+  const relatedHasSourceIpa = input.related.pronunciationVariants.some((variant) => variant.rawIpa !== null);
   return Object.freeze({
     functionalOperation: "AGENT" as const,
     statement: `Source-bounded functional operation AGENT (exploratory): the source lists ${input.related.form} as a derived form of ${input.primary.form}; its glosses identify ${input.primary.form} as “${primaryMeaning}” and ${input.related.form} as “${relatedMeaning}”. The product models ${input.primary.form} as the entity or resource and ${input.related.form} as an agent or profession associated with that entity. This is a source-bounded product hypothesis, not proof of morphology, etymology, causation, or universal Voice semantics.`,
@@ -1275,7 +1276,9 @@ function buildAgentFunctionalHypothesisV0_1(input: Readonly<{
     alternatives: Object.freeze([
       "The source-derived link is not a complete morphological or etymological analysis.",
       "The profession gloss may describe an occupation without establishing a universal semantic operation.",
-      "The related record has no source IPA in this snapshot, so no Voice or phonological force is claimed.",
+      relatedHasSourceIpa
+        ? "The related source IPA and computed Voice path are phonological observations and may have no semantic force."
+        : "The related record has no source IPA in this snapshot, so no Voice or phonological force is claimed.",
     ]),
   });
 }
