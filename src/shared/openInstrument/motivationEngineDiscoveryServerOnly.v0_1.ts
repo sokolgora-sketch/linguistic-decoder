@@ -1384,6 +1384,9 @@ function sourceAgentiveSuffixFormsV0_1(input: Readonly<{
 }>): readonly string[] {
   const forms = input.related.etymologyTemplates.flatMap((template) => {
     if (template.name !== "af" && template.name !== "suffix") return [];
+    if (Object.entries(template.args).some(([key, value]) =>
+      /^\d+$/u.test(key) && Number(key) >= 4 && value.trim() !== "",
+    )) return [];
     if (template.args["1"] !== "sq" ||
       normalizedAlbanianFormV0_1(template.args["2"] ?? "") !== normalizedAlbanianFormV0_1(input.primary.form)) {
       return [];

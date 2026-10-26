@@ -641,6 +641,71 @@ describe("real Albanian exact lexical source integration v0.1", () => {
     });
   });
 
+  it("does not promote an intermediate agentive suffix in a multi-component formation", async () => {
+    await withSyntheticSourceFileV0_1([
+      {
+        word: "punoj",
+        lang_code: "sq",
+        pos: "verb",
+        senses: [{ id: "punoj-1", glosses: ["to work"], derived: [{ word: "punëtorësi" }] }],
+        sounds: [{ ipa: "/puˈnɔj/", tags: [] }],
+      },
+      {
+        word: "punëtorësi",
+        lang_code: "sq",
+        pos: "noun",
+        senses: [{ id: "punëtorësi-1", glosses: ["the state of being a maker"] }],
+        sounds: [],
+        etymology_text: "From punoj + -tar + -ësi.",
+        etymology_links: [
+          ["punoj", "punoj#Albanian"],
+          ["-tar", "-tar#Albanian"],
+          ["-ësi", "-ësi#Albanian"],
+        ],
+        etymology_templates: [{
+          name: "suffix",
+          args: { "1": "sq", "2": "punoj", "3": "tar", "4": "-ësi" },
+          expansion: "punoj + -tar + -ësi",
+        }],
+      },
+      {
+        word: "-tar",
+        lang_code: "sq",
+        pos: "suffix",
+        senses: [{ id: "-tar-1", glosses: ["forms agent nouns. -er"] }],
+        sounds: [],
+      },
+    ], async ({ provider }) => {
+      const queries: string[] = [];
+      const countedProvider: AlbanianKaikkiServerOnlyExactLexicalSourceProviderV0_1 = Object.freeze({
+        ...provider,
+        query: async (query: string) => {
+          queries.push(query);
+          return provider.query(query);
+        },
+      });
+      const result = await buildMotivationEngineDiscoveryServerOnlyV0_1({
+        word: "punoj",
+        inputLanguage: "sq",
+        inputProfile: "albanian",
+        analysis: await analysisFor("punoj"),
+        heart: buildHeartInstrumentV1("punoj"),
+        albanianLexicalSourceProvider: countedProvider,
+      });
+      const bridge = result.discovery.albanianLexicalReading?.functionalMeaningBridge;
+      expect(queries).toEqual(["punoj", "punëtorësi"]);
+      expect(bridge).toMatchObject({
+        status: "NULL",
+        relatedForm: "punëtorësi",
+        functionalHypothesis: {
+          status: "UNKNOWN_OR_NULL",
+          functionalOperation: null,
+          statement: null,
+        },
+      });
+    });
+  });
+
   it("recognizes a source-derived verb-to-agent formation while keeping non-agent derivatives Null", async () => {
     await withSyntheticSourceFileV0_1([
       {
