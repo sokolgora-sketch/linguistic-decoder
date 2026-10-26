@@ -79,6 +79,8 @@ export type AlbanianFiveWindowsRecordV0_1 = Readonly<{
     ipa: string | null;
     tags: readonly string[];
   }>[];
+  /** Additive source-IPA projection; each observation remains keyed by source record and sound index. */
+  sourceIpaSevenVoiceAnalyses: readonly AlbanianKaikkiSourceIpaSevenVoiceAnalysisV0_1[];
   etymologyText: string | null;
   etymologyLinks: readonly AlbanianKaikkiExactLexicalSourceEtymologyLinkV0_1[];
   etymologyTemplates: readonly AlbanianKaikkiExactLexicalSourceEtymologyTemplateV0_1[];
@@ -1490,6 +1492,7 @@ function projectFiveWindowsRecordV0_1(
       ipa: observation.ipa,
       tags: Object.freeze([...observation.tags]),
     }))),
+    sourceIpaSevenVoiceAnalyses: projectAlbanianKaikkiFactSourceIpaToSevenVoicesV0_1(fact),
     etymologyText,
     etymologyLinks,
     etymologyTemplates,

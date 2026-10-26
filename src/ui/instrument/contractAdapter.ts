@@ -1172,7 +1172,10 @@ function parseMotivationDiscoveryV0_1(
         return false;
       }
       const validRecord = (record: unknown): boolean => {
-        if (!isRecord(record) || !Array.isArray(record.ipaObservations) || !Array.isArray(record.etymologyLinks) || !Array.isArray(record.etymologyTemplates)) {
+        if (!isRecord(record)) return false;
+        const ipaObservations = record.ipaObservations;
+        const sourceIpaSevenVoiceAnalyses = record.sourceIpaSevenVoiceAnalyses;
+        if (!Array.isArray(ipaObservations) || !Array.isArray(sourceIpaSevenVoiceAnalyses) || !Array.isArray(record.etymologyLinks) || !Array.isArray(record.etymologyTemplates)) {
           return false;
         }
         return typeof record.sourceRecordId === "string" &&
@@ -1191,10 +1194,21 @@ function parseMotivationDiscoveryV0_1(
             isRecord(template) && typeof template.name === "string" && isRecord(template.args) &&
             Object.values(template.args).every((value) => typeof value === "string") && typeof template.expansion === "string",
           ) &&
-          record.ipaObservations.every((observation) =>
+          ipaObservations.every((observation) =>
             isRecord(observation) && typeof observation.soundIndex === "number" && Number.isInteger(observation.soundIndex) &&
             observation.soundIndex >= 0 && (observation.ipa === null || typeof observation.ipa === "string") &&
             isStringArray(observation.tags),
+          ) &&
+          sourceIpaSevenVoiceAnalyses.length === ipaObservations.length &&
+          sourceIpaSevenVoiceAnalyses.every((analysis, index) =>
+            validSourceIpaSevenVoiceAnalysis(analysis) &&
+            isRecord(analysis) &&
+            analysis.sourceRecordId === record.sourceRecordId &&
+            analysis.entryLocator === record.entryLocator &&
+            analysis.physicalRecordOrdinal === record.physicalRecordOrdinal &&
+            analysis.form === record.form &&
+            isRecord(ipaObservations[index]) &&
+            analysis.soundIndex === ipaObservations[index].soundIndex,
           ) &&
           (record.classification === "ALBANIAN_INTERNAL_FORMATION" ||
             record.classification === "SOURCE_ATTRIBUTED_BORROWING" ||
