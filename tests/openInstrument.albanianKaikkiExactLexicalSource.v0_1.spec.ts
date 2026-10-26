@@ -934,6 +934,34 @@ describe("real Albanian exact lexical source integration v0.1", () => {
     }
   });
 
+  it("keeps the illumination fallback when no supported functional bridge exists", async () => {
+    const result = await discoveryForDriteDritareRelationTextV0_1(
+      "A source-authored note describes the related form without a transmission explanation.",
+    );
+    const reading = result.albanianLexicalReading;
+
+    expect(reading).toMatchObject({
+      status: "SUPPORTED",
+      sourcePronunciation: {
+        status: "SUPPORTED",
+        voicePath: ["I", "Ë"],
+      },
+      functionalMeaningBridge: {
+        status: "NULL",
+        functionalHypothesis: {
+          status: "UNKNOWN_OR_NULL",
+          functionalOperation: null,
+          statement: null,
+        },
+      },
+      interpretation: {
+        status: "EXPLORATORY_ZHEJI_READING",
+        statement: expect.stringContaining("illumination → clarity reading"),
+      },
+    });
+    expect(reading?.interpretation.statement).not.toContain("Integrated source-bounded functional reading");
+  });
+
   it.each([
     ["negated", "Not from mal + -or.."],
     ["qualified", "Possibly from mal + -or."],

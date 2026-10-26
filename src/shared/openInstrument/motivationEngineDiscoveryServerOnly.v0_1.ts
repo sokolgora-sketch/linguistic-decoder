@@ -1783,23 +1783,23 @@ async function buildAlbanianLexicalReadingV0_1(input: Readonly<{
   const hasSupportedPath = sourcePronunciation?.status === "SUPPORTED" &&
     sourcePronunciation.voicePath.length > 0;
   const voicePath = sourcePronunciation?.voicePath.join(" → ") ?? "Null";
-  const interpretation = hasLightMeaning && hasSupportedPath
-    ? Object.freeze({
-        status: "EXPLORATORY_ZHEJI_READING" as const,
-        statement: `The attested primary-source meaning is placed beside the source-derived ${voicePath} path. As a Zheji-inspired product prompt, this can invite an illumination → clarity reading; the prompt is exploratory and does not claim causation, etymology, or a universal Voice meaning.`,
-        alternatives: Object.freeze([
-          "The source-linked forms may reflect ordinary lexical or morphological relations.",
-          "The Voice path may be only a phonological observation with no semantic force.",
-        ]),
-        basis: Object.freeze([
-          "ATTESTED_SOURCE_GLOSSES",
-          "SOURCE_DERIVED_IPA_VOICE_PATH",
-          "PRIMARY_SOURCE_GLOSS_EVIDENCE",
-        ]),
-        claimBoundary: "Exploratory product interpretation only; no historical-origin claim, semantic proof, or winner selection.",
-      })
-    : functionalMeaningBridge.status === "SUPPORTED"
-      ? buildIntegratedFunctionalReadingInterpretationV0_1(functionalMeaningBridge)
+  const interpretation = functionalMeaningBridge.status === "SUPPORTED"
+    ? buildIntegratedFunctionalReadingInterpretationV0_1(functionalMeaningBridge)
+    : hasLightMeaning && hasSupportedPath
+      ? Object.freeze({
+          status: "EXPLORATORY_ZHEJI_READING" as const,
+          statement: `The attested primary-source meaning is placed beside the source-derived ${voicePath} path. As a Zheji-inspired product prompt, this can invite an illumination → clarity reading; the prompt is exploratory and does not claim causation, etymology, or a universal Voice meaning.`,
+          alternatives: Object.freeze([
+            "The source-linked forms may reflect ordinary lexical or morphological relations.",
+            "The Voice path may be only a phonological observation with no semantic force.",
+          ]),
+          basis: Object.freeze([
+            "ATTESTED_SOURCE_GLOSSES",
+            "SOURCE_DERIVED_IPA_VOICE_PATH",
+            "PRIMARY_SOURCE_GLOSS_EVIDENCE",
+          ]),
+          claimBoundary: "Exploratory product interpretation only; no historical-origin claim, semantic proof, or winner selection.",
+        })
       : Object.freeze({
           status: "UNKNOWN_OR_NULL" as const,
           statement: null,

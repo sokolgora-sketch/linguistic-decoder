@@ -201,6 +201,15 @@ describe("analyze-v1 Albanian lexical reading reachability", () => {
         sourceRelation: { status: "SOURCE_RELATION_NOT_VERIFIED" },
       },
     });
+    const interpretation = result.body.motivationDiscoveryV0_1.albanianLexicalReading.interpretation;
+    expect(interpretation.statement).toEqual(expect.stringContaining("Integrated source-bounded functional reading"));
+    expect(interpretation.statement).toEqual(expect.stringContaining("dritare"));
+    expect(interpretation.statement).toEqual(expect.stringContaining("light through"));
+    expect(interpretation.basis).toEqual(expect.arrayContaining([
+      "SOURCE_ATTESTED_FUNCTIONAL_BRIDGE",
+      "SOURCE_AUTHORED_TRANSMISSION_EXPLANATION",
+      "STRUCTURAL_EMBRYO_FUNCTION_REMAINS_UNKNOWN_OR_NULL",
+    ]));
   });
 
   it("projects an integrated source-bounded AGENT reading through the API", async () => {
