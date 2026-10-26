@@ -358,7 +358,14 @@ describe("real Albanian exact lexical source integration v0.1", () => {
           },
         },
         composition: { status: "NULL", relatedForm: "peshkatar" },
-        interpretation: { status: "UNKNOWN_OR_NULL" },
+        interpretation: {
+          status: "EXPLORATORY_ZHEJI_READING",
+          statement: expect.stringContaining("Integrated source-bounded functional reading"),
+          basis: expect.arrayContaining([
+            "SOURCE_ATTESTED_FUNCTIONAL_BRIDGE",
+            "STRUCTURAL_EMBRYO_FUNCTION_REMAINS_UNKNOWN_OR_NULL",
+          ]),
+        },
       });
       const statement = reading?.functionalMeaningBridge.functionalHypothesis.statement;
       expect(statement).toContain("preserves AGENT as an exploratory label");
@@ -379,6 +386,8 @@ describe("real Albanian exact lexical source integration v0.1", () => {
         expect(screen.getByTestId("albanian-reading-functional-bridge")).toHaveTextContent("Source-bounded functional operation AGENT");
         expect(screen.getByTestId("albanian-reading-functional-bridge-operation")).toHaveTextContent("Functional operation: AGENT");
         expect(screen.getByTestId("albanian-reading-functional-bridge-derived-structure-null")).toHaveTextContent("Null");
+        expect(screen.getByTestId("albanian-reading-interpretation")).toHaveTextContent("Integrated source-bounded functional reading");
+        expect(screen.getByTestId("albanian-reading-interpretation")).toHaveTextContent("independent functional meaning for any structural embryo remains Unknown / Null");
       }
     });
   });
@@ -1537,6 +1546,8 @@ describe("real Albanian exact lexical source integration v0.1", () => {
         expect(screen.getByTestId("albanian-reading-null-candidate")).toHaveTextContent("Comparison reasons: SOURCE_LINK_UNRESOLVED");
         expect(screen.getByTestId("albanian-reading-null-candidate")).toHaveTextContent("Functional operation: Null — no bounded functional operation is authorized.");
         expect(screen.getByTestId("albanian-reading-null-candidate")).toHaveTextContent("Functional reasons: SOURCE_LINKED_RELATION_NOT_SUPPORTED");
+        expect(screen.getByTestId("albanian-reading-interpretation")).toHaveTextContent("Integrated source-bounded functional reading");
+        expect(screen.getByTestId("albanian-reading-interpretation")).toHaveTextContent("Source-bounded functional operation AGENT");
         expect(screen.getByTestId("albanian-reading-related-candidate-evaluations")).toHaveTextContent("luleshitës");
         expect(screen.getByTestId("albanian-reading-related-candidate-evaluations")).toHaveTextContent("pijeshitës");
         expect(screen.getByTestId("albanian-reading-related-candidate-evaluations")).toHaveTextContent("rakishitës");
