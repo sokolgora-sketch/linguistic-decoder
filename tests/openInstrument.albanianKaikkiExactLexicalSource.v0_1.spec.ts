@@ -715,6 +715,7 @@ describe("real Albanian exact lexical source integration v0.1", () => {
       expect(screen.getByTestId("albanian-reading-functional-bridge-derived-structure-null")).toHaveTextContent("Null");
       expect(screen.getByTestId("albanian-reading-functional-bridge-derived-structure-null")).toHaveTextContent("no Voice or phonological semantic relation is claimed");
       expect(screen.getByTestId("albanian-reading-composition-null")).toHaveTextContent("Null");
+      expect(screen.queryByTestId("albanian-reading-null-candidate-summary")).not.toBeInTheDocument();
     }
   });
 
@@ -1311,6 +1312,12 @@ describe("real Albanian exact lexical source integration v0.1", () => {
         expect(screen.getByTestId("albanian-reading-related-candidate-evaluations")).toHaveTextContent("3 bounded functional relationships shown");
         expect(screen.getByTestId("albanian-reading-related-candidate-evaluations")).toHaveTextContent("1 other evaluated link remain Null");
         expect(screen.getAllByTestId("albanian-reading-related-candidate")).toHaveLength(3);
+        expect(screen.getByTestId("albanian-reading-null-candidate-summary")).toHaveTextContent("Inspect 1 Null candidate");
+        expect(screen.getByTestId("albanian-reading-null-candidate")).toHaveTextContent("missing-shitës");
+        expect(screen.getByTestId("albanian-reading-null-candidate")).toHaveTextContent("SOURCE_DERIVED_FORM · resolution UNRESOLVED · comparison NULL");
+        expect(screen.getByTestId("albanian-reading-null-candidate")).toHaveTextContent("Comparison reasons: SOURCE_LINK_UNRESOLVED");
+        expect(screen.getByTestId("albanian-reading-null-candidate")).toHaveTextContent("Functional operation: Null — no bounded functional operation is authorized.");
+        expect(screen.getByTestId("albanian-reading-null-candidate")).toHaveTextContent("Functional reasons: SOURCE_LINKED_RELATION_NOT_SUPPORTED");
         expect(screen.getByTestId("albanian-reading-related-candidate-evaluations")).toHaveTextContent("luleshitës");
         expect(screen.getByTestId("albanian-reading-related-candidate-evaluations")).toHaveTextContent("pijeshitës");
         expect(screen.getByTestId("albanian-reading-related-candidate-evaluations")).toHaveTextContent("rakishitës");
