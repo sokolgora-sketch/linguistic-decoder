@@ -662,6 +662,126 @@ describe("real Albanian exact lexical source integration v0.1", () => {
     });
   });
 
+  it("resolves the 39th source-derived lookup while preserving source order and a finite boundary", async () => {
+    const derivedForms = Array.from({ length: 40 }, (_, index) => ({
+      form: index === 23
+        ? "luleshitës"
+        : index === 30
+          ? "pijeshitës"
+          : index === 35
+            ? "rakishitës"
+            : `shitës-candidate-${index}`,
+      relation: "SOURCE_DERIVED_FORM" as const,
+      entryLocator: `jsonl://word/derived-${index}`,
+    }));
+    const primary = fixtureFact({
+      sourceRecordId: "kaikki-albanian-jsonl:word=shit%C3%ABs:ordinal=0",
+      entryLocator: "jsonl://word/shit%C3%ABs/match/0",
+      form: "shitës",
+      partOfSpeech: "noun",
+      senses: [{ senseId: "shitës-1", glosses: ["seller, vendor, salesman, grocer"] }],
+      ipaObservations: [{ soundIndex: 0, ipa: "/ˈʃitəs/", tags: [] }],
+      relatedForms: derivedForms,
+    });
+    const derivedFacts = derivedForms.slice(0, 39).map(({ form }, index) => {
+      const base = {
+        sourceRecordId: `kaikki-albanian-jsonl:word=${form}:ordinal=0`,
+        entryLocator: `jsonl://word/${form}/match/0`,
+        form,
+        partOfSpeech: "noun" as const,
+        senses: [{ senseId: `${form}-${index}`, glosses: ["candidate"] }],
+        ipaObservations: [],
+      };
+      if (form === "luleshitës") {
+        return fixtureFact({
+          ...base,
+          senses: [{ senseId: "luleshitës-1", glosses: ["flower seller, florist"] }],
+          ipaObservations: [{ soundIndex: 0, ipa: "/luleˈʃitəs/", tags: [] }],
+          etymologyText: "From lule + shitës.",
+          etymologyLinks: [{ sourceForm: "shitës", reference: "shitës#Albanian" }],
+        });
+      }
+      if (form === "pijeshitës") {
+        return fixtureFact({
+          ...base,
+          senses: [{ senseId: "pijeshitës-1", glosses: ["a seller of drinks, alcohol; bartender"] }],
+          etymologyText: "From pije + shitës.",
+          etymologyLinks: [{ sourceForm: "shitës", reference: "shitës#Albanian" }],
+        });
+      }
+      if (form === "rakishitës") {
+        return fixtureFact({
+          ...base,
+          senses: [{ senseId: "rakishitës-1", glosses: ["seller of brandy or any alcoholic beverage"] }],
+          ipaObservations: [{ soundIndex: 0, ipa: "/ɾakiˈʃitəs/", tags: [] }],
+          etymologyText: "From raki + shitës.",
+          etymologyLinks: [{ sourceForm: "shitës", reference: "shitës#Albanian" }],
+        });
+      }
+      return fixtureFact(base);
+    });
+    const baseProvider = createAlbanianKaikkiServerOnlyExactLexicalSourceProviderForSyntheticFixtureV0_1({
+      facts: [primary, ...derivedFacts],
+    });
+    const queries: string[] = [];
+    const provider: AlbanianKaikkiServerOnlyExactLexicalSourceProviderV0_1 = Object.freeze({
+      ...baseProvider,
+      query: async (query: string) => {
+        queries.push(query);
+        return baseProvider.query(query);
+      },
+    });
+    const result = await buildMotivationEngineDiscoveryServerOnlyV0_1({
+      word: "shitës",
+      inputLanguage: "sq",
+      inputProfile: "albanian",
+      analysis: await analysisFor("shitës"),
+      heart: buildHeartInstrumentV1("shitës"),
+      albanianLexicalSourceProvider: provider,
+    });
+    const reading = result.discovery.albanianLexicalReading;
+
+    expect(queries).toHaveLength(40);
+    expect(queries.slice(1)).toEqual(derivedForms.slice(0, 39).map(({ form }) => form));
+    expect(queries).not.toContain(derivedForms[39].form);
+    expect(reading?.relatedForms).toHaveLength(40);
+    expect(reading?.relatedForms.slice(0, 39).every((candidate) => candidate.resolution === "RESOLVED")).toBe(true);
+    expect(reading?.relatedForms[39]).toMatchObject({
+      form: derivedForms[39].form,
+      relation: "SOURCE_DERIVED_FORM",
+      resolution: "UNRESOLVED",
+    });
+    expect(reading?.relatedCandidateEvaluations).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        relatedForm: "luleshitës",
+        functionalMeaningBridge: expect.objectContaining({
+          status: "SUPPORTED",
+          functionalHypothesis: expect.objectContaining({ functionalOperation: "AGENT" }),
+        }),
+      }),
+      expect.objectContaining({
+        relatedForm: "pijeshitës",
+        functionalMeaningBridge: expect.objectContaining({
+          status: "SUPPORTED",
+          functionalHypothesis: expect.objectContaining({ functionalOperation: "AGENT" }),
+        }),
+      }),
+      expect.objectContaining({
+        relatedForm: "rakishitës",
+        sourceLinkedComparison: expect.objectContaining({ status: "SUPPORTED" }),
+        functionalMeaningBridge: expect.objectContaining({
+          status: "SUPPORTED",
+          functionalHypothesis: expect.objectContaining({ functionalOperation: "AGENT" }),
+        }),
+      }),
+    ]));
+    expect(reading?.functionalMeaningBridge).toMatchObject({
+      status: "SUPPORTED",
+      relatedForm: "luleshitës",
+      functionalHypothesis: { functionalOperation: "AGENT" },
+    });
+  });
+
   it("supports the source-bounded mal to malor entity-property reading through the VM and UI", async () => {
     const mal = fixtureFact({
       sourceRecordId: "kaikki-albanian-jsonl:word=mal:ordinal=0",

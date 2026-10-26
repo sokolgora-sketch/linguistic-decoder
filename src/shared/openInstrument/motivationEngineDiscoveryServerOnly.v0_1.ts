@@ -1425,7 +1425,7 @@ async function buildAlbanianLexicalReadingV0_1(input: Readonly<{
   let relatedFormLookupCount = 0;
   let derivedFormLookupCount = 0;
   related.forEach((relation, index) => {
-    const lookupLimit = relation.relation === "SOURCE_DERIVED_FORM" ? 32 : 8;
+    const lookupLimit = relation.relation === "SOURCE_DERIVED_FORM" ? 39 : 8;
     const lookupCount = relation.relation === "SOURCE_DERIVED_FORM"
       ? derivedFormLookupCount++
       : relatedFormLookupCount++;
