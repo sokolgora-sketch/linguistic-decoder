@@ -179,6 +179,12 @@ export type AlbanianFunctionalMeaningBridgeV0_1 = Readonly<{
       meaningGlosses: readonly string[];
       sourceAuthoredExplanation: string | null;
     }> | null;
+    /** Source morphology evidence is descriptive and is never final agent meaning proof. */
+    agentiveSuffix?: Readonly<{
+      sourceRecordId: string;
+      suffixForm: string;
+      meaningGlosses: readonly string[];
+    }> | null;
     structuredReference: Readonly<{
       referencedForm: string | null;
       reference: string | null;
@@ -1139,6 +1145,7 @@ function bridgeRecordFactsV0_1(
   primary: AlbanianSourceLinkedRecordV0_1,
   related: AlbanianSourceLinkedRecordV0_1 | null,
   comparison: AlbanianSourceLinkedComparisonV0_1 | null,
+  sourceAgentiveSuffixEvidence: AlbanianSourceAgentiveSuffixEvidenceV0_1 | null = null,
 ): AlbanianFunctionalMeaningBridgeV0_1["sourceFacts"] {
   return Object.freeze({
     primary: Object.freeze({
@@ -1156,6 +1163,15 @@ function bridgeRecordFactsV0_1(
           sourceAuthoredExplanation: related.etymologyText,
         })
       : null,
+    ...(sourceAgentiveSuffixEvidence
+      ? {
+          agentiveSuffix: Object.freeze({
+            sourceRecordId: sourceAgentiveSuffixEvidence.sourceRecordId,
+            suffixForm: sourceAgentiveSuffixEvidence.suffixForm,
+            meaningGlosses: sourceAgentiveSuffixEvidence.sourceGlosses,
+          }),
+        }
+      : {}),
     structuredReference: Object.freeze({
       referencedForm: comparison?.relation.referencedForm ?? null,
       reference: comparison?.relation.reference ?? null,
@@ -1322,17 +1338,24 @@ function buildAgentFunctionalHypothesisV0_1(input: Readonly<{
   sourceRelation: "SOURCE_RELATED_FORM" | "SOURCE_DERIVED_FORM" | null;
   sourceAgentiveSuffixEvidence?: AlbanianSourceAgentiveSuffixEvidenceV0_1 | null;
 }>): AlbanianFunctionalHypothesisV0_1 | null {
-  const hasAgentMeaning = input.related.meaningGlosses.some((gloss) =>
+  const hasExistingAgentMeaning = input.related.meaningGlosses.some((gloss) =>
     /\b(?:fisher(?:man|woman)?|angler|farmer|hunter|seller|singer|trader|worker|teacher|driver|operator|professional|practitioner)\b/iu.test(gloss),
   );
-  const hasSourceAgentiveSuffixEvidence = Boolean(input.sourceAgentiveSuffixEvidence);
+  // These exact source-backed final role glosses are only considered after
+  // an exact affirmative suffix record has been resolved; suffix evidence
+  // never authorizes a final function by itself.
+  const hasSourceBackedFinalAgentMeaning = input.related.meaningGlosses.some((gloss) =>
+    /\b(?:beekeeper|stableman|ostler|groom|maker|translator|interpreter)\b/iu.test(gloss),
+  );
+  const hasAgentMeaning = hasExistingAgentMeaning ||
+    (Boolean(input.sourceAgentiveSuffixEvidence) && hasSourceBackedFinalAgentMeaning);
   if (
     input.sourceRelation !== "SOURCE_DERIVED_FORM" ||
     (input.primary.partOfSpeech !== "noun" && input.primary.partOfSpeech !== "verb") ||
     input.related.partOfSpeech !== "noun" ||
     !hasMeaningEvidenceV0_1(input.primary.meaningGlosses) ||
     !hasMeaningEvidenceV0_1(input.related.meaningGlosses) ||
-    (!hasAgentMeaning && !hasSourceAgentiveSuffixEvidence)
+    !hasAgentMeaning
   ) {
     return null;
   }
@@ -1348,8 +1371,9 @@ function buildAgentFunctionalHypothesisV0_1(input: Readonly<{
     statement: `Source-bounded functional operation AGENT (exploratory): the source lists ${input.related.form} as a derived form of ${input.primary.form}; its glosses identify ${input.primary.form} as “${primaryMeaning}” and ${input.related.form} as “${relatedMeaning}”.${sourceAgentiveSuffixStatement} The product preserves AGENT as an exploratory label for this source-derived agent evidence; it does not assign an entity, resource, or other semantic role to the primary word beyond its source gloss. This is a source-bounded product hypothesis, not proof of morphology, etymology, causation, or universal Voice semantics.`,
     basis: Object.freeze([
       "SOURCE_ATTESTED_PRIMARY_MEANING",
-      "SOURCE_ATTESTED_AGENT_MEANING",
+      ...(hasAgentMeaning ? ["SOURCE_ATTESTED_AGENT_MEANING"] : []),
       "SOURCE_DERIVED_FORM_LINK",
+      ...(input.sourceAgentiveSuffixEvidence ? ["SOURCE_ATTESTED_MORPHOLOGY"] : []),
     ]),
     alternatives: Object.freeze([
       "The source-derived link is not a complete morphological or etymological analysis.",
@@ -1403,10 +1427,16 @@ function sourceAgentiveSuffixFormsV0_1(input: Readonly<{
 function suffixRecordHasAgentiveGlossV0_1(
   fact: AlbanianKaikkiExactLexicalSourceFactV0_1,
 ): boolean {
-  return fact.partOfSpeech === "suffix" &&
-    distinctGlossesV0_1([fact]).some((gloss) =>
-      /\bagent\s+noun|forms\s+agent\s+nouns|used\s+to\s+form\s+agent\s+nouns/iu.test(gloss),
-    );
+  if (fact.partOfSpeech !== "suffix") return false;
+  const glosses = distinctGlossesV0_1([fact]).map((gloss) =>
+    gloss.toLocaleLowerCase("en-US").replace(/\s+/gu, " ").trim(),
+  );
+  if (glosses.length === 0) return false;
+  const unsafeQualifier = /\b(?:not|never|possibly|perhaps|maybe|uncertain|unclear|rather|instead|unlike|but|may)\b|(?:^|\s)or(?:\s|$)|[?]/u;
+  const affirmativeAgentiveDescription = /^(?:forms agent nouns|used to form agent nouns|a suffix appended to words to create an agent noun(?:s)?)(?:[.,;:]|$)/u;
+  return glosses.every((gloss) =>
+    !unsafeQualifier.test(gloss) && affirmativeAgentiveDescription.test(gloss),
+  );
 }
 
 async function resolveSourceAgentiveSuffixEvidenceV0_1(input: Readonly<{
@@ -1448,7 +1478,12 @@ export function buildAlbanianFunctionalMeaningBridgeV0_1(input: Readonly<{
 }>): AlbanianFunctionalMeaningBridgeV0_1 {
   const related = input.related ?? input.comparison?.related ?? null;
   const sourceRelation = input.sourceRelation ?? input.comparison?.relation.relation ?? null;
-  const sourceFacts = bridgeRecordFactsV0_1(input.primary, related, input.comparison);
+  const sourceFacts = bridgeRecordFactsV0_1(
+    input.primary,
+    related,
+    input.comparison,
+    input.sourceAgentiveSuffixEvidence ?? null,
+  );
   const derivedStructure = input.comparison ? bridgeDerivedStructureV0_1(input.comparison) : null;
   const reasons: string[] = [];
   const agentFunctionalHypothesis = related
@@ -1825,6 +1860,7 @@ async function buildAlbanianLexicalReadingV0_1(input: Readonly<{
   }));
   const relatedResults = Object.freeze(relatedResultsWithFacts.map(({ publicResult }) => publicResult));
   const primaryProjection = sourceRecordProjectionV0_1(primary, input.analyses);
+  const MAX_SOURCE_AGENTIVE_SUFFIX_LOOKUPS_V0_1 = 8;
   const suffixEvidenceByForm = new Map<string, Promise<AlbanianSourceAgentiveSuffixEvidenceV0_1 | null>>();
   const relatedCandidateEvaluations = await Promise.all(relatedResultsWithFacts.map(async ({ publicResult, resolved }, index) => {
     const relatedForm = related[index]!;
@@ -1842,7 +1878,7 @@ async function buildAlbanianLexicalReadingV0_1(input: Readonly<{
         : null,
       sourceRelation: relatedForm.relation,
     });
-    if (bridge.status !== "SUPPORTED" && resolved && comparison.status === "SUPPORTED") {
+    if (resolved && comparison.status === "SUPPORTED") {
       const relatedProjection = sourceRecordProjectionV0_1(
         resolved,
         projectAlbanianKaikkiFactSourceIpaToSevenVoicesV0_1(resolved),
@@ -1851,7 +1887,7 @@ async function buildAlbanianLexicalReadingV0_1(input: Readonly<{
       if (suffixForms.length === 1) {
         const suffixKey = normalizedAlbanianFormV0_1(suffixForms[0]!);
         let evidencePromise = suffixEvidenceByForm.get(suffixKey);
-        if (!evidencePromise) {
+        if (!evidencePromise && suffixEvidenceByForm.size < MAX_SOURCE_AGENTIVE_SUFFIX_LOOKUPS_V0_1) {
           evidencePromise = resolveSourceAgentiveSuffixEvidenceV0_1({
             primary: primaryProjection,
             related: relatedProjection,
@@ -1859,13 +1895,15 @@ async function buildAlbanianLexicalReadingV0_1(input: Readonly<{
           });
           suffixEvidenceByForm.set(suffixKey, evidencePromise);
         }
-        bridge = buildAlbanianFunctionalMeaningBridgeV0_1({
-          primary: primaryProjection,
-          comparison,
-          related: relatedProjection,
-          sourceRelation: relatedForm.relation,
-          sourceAgentiveSuffixEvidence: await evidencePromise,
-        });
+        if (evidencePromise) {
+          bridge = buildAlbanianFunctionalMeaningBridgeV0_1({
+            primary: primaryProjection,
+            comparison,
+            related: relatedProjection,
+            sourceRelation: relatedForm.relation,
+            sourceAgentiveSuffixEvidence: await evidencePromise,
+          });
+        }
       }
     }
     return Object.freeze({

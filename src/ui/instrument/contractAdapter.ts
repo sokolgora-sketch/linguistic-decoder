@@ -1344,6 +1344,13 @@ function parseMotivationDiscoveryV0_1(
             typeof relatedBridgeRecord.sourceAuthoredExplanation !== "string"
           ) return false;
         }
+        const agentiveSuffix = sourceFacts.agentiveSuffix;
+        if (agentiveSuffix !== undefined && agentiveSuffix !== null && (
+          !isRecord(agentiveSuffix) ||
+          typeof agentiveSuffix.sourceRecordId !== "string" ||
+          typeof agentiveSuffix.suffixForm !== "string" ||
+          !isStringArray(agentiveSuffix.meaningGlosses)
+        )) return false;
         if (
           (sourceFacts.structuredReference.referencedForm !== null && typeof sourceFacts.structuredReference.referencedForm !== "string") ||
           (sourceFacts.structuredReference.reference !== null && typeof sourceFacts.structuredReference.reference !== "string")

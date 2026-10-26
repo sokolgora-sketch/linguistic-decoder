@@ -586,6 +586,78 @@ describe("real Albanian exact lexical source integration v0.1", () => {
     });
   });
 
+  it.each([
+    ["pelë", "pelar", "mare", "stableman, ostler, groom (especially mares)", "-ar"],
+    ["bletë", "bletar", "bee", "beekeeper", "-ar"],
+    ["thëngjill", "thëngjilltar", "coal", "coal maker", "-tar"],
+    ["përkthej", "përkthyes", "to translate", "translator; interpreter", "-s"],
+  ] as const)("preserves source-backed final agent meaning for %s → %s", async (primaryForm, relatedForm, primaryGloss, relatedGloss, suffixForm) => {
+    await withSyntheticSourceFileV0_1([
+      {
+        word: primaryForm,
+        lang_code: "sq",
+        pos: primaryForm === "përkthej" ? "verb" : "noun",
+        senses: [{ id: `${primaryForm}-1`, glosses: [primaryGloss], derived: [{ word: relatedForm }] }],
+        sounds: [],
+      },
+      {
+        word: relatedForm,
+        lang_code: "sq",
+        pos: "noun",
+        senses: [{ id: `${relatedForm}-1`, glosses: [relatedGloss] }],
+        sounds: [],
+        etymology_text: `From ${primaryForm} + ${suffixForm}.`,
+        etymology_links: [
+          [primaryForm, `${primaryForm}#Albanian`],
+          [suffixForm, `${suffixForm}#Albanian`],
+        ],
+        etymology_templates: [{
+          name: "suffix",
+          args: { "1": "sq", "2": primaryForm, "3": suffixForm },
+          expansion: `${primaryForm} + ${suffixForm}`,
+        }],
+      },
+      {
+        word: suffixForm,
+        lang_code: "sq",
+        pos: "suffix",
+        senses: [{
+          id: `${suffixForm}-1`,
+          glosses: [suffixForm === "-ar"
+            ? "a suffix appended to words to create an agent noun, much like English -er/-or"
+            : "forms agent nouns. -er"],
+        }],
+        sounds: [],
+      },
+    ], async ({ provider }) => {
+      const result = await buildMotivationEngineDiscoveryServerOnlyV0_1({
+        word: primaryForm,
+        inputLanguage: "sq",
+        inputProfile: "albanian",
+        analysis: await analysisFor(primaryForm),
+        heart: buildHeartInstrumentV1(primaryForm),
+        albanianLexicalSourceProvider: provider,
+      });
+      expect(result.discovery.albanianLexicalReading?.functionalMeaningBridge).toMatchObject({
+        status: "SUPPORTED",
+        relatedForm,
+        functionalHypothesis: {
+          functionalOperation: "AGENT",
+          statement: expect.stringContaining(relatedGloss),
+          basis: expect.arrayContaining(["SOURCE_ATTESTED_MORPHOLOGY", "SOURCE_ATTESTED_AGENT_MEANING"]),
+        },
+        sourceFacts: {
+          agentiveSuffix: {
+            suffixForm,
+            meaningGlosses: [suffixForm === "-ar"
+              ? "a suffix appended to words to create an agent noun, much like English -er/-or"
+              : "forms agent nouns. -er"],
+          },
+        },
+      });
+    });
+  });
+
   it("keeps a source-linked non-agent suffix formation Null", async () => {
     await withSyntheticSourceFileV0_1([
       {
@@ -638,6 +710,228 @@ describe("real Albanian exact lexical source integration v0.1", () => {
           statement: null,
         },
       });
+    });
+  });
+
+  it("keeps source morphology descriptive when the final derived meaning is non-agent", async () => {
+    await withSyntheticSourceFileV0_1([
+      {
+        word: "vend",
+        lang_code: "sq",
+        pos: "noun",
+        senses: [{ id: "vend-1", glosses: ["place"], derived: [{ word: "vendar" }] }],
+        sounds: [{ ipa: "/vɛnd/", tags: [] }],
+      },
+      {
+        word: "vendar",
+        lang_code: "sq",
+        pos: "noun",
+        senses: [{ id: "vendar-1", glosses: ["an abstract state"] }],
+        sounds: [],
+        etymology_text: "From vend + -tar.",
+        etymology_links: [
+          ["vend", "vend#Albanian"],
+          ["-tar", "-tar#Albanian"],
+        ],
+        etymology_templates: [{
+          name: "suffix",
+          args: { "1": "sq", "2": "vend", "3": "-tar" },
+          expansion: "vend + -tar",
+        }],
+      },
+      {
+        word: "-tar",
+        lang_code: "sq",
+        pos: "suffix",
+        senses: [{ id: "-tar-1", glosses: ["forms agent nouns. -er"] }],
+        sounds: [],
+      },
+    ], async ({ provider }) => {
+      const result = await buildMotivationEngineDiscoveryServerOnlyV0_1({
+        word: "vend",
+        inputLanguage: "sq",
+        inputProfile: "albanian",
+        analysis: await analysisFor("vend"),
+        heart: buildHeartInstrumentV1("vend"),
+        albanianLexicalSourceProvider: provider,
+      });
+      const bridge = result.discovery.albanianLexicalReading?.functionalMeaningBridge;
+      expect(bridge).toMatchObject({
+        status: "NULL",
+        relatedForm: "vendar",
+        functionalHypothesis: {
+          functionalOperation: null,
+          statement: null,
+        },
+        sourceFacts: {
+          agentiveSuffix: {
+            suffixForm: "-tar",
+            meaningGlosses: ["forms agent nouns. -er"],
+          },
+        },
+      });
+      const adapted = adaptAnalysisToTelemetryVM({
+        motivationDiscoveryV0_1: {
+          ...result.discovery,
+          exactLexicalSourceFacts: undefined,
+          sourceIpaSevenVoiceAnalyses: undefined,
+        },
+      }).motivationDiscoveryV0_1;
+      expect(adapted)
+        .toMatchObject({ kind: "present" });
+    });
+  });
+
+  it.each([
+    ["negated", ["not used to form agent nouns"]],
+    ["qualified", ["possibly used to form agent nouns"]],
+    ["conflicting", ["forms agent nouns. -er", "forms relational adjectives. -al"]],
+  ] as const)("rejects %s suffix descriptions for functional authorization", async (_label, suffixGlosses) => {
+    await withSyntheticSourceFileV0_1([
+      {
+        word: "vend",
+        lang_code: "sq",
+        pos: "noun",
+        senses: [{ id: "vend-1", glosses: ["place"], derived: [{ word: "vendar" }] }],
+        sounds: [],
+      },
+      {
+        word: "vendar",
+        lang_code: "sq",
+        pos: "noun",
+        senses: [{ id: "vendar-1", glosses: ["an abstract state"] }],
+        sounds: [],
+        etymology_text: "From vend + -tar.",
+        etymology_links: [["vend", "vend#Albanian"], ["-tar", "-tar#Albanian"]],
+        etymology_templates: [{ name: "suffix", args: { "1": "sq", "2": "vend", "3": "-tar" }, expansion: "vend + -tar" }],
+      },
+      {
+        word: "-tar",
+        lang_code: "sq",
+        pos: "suffix",
+        senses: [{ id: "-tar-1", glosses: suffixGlosses }],
+        sounds: [],
+      },
+    ], async ({ provider }) => {
+      const result = await buildMotivationEngineDiscoveryServerOnlyV0_1({
+        word: "vend",
+        inputLanguage: "sq",
+        inputProfile: "albanian",
+        analysis: await analysisFor("vend"),
+        heart: buildHeartInstrumentV1("vend"),
+        albanianLexicalSourceProvider: provider,
+      });
+      expect(result.discovery.albanianLexicalReading?.functionalMeaningBridge).toMatchObject({
+        status: "NULL",
+        functionalHypothesis: { functionalOperation: null, statement: null },
+      });
+      expect(result.discovery.albanianLexicalReading?.functionalMeaningBridge.sourceFacts).not.toHaveProperty("agentiveSuffix");
+    });
+  });
+
+  it("rejects ambiguous matching agentive suffix records", async () => {
+    await withSyntheticSourceFileV0_1([
+      {
+        word: "vend",
+        lang_code: "sq",
+        pos: "noun",
+        senses: [{ id: "vend-1", glosses: ["place"], derived: [{ word: "vendar" }] }],
+        sounds: [],
+      },
+      {
+        word: "vendar",
+        lang_code: "sq",
+        pos: "noun",
+        senses: [{ id: "vendar-1", glosses: ["an abstract state"] }],
+        sounds: [],
+        etymology_text: "From vend + -tar.",
+        etymology_links: [["vend", "vend#Albanian"], ["-tar", "-tar#Albanian"]],
+        etymology_templates: [{ name: "suffix", args: { "1": "sq", "2": "vend", "3": "-tar" }, expansion: "vend + -tar" }],
+      },
+      {
+        word: "-tar",
+        lang_code: "sq",
+        pos: "suffix",
+        senses: [{ id: "-tar-1", glosses: ["forms agent nouns. -er"] }],
+        sounds: [],
+      },
+      {
+        word: "-tar",
+        lang_code: "sq",
+        pos: "suffix",
+        senses: [{ id: "-tar-2", glosses: ["used to form agent nouns. -er"] }],
+        sounds: [],
+      },
+    ], async ({ provider }) => {
+      const result = await buildMotivationEngineDiscoveryServerOnlyV0_1({
+        word: "vend",
+        inputLanguage: "sq",
+        inputProfile: "albanian",
+        analysis: await analysisFor("vend"),
+        heart: buildHeartInstrumentV1("vend"),
+        albanianLexicalSourceProvider: provider,
+      });
+      expect(result.discovery.albanianLexicalReading?.functionalMeaningBridge.sourceFacts).not.toHaveProperty("agentiveSuffix");
+    });
+  });
+
+  it("caps distinct suffix-provider lookups at eight", async () => {
+    const suffixes = Array.from({ length: 9 }, (_, index) => `-x${index}`);
+    const derivedForms = suffixes.map((suffix) => `vendar${suffix.slice(1)}`);
+    await withSyntheticSourceFileV0_1([
+      {
+        word: "vend",
+        lang_code: "sq",
+        pos: "noun",
+        senses: [{ id: "vend-1", glosses: ["place"], derived: derivedForms.map((word) => ({ word })) }],
+        sounds: [],
+      },
+      ...derivedForms.map((word, index) => ({
+        word,
+        lang_code: "sq" as const,
+        pos: "noun" as const,
+        senses: [{ id: `${word}-1`, glosses: ["an abstract state"] }],
+        sounds: [],
+        etymology_text: `From vend + ${suffixes[index]}.`,
+        etymology_links: [["vend", "vend#Albanian"], [suffixes[index]!, `${suffixes[index]}#Albanian`]],
+        etymology_templates: [{ name: "suffix", args: { "1": "sq", "2": "vend", "3": suffixes[index]! }, expansion: `vend + ${suffixes[index]}` }],
+      })),
+      ...suffixes.map((suffix) => ({
+        word: suffix,
+        lang_code: "sq" as const,
+        pos: "suffix" as const,
+        senses: [{ id: `${suffix}-1`, glosses: ["forms agent nouns. -er"] }],
+        sounds: [],
+      })),
+    ], async ({ provider }) => {
+      const queries: string[] = [];
+      const countedProvider: AlbanianKaikkiServerOnlyExactLexicalSourceProviderV0_1 = Object.freeze({
+        ...provider,
+        query: async (query: string) => {
+          queries.push(query);
+          return provider.query(query);
+        },
+      });
+      const result = await buildMotivationEngineDiscoveryServerOnlyV0_1({
+        word: "vend",
+        inputLanguage: "sq",
+        inputProfile: "albanian",
+        analysis: await analysisFor("vend"),
+        heart: buildHeartInstrumentV1("vend"),
+        albanianLexicalSourceProvider: countedProvider,
+      });
+      expect(queries).toEqual(["vend", ...derivedForms, ...suffixes.slice(0, 8)]);
+      expect(result.discovery.albanianLexicalReading?.relatedCandidateEvaluations).toHaveLength(9);
+      expect(result.discovery.albanianLexicalReading?.relatedCandidateEvaluations.slice(8)).toEqual([
+        expect.objectContaining({
+          relatedForm: derivedForms[8],
+          functionalMeaningBridge: expect.objectContaining({
+            status: "NULL",
+          }),
+        }),
+      ]);
+      expect(result.discovery.albanianLexicalReading?.relatedCandidateEvaluations[8]?.functionalMeaningBridge.sourceFacts)
+        .not.toHaveProperty("agentiveSuffix");
     });
   });
 
