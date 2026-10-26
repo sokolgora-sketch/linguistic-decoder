@@ -142,7 +142,7 @@ export type AlbanianFunctionalMeaningBridgeV0_1 = Readonly<{
   }> | null;
   functionalHypothesis: Readonly<{
     status: "EXPLORATORY_FUNCTIONAL_HYPOTHESIS" | "UNKNOWN_OR_NULL";
-    functionalOperation: "AGENT" | null;
+    functionalOperation: "AGENT" | "ENABLE_PASSAGE" | null;
     statement: string | null;
     alternatives: readonly string[];
     basis: readonly string[];
@@ -1151,7 +1151,7 @@ function hasMeaningEvidenceV0_1(glosses: readonly string[]): boolean {
 }
 
 type AlbanianFunctionalHypothesisV0_1 = Readonly<{
-  functionalOperation: "AGENT" | null;
+  functionalOperation: "AGENT" | "ENABLE_PASSAGE" | null;
   statement: string;
   basis: readonly string[];
   alternatives: readonly string[];
@@ -1181,7 +1181,7 @@ function buildDirectionalFunctionalHypothesisV0_1(input: Readonly<{
   }
 
   return Object.freeze({
-    functionalOperation: null,
+    functionalOperation: "ENABLE_PASSAGE" as const,
     statement: `Directional functional interpretation (exploratory): the source relates ${input.primary.form} (“${primaryMeaning}”) to ${input.related.form} (“${relatedMeaning}”). Its source-authored explanation mentions letting light through, while the related meanings include a window, opening, or access function. The engine therefore models ${input.primary.form} as an enabling input and ${input.related.form} as a structure that lets that input enter or provides access. This is a falsifiable use-oriented model, not proof of morphology, etymology, causation, or Voice semantics.`,
     basis: Object.freeze([
       "SOURCE_ATTESTED_PRIMARY_MEANING",

@@ -1312,7 +1312,7 @@ function parseMotivationDiscoveryV0_1(
       const hypothesis = bridge.functionalHypothesis;
       return isRecord(hypothesis) &&
         (hypothesis.status === "EXPLORATORY_FUNCTIONAL_HYPOTHESIS" || hypothesis.status === "UNKNOWN_OR_NULL") &&
-        (hypothesis.functionalOperation === undefined || hypothesis.functionalOperation === null || hypothesis.functionalOperation === "AGENT") &&
+        (hypothesis.functionalOperation === undefined || hypothesis.functionalOperation === null || hypothesis.functionalOperation === "AGENT" || hypothesis.functionalOperation === "ENABLE_PASSAGE") &&
         (hypothesis.statement === null || typeof hypothesis.statement === "string") &&
         isStringArray(hypothesis.alternatives) &&
         isStringArray(hypothesis.basis) &&

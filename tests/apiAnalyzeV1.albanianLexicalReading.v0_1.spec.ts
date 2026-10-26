@@ -126,7 +126,10 @@ describe("analyze-v1 Albanian lexical reading reachability", () => {
         status: "SUPPORTED",
         truthLayers: ["SOURCE_FACT", "DERIVED_STRUCTURE", "EXPLORATORY_FUNCTIONAL_HYPOTHESIS"],
         relatedForm: "dritare",
-        functionalHypothesis: { status: "EXPLORATORY_FUNCTIONAL_HYPOTHESIS" },
+        functionalHypothesis: {
+          status: "EXPLORATORY_FUNCTIONAL_HYPOTHESIS",
+          functionalOperation: "ENABLE_PASSAGE",
+        },
       },
       interpretation: { status: "EXPLORATORY_ZHEJI_READING" },
       composition: {
