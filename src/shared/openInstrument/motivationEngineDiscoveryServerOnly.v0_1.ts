@@ -1317,7 +1317,7 @@ function buildAgentFunctionalHypothesisV0_1(input: Readonly<{
 }>): AlbanianFunctionalHypothesisV0_1 | null {
   if (
     input.sourceRelation !== "SOURCE_DERIVED_FORM" ||
-    input.primary.partOfSpeech !== "noun" ||
+    (input.primary.partOfSpeech !== "noun" && input.primary.partOfSpeech !== "verb") ||
     input.related.partOfSpeech !== "noun" ||
     !hasMeaningEvidenceV0_1(input.primary.meaningGlosses) ||
     !hasMeaningEvidenceV0_1(input.related.meaningGlosses) ||
