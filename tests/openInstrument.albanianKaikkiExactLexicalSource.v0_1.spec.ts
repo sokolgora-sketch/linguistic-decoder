@@ -513,6 +513,101 @@ describe("real Albanian exact lexical source integration v0.1", () => {
     });
   });
 
+  it("recognizes a source-derived verb-to-agent formation while keeping non-agent derivatives Null", async () => {
+    await withSyntheticSourceFileV0_1([
+      {
+        word: "gjuaj",
+        lang_code: "sq",
+        pos: "verb",
+        senses: [{ id: "gjuaj-1", glosses: ["to hunt"], derived: [{ word: "gjuetar" }, { word: "gjueti" }] }],
+        sounds: [],
+      },
+      {
+        word: "gjuetar",
+        lang_code: "sq",
+        pos: "noun",
+        senses: [{ id: "gjuetar-1", glosses: ["hunter"] }],
+        sounds: [],
+        etymology_text: "From gjuaj (“hunt; throw”) + -tar.",
+        etymology_links: [["gjuaj", "gjuaj#Albanian"]],
+        etymology_templates: [{
+          name: "suffix",
+          args: { "1": "sq", "2": "gjuaj", "3": "-tar" },
+          expansion: "gjuaj (“hunt; throw”) + -tar",
+        }],
+      },
+      {
+        word: "gjueti",
+        lang_code: "sq",
+        pos: "noun",
+        senses: [{ id: "gjueti-1", glosses: ["hunting"] }],
+        sounds: [],
+        etymology_text: "From gjuaj (“to hunt”).",
+        etymology_links: [["gjuaj", "gjuaj#Albanian"]],
+      },
+    ], async ({ provider }) => {
+      const result = await buildMotivationEngineDiscoveryServerOnlyV0_1({
+        word: "gjuaj",
+        inputLanguage: "sq",
+        inputProfile: "albanian",
+        analysis: await analysisFor("gjuaj"),
+        heart: buildHeartInstrumentV1("gjuaj"),
+        albanianLexicalSourceProvider: provider,
+      });
+      const reading = result.discovery.albanianLexicalReading;
+
+      expect(reading).toMatchObject({
+        status: "SUPPORTED",
+        primarySourceFact: { form: "gjuaj", partOfSpeech: "verb", meaningGlosses: ["to hunt"] },
+        sourcePronunciation: null,
+        sourceLinkedComparison: {
+          status: "SUPPORTED",
+          relation: { relatedForm: "gjuetar", referencedForm: "gjuaj", reference: "gjuaj#Albanian" },
+        },
+        functionalMeaningBridge: {
+          status: "SUPPORTED",
+          relatedForm: "gjuetar",
+          functionalHypothesis: {
+            functionalOperation: "AGENT",
+            statement: expect.stringContaining("hunter"),
+          },
+        },
+      });
+      expect(reading?.relatedCandidateEvaluations).toEqual(expect.arrayContaining([
+        expect.objectContaining({
+          relatedForm: "gjueti",
+          sourceLinkedComparison: expect.objectContaining({ status: "SUPPORTED" }),
+          functionalMeaningBridge: expect.objectContaining({
+            status: "NULL",
+            reasonCodes: ["DERIVED_STRUCTURE_NOT_SUPPORTED_FOR_BOTH_RECORDS"],
+            functionalHypothesis: expect.objectContaining({ functionalOperation: null, statement: null }),
+          }),
+        }),
+      ]));
+
+      const vm = adaptAnalysisToTelemetryVM({
+        word: "gjuaj",
+        sanitized: "gjuaj",
+        engineVersion: "fixture",
+        primaryPath: { voicePath: [] },
+        candidates: [],
+        motivationDiscoveryV0_1: {
+          ...result.discovery,
+          exactLexicalSourceFacts: undefined,
+          sourceIpaSevenVoiceAnalyses: undefined,
+        },
+      });
+      expect(vm.motivationDiscoveryV0_1).toMatchObject({ kind: "present" });
+      if (vm.motivationDiscoveryV0_1?.kind === "present") {
+        render(createElement(MotivationDiscoveryCardV0_1, { discovery: vm.motivationDiscoveryV0_1 }));
+        expect(screen.getByTestId("albanian-reading-functional-bridge")).toHaveTextContent("gjuetar");
+        expect(screen.getByTestId("albanian-reading-functional-bridge-operation")).toHaveTextContent("Functional operation: AGENT");
+        expect(screen.getByTestId("albanian-reading-functional-bridge")).toHaveTextContent("does not assign an entity, resource, or other semantic role to the primary word");
+        expect(screen.getByTestId("albanian-reading-interpretation")).toHaveTextContent("Integrated source-bounded functional reading");
+      }
+    });
+  });
+
   it("keeps the source-backed ujë control Null when its derived noun is not an agent gloss", async () => {
     await withSyntheticSourceFileV0_1([
       {
