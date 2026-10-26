@@ -1277,7 +1277,7 @@ function buildAgentFunctionalHypothesisV0_1(input: Readonly<{
   const relatedHasSourceIpa = input.related.pronunciationVariants.some((variant) => variant.rawIpa !== null);
   return Object.freeze({
     functionalOperation: "AGENT" as const,
-    statement: `Source-bounded functional operation AGENT (exploratory): the source lists ${input.related.form} as a derived form of ${input.primary.form}; its glosses identify ${input.primary.form} as “${primaryMeaning}” and ${input.related.form} as “${relatedMeaning}”. The product models ${input.primary.form} as the entity or resource and ${input.related.form} as an agent or profession associated with that entity. This is a source-bounded product hypothesis, not proof of morphology, etymology, causation, or universal Voice semantics.`,
+    statement: `Source-bounded functional operation AGENT (exploratory): the source lists ${input.related.form} as a derived form of ${input.primary.form}; its glosses identify ${input.primary.form} as “${primaryMeaning}” and ${input.related.form} as “${relatedMeaning}”. The product preserves AGENT as an exploratory label for the related agent or profession gloss and this source-derived link; it does not assign an entity, resource, or other semantic role to the primary word beyond its source gloss. This is a source-bounded product hypothesis, not proof of morphology, etymology, causation, or universal Voice semantics.`,
     basis: Object.freeze([
       "SOURCE_ATTESTED_PRIMARY_MEANING",
       "SOURCE_ATTESTED_AGENT_MEANING",
