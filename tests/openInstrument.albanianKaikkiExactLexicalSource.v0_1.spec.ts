@@ -11,6 +11,7 @@ import {
 import {
   createAlbanianKaikkiServerOnlyExactLexicalSourceProviderForSyntheticSourceFileV0_1,
   createAlbanianKaikkiServerOnlyExactLexicalSourceProviderForSyntheticFixtureV0_1,
+  createAlbanianKaikkiServerOnlyUnavailableProviderV0_1,
   type AlbanianKaikkiExactLexicalSourceFactV0_1,
   type AlbanianKaikkiServerOnlyExactLexicalSourceProviderV0_1,
 } from "@/shared/openInstrument/albanianKaikkiServerOnlyExactLexicalSource.v0_1";
@@ -76,6 +77,74 @@ async function discoveryForFactsV0_1(
 
 async function discoveryForFactV0_1(fact: AlbanianKaikkiExactLexicalSourceFactV0_1) {
   return discoveryForFactsV0_1([fact], fact.form);
+}
+
+function fiveWindowsFixtureFactsV0_1(): readonly AlbanianKaikkiExactLexicalSourceFactV0_1[] {
+  return [
+    fixtureFact({
+      sourceRecordId: "kaikki-albanian-jsonl:word=dritare:ordinal=0",
+      entryLocator: "jsonl://word/dritare/match/0",
+      physicalRecordOrdinal: 2171,
+      form: "dritare",
+      senses: [{ senseId: "dritare-window", glosses: ["window", "access to the sea"] }],
+      ipaObservations: [{ soundIndex: 0, ipa: "/dɾiˈtaɾɛ/", tags: [] }],
+      etymologyText: "From dritë (“light”) + -are (“-er”), meaning to let light through or similar.",
+      etymologyLinks: [{ sourceForm: "dritë", reference: "dritë#Albanian" }],
+      etymologyTemplates: [{ name: "der", args: { "1": "sq", "2": "dritë" }, expansion: "dritë" }],
+    }),
+    fixtureFact({
+      sourceRecordId: "kaikki-albanian-jsonl:word=f%C3%ABnjesht%C3%ABr:ordinal=0",
+      entryLocator: "jsonl://word/f%C3%ABnjesht%C3%ABr/match/0",
+      physicalRecordOrdinal: 11257,
+      form: "fënjeshtër",
+      senses: [{ senseId: "fënjeshtër-window", glosses: ["window"] }],
+      ipaObservations: [{ soundIndex: 0, ipa: "/fəˈɲeʃtəɾ/", tags: [] }],
+      etymologyText: "Borrowed from Vulgar Latin, from Latin fenestra. Doublet of finestër.",
+      etymologyLinks: [{ sourceForm: "fenestra", reference: "fenestra#Latin" }],
+      etymologyTemplates: [
+        { name: "bor+", args: { "1": "sq", "2": "la-vul", "3": "-" }, expansion: "Borrowed from Vulgar Latin" },
+        { name: "der", args: { "1": "sq", "2": "la", "3": "fenestra" }, expansion: "Latin fenestra" },
+      ],
+    }),
+    fixtureFact({
+      sourceRecordId: "kaikki-albanian-jsonl:word=finest%C3%ABr:ordinal=0",
+      entryLocator: "jsonl://word/finest%C3%ABr/match/0",
+      physicalRecordOrdinal: 11258,
+      form: "finestër",
+      senses: [{ senseId: "finestër-window", glosses: ["window"] }],
+      ipaObservations: [],
+      etymologyText: "Borrowed from Italian finestra. Doublet of fënjeshtër.",
+      etymologyLinks: [{ sourceForm: "finestra", reference: "finestra#Italian" }],
+      etymologyTemplates: [
+        { name: "bor+", args: { "1": "sq", "2": "it", "3": "finestra" }, expansion: "Borrowed from Italian finestra" },
+      ],
+    }),
+    fixtureFact({
+      sourceRecordId: "kaikki-albanian-jsonl:word=penxhere:ordinal=0",
+      entryLocator: "jsonl://word/penxhere/match/0",
+      physicalRecordOrdinal: 12549,
+      form: "penxhere",
+      senses: [{ senseId: "penxhere-window", glosses: ["window"] }],
+      ipaObservations: [{ soundIndex: 0, ipa: "/penˈd͡ʒeɾe/", tags: [] }],
+      etymologyText: "Borrowed from Ottoman Turkish پنجره (pencere), from Classical Persian پنجره (panjara).",
+      etymologyLinks: [{ sourceForm: "پنجره", reference: "پنجره#Ottoman_Turkish" }],
+      etymologyTemplates: [
+        { name: "bor+", args: { "1": "sq", "2": "ota", "3": "پنجره", tr: "pencere" }, expansion: "Borrowed from Ottoman Turkish پنجره (pencere)" },
+        { name: "der", args: { "1": "sq", "2": "fa-cls", "3": "پنجره", tr: "panjara" }, expansion: "Classical Persian پنجره (panjara)" },
+      ],
+    }),
+    fixtureFact({
+      sourceRecordId: "kaikki-albanian-jsonl:word=derk%C3%AB:ordinal=0",
+      entryLocator: "jsonl://word/derk%C3%AB/match/0",
+      physicalRecordOrdinal: 22393,
+      form: "derkë",
+      senses: [{ senseId: "derkë-window", glosses: ["window"] }],
+      ipaObservations: [],
+      etymologyText: "From derë (“door”) + -kë.",
+      etymologyLinks: [{ sourceForm: "derë", reference: "derë#Albanian" }],
+      etymologyTemplates: [{ name: "af", args: { "1": "sq", "2": "derë", "3": "-kë", t1: "door" }, expansion: "derë (“door”) + -kë" }],
+    }),
+  ];
 }
 
 async function discoveryForMalorRelationTextV0_1(etymologyText: string | null | undefined) {
@@ -2446,5 +2515,131 @@ describe("real Albanian exact lexical source integration v0.1", () => {
       status: "NULL",
       reasonCodes: expect.arrayContaining(["SOURCE_COMPONENT_RECORD_AMBIGUOUS"]),
     });
+  });
+
+  it("exposes the bounded Five Windows comparison with source-gated classifications and four additional queries", async () => {
+    const facts = fiveWindowsFixtureFactsV0_1();
+    const baseProvider = createAlbanianKaikkiServerOnlyExactLexicalSourceProviderForSyntheticFixtureV0_1({ facts });
+    const queries: string[] = [];
+    const provider: AlbanianKaikkiServerOnlyExactLexicalSourceProviderV0_1 = Object.freeze({
+      ...baseProvider,
+      query: async (query: string) => {
+        queries.push(query);
+        return baseProvider.query(query);
+      },
+    });
+    const result = await buildMotivationEngineDiscoveryServerOnlyV0_1({
+      word: "dritare",
+      inputLanguage: "sq",
+      inputProfile: "albanian",
+      analysis: await analysisFor("dritare"),
+      heart: buildHeartInstrumentV1("dritare"),
+      albanianLexicalSourceProvider: provider,
+    });
+    const comparison = result.discovery.albanianLexicalReading?.fiveWindowsComparison;
+
+    expect(queries).toEqual(["dritare", "fënjeshtër", "finestër", "penxhere", "derkë"]);
+    expect(comparison).toMatchObject({
+      comparisonId: "FIVE_WINDOWS",
+      queryForm: "dritare",
+      members: [
+        { form: "dritare", status: "MATCHES_FOUND", records: [{ classification: "ALBANIAN_INTERNAL_FORMATION" }] },
+        { form: "fënjeshtër", status: "MATCHES_FOUND", records: [{ classification: "SOURCE_ATTRIBUTED_BORROWING", borrowedFromLanguage: "Vulgar Latin", ultimateSourceLanguage: "Latin" }] },
+        { form: "finestër", status: "MATCHES_FOUND", records: [{ classification: "SOURCE_ATTRIBUTED_BORROWING", borrowedFromLanguage: "Italian", ultimateSourceLanguage: null }] },
+        { form: "penxhere", status: "MATCHES_FOUND", records: [{ classification: "SOURCE_ATTRIBUTED_BORROWING", borrowedFromLanguage: "Ottoman Turkish", ultimateSourceLanguage: "Classical Persian" }] },
+        { form: "derkë", status: "MATCHES_FOUND", records: [{ classification: "ALBANIAN_INTERNAL_FORMATION" }] },
+      ],
+    });
+    expect(comparison?.members.every((member) => member.records.every((record) => record.usageNotes.length === 0))).toBe(true);
+
+    const vm = adaptAnalysisToTelemetryVM({
+      word: "dritare",
+      sanitized: "dritare",
+      engineVersion: "fixture",
+      primaryPath: { voicePath: ["I", "A"] },
+      candidates: [],
+      motivationDiscoveryV0_1: result.discovery,
+    });
+    expect(vm.motivationDiscoveryV0_1).toMatchObject({ kind: "present" });
+    if (vm.motivationDiscoveryV0_1?.kind === "present") {
+      render(createElement(MotivationDiscoveryCardV0_1, { discovery: vm.motivationDiscoveryV0_1 }));
+      expect(screen.getByTestId("albanian-five-windows-comparison")).toHaveTextContent("FIVE WINDOWS — ALBANIAN WORD COMPARISON");
+      expect(screen.getAllByTestId("albanian-five-windows-member")).toHaveLength(5);
+      expect(screen.getByTestId("albanian-five-windows-comparison")).toHaveTextContent("fënjeshtër");
+      expect(screen.getByTestId("albanian-five-windows-comparison")).toHaveTextContent("Vulgar Latin");
+      expect(screen.getByTestId("albanian-five-windows-comparison")).toHaveTextContent("Usage / register: Unknown / Null");
+    }
+  });
+
+  it("preserves multiple source records and explicit Null members without inferring absence or lookup-limit causation", async () => {
+    const [dritare] = fiveWindowsFixtureFactsV0_1();
+    const secondRecord = fixtureFact({
+      sourceRecordId: "kaikki-albanian-jsonl:word=f%C3%ABnjesht%C3%ABr:ordinal=1",
+      entryLocator: "jsonl://word/f%C3%ABnjesht%C3%ABr/match/1",
+      physicalRecordOrdinal: 99999,
+      form: "fënjeshtër",
+      senses: [{ senseId: "fënjeshtër-window-alt", glosses: ["window variant"] }],
+      ipaObservations: [],
+    });
+    const provider = createAlbanianKaikkiServerOnlyExactLexicalSourceProviderForSyntheticFixtureV0_1({
+      facts: [dritare, secondRecord],
+    });
+    const result = await buildMotivationEngineDiscoveryServerOnlyV0_1({
+      word: "dritare",
+      inputLanguage: "sq",
+      inputProfile: "albanian",
+      analysis: await analysisFor("dritare"),
+      heart: buildHeartInstrumentV1("dritare"),
+      albanianLexicalSourceProvider: provider,
+    });
+    const comparison = result.discovery.albanianLexicalReading?.fiveWindowsComparison;
+    expect(comparison?.members.find((member) => member.form === "fënjeshtër")).toMatchObject({
+      status: "MATCHES_FOUND",
+      records: [
+        { form: "fënjeshtër", sourceRecordId: expect.stringContaining("ordinal=1") },
+      ],
+    });
+    expect(comparison?.members.find((member) => member.form === "finestër")).toMatchObject({
+      status: "SOURCE_NOT_FOUND",
+      records: [],
+      reasonCodes: ["ALBANIAN_EXACT_FORM_NOT_FOUND"],
+    });
+    expect(comparison?.members.find((member) => member.form === "finestër")?.reasonCodes).not.toContain("LOOKUP_LIMIT");
+  });
+
+  it("keeps the comparison absent outside Albanian input and fails closed when the source is unavailable", async () => {
+    const dritare = fiveWindowsFixtureFactsV0_1()[0];
+    const fixtureProvider = createAlbanianKaikkiServerOnlyExactLexicalSourceProviderForSyntheticFixtureV0_1({ facts: [dritare] });
+    const nonAlbanian = await buildMotivationEngineDiscoveryServerOnlyV0_1({
+      word: "dritare",
+      inputLanguage: "en",
+      inputProfile: "english",
+      analysis: await analysisFor("dritare"),
+      heart: buildHeartInstrumentV1("dritare"),
+      albanianLexicalSourceProvider: fixtureProvider,
+    });
+    expect(nonAlbanian.discovery.albanianLexicalReading?.fiveWindowsComparison).toBeNull();
+
+    const unavailableBase = createAlbanianKaikkiServerOnlyUnavailableProviderV0_1("ALBANIAN_SOURCE_PATH_NOT_CONFIGURED");
+    let unavailableQueries = 0;
+    const unavailableProvider: AlbanianKaikkiServerOnlyExactLexicalSourceProviderV0_1 = Object.freeze({
+      ...unavailableBase,
+      query: async (query: string) => {
+        unavailableQueries += 1;
+        return unavailableBase.query(query);
+      },
+    });
+    const unavailable = await buildMotivationEngineDiscoveryServerOnlyV0_1({
+      word: "dritare",
+      inputLanguage: "sq",
+      inputProfile: "albanian",
+      analysis: await analysisFor("dritare"),
+      heart: buildHeartInstrumentV1("dritare"),
+      albanianLexicalSourceProvider: unavailableProvider,
+    });
+    const comparison = unavailable.discovery.albanianLexicalReading?.fiveWindowsComparison;
+    expect(unavailableQueries).toBe(1);
+    expect(comparison?.members.every((member) => member.status === "UNAVAILABLE")).toBe(true);
+    expect(comparison?.members.every((member) => member.reasonCodes.includes("ALBANIAN_SOURCE_PATH_NOT_CONFIGURED"))).toBe(true);
   });
 });

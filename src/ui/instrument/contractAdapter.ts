@@ -1163,6 +1163,54 @@ function parseMotivationDiscoveryV0_1(
         ) &&
         record.pronunciationVariants.every(validSourceLinkedPronunciation);
     };
+    const validFiveWindowsComparison = reading.fiveWindowsComparison === undefined || reading.fiveWindowsComparison === null || (() => {
+      const expectedForms = ["dritare", "fënjeshtër", "finestër", "penxhere", "derkë"];
+      const comparison = reading.fiveWindowsComparison;
+      if (!isRecord(comparison) || comparison.comparisonId !== "FIVE_WINDOWS" ||
+        typeof comparison.queryForm !== "string" || !Array.isArray(comparison.members) || comparison.members.length !== expectedForms.length ||
+        !isStringArray(comparison.alternatives) || typeof comparison.summary !== "string" || typeof comparison.claimBoundary !== "string") {
+        return false;
+      }
+      const validRecord = (record: unknown): boolean => {
+        if (!isRecord(record) || !Array.isArray(record.ipaObservations) || !Array.isArray(record.etymologyLinks) || !Array.isArray(record.etymologyTemplates)) {
+          return false;
+        }
+        return typeof record.sourceRecordId === "string" &&
+          typeof record.entryLocator === "string" &&
+          typeof record.physicalRecordOrdinal === "number" &&
+          Number.isInteger(record.physicalRecordOrdinal) &&
+          record.physicalRecordOrdinal >= 0 &&
+          typeof record.form === "string" &&
+          (record.partOfSpeech === null || typeof record.partOfSpeech === "string") &&
+          isStringArray(record.meaningGlosses) &&
+          (record.etymologyText === null || typeof record.etymologyText === "string") &&
+          record.etymologyLinks.every((link) =>
+            isRecord(link) && typeof link.sourceForm === "string" && typeof link.reference === "string",
+          ) &&
+          record.etymologyTemplates.every((template) =>
+            isRecord(template) && typeof template.name === "string" && isRecord(template.args) &&
+            Object.values(template.args).every((value) => typeof value === "string") && typeof template.expansion === "string",
+          ) &&
+          record.ipaObservations.every((observation) =>
+            isRecord(observation) && typeof observation.soundIndex === "number" && Number.isInteger(observation.soundIndex) &&
+            observation.soundIndex >= 0 && (observation.ipa === null || typeof observation.ipa === "string") &&
+            isStringArray(observation.tags),
+          ) &&
+          (record.classification === "ALBANIAN_INTERNAL_FORMATION" ||
+            record.classification === "SOURCE_ATTRIBUTED_BORROWING" ||
+            record.classification === "UNKNOWN_OR_NULL") &&
+          (record.borrowedFromLanguage === null || typeof record.borrowedFromLanguage === "string") &&
+          (record.ultimateSourceLanguage === null || typeof record.ultimateSourceLanguage === "string") &&
+          isStringArray(record.usageNotes);
+      };
+      return comparison.members.every((member, index) =>
+        isRecord(member) &&
+        member.form === expectedForms[index] &&
+        (member.status === "MATCHES_FOUND" || member.status === "SOURCE_NOT_FOUND" || member.status === "UNAVAILABLE") &&
+        Array.isArray(member.records) && member.records.every(validRecord) &&
+        isStringArray(member.reasonCodes),
+      );
+    })();
     const sourceLinkedComponentReading = reading.sourceLinkedComponentReading;
     const validSourceLinkedComponentReading = sourceLinkedComponentReading === undefined || sourceLinkedComponentReading === null || (() => {
       const validRelationStatusCombination = (() => {
@@ -1359,6 +1407,7 @@ function parseMotivationDiscoveryV0_1(
       validComposition &&
       validSourceLinkedComponentReading &&
       validSourceLinkedComparison &&
+      validFiveWindowsComparison &&
       validFunctionalMeaningBridge &&
       validRelatedCandidateEvaluations &&
       (reading.interpretation.status === "EXPLORATORY_ZHEJI_READING" || reading.interpretation.status === "UNKNOWN_OR_NULL") &&
