@@ -90,6 +90,17 @@ function sourceLinkedComponentReadingSummaryV0_1(
     : `Null — ${reading.reasonCodes.join(", ") || "SOURCE_COMPONENT_RELATION_NOT_VERIFIED"}.`;
 }
 
+function fiveWindowsClassificationLabelV0_1(value: string): string {
+  switch (value) {
+    case "ALBANIAN_INTERNAL_FORMATION":
+      return "Albanian internal formation (source-attributed)";
+    case "SOURCE_ATTRIBUTED_BORROWING":
+      return "Source-attributed borrowing";
+    default:
+      return "Unknown / Null";
+  }
+}
+
 function zcText(value: unknown): string {
   if (!value || typeof value !== "object" || Array.isArray(value)) return "Null";
   const record = value as Record<string, unknown>;
@@ -684,6 +695,62 @@ export function MotivationDiscoveryCardV0_1({
             ))}
           </div>
         </div>
+      ) : null}
+
+      {albanianLexicalReading?.fiveWindowsComparison ? (
+        <section
+          data-testid="albanian-five-windows-comparison"
+          className="mt-3 rounded border border-[#53607a] bg-[#111521] p-3 text-xs leading-5 text-[#dce5f5]"
+        >
+          <div className="font-semibold uppercase tracking-[0.1em] text-[#c9d7f0]">
+            FIVE WINDOWS — ALBANIAN WORD COMPARISON
+          </div>
+          <div className="mt-1 text-[#aebbd5]">{albanianLexicalReading.fiveWindowsComparison.summary}</div>
+          <div className="mt-2 space-y-2">
+            {albanianLexicalReading.fiveWindowsComparison.members.map((member) => (
+              <article
+                key={member.form}
+                data-testid="albanian-five-windows-member"
+                className="rounded border border-[#34415c] bg-[#0b101c] p-2"
+              >
+                <div className="font-mono text-sm text-[#f5f7fb]">{member.form}</div>
+                <div className="mt-1 text-[#aebbd5]">Source status: {member.status}</div>
+                {member.records.length ? member.records.map((record) => (
+                  <div
+                    key={record.sourceRecordId}
+                    data-testid="albanian-five-windows-record"
+                    className="mt-2 rounded border border-[#26334a] bg-[#101725] p-2"
+                  >
+                    <div>Meaning: {record.meaningGlosses.join("; ") || "Unknown / Null"}</div>
+                    <div>Formation / borrowing: {fiveWindowsClassificationLabelV0_1(record.classification)}</div>
+                    <div>Original language: {record.borrowedFromLanguage ?? "Unknown / Null"}</div>
+                    <div>Ultimate source language: {record.ultimateSourceLanguage ?? "Unknown / Null"}</div>
+                    <div>Usage / register: {record.usageNotes.join("; ") || "Unknown / Null"}</div>
+                    <div className="mt-1 break-words text-[#8fa4c6]">
+                      Source: {record.sourceRecordId} · {record.entryLocator} · ordinal {record.physicalRecordOrdinal}
+                    </div>
+                    <div className="mt-1 break-words text-[#aebbd5]">
+                      Etymology (attributed): {record.etymologyText ?? "Unknown / Null"}
+                    </div>
+                    <div className="mt-1 break-words text-[#8fa4c6]">
+                      IPA: {record.ipaObservations.map((observation) => observation.ipa ?? "Null").join(" · ") || "Null"}
+                    </div>
+                  </div>
+                )) : (
+                  <div className="mt-2 rounded border border-[#594a2b] bg-[#211c12] p-2 text-[#f0ddb0]">
+                    Unknown / Null — {member.reasonCodes.join(", ") || "no source record returned"}.
+                  </div>
+                )}
+              </article>
+            ))}
+          </div>
+          <div className="mt-2 text-[#aebbd5]">
+            Alternatives: {albanianLexicalReading.fiveWindowsComparison.alternatives.join(" ")}
+          </div>
+          <div className="mt-2 text-[10px] text-[#aebbd5]">
+            {albanianLexicalReading.fiveWindowsComparison.claimBoundary}
+          </div>
+        </section>
       ) : null}
 
       {albanianLexicalReading?.status === "SUPPORTED" ? (

@@ -13,6 +13,7 @@ import {
   type AlbanianKaikkiExactLexicalSourceFactV0_1,
   type AlbanianKaikkiExactLexicalSourceEtymologyLinkV0_1,
   type AlbanianKaikkiExactLexicalSourceEtymologyTemplateV0_1,
+  type AlbanianKaikkiExactLexicalSourceLookupResultV0_1,
   type AlbanianKaikkiExactLexicalSourceStatusV0_1,
   type AlbanianKaikkiServerOnlyExactLexicalSourceProviderV0_1,
 } from "@/shared/openInstrument/albanianKaikkiServerOnlyExactLexicalSource.v0_1";
@@ -53,6 +54,57 @@ export type EnglishKaikkiProviderOperationalStatusV0_1 = Readonly<{
   failureReasonCodes: readonly string[];
 }>;
 
+export const ALBANIAN_FIVE_WINDOWS_FORMS_V0_1 = Object.freeze([
+  "dritare",
+  "fënjeshtër",
+  "finestër",
+  "penxhere",
+  "derkë",
+] as const);
+
+export type AlbanianFiveWindowsClassificationV0_1 =
+  | "ALBANIAN_INTERNAL_FORMATION"
+  | "SOURCE_ATTRIBUTED_BORROWING"
+  | "UNKNOWN_OR_NULL";
+
+export type AlbanianFiveWindowsRecordV0_1 = Readonly<{
+  sourceRecordId: string;
+  entryLocator: string;
+  physicalRecordOrdinal: number;
+  form: string;
+  partOfSpeech: string | null;
+  meaningGlosses: readonly string[];
+  ipaObservations: readonly Readonly<{
+    soundIndex: number;
+    ipa: string | null;
+    tags: readonly string[];
+  }>[];
+  etymologyText: string | null;
+  etymologyLinks: readonly AlbanianKaikkiExactLexicalSourceEtymologyLinkV0_1[];
+  etymologyTemplates: readonly AlbanianKaikkiExactLexicalSourceEtymologyTemplateV0_1[];
+  classification: AlbanianFiveWindowsClassificationV0_1;
+  borrowedFromLanguage: string | null;
+  ultimateSourceLanguage: string | null;
+  /** The current exact-source provider does not carry record usage/register tags. */
+  usageNotes: readonly string[];
+}>;
+
+export type AlbanianFiveWindowsMemberV0_1 = Readonly<{
+  form: string;
+  status: "MATCHES_FOUND" | "SOURCE_NOT_FOUND" | "UNAVAILABLE";
+  records: readonly AlbanianFiveWindowsRecordV0_1[];
+  reasonCodes: readonly string[];
+}>;
+
+export type AlbanianFiveWindowsComparisonV0_1 = Readonly<{
+  comparisonId: "FIVE_WINDOWS";
+  queryForm: string;
+  members: readonly AlbanianFiveWindowsMemberV0_1[];
+  summary: string;
+  alternatives: readonly string[];
+  claimBoundary: string;
+}>;
+
 export type AlbanianLexicalReadingV0_1 = Readonly<{
   status: "SUPPORTED" | "NULL";
   primarySourceFact: Readonly<{
@@ -85,6 +137,8 @@ export type AlbanianLexicalReadingV0_1 = Readonly<{
   }>[];
   /** Additive per-related-form evidence; the singular bridge below remains the selected primary bridge. */
   relatedCandidateEvaluations: readonly AlbanianRelatedCandidateEvaluationV0_1[];
+  /** Additive bounded comparison for the five configured source-backed window forms. */
+  fiveWindowsComparison?: AlbanianFiveWindowsComparisonV0_1 | null;
   sourceLinkedComponentReading?: AlbanianSourceLinkedComponentReadingV0_1 | null;
   sourceLinkedComparison?: AlbanianSourceLinkedComparisonV0_1 | null;
   /** Additive product bridge; this never upgrades source evidence into morphology or proof. */
@@ -1382,12 +1436,172 @@ export function buildAlbanianFunctionalMeaningBridgeV0_1(input: Readonly<{
   });
 }
 
+const FIVE_WINDOWS_LANGUAGE_NAMES_V0_1: Readonly<Record<string, string>> = Object.freeze({
+  "fa-cls": "Classical Persian",
+  it: "Italian",
+  "la-vul": "Vulgar Latin",
+  ota: "Ottoman Turkish",
+  la: "Latin",
+});
+
+function languageNameFromTemplateV0_1(
+  template: AlbanianKaikkiExactLexicalSourceEtymologyTemplateV0_1 | null,
+): string | null {
+  if (!template) return null;
+  const languageCode = template.args["2"]?.trim().toLocaleLowerCase("en-US") ?? "";
+  if (FIVE_WINDOWS_LANGUAGE_NAMES_V0_1[languageCode]) {
+    return FIVE_WINDOWS_LANGUAGE_NAMES_V0_1[languageCode];
+  }
+  const languageMatch = /^[A-Za-z]+(?:[ -][A-Za-z]+)*/u.exec(template.expansion.trim());
+  return languageMatch?.[0] ?? null;
+}
+
+function projectFiveWindowsRecordV0_1(
+  fact: AlbanianKaikkiExactLexicalSourceFactV0_1,
+): AlbanianFiveWindowsRecordV0_1 {
+  const etymologyText = fact.etymologyText?.trim() || null;
+  const etymologyLinks = Object.freeze([...(fact.etymologyLinks ?? [])]);
+  const etymologyTemplates = Object.freeze([...(fact.etymologyTemplates ?? [])]);
+  const borrowingTemplate = etymologyTemplates.find((template) => template.name === "bor+") ?? null;
+  const hasBorrowingEvidence = Boolean(borrowingTemplate) || /^Borrowed from\b/iu.test(etymologyText ?? "");
+  const hasAlbanianReference = etymologyLinks.some((link) => /#Albanian$/u.test(link.reference));
+  const hasInternalFormationEvidence = hasAlbanianReference && (
+    etymologyTemplates.some((template) => template.name === "af") ||
+    /^From\b/iu.test(etymologyText ?? "")
+  );
+  const classification: AlbanianFiveWindowsClassificationV0_1 = hasBorrowingEvidence
+    ? "SOURCE_ATTRIBUTED_BORROWING"
+    : hasInternalFormationEvidence
+      ? "ALBANIAN_INTERNAL_FORMATION"
+      : "UNKNOWN_OR_NULL";
+  const ultimateTemplate = etymologyTemplates.find((template) =>
+    template.name === "der" && template.args["2"] !== undefined && template.args["2"] !== "sq",
+  ) ?? null;
+
+  return Object.freeze({
+    sourceRecordId: fact.sourceRecordId,
+    entryLocator: fact.entryLocator,
+    physicalRecordOrdinal: fact.physicalRecordOrdinal,
+    form: fact.form,
+    partOfSpeech: fact.partOfSpeech,
+    meaningGlosses: distinctGlossesV0_1([fact]),
+    ipaObservations: Object.freeze(fact.ipaObservations.map((observation) => Object.freeze({
+      soundIndex: observation.soundIndex,
+      ipa: observation.ipa,
+      tags: Object.freeze([...observation.tags]),
+    }))),
+    etymologyText,
+    etymologyLinks,
+    etymologyTemplates,
+    classification,
+    borrowedFromLanguage: hasBorrowingEvidence
+      ? languageNameFromTemplateV0_1(borrowingTemplate)
+      : null,
+    ultimateSourceLanguage: hasBorrowingEvidence
+      ? languageNameFromTemplateV0_1(ultimateTemplate)
+      : null,
+    usageNotes: Object.freeze([]),
+  });
+}
+
+function fiveWindowsMemberFromResultV0_1(
+  form: string,
+  result: AlbanianKaikkiExactLexicalSourceLookupResultV0_1,
+): AlbanianFiveWindowsMemberV0_1 {
+  if (result.status === "MATCHES_FOUND") {
+    return Object.freeze({
+      form,
+      status: "MATCHES_FOUND",
+      records: Object.freeze(result.facts.map(projectFiveWindowsRecordV0_1)),
+      reasonCodes: Object.freeze([]),
+    });
+  }
+  return Object.freeze({
+    form,
+    status: result.status,
+    records: Object.freeze([]),
+    reasonCodes: Object.freeze([result.reasonCode]),
+  });
+}
+
+async function buildFiveWindowsComparisonV0_1(input: Readonly<{
+  word: string;
+  facts: readonly AlbanianKaikkiExactLexicalSourceFactV0_1[];
+  sourceStatus: AlbanianKaikkiExactLexicalSourceStatusV0_1;
+  provider: AlbanianKaikkiServerOnlyExactLexicalSourceProviderV0_1;
+}>): Promise<AlbanianFiveWindowsComparisonV0_1 | null> {
+  const queryForm = normalizedAlbanianFormV0_1(input.word);
+  if (!ALBANIAN_FIVE_WINDOWS_FORMS_V0_1.some((form) => normalizedAlbanianFormV0_1(form) === queryForm)) {
+    return null;
+  }
+  if (input.sourceStatus.status === "NOT_QUERIED") return null;
+
+  const unavailableResult: Extract<AlbanianKaikkiExactLexicalSourceLookupResultV0_1, { status: "UNAVAILABLE" }> | null = input.sourceStatus.status === "UNAVAILABLE"
+    ? Object.freeze({
+        status: "UNAVAILABLE" as const,
+        queryForm: input.sourceStatus.queryForm,
+        facts: Object.freeze([]) as readonly [],
+        reasonCode: (input.sourceStatus.reasonCode ?? "ALBANIAN_SOURCE_RECORD_FAILURE") as Extract<AlbanianKaikkiExactLexicalSourceLookupResultV0_1, { status: "UNAVAILABLE" }>['reasonCode'],
+      })
+    : null;
+  const members = await Promise.all(ALBANIAN_FIVE_WINDOWS_FORMS_V0_1.map(async (form) => {
+    if (normalizedAlbanianFormV0_1(form) === queryForm) {
+      if (input.sourceStatus.status === "MATCHES_FOUND") {
+        return fiveWindowsMemberFromResultV0_1(form, Object.freeze({
+          status: "MATCHES_FOUND" as const,
+          queryForm: input.sourceStatus.queryForm ?? form,
+          facts: input.facts,
+          reasonCode: null,
+        }));
+      }
+      return fiveWindowsMemberFromResultV0_1(form, Object.freeze({
+        status: input.sourceStatus.status,
+        queryForm: input.sourceStatus.queryForm,
+        facts: Object.freeze([]) as readonly [],
+        reasonCode: input.sourceStatus.reasonCode,
+      }) as unknown as AlbanianKaikkiExactLexicalSourceLookupResultV0_1);
+    }
+    if (unavailableResult) return fiveWindowsMemberFromResultV0_1(form, unavailableResult);
+    try {
+      return fiveWindowsMemberFromResultV0_1(form, await input.provider.query(form));
+    } catch {
+      return Object.freeze({
+        form,
+        status: "UNAVAILABLE" as const,
+        records: Object.freeze([]),
+        reasonCodes: Object.freeze(["ALBANIAN_SOURCE_RECORD_FAILURE"]),
+      });
+    }
+  }));
+
+  return Object.freeze({
+    comparisonId: "FIVE_WINDOWS",
+    queryForm: input.word,
+    members: Object.freeze(members),
+    summary: "This bounded comparison keeps five configured Albanian window expressions in source order. Source-authored formation or borrowing labels are shown only when the exact source record carries matching evidence.",
+    alternatives: Object.freeze([
+      "Source-authored etymology is attributed evidence, not independent historical proof.",
+      "Usage and register tags are not carried by the current exact-source contract; Unknown / Null is preserved.",
+      "IPA and Seven-Voices observations remain descriptive and separate from formation or borrowing classification.",
+      "The five configured expressions are a bounded comparison set, not a claim of synonymy or universal interchangeability.",
+    ]),
+    claimBoundary: "Curated source-linked comparison only; no synonymy, universal interchangeability, historical proof, or Seven-Voices semantic claim.",
+  });
+}
+
 async function buildAlbanianLexicalReadingV0_1(input: Readonly<{
   word: string;
   facts: readonly AlbanianKaikkiExactLexicalSourceFactV0_1[];
   analyses: readonly AlbanianKaikkiSourceIpaSevenVoiceAnalysisV0_1[];
+  sourceStatus: AlbanianKaikkiExactLexicalSourceStatusV0_1;
   provider: AlbanianKaikkiServerOnlyExactLexicalSourceProviderV0_1;
 }>): Promise<AlbanianLexicalReadingV0_1> {
+  const fiveWindowsComparison = await buildFiveWindowsComparisonV0_1({
+    word: input.word,
+    facts: input.facts,
+    sourceStatus: input.sourceStatus,
+    provider: input.provider,
+  });
   const primary = input.facts.find((fact) =>
     normalizedAlbanianFormV0_1(fact.form) === normalizedAlbanianFormV0_1(input.word) &&
     fact.partOfSpeech !== "name",
@@ -1400,6 +1614,7 @@ async function buildAlbanianLexicalReadingV0_1(input: Readonly<{
       sourcePronunciation: null,
       relatedForms: Object.freeze([]),
       relatedCandidateEvaluations: Object.freeze([]),
+      fiveWindowsComparison,
       sourceLinkedComponentReading: null,
       sourceLinkedComparison: null,
       functionalMeaningBridge: nullFunctionalMeaningBridgeV0_1({
@@ -1579,6 +1794,7 @@ async function buildAlbanianLexicalReadingV0_1(input: Readonly<{
       : null,
     relatedForms: Object.freeze(relatedResults),
     relatedCandidateEvaluations: Object.freeze(relatedCandidateEvaluations),
+    fiveWindowsComparison,
     sourceLinkedComponentReading,
     sourceLinkedComparison,
     functionalMeaningBridge,
@@ -1620,9 +1836,21 @@ export async function buildMotivationEngineDiscoveryServerOnlyV0_1(input: {
     : input.analysis;
   const queryForms = getMotivationEngineDiscoveryQueryFormsV0_1(input);
   const resolved = await resolveEnglishRecordsV0_1(provider, queryForms);
+  const albanianLexicalSourceProvider = input.albanianLexicalSourceProvider ?? await getProductionAlbanianLexicalSourceProviderV0_1();
   const albanianLexicalSourceResult = isAlbanianInputV0_1(input)
-    ? await (input.albanianLexicalSourceProvider ?? await getProductionAlbanianLexicalSourceProviderV0_1()).query(input.word)
+    ? await albanianLexicalSourceProvider.query(input.word)
     : null;
+  const exactLexicalSourceStatus = albanianLexicalSourceResult
+    ? {
+        status: albanianLexicalSourceResult.status,
+        queryForm: albanianLexicalSourceResult.queryForm,
+        reasonCode: albanianLexicalSourceResult.reasonCode,
+      }
+    : {
+        status: "NOT_QUERIED" as const,
+        queryForm: null,
+        reasonCode: "NOT_ALBANIAN_INPUT",
+      };
   const sourceAdapters: readonly GenericFunctionalWitnessSourceAdapterV1[] = [
     createAlbanianLexicalSubstrateWitnessAdapterV0_1(),
     createMultilingualDiscoverySubstrateS1LatinWitnessAdapterV0_2(),
@@ -1651,24 +1879,15 @@ export async function buildMotivationEngineDiscoveryServerOnlyV0_1(input: {
   return Object.freeze({
     discovery: Object.freeze({
       ...discovery,
-      exactLexicalSourceStatus: albanianLexicalSourceResult
-        ? {
-            status: albanianLexicalSourceResult.status,
-            queryForm: albanianLexicalSourceResult.queryForm,
-            reasonCode: albanianLexicalSourceResult.reasonCode,
-          }
-        : {
-            status: "NOT_QUERIED" as const,
-            queryForm: null,
-            reasonCode: "NOT_ALBANIAN_INPUT",
-          },
+      exactLexicalSourceStatus,
       exactLexicalSourceFacts,
       sourceIpaSevenVoiceAnalyses,
       albanianLexicalReading: await buildAlbanianLexicalReadingV0_1({
         word: input.word,
         facts: exactLexicalSourceFacts,
         analyses: sourceIpaSevenVoiceAnalyses,
-        provider: input.albanianLexicalSourceProvider ?? await getProductionAlbanianLexicalSourceProviderV0_1(),
+        sourceStatus: exactLexicalSourceStatus,
+        provider: albanianLexicalSourceProvider,
       }),
     }),
     englishProvider: resolved.operationalStatus,
