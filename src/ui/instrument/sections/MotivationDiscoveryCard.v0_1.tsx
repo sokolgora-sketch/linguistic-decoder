@@ -460,6 +460,7 @@ export function MotivationDiscoveryCardV0_1({
   const exactLexicalSourceFacts = value.exactLexicalSourceFacts ?? [];
   const sourceIpaSevenVoiceAnalyses = value.sourceIpaSevenVoiceAnalyses ?? [];
   const albanianLexicalReading = value.albanianLexicalReading;
+  const selectedPrimarySourceRecordId = albanianLexicalReading?.primarySourceFact?.sourceRecordId ?? null;
   const relatedCandidateEvaluations = albanianLexicalReading?.relatedCandidateEvaluations ?? [];
   const supportedRelatedCandidateEvaluations = relatedCandidateEvaluations.filter((candidate) =>
     candidate.functionalMeaningBridge.status === "SUPPORTED",
@@ -583,6 +584,13 @@ export function MotivationDiscoveryCardV0_1({
                     <div className="font-mono text-sm font-semibold text-[#f5f7fb]">{fact.form}</div>
                     <div className="text-[#9fb1bf]">{fact.language} · {fact.partOfSpeech ?? "part of speech Null"}</div>
                   </div>
+                  <div className="mt-1 text-[10px] font-semibold uppercase tracking-[0.1em] text-[#d8bb7a]">
+                    {selectedPrimarySourceRecordId === null
+                      ? "SOURCE RECORD SELECTION UNKNOWN"
+                      : fact.sourceRecordId === selectedPrimarySourceRecordId
+                        ? "SELECTED PRIMARY SOURCE RECORD"
+                        : "ALTERNATIVE SOURCE RECORD — NOT EVALUATED AS THE SELECTED PRIMARY READING"}
+                  </div>
                   <div className="mt-1 text-[#d7dde7]">
                     {fact.senses.flatMap((sense) => sense.glosses).join(" · ") || "No gloss recorded"}
                   </div>
@@ -598,6 +606,29 @@ export function MotivationDiscoveryCardV0_1({
                   <div className="break-words text-[#9fb1bf]">
                     Snapshot: {fact.sourceSnapshot.sha256} · {fact.sourceSnapshot.bytes} bytes
                   </div>
+                  {fact.relatedForms?.length ? (
+                    <details data-testid="albanian-source-record-links" className="mt-2 rounded border border-[#303843] bg-[#111820] p-2">
+                      <summary className="cursor-pointer text-[#d7dde7] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#d8bb7a]">
+                        Source-provided form links ({fact.relatedForms.length})
+                      </summary>
+                      <div className="mt-2 space-y-1 text-[#9fb1bf]">
+                        <div className="text-[10px] text-[#7f8b99]">
+                          These are source-provided form links belonging to this lexical record. Alternative-record links are not evaluated in the selected primary functional reading.
+                        </div>
+                        {fact.relatedForms.map((relation, relationIndex) => (
+                          <div
+                            key={`${fact.sourceRecordId}:${relationIndex}:${relation.form}:${relation.entryLocator}`}
+                            data-testid="albanian-source-record-link"
+                            className="break-words"
+                          >
+                            <span className="font-mono text-[#d7dde7]">{relation.form}</span>{" · "}
+                            {relation.relation}{" · "}
+                            {relation.entryLocator}
+                          </div>
+                        ))}
+                      </div>
+                    </details>
+                  ) : null}
                   <div className="mt-1 text-[10px] text-[#7f8b99]">
                     Exact lexical source fact only; IPA is not promoted to the canonical Voice path.
                   </div>

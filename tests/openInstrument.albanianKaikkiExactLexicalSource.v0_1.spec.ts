@@ -1358,6 +1358,13 @@ describe("real Albanian exact lexical source integration v0.1", () => {
         sounds: [{ ipa: "/ˈʃitəs/", tags: [] }],
       },
       {
+        word: "shitës",
+        lang_code: "sq",
+        pos: "adj",
+        senses: [{ id: "shites-adjective-1", glosses: ["selling, that sells"] }],
+        sounds: [{ ipa: "/ˈʃitəs/", tags: [] }],
+      },
+      {
         word: "luleshitës",
         lang_code: "sq",
         pos: "noun",
@@ -1389,6 +1396,12 @@ describe("real Albanian exact lexical source integration v0.1", () => {
       });
       const reading = result.discovery.albanianLexicalReading;
 
+      expect(reading?.primarySourceFact).toMatchObject({
+        form: "shitës",
+        partOfSpeech: "noun",
+        sourceRecordId: "kaikki-albanian-jsonl:word=shit%C3%ABs:ordinal=0",
+      });
+      expect(result.discovery.exactLexicalSourceFacts).toHaveLength(2);
       expect(reading?.functionalMeaningBridge).toMatchObject({
         status: "SUPPORTED",
         relatedForm: "luleshitës",
@@ -1983,6 +1996,115 @@ describe("real Albanian exact lexical source integration v0.1", () => {
     expect(screen.getByText("Ë → Ë", { exact: false })).toBeInTheDocument();
     expect(screen.getByText(/CURRENT_KAIKKI_IPA_SOURCE_DERIVED_PRODUCT_INTERPRETATION_NOT_FROZEN_PRONUNCIATION_AUTHORITY/)).toBeInTheDocument();
     expect(screen.getByTestId("motivation-discovery-card")).toHaveTextContent("albanian_profile");
+    expect(screen.getByText("SOURCE RECORD SELECTION UNKNOWN")).toBeInTheDocument();
+    expect(screen.queryByText(/ALTERNATIVE SOURCE RECORD/)).not.toBeInTheDocument();
+    expect(screen.queryByTestId("albanian-source-record-links")).not.toBeInTheDocument();
+  });
+
+  it("exposes source links for an alternative exact record without evaluating it as the primary reading", async () => {
+    const shqipRelatedForms = [
+      "shqipe",
+      "shqipe",
+      "shqipëllim",
+      "shqipëlloj",
+      "shqipëlluar",
+      "Shqipëri",
+      "shqipërim",
+      "shqipëroj",
+      "shqipëruar",
+      "shqipoj",
+      "shqiponjë",
+      "shqiptar",
+      "shqiptare",
+      "Skipetár",
+      "shqiptim",
+      "shqiptohem",
+      "shqiptoj",
+      "shqiptuar",
+      "shqipuar",
+    ] as const;
+    const adjective = fixtureFact({
+      sourceRecordId: "kaikki-albanian-jsonl:word=shqip:ordinal=0",
+      entryLocator: "jsonl://word/shqip/match/0",
+      physicalRecordOrdinal: 866,
+      form: "shqip",
+      partOfSpeech: "adj",
+      senses: [{ senseId: "shqip-adjective", glosses: ["Albanian"] }],
+      ipaObservations: [{ soundIndex: 0, ipa: "/ʃcip/", tags: ["Tosk"] }],
+    });
+    const adverb = fixtureFact({
+      sourceRecordId: "kaikki-albanian-jsonl:word=shqip:ordinal=1",
+      entryLocator: "jsonl://word/shqip/match/1",
+      physicalRecordOrdinal: 867,
+      form: "shqip",
+      partOfSpeech: "adv",
+      senses: [{ senseId: "shqip-adverb", glosses: ["in the Albanian language", "clear, understandable, comprehensive, unequivocally"] }],
+      ipaObservations: [{ soundIndex: 0, ipa: "/ʃcip/", tags: ["Tosk"] }],
+      relatedForms: shqipRelatedForms.map((form) => ({
+        form,
+        relation: "SOURCE_RELATED_FORM" as const,
+        entryLocator: `jsonl://word/${encodeURIComponent(form)}`,
+      })),
+    });
+    const discovery = await discoveryForFactsV0_1([adjective, adverb], "shqip");
+    expect(discovery.albanianLexicalReading?.primarySourceFact).toMatchObject({
+      sourceRecordId: adjective.sourceRecordId,
+      partOfSpeech: "adj",
+    });
+    expect(discovery.albanianLexicalReading?.relatedForms).toEqual([]);
+    expect(discovery.albanianLexicalReading?.functionalMeaningBridge.status).toBe("NULL");
+
+    const vm = adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: discovery });
+    render(createElement(MotivationDiscoveryCardV0_1, { discovery: vm.motivationDiscoveryV0_1 }));
+
+    const exactFacts = screen.getByTestId("albanian-exact-lexical-source-facts");
+    expect(exactFacts).toHaveTextContent("SELECTED PRIMARY SOURCE RECORD");
+    expect(exactFacts).toHaveTextContent("ALTERNATIVE SOURCE RECORD — NOT EVALUATED AS THE SELECTED PRIMARY READING");
+    expect(exactFacts).toHaveTextContent(adjective.sourceRecordId);
+    expect(exactFacts).toHaveTextContent(adverb.sourceRecordId);
+    expect(exactFacts).toHaveTextContent("Source-provided form links (19)");
+    expect(screen.getAllByTestId("albanian-source-record-links")).toHaveLength(1);
+    expect(screen.getByTestId("albanian-source-record-links")).not.toHaveAttribute("open");
+
+    const disclosure = screen.getByTestId("albanian-source-record-links");
+    expect(disclosure).toHaveTextContent("shqipe");
+    expect(disclosure).toHaveTextContent("SOURCE_RELATED_FORM");
+    expect(disclosure).toHaveTextContent("jsonl://word/shqipe");
+    expect(screen.getAllByTestId("albanian-source-record-link").map((node) => node.textContent?.split(" · ")[0])).toEqual([...shqipRelatedForms]);
+    expect(exactFacts).toHaveTextContent("Alternative-record links are not evaluated in the selected primary functional reading.");
+  });
+
+  it("keeps a proper-name exact record separate from the selected common-noun reading", async () => {
+    const noun = fixtureFact({
+      sourceRecordId: "kaikki-albanian-jsonl:word=drit%C3%AB:ordinal=0",
+      entryLocator: "jsonl://word/drit%C3%AB/match/0",
+      physicalRecordOrdinal: 3461,
+      form: "dritë",
+      partOfSpeech: "noun",
+      senses: [{ senseId: "drite-noun", glosses: ["light"] }],
+      relatedForms: [{ form: "dritare", relation: "SOURCE_RELATED_FORM", entryLocator: "jsonl://word/dritare" }],
+    });
+    const name = fixtureFact({
+      sourceRecordId: "kaikki-albanian-jsonl:word=drit%C3%AB:ordinal=1",
+      entryLocator: "jsonl://word/drit%C3%AB/match/1",
+      physicalRecordOrdinal: 9053,
+      form: "Dritë",
+      partOfSpeech: "name",
+      senses: [{ senseId: "drite-name", glosses: ["indefinite form of Drita"] }],
+      ipaObservations: [],
+    });
+    const discovery = await discoveryForFactsV0_1([noun, name], "dritë");
+
+    expect(discovery.exactLexicalSourceFacts).toHaveLength(2);
+    expect(discovery.albanianLexicalReading?.primarySourceFact).toMatchObject({
+      sourceRecordId: noun.sourceRecordId,
+      partOfSpeech: "noun",
+    });
+    expect(discovery.albanianLexicalReading?.relatedForms).toMatchObject([{
+      form: "dritare",
+      relation: "SOURCE_RELATED_FORM",
+    }]);
+    expect(discovery.albanianLexicalReading?.primarySourceFact?.sourceRecordId).not.toBe(name.sourceRecordId);
   });
 
   it("renders a source-authored two-component Albanian reading without promoting IPA or composition", async () => {
