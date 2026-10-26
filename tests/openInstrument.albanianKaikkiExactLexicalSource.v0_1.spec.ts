@@ -429,6 +429,143 @@ describe("real Albanian exact lexical source integration v0.1", () => {
     });
   });
 
+  it("recognizes a source-derived singer as the existing AGENT operation without changing the taxonomy", async () => {
+    await withSyntheticSourceFileV0_1([
+      {
+        word: "këngë",
+        lang_code: "sq",
+        pos: "noun",
+        senses: [{ id: "këngë-1", glosses: ["song"], derived: [{ word: "këngëtar" }] }],
+        sounds: [{ ipa: "/ˈkən.ɡə/", tags: ["Tosk"] }],
+      },
+      {
+        word: "këngëtar",
+        lang_code: "sq",
+        pos: "noun",
+        senses: [{ id: "këngëtar-1", glosses: ["singer"] }],
+        sounds: [{ ipa: "/kənɡəˈtaɾ/", tags: [] }],
+        etymology_text: "From këngë (“song”) + -tar.",
+        etymology_links: [["këngë", "këngë#Albanian"]],
+      },
+    ], async ({ provider }) => {
+      const result = await buildMotivationEngineDiscoveryServerOnlyV0_1({
+        word: "këngë",
+        inputLanguage: "sq",
+        inputProfile: "albanian",
+        analysis: await analysisFor("këngë"),
+        heart: buildHeartInstrumentV1("këngë"),
+        albanianLexicalSourceProvider: provider,
+      });
+      const reading = result.discovery.albanianLexicalReading;
+
+      expect(reading).toMatchObject({
+        status: "SUPPORTED",
+        primarySourceFact: { form: "këngë", meaningGlosses: ["song"] },
+        relatedForms: [{
+          form: "këngëtar",
+          relation: "SOURCE_DERIVED_FORM",
+          resolution: "RESOLVED",
+          partOfSpeech: "noun",
+          meaningGlosses: ["singer"],
+        }],
+        sourceLinkedComparison: {
+          status: "SUPPORTED",
+          relation: {
+            relatedForm: "këngëtar",
+            referencedForm: "këngë",
+            reference: "këngë#Albanian",
+          },
+        },
+        functionalMeaningBridge: {
+          status: "SUPPORTED",
+          relatedForm: "këngëtar",
+          functionalHypothesis: {
+            status: "EXPLORATORY_FUNCTIONAL_HYPOTHESIS",
+            functionalOperation: "AGENT",
+            statement: expect.stringContaining("singer"),
+          },
+        },
+        interpretation: {
+          status: "EXPLORATORY_ZHEJI_READING",
+          statement: expect.stringContaining("Integrated source-bounded functional reading"),
+        },
+      });
+
+      const vm = adaptAnalysisToTelemetryVM({
+        word: "këngë",
+        sanitized: "këngë",
+        engineVersion: "fixture",
+        primaryPath: { voicePath: ["Ë", "Ë"] },
+        candidates: [],
+        motivationDiscoveryV0_1: {
+          ...result.discovery,
+          exactLexicalSourceFacts: undefined,
+          sourceIpaSevenVoiceAnalyses: undefined,
+        },
+      });
+      expect(vm.motivationDiscoveryV0_1).toMatchObject({ kind: "present" });
+      if (vm.motivationDiscoveryV0_1?.kind === "present") {
+        render(createElement(MotivationDiscoveryCardV0_1, { discovery: vm.motivationDiscoveryV0_1 }));
+        expect(screen.getByTestId("albanian-reading-related-form")).toHaveTextContent("këngëtar");
+        expect(screen.getByTestId("albanian-reading-functional-bridge-operation")).toHaveTextContent("Functional operation: AGENT");
+        expect(screen.getByTestId("albanian-reading-interpretation")).toHaveTextContent("Integrated source-bounded functional reading");
+      }
+    });
+  });
+
+  it("keeps the source-backed ujë control Null when its derived noun is not an agent gloss", async () => {
+    await withSyntheticSourceFileV0_1([
+      {
+        word: "ujë",
+        lang_code: "sq",
+        pos: "noun",
+        senses: [{ id: "ujë-1", glosses: ["water"], derived: [{ word: "ansujë" }] }],
+        sounds: [{ ipa: "/ˈujə/", tags: [] }],
+      },
+      {
+        word: "ansujë",
+        lang_code: "sq",
+        pos: "noun",
+        senses: [{ id: "ansujë-1", glosses: ["island, islet"] }],
+        sounds: [],
+        etymology_text: "A compound of anë (“side”) + ujë (“water”).",
+        etymology_links: [["ujë", "ujë#Albanian"]],
+      },
+    ], async ({ provider }) => {
+      const result = await buildMotivationEngineDiscoveryServerOnlyV0_1({
+        word: "ujë",
+        inputLanguage: "sq",
+        inputProfile: "albanian",
+        analysis: await analysisFor("ujë"),
+        heart: buildHeartInstrumentV1("ujë"),
+        albanianLexicalSourceProvider: provider,
+      });
+      const reading = result.discovery.albanianLexicalReading;
+
+      expect(reading).toMatchObject({
+        status: "SUPPORTED",
+        sourcePronunciation: {
+          rawIpa: "/ˈujə/",
+          status: "NULL",
+          reasonCodes: ["NUCLEUS_STRUCTURE_UNRESOLVED"],
+        },
+        sourceLinkedComparison: {
+          status: "SUPPORTED",
+          relation: { relatedForm: "ansujë", referencedForm: "ujë" },
+        },
+        functionalMeaningBridge: {
+          status: "NULL",
+          relatedForm: "ansujë",
+          functionalHypothesis: {
+            status: "UNKNOWN_OR_NULL",
+            functionalOperation: null,
+          },
+        },
+        interpretation: { status: "UNKNOWN_OR_NULL" },
+      });
+    });
+  });
+
   it("builds a source-bound Albanian reading with computed IPA Voices and related-form extensions", async () => {
     const drite = fixtureFact({
       sourceRecordId: "kaikki-albanian-jsonl:word=drit%C3%AB:ordinal=0",
