@@ -732,8 +732,35 @@ export function MotivationDiscoveryCardV0_1({
                     <div className="mt-1 break-words text-[#aebbd5]">
                       Etymology (attributed): {record.etymologyText ?? "Unknown / Null"}
                     </div>
-                    <div className="mt-1 break-words text-[#8fa4c6]">
-                      IPA: {record.ipaObservations.map((observation) => observation.ipa ?? "Null").join(" · ") || "Null"}
+                    <div className="mt-2 font-semibold text-[#c9d7f0]">Source IPA → Seven Voices</div>
+                    {record.sourceIpaSevenVoiceAnalyses.length ? record.sourceIpaSevenVoiceAnalyses.map((analysis) => (
+                      <div
+                        key={`${analysis.sourceRecordId}:${analysis.soundIndex}`}
+                        data-testid="albanian-five-windows-ipa-analysis"
+                        className="mt-1 grid gap-2 rounded border border-[#26334a] bg-[#0b101c] p-2 sm:grid-cols-2"
+                      >
+                        <div className="break-words text-[#d7cffa]">
+                          <div>Sound {analysis.soundIndex} · {analysis.status}</div>
+                          <div>Source IPA: {analysis.rawIpa ?? "Null"}</div>
+                        </div>
+                        <div className="break-words text-[#d7cffa]">
+                          <div>Derived Voice path: {pathText(analysis.voicePath)}</div>
+                          <div>Reasons: {analysis.reasonCodes.join(", ") || "none"}</div>
+                        </div>
+                        <div className="break-words text-[#8fa4c6] sm:col-span-2">
+                          Authority: {analysis.sourcePronunciationAuthority} · boundary: {analysis.authorityBoundary}
+                        </div>
+                        <div className="break-words text-[10px] text-[#7f8b99] sm:col-span-2">
+                          Source record: {analysis.sourceRecordId} · sound {analysis.soundIndex} · snapshot {analysis.sourceSnapshot.sha256}
+                        </div>
+                      </div>
+                    )) : (
+                      <div className="mt-1 break-words text-[#d5c28f]">
+                        Source IPA: Null · Derived Voice path: Null · Reason: IPA_OBSERVATION_MISSING
+                      </div>
+                    )}
+                    <div className="mt-1 break-words text-[10px] text-[#7f8b99]">
+                      Source IPA and derived Voice paths are descriptive current-source observations, not semantic, borrowing-direction or historical proof.
                     </div>
                   </div>
                 )) : (

@@ -98,7 +98,11 @@ function fiveWindowsFixtureFactsV0_1(): readonly AlbanianKaikkiExactLexicalSourc
       physicalRecordOrdinal: 11257,
       form: "fënjeshtër",
       senses: [{ senseId: "fënjeshtër-window", glosses: ["window"] }],
-      ipaObservations: [{ soundIndex: 0, ipa: "/fəˈɲeʃtəɾ/", tags: [] }],
+      ipaObservations: [
+        { soundIndex: 0, ipa: "/fəˈɲeʃtəɾ/", tags: [] },
+        { soundIndex: 1, ipa: "/fəˈɲeʃtər/", tags: ["variant"] },
+        { soundIndex: 2, ipa: null, tags: ["missing"] },
+      ],
       etymologyText: "Borrowed from Vulgar Latin, from Latin fenestra. Doublet of finestër.",
       etymologyLinks: [{ sourceForm: "fenestra", reference: "fenestra#Latin" }],
       etymologyTemplates: [
@@ -2551,6 +2555,21 @@ describe("real Albanian exact lexical source integration v0.1", () => {
       ],
     });
     expect(comparison?.members.every((member) => member.records.every((record) => record.usageNotes.length === 0))).toBe(true);
+    expect(comparison?.members.find((member) => member.form === "dritare")?.records[0]?.sourceIpaSevenVoiceAnalyses).toMatchObject([{
+      sourceRecordId: "kaikki-albanian-jsonl:word=dritare:ordinal=0",
+      soundIndex: 0,
+      rawIpa: "/dɾiˈtaɾɛ/",
+      status: "SUPPORTED",
+      authorityBoundary: "CURRENT_KAIKKI_IPA_SOURCE_DERIVED_PRODUCT_INTERPRETATION_NOT_FROZEN_PRONUNCIATION_AUTHORITY",
+    }]);
+    expect(comparison?.members.find((member) => member.form === "fënjeshtër")?.records[0]?.sourceIpaSevenVoiceAnalyses).toMatchObject([
+      { sourceRecordId: expect.stringContaining("word=f%C3%ABnjesht%C3%ABr"), soundIndex: 0, status: "SUPPORTED" },
+      { sourceRecordId: expect.stringContaining("word=f%C3%ABnjesht%C3%ABr"), soundIndex: 1, tags: ["variant"] },
+      { sourceRecordId: expect.stringContaining("word=f%C3%ABnjesht%C3%ABr"), soundIndex: 2, rawIpa: null, status: "NULL", reasonCodes: ["IPA_OBSERVATION_MISSING"] },
+    ]);
+    expect(comparison?.members.find((member) => member.form === "fënjeshtër")?.records[0]?.sourceIpaSevenVoiceAnalyses).toHaveLength(3);
+    expect(comparison?.members.find((member) => member.form === "finestër")?.records[0]?.sourceIpaSevenVoiceAnalyses).toEqual([]);
+    expect(comparison?.members.find((member) => member.form === "derkë")?.records[0]?.sourceIpaSevenVoiceAnalyses).toEqual([]);
 
     const vm = adaptAnalysisToTelemetryVM({
       word: "dritare",
@@ -2568,7 +2587,56 @@ describe("real Albanian exact lexical source integration v0.1", () => {
       expect(screen.getByTestId("albanian-five-windows-comparison")).toHaveTextContent("fënjeshtër");
       expect(screen.getByTestId("albanian-five-windows-comparison")).toHaveTextContent("Vulgar Latin");
       expect(screen.getByTestId("albanian-five-windows-comparison")).toHaveTextContent("Usage / register: Unknown / Null");
+      expect(screen.getByTestId("albanian-five-windows-comparison")).toHaveTextContent("Source IPA → Seven Voices");
+      expect(screen.getByTestId("albanian-five-windows-comparison")).toHaveTextContent("Derived Voice path:");
+      expect(screen.getByTestId("albanian-five-windows-comparison")).toHaveTextContent("Source IPA: Null · Derived Voice path: Null · Reason: IPA_OBSERVATION_MISSING");
+      expect(screen.getAllByTestId("albanian-five-windows-ipa-analysis")).toHaveLength(5);
+      const vmComparison = vm.motivationDiscoveryV0_1.value.albanianLexicalReading?.fiveWindowsComparison;
+      expect(vmComparison?.members[0]?.records[0]?.sourceIpaSevenVoiceAnalyses[0]).toMatchObject({
+        sourceRecordId: "kaikki-albanian-jsonl:word=dritare:ordinal=0",
+        soundIndex: 0,
+      });
     }
+  });
+
+  it("rejects Five Windows IPA projections with source-record or sound-index misalignment", async () => {
+    const facts = fiveWindowsFixtureFactsV0_1();
+    const provider = createAlbanianKaikkiServerOnlyExactLexicalSourceProviderForSyntheticFixtureV0_1({ facts });
+    const result = await buildMotivationEngineDiscoveryServerOnlyV0_1({
+      word: "dritare",
+      inputLanguage: "sq",
+      inputProfile: "albanian",
+      analysis: await analysisFor("dritare"),
+      heart: buildHeartInstrumentV1("dritare"),
+      albanianLexicalSourceProvider: provider,
+    });
+    const comparison = result.discovery.albanianLexicalReading?.fiveWindowsComparison;
+    if (!comparison) throw new Error("Five Windows comparison was not produced");
+    const malformed = {
+      ...result.discovery,
+      albanianLexicalReading: {
+        ...result.discovery.albanianLexicalReading,
+        fiveWindowsComparison: {
+          ...comparison,
+          members: comparison.members.map((member, index) => index === 0
+            ? {
+                ...member,
+                records: member.records.map((record) => ({
+                  ...record,
+                  sourceIpaSevenVoiceAnalyses: record.sourceIpaSevenVoiceAnalyses.map((analysis) => ({
+                    ...analysis,
+                    sourceRecordId: "wrong-source-record",
+                  })),
+                })),
+              }
+            : member),
+        },
+      },
+    };
+    expect(adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: malformed }).motivationDiscoveryV0_1).toMatchObject({
+      kind: "missing",
+      missing: "malformed",
+    });
   });
 
   it("preserves multiple source records and explicit Null members without inferring absence or lookup-limit causation", async () => {
