@@ -287,6 +287,10 @@ describe("real Albanian exact lexical source integration v0.1", () => {
         composition: { status: "NULL", relatedForm: "peshkatar" },
         interpretation: { status: "UNKNOWN_OR_NULL" },
       });
+      const statement = reading?.functionalMeaningBridge.functionalHypothesis.statement;
+      expect(statement).toContain("preserves AGENT as an exploratory label");
+      expect(statement).toContain("does not assign an entity, resource, or other semantic role to the primary word");
+      expect(statement).not.toContain("models peshk as the entity or resource");
 
       const vm = adaptAnalysisToTelemetryVM({
         motivationDiscoveryV0_1: {
@@ -780,6 +784,15 @@ describe("real Albanian exact lexical source integration v0.1", () => {
       relatedForm: "luleshitës",
       functionalHypothesis: { functionalOperation: "AGENT" },
     });
+    const agentStatements = reading?.relatedCandidateEvaluations
+      ?.filter((candidate) => ["luleshitës", "pijeshitës", "rakishitës"].includes(candidate.relatedForm))
+      .map((candidate) => candidate.functionalMeaningBridge.functionalHypothesis.statement) ?? [];
+    expect(agentStatements).toHaveLength(3);
+    for (const statement of agentStatements) {
+      expect(statement).toContain("preserves AGENT as an exploratory label");
+      expect(statement).toContain("does not assign an entity, resource, or other semantic role to the primary word");
+      expect(statement).not.toContain("models shitës as the entity or resource");
+    }
   });
 
   it("supports the source-bounded mal to malor entity-property reading through the VM and UI", async () => {
