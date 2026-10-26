@@ -464,7 +464,10 @@ export function MotivationDiscoveryCardV0_1({
   const supportedRelatedCandidateEvaluations = relatedCandidateEvaluations.filter((candidate) =>
     candidate.functionalMeaningBridge.status === "SUPPORTED",
   );
-  const nullRelatedCandidateCount = relatedCandidateEvaluations.length - supportedRelatedCandidateEvaluations.length;
+  const nullRelatedCandidateEvaluations = relatedCandidateEvaluations.filter((candidate) =>
+    candidate.functionalMeaningBridge.status === "NULL",
+  );
+  const nullRelatedCandidateCount = nullRelatedCandidateEvaluations.length;
 
   return (
     <section
@@ -878,6 +881,52 @@ export function MotivationDiscoveryCardV0_1({
                   );
                 })}
               </div>
+              {nullRelatedCandidateEvaluations.length > 0 ? (
+                <details className="mt-3 rounded border border-[#594a2b] bg-[#211c12] p-2">
+                  <summary
+                    data-testid="albanian-reading-null-candidate-summary"
+                    className="cursor-pointer font-semibold text-[#f0ddb0]"
+                  >
+                    Inspect {nullRelatedCandidateEvaluations.length} Null candidate{nullRelatedCandidateEvaluations.length === 1 ? "" : "s"}
+                  </summary>
+                  <div
+                    data-testid="albanian-reading-null-candidate-evaluations"
+                    className="mt-2 space-y-2 text-[#d5c28f]"
+                  >
+                    {nullRelatedCandidateEvaluations.map((candidate) => {
+                      const comparison = candidate.sourceLinkedComparison;
+                      const bridge = candidate.functionalMeaningBridge;
+                      return (
+                        <article
+                          key={`${candidate.sourceRelation}:${candidate.relatedForm}`}
+                          data-testid="albanian-reading-null-candidate"
+                          className="rounded border border-[#66532e] bg-[#17140e] p-2"
+                        >
+                          <div className="font-mono text-sm text-[#f5f7fb]">{candidate.relatedForm}</div>
+                          <div className="mt-1 text-[#c8e6dc]">
+                            {candidate.sourceRelation} · resolution {candidate.resolution} · comparison {comparison.status}
+                          </div>
+                          <div className="mt-1 break-words">
+                            Comparison reasons: {comparison.reasonCodes.join(", ") || "none recorded"}
+                          </div>
+                          <div className="mt-1 break-words">{sourceLinkedComparisonSummaryV0_1(comparison)}</div>
+                          <div className="mt-1 break-words">
+                            Voice relation: {comparison.summary.voicePathRelationship} · consonantal relation: {comparison.summary.consonantalContextRelationship}
+                          </div>
+                          <div className="mt-1 text-[#c8e6dc]">Functional bridge: {bridge.status}</div>
+                          <div className="mt-1 break-words">
+                            Functional operation: {bridge.functionalHypothesis.functionalOperation ?? "Null — no bounded functional operation is authorized."}
+                          </div>
+                          <div className="mt-1 break-words">
+                            Functional reasons: {bridge.reasonCodes.join(", ") || "none recorded"}
+                          </div>
+                          <div className="mt-1 text-[10px] text-[#d5c28f]">{bridge.claimBoundary}</div>
+                        </article>
+                      );
+                    })}
+                  </div>
+                </details>
+              ) : null}
             </div>
           ) : null}
           <div className="mt-3">
