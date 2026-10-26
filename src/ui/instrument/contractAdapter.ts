@@ -1255,8 +1255,7 @@ function parseMotivationDiscoveryV0_1(
       typeof sourceLinkedComparison.summary.text === "string" &&
       typeof sourceLinkedComparison.claimBoundary === "string"
     );
-    const validFunctionalMeaningBridge = (() => {
-      const bridge = reading.functionalMeaningBridge;
+    const validFunctionalMeaningBridgeValue = (bridge: unknown): boolean => {
       if (!isRecord(bridge) || (bridge.status !== "SUPPORTED" && bridge.status !== "NULL")) return false;
       if (!isStringArray(bridge.truthLayers) || bridge.truthLayers.some((layer) =>
         layer !== "SOURCE_FACT" &&
@@ -1319,12 +1318,49 @@ function parseMotivationDiscoveryV0_1(
         typeof hypothesis.claimBoundary === "string" &&
         isStringArray(bridge.reasonCodes) &&
         typeof bridge.claimBoundary === "string";
-    })();
+    };
+    const validFunctionalMeaningBridge = validFunctionalMeaningBridgeValue(reading.functionalMeaningBridge);
+    const validRelatedCandidateComparison = (candidate: unknown): boolean => {
+      if (!isRecord(candidate) || (candidate.status !== "SUPPORTED" && candidate.status !== "NULL") ||
+        !isStringArray(candidate.reasonCodes) || !isRecord(candidate.relation) ||
+        (candidate.relation.relation !== "SOURCE_RELATED_FORM" && candidate.relation.relation !== "SOURCE_DERIVED_FORM") ||
+        typeof candidate.relation.primarySourceRecordId !== "string" ||
+        typeof candidate.relation.primaryEntryLocator !== "string" ||
+        typeof candidate.relation.relatedForm !== "string" ||
+        (candidate.relation.relatedSourceRecordId !== null && typeof candidate.relation.relatedSourceRecordId !== "string") ||
+        typeof candidate.relation.relatedEntryLocator !== "string" ||
+        candidate.relation.direction !== "RELATED_FORM_TO_PRIMARY_ETYMLOGY_REFERENCE" ||
+        (candidate.relation.referencedForm !== null && typeof candidate.relation.referencedForm !== "string") ||
+        (candidate.relation.reference !== null && typeof candidate.relation.reference !== "string") ||
+        !validSourceLinkedRecord(candidate.primary) ||
+        (candidate.related !== null && !validSourceLinkedRecord(candidate.related)) ||
+        !isRecord(candidate.summary) ||
+        !["EXACT_SUPPORTED_PATH_SET_MATCH", "SHARED_INITIAL_VOICE_DIFFERENT_LATER_PATH", "DIFFERENT_SUPPORTED_VOICE_PATHS", "UNKNOWN"].includes(candidate.summary.voicePathRelationship as string) ||
+        !["EXACT_SUPPORTED_CONTEXT_SET_MATCH", "DIFFERENT_SUPPORTED_CONTEXTS", "UNKNOWN"].includes(candidate.summary.consonantalContextRelationship as string) ||
+        typeof candidate.summary.text !== "string" ||
+        typeof candidate.claimBoundary !== "string") {
+        return false;
+      }
+      return true;
+    };
+    const relatedCandidateEvaluations = reading.relatedCandidateEvaluations;
+    const validRelatedCandidateEvaluations = relatedCandidateEvaluations === undefined || (
+      Array.isArray(relatedCandidateEvaluations) && relatedCandidateEvaluations.every((candidate) => {
+        const validCandidate = isRecord(candidate) &&
+          typeof candidate.relatedForm === "string" &&
+          (candidate.sourceRelation === "SOURCE_RELATED_FORM" || candidate.sourceRelation === "SOURCE_DERIVED_FORM") &&
+          (candidate.resolution === "RESOLVED" || candidate.resolution === "UNRESOLVED") &&
+          validRelatedCandidateComparison(candidate.sourceLinkedComparison) &&
+          validFunctionalMeaningBridgeValue(candidate.functionalMeaningBridge);
+        return validCandidate;
+      })
+    );
     return validPrimary && validPronunciation && validRelated &&
       validComposition &&
       validSourceLinkedComponentReading &&
       validSourceLinkedComparison &&
       validFunctionalMeaningBridge &&
+      validRelatedCandidateEvaluations &&
       (reading.interpretation.status === "EXPLORATORY_ZHEJI_READING" || reading.interpretation.status === "UNKNOWN_OR_NULL") &&
       (reading.interpretation.statement === null || typeof reading.interpretation.statement === "string") &&
       isStringArray(reading.interpretation.alternatives) &&

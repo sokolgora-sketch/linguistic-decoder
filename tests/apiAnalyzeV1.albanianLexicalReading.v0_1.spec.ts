@@ -115,6 +115,18 @@ describe("analyze-v1 Albanian lexical reading reachability", () => {
         form: "dritare",
         etymologyText: "From dritë (“light”) + -are (“-er”), meaning to let light through or similar.",
       }],
+      relatedCandidateEvaluations: expect.arrayContaining([
+        expect.objectContaining({
+          relatedForm: "dritare",
+          sourceRelation: "SOURCE_RELATED_FORM",
+          resolution: "RESOLVED",
+          functionalMeaningBridge: expect.objectContaining({
+            status: "SUPPORTED",
+            relatedForm: "dritare",
+            functionalHypothesis: expect.objectContaining({ functionalOperation: "ENABLE_PASSAGE" }),
+          }),
+        }),
+      ]),
       sourceLinkedComparison: {
         status: "SUPPORTED",
         relation: {
