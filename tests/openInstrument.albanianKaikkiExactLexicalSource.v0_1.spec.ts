@@ -449,6 +449,7 @@ describe("real Albanian exact lexical source integration v0.1", () => {
         },
         functionalHypothesis: {
           status: "EXPLORATORY_FUNCTIONAL_HYPOTHESIS",
+          functionalOperation: "ENABLE_PASSAGE",
         },
       },
     });
@@ -469,6 +470,7 @@ describe("real Albanian exact lexical source integration v0.1", () => {
       expect(screen.getByTestId("albanian-source-linked-comparison")).toHaveTextContent("dritë#Albanian");
       expect(screen.getByTestId("albanian-source-linked-comparison")).toHaveTextContent("SHARED_INITIAL_VOICE_DIFFERENT_LATER_PATH");
       expect(screen.getByTestId("albanian-reading-functional-bridge")).toHaveTextContent("Directional functional interpretation");
+      expect(screen.getByTestId("albanian-reading-functional-bridge-operation")).toHaveTextContent("Functional operation: ENABLE_PASSAGE");
       expect(screen.getByTestId("albanian-reading-functional-bridge")).toHaveTextContent("enabling input");
       const functionalBridgeBasis = screen.getByTestId("albanian-reading-functional-bridge-basis");
       expect(functionalBridgeBasis).toHaveTextContent("SOURCE_AUTHORED_TRANSMISSION_EXPLANATION");
