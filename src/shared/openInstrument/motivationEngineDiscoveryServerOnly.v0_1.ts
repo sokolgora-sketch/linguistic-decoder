@@ -1322,7 +1322,7 @@ function buildAgentFunctionalHypothesisV0_1(input: Readonly<{
     !hasMeaningEvidenceV0_1(input.primary.meaningGlosses) ||
     !hasMeaningEvidenceV0_1(input.related.meaningGlosses) ||
     !input.related.meaningGlosses.some((gloss) =>
-      /\b(?:fisher(?:man|woman)?|angler|farmer|hunter|seller|trader|worker|teacher|driver|operator|professional|practitioner)\b/iu.test(gloss),
+      /\b(?:fisher(?:man|woman)?|angler|farmer|hunter|seller|singer|trader|worker|teacher|driver|operator|professional|practitioner)\b/iu.test(gloss),
     )
   ) {
     return null;
