@@ -1438,6 +1438,40 @@ export function buildAlbanianFunctionalMeaningBridgeV0_1(input: Readonly<{
   });
 }
 
+function buildIntegratedFunctionalReadingInterpretationV0_1(
+  functionalMeaningBridge: AlbanianFunctionalMeaningBridgeV0_1,
+): AlbanianLexicalReadingV0_1["interpretation"] {
+  const hypothesis = functionalMeaningBridge.functionalHypothesis;
+  if (
+    functionalMeaningBridge.status !== "SUPPORTED" ||
+    hypothesis.status !== "EXPLORATORY_FUNCTIONAL_HYPOTHESIS" ||
+    hypothesis.statement === null
+  ) {
+    return Object.freeze({
+      status: "UNKNOWN_OR_NULL" as const,
+      statement: null,
+      alternatives: Object.freeze([]),
+      basis: Object.freeze([]),
+      claimBoundary: "The available source evidence does not authorize a bounded product interpretation; Null is preserved.",
+    });
+  }
+
+  return Object.freeze({
+    status: "EXPLORATORY_ZHEJI_READING" as const,
+    statement: `Integrated source-bounded functional reading (exploratory): ${hypothesis.statement} The source-bounded bridge is presented alongside the source facts and descriptive structural observations; independent functional meaning for any structural embryo remains Unknown / Null.`,
+    alternatives: Object.freeze([
+      ...hypothesis.alternatives,
+      "Other evaluated source-linked candidates remain inspectable; no single winner is claimed.",
+    ]),
+    basis: Object.freeze([
+      "SOURCE_ATTESTED_FUNCTIONAL_BRIDGE",
+      ...hypothesis.basis,
+      "STRUCTURAL_EMBRYO_FUNCTION_REMAINS_UNKNOWN_OR_NULL",
+    ]),
+    claimBoundary: "Integrated exploratory product reading only; source facts, derived structure and functional hypothesis remain separate. No independent embryo function, morphology, etymology, causation, historical origin, or universal Voice semantics is claimed.",
+  });
+}
+
 const FIVE_WINDOWS_LANGUAGE_NAMES_V0_1: Readonly<Record<string, string>> = Object.freeze({
   "fa-cls": "Classical Persian",
   it: "Italian",
@@ -1749,31 +1783,33 @@ async function buildAlbanianLexicalReadingV0_1(input: Readonly<{
   const hasSupportedPath = sourcePronunciation?.status === "SUPPORTED" &&
     sourcePronunciation.voicePath.length > 0;
   const voicePath = sourcePronunciation?.voicePath.join(" → ") ?? "Null";
-  const interpretation = hasLightMeaning && hasSupportedPath
-    ? Object.freeze({
-        status: "EXPLORATORY_ZHEJI_READING" as const,
-        statement: `The attested primary-source meaning is placed beside the source-derived ${voicePath} path. As a Zheji-inspired product prompt, this can invite an illumination → clarity reading; the prompt is exploratory and does not claim causation, etymology, or a universal Voice meaning.`,
-        alternatives: Object.freeze([
-          "The source-linked forms may reflect ordinary lexical or morphological relations.",
-          "The Voice path may be only a phonological observation with no semantic force.",
-        ]),
-        basis: Object.freeze([
-          "ATTESTED_SOURCE_GLOSSES",
-          "SOURCE_DERIVED_IPA_VOICE_PATH",
-          "PRIMARY_SOURCE_GLOSS_EVIDENCE",
-        ]),
-        claimBoundary: "Exploratory product interpretation only; no historical-origin claim, semantic proof, or winner selection.",
-      })
-    : Object.freeze({
-        status: "UNKNOWN_OR_NULL" as const,
-        statement: null,
-        alternatives: Object.freeze([]),
-        basis: Object.freeze([
-          "ATTESTED_SOURCE_GLOSSES",
-          ...(sourcePronunciation ? ["SOURCE_DERIVED_IPA_VOICE_PATH"] : []),
-        ]),
-        claimBoundary: "The available source evidence does not authorize a bounded product interpretation; Null is preserved.",
-      });
+  const interpretation = functionalMeaningBridge.status === "SUPPORTED"
+    ? buildIntegratedFunctionalReadingInterpretationV0_1(functionalMeaningBridge)
+    : hasLightMeaning && hasSupportedPath
+      ? Object.freeze({
+          status: "EXPLORATORY_ZHEJI_READING" as const,
+          statement: `The attested primary-source meaning is placed beside the source-derived ${voicePath} path. As a Zheji-inspired product prompt, this can invite an illumination → clarity reading; the prompt is exploratory and does not claim causation, etymology, or a universal Voice meaning.`,
+          alternatives: Object.freeze([
+            "The source-linked forms may reflect ordinary lexical or morphological relations.",
+            "The Voice path may be only a phonological observation with no semantic force.",
+          ]),
+          basis: Object.freeze([
+            "ATTESTED_SOURCE_GLOSSES",
+            "SOURCE_DERIVED_IPA_VOICE_PATH",
+            "PRIMARY_SOURCE_GLOSS_EVIDENCE",
+          ]),
+          claimBoundary: "Exploratory product interpretation only; no historical-origin claim, semantic proof, or winner selection.",
+        })
+      : Object.freeze({
+          status: "UNKNOWN_OR_NULL" as const,
+          statement: null,
+          alternatives: Object.freeze([]),
+          basis: Object.freeze([
+            "ATTESTED_SOURCE_GLOSSES",
+            ...(sourcePronunciation ? ["SOURCE_DERIVED_IPA_VOICE_PATH"] : []),
+          ]),
+          claimBoundary: "The available source evidence does not authorize a bounded product interpretation; Null is preserved.",
+        });
 
   return Object.freeze({
     status: "SUPPORTED",

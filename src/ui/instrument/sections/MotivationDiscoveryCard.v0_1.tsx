@@ -1074,7 +1074,7 @@ export function MotivationDiscoveryCardV0_1({
             </div>
           </div>
           <div className="mt-3 rounded border border-[#66532e] bg-[#1b180f] p-2 text-[#f0ddb0]">
-            <div className="font-semibold uppercase tracking-[0.1em]">EXPLORATORY ZHEJI-INSPIRED READING</div>
+            <div className="font-semibold uppercase tracking-[0.1em]">INTEGRATED FUNCTIONAL READING · EXPLORATORY</div>
             <div data-testid="albanian-reading-interpretation" className="mt-1 text-sm">
               {albanianLexicalReading.interpretation.statement ?? "No bounded product interpretation is currently authorized; Null is valid."}
             </div>

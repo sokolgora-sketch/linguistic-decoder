@@ -55,8 +55,45 @@ jest.mock("@/shared/openInstrument/motivationEngineDiscoveryServerOnly.v0_1", ()
       bytes: 67438537,
     },
   };
+  const peshk = {
+    sourceRecordId: "kaikki-albanian-jsonl:word=peshk:ordinal=0",
+    entryLocator: "jsonl://word/peshk/match/0",
+    physicalRecordOrdinal: 2352,
+    language: "Albanian",
+    languageCode: "sq",
+    form: "peshk",
+    partOfSpeech: "noun",
+    senses: [{ senseId: "peshk-fish", glosses: ["fish"] }],
+    ipaObservations: [{ soundIndex: 0, ipa: "[pɛʃk]", tags: [] }],
+    relatedForms: [{
+      form: "peshkatar",
+      relation: "SOURCE_DERIVED_FORM",
+      entryLocator: "jsonl://word/peshkatar",
+    }],
+    etymologyText: null,
+    sourceStatus: "observed_external_snapshot",
+    attestationTruth: "fact",
+    pronunciationAuthority: "CURRENT_KAIKKI_RECORD_ONLY_UNBOUND_TO_FROZEN_PROFILE",
+    sourceSnapshot: drite.sourceSnapshot,
+  };
+  const peshkatar = {
+    sourceRecordId: "kaikki-albanian-jsonl:word=peshkatar:ordinal=0",
+    entryLocator: "jsonl://word/peshkatar/match/0",
+    physicalRecordOrdinal: 10353,
+    language: "Albanian",
+    languageCode: "sq",
+    form: "peshkatar",
+    partOfSpeech: "noun",
+    senses: [{ senseId: "peshkatar-fisherman", glosses: ["fisherman"] }],
+    ipaObservations: [],
+    etymologyText: null,
+    sourceStatus: "observed_external_snapshot",
+    attestationTruth: "fact",
+    pronunciationAuthority: "CURRENT_KAIKKI_RECORD_ONLY_UNBOUND_TO_FROZEN_PROFILE",
+    sourceSnapshot: drite.sourceSnapshot,
+  };
   const albanianProvider = lexicalSource.createAlbanianKaikkiServerOnlyExactLexicalSourceProviderForSyntheticFixtureV0_1({
-    facts: [drite, dritare],
+    facts: [drite, dritare, peshk, peshkatar],
   });
   const englishProvider = {
     query: async (query: unknown) => ({
@@ -82,6 +119,20 @@ async function analyzeDriteV0_1(): Promise<any> {
     headers: { "content-type": "application/json" },
     body: JSON.stringify({
       word: "dritë",
+      language: "sq",
+      alphabet: "albanian",
+      providerExecution: "disabled",
+    }),
+  }));
+  return { status: response.status, body: await response.json() };
+}
+
+async function analyzePeshkV0_1(): Promise<any> {
+  const response = await POST(new Request("http://localhost/api/analyze-v1", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({
+      word: "peshk",
       language: "sq",
       alphabet: "albanian",
       providerExecution: "disabled",
@@ -148,6 +199,36 @@ describe("analyze-v1 Albanian lexical reading reachability", () => {
         status: "NULL",
         relatedForm: "dritare",
         sourceRelation: { status: "SOURCE_RELATION_NOT_VERIFIED" },
+      },
+    });
+    const interpretation = result.body.motivationDiscoveryV0_1.albanianLexicalReading.interpretation;
+    expect(interpretation.statement).toEqual(expect.stringContaining("Integrated source-bounded functional reading"));
+    expect(interpretation.statement).toEqual(expect.stringContaining("dritare"));
+    expect(interpretation.statement).toEqual(expect.stringContaining("light through"));
+    expect(interpretation.basis).toEqual(expect.arrayContaining([
+      "SOURCE_ATTESTED_FUNCTIONAL_BRIDGE",
+      "SOURCE_AUTHORED_TRANSMISSION_EXPLANATION",
+      "STRUCTURAL_EMBRYO_FUNCTION_REMAINS_UNKNOWN_OR_NULL",
+    ]));
+  });
+
+  it("projects an integrated source-bounded AGENT reading through the API", async () => {
+    const result = await analyzePeshkV0_1();
+    expect(result.status).toBe(200);
+    expect(result.body.motivationDiscoveryV0_1.albanianLexicalReading).toMatchObject({
+      status: "SUPPORTED",
+      functionalMeaningBridge: {
+        status: "SUPPORTED",
+        relatedForm: "peshkatar",
+        functionalHypothesis: { functionalOperation: "AGENT" },
+      },
+      interpretation: {
+        status: "EXPLORATORY_ZHEJI_READING",
+        statement: expect.stringContaining("Integrated source-bounded functional reading"),
+        basis: expect.arrayContaining([
+          "SOURCE_ATTESTED_FUNCTIONAL_BRIDGE",
+          "STRUCTURAL_EMBRYO_FUNCTION_REMAINS_UNKNOWN_OR_NULL",
+        ]),
       },
     });
   });
