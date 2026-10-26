@@ -1210,6 +1210,114 @@ describe("real Albanian exact lexical source integration v0.1", () => {
     });
   });
 
+  it("exposes every source-resolved AGENT relationship while preserving the selected primary bridge", async () => {
+    await withSyntheticSourceFileV0_1([
+      {
+        word: "shitës",
+        lang_code: "sq",
+        pos: "noun",
+        senses: [{
+          id: "shites-1",
+          glosses: ["seller, vendor, salesman, grocer"],
+          derived: [{ word: "luleshitës" }, { word: "pijeshitës" }, { word: "rakishitës" }, { word: "missing-shitës" }],
+        }],
+        sounds: [{ ipa: "/ˈʃitəs/", tags: [] }],
+      },
+      {
+        word: "luleshitës",
+        lang_code: "sq",
+        pos: "noun",
+        senses: [{ id: "luleshites-1", glosses: ["flower seller, florist"] }],
+        sounds: [{ ipa: "/luleˈʃitəs/", tags: [] }],
+      },
+      {
+        word: "pijeshitës",
+        lang_code: "sq",
+        pos: "noun",
+        senses: [{ id: "pijeshites-1", glosses: ["a seller of drinks, alcohol; bartender"] }],
+        sounds: [],
+      },
+      {
+        word: "rakishitës",
+        lang_code: "sq",
+        pos: "noun",
+        senses: [{ id: "rakishites-1", glosses: ["seller of brandy or any alcoholic beverage"] }],
+        sounds: [{ ipa: "/ɾakiˈʃitəs/", tags: [] }],
+      },
+    ], async ({ provider }) => {
+      const result = await buildMotivationEngineDiscoveryServerOnlyV0_1({
+        word: "shitës",
+        inputLanguage: "sq",
+        inputProfile: "albanian",
+        analysis: await analysisFor("shitës"),
+        heart: buildHeartInstrumentV1("shitës"),
+        albanianLexicalSourceProvider: provider,
+      });
+      const reading = result.discovery.albanianLexicalReading;
+
+      expect(reading?.functionalMeaningBridge).toMatchObject({
+        status: "SUPPORTED",
+        relatedForm: "luleshitës",
+        functionalHypothesis: { functionalOperation: "AGENT" },
+      });
+      expect(reading?.relatedCandidateEvaluations).toEqual(expect.arrayContaining([
+        expect.objectContaining({
+          relatedForm: "luleshitës",
+          sourceRelation: "SOURCE_DERIVED_FORM",
+          resolution: "RESOLVED",
+          sourceLinkedComparison: expect.objectContaining({ status: "NULL" }),
+          functionalMeaningBridge: expect.objectContaining({
+            status: "SUPPORTED",
+            relatedForm: "luleshitës",
+            functionalHypothesis: expect.objectContaining({ functionalOperation: "AGENT" }),
+          }),
+        }),
+        expect.objectContaining({
+          relatedForm: "pijeshitës",
+          functionalMeaningBridge: expect.objectContaining({
+            status: "SUPPORTED",
+            relatedForm: "pijeshitës",
+            functionalHypothesis: expect.objectContaining({ functionalOperation: "AGENT" }),
+          }),
+        }),
+        expect.objectContaining({
+          relatedForm: "rakishitës",
+          functionalMeaningBridge: expect.objectContaining({
+            status: "SUPPORTED",
+            relatedForm: "rakishitës",
+            functionalHypothesis: expect.objectContaining({ functionalOperation: "AGENT" }),
+          }),
+        }),
+        expect.objectContaining({
+          relatedForm: "missing-shitës",
+          resolution: "UNRESOLVED",
+          functionalMeaningBridge: expect.objectContaining({
+            status: "NULL",
+            functionalHypothesis: expect.objectContaining({ functionalOperation: null }),
+          }),
+        }),
+      ]));
+
+      const vm = adaptAnalysisToTelemetryVM({
+        motivationDiscoveryV0_1: {
+          ...result.discovery,
+          exactLexicalSourceFacts: undefined,
+          sourceIpaSevenVoiceAnalyses: undefined,
+        },
+      });
+      expect(vm.motivationDiscoveryV0_1).toMatchObject({ kind: "present" });
+      if (vm.motivationDiscoveryV0_1?.kind === "present") {
+        render(createElement(MotivationDiscoveryCardV0_1, { discovery: vm.motivationDiscoveryV0_1 }));
+        expect(screen.getByTestId("albanian-reading-related-candidate-evaluations")).toHaveTextContent("3 bounded functional relationships shown");
+        expect(screen.getByTestId("albanian-reading-related-candidate-evaluations")).toHaveTextContent("1 other evaluated link remain Null");
+        expect(screen.getAllByTestId("albanian-reading-related-candidate")).toHaveLength(3);
+        expect(screen.getByTestId("albanian-reading-related-candidate-evaluations")).toHaveTextContent("luleshitës");
+        expect(screen.getByTestId("albanian-reading-related-candidate-evaluations")).toHaveTextContent("pijeshitës");
+        expect(screen.getByTestId("albanian-reading-related-candidate-evaluations")).toHaveTextContent("rakishitës");
+      }
+    });
+  });
+
   it("keeps the first source-linked comparison when no directional functional operation is supported", async () => {
     const primary = fixtureFact({
       sourceRecordId: "kaikki-albanian-jsonl:word=mal:ordinal=0",

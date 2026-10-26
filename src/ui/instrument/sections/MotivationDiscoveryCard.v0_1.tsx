@@ -460,6 +460,11 @@ export function MotivationDiscoveryCardV0_1({
   const exactLexicalSourceFacts = value.exactLexicalSourceFacts ?? [];
   const sourceIpaSevenVoiceAnalyses = value.sourceIpaSevenVoiceAnalyses ?? [];
   const albanianLexicalReading = value.albanianLexicalReading;
+  const relatedCandidateEvaluations = albanianLexicalReading?.relatedCandidateEvaluations ?? [];
+  const supportedRelatedCandidateEvaluations = relatedCandidateEvaluations.filter((candidate) =>
+    candidate.functionalMeaningBridge.status === "SUPPORTED",
+  );
+  const nullRelatedCandidateCount = relatedCandidateEvaluations.length - supportedRelatedCandidateEvaluations.length;
 
   return (
     <section
@@ -832,6 +837,49 @@ export function MotivationDiscoveryCardV0_1({
               {albanianLexicalReading.functionalMeaningBridge.claimBoundary}
             </div>
           </div>
+          {relatedCandidateEvaluations.length > 0 ? (
+            <div
+              data-testid="albanian-reading-related-candidate-evaluations"
+              className="mt-3 rounded-lg border border-[#355a52] bg-[#12211e] p-3 text-xs leading-5 text-[#c8e6dc]"
+            >
+              <div className="font-semibold uppercase tracking-[0.12em]">SOURCE-LINKED FUNCTIONAL RELATIONSHIPS</div>
+              <div className="mt-1 text-[#9fbdb5]">
+                {supportedRelatedCandidateEvaluations.length} bounded functional relationship{supportedRelatedCandidateEvaluations.length === 1 ? "" : "s"} shown; {nullRelatedCandidateCount} other evaluated link{nullRelatedCandidateCount === 1 ? "" : "s"} remain Null.
+              </div>
+              <div className="mt-2 space-y-2">
+                {supportedRelatedCandidateEvaluations.map((candidate) => {
+                  const bridge = candidate.functionalMeaningBridge;
+                  const relatedFact = bridge.sourceFacts?.related;
+                  const derivedStructure = bridge.derivedStructure;
+                  return (
+                    <article
+                      key={`${candidate.sourceRelation}:${candidate.relatedForm}`}
+                      data-testid="albanian-reading-related-candidate"
+                      className="rounded border border-[#355a52] bg-[#0e1b19] p-2"
+                    >
+                      <div className="font-mono text-sm text-[#f5f7fb]">{candidate.relatedForm}</div>
+                      <div className="mt-1 text-[#9fbdb5]">
+                        {candidate.sourceRelation} · {candidate.resolution} · comparison {candidate.sourceLinkedComparison.status}
+                      </div>
+                      <div className="mt-1">
+                        Source meanings: {bridge.sourceFacts?.primary.meaningGlosses.join("; ") || "Null"} → {relatedFact?.meaningGlosses.join("; ") || "Null"}
+                      </div>
+                      <div className="mt-1 text-[#d5c28f]">
+                        Functional operation: {bridge.functionalHypothesis.functionalOperation ?? "Null"}
+                      </div>
+                      <div className="mt-1">{bridge.functionalHypothesis.statement ?? "Null — no bounded functional explanation is available."}</div>
+                      <div className="mt-1 text-[#9fbdb5]">
+                        IPA/Voice structure: {derivedStructure ? `${derivedStructure.primary.voicePaths.join(" | ")} → ${derivedStructure.related.voicePaths.join(" | ")}` : "Null"}
+                      </div>
+                      <div className="mt-1 text-[#9fbdb5]">
+                        Alternatives: {bridge.functionalHypothesis.alternatives.join(" ") || "Null"}
+                      </div>
+                    </article>
+                  );
+                })}
+              </div>
+            </div>
+          ) : null}
           <div className="mt-3">
             <div className="font-semibold text-[#f5f7fb]">Source-linked form candidates</div>
             <div className="mt-1 text-[#9fbdb5]">

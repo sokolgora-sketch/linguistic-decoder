@@ -83,6 +83,8 @@ export type AlbanianLexicalReadingV0_1 = Readonly<{
     /** Source-authored prose; displayed as attribution, never as machine relation proof. */
     etymologyText: string | null;
   }>[];
+  /** Additive per-related-form evidence; the singular bridge below remains the selected primary bridge. */
+  relatedCandidateEvaluations: readonly AlbanianRelatedCandidateEvaluationV0_1[];
   sourceLinkedComponentReading?: AlbanianSourceLinkedComponentReadingV0_1 | null;
   sourceLinkedComparison?: AlbanianSourceLinkedComparisonV0_1 | null;
   /** Additive product bridge; this never upgrades source evidence into morphology or proof. */
@@ -218,6 +220,14 @@ export type AlbanianSourceLinkedComparisonV0_1 = Readonly<{
     text: string;
   }>;
   claimBoundary: string;
+}>;
+
+export type AlbanianRelatedCandidateEvaluationV0_1 = Readonly<{
+  relatedForm: string;
+  sourceRelation: "SOURCE_RELATED_FORM" | "SOURCE_DERIVED_FORM";
+  resolution: "RESOLVED" | "UNRESOLVED";
+  sourceLinkedComparison: AlbanianSourceLinkedComparisonV0_1;
+  functionalMeaningBridge: AlbanianFunctionalMeaningBridgeV0_1;
 }>;
 
 type AlbanianSourceLinkedComponentRelationV0_1 =
@@ -1389,6 +1399,7 @@ async function buildAlbanianLexicalReadingV0_1(input: Readonly<{
       primarySourceFact: null,
       sourcePronunciation: null,
       relatedForms: Object.freeze([]),
+      relatedCandidateEvaluations: Object.freeze([]),
       sourceLinkedComponentReading: null,
       sourceLinkedComparison: null,
       functionalMeaningBridge: nullFunctionalMeaningBridgeV0_1({
@@ -1470,34 +1481,38 @@ async function buildAlbanianLexicalReadingV0_1(input: Readonly<{
   }));
   const relatedResults = Object.freeze(relatedResultsWithFacts.map(({ publicResult }) => publicResult));
   const primaryProjection = sourceRecordProjectionV0_1(primary, input.analyses);
-  const relatedCandidateEvaluations = relatedResultsWithFacts.map(({ resolved }, index) => {
-    const relatedForm = related[index];
-    const comparison = relatedForm
-      ? buildSourceLinkedComparisonV0_1({
-          primary,
-          primaryAnalyses: input.analyses,
-          relatedForm,
-          related: resolved,
-        })
-      : null;
+  const relatedCandidateEvaluations = relatedResultsWithFacts.map(({ publicResult, resolved }, index) => {
+    const relatedForm = related[index]!;
+    const comparison = buildSourceLinkedComparisonV0_1({
+      primary,
+      primaryAnalyses: input.analyses,
+      relatedForm,
+      related: resolved,
+    });
     const bridge = buildAlbanianFunctionalMeaningBridgeV0_1({
       primary: primaryProjection,
       comparison,
       related: resolved
         ? sourceRecordProjectionV0_1(resolved, projectAlbanianKaikkiFactSourceIpaToSevenVoicesV0_1(resolved))
         : null,
-      sourceRelation: relatedForm?.relation ?? null,
+      sourceRelation: relatedForm.relation,
     });
-    return Object.freeze({ comparison, bridge });
+    return Object.freeze({
+      relatedForm: publicResult.form,
+      sourceRelation: publicResult.relation,
+      resolution: publicResult.resolution,
+      sourceLinkedComparison: comparison,
+      functionalMeaningBridge: bridge,
+    });
   });
-  const selectedRelatedCandidate = relatedCandidateEvaluations.find(({ comparison, bridge }) =>
-    comparison?.status === "SUPPORTED" && bridge.status === "SUPPORTED",
-  ) ?? relatedCandidateEvaluations.find(({ bridge }) => bridge.status === "SUPPORTED")
-    ?? relatedCandidateEvaluations.find(({ comparison }) => comparison?.status === "SUPPORTED")
+  const selectedRelatedCandidate = relatedCandidateEvaluations.find(({ sourceLinkedComparison, functionalMeaningBridge }) =>
+    sourceLinkedComparison.status === "SUPPORTED" && functionalMeaningBridge.status === "SUPPORTED",
+  ) ?? relatedCandidateEvaluations.find(({ functionalMeaningBridge }) => functionalMeaningBridge.status === "SUPPORTED")
+    ?? relatedCandidateEvaluations.find(({ sourceLinkedComparison }) => sourceLinkedComparison.status === "SUPPORTED")
     ?? relatedCandidateEvaluations[0]
     ?? null;
-  const sourceLinkedComparison = selectedRelatedCandidate?.comparison ?? null;
-  const functionalMeaningBridge = selectedRelatedCandidate?.bridge ?? buildAlbanianFunctionalMeaningBridgeV0_1({
+  const sourceLinkedComparison = selectedRelatedCandidate?.sourceLinkedComparison ?? null;
+  const functionalMeaningBridge = selectedRelatedCandidate?.functionalMeaningBridge ?? buildAlbanianFunctionalMeaningBridgeV0_1({
     primary: primaryProjection,
     comparison: null,
   });
@@ -1563,6 +1578,7 @@ async function buildAlbanianLexicalReadingV0_1(input: Readonly<{
         })
       : null,
     relatedForms: Object.freeze(relatedResults),
+    relatedCandidateEvaluations: Object.freeze(relatedCandidateEvaluations),
     sourceLinkedComponentReading,
     sourceLinkedComparison,
     functionalMeaningBridge,
