@@ -2641,5 +2641,15 @@ describe("real Albanian exact lexical source integration v0.1", () => {
     expect(unavailableQueries).toBe(1);
     expect(comparison?.members.every((member) => member.status === "UNAVAILABLE")).toBe(true);
     expect(comparison?.members.every((member) => member.reasonCodes.includes("ALBANIAN_SOURCE_PATH_NOT_CONFIGURED"))).toBe(true);
+
+    const unavailableVm = adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: unavailable.discovery });
+    expect(unavailableVm.motivationDiscoveryV0_1).toMatchObject({ kind: "present" });
+    if (unavailableVm.motivationDiscoveryV0_1?.kind === "present") {
+      render(createElement(MotivationDiscoveryCardV0_1, { discovery: unavailableVm.motivationDiscoveryV0_1 }));
+      expect(screen.queryByTestId("albanian-lexical-reading")).toBeNull();
+      expect(screen.getByTestId("albanian-five-windows-comparison")).toHaveTextContent("FIVE WINDOWS — ALBANIAN WORD COMPARISON");
+      expect(screen.getAllByTestId("albanian-five-windows-member")).toHaveLength(5);
+      expect(screen.getByTestId("albanian-five-windows-comparison")).toHaveTextContent("ALBANIAN_SOURCE_PATH_NOT_CONFIGURED");
+    }
   });
 });
