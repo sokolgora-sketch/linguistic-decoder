@@ -513,6 +513,134 @@ describe("real Albanian exact lexical source integration v0.1", () => {
     });
   });
 
+  it("uses an exact source-linked agentive suffix record for an unwhitelisted AGENT candidate", async () => {
+    await withSyntheticSourceFileV0_1([
+      {
+        word: "thëngjill",
+        lang_code: "sq",
+        pos: "noun",
+        senses: [{ id: "thëngjill-1", glosses: ["coal"], derived: [{ word: "thëngjilltar" }] }],
+        sounds: [{ ipa: "/θəŋˈɟil/", tags: [] }],
+      },
+      {
+        word: "thëngjilltar",
+        lang_code: "sq",
+        pos: "noun",
+        senses: [{ id: "thëngjilltar-1", glosses: ["coal maker"] }],
+        sounds: [],
+        etymology_text: "From thëngjill (“ember, coal”) + -tar (agent noun suffix).",
+        etymology_links: [
+          ["thëngjill", "thëngjill#Albanian"],
+          ["-tar", "-tar#Albanian"],
+        ],
+        etymology_templates: [{
+          name: "suffix",
+          args: { "1": "sq", "2": "thëngjill", "3": "tar", "pos2": "agent noun suffix" },
+          expansion: "thëngjill (“ember, coal”) + -tar (agent noun suffix)",
+        }],
+      },
+      {
+        word: "-tar",
+        lang_code: "sq",
+        pos: "suffix",
+        senses: [{ id: "-tar-1", glosses: ["forms agent nouns. -er"] }],
+        sounds: [],
+      },
+    ], async ({ provider }) => {
+      const queries: string[] = [];
+      const countedProvider: AlbanianKaikkiServerOnlyExactLexicalSourceProviderV0_1 = Object.freeze({
+        ...provider,
+        query: async (query: string) => {
+          queries.push(query);
+          return provider.query(query);
+        },
+      });
+      const result = await buildMotivationEngineDiscoveryServerOnlyV0_1({
+        word: "thëngjill",
+        inputLanguage: "sq",
+        inputProfile: "albanian",
+        analysis: await analysisFor("thëngjill"),
+        heart: buildHeartInstrumentV1("thëngjill"),
+        albanianLexicalSourceProvider: countedProvider,
+      });
+      const reading = result.discovery.albanianLexicalReading;
+
+      expect(queries).toEqual(["thëngjill", "thëngjilltar", "-tar"]);
+      expect(reading).toMatchObject({
+        primarySourceFact: { form: "thëngjill", meaningGlosses: ["coal"] },
+        sourceLinkedComparison: {
+          status: "SUPPORTED",
+          relation: { relatedForm: "thëngjilltar", referencedForm: "thëngjill" },
+        },
+        functionalMeaningBridge: {
+          status: "SUPPORTED",
+          relatedForm: "thëngjilltar",
+          functionalHypothesis: {
+            functionalOperation: "AGENT",
+            statement: expect.stringContaining("forms agent nouns"),
+          },
+        },
+      });
+      expect(reading?.functionalMeaningBridge.functionalHypothesis.statement).toContain("-tar");
+      expect(reading?.functionalMeaningBridge.functionalHypothesis.statement).not.toContain("universal suffix rule");
+    });
+  });
+
+  it("keeps a source-linked non-agent suffix formation Null", async () => {
+    await withSyntheticSourceFileV0_1([
+      {
+        word: "mal",
+        lang_code: "sq",
+        pos: "noun",
+        senses: [{ id: "mal-1", glosses: ["mountain"], derived: [{ word: "malor-noun" }] }],
+        sounds: [{ ipa: "/ˈmal/", tags: [] }],
+      },
+      {
+        word: "malor-noun",
+        lang_code: "sq",
+        pos: "noun",
+        senses: [{ id: "malor-noun-1", glosses: ["mountain term"] }],
+        sounds: [],
+        etymology_text: "From mal + -or.",
+        etymology_links: [
+          ["mal", "mal#Albanian"],
+          ["-or", "-or#Albanian"],
+        ],
+        etymology_templates: [{
+          name: "suffix",
+          args: { "1": "sq", "2": "mal", "3": "-or" },
+          expansion: "mal + -or",
+        }],
+      },
+      {
+        word: "-or",
+        lang_code: "sq",
+        pos: "suffix",
+        senses: [{ id: "-or-1", glosses: ["forms relational adjectives. -al"] }],
+        sounds: [],
+      },
+    ], async ({ provider }) => {
+      const result = await buildMotivationEngineDiscoveryServerOnlyV0_1({
+        word: "mal",
+        inputLanguage: "sq",
+        inputProfile: "albanian",
+        analysis: await analysisFor("mal"),
+        heart: buildHeartInstrumentV1("mal"),
+        albanianLexicalSourceProvider: provider,
+      });
+      const bridge = result.discovery.albanianLexicalReading?.functionalMeaningBridge;
+      expect(bridge).toMatchObject({
+        status: "NULL",
+        relatedForm: "malor-noun",
+        functionalHypothesis: {
+          status: "UNKNOWN_OR_NULL",
+          functionalOperation: null,
+          statement: null,
+        },
+      });
+    });
+  });
+
   it("recognizes a source-derived verb-to-agent formation while keeping non-agent derivatives Null", async () => {
     await withSyntheticSourceFileV0_1([
       {
