@@ -261,6 +261,22 @@ describe("Open Instrument ZE-15 research hypothesis manifest v0.1", () => {
     );
   });
 
+  it("rejects duplicate rationale text across independent reviewer records", () => {
+    const value = cloneManifest();
+    const assertions = value.assertions as Array<Record<string, unknown>>;
+    const candidate = reviewCandidate();
+    (candidate.reviewerRecords[1] as Record<string, unknown>).rationale =
+      (candidate.reviewerRecords[0] as Record<string, unknown>).rationale;
+    assertions[0] = { ...assertions[0], reviewCandidate: candidate };
+
+    const result = parseResearchHypothesisManifestV0_1(value);
+    expect(result.ok).toBe(false);
+    if (result.ok) throw new Error("expected duplicate rationale rejection");
+    expect(result.reasonCodes).toContain(
+      "ASSERTION_0_REVIEWER_RATIONALES_NOT_DISTINCT",
+    );
+  });
+
   it("rejects missing rationale and missing owner approval", () => {
     const value = cloneManifest();
     const assertions = value.assertions as Array<Record<string, unknown>>;

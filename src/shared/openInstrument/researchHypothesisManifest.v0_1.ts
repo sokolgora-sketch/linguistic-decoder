@@ -430,6 +430,9 @@ function parseReviewCandidateV0_1(
     if (new Set(records.map((record) => record.provenance.sourceRef)).size !== 2) {
       reasonCodes.push(`ASSERTION_${index}_REVIEWER_PROVENANCE_NOT_DISTINCT`);
     }
+    if (new Set(records.map((record) => record.rationale)).size !== 2) {
+      reasonCodes.push(`ASSERTION_${index}_REVIEWER_RATIONALES_NOT_DISTINCT`);
+    }
     if (candidateTrack === "AI_REVIEW") {
       const reviewerIds = new Set(records.map((record) => record.reviewerId));
       if (
