@@ -1138,6 +1138,24 @@ function parseMotivationDiscoveryV0_1(
         (context.structuralSignature === null || typeof context.structuralSignature === "string") &&
         isStringArray(context.reasonCodes);
     };
+    const validSourceCategory = (category: unknown): boolean =>
+      isRecord(category) &&
+      typeof category.name === "string" &&
+      (category.kind === null || typeof category.kind === "string") &&
+      isStringArray(category.parents) &&
+      (category.source === null || typeof category.source === "string") &&
+      (category.orig === null || typeof category.orig === "string") &&
+      (category.langcode === null || typeof category.langcode === "string") &&
+      (category._dis === null || typeof category._dis === "string");
+    const validSourceSenses = (value: unknown): boolean => value === undefined || (
+      Array.isArray(value) && value.every((sense) =>
+        isRecord(sense) &&
+        (sense.senseId === null || typeof sense.senseId === "string") &&
+        isStringArray(sense.glosses) &&
+        Array.isArray(sense.categories) &&
+        sense.categories.every(validSourceCategory),
+      )
+    );
     const validSourceLinkedRecord = (record: unknown): boolean => {
       if (!isRecord(record) || !Array.isArray(record.etymologyLinks) || !Array.isArray(record.etymologyTemplates) || !Array.isArray(record.pronunciationVariants)) {
         return false;
@@ -1150,6 +1168,7 @@ function parseMotivationDiscoveryV0_1(
         typeof record.form === "string" &&
         (record.partOfSpeech === null || typeof record.partOfSpeech === "string") &&
         isStringArray(record.meaningGlosses) &&
+        validSourceSenses(record.sourceSenses) &&
         (record.etymologyText === null || typeof record.etymologyText === "string") &&
         record.etymologyLinks.every((link) =>
           isRecord(link) && typeof link.sourceForm === "string" && typeof link.reference === "string",
@@ -1334,7 +1353,8 @@ function parseMotivationDiscoveryV0_1(
           typeof record.sourceRecordId === "string" &&
           typeof record.entryLocator === "string" &&
           typeof record.form === "string" &&
-          isStringArray(record.meaningGlosses);
+          isStringArray(record.meaningGlosses) &&
+          validSourceSenses(record.sourceSenses);
         if (!validBridgeRecord(sourceFacts.primary)) return false;
         const relatedBridgeRecord = sourceFacts.related;
         if (relatedBridgeRecord !== null) {

@@ -227,8 +227,18 @@ type SyntheticSourceRecordV0_1 = Readonly<{
   senses: readonly Readonly<{
     id: string;
     glosses: readonly string[];
+    categories?: readonly Readonly<{
+      name: string;
+      kind?: string;
+      parents?: readonly string[];
+      source?: string;
+      orig?: string;
+      langcode?: string;
+      _dis?: string;
+    }>[];
     derived?: readonly Readonly<{ word: string }>[];
   }>[];
+  categories?: readonly Readonly<Record<string, unknown>>[];
   sounds: readonly Readonly<{ ipa: string; tags: readonly string[] }>[];
   related?: readonly Readonly<{ word: string }>[];
   derived?: readonly Readonly<{ word: string }>[];
@@ -513,6 +523,85 @@ describe("real Albanian exact lexical source integration v0.1", () => {
     });
   });
 
+  it("uses exact final-sense sq:Occupations evidence without flattening category scope", async () => {
+    const occupationCategory = {
+      name: "Occupations",
+      kind: "other",
+      parents: [],
+      source: "w",
+      orig: "sq:Occupations",
+      langcode: "sq",
+    } as const;
+    await withSyntheticSourceFileV0_1([
+      {
+        word: "bletë",
+        lang_code: "sq",
+        pos: "noun",
+        senses: [{ id: "bletë-1", glosses: ["bee"], derived: [{ word: "bletar" }] }],
+        sounds: [],
+      },
+      {
+        word: "bletar",
+        lang_code: "sq",
+        pos: "noun",
+        senses: [{ id: "bletar-1", glosses: ["beekeeper"], categories: [occupationCategory] }],
+        sounds: [],
+        etymology_text: "From bletë (“bee”) + -ar noun suffix.",
+        etymology_links: [["bletë", "bletë#Albanian"]],
+      },
+      {
+        word: "përkthej",
+        lang_code: "sq",
+        pos: "verb",
+        senses: [{ id: "përkthej-1", glosses: ["to translate"], derived: [{ word: "përkthyes" }] }],
+        sounds: [],
+      },
+      {
+        word: "përkthyes",
+        lang_code: "sq",
+        pos: "noun",
+        senses: [{ id: "përkthyes-1", glosses: ["translator; interpreter"], categories: [occupationCategory] }],
+        sounds: [],
+        etymology_text: "From përkthej (“to translate”) + -s.",
+        etymology_links: [["përkthej", "përkthej#Albanian"]],
+      },
+    ], async ({ provider }) => {
+      for (const [word, relatedForm] of [["bletë", "bletar"], ["përkthej", "përkthyes"]] as const) {
+        const discovery = await buildMotivationEngineDiscoveryServerOnlyV0_1({
+          word,
+          inputLanguage: "sq",
+          inputProfile: "albanian",
+          analysis: await analysisFor(word),
+          heart: buildHeartInstrumentV1(word),
+          albanianLexicalSourceProvider: provider,
+        });
+        expect(discovery.discovery.albanianLexicalReading).toMatchObject({
+          functionalMeaningBridge: {
+            status: "SUPPORTED",
+            relatedForm,
+            functionalHypothesis: {
+              functionalOperation: "AGENT",
+              basis: expect.arrayContaining(["SOURCE_ATTESTED_FINAL_SENSE_CATEGORY"]),
+              statement: expect.stringContaining("sq:Occupations"),
+            },
+            sourceFacts: {
+              related: {
+                sourceSenses: [{
+                  categories: [expect.objectContaining({
+                    name: "Occupations",
+                    orig: "sq:Occupations",
+                    langcode: "sq",
+                    source: "w",
+                  })],
+                }],
+              },
+            },
+          },
+        });
+      }
+    });
+  });
+
   it("recognizes a source-derived verb-to-agent formation while keeping non-agent derivatives Null", async () => {
     await withSyntheticSourceFileV0_1([
       {
@@ -605,6 +694,90 @@ describe("real Albanian exact lexical source integration v0.1", () => {
         expect(screen.getByTestId("albanian-reading-functional-bridge")).toHaveTextContent("does not assign an entity, resource, or other semantic role to the primary word");
         expect(screen.getByTestId("albanian-reading-interpretation")).toHaveTextContent("Integrated source-bounded functional reading");
       }
+    });
+  });
+
+  it.each([
+    ["wrong category provenance", { name: "Occupations", kind: "other", parents: [], source: "w", orig: "en:Occupations", langcode: "en" }],
+    ["missing sense identity", { name: "Occupations", kind: "other", parents: [], source: "w", orig: "sq:Occupations", langcode: "sq" }],
+  ] as const)("keeps category-backed AGENT Null for %s", async (_label, category) => {
+    const primary = fixtureFact({
+      form: "bletë",
+      senses: [{ senseId: "bletë-1", glosses: ["bee"] }],
+      relatedForms: [{ form: "bletar", relation: "SOURCE_DERIVED_FORM", entryLocator: "jsonl://word/bletar" }],
+    });
+    const related = fixtureFact({
+      form: "bletar",
+      partOfSpeech: "noun",
+      senses: [{ senseId: _label === "missing sense identity" ? null : "bletar-1", glosses: ["beekeeper"], categories: [category] }],
+      etymologyText: "From bletë (“bee”) + -ar noun suffix.",
+      etymologyLinks: [{ sourceForm: "bletë", reference: "bletë#Albanian" }],
+    });
+    const result = await discoveryForFactsV0_1([primary, related], "bletë");
+    expect(result.albanianLexicalReading?.functionalMeaningBridge).toMatchObject({
+      status: "NULL",
+      relatedForm: "bletar",
+      functionalHypothesis: { functionalOperation: null, status: "UNKNOWN_OR_NULL" },
+    });
+  });
+
+  it("does not promote entry-level-only category metadata to a final-sense AGENT", async () => {
+    await withSyntheticSourceFileV0_1([
+      {
+        word: "bletë",
+        lang_code: "sq",
+        pos: "noun",
+        senses: [{ id: "bletë-1", glosses: ["bee"], derived: [{ word: "bletar" }] }],
+        sounds: [],
+      },
+      {
+        word: "bletar",
+        lang_code: "sq",
+        pos: "noun",
+        categories: [{ name: "Occupations", orig: "sq:Occupations", langcode: "sq", source: "w" }],
+        senses: [{ id: "bletar-1", glosses: ["beekeeper"] }],
+        sounds: [],
+        etymology_text: "From bletë (“bee”) + -ar noun suffix.",
+        etymology_links: [["bletë", "bletë#Albanian"]],
+      },
+    ], async ({ provider }) => {
+      const result = await buildMotivationEngineDiscoveryServerOnlyV0_1({
+        word: "bletë",
+        inputLanguage: "sq",
+        inputProfile: "albanian",
+        analysis: await analysisFor("bletë"),
+        heart: buildHeartInstrumentV1("bletë"),
+        albanianLexicalSourceProvider: provider,
+      });
+      expect(result.discovery.albanianLexicalReading?.functionalMeaningBridge).toMatchObject({
+        status: "NULL",
+        functionalHypothesis: { functionalOperation: null, status: "UNKNOWN_OR_NULL" },
+      });
+    });
+  });
+
+  it("keeps ambiguous final category senses Null", async () => {
+    const category = { name: "Occupations", kind: "other", parents: [], source: "w", orig: "sq:Occupations", langcode: "sq" } as const;
+    const primary = fixtureFact({
+      form: "root",
+      senses: [{ senseId: "root-1", glosses: ["root"] }],
+      relatedForms: [{ form: "agent-term", relation: "SOURCE_DERIVED_FORM", entryLocator: "jsonl://word/agent-term" }],
+    });
+    const related = fixtureFact({
+      form: "agent-term",
+      partOfSpeech: "noun",
+      senses: [
+        { senseId: "agent-1", glosses: ["one who does the work"], categories: [category] },
+        { senseId: "agent-2", glosses: ["a different occupation sense"], categories: [category] },
+      ],
+      etymologyText: "From root + agent suffix.",
+      etymologyLinks: [{ sourceForm: "root", reference: "root#Albanian" }],
+    });
+    const result = await discoveryForFactsV0_1([primary, related], "root");
+    expect(result.albanianLexicalReading?.functionalMeaningBridge).toMatchObject({
+      status: "NULL",
+      relatedForm: "agent-term",
+      functionalHypothesis: { functionalOperation: null, status: "UNKNOWN_OR_NULL" },
     });
   });
 
@@ -2005,7 +2178,7 @@ describe("real Albanian exact lexical source integration v0.1", () => {
       expect(nene.result.status === "MATCHES_FOUND" ? nene.result.facts : []).toHaveLength(2);
       expect(nene.result.status === "MATCHES_FOUND" ? nene.result.facts.map((fact) => fact.physicalRecordOrdinal) : []).toEqual([0, 1]);
       expect(nene.result.status === "MATCHES_FOUND" ? nene.result.facts[0]?.senses : []).toEqual([
-        { senseId: "nene-1", glosses: ["mother", "grandmother"] },
+        { senseId: "nene-1", glosses: ["mother", "grandmother"], categories: [] },
       ]);
       expect(nene.result.status === "MATCHES_FOUND" ? nene.result.facts[0]?.ipaObservations : []).toEqual([
         { soundIndex: 0, ipa: "/nənə/", tags: [] },
