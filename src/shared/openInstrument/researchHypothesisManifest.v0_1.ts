@@ -308,7 +308,7 @@ function parseAssertionV0_1(
       evidence.sourceProfileId === sourceProfileId &&
       evidence.sourceArtifactSha256 === sourceArtifactSha256 &&
       evidence.sourceRecordId === sourceRecordId &&
-      (evidence.senseId === undefined || evidence.senseId === senseId)
+      evidence.senseId === senseId
     );
   });
   if (!sourceIdentityMatched) {

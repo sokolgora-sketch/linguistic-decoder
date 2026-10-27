@@ -108,6 +108,23 @@ describe("Open Instrument ZE-15 research hypothesis manifest v0.1", () => {
     expect(result.reasonCodes).toContain("ASSERTION_0_SOURCE_IDENTITY_MISMATCH");
   });
 
+  it("fails closed when source-attested evidence omits sense identity", () => {
+    const value = cloneManifest();
+    const evidence = value.evidence as Array<Record<string, unknown>>;
+    const pelarSourceEvidence = evidence.find(
+      (item) => item.sourceRecordId === "en-pelar-sq-noun-RnBYACSN",
+    );
+    if (!pelarSourceEvidence) {
+      throw new Error("expected pelar source evidence");
+    }
+    delete pelarSourceEvidence.senseId;
+
+    const result = parseResearchHypothesisManifestV0_1(value);
+    expect(result.ok).toBe(false);
+    if (result.ok) throw new Error("expected missing sense identity rejection");
+    expect(result.reasonCodes).toContain("ASSERTION_0_SOURCE_IDENTITY_MISMATCH");
+  });
+
   it("fails closed for missing sense identity", () => {
     const value = cloneManifest();
     const assertions = value.assertions as Array<Record<string, unknown>>;
@@ -171,7 +188,7 @@ describe("Open Instrument ZE-15 research hypothesis manifest v0.1", () => {
     expect(result.reasonCodes).toContain("ASSERTION_0_STATUS_INVALID");
   });
 
-  it("keeps conflicting researcher assertions as separate no-single-winner evidence", () => {
+  it("preserves multiple researcher assertions without selecting a single winner", () => {
     const value = cloneManifest();
     const assertions = value.assertions as Array<Record<string, unknown>>;
     assertions.push({
