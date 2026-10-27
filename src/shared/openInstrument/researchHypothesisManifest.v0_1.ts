@@ -15,11 +15,24 @@ export const RESEARCH_HYPOTHESIS_CLAIM_BOUNDARY_V0_1 =
 export const RESEARCH_HYPOTHESIS_PRODUCTION_AUTHORIZATION_V0_1 =
   "NOT_AUTHORIZED" as const;
 
+export const RESEARCH_HYPOTHESIS_HISTORICAL_RELATION_V0_1 =
+  "NOT_CLAIMED" as const;
+
+export const RESEARCH_HYPOTHESIS_WINNER_CLAIM_V0_1 =
+  "NOT_CLAIMED" as const;
+
 export type ResearchHypothesisStatusV0_1 =
   | "PROPOSED_NOT_REVIEWED"
   | "REVIEWED"
+  | "REVIEWED_ALIGNED_AI_OWNER_APPROVED"
+  | "REVIEWED_ALIGNED_HUMAN_OWNER_APPROVED"
   | "REJECTED"
   | "UNRESOLVED";
+
+export type ResearchHypothesisReviewTrackV0_1 =
+  | "AI_REVIEW"
+  | "HUMAN_REVIEW"
+  | "NONE";
 
 export type ResearchHypothesisEvidenceAuthorityV0_1 =
   | "SOURCE_ATTESTED"
@@ -44,6 +57,37 @@ export type ResearchHypothesisEvidenceRefV0_1 = Readonly<{
   note: string;
 }>;
 
+export type ResearchHypothesisReviewRationaleProvenanceV0_1 = Readonly<{
+  sourceKind: "AUDIT_TRAIL";
+  sourceRef: string;
+}>;
+
+export type ResearchHypothesisReviewRationaleV0_1 = Readonly<{
+  reviewerId: string;
+  reviewerKind: "AI" | "HUMAN";
+  rationale: string;
+  evidenceRefs: readonly string[];
+  recordedAt: string;
+  recordedBeforePeerExposure: true;
+  provenance: ResearchHypothesisReviewRationaleProvenanceV0_1;
+}>;
+
+export type ResearchHypothesisReviewCandidateV0_1 = Readonly<{
+  status: "PRE_APPROVAL_CANDIDATE_RATIONALE";
+  reviewTrack: "AI_REVIEW" | "HUMAN_REVIEW";
+  reviewerRecords: readonly [
+    ResearchHypothesisReviewRationaleV0_1,
+    ResearchHypothesisReviewRationaleV0_1,
+  ];
+}>;
+
+export type ResearchHypothesisOwnerApprovalV0_1 = Readonly<{
+  status: "APPROVED";
+  ownerId: string;
+  approvedAt: string;
+  approvalRef: string;
+}>;
+
 export type ResearchHypothesisAssertionV0_1 = Readonly<{
   schemaVersion: typeof RESEARCH_HYPOTHESIS_MANIFEST_SCHEMA_V0_1;
   hypothesisId: string;
@@ -61,6 +105,9 @@ export type ResearchHypothesisAssertionV0_1 = Readonly<{
   evidenceAuthority: ResearchHypothesisEvidenceAuthorityV0_1;
   reasonCodes: readonly string[];
   claimBoundary: typeof RESEARCH_HYPOTHESIS_CLAIM_BOUNDARY_V0_1;
+  reviewTrack: ResearchHypothesisReviewTrackV0_1;
+  reviewCandidate: ResearchHypothesisReviewCandidateV0_1 | null;
+  ownerApproval: ResearchHypothesisOwnerApprovalV0_1 | null;
 }>;
 
 export type ResearchHypothesisManifestV0_1 = Readonly<{
@@ -87,9 +134,14 @@ export type ResearchHypothesisCandidateEvidenceV0_1 = Readonly<{
   evidenceAuthority: ResearchHypothesisEvidenceAuthorityV0_1;
   reasonCodes: readonly string[];
   claimBoundary: typeof RESEARCH_HYPOTHESIS_CLAIM_BOUNDARY_V0_1;
+  reviewTrack: ResearchHypothesisReviewTrackV0_1;
+  reviewCandidate: ResearchHypothesisReviewCandidateV0_1 | null;
+  ownerApproval: ResearchHypothesisOwnerApprovalV0_1 | null;
   productionAuthorization: typeof RESEARCH_HYPOTHESIS_PRODUCTION_AUTHORIZATION_V0_1;
   functionalOperation: null;
   embryoFunction: "UNKNOWN_OR_NULL";
+  historicalRelation: typeof RESEARCH_HYPOTHESIS_HISTORICAL_RELATION_V0_1;
+  winnerClaim: typeof RESEARCH_HYPOTHESIS_WINNER_CLAIM_V0_1;
   userDecisionPosture: "user_decides";
   noSingleWinner: true;
 }>;
@@ -130,6 +182,17 @@ function dateV0_1(value: unknown): string | null {
     : null;
 }
 
+function dateTimeV0_1(value: unknown): string | null {
+  const normalized = textV0_1(value);
+  if (
+    !normalized ||
+    !/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{3})?Z$/.test(normalized)
+  ) {
+    return null;
+  }
+  return normalized;
+}
+
 function uniqueStringsV0_1(value: unknown): string[] | null {
   if (!Array.isArray(value)) return null;
   const normalized = value.map(textV0_1);
@@ -167,9 +230,240 @@ function allowedStatusV0_1(
   return (
     value === "PROPOSED_NOT_REVIEWED" ||
     value === "REVIEWED" ||
+    value === "REVIEWED_ALIGNED_AI_OWNER_APPROVED" ||
+    value === "REVIEWED_ALIGNED_HUMAN_OWNER_APPROVED" ||
     value === "REJECTED" ||
     value === "UNRESOLVED"
   );
+}
+
+function allowedReviewTrackV0_1(
+  value: unknown,
+): value is ResearchHypothesisReviewTrackV0_1 {
+  return value === "AI_REVIEW" || value === "HUMAN_REVIEW" || value === "NONE";
+}
+
+function terminalReviewTrackV0_1(
+  value: ResearchHypothesisStatusV0_1,
+): "AI_REVIEW" | "HUMAN_REVIEW" | null {
+  if (value === "REVIEWED_ALIGNED_AI_OWNER_APPROVED") return "AI_REVIEW";
+  if (value === "REVIEWED_ALIGNED_HUMAN_OWNER_APPROVED") {
+    return "HUMAN_REVIEW";
+  }
+  return null;
+}
+
+function parseOwnerApprovalV0_1(
+  value: unknown,
+  index: number,
+  reasonCodes: string[],
+): ResearchHypothesisOwnerApprovalV0_1 | null {
+  if (value === undefined || value === null) return null;
+  if (!isRecordV0_1(value)) {
+    reasonCodes.push(`ASSERTION_${index}_OWNER_APPROVAL_NOT_OBJECT`);
+    return null;
+  }
+
+  const ownerId = textV0_1(value.ownerId);
+  const approvedAt = dateTimeV0_1(value.approvedAt);
+  const approvalRef = textV0_1(value.approvalRef);
+
+  if (value.status !== "APPROVED") {
+    reasonCodes.push(`ASSERTION_${index}_OWNER_APPROVAL_STATUS_INVALID`);
+  }
+  if (!ownerId) reasonCodes.push(`ASSERTION_${index}_OWNER_ID_REQUIRED`);
+  if (!approvedAt) {
+    reasonCodes.push(`ASSERTION_${index}_OWNER_APPROVED_AT_INVALID`);
+  }
+  if (!approvalRef) {
+    reasonCodes.push(`ASSERTION_${index}_OWNER_APPROVAL_REF_REQUIRED`);
+  }
+
+  if (
+    value.status !== "APPROVED" ||
+    !ownerId ||
+    !approvedAt ||
+    !approvalRef
+  ) {
+    return null;
+  }
+
+  return { status: "APPROVED", ownerId, approvedAt, approvalRef };
+}
+
+function parseReviewCandidateV0_1(
+  value: unknown,
+  index: number,
+  evidenceById: ReadonlyMap<string, ResearchHypothesisEvidenceRefV0_1>,
+  assertionEvidenceRefs: readonly string[] | null,
+  reasonCodes: string[],
+): ResearchHypothesisReviewCandidateV0_1 | null {
+  if (value === undefined || value === null) return null;
+  if (!isRecordV0_1(value)) {
+    reasonCodes.push(`ASSERTION_${index}_REVIEW_CANDIDATE_NOT_OBJECT`);
+    return null;
+  }
+
+  const reviewTrack = value.reviewTrack;
+  const candidateTrack =
+    reviewTrack === "AI_REVIEW" || reviewTrack === "HUMAN_REVIEW"
+      ? reviewTrack
+      : null;
+  const rawReviewerRecords = value.reviewerRecords;
+  if (value.status !== "PRE_APPROVAL_CANDIDATE_RATIONALE") {
+    reasonCodes.push(`ASSERTION_${index}_REVIEW_CANDIDATE_STATUS_INVALID`);
+  }
+  if (candidateTrack === null) {
+    reasonCodes.push(`ASSERTION_${index}_REVIEW_CANDIDATE_TRACK_INVALID`);
+  }
+  if (!Array.isArray(rawReviewerRecords) || rawReviewerRecords.length !== 2) {
+    reasonCodes.push(`ASSERTION_${index}_REVIEW_CANDIDATE_REVIEWERS_INVALID`);
+  }
+
+  const parsedRecords = (
+    Array.isArray(rawReviewerRecords) ? rawReviewerRecords : []
+  ).map<ResearchHypothesisReviewRationaleV0_1 | null>(
+    (rawRecord, reviewerIndex) => {
+    if (!isRecordV0_1(rawRecord)) {
+      reasonCodes.push(
+        `ASSERTION_${index}_REVIEWER_${reviewerIndex}_NOT_OBJECT`,
+      );
+      return null;
+    }
+
+    const reviewerId = textV0_1(rawRecord.reviewerId);
+    const reviewerKind = rawRecord.reviewerKind;
+    const parsedReviewerKind =
+      reviewerKind === "AI" || reviewerKind === "HUMAN"
+        ? reviewerKind
+        : null;
+    const rationale = textV0_1(rawRecord.rationale);
+    const evidenceRefs = uniqueStringsV0_1(rawRecord.evidenceRefs);
+    const recordedAt = dateTimeV0_1(rawRecord.recordedAt);
+    const provenance = isRecordV0_1(rawRecord.provenance)
+      ? rawRecord.provenance
+      : null;
+    const sourceRef = textV0_1(provenance?.sourceRef);
+
+    if (!reviewerId) {
+      reasonCodes.push(
+        `ASSERTION_${index}_REVIEWER_${reviewerIndex}_ID_REQUIRED`,
+      );
+    }
+    if (parsedReviewerKind === null) {
+      reasonCodes.push(
+        `ASSERTION_${index}_REVIEWER_${reviewerIndex}_KIND_INVALID`,
+      );
+    }
+    if (!rationale) {
+      reasonCodes.push(
+        `ASSERTION_${index}_REVIEWER_${reviewerIndex}_RATIONALE_REQUIRED`,
+      );
+    }
+    if (!evidenceRefs) {
+      reasonCodes.push(
+        `ASSERTION_${index}_REVIEWER_${reviewerIndex}_EVIDENCE_REFS_INVALID`,
+      );
+    }
+    if (!recordedAt) {
+      reasonCodes.push(
+        `ASSERTION_${index}_REVIEWER_${reviewerIndex}_RECORDED_AT_INVALID`,
+      );
+    }
+    if (rawRecord.recordedBeforePeerExposure !== true) {
+      reasonCodes.push(
+        `ASSERTION_${index}_REVIEWER_${reviewerIndex}_INDEPENDENCE_REQUIRED`,
+      );
+    }
+    if (provenance?.sourceKind !== "AUDIT_TRAIL" || !sourceRef) {
+      reasonCodes.push(
+        `ASSERTION_${index}_REVIEWER_${reviewerIndex}_PROVENANCE_INVALID`,
+      );
+    }
+
+    if (
+      !reviewerId ||
+      parsedReviewerKind === null ||
+      !rationale ||
+      !evidenceRefs ||
+      !recordedAt ||
+      rawRecord.recordedBeforePeerExposure !== true ||
+      provenance?.sourceKind !== "AUDIT_TRAIL" ||
+      !sourceRef
+    ) {
+      return null;
+    }
+
+    for (const evidenceRef of evidenceRefs) {
+      if (!evidenceById.has(evidenceRef)) {
+        reasonCodes.push(
+          `ASSERTION_${index}_REVIEWER_${reviewerIndex}_EVIDENCE_REF_MISSING:${evidenceRef}`,
+        );
+      }
+      if (!assertionEvidenceRefs?.includes(evidenceRef)) {
+        reasonCodes.push(
+          `ASSERTION_${index}_REVIEWER_${reviewerIndex}_EVIDENCE_REF_NOT_BOUND:${evidenceRef}`,
+        );
+      }
+    }
+
+      return {
+        reviewerId,
+        reviewerKind: parsedReviewerKind,
+        rationale,
+        evidenceRefs,
+        recordedAt,
+        recordedBeforePeerExposure: true,
+        provenance: { sourceKind: "AUDIT_TRAIL", sourceRef },
+      };
+    },
+  );
+
+  const records = parsedRecords.filter(
+    (record): record is ResearchHypothesisReviewRationaleV0_1 =>
+      record !== null,
+  );
+  if (records.length === 2) {
+    if (new Set(records.map((record) => record.reviewerId)).size !== 2) {
+      reasonCodes.push(`ASSERTION_${index}_REVIEWER_IDS_NOT_DISTINCT`);
+    }
+    if (new Set(records.map((record) => record.provenance.sourceRef)).size !== 2) {
+      reasonCodes.push(`ASSERTION_${index}_REVIEWER_PROVENANCE_NOT_DISTINCT`);
+    }
+    if (candidateTrack === "AI_REVIEW") {
+      const reviewerIds = new Set(records.map((record) => record.reviewerId));
+      if (
+        records.some((record) => record.reviewerKind !== "AI") ||
+        reviewerIds.size !== 2 ||
+        !reviewerIds.has("ChatGPT") ||
+        !reviewerIds.has("DeepSeek")
+      ) {
+        reasonCodes.push(`ASSERTION_${index}_AI_REVIEWER_SET_INVALID`);
+      }
+    }
+    if (
+      candidateTrack === "HUMAN_REVIEW" &&
+      records.some((record) => record.reviewerKind !== "HUMAN")
+    ) {
+      reasonCodes.push(`ASSERTION_${index}_HUMAN_REVIEWER_SET_INVALID`);
+    }
+  }
+
+  if (
+    value.status !== "PRE_APPROVAL_CANDIDATE_RATIONALE" ||
+    candidateTrack === null ||
+    !Array.isArray(rawReviewerRecords) ||
+    rawReviewerRecords.length !== 2 ||
+    records.length !== 2
+  ) {
+    return null;
+  }
+
+  return {
+    status: "PRE_APPROVAL_CANDIDATE_RATIONALE",
+    reviewTrack: candidateTrack,
+    reviewerRecords: [records[0], records[1]],
+  };
 }
 
 function parseEvidenceRefV0_1(
@@ -247,6 +541,12 @@ function parseAssertionV0_1(
   const assertionDate = dateV0_1(value.assertionDate);
   const evidenceRefs = uniqueStringsV0_1(value.evidenceRefs);
   const reasonList = uniqueStringsV0_1(value.reasonCodes);
+  const reviewTrack =
+    value.reviewTrack === undefined
+      ? "NONE"
+      : allowedReviewTrackV0_1(value.reviewTrack)
+        ? value.reviewTrack
+        : null;
 
   if (schemaVersion !== RESEARCH_HYPOTHESIS_MANIFEST_SCHEMA_V0_1) {
     reasonCodes.push(`ASSERTION_${index}_SCHEMA_VERSION_INVALID`);
@@ -274,6 +574,9 @@ function parseAssertionV0_1(
   if (value.claimBoundary !== RESEARCH_HYPOTHESIS_CLAIM_BOUNDARY_V0_1) {
     reasonCodes.push(`ASSERTION_${index}_CLAIM_BOUNDARY_INVALID`);
   }
+  if (reviewTrack === null) {
+    reasonCodes.push(`ASSERTION_${index}_REVIEW_TRACK_INVALID`);
+  }
 
   if (
     !hypothesisId ||
@@ -290,7 +593,8 @@ function parseAssertionV0_1(
     !evidenceRefs ||
     !allowedEvidenceAuthorityV0_1(value.evidenceAuthority) ||
     !reasonList ||
-    value.claimBoundary !== RESEARCH_HYPOTHESIS_CLAIM_BOUNDARY_V0_1
+    value.claimBoundary !== RESEARCH_HYPOTHESIS_CLAIM_BOUNDARY_V0_1 ||
+    reviewTrack === null
   ) {
     return null;
   }
@@ -315,6 +619,44 @@ function parseAssertionV0_1(
     reasonCodes.push(`ASSERTION_${index}_SOURCE_IDENTITY_MISMATCH`);
   }
 
+  const reviewCandidate = parseReviewCandidateV0_1(
+    value.reviewCandidate,
+    index,
+    evidenceById,
+    evidenceRefs,
+    reasonCodes,
+  );
+  const ownerApproval = parseOwnerApprovalV0_1(
+    value.ownerApproval,
+    index,
+    reasonCodes,
+  );
+  const terminalTrack = terminalReviewTrackV0_1(value.hypothesisStatus);
+
+  if (terminalTrack) {
+    if (reasonList.includes("REVIEWER_DISAGREEMENT_RETAINED_UNRESOLVED")) {
+      reasonCodes.push(`ASSERTION_${index}_TERMINAL_REVIEW_DISAGREEMENT`);
+    }
+    if (reviewTrack !== terminalTrack) {
+      reasonCodes.push(`ASSERTION_${index}_TERMINAL_REVIEW_TRACK_MISMATCH`);
+    }
+    if (!reviewCandidate) {
+      reasonCodes.push(`ASSERTION_${index}_TERMINAL_REVIEW_CANDIDATE_REQUIRED`);
+    } else if (reviewCandidate.reviewTrack !== terminalTrack) {
+      reasonCodes.push(`ASSERTION_${index}_TERMINAL_CANDIDATE_TRACK_MISMATCH`);
+    }
+    if (!ownerApproval) {
+      reasonCodes.push(`ASSERTION_${index}_TERMINAL_OWNER_APPROVAL_REQUIRED`);
+    }
+  } else {
+    if (reviewTrack !== "NONE") {
+      reasonCodes.push(`ASSERTION_${index}_NONTERMINAL_REVIEW_TRACK_ACTIVE`);
+    }
+    if (ownerApproval) {
+      reasonCodes.push(`ASSERTION_${index}_NONTERMINAL_OWNER_APPROVAL_FORBIDDEN`);
+    }
+  }
+
   return {
     schemaVersion: RESEARCH_HYPOTHESIS_MANIFEST_SCHEMA_V0_1,
     hypothesisId,
@@ -332,6 +674,9 @@ function parseAssertionV0_1(
     evidenceAuthority: value.evidenceAuthority,
     reasonCodes: reasonList,
     claimBoundary: RESEARCH_HYPOTHESIS_CLAIM_BOUNDARY_V0_1,
+    reviewTrack,
+    reviewCandidate,
+    ownerApproval,
   };
 }
 
@@ -416,9 +761,14 @@ export function projectResearchHypothesisManifestToCandidateEvidenceV0_1(
     evidenceAuthority: assertion.evidenceAuthority,
     reasonCodes: [...assertion.reasonCodes],
     claimBoundary: assertion.claimBoundary,
+    reviewTrack: assertion.reviewTrack,
+    reviewCandidate: assertion.reviewCandidate,
+    ownerApproval: assertion.ownerApproval,
     productionAuthorization: RESEARCH_HYPOTHESIS_PRODUCTION_AUTHORIZATION_V0_1,
     functionalOperation: null,
     embryoFunction: "UNKNOWN_OR_NULL",
+    historicalRelation: RESEARCH_HYPOTHESIS_HISTORICAL_RELATION_V0_1,
+    winnerClaim: RESEARCH_HYPOTHESIS_WINNER_CLAIM_V0_1,
     userDecisionPosture: "user_decides",
     noSingleWinner: true,
   }));

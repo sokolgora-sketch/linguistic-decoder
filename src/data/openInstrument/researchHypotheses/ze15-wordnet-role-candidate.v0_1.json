@@ -68,6 +68,9 @@
         "CROSS_SOURCE_SENSE_ALIGNMENT_UNREVIEWED",
         "GROOM_SENSE_AMBIGUITY_RETAINED"
       ],
+      "reviewTrack": "NONE",
+      "reviewCandidate": null,
+      "ownerApproval": null,
       "claimBoundary": "research_only_not_production_authorization"
     },
     {
@@ -93,6 +96,9 @@
         "OEWN_EXACT_GLOSS_UNAVAILABLE_AND_TYPED_EQUIVALENCE_UNPROVEN",
         "UNTYPED_SYNONYM_NOT_TREATED_AS_SENSE_ALIGNMENT"
       ],
+      "reviewTrack": "NONE",
+      "reviewCandidate": null,
+      "ownerApproval": null,
       "claimBoundary": "research_only_not_production_authorization"
     }
   ]
