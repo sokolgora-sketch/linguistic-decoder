@@ -23,6 +23,10 @@ function pathText(values: readonly string[]): string {
   return values.length ? values.join(" → ") : "Null";
 }
 
+function sourceSoundTagsTextV0_1(tags: readonly string[]): string {
+  return tags.length ? tags.join(", ") : "not provided";
+}
+
 function sourceLinkedContextTextV0_1(
   variant: AlbanianSourceLinkedRecordV0_1["pronunciationVariants"][number],
 ): string {
@@ -666,6 +670,9 @@ export function MotivationDiscoveryCardV0_1({
           <div className="mt-1 text-[10px] text-[#9fb1bf]">
             Product interpretation only; this does not promote current-source IPA to frozen pronunciation authority or replace the separate profile-derived path.
           </div>
+          <div className="mt-1 text-[10px] text-[#9fb1bf]">
+            Sound tags are copied from the current Kaikki lexical observation; they are not independently validated dialect-profile authority.
+          </div>
           <div className="mt-3 space-y-3">
             {sourceIpaSevenVoiceAnalyses.map((analysis) => (
               <article
@@ -678,6 +685,9 @@ export function MotivationDiscoveryCardV0_1({
                 </div>
                 <div className="mt-1 break-words font-mono text-[#d7cffa]">
                   IPA: {analysis.rawIpa ?? "Null"} · Voice path: {pathText(analysis.voicePath)}
+                </div>
+                <div className="break-words text-[#9fb1bf]">
+                  Source sound tags: {sourceSoundTagsTextV0_1(analysis.tags)}
                 </div>
                 <div className="break-words text-[#9fb1bf]">
                   Nuclei: {analysis.nuclei.map((nucleus) => `${nucleus.raw} → ${nucleus.voice ?? "Null"}`).join(" · ") || "Null"}
@@ -742,6 +752,7 @@ export function MotivationDiscoveryCardV0_1({
                         <div className="break-words text-[#d7cffa]">
                           <div>Sound {analysis.soundIndex} · {analysis.status}</div>
                           <div>Source IPA: {analysis.rawIpa ?? "Null"}</div>
+                          <div>Source sound tags: {sourceSoundTagsTextV0_1(analysis.tags)}</div>
                         </div>
                         <div className="break-words text-[#d7cffa]">
                           <div>Derived Voice path: {pathText(analysis.voicePath)}</div>
@@ -761,6 +772,9 @@ export function MotivationDiscoveryCardV0_1({
                     )}
                     <div className="mt-1 break-words text-[10px] text-[#7f8b99]">
                       Source IPA and derived Voice paths are descriptive current-source observations, not semantic, borrowing-direction or historical proof.
+                    </div>
+                    <div className="mt-1 break-words text-[10px] text-[#7f8b99]">
+                      Source sound tags are copied from the current Kaikki lexical observation, not inferred from spelling or geography.
                     </div>
                   </div>
                 )) : (

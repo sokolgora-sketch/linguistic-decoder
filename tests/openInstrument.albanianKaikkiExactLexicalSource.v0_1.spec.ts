@@ -87,7 +87,7 @@ function fiveWindowsFixtureFactsV0_1(): readonly AlbanianKaikkiExactLexicalSourc
       physicalRecordOrdinal: 2171,
       form: "dritare",
       senses: [{ senseId: "dritare-window", glosses: ["window", "access to the sea"] }],
-      ipaObservations: [{ soundIndex: 0, ipa: "/dɾiˈtaɾɛ/", tags: [] }],
+      ipaObservations: [{ soundIndex: 0, ipa: "/dɾiˈtaɾɛ/", tags: ["Gheg"] }],
       etymologyText: "From dritë (“light”) + -are (“-er”), meaning to let light through or similar.",
       etymologyLinks: [{ sourceForm: "dritë", reference: "dritë#Albanian" }],
       etymologyTemplates: [{ name: "der", args: { "1": "sq", "2": "dritë" }, expansion: "dritë" }],
@@ -99,9 +99,9 @@ function fiveWindowsFixtureFactsV0_1(): readonly AlbanianKaikkiExactLexicalSourc
       form: "fënjeshtër",
       senses: [{ senseId: "fënjeshtër-window", glosses: ["window"] }],
       ipaObservations: [
-        { soundIndex: 0, ipa: "/fəˈɲeʃtəɾ/", tags: [] },
-        { soundIndex: 1, ipa: "/fəˈɲeʃtər/", tags: ["variant"] },
-        { soundIndex: 2, ipa: null, tags: ["missing"] },
+        { soundIndex: 0, ipa: "/fəˈɲeʃtəɾ/", tags: ["Tosk"] },
+        { soundIndex: 1, ipa: "/fəˈɲeʃtər/", tags: ["Northern", "Tosk", "variant"] },
+        { soundIndex: 2, ipa: null, tags: [] },
       ],
       etymologyText: "Borrowed from Vulgar Latin, from Latin fenestra. Doublet of finestër.",
       etymologyLinks: [{ sourceForm: "fenestra", reference: "fenestra#Latin" }],
@@ -129,7 +129,7 @@ function fiveWindowsFixtureFactsV0_1(): readonly AlbanianKaikkiExactLexicalSourc
       physicalRecordOrdinal: 12549,
       form: "penxhere",
       senses: [{ senseId: "penxhere-window", glosses: ["window"] }],
-      ipaObservations: [{ soundIndex: 0, ipa: "/penˈd͡ʒeɾe/", tags: [] }],
+      ipaObservations: [{ soundIndex: 0, ipa: "/penˈd͡ʒeɾe/", tags: ["Southern", "Gheg"] }],
       etymologyText: "Borrowed from Ottoman Turkish پنجره (pencere), from Classical Persian پنجره (panjara).",
       etymologyLinks: [{ sourceForm: "پنجره", reference: "پنجره#Ottoman_Turkish" }],
       etymologyTemplates: [
@@ -2835,7 +2835,7 @@ describe("real Albanian exact lexical source integration v0.1", () => {
     }]);
     expect(comparison?.members.find((member) => member.form === "fënjeshtër")?.records[0]?.sourceIpaSevenVoiceAnalyses).toMatchObject([
       { sourceRecordId: expect.stringContaining("word=f%C3%ABnjesht%C3%ABr"), soundIndex: 0, status: "SUPPORTED" },
-      { sourceRecordId: expect.stringContaining("word=f%C3%ABnjesht%C3%ABr"), soundIndex: 1, tags: ["variant"] },
+      { sourceRecordId: expect.stringContaining("word=f%C3%ABnjesht%C3%ABr"), soundIndex: 1, tags: ["Northern", "Tosk", "variant"] },
       { sourceRecordId: expect.stringContaining("word=f%C3%ABnjesht%C3%ABr"), soundIndex: 2, rawIpa: null, status: "NULL", reasonCodes: ["IPA_OBSERVATION_MISSING"] },
     ]);
     expect(comparison?.members.find((member) => member.form === "fënjeshtër")?.records[0]?.sourceIpaSevenVoiceAnalyses).toHaveLength(3);
@@ -2861,11 +2861,22 @@ describe("real Albanian exact lexical source integration v0.1", () => {
       expect(screen.getByTestId("albanian-five-windows-comparison")).toHaveTextContent("Source IPA → Seven Voices");
       expect(screen.getByTestId("albanian-five-windows-comparison")).toHaveTextContent("Derived Voice path:");
       expect(screen.getByTestId("albanian-five-windows-comparison")).toHaveTextContent("Source IPA: Null · Derived Voice path: Null · Reason: IPA_OBSERVATION_MISSING");
+      expect(screen.getByTestId("albanian-five-windows-comparison")).toHaveTextContent("Source sound tags: Gheg");
+      expect(screen.getByTestId("albanian-five-windows-comparison")).toHaveTextContent("Source sound tags: Tosk");
+      expect(screen.getByTestId("albanian-five-windows-comparison")).toHaveTextContent("Source sound tags: Northern, Tosk, variant");
+      expect(screen.getByTestId("albanian-five-windows-comparison")).toHaveTextContent("Source sound tags: Southern, Gheg");
+      expect(screen.getByTestId("albanian-five-windows-comparison")).toHaveTextContent("Source sound tags: not provided");
       expect(screen.getAllByTestId("albanian-five-windows-ipa-analysis")).toHaveLength(5);
       const vmComparison = vm.motivationDiscoveryV0_1.value.albanianLexicalReading?.fiveWindowsComparison;
       expect(vmComparison?.members[0]?.records[0]?.sourceIpaSevenVoiceAnalyses[0]).toMatchObject({
         sourceRecordId: "kaikki-albanian-jsonl:word=dritare:ordinal=0",
         soundIndex: 0,
+        tags: ["Gheg"],
+      });
+      expect(vmComparison?.members[1]?.records[0]?.sourceIpaSevenVoiceAnalyses[1]).toMatchObject({
+        sourceRecordId: "kaikki-albanian-jsonl:word=f%C3%ABnjesht%C3%ABr:ordinal=0",
+        soundIndex: 1,
+        tags: ["Northern", "Tosk", "variant"],
       });
     }
   });
