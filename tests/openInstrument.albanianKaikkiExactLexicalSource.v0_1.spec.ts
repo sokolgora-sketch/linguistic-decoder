@@ -859,7 +859,7 @@ describe("real Albanian exact lexical source integration v0.1", () => {
         word: "-tar",
         lang_code: "sq",
         pos: "suffix",
-        senses: [{ id: "-tar-2", glosses: ["used to form agent nouns. -er"] }],
+        senses: [{ id: "-tar-2", glosses: ["forms relational adjectives. -al"] }],
         sounds: [],
       },
     ], async ({ provider }) => {

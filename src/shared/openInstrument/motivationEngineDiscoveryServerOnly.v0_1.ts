@@ -1449,16 +1449,17 @@ async function resolveSourceAgentiveSuffixEvidenceV0_1(input: Readonly<{
   const suffixForm = suffixForms[0]!;
   try {
     const result = await input.provider.query(suffixForm);
-    const matches = result.status === "MATCHES_FOUND"
+    const identityMatches = result.status === "MATCHES_FOUND"
       ? result.facts.filter((fact) =>
         fact.languageCode === "sq" &&
         fact.language === "Albanian" &&
         normalizedAlbanianFormV0_1(fact.form) === normalizedAlbanianFormV0_1(suffixForm) &&
-        suffixRecordHasAgentiveGlossV0_1(fact),
+        fact.partOfSpeech === "suffix",
       )
       : [];
-    if (matches.length !== 1) return null;
-    const suffixFact = matches[0]!;
+    if (identityMatches.length !== 1) return null;
+    const suffixFact = identityMatches[0]!;
+    if (!suffixRecordHasAgentiveGlossV0_1(suffixFact)) return null;
     return Object.freeze({
       suffixForm: suffixFact.form,
       sourceRecordId: suffixFact.sourceRecordId,
