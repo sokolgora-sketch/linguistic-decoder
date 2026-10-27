@@ -1341,21 +1341,13 @@ function buildAgentFunctionalHypothesisV0_1(input: Readonly<{
   const hasExistingAgentMeaning = input.related.meaningGlosses.some((gloss) =>
     /\b(?:fisher(?:man|woman)?|angler|farmer|hunter|seller|singer|trader|worker|teacher|driver|operator|professional|practitioner)\b/iu.test(gloss),
   );
-  // These exact source-backed final role glosses are only considered after
-  // an exact affirmative suffix record has been resolved; suffix evidence
-  // never authorizes a final function by itself.
-  const hasSourceBackedFinalAgentMeaning = input.related.meaningGlosses.some((gloss) =>
-    /\b(?:beekeeper|stableman|ostler|groom|maker|translator|interpreter)\b/iu.test(gloss),
-  );
-  const hasAgentMeaning = hasExistingAgentMeaning ||
-    (Boolean(input.sourceAgentiveSuffixEvidence) && hasSourceBackedFinalAgentMeaning);
   if (
     input.sourceRelation !== "SOURCE_DERIVED_FORM" ||
     (input.primary.partOfSpeech !== "noun" && input.primary.partOfSpeech !== "verb") ||
     input.related.partOfSpeech !== "noun" ||
     !hasMeaningEvidenceV0_1(input.primary.meaningGlosses) ||
     !hasMeaningEvidenceV0_1(input.related.meaningGlosses) ||
-    !hasAgentMeaning
+    !hasExistingAgentMeaning
   ) {
     return null;
   }
@@ -1371,7 +1363,7 @@ function buildAgentFunctionalHypothesisV0_1(input: Readonly<{
     statement: `Source-bounded functional operation AGENT (exploratory): the source lists ${input.related.form} as a derived form of ${input.primary.form}; its glosses identify ${input.primary.form} as “${primaryMeaning}” and ${input.related.form} as “${relatedMeaning}”.${sourceAgentiveSuffixStatement} The product preserves AGENT as an exploratory label for this source-derived agent evidence; it does not assign an entity, resource, or other semantic role to the primary word beyond its source gloss. This is a source-bounded product hypothesis, not proof of morphology, etymology, causation, or universal Voice semantics.`,
     basis: Object.freeze([
       "SOURCE_ATTESTED_PRIMARY_MEANING",
-      ...(hasAgentMeaning ? ["SOURCE_ATTESTED_AGENT_MEANING"] : []),
+      "SOURCE_ATTESTED_AGENT_MEANING",
       "SOURCE_DERIVED_FORM_LINK",
       ...(input.sourceAgentiveSuffixEvidence ? ["SOURCE_ATTESTED_MORPHOLOGY"] : []),
     ]),

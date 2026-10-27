@@ -513,7 +513,7 @@ describe("real Albanian exact lexical source integration v0.1", () => {
     });
   });
 
-  it("uses an exact source-linked agentive suffix record for an unwhitelisted AGENT candidate", async () => {
+  it("keeps an exact source-linked suffix record descriptive for an unwhitelisted final meaning", async () => {
     await withSyntheticSourceFileV0_1([
       {
         word: "thëngjill",
@@ -573,16 +573,20 @@ describe("real Albanian exact lexical source integration v0.1", () => {
           relation: { relatedForm: "thëngjilltar", referencedForm: "thëngjill" },
         },
         functionalMeaningBridge: {
-          status: "SUPPORTED",
+          status: "NULL",
           relatedForm: "thëngjilltar",
           functionalHypothesis: {
-            functionalOperation: "AGENT",
-            statement: expect.stringContaining("forms agent nouns"),
+            functionalOperation: null,
+            statement: null,
+          },
+          sourceFacts: {
+            agentiveSuffix: {
+              suffixForm: "-tar",
+              meaningGlosses: ["forms agent nouns. -er"],
+            },
           },
         },
       });
-      expect(reading?.functionalMeaningBridge.functionalHypothesis.statement).toContain("-tar");
-      expect(reading?.functionalMeaningBridge.functionalHypothesis.statement).not.toContain("universal suffix rule");
     });
   });
 
@@ -591,7 +595,7 @@ describe("real Albanian exact lexical source integration v0.1", () => {
     ["bletë", "bletar", "bee", "beekeeper", "-ar"],
     ["thëngjill", "thëngjilltar", "coal", "coal maker", "-tar"],
     ["përkthej", "përkthyes", "to translate", "translator; interpreter", "-s"],
-  ] as const)("preserves source-backed final agent meaning for %s → %s", async (primaryForm, relatedForm, primaryGloss, relatedGloss, suffixForm) => {
+  ] as const)("does not generalize suffix evidence into AGENT for %s → %s", async (primaryForm, relatedForm, primaryGloss, _relatedGloss, suffixForm) => {
     await withSyntheticSourceFileV0_1([
       {
         word: primaryForm,
@@ -604,7 +608,7 @@ describe("real Albanian exact lexical source integration v0.1", () => {
         word: relatedForm,
         lang_code: "sq",
         pos: "noun",
-        senses: [{ id: `${relatedForm}-1`, glosses: [relatedGloss] }],
+        senses: [{ id: `${relatedForm}-1`, glosses: [_relatedGloss] }],
         sounds: [],
         etymology_text: `From ${primaryForm} + ${suffixForm}.`,
         etymology_links: [
@@ -639,12 +643,11 @@ describe("real Albanian exact lexical source integration v0.1", () => {
         albanianLexicalSourceProvider: provider,
       });
       expect(result.discovery.albanianLexicalReading?.functionalMeaningBridge).toMatchObject({
-        status: "SUPPORTED",
+        status: "NULL",
         relatedForm,
         functionalHypothesis: {
-          functionalOperation: "AGENT",
-          statement: expect.stringContaining(relatedGloss),
-          basis: expect.arrayContaining(["SOURCE_ATTESTED_MORPHOLOGY", "SOURCE_ATTESTED_AGENT_MEANING"]),
+          functionalOperation: null,
+          statement: null,
         },
         sourceFacts: {
           agentiveSuffix: {
@@ -826,6 +829,67 @@ describe("real Albanian exact lexical source integration v0.1", () => {
         functionalHypothesis: { functionalOperation: null, statement: null },
       });
       expect(result.discovery.albanianLexicalReading?.functionalMeaningBridge.sourceFacts).not.toHaveProperty("agentiveSuffix");
+    });
+  });
+
+  it.each([
+    ["abstract-state", ["the state of being a maker"]],
+    ["negated", ["not a maker"]],
+    ["qualified", ["possibly a maker"]],
+    ["purpose", ["a place for a maker"]],
+    ["conflicting", ["the state of being a maker", "a place for a maker"]],
+    ["missing", []],
+  ] as const)("keeps suffix morphology descriptive for %s final sense", async (_label, finalGlosses) => {
+    await withSyntheticSourceFileV0_1([
+      {
+        word: "vend",
+        lang_code: "sq",
+        pos: "noun",
+        senses: [{ id: "vend-1", glosses: ["place"], derived: [{ word: "vendar" }] }],
+        sounds: [],
+      },
+      {
+        word: "vendar",
+        lang_code: "sq",
+        pos: "noun",
+        senses: [{ id: "vendar-1", glosses: finalGlosses }],
+        sounds: [],
+        etymology_text: "From vend + -tar.",
+        etymology_links: [["vend", "vend#Albanian"], ["-tar", "-tar#Albanian"]],
+        etymology_templates: [{ name: "suffix", args: { "1": "sq", "2": "vend", "3": "-tar" }, expansion: "vend + -tar" }],
+      },
+      {
+        word: "-tar",
+        lang_code: "sq",
+        pos: "suffix",
+        senses: [{ id: "-tar-1", glosses: ["forms agent nouns. -er"] }],
+        sounds: [],
+      },
+    ], async ({ provider }) => {
+      const result = await buildMotivationEngineDiscoveryServerOnlyV0_1({
+        word: "vend",
+        inputLanguage: "sq",
+        inputProfile: "albanian",
+        analysis: await analysisFor("vend"),
+        heart: buildHeartInstrumentV1("vend"),
+        albanianLexicalSourceProvider: provider,
+      });
+      const bridge = result.discovery.albanianLexicalReading?.functionalMeaningBridge;
+      expect(bridge).toMatchObject({
+        status: "NULL",
+        relatedForm: "vendar",
+        functionalHypothesis: {
+          status: "UNKNOWN_OR_NULL",
+          functionalOperation: null,
+          statement: null,
+        },
+        sourceFacts: {
+          agentiveSuffix: {
+            suffixForm: "-tar",
+            meaningGlosses: ["forms agent nouns. -er"],
+          },
+        },
+      });
     });
   });
 
