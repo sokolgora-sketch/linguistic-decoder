@@ -1,0 +1,99 @@
+{
+  "schemaVersion": "open-instrument.research-hypothesis-manifest.v0_1",
+  "manifestId": "research.ze15.wordnet-role-candidate.v0_1",
+  "evidence": [
+    {
+      "evidenceId": "ze15.albanian.pelar.source.v0_1",
+      "authority": "SOURCE_ATTESTED",
+      "sourceProfileId": "open-instrument.albanian-kaikki.frozen.20261022T035432Z",
+      "sourceArtifactSha256": "7a84eca776ebfac752e7251bb0822edc9cd1701d1d58060d4f8ef4b76a208fcc",
+      "sourceRecordId": "en-pelar-sq-noun-RnBYACSN",
+      "senseId": "en-pelar-sq-noun-RnBYACSN",
+      "locator": "kaikki-albanian-20261022T035432Z.jsonl:line-1597",
+      "note": "Albanian noun pelar; gloss stableman, ostler, groom (especially mares); source relation pelë + -ar."
+    },
+    {
+      "evidenceId": "ze15.oewn.pelar.occupational-path.v0_1",
+      "authority": "ONTOLOGY_SUPPORTED",
+      "sourceProfileId": "open-english-wordnet.json.2025",
+      "sourceArtifactSha256": "7d749f6e2c39e6970e4997839dcf6e42fd281f3c2fae0171d2192bae8cfa4b51",
+      "sourceRecordId": "stableman%1:18:00::|84190390-n",
+      "senseId": "stableman%1:18:00::",
+      "locator": "OEWN 2025 JSON: stableman, ostler, groom; hypernym path to 09655706-n worker",
+      "note": "Typed occupational-worker path; groom retains alternative noun senses and is not treated as uniquely disambiguated."
+    },
+    {
+      "evidenceId": "ze15.albanian.thengjilltar.source.v0_1",
+      "authority": "SOURCE_ATTESTED",
+      "sourceProfileId": "open-instrument.albanian-kaikki.frozen.20261022T035432Z",
+      "sourceArtifactSha256": "7a84eca776ebfac752e7251bb0822edc9cd1701d1d58060d4f8ef4b76a208fcc",
+      "sourceRecordId": "en-thëngjilltar-sq-noun-AMp0~85e",
+      "senseId": "en-thëngjilltar-sq-noun-AMp0~85e",
+      "locator": "kaikki-albanian-20261022T035432Z.jsonl:line-12091",
+      "note": "Albanian noun thëngjilltar; gloss coal maker; source relation thëngjill + -tar; synonym qymyrbërës."
+    },
+    {
+      "evidenceId": "ze15.oewn.thengjilltar.exact-gloss-unresolved.v0_1",
+      "authority": "UNRESOLVED",
+      "sourceProfileId": "open-english-wordnet.json.2025",
+      "sourceArtifactSha256": "7d749f6e2c39e6970e4997839dcf6e42fd281f3c2fae0171d2192bae8cfa4b51",
+      "sourceRecordId": "coal maker",
+      "senseId": "unresolved",
+      "locator": "OEWN 2025 JSON: exact lemma coal maker absent; maker and charcoal burner alternatives inspected",
+      "note": "No typed exact-gloss join is established; substitutions are prohibited."
+    }
+  ],
+  "assertions": [
+    {
+      "schemaVersion": "open-instrument.research-hypothesis-manifest.v0_1",
+      "hypothesisId": "ze15.pelar.occupational-role.v0_1",
+      "sourceProfileId": "open-instrument.albanian-kaikki.frozen.20261022T035432Z",
+      "sourceArtifactSha256": "7a84eca776ebfac752e7251bb0822edc9cd1701d1d58060d4f8ef4b76a208fcc",
+      "sourceRecordId": "en-pelar-sq-noun-RnBYACSN",
+      "senseId": "en-pelar-sq-noun-RnBYACSN",
+      "targetLemma": "pelar",
+      "baseLemma": "pelë",
+      "proposedSemanticRole": "OCCUPATIONAL_ROLE",
+      "hypothesisStatus": "PROPOSED_NOT_REVIEWED",
+      "assertionAuthor": "OPEN_INSTRUMENT_ZE15_RESEARCHER",
+      "assertionDate": "2026-10-27",
+      "evidenceRefs": [
+        "ze15.albanian.pelar.source.v0_1",
+        "ze15.oewn.pelar.occupational-path.v0_1"
+      ],
+      "evidenceAuthority": "RESEARCHER_PROPOSED",
+      "reasonCodes": [
+        "SOURCE_ATTESTED_ALBANIAN_RECORD",
+        "OEWN_TYPED_OCCUPATIONAL_WORKER_PATH",
+        "CROSS_SOURCE_SENSE_ALIGNMENT_UNREVIEWED",
+        "GROOM_SENSE_AMBIGUITY_RETAINED"
+      ],
+      "claimBoundary": "research_only_not_production_authorization"
+    },
+    {
+      "schemaVersion": "open-instrument.research-hypothesis-manifest.v0_1",
+      "hypothesisId": "ze15.thengjilltar.occupational-role.v0_1",
+      "sourceProfileId": "open-instrument.albanian-kaikki.frozen.20261022T035432Z",
+      "sourceArtifactSha256": "7a84eca776ebfac752e7251bb0822edc9cd1701d1d58060d4f8ef4b76a208fcc",
+      "sourceRecordId": "en-thëngjilltar-sq-noun-AMp0~85e",
+      "senseId": "en-thëngjilltar-sq-noun-AMp0~85e",
+      "targetLemma": "thëngjilltar",
+      "baseLemma": "thëngjill",
+      "proposedSemanticRole": "OCCUPATIONAL_ROLE",
+      "hypothesisStatus": "PROPOSED_NOT_REVIEWED",
+      "assertionAuthor": "OPEN_INSTRUMENT_ZE15_RESEARCHER",
+      "assertionDate": "2026-10-27",
+      "evidenceRefs": [
+        "ze15.albanian.thengjilltar.source.v0_1",
+        "ze15.oewn.thengjilltar.exact-gloss-unresolved.v0_1"
+      ],
+      "evidenceAuthority": "RESEARCHER_PROPOSED",
+      "reasonCodes": [
+        "SOURCE_ATTESTED_ALBANIAN_RECORD",
+        "OEWN_EXACT_GLOSS_UNAVAILABLE_AND_TYPED_EQUIVALENCE_UNPROVEN",
+        "UNTYPED_SYNONYM_NOT_TREATED_AS_SENSE_ALIGNMENT"
+      ],
+      "claimBoundary": "research_only_not_production_authorization"
+    }
+  ]
+}
