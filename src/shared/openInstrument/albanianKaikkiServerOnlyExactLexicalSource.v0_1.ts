@@ -152,6 +152,18 @@ export function createAlbanianKaikkiSourceDiagnosticContextV0_1():
 export type AlbanianKaikkiExactLexicalSourceSenseV0_1 = Readonly<{
   senseId: string | null;
   glosses: readonly string[];
+  /** Source-authored categories kept at sense scope; never promoted to entry scope. */
+  categories?: readonly AlbanianKaikkiExactLexicalSourceCategoryV0_1[];
+}>;
+
+export type AlbanianKaikkiExactLexicalSourceCategoryV0_1 = Readonly<{
+  name: string;
+  kind: string | null;
+  parents: readonly string[];
+  source: string | null;
+  orig: string | null;
+  langcode: string | null;
+  _dis: string | null;
 }>;
 
 export type AlbanianKaikkiExactLexicalSourceIpaObservationV0_1 = Readonly<{
@@ -353,6 +365,20 @@ function projectSenseV0_1(value: unknown): AlbanianKaikkiExactLexicalSourceSense
   return Object.freeze({
     senseId: textV0_1(sense.id),
     glosses: stringArrayV0_1(sense.glosses),
+    categories: Array.isArray(sense.categories)
+      ? Object.freeze(sense.categories.map((value) => {
+          const category = isRecordV0_1(value) ? value : {};
+          return Object.freeze({
+            name: textV0_1(category.name) ?? "",
+            kind: textV0_1(category.kind),
+            parents: stringArrayV0_1(category.parents),
+            source: textV0_1(category.source),
+            orig: textV0_1(category.orig),
+            langcode: textV0_1(category.langcode),
+            _dis: textV0_1(category._dis),
+          });
+        }))
+      : Object.freeze([]),
   });
 }
 

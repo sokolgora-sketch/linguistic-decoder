@@ -10,6 +10,7 @@ import {
   type EnglishKaikkiServerOnlyExactIndexProviderV0_1,
 } from "@/shared/openInstrument/englishKaikkiServerOnlyExactIndexProvider.v0_1";
 import {
+  type AlbanianKaikkiExactLexicalSourceCategoryV0_1,
   type AlbanianKaikkiExactLexicalSourceFactV0_1,
   type AlbanianKaikkiExactLexicalSourceEtymologyLinkV0_1,
   type AlbanianKaikkiExactLexicalSourceEtymologyTemplateV0_1,
@@ -171,6 +172,11 @@ export type AlbanianFunctionalMeaningBridgeV0_1 = Readonly<{
       entryLocator: string;
       form: string;
       meaningGlosses: readonly string[];
+      sourceSenses: readonly Readonly<{
+        senseId: string | null;
+        glosses: readonly string[];
+        categories: readonly AlbanianKaikkiExactLexicalSourceCategoryV0_1[];
+      }>[];
     }>;
     related: Readonly<{
       sourceRecordId: string;
@@ -178,6 +184,11 @@ export type AlbanianFunctionalMeaningBridgeV0_1 = Readonly<{
       form: string;
       meaningGlosses: readonly string[];
       sourceAuthoredExplanation: string | null;
+      sourceSenses: readonly Readonly<{
+        senseId: string | null;
+        glosses: readonly string[];
+        categories: readonly AlbanianKaikkiExactLexicalSourceCategoryV0_1[];
+      }>[];
     }> | null;
     structuredReference: Readonly<{
       referencedForm: string | null;
@@ -241,6 +252,11 @@ export type AlbanianSourceLinkedRecordV0_1 = Readonly<{
   form: string;
   partOfSpeech: string | null;
   meaningGlosses: readonly string[];
+  sourceSenses?: readonly Readonly<{
+    senseId: string | null;
+    glosses: readonly string[];
+    categories: readonly AlbanianKaikkiExactLexicalSourceCategoryV0_1[];
+  }>[];
   etymologyText: string | null;
   etymologyLinks: readonly AlbanianKaikkiExactLexicalSourceEtymologyLinkV0_1[];
   etymologyTemplates: readonly AlbanianKaikkiExactLexicalSourceEtymologyTemplateV0_1[];
@@ -674,6 +690,11 @@ function sourceRecordProjectionV0_1(
     form: fact.form,
     partOfSpeech: fact.partOfSpeech,
     meaningGlosses: distinctGlossesV0_1([fact]),
+    sourceSenses: Object.freeze(fact.senses.map((sense) => Object.freeze({
+      senseId: sense.senseId,
+      glosses: Object.freeze([...sense.glosses]),
+      categories: Object.freeze([...(sense.categories ?? [])]),
+    }))),
     etymologyText: fact.etymologyText ?? null,
     etymologyLinks: Object.freeze([...(fact.etymologyLinks ?? [])]),
     etymologyTemplates: Object.freeze([...(fact.etymologyTemplates ?? [])]),
@@ -1140,6 +1161,7 @@ function bridgeRecordFactsV0_1(
       entryLocator: primary.entryLocator,
       form: primary.form,
       meaningGlosses: primary.meaningGlosses,
+      sourceSenses: primary.sourceSenses ?? Object.freeze([]),
     }),
     related: related
       ? Object.freeze({
@@ -1148,6 +1170,7 @@ function bridgeRecordFactsV0_1(
           form: related.form,
           meaningGlosses: related.meaningGlosses,
           sourceAuthoredExplanation: related.etymologyText,
+          sourceSenses: related.sourceSenses ?? Object.freeze([]),
         })
       : null,
     structuredReference: Object.freeze({
@@ -1310,9 +1333,34 @@ function buildEntityToAttributedPropertyHypothesisV0_1(input: Readonly<{
   });
 }
 
+type AlbanianSourceSenseAgentEvidenceV0_1 = Readonly<{
+  sense: NonNullable<AlbanianSourceLinkedRecordV0_1["sourceSenses"]>[number];
+  category: AlbanianKaikkiExactLexicalSourceCategoryV0_1;
+}>;
+
+function qualifyingSourceSenseAgentEvidenceV0_1(
+  record: AlbanianSourceLinkedRecordV0_1,
+): AlbanianSourceSenseAgentEvidenceV0_1 | null {
+  const qualifyingSenses = (record.sourceSenses ?? []).flatMap((sense) => {
+    if (!sense.senseId || sense.glosses.length === 0) return [];
+    const qualifyingCategories = sense.categories.filter((category) =>
+      category.name === "Occupations" &&
+      category.orig === "sq:Occupations" &&
+      category.langcode === "sq" &&
+      category.source === "w",
+    );
+    if (qualifyingCategories.length !== 1) return [];
+    const category = qualifyingCategories[0];
+    return category ? [{ sense, category }] : [];
+  });
+
+  return qualifyingSenses.length === 1 ? qualifyingSenses[0] ?? null : null;
+}
+
 function buildAgentFunctionalHypothesisV0_1(input: Readonly<{
   primary: AlbanianSourceLinkedRecordV0_1;
   related: AlbanianSourceLinkedRecordV0_1;
+  comparison: AlbanianSourceLinkedComparisonV0_1 | null;
   sourceRelation: "SOURCE_RELATED_FORM" | "SOURCE_DERIVED_FORM" | null;
 }>): AlbanianFunctionalHypothesisV0_1 | null {
   if (
@@ -1320,24 +1368,34 @@ function buildAgentFunctionalHypothesisV0_1(input: Readonly<{
     (input.primary.partOfSpeech !== "noun" && input.primary.partOfSpeech !== "verb") ||
     input.related.partOfSpeech !== "noun" ||
     !hasMeaningEvidenceV0_1(input.primary.meaningGlosses) ||
-    !hasMeaningEvidenceV0_1(input.related.meaningGlosses) ||
-    !input.related.meaningGlosses.some((gloss) =>
-      /\b(?:fisher(?:man|woman)?|angler|farmer|hunter|seller|singer|trader|worker|teacher|driver|operator|professional|practitioner)\b/iu.test(gloss),
-    )
+    !hasMeaningEvidenceV0_1(input.related.meaningGlosses)
   ) {
     return null;
   }
 
+  const sourceSenseAgentEvidence = input.comparison?.status === "SUPPORTED"
+    ? qualifyingSourceSenseAgentEvidenceV0_1(input.related)
+    : null;
+  const existingWhitelistedAgentGloss = input.related.meaningGlosses.some((gloss) =>
+    /\b(?:fisher(?:man|woman)?|angler|farmer|hunter|seller|singer|trader|worker|teacher|driver|operator|professional|practitioner)\b/iu.test(gloss),
+  );
+  if (!sourceSenseAgentEvidence && !existingWhitelistedAgentGloss) return null;
+
   const primaryMeaning = input.primary.meaningGlosses.join("; ");
   const relatedMeaning = input.related.meaningGlosses.join("; ");
+  const functionalMeaning = sourceSenseAgentEvidence?.sense.glosses.join("; ") ?? relatedMeaning;
   const relatedHasSourceIpa = input.related.pronunciationVariants.some((variant) => variant.rawIpa !== null);
+  const categoryBackedStatement = sourceSenseAgentEvidence
+    ? ` The final source sense (“${functionalMeaning}”) carries the exact source-authored sq:Occupations category, with its sense identity preserved; the category is evidence for this lexical sense only, not for every use of the suffix or for an independent semantic law.`
+    : "";
   return Object.freeze({
     functionalOperation: "AGENT" as const,
-    statement: `Source-bounded functional operation AGENT (exploratory): the source lists ${input.related.form} as a derived form of ${input.primary.form}; its glosses identify ${input.primary.form} as “${primaryMeaning}” and ${input.related.form} as “${relatedMeaning}”. The product preserves AGENT as an exploratory label for the related agent or profession gloss and this source-derived link; it does not assign an entity, resource, or other semantic role to the primary word beyond its source gloss. This is a source-bounded product hypothesis, not proof of morphology, etymology, causation, or universal Voice semantics.`,
+    statement: `Source-bounded functional operation AGENT (exploratory): the source lists ${input.related.form} as a derived form of ${input.primary.form}; its glosses identify ${input.primary.form} as “${primaryMeaning}” and ${input.related.form} as “${relatedMeaning}”. The product preserves AGENT as an exploratory label for the related agent or profession gloss and this source-derived link; it does not assign an entity, resource, or other semantic role to the primary word beyond its source gloss.${categoryBackedStatement} This is a source-bounded product hypothesis, not proof of morphology, etymology, causation, or universal Voice semantics.`,
     basis: Object.freeze([
       "SOURCE_ATTESTED_PRIMARY_MEANING",
       "SOURCE_ATTESTED_AGENT_MEANING",
       "SOURCE_DERIVED_FORM_LINK",
+      ...(sourceSenseAgentEvidence ? ["SOURCE_ATTESTED_FINAL_SENSE_CATEGORY"] : []),
     ]),
     alternatives: Object.freeze([
       "The source-derived link is not a complete morphological or etymological analysis.",
@@ -1364,6 +1422,7 @@ export function buildAlbanianFunctionalMeaningBridgeV0_1(input: Readonly<{
     ? buildAgentFunctionalHypothesisV0_1({
         primary: input.primary,
         related,
+        comparison: input.comparison,
         sourceRelation,
       })
     : null;
