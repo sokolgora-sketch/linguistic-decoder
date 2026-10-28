@@ -370,6 +370,24 @@ function Candidate({
                   <div className="break-words text-[#9fb1bf]">
                     Evidence refs: {record.sourceFact.evidenceRefs.join(", ") || "none"}
                   </div>
+                  {record.sourceFact.sourceDetails ? (
+                    <div className="break-words rounded border border-[#303843] bg-[#121923] p-2 text-[#b9c7d4]">
+                      <div className="font-semibold text-[#d7dde7]">Source details</div>
+                      <div>Synset: {record.sourceFact.sourceDetails.synsetId}</div>
+                      <div>
+                        Definitions: {record.sourceFact.sourceDetails.definitions.join(" · ") || "not provided"}
+                      </div>
+                      <div>
+                        Examples: {record.sourceFact.sourceDetails.examples.join(" · ") || "not provided"}
+                      </div>
+                      <div>
+                        Relation types: {record.sourceFact.sourceDetails.relationTypes.join(", ") || "not provided"}
+                      </div>
+                      {record.sourceFact.sourceDetails.license ? (
+                        <div>License: {record.sourceFact.sourceDetails.license}</div>
+                      ) : null}
+                    </div>
+                  ) : null}
                   <div className="break-words text-[#9fb1bf]">
                     Matched query: {record.structuralComparison.matchedQuery} · relation: {record.structuralComparison.matchClassification}
                   </div>

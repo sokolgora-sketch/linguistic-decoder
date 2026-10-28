@@ -37,6 +37,18 @@ export type GenericFunctionalWitnessSourceProvenanceV1 = Readonly<{
   languageVariety: string | null;
 }>;
 
+/**
+ * Additive source-authored lexical details. These are descriptive evidence
+ * only; they do not authorize functional, historical, or pronunciation claims.
+ */
+export type GenericFunctionalWitnessSourceDetailsV1 = Readonly<{
+  synsetId: string;
+  definitions: readonly string[];
+  examples: readonly string[];
+  relationTypes: readonly string[];
+  license?: string;
+}>;
+
 export type GenericFunctionalWitnessSourceRecordV1 = Readonly<{
   queryForm: string;
   sourceId: string;
@@ -53,6 +65,7 @@ export type GenericFunctionalWitnessSourceRecordV1 = Readonly<{
   sourceStatus: MultiSourceFunctionalResearchSourceStatusV0_1;
   sourceAuthorityStatus?: "reviewed_accepted";
   sourceProvenance?: GenericFunctionalWitnessSourceProvenanceV1;
+  sourceDetails?: GenericFunctionalWitnessSourceDetailsV1;
 }>;
 
 export type GenericFunctionalWitnessSourceAdapterResultV1 =
@@ -95,6 +108,7 @@ export type GenericFunctionalWitnessV1 = Readonly<{
   sourceStatus: MultiSourceFunctionalResearchSourceStatusV0_1;
   sourceAuthorityStatus?: "reviewed_accepted";
   sourceProvenance?: GenericFunctionalWitnessSourceProvenanceV1;
+  sourceDetails?: GenericFunctionalWitnessSourceDetailsV1;
   candidateVoicePathPolicy?: "SOURCE_FORM_EXTRACTED" | "NULL_UNAUTHORIZED";
   sourceAttestation: "SOURCE_RECORD_ONLY";
   functionalCorrespondence: "NOT_EVALUATED";
@@ -189,6 +203,20 @@ function sourceProvenanceIsValidV1(
   );
 }
 
+function sourceDetailsIsValidV1(value: unknown): value is GenericFunctionalWitnessSourceDetailsV1 {
+  if (value === null || typeof value !== "object" || Array.isArray(value)) return false;
+  const details = value as Record<string, unknown>;
+  const validTextArray = (candidate: unknown): candidate is readonly string[] =>
+    Array.isArray(candidate) && candidate.every(exactTextV1);
+  return (
+    exactTextV1(details.synsetId) &&
+    validTextArray(details.definitions) &&
+    validTextArray(details.examples) &&
+    validTextArray(details.relationTypes) &&
+    (details.license === undefined || exactTextV1(details.license))
+  );
+}
+
 function isEvidenceFamilyV1(
   value: unknown,
 ): value is MultiSourceEvidenceFamilyV0_1 {
@@ -264,7 +292,8 @@ function sourceRecordIsValidV1(
     (record.sourceAuthorityStatus === undefined ||
       record.sourceAuthorityStatus === "reviewed_accepted") &&
     (record.sourceProvenance === undefined ||
-      sourceProvenanceIsValidV1(record.sourceProvenance, record.sourceId))
+      sourceProvenanceIsValidV1(record.sourceProvenance, record.sourceId)) &&
+    (record.sourceDetails === undefined || sourceDetailsIsValidV1(record.sourceDetails))
   );
 }
 
@@ -360,6 +389,16 @@ function buildWitnessV1(
       ? {
           sourceProvenance: {
             ...record.sourceProvenance,
+          },
+        }
+      : {}),
+    ...(record.sourceDetails
+      ? {
+          sourceDetails: {
+            ...record.sourceDetails,
+            definitions: [...record.sourceDetails.definitions],
+            examples: [...record.sourceDetails.examples],
+            relationTypes: [...record.sourceDetails.relationTypes],
           },
         }
       : {}),

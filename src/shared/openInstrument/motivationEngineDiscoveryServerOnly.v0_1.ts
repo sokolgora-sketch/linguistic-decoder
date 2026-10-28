@@ -20,6 +20,9 @@ import {
 } from "@/shared/openInstrument/albanianKaikkiServerOnlyExactLexicalSource.v0_1";
 import { createAlbanianKaikkiServerOnlyProductionProviderV0_1 } from "@/shared/openInstrument/albanianKaikkiServerOnlySourceDelivery.v0_1";
 import {
+  getProductionAlbaNetSourceV0_1,
+} from "@/shared/openInstrument/albanetSourceFamilyAdapter.v0_1";
+import {
   projectAlbanianKaikkiFactSourceIpaToSevenVoicesV0_1,
   projectAlbanianKaikkiFactsSourceIpaToSevenVoicesV0_1,
   type AlbanianKaikkiSourceIpaSevenVoiceAnalysisV0_1,
@@ -43,6 +46,7 @@ import type {
   GenericFunctionalWitnessQueryV1,
   GenericFunctionalWitnessSourceAdapterResultV1,
   GenericFunctionalWitnessSourceAdapterV1,
+  GenericFunctionalWitnessSourceDetailsV1,
   GenericFunctionalWitnessSourceRecordV1,
 } from "@/shared/openInstrument/genericFunctionalWitnessDiscovery.v1";
 import type { HeartInstrumentV1 } from "@/v1/heartInstrument.v1";
@@ -442,14 +446,26 @@ function providerFailureReasonV0_1(
 function attachSourceFamilyProjectionV0_1(
   discovery: MotivationEngineDiscoveryV0_1,
   sourceFamilyBySourceId: ReadonlyMap<string, string>,
+  sourceDetailsBySourceId: ReadonlyMap<string, GenericFunctionalWitnessSourceDetailsV1> = new Map(),
 ): MotivationEngineDiscoveryV0_1 {
   const candidates = discovery.candidates.map((candidate) => {
     const sourceFamilyId = sourceFamilyBySourceId.get(candidate.sourceFact.sourceId);
+    const sourceDetails = sourceDetailsBySourceId.get(candidate.sourceFact.sourceId);
     return {
       ...candidate,
       sourceFact: {
         ...candidate.sourceFact,
         ...(sourceFamilyId ? { sourceFamilyId } : {}),
+        ...(sourceDetails
+          ? {
+              sourceDetails: {
+                ...sourceDetails,
+                definitions: [...sourceDetails.definitions],
+                examples: [...sourceDetails.examples],
+                relationTypes: [...sourceDetails.relationTypes],
+              },
+            }
+          : {}),
       },
     };
   });
@@ -475,6 +491,7 @@ function addStaticSourceFamiliesV0_1(
 function sourceFamilyRecordingAdapterV0_1(
   adapter: GenericFunctionalWitnessSourceAdapterV1,
   sourceFamilyBySourceId: Map<string, string>,
+  sourceDetailsBySourceId: Map<string, GenericFunctionalWitnessSourceDetailsV1>,
 ): GenericFunctionalWitnessSourceAdapterV1 {
   return Object.freeze({
     ...adapter,
@@ -484,6 +501,7 @@ function sourceFamilyRecordingAdapterV0_1(
         for (const record of result.records) {
           const sourceFamilyId = record.sourceProvenance?.sourceTraditionId;
           if (sourceFamilyId) sourceFamilyBySourceId.set(record.sourceId, sourceFamilyId);
+          if (record.sourceDetails) sourceDetailsBySourceId.set(record.sourceId, record.sourceDetails);
         }
       }
       return result;
@@ -1915,6 +1933,7 @@ export async function buildMotivationEngineDiscoveryServerOnlyV0_1(input: {
   profileDerivedVoicePath?: readonly string[] | null;
   provider?: EnglishKaikkiServerOnlyExactIndexProviderV0_1;
   albanianLexicalSourceProvider?: AlbanianKaikkiServerOnlyExactLexicalSourceProviderV0_1;
+  albanetSourceAdapter?: GenericFunctionalWitnessSourceAdapterV1 | null;
 }): Promise<MotivationEngineDiscoveryServerOnlyResultV0_1> {
   const provider = input.provider ?? await getProductionProviderV0_1();
   // Keep the profile-derived path in the server/API integration seam. The
@@ -1949,15 +1968,20 @@ export async function buildMotivationEngineDiscoveryServerOnlyV0_1(input: {
         queryForm: null,
         reasonCode: "NOT_ALBANIAN_INPUT",
       };
+  const albanetSourceAdapter = !isAlbanianInputV0_1(input) || input.albanetSourceAdapter === null
+    ? null
+    : input.albanetSourceAdapter ?? (await getProductionAlbaNetSourceV0_1()).adapter;
   const sourceAdapters: readonly GenericFunctionalWitnessSourceAdapterV1[] = [
     createAlbanianLexicalSubstrateWitnessAdapterV0_1(),
     createMultilingualDiscoverySubstrateS1LatinWitnessAdapterV0_2(),
     createResolvedEnglishAdapterV0_1(resolved.recordsByQuery),
+    ...(isAlbanianInputV0_1(input) && albanetSourceAdapter ? [albanetSourceAdapter] : []),
   ];
   const sourceFamilyBySourceId = new Map<string, string>();
+  const sourceDetailsBySourceId = new Map<string, GenericFunctionalWitnessSourceDetailsV1>();
   addStaticSourceFamiliesV0_1(sourceFamilyBySourceId);
   const recordingSourceAdapters = sourceAdapters.map((adapter) =>
-    sourceFamilyRecordingAdapterV0_1(adapter, sourceFamilyBySourceId),
+    sourceFamilyRecordingAdapterV0_1(adapter, sourceFamilyBySourceId, sourceDetailsBySourceId),
   );
 
   const discovery = attachSourceFamilyProjectionV0_1(buildMotivationEngineDiscoveryV0_1({
@@ -1967,7 +1991,7 @@ export async function buildMotivationEngineDiscoveryServerOnlyV0_1(input: {
     analysis: discoveryAnalysis,
     heart: input.heart,
     sourceAdapters: recordingSourceAdapters,
-  }), sourceFamilyBySourceId);
+  }), sourceFamilyBySourceId, sourceDetailsBySourceId);
   const exactLexicalSourceFacts = albanianLexicalSourceResult?.status === "MATCHES_FOUND"
     ? albanianLexicalSourceResult.facts
     : Object.freeze([]) as readonly AlbanianKaikkiExactLexicalSourceFactV0_1[];

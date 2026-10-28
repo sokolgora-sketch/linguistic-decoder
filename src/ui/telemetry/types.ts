@@ -369,6 +369,13 @@ export type MotivationDiscoveryCandidateV0_1VM = Readonly<{
     evidenceRefs: string[];
     sourceUrlOrArchiveRef: string | null;
     entryLocator: string | null;
+    sourceDetails?: Readonly<{
+      synsetId: string;
+      definitions: string[];
+      examples: string[];
+      relationTypes: string[];
+      license?: string;
+    }>;
   }>;
   derivedStructure: Readonly<{
     minRootId: string;
