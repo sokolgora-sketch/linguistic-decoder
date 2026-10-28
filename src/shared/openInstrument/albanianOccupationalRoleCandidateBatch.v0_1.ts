@@ -772,7 +772,10 @@ export function getAlbanianOccupationalRoleCandidatesForWordV0_1(
   const candidates = frozenBatch.candidates.filter((candidate) =>
     candidate.sourceRecord.lemma.normalize("NFC").toLocaleLowerCase("sq-AL") === key ||
     candidate.sourceDerivedRelations.some((relation) => relation.baseLemma.normalize("NFC").toLocaleLowerCase("sq-AL") === key) ||
-    candidate.sourceRecord.etymologyLinks.some((link) => link.form.normalize("NFC").toLocaleLowerCase("sq-AL") === key),
+    candidate.sourceRecord.etymologyLinks.some((link) =>
+      (link.resolution === "SOURCE_ROWS_FOUND" || link.resolution === "SOURCE_ROW_NOT_FOUND") &&
+      link.form.normalize("NFC").toLocaleLowerCase("sq-AL") === key,
+    ),
   ).map((candidate) => Object.freeze({
     ...candidate,
     researchHypothesis: projectExistingHypothesisV0_1(candidate),

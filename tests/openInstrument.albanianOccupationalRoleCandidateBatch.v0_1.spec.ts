@@ -195,4 +195,55 @@ describe("Albanian occupational-role candidate batch v0.1", () => {
     expect(getAlbanianOccupationalRoleCandidatesForWordV0_1("peshk")).toMatchObject({ status: "NO_CANDIDATES", candidates: [] });
     expect(getAlbanianOccupationalRoleCandidatesForWordV0_1(null).reasonCodes).toEqual(["QUERY_FORM_UNAVAILABLE"]);
   });
+
+  it("does not use Italian etymology forms as Albanian query relationships and retains the source evidence on target lookup", () => {
+    expect(getAlbanianOccupationalRoleCandidatesForWordV0_1("cappellaro")).toMatchObject({
+      status: "NO_CANDIDATES",
+      candidates: [],
+      reasonCodes: ["NO_SOURCE_ROLE_CANDIDATE_IN_BOUNDED_BATCH"],
+    });
+    const kapelar = getAlbanianOccupationalRoleCandidatesForWordV0_1("kapelar").candidates
+      .find((candidate) => candidate.sourceRecord.lemma === "kapelar")!;
+    expect(kapelar.sourceRecord.etymologyLinks).toEqual([expect.objectContaining({
+      form: "cappellaro",
+      reference: "cappellaro#Italian",
+      resolution: "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
+      resolvedSourceRows: [],
+    })]);
+  });
+
+  it("does not use Ottoman Turkish etymology forms as Albanian query relationships and retains the source evidence on target lookup", () => {
+    expect(getAlbanianOccupationalRoleCandidatesForWordV0_1("خدمتكار")).toMatchObject({
+      status: "NO_CANDIDATES",
+      candidates: [],
+      reasonCodes: ["NO_SOURCE_ROLE_CANDIDATE_IN_BOUNDED_BATCH"],
+    });
+    const hyzmeqar = getAlbanianOccupationalRoleCandidatesForWordV0_1("hyzmeqar").candidates
+      .find((candidate) => candidate.sourceRecord.lemma === "hyzmeqar")!;
+    expect(hyzmeqar.sourceRecord.etymologyLinks).toEqual([expect.objectContaining({
+      form: "خدمتكار",
+      reference: "خدمتكار#Ottoman_Turkish",
+      resolution: "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
+      resolvedSourceRows: [],
+    })]);
+  });
+
+  it("keeps explicit Albanian etymology query links eligible when their referenced source row is unresolved", () => {
+    const unresolvedBaseQuery = getAlbanianOccupationalRoleCandidatesForWordV0_1("dreqës");
+    const armëndreqës = unresolvedBaseQuery.candidates.find((candidate) => candidate.sourceRecord.lemma === "armëndreqës");
+    expect(armëndreqës?.sourceRecord.etymologyLinks).toEqual(expect.arrayContaining([expect.objectContaining({
+      form: "dreqës",
+      reference: "dreqës#Albanian",
+      resolution: "SOURCE_ROW_NOT_FOUND",
+      resolvedSourceRows: [],
+    })]));
+    expect(armëndreqës?.functionalOperation).toBeNull();
+
+    const pele = getAlbanianOccupationalRoleCandidatesForWordV0_1("pelë");
+    expect(pele.candidates.map((candidate) => candidate.sourceRecord.lemma)).toContain("pelar");
+
+    const thëngjill = getAlbanianOccupationalRoleCandidatesForWordV0_1("thëngjill");
+    expect(thëngjill.candidates.map((candidate) => candidate.sourceRecord.lemma)).toContain("thëngjilltar");
+    expect(thëngjill.candidates.find((candidate) => candidate.sourceRecord.lemma === "thëngjilltar")?.functionalOperation).toBeNull();
+  });
 });
