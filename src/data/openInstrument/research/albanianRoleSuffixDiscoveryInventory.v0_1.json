@@ -70,7 +70,7 @@
           "form": "Pharus",
           "reference": "Pharus#Latin",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         }
       ],
@@ -172,23 +172,14 @@
           "form": "jaguar",
           "reference": "jaguar#Portuguese",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROWS_FOUND",
-          "resolvedSourceRows": [
-            {
-              "sourceRecordId": "kaikki-albanian-jsonl:word=jaguar:ordinal=0",
-              "entryLocator": "jsonl://word/jaguar/match/0",
-              "physicalRecordOrdinal": 197,
-              "senseIds": [
-                "en-jaguar-sq-noun--lv4eay5"
-              ]
-            }
-          ]
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
+          "resolvedSourceRows": []
         },
         {
           "form": "îagûara",
           "reference": "îagûara#Old_Tupi",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         }
       ],
@@ -304,7 +295,7 @@
           "form": "aurum",
           "reference": "aurum#Latin",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         }
       ],
@@ -591,7 +582,7 @@
           "form": "aurum",
           "reference": "aurum#Latin",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         }
       ],
@@ -921,17 +912,8 @@
           "form": "are",
           "reference": "are#French",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROWS_FOUND",
-          "resolvedSourceRows": [
-            {
-              "sourceRecordId": "kaikki-albanian-jsonl:word=are:ordinal=0",
-              "entryLocator": "jsonl://word/are/match/0",
-              "physicalRecordOrdinal": 16,
-              "senseIds": [
-                "en-are-sq-noun-Z3gVFVbd"
-              ]
-            }
-          ]
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
+          "resolvedSourceRows": []
         }
       ],
       "senses": [
@@ -1120,93 +1102,84 @@
           "form": "*bʰers-",
           "reference": "Reconstruction:Proto-Indo-European/bʰers-",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "far",
           "reference": "far#Latin",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROWS_FOUND",
-          "resolvedSourceRows": [
-            {
-              "sourceRecordId": "kaikki-albanian-jsonl:word=far:ordinal=0",
-              "entryLocator": "jsonl://word/far/match/0",
-              "physicalRecordOrdinal": 157,
-              "senseIds": [
-                "en-far-sq-noun-s3DeFOlB"
-              ]
-            }
-          ]
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
+          "resolvedSourceRows": []
         },
         {
           "form": "*baraz",
           "reference": "Reconstruction:Proto-Germanic/baraz",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "*boršьno",
           "reference": "Reconstruction:Proto-Slavic/boršьno",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "φάρμακον",
           "reference": "φάρμακον#Ancient_Greek",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "*bʰer-",
           "reference": "Reconstruction:Proto-Indo-European/bʰer-",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "*bʰewH-",
           "reference": "Reconstruction:Proto-Indo-European/bʰuH-",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "φυτόν",
           "reference": "φυτόν#Ancient_Greek",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "բոյս",
           "reference": "բոյս#Old_Armenian",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "weed",
           "reference": "weed#English",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "herbe",
           "reference": "herbe#French",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "erba",
           "reference": "erba#Italian",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         }
       ],
@@ -1507,93 +1480,84 @@
           "form": "*bʰers-",
           "reference": "Reconstruction:Proto-Indo-European/bʰers-",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "far",
           "reference": "far#Latin",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROWS_FOUND",
-          "resolvedSourceRows": [
-            {
-              "sourceRecordId": "kaikki-albanian-jsonl:word=far:ordinal=0",
-              "entryLocator": "jsonl://word/far/match/0",
-              "physicalRecordOrdinal": 157,
-              "senseIds": [
-                "en-far-sq-noun-s3DeFOlB"
-              ]
-            }
-          ]
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
+          "resolvedSourceRows": []
         },
         {
           "form": "*baraz",
           "reference": "Reconstruction:Proto-Germanic/baraz",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "*boršьno",
           "reference": "Reconstruction:Proto-Slavic/boršьno",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "φάρμακον",
           "reference": "φάρμακον#Ancient_Greek",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "*bʰer-",
           "reference": "Reconstruction:Proto-Indo-European/bʰer-",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "*bʰewH-",
           "reference": "Reconstruction:Proto-Indo-European/bʰuH-",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "φυτόν",
           "reference": "φυτόν#Ancient_Greek",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "բոյս",
           "reference": "բոյս#Old_Armenian",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "weed",
           "reference": "weed#English",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "herbe",
           "reference": "herbe#French",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "erba",
           "reference": "erba#Italian",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         }
       ],
@@ -1917,46 +1881,8 @@
           "form": "bar",
           "reference": "bar#English",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROWS_FOUND",
-          "resolvedSourceRows": [
-            {
-              "sourceRecordId": "kaikki-albanian-jsonl:word=bar:ordinal=0",
-              "entryLocator": "jsonl://word/bar/match/0",
-              "physicalRecordOrdinal": 270,
-              "senseIds": [
-                "en-bar-sq-noun-9sxbCFth",
-                "en-bar-sq-noun-TiI2k4Z0",
-                "en-bar-sq-noun-QP2Bbrdu"
-              ]
-            },
-            {
-              "sourceRecordId": "kaikki-albanian-jsonl:word=bar:ordinal=1",
-              "entryLocator": "jsonl://word/bar/match/1",
-              "physicalRecordOrdinal": 271,
-              "senseIds": [
-                "en-bar-sq-noun-WjNSEzUj",
-                "en-bar-sq-noun-E6dYiqH7",
-                "en-bar-sq-noun-Ivreqj~O",
-                "en-bar-sq-noun-sq:marijuana"
-              ]
-            },
-            {
-              "sourceRecordId": "kaikki-albanian-jsonl:word=bar:ordinal=2",
-              "entryLocator": "jsonl://word/bar/match/2",
-              "physicalRecordOrdinal": 272,
-              "senseIds": [
-                "en-bar-sq-noun-j3PQLX9U"
-              ]
-            },
-            {
-              "sourceRecordId": "kaikki-albanian-jsonl:word=bar:ordinal=3",
-              "entryLocator": "jsonl://word/bar/match/3",
-              "physicalRecordOrdinal": 273,
-              "senseIds": [
-                "en-bar-sq-noun-WX2w6HjZ"
-              ]
-            }
-          ]
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
+          "resolvedSourceRows": []
         }
       ],
       "senses": [
@@ -2171,104 +2097,28 @@
           "form": "Bar",
           "reference": "Bar#German",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "bar",
           "reference": "bar#French",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROWS_FOUND",
-          "resolvedSourceRows": [
-            {
-              "sourceRecordId": "kaikki-albanian-jsonl:word=bar:ordinal=0",
-              "entryLocator": "jsonl://word/bar/match/0",
-              "physicalRecordOrdinal": 270,
-              "senseIds": [
-                "en-bar-sq-noun-9sxbCFth",
-                "en-bar-sq-noun-TiI2k4Z0",
-                "en-bar-sq-noun-QP2Bbrdu"
-              ]
-            },
-            {
-              "sourceRecordId": "kaikki-albanian-jsonl:word=bar:ordinal=1",
-              "entryLocator": "jsonl://word/bar/match/1",
-              "physicalRecordOrdinal": 271,
-              "senseIds": [
-                "en-bar-sq-noun-WjNSEzUj",
-                "en-bar-sq-noun-E6dYiqH7",
-                "en-bar-sq-noun-Ivreqj~O",
-                "en-bar-sq-noun-sq:marijuana"
-              ]
-            },
-            {
-              "sourceRecordId": "kaikki-albanian-jsonl:word=bar:ordinal=2",
-              "entryLocator": "jsonl://word/bar/match/2",
-              "physicalRecordOrdinal": 272,
-              "senseIds": [
-                "en-bar-sq-noun-j3PQLX9U"
-              ]
-            },
-            {
-              "sourceRecordId": "kaikki-albanian-jsonl:word=bar:ordinal=3",
-              "entryLocator": "jsonl://word/bar/match/3",
-              "physicalRecordOrdinal": 273,
-              "senseIds": [
-                "en-bar-sq-noun-WX2w6HjZ"
-              ]
-            }
-          ]
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
+          "resolvedSourceRows": []
         },
         {
           "form": "bar",
           "reference": "bar#English",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROWS_FOUND",
-          "resolvedSourceRows": [
-            {
-              "sourceRecordId": "kaikki-albanian-jsonl:word=bar:ordinal=0",
-              "entryLocator": "jsonl://word/bar/match/0",
-              "physicalRecordOrdinal": 270,
-              "senseIds": [
-                "en-bar-sq-noun-9sxbCFth",
-                "en-bar-sq-noun-TiI2k4Z0",
-                "en-bar-sq-noun-QP2Bbrdu"
-              ]
-            },
-            {
-              "sourceRecordId": "kaikki-albanian-jsonl:word=bar:ordinal=1",
-              "entryLocator": "jsonl://word/bar/match/1",
-              "physicalRecordOrdinal": 271,
-              "senseIds": [
-                "en-bar-sq-noun-WjNSEzUj",
-                "en-bar-sq-noun-E6dYiqH7",
-                "en-bar-sq-noun-Ivreqj~O",
-                "en-bar-sq-noun-sq:marijuana"
-              ]
-            },
-            {
-              "sourceRecordId": "kaikki-albanian-jsonl:word=bar:ordinal=2",
-              "entryLocator": "jsonl://word/bar/match/2",
-              "physicalRecordOrdinal": 272,
-              "senseIds": [
-                "en-bar-sq-noun-j3PQLX9U"
-              ]
-            },
-            {
-              "sourceRecordId": "kaikki-albanian-jsonl:word=bar:ordinal=3",
-              "entryLocator": "jsonl://word/bar/match/3",
-              "physicalRecordOrdinal": 273,
-              "senseIds": [
-                "en-bar-sq-noun-WX2w6HjZ"
-              ]
-            }
-          ]
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
+          "resolvedSourceRows": []
         },
         {
           "form": "βάρος",
           "reference": "βάρος#Ancient_Greek",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         }
       ],
@@ -2665,7 +2515,7 @@
           "form": "abonner",
           "reference": "abonner#French",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         }
       ],
@@ -2758,7 +2608,7 @@
           "form": "abonner",
           "reference": "abonner#French",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         }
       ],
@@ -2866,49 +2716,49 @@
           "form": "*atsara",
           "reference": "Reconstruction:Proto-Albanian/atsara",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "*h₂eḱrós",
           "reference": "Reconstruction:Proto-Indo-European/h₂eḱrós",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "*h₂eḱ-",
           "reference": "Reconstruction:Proto-Indo-European/h₂eḱ-",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "aicher",
           "reference": "aicher#Old_Irish",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "ācer",
           "reference": "acer#Latin",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "ἄκρος",
           "reference": "ἄκρος#Ancient_Greek",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "ἄκρον",
           "reference": "ἄκρον#Ancient_Greek",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         }
       ],
@@ -3264,49 +3114,49 @@
           "form": "*atsara",
           "reference": "Reconstruction:Proto-Albanian/atsara",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "*h₂eḱrós",
           "reference": "Reconstruction:Proto-Indo-European/h₂eḱrós",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "*h₂eḱ-",
           "reference": "Reconstruction:Proto-Indo-European/h₂eḱ-",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "aicher",
           "reference": "aicher#Old_Irish",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "ācer",
           "reference": "acer#Latin",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "ἄκρος",
           "reference": "ἄκρος#Ancient_Greek",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "ἄκρον",
           "reference": "ἄκρον#Ancient_Greek",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         }
       ],
@@ -3478,49 +3328,49 @@
           "form": "*atsara",
           "reference": "Reconstruction:Proto-Albanian/atsara",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "*h₂eḱrós",
           "reference": "Reconstruction:Proto-Indo-European/h₂eḱrós",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "*h₂eḱ-",
           "reference": "Reconstruction:Proto-Indo-European/h₂eḱ-",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "aicher",
           "reference": "aicher#Old_Irish",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "ācer",
           "reference": "acer#Latin",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "ἄκρος",
           "reference": "ἄκρος#Ancient_Greek",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "ἄκρον",
           "reference": "ἄκρον#Ancient_Greek",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         }
       ],
@@ -4054,7 +3904,7 @@
           "form": "-ārius",
           "reference": "-arius#Latin",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         }
       ],
@@ -4149,7 +3999,7 @@
           "form": "laurus",
           "reference": "laurus#Latin",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         }
       ],
@@ -4251,17 +4101,8 @@
           "form": "-tor",
           "reference": "-tor#Latin",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROWS_FOUND",
-          "resolvedSourceRows": [
-            {
-              "sourceRecordId": "kaikki-albanian-jsonl:word=-tor:ordinal=0",
-              "entryLocator": "jsonl://word/-tor/match/0",
-              "physicalRecordOrdinal": 2282,
-              "senseIds": [
-                "en--tor-sq-suffix-XYp0WtXA"
-              ]
-            }
-          ]
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
+          "resolvedSourceRows": []
         }
       ],
       "senses": [
@@ -4403,14 +4244,14 @@
           "form": "μακάρι",
           "reference": "μακάρι#Greek",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "măcar",
           "reference": "măcar#Romanian",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         }
       ],
@@ -4548,14 +4389,14 @@
           "form": "μακάρι",
           "reference": "μακάρι#Greek",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "măcar",
           "reference": "măcar#Romanian",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         }
       ],
@@ -4642,28 +4483,28 @@
           "form": "*werja",
           "reference": "Reconstruction:Proto-Albanian/werja",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "*h₂wer-",
           "reference": "Reconstruction:Proto-Indo-European/h₂wer-",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "ἀείρω",
           "reference": "ἀείρω#Ancient_Greek",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "vérti",
           "reference": "verti#Lithuanian",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         }
       ],
@@ -4791,14 +4632,14 @@
           "form": "زار",
           "reference": "زار#Ottoman_Turkish",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "زَهْر",
           "reference": "زهر#Arabic",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         }
       ],
@@ -4904,7 +4745,7 @@
           "form": "λυτάρι",
           "reference": "λυτάρι#Greek",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         }
       ],
@@ -5033,14 +4874,14 @@
           "form": "افطار",
           "reference": "افطار#Ottoman_Turkish",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "إفطار",
           "reference": "إفطار#Arabic",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         }
       ],
@@ -5405,35 +5246,35 @@
           "form": "βιστάριον",
           "reference": "βιστάριον#Ancient_Greek",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "Latin",
           "reference": "Latin",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "vestarion",
           "reference": "vestarion#Latin",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "Latin",
           "reference": "Latin",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "vestis",
           "reference": "vestis#Latin",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         }
       ],
@@ -5570,14 +5411,14 @@
           "form": "پازار",
           "reference": "پازار#Ottoman_Turkish",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "بازار",
           "reference": "بازار#Persian",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         }
       ],
@@ -5755,7 +5596,7 @@
           "form": "طمر",
           "reference": "طمر#Ottoman_Turkish",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         }
       ],
@@ -5989,24 +5830,14 @@
           "form": "kar",
           "reference": "kar#Romani",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROWS_FOUND",
-          "resolvedSourceRows": [
-            {
-              "sourceRecordId": "kaikki-albanian-jsonl:word=kar:ordinal=0",
-              "entryLocator": "jsonl://word/kar/match/0",
-              "physicalRecordOrdinal": 1273,
-              "senseIds": [
-                "en-kar-sq-noun-9pUtbu9V",
-                "en-kar-sq-noun-dsHx~2Wd"
-              ]
-            }
-          ]
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
+          "resolvedSourceRows": []
         },
         {
           "form": "*𑀓𑀸𑀝",
           "reference": "Reconstruction:Prakrit/𑀓𑀸𑀝",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         }
       ],
@@ -6198,31 +6029,21 @@
           "form": "ugar",
           "reference": "ugar#Serbo-Croatian",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROWS_FOUND",
-          "resolvedSourceRows": [
-            {
-              "sourceRecordId": "kaikki-albanian-jsonl:word=ugar:ordinal=0",
-              "entryLocator": "jsonl://word/ugar/match/0",
-              "physicalRecordOrdinal": 1330,
-              "senseIds": [
-                "en-ugar-sq-noun-cPUvijBT",
-                "en-ugar-sq-noun-WTeBA8LZ"
-              ]
-            }
-          ]
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
+          "resolvedSourceRows": []
         },
         {
           "form": "угар",
           "reference": "угар#Macedonian",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "*ugorъ",
           "reference": "Reconstruction:Proto-Slavic/ugorъ",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         }
       ],
@@ -6312,7 +6133,7 @@
           "form": "γομάρι",
           "reference": "γομάρι#Greek",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         }
       ],
@@ -6590,42 +6411,42 @@
           "form": "măgar",
           "reference": "măgar#Romanian",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "*margar",
           "reference": "Reconstruction:Albanian/margar",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "*margë",
           "reference": "Reconstruction:Albanian/margë",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "*𐌼𐌰𐍂𐌷𐍃",
           "reference": "Reconstruction:Gothic/𐌼𐌰𐍂𐌷𐍃",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "*marhaz",
           "reference": "Reconstruction:Proto-Germanic/marhaz",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "*márkos",
           "reference": "Reconstruction:Proto-Indo-European/márkos",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         }
       ],
@@ -6779,25 +6600,14 @@
           "form": "pehar",
           "reference": "pehar#Serbo-Croatian",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROWS_FOUND",
-          "resolvedSourceRows": [
-            {
-              "sourceRecordId": "kaikki-albanian-jsonl:word=pehar:ordinal=0",
-              "entryLocator": "jsonl://word/pehar/match/0",
-              "physicalRecordOrdinal": 1500,
-              "senseIds": [
-                "en-pehar-sq-noun-tRctHBA5",
-                "en-pehar-sq-noun-xhcXgdZf",
-                "en-pehar-sq-noun-evTRB7rd"
-              ]
-            }
-          ]
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
+          "resolvedSourceRows": []
         },
         {
           "form": "pehhari",
           "reference": "pehhari#Old_High_German",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
@@ -6811,56 +6621,56 @@
           "form": "pīcārium",
           "reference": "picarium#Latin",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "bīcārium",
           "reference": "bicarium#Latin",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "bacarium",
           "reference": "bacarium#Latin",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "βίκος",
           "reference": "βίκος#Ancient_Greek",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "Becher",
           "reference": "Becher#German",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "bicchiere",
           "reference": "bicchiere#Italian",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "pitcher",
           "reference": "pitcher#English",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "beaker",
           "reference": "beaker#English",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         }
       ],
@@ -7631,56 +7441,56 @@
           "form": "مختار",
           "reference": "مختار#Ottoman_Turkish",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "village",
           "reference": "village",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "headman",
           "reference": "headman",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "مختار",
           "reference": "مختار#North_Levantine_Arabic",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "village",
           "reference": "village",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "headman",
           "reference": "headman",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "مُخْتَار",
           "reference": "مختار#Arabic",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "chosen",
           "reference": "chosen",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         }
       ],
@@ -8121,14 +7931,14 @@
           "form": "آستار",
           "reference": "آستار#Ottoman_Turkish",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "آستر",
           "reference": "آستر#Persian",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         }
       ],
@@ -8243,7 +8053,7 @@
           "form": "cellulare",
           "reference": "cellulare#Italian",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         }
       ],
@@ -8344,7 +8154,7 @@
           "form": "réservoir",
           "reference": "réservoir#French",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         }
       ],
@@ -9333,14 +9143,14 @@
           "form": "بكار",
           "reference": "بكار#Ottoman_Turkish",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "بِكَر",
           "reference": "بكر#Arabic",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         }
       ],
@@ -9883,7 +9693,7 @@
           "form": "sdari",
           "reference": "sdari#Sicilian",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         }
       ],
@@ -10078,14 +9888,14 @@
           "form": "دیوار",
           "reference": "دیوار#Ottoman_Turkish",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "дува́р",
           "reference": "дувар#Bulgarian",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         }
       ],
@@ -10853,7 +10663,7 @@
           "form": "ضرر",
           "reference": "ضرر#Ottoman_Turkish",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         }
       ],
@@ -11109,7 +10919,7 @@
           "form": "بوكار",
           "reference": "بوكار#Ottoman_Turkish",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         }
       ],
@@ -11480,7 +11290,7 @@
           "form": "σαμάρι",
           "reference": "σαμάρι#Greek",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         }
       ],
@@ -11601,14 +11411,14 @@
           "form": "încornorat",
           "reference": "încornorat#Romanian",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "рогоносец",
           "reference": "рогоносец#Macedonian",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         }
       ],
@@ -11742,14 +11552,14 @@
           "form": "încornorat",
           "reference": "încornorat#Romanian",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "рогоносец",
           "reference": "рогоносец#Macedonian",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         }
       ],
@@ -12264,14 +12074,14 @@
           "form": "*en-bara",
           "reference": "Reconstruction:Proto-Albanian/en-bara",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "*bara",
           "reference": "Reconstruction:Proto-Albanian/bara",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
@@ -12481,14 +12291,14 @@
           "form": "مردار",
           "reference": "مردار#Ottoman_Turkish",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "مردار",
           "reference": "مردار#Persian",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         }
       ],
@@ -12588,14 +12398,14 @@
           "form": "مردار",
           "reference": "مردار#Ottoman_Turkish",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "مردار",
           "reference": "مردار#Persian",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         }
       ],
@@ -13318,7 +13128,7 @@
           "form": "cellārium",
           "reference": "cellarium#Latin",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
@@ -13399,21 +13209,21 @@
           "form": "*klětь",
           "reference": "Reconstruction:Proto-Slavic/klětь",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "*ḱley-",
           "reference": "Reconstruction:Proto-Indo-European/ḱley-",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "*kladeti",
           "reference": "Reconstruction:Proto-Celtic/kladeti",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
@@ -13930,7 +13740,7 @@
           "form": "*pǫdarь",
           "reference": "Reconstruction:Proto-Slavic/pǫdarь",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
@@ -14387,52 +14197,43 @@
           "form": "Dyrrhachium",
           "reference": "Dyrrhachium#Latin",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "Δυρράχιον",
           "reference": "Δυρράχιον#Ancient_Greek",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "Durratio",
           "reference": "Durratio#Latin",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "/u/",
           "reference": "/u/#Ancient_Greek",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "Durazzo",
           "reference": "Durazzo#English",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "Durrës",
           "reference": "Durrës#English",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROWS_FOUND",
-          "resolvedSourceRows": [
-            {
-              "sourceRecordId": "kaikki-albanian-jsonl:word=Durr%C3%ABs:ordinal=0",
-              "entryLocator": "jsonl://word/Durr%C3%ABs/match/0",
-              "physicalRecordOrdinal": 3141,
-              "senseIds": [
-                "en-Durrës-sq-name-l-hIGG05"
-              ]
-            }
-          ]
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
+          "resolvedSourceRows": []
         }
       ],
       "senses": [
@@ -15528,7 +15329,7 @@
           "form": "sveglio",
           "reference": "sveglio#Italian",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         }
       ],
@@ -15681,7 +15482,7 @@
           "form": "sveglio",
           "reference": "sveglio#Italian",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         }
       ],
@@ -16294,7 +16095,7 @@
           "form": "trottoir",
           "reference": "trottoir#French",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         }
       ],
@@ -16575,28 +16376,28 @@
           "form": "قنطار",
           "reference": "قنطار#Ottoman_Turkish",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "قِنْطَار",
           "reference": "قنطار#Arabic",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "κεντηνάριον",
           "reference": "κεντηνάριον#Ancient_Greek",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "centēnārium",
           "reference": "centenarium#Latin",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         }
       ],
@@ -17461,17 +17262,8 @@
           "form": "hepar",
           "reference": "hepar#Latin",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROWS_FOUND",
-          "resolvedSourceRows": [
-            {
-              "sourceRecordId": "kaikki-albanian-jsonl:word=hepar:ordinal=0",
-              "entryLocator": "jsonl://word/hepar/match/0",
-              "physicalRecordOrdinal": 3961,
-              "senseIds": [
-                "en-hepar-sq-noun-669IqXJX"
-              ]
-            }
-          ]
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
+          "resolvedSourceRows": []
         }
       ],
       "senses": [
@@ -18366,7 +18158,7 @@
           "form": "litraru",
           "reference": "litraru#Sicilian",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         }
       ],
@@ -20092,14 +19884,14 @@
           "form": "luctator, luctatōrem",
           "reference": "luctator#Latin",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "luptător",
           "reference": "luptător#Romanian",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         }
       ],
@@ -20825,7 +20617,7 @@
           "form": "sagittārius",
           "reference": "sagittarius#Latin",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         }
       ],
@@ -23185,7 +22977,7 @@
           "form": "molāris",
           "reference": "molaris#Latin",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         }
       ],
@@ -23479,14 +23271,14 @@
           "form": "*rrëndë-zë",
           "reference": "Reconstruction:Albanian/rrëndë-zë",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "*r̄ândə-dᶻə",
           "reference": "Reconstruction:Proto-Albanian/r̄ândə-dᶻə",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         }
       ],
@@ -23634,7 +23426,7 @@
           "form": "Iānuārius",
           "reference": "Ianuarius#Latin",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         }
       ],
@@ -23739,14 +23531,14 @@
           "form": "collāre",
           "reference": "collare#Latin",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "collāris",
           "reference": "collaris#Latin",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         }
       ],
@@ -23961,14 +23753,14 @@
           "form": "caballāricius",
           "reference": "caballaricius#Latin",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "caballus",
           "reference": "caballus#Latin",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
@@ -23992,14 +23784,14 @@
           "form": "cãlãrets",
           "reference": "cãlãrets#Aromanian",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "călăreț",
           "reference": "călăreț#Romanian",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         }
       ],
@@ -24192,7 +23984,7 @@
           "form": "chorus",
           "reference": "chorus#Latin",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         }
       ],
@@ -24753,21 +24545,21 @@
           "form": "плитар",
           "reference": "плитар#Macedonian",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "πλίθρα",
           "reference": "πλίθρα#Greek",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "πλιθάρι",
           "reference": "πλιθάρι#Greek",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         }
       ],
@@ -25137,21 +24929,21 @@
           "form": "болꙗринъ",
           "reference": "болꙗринъ#Old_Church_Slavonic",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "boljar",
           "reference": "boljar#Serbo-Croatian",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "боляр",
           "reference": "боляр#Bulgarian",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
@@ -25713,14 +25505,14 @@
           "form": "Antivari",
           "reference": "Antivari#Italian",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "Antibarum",
           "reference": "Antibarum#Latin",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         }
       ],
@@ -26532,35 +26324,35 @@
           "form": "زغر",
           "reference": "زغر#Ottoman_Turkish",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "ζαγάρι",
           "reference": "ζαγάρι#Greek",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "загар",
           "reference": "загар#Macedonian",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "zàgār",
           "reference": "zagar#Serbo-Croatian",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "за̀га̄р",
           "reference": "загар#Serbo-Croatian",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         }
       ],
@@ -27218,7 +27010,7 @@
           "form": "traiectōrium",
           "reference": "traiectorium#Latin",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         }
       ],
@@ -27770,14 +27562,14 @@
           "form": "traditor",
           "reference": "traditor",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "tradere",
           "reference": "tradere#Latin",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         }
       ],
@@ -28007,14 +27799,14 @@
           "form": "brigand",
           "reference": "brigand",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "bandit",
           "reference": "bandit",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
@@ -28145,21 +27937,21 @@
           "form": "قلمار",
           "reference": "قلمار#Ottoman_Turkish",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "kalamar",
           "reference": "kalamar#Turkish",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "καλαμάρι",
           "reference": "καλαμάρι#Greek",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         }
       ],
@@ -29607,7 +29399,7 @@
           "form": "iūdicātus",
           "reference": "iudicatus#Latin",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         }
       ],
@@ -30742,7 +30534,7 @@
           "form": "αὐλός",
           "reference": "αὐλός#Ancient_Greek",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         }
       ],
@@ -30884,42 +30676,42 @@
           "form": "brūmārius",
           "reference": "brumarius#Latin",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "brumar",
           "reference": "brumar#Romanian",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "brumâr",
           "reference": "brumâr#Friulian",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "Brumaire",
           "reference": "Brumaire#French",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "brūma",
           "reference": "bruma#Latin",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "brumă",
           "reference": "brumă#Romanian",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         }
       ],
@@ -31069,35 +30861,35 @@
           "form": "Serbian",
           "reference": "Serbian",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "Macedonian",
           "reference": "Macedonian",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "коложег",
           "reference": "коложег#Macedonian",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "коло",
           "reference": "коло#Macedonian",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "жег",
           "reference": "жег#Macedonian",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         }
       ],
@@ -31358,7 +31150,7 @@
           "form": "λάμπω",
           "reference": "λάμπω#Ancient_Greek",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
@@ -31580,21 +31372,21 @@
           "form": "*-ikʷyos",
           "reference": "Reconstruction:Proto-Indo-European/-ikʷyos",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "*kʷey-",
           "reference": "Reconstruction:Proto-Indo-European/kʷey-",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "-իչ",
           "reference": "-իչ#Armenian",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         }
       ],
@@ -31697,14 +31489,14 @@
           "form": "pinzari",
           "reference": "pinzari#Sicilian",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "pensāre",
           "reference": "penso#Latin",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
@@ -35122,14 +34914,14 @@
           "form": "پانجار",
           "reference": "پانجار#Ottoman_Turkish",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "բանջար",
           "reference": "բանջար#Armenian",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         }
       ],
@@ -35454,14 +35246,14 @@
           "form": "Tosk",
           "reference": "Tosk",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "suffix",
           "reference": "suffix",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
@@ -36299,14 +36091,14 @@
           "form": "Tosk",
           "reference": "Tosk",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "suffix",
           "reference": "suffix",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
@@ -36629,21 +36421,21 @@
           "form": "spienza",
           "reference": "spienza#Venetan",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "splenza",
           "reference": "splenza#Venetan",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "pança",
           "reference": "pança#Venetan",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
@@ -36689,14 +36481,14 @@
           "form": "फण्ड",
           "reference": "फण्ड#Sanskrit",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "*pleh₁-",
           "reference": "Reconstruction:Proto-Indo-European/pleh₁-",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         }
       ],
@@ -36986,21 +36778,21 @@
           "form": "spienza",
           "reference": "spienza#Venetan",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "splenza",
           "reference": "splenza#Venetan",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "pança",
           "reference": "pança#Venetan",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
@@ -37046,14 +36838,14 @@
           "form": "फण्ड",
           "reference": "फण्ड#Sanskrit",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "*pleh₁-",
           "reference": "Reconstruction:Proto-Indo-European/pleh₁-",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         }
       ],
@@ -38054,7 +37846,7 @@
           "form": "acquired immune deficiency syndrome",
           "reference": "acquired immune deficiency syndrome#English",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         }
       ],
@@ -38147,7 +37939,7 @@
           "form": "sgarrari",
           "reference": "sgarrari#Sicilian",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         }
       ],
@@ -38401,7 +38193,7 @@
           "form": "thēsaurus",
           "reference": "thesaurus#Latin",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
@@ -39100,42 +38892,42 @@
           "form": "cynʾl",
           "reference": "cynʾl#Middle_Persian",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "چِنَار",
           "reference": "چنار#Persian",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "چِنَار",
           "reference": "چنار#Ottoman_Turkish",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "چِنَار",
           "reference": "چنار#Ottoman_Turkish",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "چِنَار",
           "reference": "چنار#Persian",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "cynʾl",
           "reference": "cynʾl#Middle_Persian",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         }
       ],
@@ -40861,28 +40653,28 @@
           "form": "Aromanian",
           "reference": "Aromanian",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "čipare",
           "reference": "čipare#Aromanian",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "braid",
           "reference": "braid",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "soutache",
           "reference": "soutache",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
@@ -40896,14 +40688,14 @@
           "form": "ribbon",
           "reference": "ribbon",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "headgear",
           "reference": "headgear",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         }
       ],
@@ -45289,56 +45081,56 @@
           "form": "مختار",
           "reference": "مختار#Ottoman_Turkish",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "village",
           "reference": "village",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "headman",
           "reference": "headman",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "مختار",
           "reference": "مختار#North_Levantine_Arabic",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "village",
           "reference": "village",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "headman",
           "reference": "headman",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "مُخْتَار",
           "reference": "مختار#Arabic",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "chosen",
           "reference": "chosen",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
@@ -45801,7 +45593,7 @@
           "form": "συρτάρι",
           "reference": "συρτάρι#Greek",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         }
       ],
@@ -46209,14 +46001,14 @@
           "form": "Laurence",
           "reference": "Laurence",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "Laurentius",
           "reference": "Laurentius#Latin",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         }
       ],
@@ -46309,7 +46101,7 @@
           "form": "یولار",
           "reference": "یولار#Ottoman_Turkish",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         }
       ],
@@ -46445,7 +46237,7 @@
           "form": "بیراقدار",
           "reference": "بیراقدار#Ottoman_Turkish",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         }
       ],
@@ -47667,7 +47459,7 @@
           "form": "litterārius",
           "reference": "litterarius#Latin",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
@@ -47818,7 +47610,7 @@
           "form": "litterārius",
           "reference": "litterarius#Latin",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
@@ -49369,17 +49161,8 @@
           "form": "-s",
           "reference": "-s#Albanian:_agent",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROWS_FOUND",
-          "resolvedSourceRows": [
-            {
-              "sourceRecordId": "kaikki-albanian-jsonl:word=-s:ordinal=0",
-              "entryLocator": "jsonl://word/-s/match/0",
-              "physicalRecordOrdinal": 578,
-              "senseIds": [
-                "en--s-sq-suffix-sq:agent"
-              ]
-            }
-          ]
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
+          "resolvedSourceRows": []
         }
       ],
       "senses": [
@@ -49892,17 +49675,8 @@
           "form": "-s",
           "reference": "-s#Albanian:_agent",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROWS_FOUND",
-          "resolvedSourceRows": [
-            {
-              "sourceRecordId": "kaikki-albanian-jsonl:word=-s:ordinal=0",
-              "entryLocator": "jsonl://word/-s/match/0",
-              "physicalRecordOrdinal": 578,
-              "senseIds": [
-                "en--s-sq-suffix-sq:agent"
-              ]
-            }
-          ]
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
+          "resolvedSourceRows": []
         }
       ],
       "senses": [
@@ -50135,7 +49909,7 @@
           "form": "Rechtsanwalt",
           "reference": "Rechtsanwalt#German",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         }
       ],
@@ -52178,21 +51952,21 @@
           "form": "градинар",
           "reference": "градинар#Macedonian",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "gràdinār",
           "reference": "gradinar#Serbo-Croatian",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "гра̀дина̄р",
           "reference": "градинар#Serbo-Croatian",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
@@ -53178,7 +52952,7 @@
           "form": "balneātor",
           "reference": "balneator#Latin",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         }
       ],
@@ -53332,21 +53106,21 @@
           "form": "πουρνάρι",
           "reference": "πουρνάρι#Greek",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "πρινάρι",
           "reference": "πρινάρι#Greek",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "πρῖνος",
           "reference": "πρῖνος#Ancient_Greek",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         }
       ],
@@ -53786,14 +53560,14 @@
           "form": "حیدر",
           "reference": "حیدر#Ottoman_Turkish",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "حَيْدَر",
           "reference": "حيدر#Arabic",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         }
       ],
@@ -53946,7 +53720,7 @@
           "form": "чифлигар",
           "reference": "чифлигар#Macedonian",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         }
       ],
@@ -54226,7 +54000,7 @@
           "form": "чифлигар",
           "reference": "чифлигар#Macedonian",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         }
       ],
@@ -54341,7 +54115,7 @@
           "form": "голо",
           "reference": "голо#Macedonian",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         }
       ],
@@ -56394,17 +56168,8 @@
           "form": "-s",
           "reference": "-s#Albanian:_agent",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROWS_FOUND",
-          "resolvedSourceRows": [
-            {
-              "sourceRecordId": "kaikki-albanian-jsonl:word=-s:ordinal=0",
-              "entryLocator": "jsonl://word/-s/match/0",
-              "physicalRecordOrdinal": 578,
-              "senseIds": [
-                "en--s-sq-suffix-sq:agent"
-              ]
-            }
-          ]
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
+          "resolvedSourceRows": []
         }
       ],
       "senses": [
@@ -57582,21 +57347,21 @@
           "form": "كهربار",
           "reference": "كهربار#Ottoman_Turkish",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "كهربا",
           "reference": "كهربا#Ottoman_Turkish",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "کهربا",
           "reference": "کهربا#Persian",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         }
       ],
@@ -57841,17 +57606,8 @@
           "form": "-s",
           "reference": "-s#Albanian:_agent",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROWS_FOUND",
-          "resolvedSourceRows": [
-            {
-              "sourceRecordId": "kaikki-albanian-jsonl:word=-s:ordinal=0",
-              "entryLocator": "jsonl://word/-s/match/0",
-              "physicalRecordOrdinal": 578,
-              "senseIds": [
-                "en--s-sq-suffix-sq:agent"
-              ]
-            }
-          ]
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
+          "resolvedSourceRows": []
         }
       ],
       "senses": [
@@ -58080,7 +57836,7 @@
           "form": "أنور",
           "reference": "أنور#Arabic",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
@@ -58820,7 +58576,7 @@
           "form": "μαργαριτάρι",
           "reference": "μαργαριτάρι#Greek",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         }
       ],
@@ -58926,7 +58682,7 @@
           "form": "كلار",
           "reference": "كلار#Ottoman_Turkish",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         }
       ],
@@ -77722,7 +77478,7 @@
           "form": "خدمتكار",
           "reference": "خدمتكار#Ottoman_Turkish",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         }
       ],
@@ -78019,14 +77775,14 @@
           "form": "mámac",
           "reference": "mamac#Serbo-Croatian",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "ма́мац",
           "reference": "мамац#Serbo-Croatian",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         }
       ],
@@ -80331,7 +80087,7 @@
           "form": "carcass",
           "reference": "carcass",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
@@ -86100,28 +85856,28 @@
           "form": "Slovenian",
           "reference": "Slovenian",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "pok",
           "reference": "pok#Slovene",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "pokavka",
           "reference": "pokavka#Slovene",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "pop gun",
           "reference": "pop gun",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         }
       ],
@@ -86269,14 +86025,14 @@
           "form": "emphatic",
           "reference": "emphatic",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "affective",
           "reference": "affective",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
@@ -86316,7 +86072,7 @@
           "form": "larynx",
           "reference": "larynx",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         }
       ],
@@ -92887,7 +92643,7 @@
           "form": "skylark",
           "reference": "skylark",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
@@ -92930,7 +92686,7 @@
           "form": "heron",
           "reference": "heron",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         }
       ],
@@ -93054,7 +92810,7 @@
           "form": "skylark",
           "reference": "skylark",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
@@ -93097,7 +92853,7 @@
           "form": "heron",
           "reference": "heron",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         }
       ],
@@ -93189,7 +92945,7 @@
           "form": "heron",
           "reference": "heron",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
@@ -93660,7 +93416,7 @@
           "form": "crest",
           "reference": "crest",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         }
       ],
@@ -96955,7 +96711,7 @@
           "form": "φιλότιμος",
           "reference": "φιλότιμος#Greek",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         }
       ],
@@ -97923,14 +97679,14 @@
           "form": "Požar",
           "reference": "Požar#Serbo-Croatian",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "požar",
           "reference": "požar#Serbo-Croatian",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
@@ -98223,21 +97979,21 @@
           "form": "Μποντάρι",
           "reference": "Μποντάρι#Greek",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "под",
           "reference": "под#Bulgarian",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "под",
           "reference": "под#Macedonian",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
@@ -98258,14 +98014,14 @@
           "form": "Μπουδάρι",
           "reference": "Μπουδάρι#Greek",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "Podari",
           "reference": "Podari#Romanian",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
@@ -98387,14 +98143,14 @@
           "form": "παλαμάρι",
           "reference": "παλαμάρι#Greek",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "پالامار",
           "reference": "پالامار#Ottoman_Turkish",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         }
       ],
@@ -98684,14 +98440,14 @@
           "form": "Moussocari",
           "reference": "Moussocari#French",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "Μουσούκαρη",
           "reference": "Μουσούκαρη#Greek",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         }
       ],
@@ -98798,14 +98554,14 @@
           "form": "Palomba",
           "reference": "Palomba#French",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
           "form": "Πουλούμπαρι",
           "reference": "Πουλούμπαρι#Greek",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         },
         {
@@ -98920,7 +98676,7 @@
           "form": "cappellaro",
           "reference": "cappellaro#Italian",
           "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-          "resolution": "SOURCE_ROW_NOT_FOUND",
+          "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
           "resolvedSourceRows": []
         }
       ],

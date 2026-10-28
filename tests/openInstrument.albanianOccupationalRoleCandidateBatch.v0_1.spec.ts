@@ -22,11 +22,12 @@ function sourceRow(input: Readonly<{
   etymologyLinks?: readonly (readonly [string, string])[];
   etymologyText?: string;
   sounds?: readonly Readonly<Record<string, unknown>>[];
+  langCode?: string;
 }>): Readonly<Record<string, unknown>> {
   return {
     word: input.word,
     id: input.id,
-    lang_code: "sq",
+    lang_code: input.langCode ?? "sq",
     pos: input.pos,
     senses: input.senses,
     ...(input.derived ? { derived: input.derived.map((word) => ({ word })) } : {}),
@@ -50,6 +51,11 @@ function fixtureBatch() {
     sourceRow({ word: "gjueti", id: "en-gjueti-sq-noun-2OZsfFaS", pos: "noun", senses: [{ id: "en-gjueti-sq-noun-2OZsfFaS", glosses: ["hunting"] }] }),
     sourceRow({ word: "kombëtar", id: "en-kombëtar-sq-adj-QARk6emb", pos: "adj", senses: [{ id: "en-kombëtar-sq-adj-QARk6emb", glosses: ["national"], categories: [occupations] }] }),
     sourceRow({ word: "shitës", id: "en-shitës-sq-adj-fixture", pos: "adj", senses: [{ id: "en-shitës-sq-adj-fixture", glosses: ["selling"], categories: [occupations] }] }),
+    sourceRow({ word: "jaguar", id: "en-jaguar-sq-noun-fixture", pos: "noun", senses: [{ id: "en-jaguar-sq-noun-fixture", glosses: ["jaguar"], categories: [occupations] }], etymologyLinks: [["jaguar", "jaguar#Portuguese"]] }),
+    sourceRow({ word: "bar", id: "en-bar-sq-noun-fixture", pos: "noun", senses: [{ id: "en-bar-sq-noun-fixture", glosses: ["bar"], categories: [occupations] }], etymologyLinks: [["far", "far#Latin"]] }),
+    sourceRow({ word: "far", id: "en-far-sq-noun-fixture", pos: "noun", senses: [{ id: "en-far-sq-noun-fixture", glosses: ["seed"] }] }),
+    sourceRow({ word: "notar", id: "en-notar-sq-noun-fixture", pos: "noun", senses: [{ id: "en-notar-sq-noun-fixture", glosses: ["notary"], categories: [occupations] }], etymologyLinks: [["far", "far"]] }),
+    sourceRow({ word: "foreign-tar", id: "foreign-tar-fixture", pos: "noun", langCode: "en", senses: [{ id: "foreign-tar-fixture", glosses: ["foreign occupational noun"], categories: [occupations] }] }),
   ];
   const oewnEntries = {
     stableman: { n: { sense: [{ id: "stableman%1:18:00::", synset: "84190390-n" }] } },
@@ -84,8 +90,8 @@ describe("Albanian occupational-role candidate batch v0.1", () => {
     const first = buildAlbanianOccupationalRoleCandidateBatchV0_1(fixtures);
     const second = buildAlbanianOccupationalRoleCandidateBatchV0_1(fixtures);
     expect(JSON.stringify(first)).toBe(JSON.stringify(second));
-    expect(first.batch.candidates.map((candidate) => candidate.sourceRecord.lemma)).toEqual(["pelar", "thëngjilltar", "bletar"]);
-    expect(first.batch.suffixScan.candidateSenseCount).toBe(3);
+    expect(first.batch.candidates.map((candidate) => candidate.sourceRecord.lemma)).toEqual(["pelar", "thëngjilltar", "bletar", "jaguar", "bar", "notar"]);
+    expect(first.batch.suffixScan.candidateSenseCount).toBe(6);
     expect(first.batch.candidates.every((candidate) => candidate.functionalOperation === null && candidate.productionAuthorization === "NOT_AUTHORIZED")).toBe(true);
     expect(first.suffixDiscoveryInventory.records.map((record) => record.lemma)).toEqual(expect.arrayContaining([
       "pelar", "thëngjilltar", "bletar", "shqiptar", "gjitar", "kombëtar",
@@ -95,6 +101,7 @@ describe("Albanian occupational-role candidate batch v0.1", () => {
       glosses: ["stableman, ostler, groom (especially mares)"],
       exactOewnGlossTerms: ["stableman", "ostler", "groom"],
     });
+    expect(first.suffixDiscoveryInventory.records.some((record) => record.lemma === "foreign-tar")).toBe(false);
   });
 
   it("keeps pelar's source row, sense, locator, typed OEWN alternatives, and unreviewed projector separate", () => {
@@ -110,6 +117,8 @@ describe("Albanian occupational-role candidate batch v0.1", () => {
       expect.objectContaining({ form: "pelë", direction: "TARGET_RECORD_REFERENCES_SOURCE_FORM", resolution: "SOURCE_ROWS_FOUND" }),
       expect.objectContaining({ form: "-ar", direction: "TARGET_RECORD_REFERENCES_SOURCE_FORM", resolution: "SOURCE_ROW_NOT_FOUND" }),
     ]));
+    expect(pelar.reasonCodes).toContain("EXISTING_RESEARCH_HYPOTHESIS_RETAINED");
+    expect(pelar.reasonCodes).not.toContain("SOURCE_OCCUPATIONS_CATEGORY_ATTESTED");
     expect(pelar.ontology.senses.map((sense) => sense.senseId)).toEqual([
       "groom%1:18:00::", "groom%1:18:01::", "groom%1:18:02::", "ostler%1:18:00::", "stableman%1:18:00::",
     ]);
@@ -145,10 +154,37 @@ describe("Albanian occupational-role candidate batch v0.1", () => {
       productionAuthorization: "NOT_AUTHORIZED",
     });
     expect(coal.researchHypothesis?.evidenceRefs).toEqual(["ze15.albanian.thengjilltar.source.v0_1"]);
+    expect(coal.reasonCodes).not.toContain("SOURCE_OCCUPATIONS_CATEGORY_ATTESTED");
     expect(beekeeper.sourceRecord.pronunciationIpa).toEqual([]);
     expect(beekeeper.reasonCodes).toContain("SOURCE_IPA_NOT_PRESENT");
+    expect(beekeeper.reasonCodes).toContain("SOURCE_OCCUPATIONS_CATEGORY_ATTESTED");
     expect(batch.batch.candidates.some((candidate) => ["shqiptar", "gjitar", "gjueti", "kombëtar", "shitës"].includes(candidate.sourceRecord.lemma))).toBe(false);
     expect(batch.suffixDiscoveryInventory.records.some((record) => record.lemma === "gjueti")).toBe(false);
+  });
+
+  it("does not resolve foreign or unanchored etymology references to same-spelled Albanian rows", () => {
+    const batch = buildAlbanianOccupationalRoleCandidateBatchV0_1(fixtureBatch());
+    const jaguar = batch.batch.candidates.find((candidate) => candidate.sourceRecord.lemma === "jaguar")!;
+    const bar = batch.batch.candidates.find((candidate) => candidate.sourceRecord.lemma === "bar")!;
+    const notar = batch.batch.candidates.find((candidate) => candidate.sourceRecord.lemma === "notar")!;
+    expect(jaguar.sourceRecord.etymologyLinks).toEqual([expect.objectContaining({
+      form: "jaguar",
+      reference: "jaguar#Portuguese",
+      resolution: "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
+      resolvedSourceRows: [],
+    })]);
+    expect(bar.sourceRecord.etymologyLinks).toEqual([expect.objectContaining({
+      form: "far",
+      reference: "far#Latin",
+      resolution: "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
+      resolvedSourceRows: [],
+    })]);
+    expect(notar.sourceRecord.etymologyLinks).toEqual([expect.objectContaining({
+      form: "far",
+      reference: "far",
+      resolution: "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
+      resolvedSourceRows: [],
+    })]);
   });
 
   it("projects only query-linked candidates and never turns a research candidate into the engine operation", () => {

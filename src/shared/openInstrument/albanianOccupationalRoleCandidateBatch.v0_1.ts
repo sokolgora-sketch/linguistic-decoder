@@ -50,7 +50,7 @@ export type AlbanianOccupationalRoleCandidateV0_1 = Readonly<{
       form: string;
       reference: string;
       direction: "TARGET_RECORD_REFERENCES_SOURCE_FORM";
-      resolution: "SOURCE_ROWS_FOUND" | "SOURCE_ROW_NOT_FOUND";
+      resolution: "SOURCE_ROWS_FOUND" | "SOURCE_ROW_NOT_FOUND" | "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN";
       resolvedSourceRows: readonly Readonly<{ sourceRecordId: string; entryLocator: string; physicalRecordOrdinal: number; senseIds: readonly string[] }>[];
     }>[];
   }>;
@@ -305,7 +305,9 @@ function targetEtymologyLinks(
     const form = text(item[0]);
     const reference = text(item[1]);
     if (!form || !reference) return [];
-    const rows = rowByLemma.get(form) ?? [];
+    const languageAnchor = reference.slice(reference.lastIndexOf("#") + 1).trim().toLocaleLowerCase("en-US");
+    const hasExplicitAlbanianLanguageAnchor = reference.includes("#") && languageAnchor === "albanian";
+    const rows = hasExplicitAlbanianLanguageAnchor ? rowByLemma.get(form) ?? [] : [];
     const resolvedSourceRows = rows.map((row) => Object.freeze({
       sourceRecordId: sourceRecordId(row.lemma, row.matchOrdinal),
       entryLocator: entryLocator(row.lemma, row.matchOrdinal),
@@ -318,7 +320,9 @@ function targetEtymologyLinks(
       form,
       reference,
       direction: "TARGET_RECORD_REFERENCES_SOURCE_FORM" as const,
-      resolution: resolvedSourceRows.length ? "SOURCE_ROWS_FOUND" as const : "SOURCE_ROW_NOT_FOUND" as const,
+      resolution: !hasExplicitAlbanianLanguageAnchor
+        ? "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN" as const
+        : resolvedSourceRows.length ? "SOURCE_ROWS_FOUND" as const : "SOURCE_ROW_NOT_FOUND" as const,
       resolvedSourceRows: Object.freeze(resolvedSourceRows),
     })];
   }));
@@ -349,9 +353,10 @@ export function buildAlbanianOccupationalRoleCandidateBatchV0_1(input: Readonly<
     matchOrdinals.set(lemma, ordinal + 1);
     return { record, physicalRecordOrdinal, lemma, matchOrdinal: ordinal };
   });
+  const albanianIdentities = identities.filter((row) => row.record.lang_code === "sq");
   const rowByLemma = new Map<string, typeof identities>();
-  identities.forEach((row) => rowByLemma.set(row.lemma, [...(rowByLemma.get(row.lemma) ?? []), row]));
-  const suffixRows = identities.filter((row) => albanianSuffixDiscoveryMatchesV0_1(row.lemma).length > 0);
+  albanianIdentities.forEach((row) => rowByLemma.set(row.lemma, [...(rowByLemma.get(row.lemma) ?? []), row]));
+  const suffixRows = albanianIdentities.filter((row) => albanianSuffixDiscoveryMatchesV0_1(row.lemma).length > 0);
   const suffixSenseCount = suffixRows.reduce((total, row) => total + (Array.isArray(row.record.senses) ? row.record.senses.length : 0), 0);
   const sourceResearchManifest = rawResearchHypotheses as unknown as ResearchHypothesisManifestV0_1;
   const seedSenseKeys = new Set(sourceResearchManifest.assertions
@@ -372,7 +377,7 @@ export function buildAlbanianOccupationalRoleCandidateBatchV0_1(input: Readonly<
   }).sort((left, right) => left.physicalRecordOrdinal - right.physicalRecordOrdinal || left.senseOrdinal - right.senseOrdinal);
 
   const derivedByTarget = new Map<string, AlbanianOccupationalRoleCandidateV0_1["sourceDerivedRelations"]>();
-  identities.forEach((base) => {
+  albanianIdentities.forEach((base) => {
     const addRelations = (raw: unknown, baseSenseId: string | null, relationScope: "SOURCE_RECORD" | "SOURCE_SENSE", relationOffset: number): void => {
       if (!Array.isArray(raw)) return;
       raw.forEach((item, index) => {
@@ -425,7 +430,7 @@ export function buildAlbanianOccupationalRoleCandidateBatchV0_1(input: Readonly<
       isRecord(sound) && typeof sound.ipa === "string" && sound.ipa.trim()
         ? [{ soundIndex, ipa: sound.ipa.trim() }]
         : []) : [];
-    const roleCategoryCount = candidate.categories.length;
+    const roleCategoryCount = candidate.categories.filter(isExactOccupationsCategory).length;
     const researchAssertion = seedSenseKeys.has(`${candidate.lemma.normalize("NFC")}\u0000${candidate.senseId}`);
     const baseRows = derivedByTarget.get(candidate.lemma) ?? Object.freeze([]);
     const categoryEvidence = candidate.categories.flatMap((category) => typeof category.name === "string" ? [Object.freeze({

@@ -1515,7 +1515,8 @@ function parseMotivationDiscoveryV0_1(
           !Array.isArray(source.etymologyLinks) ||
           !source.etymologyLinks.every((link) => isRecord(link) && typeof link.form === "string" && typeof link.reference === "string" &&
             link.direction === "TARGET_RECORD_REFERENCES_SOURCE_FORM" &&
-            (link.resolution === "SOURCE_ROWS_FOUND" || link.resolution === "SOURCE_ROW_NOT_FOUND") &&
+            (link.resolution === "SOURCE_ROWS_FOUND" || link.resolution === "SOURCE_ROW_NOT_FOUND" ||
+              link.resolution === "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN") &&
             Array.isArray(link.resolvedSourceRows) && link.resolvedSourceRows.every((row) => isRecord(row) &&
               typeof row.sourceRecordId === "string" && row.sourceRecordId !== candidate.sourceRecordId &&
               typeof row.entryLocator === "string" && typeof row.physicalRecordOrdinal === "number" &&

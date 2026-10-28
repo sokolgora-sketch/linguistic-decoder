@@ -612,7 +612,7 @@
       "noSingleWinner": true,
       "userDecisionPosture": "user_decides",
       "reasonCodes": [
-        "SOURCE_OCCUPATIONS_CATEGORY_ATTESTED",
+        "EXISTING_RESEARCH_HYPOTHESIS_RETAINED",
         "SOURCE_DERIVED_FORM_LINK_PRESENT",
         "TARGET_SOURCE_ETYMOLOGY_REFERENCES_PRESENT",
         "OEWN_EXACT_GLOSS_TERMS_HAVE_NOUN_SENSES",
@@ -3937,7 +3937,7 @@
       "noSingleWinner": true,
       "userDecisionPosture": "user_decides",
       "reasonCodes": [
-        "SOURCE_OCCUPATIONS_CATEGORY_ATTESTED",
+        "EXISTING_RESEARCH_HYPOTHESIS_RETAINED",
         "SOURCE_DERIVED_FORM_LINK_PRESENT",
         "TARGET_SOURCE_ETYMOLOGY_REFERENCES_PRESENT",
         "OEWN_EXACT_GLOSS_TERMS_NOT_FOUND",
@@ -5149,7 +5149,7 @@
             "form": "خدمتكار",
             "reference": "خدمتكار#Ottoman_Turkish",
             "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-            "resolution": "SOURCE_ROW_NOT_FOUND",
+            "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
             "resolvedSourceRows": []
           }
         ]
@@ -5597,7 +5597,7 @@
             "form": "cappellaro",
             "reference": "cappellaro#Italian",
             "direction": "TARGET_RECORD_REFERENCES_SOURCE_FORM",
-            "resolution": "SOURCE_ROW_NOT_FOUND",
+            "resolution": "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
             "resolvedSourceRows": []
           }
         ]

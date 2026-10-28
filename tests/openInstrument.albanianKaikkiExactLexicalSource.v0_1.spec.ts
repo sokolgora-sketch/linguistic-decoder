@@ -23,7 +23,7 @@ import { projectAlbanianSourceOrderContextSignatureV0_1 } from "@/shared/openIns
 import { adaptAnalysisToTelemetryVM } from "@/ui/instrument/contractAdapter";
 import { MotivationDiscoveryCardV0_1 } from "@/ui/instrument/sections/MotivationDiscoveryCard.v0_1";
 import { createElement } from "react";
-import { render, screen } from "@testing-library/react";
+import { cleanup, render, screen } from "@testing-library/react";
 
 function fixtureFact(
   overrides: Partial<AlbanianKaikkiExactLexicalSourceFactV0_1> = {},
@@ -1467,6 +1467,32 @@ describe("real Albanian exact lexical source integration v0.1", () => {
       expect(batch).toHaveTextContent("UNKNOWN_OR_NULL");
       expect(batch).toHaveTextContent("CC BY-SA 4.0");
       expect(batch).toHaveTextContent("CC BY 4.0");
+    }
+
+    const foreignReferenceDiscovery = JSON.parse(JSON.stringify(peleDiscovery)) as typeof peleDiscovery;
+    const foreignReferenceCandidate = foreignReferenceDiscovery.albanianLexicalReading?.occupationalRoleResearchCandidates?.candidates
+      .find((candidate) => candidate.sourceRecord.lemma === "pelar");
+    if (!foreignReferenceCandidate) throw new Error("Expected pelar candidate fixture");
+    (foreignReferenceCandidate.sourceRecord.etymologyLinks as unknown as Array<{
+      form: string;
+      reference: string;
+      direction: "TARGET_RECORD_REFERENCES_SOURCE_FORM";
+      resolution: "SOURCE_ROWS_FOUND" | "SOURCE_ROW_NOT_FOUND" | "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN";
+      resolvedSourceRows: unknown[];
+    }>).push({
+      form: "jaguar",
+      reference: "jaguar#Portuguese",
+      direction: "TARGET_RECORD_REFERENCES_SOURCE_FORM",
+      resolution: "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
+      resolvedSourceRows: [],
+    });
+    const foreignReferenceVm = adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: foreignReferenceDiscovery });
+    expect(foreignReferenceVm.motivationDiscoveryV0_1).toMatchObject({ kind: "present" });
+    cleanup();
+    if (foreignReferenceVm.motivationDiscoveryV0_1?.kind === "present") {
+      render(createElement(MotivationDiscoveryCardV0_1, { discovery: foreignReferenceVm.motivationDiscoveryV0_1 }));
+      expect(screen.getByTestId("albanian-occupational-role-research-candidates"))
+        .toHaveTextContent("REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN");
     }
 
     const tampered = JSON.parse(JSON.stringify(peleDiscovery)) as {

@@ -300,6 +300,7 @@ describe("analyze-v1 Albanian lexical reading reachability", () => {
           senseId: "en-pelar-sq-noun-RnBYACSN",
           functionalOperation: null,
           productionAuthorization: "NOT_AUTHORIZED",
+          reasonCodes: expect.not.arrayContaining(["SOURCE_OCCUPATIONS_CATEGORY_ATTESTED"]),
           researchHypothesis: expect.objectContaining({
             hypothesisStatus: "PROPOSED_NOT_REVIEWED",
             reviewCandidate: null,
