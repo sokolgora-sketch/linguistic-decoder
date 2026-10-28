@@ -158,6 +158,45 @@ describe("Motivation Discovery Lab presentation v0.1", () => {
     expect(screen.getByText(/No single winner/)).toBeInTheDocument();
   });
 
+  it("shows additive AlbaNet synset details without turning them into functional evidence", () => {
+    const albaNetCandidate = {
+      ...model().candidates[0],
+      candidateForm: "di",
+      candidateGloss: "knowledge",
+      sourceFact: {
+        ...model().candidates[0]?.sourceFact,
+        sourceFamilyId: "albanet-omw-sq-v0.1",
+        sourceId: "albanet-omw-sq-v0.1:00000001-n:lemma=di",
+        sourceUrlOrArchiveRef: "https://github.com/omwn/omw-data",
+        entryLocator: "wns/als/wn-data-als.tab#synset=00000001-n;lemma=di",
+        sourceDetails: {
+          synsetId: "00000001-n",
+          definitions: ["knowledge"],
+          examples: ["Ai di."],
+          relationTypes: ["als:def", "als:exe", "als:lemma"],
+          license: "CC BY 3.0",
+        },
+      },
+      functionalInterpretation: {
+        status: "UNKNOWN_OR_NULL" as const,
+        truthClassification: "unknown_or_null" as const,
+        statement: null,
+        evidenceKind: "none" as const,
+        evidenceRefs: [],
+        reason: "INSUFFICIENT_FUNCTIONAL_EVIDENCE",
+      },
+    };
+
+    render(<MotivationDiscoveryCardV0_1 discovery={{ kind: "present", value: model({ candidates: [albaNetCandidate] }) }} />);
+
+    expect(screen.getByText(/Source family: albanet-omw-sq-v0\.1/)).toBeInTheDocument();
+    expect(screen.getByText(/Synset: 00000001-n/)).toBeInTheDocument();
+    expect(screen.getByText(/Definitions: knowledge/)).toBeInTheDocument();
+    expect(screen.getByText(/Examples: Ai di\./)).toBeInTheDocument();
+    expect(screen.getByText(/License: CC BY 3\.0/)).toBeInTheDocument();
+    expect(screen.getByText("Functional motivation unknown")).toBeInTheDocument();
+  });
+
   it("keeps candidate summaries human-readable while preserving technical details", () => {
     const di = model().candidates[0];
     const da = {

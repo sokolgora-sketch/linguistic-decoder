@@ -1513,6 +1513,15 @@ function parseMotivationDiscoveryV0_1(
     const candidateConsonantalMalformed =
       candidateConsonantalValue !== null && !isRecord(candidateConsonantalValue);
     const interpretation = candidate.functionalInterpretation;
+    const sourceDetails = source.sourceDetails;
+    const sourceDetailsValid = sourceDetails === undefined || (
+      isRecord(sourceDetails) &&
+      typeof sourceDetails.synsetId === "string" &&
+      isStringArray(sourceDetails.definitions) &&
+      isStringArray(sourceDetails.examples) &&
+      isStringArray(sourceDetails.relationTypes) &&
+      (sourceDetails.license === undefined || typeof sourceDetails.license === "string")
+    );
     if (
       typeof candidate.candidateId !== "string" ||
       typeof candidate.candidateLanguage !== "string" ||
@@ -1522,6 +1531,7 @@ function parseMotivationDiscoveryV0_1(
       !isStringArray(candidate.candidateVoicePath) ||
       (source.sourceFamilyId !== undefined &&
         (typeof source.sourceFamilyId !== "string" || source.sourceFamilyId.length === 0)) ||
+      !sourceDetailsValid ||
       typeof source.sourceId !== "string" ||
       typeof source.sourceStatus !== "string" ||
       typeof source.attestationTruth !== "string" ||
