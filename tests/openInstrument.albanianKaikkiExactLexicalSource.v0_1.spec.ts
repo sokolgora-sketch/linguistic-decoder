@@ -236,6 +236,7 @@ type SyntheticSourceRecordV0_1 = Readonly<{
       langcode?: string;
       _dis?: string;
     }>[];
+    related?: readonly Readonly<{ word: string }>[];
     derived?: readonly Readonly<{ word: string }>[];
   }>[];
   categories?: readonly Readonly<Record<string, unknown>>[];
@@ -1087,6 +1088,47 @@ describe("real Albanian exact lexical source integration v0.1", () => {
             relation: "SOURCE_DERIVED_FORM",
             entryLocator: "jsonl://word/malor",
           }],
+        }],
+      });
+    });
+  });
+
+  it("projects sense-level related links while preserving source order and duplicate behavior", async () => {
+    await withSyntheticSourceFileV0_1([
+      {
+        word: "abonoj",
+        lang_code: "sq",
+        pos: "verb",
+        senses: [{
+          id: "abonoj-1",
+          glosses: ["to subscribe"],
+          related: [{ word: "abonohem" }, { word: "abonuar" }, { word: "abonohem" }],
+          derived: [{ word: "abonuar-derived" }],
+        }],
+        sounds: [{ ipa: "[abonɔj]", tags: [] }],
+        related: [{ word: "record-related" }],
+        derived: [{ word: "record-derived" }],
+      },
+      ...["record-related", "record-derived", "abonohem", "abonuar", "abonuar-derived"].map((word) => ({
+        word,
+        lang_code: "sq" as const,
+        pos: "noun",
+        senses: [{ id: `${word}-1`, glosses: [word] }],
+        sounds: [],
+      })),
+    ], async ({ provider }) => {
+      await expect(provider.query("abonoj")).resolves.toMatchObject({
+        status: "MATCHES_FOUND",
+        facts: [{
+          form: "abonoj",
+          relatedForms: [
+            { form: "record-related", relation: "SOURCE_RELATED_FORM", entryLocator: "jsonl://word/record-related" },
+            { form: "record-derived", relation: "SOURCE_DERIVED_FORM", entryLocator: "jsonl://word/record-derived" },
+            { form: "abonohem", relation: "SOURCE_RELATED_FORM", entryLocator: "jsonl://word/abonohem" },
+            { form: "abonuar", relation: "SOURCE_RELATED_FORM", entryLocator: "jsonl://word/abonuar" },
+            { form: "abonohem", relation: "SOURCE_RELATED_FORM", entryLocator: "jsonl://word/abonohem" },
+            { form: "abonuar-derived", relation: "SOURCE_DERIVED_FORM", entryLocator: "jsonl://word/abonuar-derived" },
+          ],
         }],
       });
     });
