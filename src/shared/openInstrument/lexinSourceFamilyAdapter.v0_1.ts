@@ -64,6 +64,8 @@ type LexinUnavailableReasonCodeV0_1 =
   | "LEXIN_SOURCE_OUTSIDE_EXTERNAL_BOUNDARY"
   | "LEXIN_SOURCE_BYTE_LENGTH_MISMATCH"
   | "LEXIN_SOURCE_SHA256_MISMATCH"
+  | "LEXIN_SOURCE_PATH_ACCESS_FAILURE"
+  | "LEXIN_SOURCE_READ_FAILURE"
   | "LEXIN_SOURCE_SCHEMA_INVALID"
   | "LEXIN_SOURCE_RECORD_INVALID"
   | "LEXIN_SOURCE_DUPLICATE_RECORD_ID";
@@ -371,38 +373,56 @@ export async function loadLexinServerOnlySourceV0_1(
   expectedIdentity: LexinSourceIdentityV0_1 = LEXIN_SOURCE_IDENTITY_V0_1,
 ): Promise<LexinSourceLoadResultV0_1> {
   if (!sourcePath) return unavailableV0_1(null, "LEXIN_SOURCE_PATH_NOT_CONFIGURED");
+
+  let repositoryRoot: string;
+  let resolvedPath: string;
   try {
-    const repositoryRoot = await realpath(process.cwd());
-    const resolvedPath = await realpath(sourcePath);
-    const sourceStat = await lstat(resolvedPath);
-    if (!sourceStat.isFile()) return unavailableV0_1(resolvedPath, "LEXIN_SOURCE_NOT_REGULAR_FILE");
-    if (insideRootV0_1(repositoryRoot, resolvedPath) || insideRootV0_1(resolvedPath, repositoryRoot)) {
-      return unavailableV0_1(resolvedPath, "LEXIN_SOURCE_OUTSIDE_EXTERNAL_BOUNDARY");
-    }
-    const bytes = await readFile(resolvedPath);
-    if (bytes.byteLength !== expectedIdentity.bytes) {
-      return unavailableV0_1(resolvedPath, "LEXIN_SOURCE_BYTE_LENGTH_MISMATCH");
-    }
-    const sha256 = createHash("sha256").update(bytes).digest("hex");
-    if (sha256 !== expectedIdentity.sha256) {
-      return unavailableV0_1(resolvedPath, "LEXIN_SOURCE_SHA256_MISMATCH");
-    }
-    const parsed = parseLexinXmlV0_1(bytes.toString("utf8"));
-    if (!parsed.ok || parsed.version !== expectedIdentity.xmlVersion) {
-      return unavailableV0_1(resolvedPath, parsed.ok ? "LEXIN_SOURCE_SCHEMA_INVALID" : parsed.reasonCode);
-    }
-    return {
-      status: "READY",
-      sourcePath: resolvedPath,
-      records: parsed.records,
-      adapter: createLexinSourceFamilyAdapterV0_1(parsed.records),
-    };
-  } catch (error) {
-    const reasonCode = error instanceof Error && error.message === "LEXIN_SOURCE_DUPLICATE_RECORD_ID"
-      ? "LEXIN_SOURCE_DUPLICATE_RECORD_ID"
-      : "LEXIN_SOURCE_SCHEMA_INVALID";
-    return unavailableV0_1(sourcePath, reasonCode);
+    repositoryRoot = await realpath(process.cwd());
+    resolvedPath = await realpath(sourcePath);
+  } catch {
+    return unavailableV0_1(sourcePath, "LEXIN_SOURCE_PATH_ACCESS_FAILURE");
   }
+
+  let sourceStat;
+  try {
+    sourceStat = await lstat(resolvedPath);
+  } catch {
+    return unavailableV0_1(resolvedPath, "LEXIN_SOURCE_PATH_ACCESS_FAILURE");
+  }
+  if (!sourceStat.isFile()) return unavailableV0_1(resolvedPath, "LEXIN_SOURCE_NOT_REGULAR_FILE");
+  if (insideRootV0_1(repositoryRoot, resolvedPath) || insideRootV0_1(resolvedPath, repositoryRoot)) {
+    return unavailableV0_1(resolvedPath, "LEXIN_SOURCE_OUTSIDE_EXTERNAL_BOUNDARY");
+  }
+
+  let bytes: Buffer;
+  try {
+    bytes = await readFile(resolvedPath);
+  } catch {
+    return unavailableV0_1(resolvedPath, "LEXIN_SOURCE_READ_FAILURE");
+  }
+  if (bytes.byteLength !== expectedIdentity.bytes) {
+    return unavailableV0_1(resolvedPath, "LEXIN_SOURCE_BYTE_LENGTH_MISMATCH");
+  }
+  const sha256 = createHash("sha256").update(bytes).digest("hex");
+  if (sha256 !== expectedIdentity.sha256) {
+    return unavailableV0_1(resolvedPath, "LEXIN_SOURCE_SHA256_MISMATCH");
+  }
+
+  let parsed: ReturnType<typeof parseLexinXmlV0_1>;
+  try {
+    parsed = parseLexinXmlV0_1(bytes.toString("utf8"));
+  } catch {
+    return unavailableV0_1(resolvedPath, "LEXIN_SOURCE_SCHEMA_INVALID");
+  }
+  if (!parsed.ok || parsed.version !== expectedIdentity.xmlVersion) {
+    return unavailableV0_1(resolvedPath, parsed.ok ? "LEXIN_SOURCE_SCHEMA_INVALID" : parsed.reasonCode);
+  }
+  return {
+    status: "READY",
+    sourcePath: resolvedPath,
+    records: parsed.records,
+    adapter: createLexinSourceFamilyAdapterV0_1(parsed.records),
+  };
 }
 
 const productionLexinSourceCacheV0_1 = new Map<string, Promise<LexinSourceLoadResultV0_1>>();

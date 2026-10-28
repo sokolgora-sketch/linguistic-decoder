@@ -179,6 +179,53 @@ describe("Lexin Swedish-Albanian source-family adapter v0.1", () => {
         status: "UNAVAILABLE",
         reasonCode: "LEXIN_SOURCE_PATH_NOT_CONFIGURED",
       });
+      await expect(loadLexinServerOnlySourceV0_1(join(directory, "missing.xml"), identity)).resolves.toMatchObject({
+        status: "UNAVAILABLE",
+        reasonCode: "LEXIN_SOURCE_PATH_ACCESS_FAILURE",
+        adapter: null,
+      });
+    } finally {
+      await rm(directory, { recursive: true, force: true });
+    }
+  });
+
+  it("classifies a read failure separately from malformed XML without relying on file permissions", async () => {
+    const directory = await mkdtemp(join(tmpdir(), "open-instrument-lexin-read-failure-"));
+    const fixturePath = join(directory, "unreadable.xml");
+    await writeFile(fixturePath, VALID_XML, "utf8");
+    const identity = fixtureIdentity(VALID_XML);
+    jest.resetModules();
+    const mockedReadFile = jest.fn().mockRejectedValue(Object.assign(new Error("EACCES"), { code: "EACCES" }));
+    jest.doMock("node:fs/promises", () => ({
+      ...jest.requireActual("node:fs/promises"),
+      readFile: mockedReadFile,
+    }));
+    try {
+      const isolatedAdapter = await import("@/shared/openInstrument/lexinSourceFamilyAdapter.v0_1");
+      await expect(isolatedAdapter.loadLexinServerOnlySourceV0_1(fixturePath, identity)).resolves.toMatchObject({
+        status: "UNAVAILABLE",
+        reasonCode: "LEXIN_SOURCE_READ_FAILURE",
+        adapter: null,
+      });
+      expect(mockedReadFile).toHaveBeenCalledTimes(1);
+    } finally {
+      jest.dontMock("node:fs/promises");
+      jest.resetModules();
+      await rm(directory, { recursive: true, force: true });
+    }
+  });
+
+  it("classifies malformed XML as a schema failure after path and checksum validation", async () => {
+    const directory = await mkdtemp(join(tmpdir(), "open-instrument-lexin-schema-failure-"));
+    const malformedXml = VALID_XML.replace("</Dictionary>", "");
+    const fixturePath = join(directory, "malformed.xml");
+    await writeFile(fixturePath, malformedXml, "utf8");
+    try {
+      await expect(loadLexinServerOnlySourceV0_1(fixturePath, fixtureIdentity(malformedXml))).resolves.toMatchObject({
+        status: "UNAVAILABLE",
+        reasonCode: "LEXIN_SOURCE_SCHEMA_INVALID",
+        adapter: null,
+      });
     } finally {
       await rm(directory, { recursive: true, force: true });
     }
