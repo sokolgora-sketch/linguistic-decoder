@@ -1,3 +1,8 @@
+import { createHash } from "node:crypto";
+import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+
 import { buildHeartInstrumentV1 } from "@/v1/heartInstrument.v1";
 import { runAnalysisDeterministic } from "@/lib/runAnalysisDeterministic";
 import { enginePayloadToAnalysisResult } from "@/shared/analysisAdapter";
@@ -11,13 +16,44 @@ import {
 import {
   createAlbaNetSourceFamilyAdapterV0_1,
   ALBANET_SOURCE_PATH_ENV_V0_1,
+  parseAlbaNetTabV0_1,
   type AlbaNetSourceRecordV0_1,
+  type AlbaNetSourceLoadResultV0_1,
 } from "@/shared/openInstrument/albanetSourceFamilyAdapter.v0_1";
 import type { GenericFunctionalWitnessSourceAdapterV1 } from "@/shared/openInstrument/genericFunctionalWitnessDiscovery.v1";
 import {
   ENGLISH_KAIKKI_SERVER_ONLY_EXACT_INDEX_PROVIDER_ID_V0_1,
   type EnglishKaikkiServerOnlyExactIndexProviderV0_1,
 } from "@/shared/openInstrument/englishKaikkiServerOnlyExactIndexProvider.v0_1";
+
+const mockAlbaNetFixtureTabV0_1 = [
+  "# Albanet\tals\thttp://fjalnet.com/\tCC BY 3.0",
+  "00000001-n\tals:lemma\tdi",
+  "00000001-n\tals:def\t0\tknowledge",
+  "00000001-n\tals:exe\t0\tAi di.",
+].join("\n");
+
+let mockAlbaNetSourceLoadResultV0_1: AlbaNetSourceLoadResultV0_1 | null = null;
+
+jest.mock("@/shared/openInstrument/albanetSourceFamilyAdapter.v0_1", () => {
+  const actual = jest.requireActual(
+    "@/shared/openInstrument/albanetSourceFamilyAdapter.v0_1",
+  );
+
+  return {
+    ...actual,
+    getProductionAlbaNetSourceV0_1: jest.fn(async () => {
+      const configuredPath = process.env[actual.ALBANET_SOURCE_PATH_ENV_V0_1];
+      if (
+        mockAlbaNetSourceLoadResultV0_1 === null ||
+        configuredPath !== mockAlbaNetSourceLoadResultV0_1.sourcePath
+      ) {
+        throw new Error("ALBANET_TEST_FIXTURE_NOT_CONFIGURED");
+      }
+      return mockAlbaNetSourceLoadResultV0_1;
+    }),
+  };
+});
 
 async function analysisFor(word: string) {
   const payload = await runAnalysisDeterministic(word, {
@@ -104,10 +140,28 @@ describe("AlbaNet server-only Discovery integration v0.1", () => {
   });
 
   it("reaches the analyze-v1 API as additive AlbaNet evidence for Albanian input", async () => {
+    const directory = await mkdtemp(join(tmpdir(), "open-instrument-albanet-api-"));
+    const fixturePath = join(directory, "wn-data-als.tab");
+    const fixtureBytes = Buffer.from(mockAlbaNetFixtureTabV0_1, "utf8");
+    const fixtureSha256 = createHash("sha256").update(fixtureBytes).digest("hex");
+    await writeFile(fixturePath, fixtureBytes);
+
     const previousPath = process.env[ALBANET_SOURCE_PATH_ENV_V0_1];
-    process.env[ALBANET_SOURCE_PATH_ENV_V0_1] =
-      "/Users/wei/OpenInstrumentResearch/multi-source-acquisition-v0-1-20261028/raw/omw-data/wns/als/wn-data-als.tab";
+    process.env[ALBANET_SOURCE_PATH_ENV_V0_1] = fixturePath;
     try {
+      const parsed = parseAlbaNetTabV0_1(await readFile(fixturePath, "utf8"));
+      expect(parsed.ok).toBe(true);
+      if (!parsed.ok) return;
+
+      expect(fixtureBytes.byteLength).toBe(Buffer.byteLength(mockAlbaNetFixtureTabV0_1, "utf8"));
+      expect(fixtureSha256).toMatch(/^[a-f0-9]{64}$/u);
+      mockAlbaNetSourceLoadResultV0_1 = {
+        status: "READY",
+        sourcePath: fixturePath,
+        records: parsed.records,
+        adapter: createAlbaNetSourceFamilyAdapterV0_1(parsed.records),
+      };
+
       const response = await GET(
         new Request("http://localhost/api/analyze-v1?word=study&mode=strict&alphabet=albanian&language=sq"),
       );
@@ -136,8 +190,10 @@ describe("AlbaNet server-only Discovery integration v0.1", () => {
         },
       });
     } finally {
+      mockAlbaNetSourceLoadResultV0_1 = null;
       if (previousPath === undefined) delete process.env[ALBANET_SOURCE_PATH_ENV_V0_1];
       else process.env[ALBANET_SOURCE_PATH_ENV_V0_1] = previousPath;
+      await rm(directory, { recursive: true, force: true });
     }
   });
 });
