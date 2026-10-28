@@ -449,10 +449,17 @@ function sourceFactV0_1(
         return sourceFormLinksV0_1(value.derived, "SOURCE_DERIVED_FORM");
       })
     : [];
-  const relatedForms = Array.isArray(record.related) || Array.isArray(record.derived) || senseDerivedForms.length > 0
+  const senseRelatedForms = Array.isArray(record.senses)
+    ? record.senses.flatMap((value) => {
+        if (!isRecordV0_1(value)) return [];
+        return sourceFormLinksV0_1(value.related, "SOURCE_RELATED_FORM");
+      })
+    : [];
+  const relatedForms = Array.isArray(record.related) || Array.isArray(record.derived) || senseRelatedForms.length > 0 || senseDerivedForms.length > 0
     ? Object.freeze([
         ...sourceFormLinksV0_1(record.related, "SOURCE_RELATED_FORM"),
         ...sourceFormLinksV0_1(record.derived, "SOURCE_DERIVED_FORM"),
+        ...senseRelatedForms,
         ...senseDerivedForms,
       ])
     : undefined;
