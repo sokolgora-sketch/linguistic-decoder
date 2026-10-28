@@ -190,7 +190,7 @@ describe("Motivation Discovery Lab presentation v0.1", () => {
     render(<MotivationDiscoveryCardV0_1 discovery={{ kind: "present", value: model({ candidates: [albaNetCandidate] }) }} />);
 
     expect(screen.getByText(/Source family: albanet-omw-sq-v0\.1/)).toBeInTheDocument();
-    expect(screen.getByText(/Synset: 00000001-n/)).toBeInTheDocument();
+    expect(screen.getByText(/Source identity: 00000001-n/)).toBeInTheDocument();
     expect(screen.getByText(/Definitions: knowledge/)).toBeInTheDocument();
     expect(screen.getByText(/Examples: Ai di\./)).toBeInTheDocument();
     expect(screen.getByText(/License: CC BY 3\.0/)).toBeInTheDocument();

@@ -1517,6 +1517,7 @@ function parseMotivationDiscoveryV0_1(
     const sourceDetailsValid = sourceDetails === undefined || (
       isRecord(sourceDetails) &&
       typeof sourceDetails.synsetId === "string" &&
+      (sourceDetails.sourceIdentity === undefined || typeof sourceDetails.sourceIdentity === "string") &&
       isStringArray(sourceDetails.definitions) &&
       isStringArray(sourceDetails.examples) &&
       isStringArray(sourceDetails.relationTypes) &&

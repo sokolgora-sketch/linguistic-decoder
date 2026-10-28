@@ -373,7 +373,7 @@ function Candidate({
                   {record.sourceFact.sourceDetails ? (
                     <div className="break-words rounded border border-[#303843] bg-[#121923] p-2 text-[#b9c7d4]">
                       <div className="font-semibold text-[#d7dde7]">Source details</div>
-                      <div>Synset: {record.sourceFact.sourceDetails.synsetId}</div>
+                      <div>Source identity: {record.sourceFact.sourceDetails.sourceIdentity ?? record.sourceFact.sourceDetails.synsetId}</div>
                       <div>
                         Definitions: {record.sourceFact.sourceDetails.definitions.join(" · ") || "not provided"}
                       </div>
