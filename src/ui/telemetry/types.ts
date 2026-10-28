@@ -371,6 +371,7 @@ export type MotivationDiscoveryCandidateV0_1VM = Readonly<{
     entryLocator: string | null;
     sourceDetails?: Readonly<{
       synsetId: string;
+      sourceIdentity?: string;
       definitions: string[];
       examples: string[];
       relationTypes: string[];

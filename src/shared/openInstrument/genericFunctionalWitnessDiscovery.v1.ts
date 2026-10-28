@@ -43,6 +43,8 @@ export type GenericFunctionalWitnessSourceProvenanceV1 = Readonly<{
  */
 export type GenericFunctionalWitnessSourceDetailsV1 = Readonly<{
   synsetId: string;
+  /** Source-family-specific record identity when the source is not synset-based. */
+  sourceIdentity?: string;
   definitions: readonly string[];
   examples: readonly string[];
   relationTypes: readonly string[];
@@ -210,6 +212,7 @@ function sourceDetailsIsValidV1(value: unknown): value is GenericFunctionalWitne
     Array.isArray(candidate) && candidate.every(exactTextV1);
   return (
     exactTextV1(details.synsetId) &&
+    (details.sourceIdentity === undefined || exactTextV1(details.sourceIdentity)) &&
     validTextArray(details.definitions) &&
     validTextArray(details.examples) &&
     validTextArray(details.relationTypes) &&
@@ -396,6 +399,9 @@ function buildWitnessV1(
       ? {
           sourceDetails: {
             ...record.sourceDetails,
+            ...(record.sourceDetails.sourceIdentity
+              ? { sourceIdentity: record.sourceDetails.sourceIdentity }
+              : {}),
             definitions: [...record.sourceDetails.definitions],
             examples: [...record.sourceDetails.examples],
             relationTypes: [...record.sourceDetails.relationTypes],

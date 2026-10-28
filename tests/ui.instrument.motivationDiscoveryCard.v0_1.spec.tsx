@@ -197,6 +197,29 @@ describe("Motivation Discovery Lab presentation v0.1", () => {
     expect(screen.getByText("Functional motivation unknown")).toBeInTheDocument();
   });
 
+  it("labels source-backed identities separately from legacy synsets", () => {
+    const candidate = model().candidates[0];
+    render(<MotivationDiscoveryCardV0_1 discovery={{
+      kind: "present",
+      value: model({
+        candidates: [{
+          ...candidate,
+          sourceFact: {
+            ...candidate.sourceFact,
+            sourceDetails: {
+              sourceIdentity: "lexin-swedish-albanian-v0.1:word=20",
+              definitions: [],
+              examples: [],
+              relationTypes: [],
+            },
+          },
+        }],
+      }),
+    }} />);
+
+    expect(screen.getByText(/Source identity: lexin-swedish-albanian-v0\.1:word=20/)).toBeInTheDocument();
+  });
+
   it("keeps candidate summaries human-readable while preserving technical details", () => {
     const di = model().candidates[0];
     const da = {

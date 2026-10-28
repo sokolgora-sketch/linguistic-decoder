@@ -23,6 +23,9 @@ import {
   getProductionAlbaNetSourceV0_1,
 } from "@/shared/openInstrument/albanetSourceFamilyAdapter.v0_1";
 import {
+  getProductionLexinSourceV0_1,
+} from "@/shared/openInstrument/lexinSourceFamilyAdapter.v0_1";
+import {
   projectAlbanianKaikkiFactSourceIpaToSevenVoicesV0_1,
   projectAlbanianKaikkiFactsSourceIpaToSevenVoicesV0_1,
   type AlbanianKaikkiSourceIpaSevenVoiceAnalysisV0_1,
@@ -1934,6 +1937,7 @@ export async function buildMotivationEngineDiscoveryServerOnlyV0_1(input: {
   provider?: EnglishKaikkiServerOnlyExactIndexProviderV0_1;
   albanianLexicalSourceProvider?: AlbanianKaikkiServerOnlyExactLexicalSourceProviderV0_1;
   albanetSourceAdapter?: GenericFunctionalWitnessSourceAdapterV1 | null;
+  lexinSourceAdapter?: GenericFunctionalWitnessSourceAdapterV1 | null;
 }): Promise<MotivationEngineDiscoveryServerOnlyResultV0_1> {
   const provider = input.provider ?? await getProductionProviderV0_1();
   // Keep the profile-derived path in the server/API integration seam. The
@@ -1971,11 +1975,15 @@ export async function buildMotivationEngineDiscoveryServerOnlyV0_1(input: {
   const albanetSourceAdapter = !isAlbanianInputV0_1(input) || input.albanetSourceAdapter === null
     ? null
     : input.albanetSourceAdapter ?? (await getProductionAlbaNetSourceV0_1()).adapter;
+  const lexinSourceAdapter = !isAlbanianInputV0_1(input) || input.lexinSourceAdapter === null
+    ? null
+    : input.lexinSourceAdapter ?? (await getProductionLexinSourceV0_1()).adapter;
   const sourceAdapters: readonly GenericFunctionalWitnessSourceAdapterV1[] = [
     createAlbanianLexicalSubstrateWitnessAdapterV0_1(),
     createMultilingualDiscoverySubstrateS1LatinWitnessAdapterV0_2(),
     createResolvedEnglishAdapterV0_1(resolved.recordsByQuery),
     ...(isAlbanianInputV0_1(input) && albanetSourceAdapter ? [albanetSourceAdapter] : []),
+    ...(isAlbanianInputV0_1(input) && lexinSourceAdapter ? [lexinSourceAdapter] : []),
   ];
   const sourceFamilyBySourceId = new Map<string, string>();
   const sourceDetailsBySourceId = new Map<string, GenericFunctionalWitnessSourceDetailsV1>();
