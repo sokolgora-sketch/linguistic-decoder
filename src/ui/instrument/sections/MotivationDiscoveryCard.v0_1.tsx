@@ -505,6 +505,7 @@ export function MotivationDiscoveryCardV0_1({
     candidate.functionalMeaningBridge.status === "NULL",
   );
   const nullRelatedCandidateCount = nullRelatedCandidateEvaluations.length;
+  const occupationalRoleResearchCandidates = albanianLexicalReading?.occupationalRoleResearchCandidates;
 
   return (
     <section
@@ -1088,6 +1089,81 @@ export function MotivationDiscoveryCardV0_1({
                 </details>
               ) : null}
             </div>
+          ) : null}
+          {occupationalRoleResearchCandidates?.candidates.length ? (
+            <details data-testid="albanian-occupational-role-research-candidates" className="mt-3 rounded-lg border border-[#66532e] bg-[#1b180f] p-3 text-xs leading-5 text-[#f0ddb0]">
+              <summary className="cursor-pointer font-semibold uppercase tracking-[0.12em]">
+                Inspect {occupationalRoleResearchCandidates.candidates.length} source-linked occupational-role research candidate{occupationalRoleResearchCandidates.candidates.length === 1 ? "" : "s"}
+              </summary>
+              <div className="mt-2 text-[#d5c28f]">
+                Deterministic frozen-source batch: {occupationalRoleResearchCandidates.scanSummary.suffixSenseCount} suffix-filtered senses / {occupationalRoleResearchCandidates.scanSummary.uniqueSuffixLemmas} lemmas screened; {occupationalRoleResearchCandidates.scanSummary.sourceCategorySenseCount} exact source-category senses plus {occupationalRoleResearchCandidates.scanSummary.candidateSenseCount - occupationalRoleResearchCandidates.scanSummary.sourceCategorySenseCount} pre-existing research senses are exposed across {occupationalRoleResearchCandidates.scanSummary.selectedUniqueLemmaCount} lemmas. Suffixes are discovery filters, not semantic evidence.
+              </div>
+              <div className="mt-1 break-words text-[10px] text-[#9fb1bf]">
+                Kaikki via {occupationalRoleResearchCandidates.sourceUpstream} · licenses {occupationalRoleResearchCandidates.sourceLicenses.join(" / ")} · attribution required · source SHA256 {occupationalRoleResearchCandidates.sourceArtifactSha256}
+                <br />OEWN 2025 SHA256 {occupationalRoleResearchCandidates.oewnArtifactSha256} · {occupationalRoleResearchCandidates.oewnLicense}
+              </div>
+              <div className="mt-2 space-y-2">
+                {occupationalRoleResearchCandidates.candidates.map((candidate) => (
+                  <article key={candidate.candidateId} data-testid="albanian-occupational-role-research-candidate" className="rounded border border-[#594a2b] bg-[#17140e] p-2">
+                    <div className="flex flex-wrap items-baseline gap-2">
+                      <span className="font-mono text-sm font-semibold text-[#f5f7fb]">{candidate.sourceRecord.lemma}</span>
+                      <span>{candidate.sourceRecord.partOfSpeech ?? "POS unavailable"} · {candidate.candidateStatus}</span>
+                    </div>
+                    <div className="mt-1">SOURCE_FACT gloss: {candidate.sourceRecord.glosses.join("; ") || "Null"}</div>
+                    <div className="mt-1 break-words text-[#9fb1bf]">
+                      Kaikki row ID: {candidate.sourceRecordId} · raw entry ID: {candidate.sourceRecord.rawEntryId ?? "Null"} · sense ID: {candidate.senseId} · {candidate.sourceRecord.entryLocator} · physical row {candidate.sourceRecord.physicalRecordOrdinal + 1}
+                    </div>
+                    <div className="mt-1 break-words">
+                      Exact source category: {candidate.sourceRecord.categories.map((category) => `${category.name} (${category.orig ?? "no orig"}; ${category.langcode ?? "no language"}; ${category.source ?? "no source"})`).join(" · ") || "not present"}
+                    </div>
+                    <div className="mt-1 break-words text-[#d5c28f]">
+                      IPA observations: {candidate.sourceRecord.pronunciationIpa.map((sound) => `sound ${sound.soundIndex}: ${sound.ipa}`).join(" · ") || "Null — no source IPA in this record"}
+                    </div>
+                    <div className="mt-1 break-words">
+                      Source-derived record direction: {candidate.sourceDerivedRelations.map((relation) => `${relation.baseLemma} → ${candidate.sourceRecord.lemma} (${relation.baseSourceRecordId}; ${relation.baseEntryLocator}; ${relation.relationScope.toLowerCase()} index ${relation.relationIndex}; base senses ${relation.baseSenseIds.join(", ") || "record-level"})`).join(" · ") || "not found"}
+                    </div>
+                    <div className="mt-1 break-words">
+                      Target-record source etymology references: {candidate.sourceRecord.etymologyLinks.map((link) => `${candidate.sourceRecord.lemma} → ${link.form} [${link.reference}; ${link.resolution}; ${link.resolvedSourceRows.map((row) => `${row.sourceRecordId} / ${row.entryLocator} / senses ${row.senseIds.join(", ") || "Null"}`).join("; ") || "no resolved row"}]`).join(" · ") || "Null"}
+                    </div>
+                    <div className="mt-1 break-words text-[#9fb1bf]">
+                      Attributed etymology text: {candidate.sourceRecord.etymologyText ?? "Null"} · suffix-filter observation: {candidate.suffixDiscoveryMatches.join(", ") || "none"}
+                    </div>
+                    <div className="mt-1 break-words text-[#9fb1bf]">
+                      Source etymology templates: {candidate.sourceRecord.etymologyTemplates.map((template) => `${template.name}(${Object.entries(template.args).map(([key, value]) => `${key}=${value}`).join(", ")}) → ${template.expansion || "Null"}`).join(" · ") || "not provided"}
+                    </div>
+                    <div className="mt-2 rounded border border-[#34415c] bg-[#0b101c] p-2">
+                      <div className="font-semibold text-[#dce5f5]">OEWN 2025 exact English-gloss lookup · CC BY 4.0</div>
+                      <div className="mt-1">Exact gloss terms: {candidate.ontology.exactGlossTerms.join("; ") || "Null"} · {candidate.ontology.status}</div>
+                      {candidate.ontology.senses.length ? (
+                        <div className="mt-1 space-y-1">
+                          {candidate.ontology.senses.map((sense) => (
+                            <div key={`${sense.senseId}:${sense.synsetId}`} className="break-words">
+                              {sense.lemma} · {sense.senseId} · {sense.synsetId} · {sense.definitions.join("; ") || "definition Null"}
+                              {sense.typedHypernymPaths.map((path, index) => (
+                                <div key={`${sense.senseId}:path:${index}`} className="ml-2 text-[#aebbd5]">
+                                  Typed worker path: {path.map((node) => `${node.synsetId} (${node.members.join(", ") || "no members"})`).join(" → ")}
+                                </div>
+                              ))}
+                            </div>
+                          ))}
+                        </div>
+                      ) : <div className="mt-1">No exact noun-sense match; UNKNOWN / NULL. No synonym substitution is made.</div>}
+                      <div className="mt-1 text-[10px] text-[#9fb1bf]">Attribution: Princeton WordNet; Open English WordNet Community. English ontology evidence is not Albanian semantic authority.</div>
+                    </div>
+                    {candidate.researchHypothesis ? (
+                      <div className="mt-2 break-words rounded border border-[#66532e] bg-[#211c12] p-2">
+                        Existing research hypothesis: {candidate.researchHypothesis.hypothesisStatus} · review track {candidate.researchHypothesis.reviewTrack} · no review candidate or owner approval recorded.
+                        <br />Evidence refs: {candidate.researchHypothesis.evidenceRefs.join(", ") || "none"} · reasons: {candidate.researchHypothesis.reasonCodes.join(", ") || "none"}
+                      </div>
+                    ) : <div className="mt-2">SOURCE_FACT candidate only; no reviewed research hypothesis record is attached.</div>}
+                    <div className="mt-2 font-semibold">Functional operation: Null · production authorization: NOT_AUTHORIZED · embryo function: UNKNOWN_OR_NULL · historical relation: NOT_CLAIMED · noSingleWinner: true · user_decides</div>
+                    <div className="mt-1 text-[10px] text-[#d5c28f]">{candidate.claimBoundary}</div>
+                    <div className="mt-1 break-words text-[10px] text-[#9fb1bf]">Reason codes: {candidate.reasonCodes.join(", ")}</div>
+                  </article>
+                ))}
+              </div>
+              <div className="mt-2 text-[10px] text-[#9fb1bf]">{occupationalRoleResearchCandidates.claimBoundary}</div>
+            </details>
           ) : null}
           <div className="mt-3">
             <div className="font-semibold text-[#f5f7fb]">Source-linked form candidates</div>

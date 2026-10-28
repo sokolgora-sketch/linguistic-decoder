@@ -92,8 +92,44 @@ jest.mock("@/shared/openInstrument/motivationEngineDiscoveryServerOnly.v0_1", ()
     pronunciationAuthority: "CURRENT_KAIKKI_RECORD_ONLY_UNBOUND_TO_FROZEN_PROFILE",
     sourceSnapshot: drite.sourceSnapshot,
   };
+  const pele = {
+    sourceRecordId: "kaikki-albanian-jsonl:word=pel%C3%AB:ordinal=0",
+    entryLocator: "jsonl://word/pel%C3%AB/match/0",
+    physicalRecordOrdinal: 4275,
+    language: "Albanian",
+    languageCode: "sq",
+    form: "pelë",
+    partOfSpeech: "noun",
+    senses: [{ senseId: "en-pelë-sq-noun-B0ryv46E", glosses: ["mare"] }],
+    ipaObservations: [],
+    relatedForms: [{ form: "pelar", relation: "SOURCE_DERIVED_FORM", entryLocator: "jsonl://word/pelar" }],
+    sourceStatus: "observed_external_snapshot",
+    attestationTruth: "fact",
+    pronunciationAuthority: "CURRENT_KAIKKI_RECORD_ONLY_UNBOUND_TO_FROZEN_PROFILE",
+    sourceSnapshot: drite.sourceSnapshot,
+  };
+  const pelar = {
+    sourceRecordId: "kaikki-albanian-jsonl:word=pelar:ordinal=0",
+    entryLocator: "jsonl://word/pelar/match/0",
+    physicalRecordOrdinal: 1596,
+    language: "Albanian",
+    languageCode: "sq",
+    form: "pelar",
+    partOfSpeech: "noun",
+    senses: [{ senseId: "en-pelar-sq-noun-RnBYACSN", glosses: ["stableman, ostler, groom (especially mares)"] }],
+    ipaObservations: [{ soundIndex: 0, ipa: "/peˈlar/", tags: [] }],
+    etymologyText: "From pelë (“mare”) + -ar.",
+    etymologyLinks: [
+      { sourceForm: "pelë", reference: "pelë#Albanian" },
+      { sourceForm: "-ar", reference: "-ar#Albanian" },
+    ],
+    sourceStatus: "observed_external_snapshot",
+    attestationTruth: "fact",
+    pronunciationAuthority: "CURRENT_KAIKKI_RECORD_ONLY_UNBOUND_TO_FROZEN_PROFILE",
+    sourceSnapshot: drite.sourceSnapshot,
+  };
   const albanianProvider = lexicalSource.createAlbanianKaikkiServerOnlyExactLexicalSourceProviderForSyntheticFixtureV0_1({
-    facts: [drite, dritare, peshk, peshkatar],
+    facts: [drite, dritare, peshk, peshkatar, pele, pelar],
   });
   const englishProvider = {
     query: async (query: unknown) => ({
@@ -137,6 +173,15 @@ async function analyzePeshkV0_1(): Promise<any> {
       alphabet: "albanian",
       providerExecution: "disabled",
     }),
+  }));
+  return { status: response.status, body: await response.json() };
+}
+
+async function analyzePeleV0_1(): Promise<any> {
+  const response = await POST(new Request("http://localhost/api/analyze-v1", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ word: "pelë", language: "sq", alphabet: "albanian", providerExecution: "disabled" }),
   }));
   return { status: response.status, body: await response.json() };
 }
@@ -230,6 +275,38 @@ describe("analyze-v1 Albanian lexical reading reachability", () => {
           "STRUCTURAL_EMBRYO_FUNCTION_REMAINS_UNKNOWN_OR_NULL",
         ]),
       },
+    });
+  });
+
+  it("projects the bounded pelar evidence through the API without authorizing AGENT", async () => {
+    const result = await analyzePeleV0_1();
+    expect(result.status).toBe(200);
+    const reading = result.body.motivationDiscoveryV0_1.albanianLexicalReading;
+    expect(reading.relatedCandidateEvaluations).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        relatedForm: "pelar",
+        functionalMeaningBridge: expect.objectContaining({
+          status: "NULL",
+          functionalHypothesis: expect.objectContaining({ functionalOperation: null }),
+        }),
+      }),
+    ]));
+    expect(reading.occupationalRoleResearchCandidates).toMatchObject({
+      status: "CANDIDATES_FOUND",
+      sourceArtifactSha256: "7a84eca776ebfac752e7251bb0822edc9cd1701d1d58060d4f8ef4b76a208fcc",
+      candidates: expect.arrayContaining([
+        expect.objectContaining({
+          sourceRecordId: "kaikki-albanian-jsonl:word=pelar:ordinal=0",
+          senseId: "en-pelar-sq-noun-RnBYACSN",
+          functionalOperation: null,
+          productionAuthorization: "NOT_AUTHORIZED",
+          researchHypothesis: expect.objectContaining({
+            hypothesisStatus: "PROPOSED_NOT_REVIEWED",
+            reviewCandidate: null,
+            ownerApproval: null,
+          }),
+        }),
+      ]),
     });
   });
 });

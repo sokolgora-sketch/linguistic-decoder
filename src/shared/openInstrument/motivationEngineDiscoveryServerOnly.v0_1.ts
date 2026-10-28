@@ -38,6 +38,10 @@ import {
   normalizeEnglishLexicalJoinKeyV0_1,
 } from "@/shared/openInstrument/englishLexicalSenseSourceContract.v0_1";
 import {
+  getAlbanianOccupationalRoleCandidatesForWordV0_1,
+  type AlbanianOccupationalRoleCandidateBatchViewV0_1,
+} from "@/shared/openInstrument/albanianOccupationalRoleCandidateBatch.v0_1";
+import {
   buildMotivationEngineDiscoveryV0_1,
   type MotivationEngineDiscoveryV0_1,
 } from "@/shared/openInstrument/motivationEngineDiscovery.v0_1";
@@ -147,6 +151,8 @@ export type AlbanianLexicalReadingV0_1 = Readonly<{
   }>[];
   /** Additive per-related-form evidence; the singular bridge below remains the selected primary bridge. */
   relatedCandidateEvaluations: readonly AlbanianRelatedCandidateEvaluationV0_1[];
+  /** Bounded source/ontology research candidates; never authorizes a functional operation. */
+  occupationalRoleResearchCandidates?: AlbanianOccupationalRoleCandidateBatchViewV0_1;
   /** Additive bounded comparison for the five configured source-backed window forms. */
   fiveWindowsComparison?: AlbanianFiveWindowsComparisonV0_1 | null;
   sourceLinkedComponentReading?: AlbanianSourceLinkedComponentReadingV0_1 | null;
@@ -1719,6 +1725,7 @@ async function buildAlbanianLexicalReadingV0_1(input: Readonly<{
     sourceStatus: input.sourceStatus,
     provider: input.provider,
   });
+  const occupationalRoleResearchCandidates = getAlbanianOccupationalRoleCandidatesForWordV0_1(input.word);
   const primary = input.facts.find((fact) =>
     normalizedAlbanianFormV0_1(fact.form) === normalizedAlbanianFormV0_1(input.word) &&
     fact.partOfSpeech !== "name",
@@ -1731,6 +1738,7 @@ async function buildAlbanianLexicalReadingV0_1(input: Readonly<{
       sourcePronunciation: null,
       relatedForms: Object.freeze([]),
       relatedCandidateEvaluations: Object.freeze([]),
+      occupationalRoleResearchCandidates,
       fiveWindowsComparison,
       sourceLinkedComponentReading: null,
       sourceLinkedComparison: null,
@@ -1913,6 +1921,7 @@ async function buildAlbanianLexicalReadingV0_1(input: Readonly<{
       : null,
     relatedForms: Object.freeze(relatedResults),
     relatedCandidateEvaluations: Object.freeze(relatedCandidateEvaluations),
+    occupationalRoleResearchCandidates,
     fiveWindowsComparison,
     sourceLinkedComponentReading,
     sourceLinkedComparison,
