@@ -48,6 +48,14 @@ function sourceLinkedRecordCardV0_1(
   label: string,
   record: AlbanianSourceLinkedRecordV0_1,
 ) {
+  const sourceSenseEvidence = (record.sourceSenses ?? []).map((sense) =>
+    `${sense.senseId ?? "Null sense ID"}: ${sense.glosses.join("; ") || "Null gloss"}${sense.categories.length
+      ? ` · categories ${sense.categories.map((category) => `${category.name} (${category.orig ?? "no source label"}; ${category.langcode ?? "no language"}; ${category.source ?? "no category source"})`).join(", ")}`
+      : " · no source category"}`,
+  ).join(" · ");
+  const sourceTemplateEvidence = record.etymologyTemplates.map((template) =>
+    `${template.name}(${Object.entries(template.args).map(([key, value]) => `${key}=${value}`).join(", ")}) → ${template.expansion || "Null"}`,
+  ).join(" · ");
   return (
     <article className="rounded border border-[#28443f] bg-[#0c1514] p-2">
       <div className="font-semibold text-[#f5f7fb]">{label}: <span className="font-mono">{record.form}</span></div>
@@ -65,6 +73,12 @@ function sourceLinkedRecordCardV0_1(
         Structured source references: {record.etymologyLinks.length
           ? record.etymologyLinks.map((link) => `${link.sourceForm} → ${link.reference}`).join(" · ")
           : "none recorded"}
+      </div>
+      <div data-testid="albanian-reading-source-sense-evidence" className="mt-2 break-words text-[#9fbdb5]">
+        Source sense/category evidence: {sourceSenseEvidence || "Null"}
+      </div>
+      <div data-testid="albanian-reading-target-source-template" className="mt-2 break-words text-[#d5c28f]">
+        Source-authored templates (attributed; not independent morphology proof): {sourceTemplateEvidence || "Null"}
       </div>
       <div className="mt-2 space-y-1 text-[#9fbdb5]">
         {record.pronunciationVariants.length ? record.pronunciationVariants.map((variant) => (
@@ -1032,6 +1046,22 @@ export function MotivationDiscoveryCardV0_1({
                         Functional operation: {bridge.functionalHypothesis.functionalOperation ?? "Null"}
                       </div>
                       <div className="mt-1">{bridge.functionalHypothesis.statement ?? "Null — no bounded functional explanation is available."}</div>
+                      {candidate.sourceLinkedComparison.related ? (
+                        <>
+                          <div className="mt-1 break-words text-[#9fbdb5]">
+                            Target source sense/category evidence: {(candidate.sourceLinkedComparison.related.sourceSenses ?? []).map((sense) =>
+                              `${sense.senseId ?? "Null sense ID"}: ${sense.glosses.join("; ") || "Null gloss"}${sense.categories.length
+                                ? ` · ${sense.categories.map((category) => `${category.name} (${category.orig ?? "no source label"}; ${category.langcode ?? "no language"}; ${category.source ?? "no category source"})`).join(", ")}`
+                                : " · no source category"}`,
+                            ).join(" · ") || "Null"}
+                          </div>
+                          <div className="mt-1 break-words text-[#d5c28f]">
+                            Target source-authored templates (attributed; not independent morphology proof): {candidate.sourceLinkedComparison.related.etymologyTemplates.map((template) =>
+                              `${template.name}(${Object.entries(template.args).map(([key, value]) => `${key}=${value}`).join(", ")}) → ${template.expansion || "Null"}`,
+                            ).join(" · ") || "Null"}
+                          </div>
+                        </>
+                      ) : null}
                       <div className="mt-1 text-[#9fbdb5]">
                         IPA/Voice structure: {derivedStructure ? `${derivedStructure.primary.voicePaths.join(" | ")} → ${derivedStructure.related.voicePaths.join(" | ")}` : "Null"}
                       </div>
