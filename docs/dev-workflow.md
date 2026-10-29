@@ -107,7 +107,7 @@ Run focused tests first for changed behavior. Use the actual repository commands
 - `npm run build` runs the production build directly.
 - `npm run gate` runs lint, unit tests, integration tests, and the production build.
 
-Use `npm run gate:quick` for quick validation when a build is not required. Use `npm run gate`, or report a separately executed `npm run build`, when production-build validation is required. Pre-merge proof must show the command that actually provided build coverage.
+Use `npm run gate` or a separately executed `npm run build` when production-build validation is required. Pre-merge proof must show the command that actually provided build coverage.
 
 The repository pre-push hook runs `npm run gate:prepush` for constrained local
 environments. This is not a validation bypass: it runs lint plus Jest in
@@ -130,11 +130,17 @@ normal capable local environment may still use `npm run gate:quick` or
 
 Never claim PASS, build success, CI success, or gate success without actual output. Do not encode transient test counts in this durable workflow.
 
-For the current repository command surface, the normal pre-merge sequence is
-focused validation, `npm run gate:quick`, and `npm run build` when the lane
-requires production-build coverage. `npm run gate` is the combined full gate
-when that broader command is appropriate. Inspect `package.json` and the
-current CI workflows before relying on any command or historical test count.
+For an ordinary scoped change, default local validation is focused tests,
+changed-file ESLint, and the applicable production or contract typecheck. Keep
+the normal pre-push hook enabled; it must complete `npm run gate:prepush` on
+every push. Run `npm run gate:quick` when broader local integration validation
+is warranted, not as a routine pre-merge step. `gate:quick` and `gate:prepush`
+are not equivalent: `gate:prepush` excludes the defined capability-dependent
+suites and does not run integration tests. Require all hosted CI checks to pass
+before merge; neither local gate substitutes for hosted CI. Use `npm run gate`
+or `npm run build` when production-build coverage is required. Inspect
+`package.json` and the current CI workflows before relying on any command or
+historical test count.
 Documentation-only changes still require consistency, path/link, and any
 repository documentation validation that actually exists; do not run
 unrelated expensive suites only for ceremony.
