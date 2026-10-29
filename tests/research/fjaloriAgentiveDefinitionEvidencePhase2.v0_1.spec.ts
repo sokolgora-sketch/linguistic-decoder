@@ -17,7 +17,7 @@ import {
   type FjaloriExportV0_1,
   type FjaloriSourceRowV0_1,
   type KaikkiNegativeControlRecordV0_1,
-} from "@/scripts/research/fjaloriAgentiveDefinitionEvidencePhase2.v0_1";
+} from "../../scripts/research/fjaloriAgentiveDefinitionEvidencePhase2.v0_1";
 
 const candidates = rawCandidateBatch.candidates.map((rawCandidate) => {
   const projected = getAlbanianOccupationalRoleCandidatesForWordV0_1(rawCandidate.sourceRecord.lemma)
