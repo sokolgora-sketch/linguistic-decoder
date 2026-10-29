@@ -1384,14 +1384,82 @@ function qualifyingSourceSenseAgentEvidenceV0_1(
   return qualifyingSenses.length === 1 ? qualifyingSenses[0] ?? null : null;
 }
 
+function normalizedSourceTemplateTextV0_1(value: string): string {
+  return value.normalize("NFC").trim().replace(/\s+/gu, " ").toLocaleLowerCase("sq-AL");
+}
+
+function hasExactTargetAuthoredAlbanianSuffixEvidenceV0_1(input: Readonly<{
+  primary: AlbanianSourceLinkedRecordV0_1;
+  related: AlbanianSourceLinkedRecordV0_1;
+  comparison: AlbanianSourceLinkedComparisonV0_1 | null;
+}>): boolean {
+  const comparison = input.comparison;
+  if (
+    comparison?.status !== "SUPPORTED" ||
+    comparison.relation.relation !== "SOURCE_RELATED_FORM" ||
+    comparison.relation.primarySourceRecordId !== input.primary.sourceRecordId ||
+    comparison.relation.primaryEntryLocator !== input.primary.entryLocator ||
+    comparison.relation.relatedSourceRecordId !== input.related.sourceRecordId ||
+    comparison.relation.relatedEntryLocator !== input.related.entryLocator ||
+    normalizedAlbanianFormV0_1(comparison.relation.relatedForm) !== normalizedAlbanianFormV0_1(input.related.form) ||
+    comparison.related?.sourceRecordId !== input.related.sourceRecordId ||
+    comparison.related.entryLocator !== input.related.entryLocator ||
+    comparison.related.form !== input.related.form
+  ) {
+    return false;
+  }
+
+  const matchingReferences = input.related.etymologyLinks.filter((link) =>
+    exactAlbanianSourceReferenceV0_1(link, input.primary.form) &&
+    link.sourceForm === comparison.relation.referencedForm &&
+    link.reference === comparison.relation.reference,
+  );
+  const suffixTemplates = input.related.etymologyTemplates.filter((template) => template.name === "suffix");
+  if (matchingReferences.length !== 1 || suffixTemplates.length !== 1) return false;
+
+  const template = suffixTemplates[0];
+  if (!template) return false;
+  const args = template.args;
+  const argKeys = Object.keys(args).sort();
+  const base = args["2"]?.trim() ?? "";
+  const suffix = args["3"]?.trim() ?? "";
+  if (
+    JSON.stringify(argKeys) !== JSON.stringify(["1", "2", "3"]) ||
+    args["1"] !== "sq" ||
+    normalizedAlbanianFormV0_1(base) !== normalizedAlbanianFormV0_1(input.primary.form) ||
+    suffix.length === 0 ||
+    suffix.startsWith("-") ||
+    normalizedSourceTemplateTextV0_1(template.expansion) !== normalizedSourceTemplateTextV0_1(`${base} + -${suffix}`)
+  ) {
+    return false;
+  }
+
+  const sourceExplanation = input.related.etymologyText?.trim().replace(/[.!?]+$/u, "") ?? "";
+  return sourceExplanation.length > 0 &&
+    normalizedSourceTemplateTextV0_1(sourceExplanation) === normalizedSourceTemplateTextV0_1(`${base} + -${suffix}`.replace(/^/u, "From "));
+}
+
+function isSingleMeaningfulSourceSenseV0_1(
+  record: AlbanianSourceLinkedRecordV0_1,
+  expectedSenseId: string,
+): boolean {
+  const meaningfulSenses = (record.sourceSenses ?? []).filter((sense) =>
+    sense.glosses.some((gloss) => gloss.trim().length > 0),
+  );
+  return meaningfulSenses.length === 1 && meaningfulSenses[0]?.senseId === expectedSenseId;
+}
+
 function buildAgentFunctionalHypothesisV0_1(input: Readonly<{
   primary: AlbanianSourceLinkedRecordV0_1;
   related: AlbanianSourceLinkedRecordV0_1;
   comparison: AlbanianSourceLinkedComparisonV0_1 | null;
   sourceRelation: "SOURCE_RELATED_FORM" | "SOURCE_DERIVED_FORM" | null;
 }>): AlbanianFunctionalHypothesisV0_1 | null {
+  const directDerivedForm = input.sourceRelation === "SOURCE_DERIVED_FORM";
+  const targetAuthoredSuffixRelation = input.sourceRelation === "SOURCE_RELATED_FORM" &&
+    hasExactTargetAuthoredAlbanianSuffixEvidenceV0_1(input);
   if (
-    input.sourceRelation !== "SOURCE_DERIVED_FORM" ||
+    (!directDerivedForm && !targetAuthoredSuffixRelation) ||
     (input.primary.partOfSpeech !== "noun" && input.primary.partOfSpeech !== "verb") ||
     input.related.partOfSpeech !== "noun" ||
     !hasMeaningEvidenceV0_1(input.primary.meaningGlosses) ||
@@ -1403,30 +1471,49 @@ function buildAgentFunctionalHypothesisV0_1(input: Readonly<{
   const sourceSenseAgentEvidence = input.comparison?.status === "SUPPORTED"
     ? qualifyingSourceSenseAgentEvidenceV0_1(input.related)
     : null;
+  if (
+    targetAuthoredSuffixRelation &&
+    (!sourceSenseAgentEvidence || !isSingleMeaningfulSourceSenseV0_1(input.related, sourceSenseAgentEvidence.sense.senseId ?? ""))
+  ) {
+    return null;
+  }
   const existingWhitelistedAgentGloss = input.related.meaningGlosses.some((gloss) =>
     /\b(?:fisher(?:man|woman)?|angler|farmer|hunter|seller|singer|trader|worker|teacher|driver|operator|professional|practitioner)\b/iu.test(gloss),
   );
-  if (!sourceSenseAgentEvidence && !existingWhitelistedAgentGloss) return null;
+  if (!sourceSenseAgentEvidence && !(directDerivedForm && existingWhitelistedAgentGloss)) return null;
 
   const primaryMeaning = input.primary.meaningGlosses.join("; ");
   const relatedMeaning = input.related.meaningGlosses.join("; ");
   const functionalMeaning = sourceSenseAgentEvidence?.sense.glosses.join("; ") ?? relatedMeaning;
   const relatedHasSourceIpa = input.related.pronunciationVariants.some((variant) => variant.rawIpa !== null);
+  const targetSuffixTemplate = input.related.etymologyTemplates.find((template) => template.name === "suffix");
   const categoryBackedStatement = sourceSenseAgentEvidence
     ? ` The final source sense (“${functionalMeaning}”) carries the exact source-authored sq:Occupations category, with its sense identity preserved; the category is evidence for this lexical sense only, not for every use of the suffix or for an independent semantic law.`
     : "";
+  const statement = targetAuthoredSuffixRelation && targetSuffixTemplate
+    ? `Source-bounded functional operation AGENT (exploratory): the base source record lists ${input.related.form} (“${relatedMeaning}”) as SOURCE_RELATED_FORM of ${input.primary.form} (“${primaryMeaning}”), not as a base-side derived-form link. The exact target record separately cites ${input.comparison?.relation.reference ?? "Null"} and attributes the template ${targetSuffixTemplate.expansion}; its uniquely identified source sense (“${functionalMeaning}”) carries sq:Occupations. The product models AGENT for this source-qualified target sense while preserving the source relation label. The attributed template is not independent proof of morphology, history, or a universal suffix rule, and no embryo meaning is claimed.`
+    : `Source-bounded functional operation AGENT (exploratory): the source lists ${input.related.form} as a derived form of ${input.primary.form}; its glosses identify ${input.primary.form} as “${primaryMeaning}” and ${input.related.form} as “${relatedMeaning}”. The product preserves AGENT as an exploratory label for the related agent or profession gloss and this source-derived link; it does not assign an entity, resource, or other semantic role to the primary word beyond its source gloss.${categoryBackedStatement} This is a source-bounded product hypothesis, not proof of morphology, etymology, causation, or universal Voice semantics.`;
   return Object.freeze({
     functionalOperation: "AGENT" as const,
-    statement: `Source-bounded functional operation AGENT (exploratory): the source lists ${input.related.form} as a derived form of ${input.primary.form}; its glosses identify ${input.primary.form} as “${primaryMeaning}” and ${input.related.form} as “${relatedMeaning}”. The product preserves AGENT as an exploratory label for the related agent or profession gloss and this source-derived link; it does not assign an entity, resource, or other semantic role to the primary word beyond its source gloss.${categoryBackedStatement} This is a source-bounded product hypothesis, not proof of morphology, etymology, causation, or universal Voice semantics.`,
+    statement,
     basis: Object.freeze([
       "SOURCE_ATTESTED_PRIMARY_MEANING",
       "SOURCE_ATTESTED_AGENT_MEANING",
-      "SOURCE_DERIVED_FORM_LINK",
+      ...(targetAuthoredSuffixRelation
+        ? ["SOURCE_RELATED_FORM_LINK", "TARGET_SOURCE_AUTHORED_SUFFIX_TEMPLATE", "SOURCE_STRUCTURED_ALBANIAN_REFERENCE"]
+        : ["SOURCE_DERIVED_FORM_LINK"]),
       ...(sourceSenseAgentEvidence ? ["SOURCE_ATTESTED_FINAL_SENSE_CATEGORY"] : []),
     ]),
     alternatives: Object.freeze([
-      "The source-derived link is not a complete morphological or etymological analysis.",
-      "The profession gloss may describe an occupation without establishing a universal semantic operation.",
+      ...(targetAuthoredSuffixRelation
+        ? [
+            "The base record labels this as a related form; only the target record attributes the source reference and suffix template, and that attribution is not independent proof of morphology.",
+            "The exact source category supports this identified lexical sense only; it establishes no universal suffix rule or independent embryo meaning.",
+          ]
+        : [
+            "The source-derived link is not a complete morphological or etymological analysis.",
+            "The profession gloss may describe an occupation without establishing a universal semantic operation.",
+          ]),
       relatedHasSourceIpa
         ? "The related source IPA and computed Voice path are phonological observations and may have no semantic force."
         : "The related record has no source IPA in this snapshot, so no Voice or phonological force is claimed.",

@@ -51,6 +51,47 @@ function fixtureFact(
   };
 }
 
+function shkenceScientistFixtureFactsV0_1(
+  relatedOverrides: Partial<AlbanianKaikkiExactLexicalSourceFactV0_1> = {},
+  relation: "SOURCE_RELATED_FORM" | "SOURCE_DERIVED_FORM" = "SOURCE_RELATED_FORM",
+): readonly AlbanianKaikkiExactLexicalSourceFactV0_1[] {
+  const occupationsCategory = {
+    name: "Occupations",
+    kind: null,
+    parents: [],
+    source: "w",
+    orig: "sq:Occupations",
+    langcode: "sq",
+    _dis: null,
+  } as const;
+  const primary = fixtureFact({
+    sourceRecordId: "kaikki-albanian-jsonl:word=shkenc%C3%AB:ordinal=fixture",
+    entryLocator: "jsonl://word/shkenc%C3%AB/match/fixture",
+    form: "shkencë",
+    partOfSpeech: "noun",
+    senses: [{ senseId: "shkence-fixture-sense", glosses: ["science"] }],
+    ipaObservations: [{ soundIndex: 0, ipa: "/ʃkɛnts(ə)/", tags: [] }],
+    relatedForms: [{ form: "shkencëtar", relation, entryLocator: "jsonl://word/shkenc%C3%ABtar" }],
+  });
+  const related = fixtureFact({
+    sourceRecordId: "kaikki-albanian-jsonl:word=shkenc%C3%ABtar:ordinal=fixture",
+    entryLocator: "jsonl://word/shkenc%C3%ABtar/match/fixture",
+    form: "shkencëtar",
+    partOfSpeech: "noun",
+    senses: [{ senseId: "shkencetar-scientist-fixture", glosses: ["scientist"], categories: [occupationsCategory] }],
+    ipaObservations: [],
+    etymologyText: "From shkencë + -tar.",
+    etymologyLinks: [{ sourceForm: "shkencë", reference: "shkencë#Albanian" }],
+    etymologyTemplates: [{
+      name: "suffix",
+      args: { "1": "sq", "2": "shkencë", "3": "tar" },
+      expansion: "shkencë + -tar",
+    }],
+    ...relatedOverrides,
+  });
+  return Object.freeze([primary, related]);
+}
+
 async function analysisFor(word: string) {
   const payload = await runAnalysisDeterministic(word, {
     mode: "strict",
@@ -2086,6 +2127,104 @@ describe("real Albanian exact lexical source integration v0.1", () => {
       reasonCodes: ["FUNCTIONAL_OPERATION_NOT_SUPPORTED"],
       functionalHypothesis: { status: "UNKNOWN_OR_NULL", statement: null },
     });
+  });
+
+  it("activates a sense-bound target-authored suffix interpretation without relabeling the base relation", async () => {
+    const discovery = await discoveryForFactsV0_1(shkenceScientistFixtureFactsV0_1(), "shkencë");
+    const reading = discovery.albanianLexicalReading;
+    const candidate = reading?.relatedCandidateEvaluations.find((item) => item.relatedForm === "shkencëtar");
+    expect(candidate).toMatchObject({
+      sourceRelation: "SOURCE_RELATED_FORM",
+      resolution: "RESOLVED",
+      sourceLinkedComparison: {
+        status: "SUPPORTED",
+        relation: {
+          relation: "SOURCE_RELATED_FORM",
+          primarySourceRecordId: "kaikki-albanian-jsonl:word=shkenc%C3%AB:ordinal=fixture",
+          relatedSourceRecordId: "kaikki-albanian-jsonl:word=shkenc%C3%ABtar:ordinal=fixture",
+          referencedForm: "shkencë",
+          reference: "shkencë#Albanian",
+        },
+        related: {
+          sourceSenses: [{ senseId: "shkencetar-scientist-fixture", glosses: ["scientist"] }],
+          etymologyTemplates: [{ name: "suffix", args: { "1": "sq", "2": "shkencë", "3": "tar" }, expansion: "shkencë + -tar" }],
+        },
+      },
+      functionalMeaningBridge: {
+        status: "SUPPORTED",
+        functionalHypothesis: {
+          status: "EXPLORATORY_FUNCTIONAL_HYPOTHESIS",
+          functionalOperation: "AGENT",
+          basis: expect.arrayContaining([
+            "SOURCE_RELATED_FORM_LINK",
+            "TARGET_SOURCE_AUTHORED_SUFFIX_TEMPLATE",
+            "SOURCE_STRUCTURED_ALBANIAN_REFERENCE",
+            "SOURCE_ATTESTED_FINAL_SENSE_CATEGORY",
+          ]),
+        },
+      },
+    });
+    expect(candidate?.functionalMeaningBridge.functionalHypothesis.statement).toContain("not as a base-side derived-form link");
+    expect(candidate?.sourceLinkedComparison.related?.sourceSenses[0]?.senseId).toBe("shkencetar-scientist-fixture");
+    expect(candidate?.functionalMeaningBridge.functionalHypothesis.basis).not.toContain("SOURCE_DERIVED_FORM_LINK");
+    expect(candidate?.functionalMeaningBridge.derivedStructure).toBeNull();
+    expect(reading?.interpretation).toMatchObject({ status: "EXPLORATORY_ZHEJI_READING" });
+    expect(reading?.interpretation.statement).toContain("AGENT");
+
+    const vm = adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: discovery });
+    expect(vm.motivationDiscoveryV0_1).toMatchObject({ kind: "present" });
+    if (vm.motivationDiscoveryV0_1?.kind !== "present") throw new Error("Expected the additive API adapter projection");
+    render(createElement(MotivationDiscoveryCardV0_1, { discovery: vm.motivationDiscoveryV0_1 }));
+    expect(screen.getByTestId("albanian-reading-functional-bridge")).toHaveTextContent("AGENT");
+    expect(screen.getByTestId("albanian-reading-functional-bridge-operation")).toHaveTextContent("Functional operation: AGENT");
+    expect(screen.getByTestId("albanian-reading-functional-bridge")).toHaveTextContent("SOURCE_RELATED_FORM");
+    const sourceSenseEvidenceText = screen.getAllByTestId("albanian-reading-source-sense-evidence").map((node) => node.textContent).join(" ");
+    expect(sourceSenseEvidenceText).toContain("shkencetar-scientist-fixture");
+    expect(sourceSenseEvidenceText).toContain("Occupations (sq:Occupations; sq; w)");
+    const targetTemplateEvidenceText = screen.getAllByTestId("albanian-reading-target-source-template").map((node) => node.textContent).join(" ");
+    expect(targetTemplateEvidenceText).toContain("suffix(1=sq, 2=shkencë, 3=tar) → shkencë + -tar");
+    expect(targetTemplateEvidenceText).toContain("not independent morphology proof");
+    expect(screen.getByTestId("albanian-source-linked-comparison")).toHaveTextContent("Linked source record: shkencëtar");
+    expect(screen.getByTestId("albanian-source-linked-comparison")).toHaveTextContent("IPA variants: Null");
+    expect(screen.getByTestId("albanian-functional-meaning-bridge")).toHaveTextContent("Null — source IPA is unavailable for one or both records");
+    cleanup();
+  });
+
+  it.each([
+    ["missing target suffix template", { etymologyTemplates: [] }],
+    ["template does not identify the queried base", {
+      etymologyText: "From scienza + -tar.",
+      etymologyTemplates: [{ name: "suffix", args: { "1": "sq", "2": "scienza", "3": "tar" }, expansion: "scienza + -tar" }],
+    }],
+    ["non-authoritative category", {
+      senses: [{ senseId: "shkencetar-scientist-fixture", glosses: ["scientist"], categories: [{
+        name: "Occupations", kind: null, parents: [], source: "w+disamb", orig: "sq:Occupations", langcode: "sq", _dis: null,
+      }] }],
+    }],
+    ["multiple final lexical senses", {
+      senses: [
+        { senseId: "shkencetar-scientist-fixture", glosses: ["scientist"], categories: [{
+          name: "Occupations", kind: null, parents: [], source: "w", orig: "sq:Occupations", langcode: "sq", _dis: null,
+        }] },
+        { senseId: "shkencetar-abstract-fixture", glosses: ["the state of being a scientist"] },
+      ],
+    }],
+    ["foreign-language target reference", {
+      etymologyLinks: [{ sourceForm: "shkencë", reference: "shkencë#Ottoman_Turkish" }],
+    }],
+    ["source explanation conflicts with template", { etymologyText: "Not from shkencë + -tar." }],
+  ] as const)("keeps a target-side AGENT Null for %s", async (_label, targetOverrides) => {
+    const discovery = await discoveryForFactsV0_1(
+      shkenceScientistFixtureFactsV0_1(targetOverrides as Partial<AlbanianKaikkiExactLexicalSourceFactV0_1>),
+      "shkencë",
+    );
+    const candidate = discovery.albanianLexicalReading?.relatedCandidateEvaluations.find((item) => item.relatedForm === "shkencëtar");
+    expect(candidate?.sourceRelation).toBe("SOURCE_RELATED_FORM");
+    expect(candidate?.functionalMeaningBridge).toMatchObject({
+      status: "NULL",
+      functionalHypothesis: { status: "UNKNOWN_OR_NULL", functionalOperation: null },
+    });
+    expect(candidate?.functionalMeaningBridge.functionalHypothesis.statement).toBeNull();
   });
 
   it("exposes every source-resolved AGENT relationship while preserving the selected primary bridge", async () => {
