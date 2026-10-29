@@ -23,7 +23,7 @@ import { projectAlbanianSourceOrderContextSignatureV0_1 } from "@/shared/openIns
 import { adaptAnalysisToTelemetryVM } from "@/ui/instrument/contractAdapter";
 import { MotivationDiscoveryCardV0_1 } from "@/ui/instrument/sections/MotivationDiscoveryCard.v0_1";
 import { createElement } from "react";
-import { render, screen } from "@testing-library/react";
+import { cleanup, render, screen } from "@testing-library/react";
 
 function fixtureFact(
   overrides: Partial<AlbanianKaikkiExactLexicalSourceFactV0_1> = {},
@@ -1322,6 +1322,193 @@ describe("real Albanian exact lexical source integration v0.1", () => {
       expect(statement).toContain("does not assign an entity, resource, or other semantic role to the primary word");
       expect(statement).not.toContain("models shitës as the entity or resource");
     }
+  });
+
+  it("shows frozen occupational-role candidates while keeping the existing category-gated AGENT separate", async () => {
+    const occupations = {
+      name: "Occupations",
+      kind: "other",
+      parents: [],
+      source: "w",
+      orig: "sq:Occupations",
+      langcode: "sq",
+      _dis: null,
+    };
+    const facts = [
+      fixtureFact({
+        sourceRecordId: "kaikki-albanian-jsonl:word=pel%C3%AB:ordinal=0",
+        entryLocator: "jsonl://word/pel%C3%AB/match/0",
+        physicalRecordOrdinal: 4275,
+        form: "pelë",
+        partOfSpeech: "noun",
+        senses: [{ senseId: "en-pelë-sq-noun-B0ryv46E", glosses: ["mare"] }],
+        ipaObservations: [],
+        relatedForms: [{ form: "pelar", relation: "SOURCE_DERIVED_FORM", entryLocator: "jsonl://word/pelar" }],
+      }),
+      fixtureFact({
+        sourceRecordId: "kaikki-albanian-jsonl:word=pelar:ordinal=0",
+        entryLocator: "jsonl://word/pelar/match/0",
+        physicalRecordOrdinal: 1596,
+        form: "pelar",
+        partOfSpeech: "noun",
+        senses: [{ senseId: "en-pelar-sq-noun-RnBYACSN", glosses: ["stableman, ostler, groom (especially mares)"] }],
+        ipaObservations: [{ soundIndex: 0, ipa: "/peˈlar/", tags: [] }],
+        etymologyText: "From pelë (“mare”) + -ar.",
+        etymologyLinks: [
+          { sourceForm: "pelë", reference: "pelë#Albanian" },
+          { sourceForm: "-ar", reference: "-ar#Albanian" },
+        ],
+      }),
+      fixtureFact({
+        sourceRecordId: "kaikki-albanian-jsonl:word=th%C3%ABngjill:ordinal=0",
+        entryLocator: "jsonl://word/th%C3%ABngjill/match/0",
+        physicalRecordOrdinal: 6419,
+        form: "thëngjill",
+        partOfSpeech: "noun",
+        senses: [{ senseId: "en-thëngjill-sq-noun-K~rhJi0l", glosses: ["coal, charcoal"] }],
+        ipaObservations: [],
+        relatedForms: [{ form: "thëngjilltar", relation: "SOURCE_DERIVED_FORM", entryLocator: "jsonl://word/th%C3%ABngjilltar" }],
+      }),
+      fixtureFact({
+        sourceRecordId: "kaikki-albanian-jsonl:word=th%C3%ABngjilltar:ordinal=0",
+        entryLocator: "jsonl://word/th%C3%ABngjilltar/match/0",
+        physicalRecordOrdinal: 12090,
+        form: "thëngjilltar",
+        partOfSpeech: "noun",
+        senses: [{ senseId: "en-thëngjilltar-sq-noun-AMp0~85e", glosses: ["coal maker"] }],
+        ipaObservations: [{ soundIndex: 0, ipa: "/θənɟiɫˈtaɾ/", tags: [] }],
+        etymologyLinks: [
+          { sourceForm: "thëngjill", reference: "thëngjill#Albanian" },
+          { sourceForm: "-tar", reference: "-tar#Albanian" },
+        ],
+      }),
+      fixtureFact({
+        sourceRecordId: "kaikki-albanian-jsonl:word=blet%C3%AB:ordinal=0",
+        entryLocator: "jsonl://word/blet%C3%AB/match/0",
+        physicalRecordOrdinal: 2379,
+        form: "bletë",
+        partOfSpeech: "noun",
+        senses: [{ senseId: "en-bletë-sq-noun-fixture", glosses: ["bee"] }],
+        ipaObservations: [],
+        relatedForms: [{ form: "bletar", relation: "SOURCE_DERIVED_FORM", entryLocator: "jsonl://word/bletar" }],
+      }),
+      fixtureFact({
+        sourceRecordId: "kaikki-albanian-jsonl:word=bletar:ordinal=0",
+        entryLocator: "jsonl://word/bletar/match/0",
+        physicalRecordOrdinal: 3973,
+        form: "bletar",
+        partOfSpeech: "noun",
+        senses: [{ senseId: "en-bletar-sq-noun-KI12VIJ3", glosses: ["beekeeper"], categories: [occupations] }],
+        ipaObservations: [],
+        etymologyLinks: [{ sourceForm: "bletë", reference: "bletë#Albanian" }],
+      }),
+    ];
+
+    const peleDiscovery = await discoveryForFactsV0_1(facts, "pelë");
+    const peleReading = peleDiscovery.albanianLexicalReading;
+    expect(peleReading?.relatedCandidateEvaluations).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        relatedForm: "pelar",
+        sourceRelation: "SOURCE_DERIVED_FORM",
+        functionalMeaningBridge: expect.objectContaining({
+          status: "NULL",
+          functionalHypothesis: expect.objectContaining({ functionalOperation: null }),
+        }),
+      }),
+    ]));
+    const pelarCandidate = peleReading?.occupationalRoleResearchCandidates?.candidates.find((candidate) => candidate.sourceRecord.lemma === "pelar");
+    expect(pelarCandidate).toMatchObject({
+      senseId: "en-pelar-sq-noun-RnBYACSN",
+      functionalOperation: null,
+      productionAuthorization: "NOT_AUTHORIZED",
+      researchHypothesis: {
+        hypothesisStatus: "PROPOSED_NOT_REVIEWED",
+        reviewTrack: "NONE",
+        reviewCandidate: null,
+        ownerApproval: null,
+      },
+      ontology: { status: "TYPED_WORKER_PATHS_OBSERVED" },
+    });
+
+    const coalDiscovery = await discoveryForFactsV0_1(facts, "thëngjill");
+    const coalCandidate = coalDiscovery.albanianLexicalReading?.occupationalRoleResearchCandidates?.candidates.find((candidate) => candidate.sourceRecord.lemma === "thëngjilltar");
+    expect(coalCandidate).toMatchObject({
+      senseId: "en-thëngjilltar-sq-noun-AMp0~85e",
+      ontology: { status: "EXACT_GLOSS_SENSES_NOT_FOUND", senses: [] },
+      functionalOperation: null,
+      productionAuthorization: "NOT_AUTHORIZED",
+      researchHypothesis: { hypothesisStatus: "PROPOSED_NOT_REVIEWED", ownerApproval: null },
+    });
+
+    const bletëDiscovery = await discoveryForFactsV0_1(facts, "bletë");
+    expect(bletëDiscovery.albanianLexicalReading?.functionalMeaningBridge).toMatchObject({
+      status: "SUPPORTED",
+      relatedForm: "bletar",
+      functionalHypothesis: { functionalOperation: "AGENT" },
+    });
+    expect(bletëDiscovery.albanianLexicalReading?.relatedCandidateEvaluations).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        relatedForm: "bletar",
+        functionalMeaningBridge: expect.objectContaining({
+          status: "SUPPORTED",
+          functionalHypothesis: expect.objectContaining({ functionalOperation: "AGENT" }),
+        }),
+      }),
+    ]));
+    const vm = adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: peleDiscovery });
+    expect(vm.motivationDiscoveryV0_1).toMatchObject({ kind: "present" });
+    if (vm.motivationDiscoveryV0_1?.kind === "present") {
+      render(createElement(MotivationDiscoveryCardV0_1, { discovery: vm.motivationDiscoveryV0_1 }));
+      const batch = screen.getByTestId("albanian-occupational-role-research-candidates");
+      expect(batch).toHaveTextContent("stableman, ostler, groom (especially mares)");
+      expect(batch).toHaveTextContent("TYPED_WORKER_PATHS_OBSERVED");
+      expect(batch).toHaveTextContent("Functional operation: Null");
+      expect(batch).toHaveTextContent("NOT_AUTHORIZED");
+      expect(batch).toHaveTextContent("UNKNOWN_OR_NULL");
+      expect(batch).toHaveTextContent("CC BY-SA 4.0");
+      expect(batch).toHaveTextContent("CC BY 4.0");
+    }
+
+    const foreignReferenceDiscovery = JSON.parse(JSON.stringify(peleDiscovery)) as typeof peleDiscovery;
+    const foreignReferenceCandidate = foreignReferenceDiscovery.albanianLexicalReading?.occupationalRoleResearchCandidates?.candidates
+      .find((candidate) => candidate.sourceRecord.lemma === "pelar");
+    if (!foreignReferenceCandidate) throw new Error("Expected pelar candidate fixture");
+    (foreignReferenceCandidate.sourceRecord.etymologyLinks as unknown as Array<{
+      form: string;
+      reference: string;
+      direction: "TARGET_RECORD_REFERENCES_SOURCE_FORM";
+      resolution: "SOURCE_ROWS_FOUND" | "SOURCE_ROW_NOT_FOUND" | "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN";
+      resolvedSourceRows: unknown[];
+    }>).push({
+      form: "jaguar",
+      reference: "jaguar#Portuguese",
+      direction: "TARGET_RECORD_REFERENCES_SOURCE_FORM",
+      resolution: "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN",
+      resolvedSourceRows: [],
+    });
+    const foreignReferenceVm = adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: foreignReferenceDiscovery });
+    expect(foreignReferenceVm.motivationDiscoveryV0_1).toMatchObject({ kind: "present" });
+    cleanup();
+    if (foreignReferenceVm.motivationDiscoveryV0_1?.kind === "present") {
+      render(createElement(MotivationDiscoveryCardV0_1, { discovery: foreignReferenceVm.motivationDiscoveryV0_1 }));
+      expect(screen.getByTestId("albanian-occupational-role-research-candidates"))
+        .toHaveTextContent("REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN");
+    }
+
+    const tampered = JSON.parse(JSON.stringify(peleDiscovery)) as {
+      albanianLexicalReading: {
+        occupationalRoleResearchCandidates: {
+          candidates: Array<{ sourceRecord: { lemma: string }; functionalOperation: null | "AGENT" }>;
+        };
+      };
+    };
+    const tamperedPelar = tampered.albanianLexicalReading.occupationalRoleResearchCandidates.candidates
+      .find((candidate) => candidate.sourceRecord.lemma === "pelar");
+    if (tamperedPelar) tamperedPelar.functionalOperation = "AGENT";
+    expect(adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: tampered }).motivationDiscoveryV0_1).toMatchObject({
+      kind: "missing",
+      missing: "malformed",
+    });
   });
 
   it("supports the source-bounded mal to malor entity-property reading through the VM and UI", async () => {

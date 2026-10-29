@@ -1437,6 +1437,113 @@ function parseMotivationDiscoveryV0_1(
         return validCandidate;
       })
     );
+    const validOccupationalRoleResearchCandidateBatch = (batch: unknown): boolean => {
+      if (batch === undefined || batch === null) return true;
+      if (!isRecord(batch) ||
+        typeof batch.queryForm !== "string" ||
+        (batch.status !== "CANDIDATES_FOUND" && batch.status !== "NO_CANDIDATES") ||
+        batch.sourceProfileId !== "open-instrument.albanian-kaikki.frozen.20261022T035432Z" ||
+        batch.sourceArtifactSha256 !== "7a84eca776ebfac752e7251bb0822edc9cd1701d1d58060d4f8ef4b76a208fcc" ||
+        batch.sourceArtifactBytes !== 67438537 ||
+        batch.sourceUrl !== "https://kaikki.org/dictionary/Albanian/kaikki.org-dictionary-Albanian.jsonl" ||
+        batch.sourceUpstream !== "English Wiktionary → Wiktextract → Kaikki Albanian JSONL" ||
+        !isStringArray(batch.sourceLicenses) || batch.sourceLicenses.length !== 2 ||
+        batch.sourceLicenses[0] !== "CC BY-SA 4.0" || batch.sourceLicenses[1] !== "GFDL" ||
+        batch.sourceAttributionRequired !== true ||
+        batch.oewnArtifactSha256 !== "7d749f6e2c39e6970e4997839dcf6e42fd281f3c2fae0171d2192bae8cfa4b51" ||
+        batch.oewnArtifactBytes !== 9986555 || batch.oewnReleaseDate !== "2025-12-31" ||
+        batch.oewnLicense !== "CC BY 4.0" || !isStringArray(batch.oewnAttribution) ||
+        batch.oewnAttribution.length !== 2 || batch.oewnAttribution[0] !== "Princeton WordNet" ||
+        batch.oewnAttribution[1] !== "Open English WordNet Community" ||
+        !isStringArray(batch.reasonCodes) ||
+        typeof batch.claimBoundary !== "string" ||
+        !isRecord(batch.scanSummary) ||
+        !Array.isArray(batch.candidates)) return false;
+      const summaryNumbers = [
+        "sourceRowsScanned", "suffixRows", "uniqueSuffixLemmas", "suffixSenseCount", "sourceCategorySenseCount",
+        "candidateSenseCount", "selectedUniqueLemmaCount", "excludedSuffixSenseCount", "sourceDerivedRelationCount",
+        "targetEtymologyReferenceCount", "targetLexicalEtymologyReferenceCount", "targetEtymologyCandidateSenseCount",
+        "uniqueSourceDerivedFormEdgeCount", "exactOewnSenseCount", "exactOewnCandidateSenseCount",
+        "typedWorkerPathSenseCount", "typedWorkerCandidateSenseCount", "existingFunctionalGateEvidenceCandidateSenseCount",
+      ];
+      const scanSummary = batch.scanSummary;
+      if (!isRecord(scanSummary) || summaryNumbers.some((key) => typeof scanSummary[key] !== "number" || !Number.isInteger(scanSummary[key]) || (scanSummary[key] as number) < 0)) return false;
+      const validCandidate = (candidate: unknown): boolean => {
+        if (!isRecord(candidate) ||
+          typeof candidate.candidateId !== "string" ||
+          (candidate.candidateStatus !== "SOURCE_ROLE_CATEGORY_CANDIDATE" && candidate.candidateStatus !== "EXISTING_RESEARCH_HYPOTHESIS") ||
+          candidate.sourceProfileId !== batch.sourceProfileId ||
+          candidate.sourceArtifactSha256 !== batch.sourceArtifactSha256 ||
+          typeof candidate.sourceRecordId !== "string" ||
+          typeof candidate.senseId !== "string" ||
+          candidate.sourceRecordId === candidate.senseId ||
+          !isRecord(candidate.sourceRecord) ||
+          !isStringArray(candidate.suffixDiscoveryMatches) ||
+          !Array.isArray(candidate.sourceDerivedRelations) ||
+          !isRecord(candidate.ontology) ||
+          candidate.ontology.release !== "Open English WordNet 2025" ||
+          candidate.ontology.artifactSha256 !== batch.oewnArtifactSha256 ||
+          !isStringArray(candidate.ontology.exactGlossTerms) ||
+          !["TYPED_WORKER_PATHS_OBSERVED", "EXACT_GLOSS_SENSES_FOUND", "EXACT_GLOSS_SENSES_NOT_FOUND"].includes(candidate.ontology.status as string) ||
+          !Array.isArray(candidate.ontology.senses) ||
+          candidate.functionalOperation !== null ||
+          candidate.productionAuthorization !== "NOT_AUTHORIZED" ||
+          candidate.embryoFunction !== "UNKNOWN_OR_NULL" ||
+          candidate.historicalRelation !== "NOT_CLAIMED" ||
+          candidate.noSingleWinner !== true ||
+          candidate.userDecisionPosture !== "user_decides" ||
+          !isStringArray(candidate.reasonCodes) ||
+          typeof candidate.claimBoundary !== "string") return false;
+        const source = candidate.sourceRecord;
+        if (typeof source.physicalRecordOrdinal !== "number" || !Number.isInteger(source.physicalRecordOrdinal) || source.physicalRecordOrdinal < 0 ||
+          typeof source.senseOrdinal !== "number" || !Number.isInteger(source.senseOrdinal) || source.senseOrdinal < 0 ||
+          typeof source.entryLocator !== "string" ||
+          (source.rawEntryId !== null && typeof source.rawEntryId !== "string") ||
+          typeof source.lemma !== "string" ||
+          (source.partOfSpeech !== null && typeof source.partOfSpeech !== "string") ||
+          !isStringArray(source.glosses) || !Array.isArray(source.pronunciationIpa) ||
+          !source.pronunciationIpa.every((ipa) => isRecord(ipa) && typeof ipa.soundIndex === "number" && Number.isInteger(ipa.soundIndex) && ipa.soundIndex >= 0 && typeof ipa.ipa === "string") ||
+          !Array.isArray(source.categories) ||
+          !source.categories.every((category) => isRecord(category) && typeof category.name === "string" &&
+            (category.source === null || typeof category.source === "string") && (category.orig === null || typeof category.orig === "string") &&
+            (category.langcode === null || typeof category.langcode === "string")) ||
+          (source.etymologyText !== null && typeof source.etymologyText !== "string") ||
+          !Array.isArray(source.etymologyTemplates) ||
+          !source.etymologyTemplates.every((template) => isRecord(template) && typeof template.name === "string" &&
+            isRecord(template.args) && Object.values(template.args).every((value) => typeof value === "string") &&
+            typeof template.expansion === "string") ||
+          !Array.isArray(source.etymologyLinks) ||
+          !source.etymologyLinks.every((link) => isRecord(link) && typeof link.form === "string" && typeof link.reference === "string" &&
+            link.direction === "TARGET_RECORD_REFERENCES_SOURCE_FORM" &&
+            (link.resolution === "SOURCE_ROWS_FOUND" || link.resolution === "SOURCE_ROW_NOT_FOUND" ||
+              link.resolution === "REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN") &&
+            Array.isArray(link.resolvedSourceRows) && link.resolvedSourceRows.every((row) => isRecord(row) &&
+              typeof row.sourceRecordId === "string" && row.sourceRecordId !== candidate.sourceRecordId &&
+              typeof row.entryLocator === "string" && typeof row.physicalRecordOrdinal === "number" &&
+              Number.isInteger(row.physicalRecordOrdinal) && row.physicalRecordOrdinal >= 0 && isStringArray(row.senseIds)) &&
+            ((link.resolution === "SOURCE_ROWS_FOUND") === (link.resolvedSourceRows.length > 0)))) return false;
+        if (!candidate.sourceDerivedRelations.every((relation) => isRecord(relation) && typeof relation.baseLemma === "string" &&
+          typeof relation.baseSourceRecordId === "string" && typeof relation.baseEntryLocator === "string" &&
+          typeof relation.basePhysicalRecordOrdinal === "number" && Number.isInteger(relation.basePhysicalRecordOrdinal) &&
+          isStringArray(relation.baseSenseIds) && (relation.relationScope === "SOURCE_RECORD" || relation.relationScope === "SOURCE_SENSE") &&
+          typeof relation.relationIndex === "number" && Number.isInteger(relation.relationIndex) && relation.relationIndex >= 0 &&
+          relation.direction === "BASE_RECORD_LISTS_TARGET_AS_DERIVED_FORM")) return false;
+        if (!candidate.ontology.senses.every((sense) => isRecord(sense) && typeof sense.lemma === "string" && typeof sense.senseId === "string" &&
+          typeof sense.synsetId === "string" && isStringArray(sense.definitions) && Array.isArray(sense.typedHypernymPaths) &&
+          sense.typedHypernymPaths.every((path) => Array.isArray(path) && path.every((node) => isRecord(node) && typeof node.synsetId === "string" && isStringArray(node.members) && isStringArray(node.definitions))))) return false;
+        const hypothesis = candidate.researchHypothesis;
+        return hypothesis === null || (isRecord(hypothesis) &&
+          hypothesis.sourceStatus === "research_candidate" && hypothesis.admissionScope === "research_hypothesis_only" &&
+          hypothesis.sourceRecordId === candidate.sourceRecordId && hypothesis.senseId === candidate.senseId &&
+          hypothesis.hypothesisStatus === "PROPOSED_NOT_REVIEWED" && hypothesis.reviewTrack === "NONE" &&
+          hypothesis.reviewCandidate === null && hypothesis.ownerApproval === null && hypothesis.functionalOperation === null &&
+          hypothesis.productionAuthorization === "NOT_AUTHORIZED" && hypothesis.embryoFunction === "UNKNOWN_OR_NULL" &&
+          hypothesis.historicalRelation === "NOT_CLAIMED" && hypothesis.noSingleWinner === true && hypothesis.userDecisionPosture === "user_decides" &&
+          isStringArray(hypothesis.evidenceRefs) && isStringArray(hypothesis.reasonCodes));
+      };
+      return batch.candidates.every(validCandidate) &&
+        ((batch.status === "CANDIDATES_FOUND") === (batch.candidates.length > 0));
+    };
     return validPrimary && validPronunciation && validRelated &&
       validComposition &&
       validSourceLinkedComponentReading &&
@@ -1444,6 +1551,7 @@ function parseMotivationDiscoveryV0_1(
       validFiveWindowsComparison &&
       validFunctionalMeaningBridge &&
       validRelatedCandidateEvaluations &&
+      validOccupationalRoleResearchCandidateBatch(reading.occupationalRoleResearchCandidates) &&
       (reading.interpretation.status === "EXPLORATORY_ZHEJI_READING" || reading.interpretation.status === "UNKNOWN_OR_NULL") &&
       (reading.interpretation.statement === null || typeof reading.interpretation.statement === "string") &&
       isStringArray(reading.interpretation.alternatives) &&
