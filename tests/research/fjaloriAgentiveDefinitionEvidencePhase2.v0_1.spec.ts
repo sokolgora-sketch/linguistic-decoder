@@ -1,4 +1,7 @@
 import rawCandidateBatch from "@/data/openInstrument/albanianOccupationalRoleCandidateBatch.v0_1.json";
+import { mkdirSync, mkdtempSync, realpathSync, rmSync, symlinkSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import {
   getAlbanianOccupationalRoleCandidatesForWordV0_1,
   type AlbanianOccupationalRoleCandidateV0_1,
@@ -13,6 +16,7 @@ import {
   buildFjaloriDefinitionUnitsV0_1,
   buildFjaloriPhase2ReportV0_1,
   normalizeAlbanianLexicalFormV0_1,
+  resolveExternalReportPathV0_1,
   verifyArtifactDigestV0_1,
   type FjaloriExportV0_1,
   type FjaloriSourceRowV0_1,
@@ -370,5 +374,32 @@ describe("Fjalori Phase 2 local evidence runner", () => {
     expect(() => buildReport([row("not-a-candidate", 1, { definition: "synthetic unrelated text" })]))
       .toThrow("FJALORI_EXPORT_ROW_IDENTITY_OR_ORDER_INVALID");
     expect(candidateIds.size).toBe(targetSenseCount);
+  });
+
+  it("rejects in-repository report paths after canonicalizing symlink parents and path components", () => {
+    const temporaryRoot = mkdtempSync(join(tmpdir(), "fjalori-report-path-v01-"));
+    const repositoryRoot = join(temporaryRoot, "repository");
+    const unusualInRepositoryDirectory = join(repositoryRoot, "..private");
+    const symlinkTargetInsideRepository = join(repositoryRoot, "private-reports");
+    const symlinkParentOutsideRepository = join(temporaryRoot, "external-alias");
+    const safeExternalDirectory = join(temporaryRoot, "safe-external");
+    mkdirSync(unusualInRepositoryDirectory, { recursive: true });
+    mkdirSync(symlinkTargetInsideRepository, { recursive: true });
+    mkdirSync(safeExternalDirectory, { recursive: true });
+    symlinkSync(symlinkTargetInsideRepository, symlinkParentOutsideRepository, "dir");
+
+    try {
+      expect(() => resolveExternalReportPathV0_1(
+        join(unusualInRepositoryDirectory, "report.json"), repositoryRoot,
+      )).toThrow("REPORT_PATH_MUST_BE_OUTSIDE_PUBLIC_REPOSITORY");
+      expect(() => resolveExternalReportPathV0_1(
+        join(symlinkParentOutsideRepository, "report.json"), repositoryRoot,
+      )).toThrow("REPORT_PATH_MUST_BE_OUTSIDE_PUBLIC_REPOSITORY");
+      expect(resolveExternalReportPathV0_1(
+        join(safeExternalDirectory, "report.json"), repositoryRoot,
+      )).toBe(join(realpathSync(safeExternalDirectory), "report.json"));
+    } finally {
+      rmSync(temporaryRoot, { recursive: true, force: true });
+    }
   });
 });

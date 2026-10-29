@@ -4,9 +4,9 @@
  */
 import { createHash } from "node:crypto";
 import { spawnSync } from "node:child_process";
-import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { mkdtempSync, readFileSync, realpathSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { dirname, isAbsolute, join, relative, resolve } from "node:path";
+import { basename, dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { analyzeAlbanianAgentiveDefinitionV0_1 } from "../../src/shared/openInstrument/albanianAgentiveDefinitionAnalyzer.v0_1";
 import type { AlbanianAgentiveDefinitionClassificationV0_1 } from "../../src/shared/openInstrument/albanianAgentiveDefinitionAnalyzer.v0_1";
@@ -1075,15 +1075,23 @@ function parseCliOptionsV0_1(argv: readonly string[]): CliOptionsV0_1 {
   return Object.freeze({ parquet, kaikki, report, python });
 }
 
+export function resolveExternalReportPathV0_1(reportPath: string, repositoryRoot: string): string {
+  const absoluteReportPath = resolve(reportPath);
+  const canonicalRepositoryRoot = realpathSync(repositoryRoot);
+  const canonicalReportParent = realpathSync(dirname(absoluteReportPath));
+  const canonicalReportPath = join(canonicalReportParent, basename(absoluteReportPath));
+  const reportRelativeToRepo = relative(canonicalRepositoryRoot, canonicalReportPath);
+  const reportPathIsInsideRepository = reportRelativeToRepo === "" ||
+    (!reportRelativeToRepo.startsWith(`..${sep}`) && !isAbsolute(reportRelativeToRepo));
+  if (reportPathIsInsideRepository) throw new Error("REPORT_PATH_MUST_BE_OUTSIDE_PUBLIC_REPOSITORY");
+  return canonicalReportPath;
+}
+
 export async function runFjaloriPhase2CliV0_1(argv = process.argv.slice(2)): Promise<FjaloriPhase2ReportV0_1> {
   const options = parseCliOptionsV0_1(argv);
   const scriptPath = fileURLToPath(import.meta.url);
-  const repoRoot = resolve(dirname(scriptPath), "../..");
-  const reportPath = resolve(options.report);
-  const reportRelativeToRepo = relative(repoRoot, reportPath);
-  if (reportRelativeToRepo === "" || (!reportRelativeToRepo.startsWith("..") && !isAbsolute(reportRelativeToRepo))) {
-    throw new Error("REPORT_PATH_MUST_BE_OUTSIDE_PUBLIC_REPOSITORY");
-  }
+  const repoRoot = realpathSync(resolve(dirname(scriptPath), "../.."));
+  const reportPath = resolveExternalReportPathV0_1(options.report, repoRoot);
 
   const candidateBatchPath = resolve(repoRoot, "src/data/openInstrument/albanianOccupationalRoleCandidateBatch.v0_1.json");
   const exporterPath = resolve(repoRoot, "scripts/research/exportFjaloriAgentiveDefinitionEvidenceV0_1.py");
