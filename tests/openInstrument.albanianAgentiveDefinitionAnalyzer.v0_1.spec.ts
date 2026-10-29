@@ -65,6 +65,28 @@ describe("Albanian agentive definition analyzer v0.1", () => {
     });
   });
 
+  it.each(["Ai që punon me", "Ai që punon në", "Ai që punon për", "Ai që punon si"])(
+    "keeps an incomplete prepositional predicate unresolved: %s",
+    (definitionText) => {
+      expect(analyze(definitionText)).toMatchObject({
+        classification: "UNKNOWN_OR_NULL",
+        matchedPattern: "INCOMPLETE_PREPOSITIONAL_HUMAN_PREDICATE",
+        reasonCodes: ["ROLE_COMPLEMENT_STRUCTURE_UNRESOLVED"],
+      });
+    },
+  );
+
+  it.each(["mbiemër", "folje"])(
+    "does not let a role-head phrase override contradictory POS %s",
+    (posTag) => {
+      expect(analyze("Bari pelash", { posTag })).toMatchObject({
+        classification: "UNKNOWN_OR_NULL",
+        matchedPattern: "ROLE_HEAD_WITH_GENITIVE_PLURAL_COMPLEMENT",
+        reasonCodes: ["HEADWORD_POS_CONFLICTS_WITH_HUMAN_ROLE_TEXT"],
+      });
+    },
+  );
+
   it.each(["Ai që nuk shet lule", "Ajo që s’punon me bletë"])(
     "does not classify a negated action as a human agent role: %s",
     (definitionText) => {

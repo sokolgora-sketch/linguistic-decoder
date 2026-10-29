@@ -26,6 +26,7 @@ export type AlbanianAgentiveDefinitionClassificationV0_1 =
 
 export const ALBANIAN_AGENTIVE_DEFINITION_PATTERN_IDS_V0_1 = [
   "EXPLICIT_HUMAN_SUBJECT_QUALIFIED_PREDICATE",
+  "INCOMPLETE_PREPOSITIONAL_HUMAN_PREDICATE",
   "ROLE_HEAD_WITH_GENITIVE_PLURAL_COMPLEMENT",
   "ANIMAL_OR_BIOLOGICAL_SEMANTIC_HEAD",
   "ACTIVITY_OR_PROCESS_NOMINAL_HEAD",
@@ -150,6 +151,11 @@ const QUALIFIED_PREDICATES_V0_1 =
 
 const EXPLICIT_HUMAN_ROLE_PATTERN_V0_1 = new RegExp(
   `^(?<phrase>${HUMAN_SUBJECTS_V0_1}\\s+që\\s+(?:(?<negation>nuk\\s+|s['’]\\s*))?${QUALIFIED_PREDICATES_V0_1}\\s+[\\p{L}\\p{M}\\d][\\p{L}\\p{M}\\d\\s'’,-]*?)[.!?]*$`,
+  "u",
+);
+
+const INCOMPLETE_PREPOSITIONAL_HUMAN_PREDICATE_PATTERN_V0_1 = new RegExp(
+  `^(?<phrase>${HUMAN_SUBJECTS_V0_1}\\s+që\\s+punon\\s+(?:me|për|në|si))[.!?]*$`,
   "u",
 );
 
@@ -353,7 +359,27 @@ function evaluateClauseV0_1(
   const signals: RuleSignalV0_1[] = [];
   const unresolved: UnresolvedSignalV0_1[] = [];
 
-  const explicitMatch = EXPLICIT_HUMAN_ROLE_PATTERN_V0_1.exec(clauseText);
+  const incompletePrepositionalMatch =
+    INCOMPLETE_PREPOSITIONAL_HUMAN_PREDICATE_PATTERN_V0_1.exec(clauseText);
+  const incompletePrepositionalPhrase = incompletePrepositionalMatch?.groups?.["phrase"];
+  if (incompletePrepositionalMatch && incompletePrepositionalPhrase) {
+    const range = capturedRangeV0_1(
+      clause,
+      incompletePrepositionalMatch,
+      incompletePrepositionalPhrase,
+    );
+    if (range) {
+      unresolved.push({
+        matchedPattern: "INCOMPLETE_PREPOSITIONAL_HUMAN_PREDICATE",
+        reasonCode: "ROLE_COMPLEMENT_STRUCTURE_UNRESOLVED",
+        range,
+      });
+    }
+  }
+
+  const explicitMatch = incompletePrepositionalMatch
+    ? null
+    : EXPLICIT_HUMAN_ROLE_PATTERN_V0_1.exec(clauseText);
   const explicitPhrase = explicitMatch?.groups?.["phrase"];
   if (explicitMatch && explicitPhrase) {
     const range = capturedRangeV0_1(clause, explicitMatch, explicitPhrase);
@@ -387,7 +413,15 @@ function evaluateClauseV0_1(
     "ROLE_HEAD_WITH_GENITIVE_PLURAL_COMPLEMENT",
     "ROLE_HEAD_COMPLEMENT_CONSTRUCTION_MATCHED",
   );
-  if (roleSignal) signals.push(roleSignal);
+  if (roleSignal && isIncompatibleHumanRolePosV0_1(posTag)) {
+    unresolved.push({
+      matchedPattern: roleSignal.matchedPattern,
+      reasonCode: "HEADWORD_POS_CONFLICTS_WITH_HUMAN_ROLE_TEXT",
+      range: roleSignal.range,
+    });
+  } else if (roleSignal) {
+    signals.push(roleSignal);
+  }
 
   const animalSignal = signalFromPatternV0_1(
     clause,
