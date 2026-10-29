@@ -317,15 +317,16 @@ function splitClausesV0_1(text: string): readonly TextRangeV0_1[] {
 function isAdjectivePosV0_1(posTag: string | null): boolean {
   if (posTag === null) return false;
   const normalized = posTag.normalize("NFC").trim().toLocaleLowerCase("sq-AL");
-  return normalized === "mbiemër" || normalized === "mbiemer" ||
+  return normalized === "mb." || normalized === "mbiemër" || normalized === "mbiemer" ||
     normalized === "adjective" || normalized === "adj" || normalized === "adj.";
 }
 
 function isIncompatibleHumanRolePosV0_1(posTag: string | null): boolean {
   if (posTag === null) return false;
   const normalized = posTag.normalize("NFC").trim().toLocaleLowerCase("sq-AL");
-  return normalized === "mbiemër" || normalized === "mbiemer" ||
+  return normalized === "mb." || normalized === "mbiemër" || normalized === "mbiemer" ||
     normalized === "adjective" || normalized === "adj" || normalized === "adj." ||
+    normalized === "kal." || normalized === "jokal." ||
     normalized === "folje" || normalized === "verb" || normalized === "v.";
 }
 

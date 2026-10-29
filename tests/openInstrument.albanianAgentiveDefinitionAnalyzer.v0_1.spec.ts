@@ -87,6 +87,34 @@ describe("Albanian agentive definition analyzer v0.1", () => {
     },
   );
 
+  it.each(["mb.", "kal.", "jokal."])(
+    "keeps the role-head phrase unresolved for source POS tag %s",
+    (posTag) => {
+      expect(analyze("Bari pelash", { posTag })).toMatchObject({
+        classification: "UNKNOWN_OR_NULL",
+        matchedPattern: "ROLE_HEAD_WITH_GENITIVE_PLURAL_COMPLEMENT",
+        reasonCodes: ["HEADWORD_POS_CONFLICTS_WITH_HUMAN_ROLE_TEXT"],
+      });
+    },
+  );
+
+  it("recognizes the Fjalori adjective abbreviation for property definitions", () => {
+    expect(analyze("Që lidhet me kombin", { posTag: "mb." })).toMatchObject({
+      classification: "ADJECTIVE_OR_PROPERTY",
+      matchedPattern: "ADJECTIVE_RELATIVE_PROPERTY_WITH_ADJECTIVE_POS",
+    });
+  });
+
+  it.each(["m.", "f."])(
+    "keeps noun POS tag %s compatible with a human-role definition",
+    (posTag) => {
+      expect(analyze("Bari pelash", { posTag })).toMatchObject({
+        classification: "HUMAN_AGENT_ROLE",
+        matchedPattern: "ROLE_HEAD_WITH_GENITIVE_PLURAL_COMPLEMENT",
+      });
+    },
+  );
+
   it.each(["Ai që nuk shet lule", "Ajo që s’punon me bletë"])(
     "does not classify a negated action as a human agent role: %s",
     (definitionText) => {
