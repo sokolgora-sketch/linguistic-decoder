@@ -51,6 +51,32 @@ function fixtureFact(
   };
 }
 
+function sellerFamilyFixtureFactsV0_1(): readonly AlbanianKaikkiExactLexicalSourceFactV0_1[] {
+  const names = ["flower seller", "drinks seller", "brandy seller"];
+  const forms = ["luleshitës", "pijeshitës", "rakishitës"];
+  return [
+    fixtureFact({
+      sourceRecordId: "kaikki-albanian-jsonl:word=shit%C3%ABs:ordinal=fixture",
+      entryLocator: "jsonl://word/shit%C3%ABs/match/fixture",
+      form: "shitës",
+      senses: [{ senseId: "shites-seller-fixture", glosses: ["seller, vendor"] }],
+      relatedForms: [
+        ...forms.map((form) => ({ form, relation: "SOURCE_DERIVED_FORM" as const, entryLocator: `jsonl://word/${encodeURIComponent(form)}` })),
+        { form: "missing-shitës", relation: "SOURCE_DERIVED_FORM" as const, entryLocator: "jsonl://word/missing-shit%C3%ABs" },
+      ],
+      ipaObservations: [],
+    }),
+    ...forms.map((form, index) => fixtureFact({
+      sourceRecordId: `kaikki-albanian-jsonl:word=${encodeURIComponent(form)}:ordinal=fixture`,
+      entryLocator: `jsonl://word/${encodeURIComponent(form)}/match/fixture`,
+      form,
+      senses: [{ senseId: `${form}-sense-fixture`, glosses: [names[index]!] }],
+      etymologyLinks: [{ sourceForm: "shitës", reference: "shitës#Albanian" }],
+      ipaObservations: [],
+    })),
+  ];
+}
+
 function shkenceScientistFixtureFactsV0_1(
   relatedOverrides: Partial<AlbanianKaikkiExactLexicalSourceFactV0_1> = {},
   relation: "SOURCE_RELATED_FORM" | "SOURCE_DERIVED_FORM" = "SOURCE_RELATED_FORM",
@@ -2759,6 +2785,126 @@ describe("real Albanian exact lexical source integration v0.1", () => {
         expect(screen.getByTestId("albanian-reading-related-candidate-evaluations")).toHaveTextContent("rakishitës");
       }
     });
+  });
+
+  it("projects an ordered source-qualified AGENT family through the engine, adapter, and UI without changing the selected bridge or Null", async () => {
+    const result = await buildMotivationEngineDiscoveryServerOnlyV0_1({
+      word: "shitës",
+      inputLanguage: "sq",
+      inputProfile: "albanian",
+      analysis: await analysisFor("shitës"),
+      heart: buildHeartInstrumentV1("shitës"),
+      albanianLexicalSourceProvider: createAlbanianKaikkiServerOnlyExactLexicalSourceProviderForSyntheticFixtureV0_1({ facts: sellerFamilyFixtureFactsV0_1() }),
+    });
+    const reading = result.discovery.albanianLexicalReading;
+    expect(reading?.functionalMeaningBridge).toMatchObject({ relatedForm: "luleshitës", status: "SUPPORTED" });
+    expect(reading?.relatedCandidateEvaluations.at(-1)).toMatchObject({
+      relatedForm: "missing-shitës",
+      resolution: "UNRESOLVED",
+      functionalMeaningBridge: { status: "NULL", functionalHypothesis: { functionalOperation: null } },
+    });
+    expect(reading?.functionalFamilyReading).toMatchObject({
+      status: "EXPLORATORY_FUNCTIONAL_FAMILY",
+      functionalOperation: "AGENT",
+      primary: { form: "shitës", senseId: "shites-seller-fixture", meaningGlosses: ["seller, vendor"] },
+      noSingleWinner: true,
+      userDecisionPosture: "user_decides",
+    });
+    expect(reading?.functionalFamilyReading?.members.map((member) => member.form)).toEqual([
+      "luleshitës", "pijeshitës", "rakishitës",
+    ]);
+    expect(reading?.functionalFamilyReading?.members.map((member) => member.senseId)).toEqual([
+      "luleshitës-sense-fixture", "pijeshitës-sense-fixture", "rakishitës-sense-fixture",
+    ]);
+    expect(reading?.functionalFamilyReading?.members.every((member) =>
+      member.sourceRelation === "SOURCE_DERIVED_FORM" &&
+      member.sourceComparisonStatus === "SUPPORTED" &&
+      member.functionalBridgeStatus === "SUPPORTED" &&
+      member.evidenceBasis.includes("SOURCE_DERIVED_FORM_LINK"),
+    )).toBe(true);
+    expect(reading?.functionalFamilyReading?.statement).toContain("frozen Kaikki");
+    const vm = adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: {
+      ...result.discovery,
+      exactLexicalSourceFacts: undefined,
+      sourceIpaSevenVoiceAnalyses: undefined,
+    } });
+    expect(vm.motivationDiscoveryV0_1).toMatchObject({ kind: "present" });
+    if (vm.motivationDiscoveryV0_1?.kind === "present") {
+      render(createElement(MotivationDiscoveryCardV0_1, { discovery: vm.motivationDiscoveryV0_1 }));
+      const section = screen.getByTestId("albanian-functional-family-reading");
+      expect(section).toHaveTextContent("shitës");
+      expect(section).toHaveTextContent("flower seller");
+      expect(section).toHaveTextContent("drinks seller");
+      expect(section).toHaveTextContent("brandy seller");
+      expect(section).toHaveTextContent("Same frozen Kaikki source");
+      expect(screen.getByTestId("albanian-reading-functional-bridge")).toHaveTextContent("luleshitës");
+      expect(screen.getByTestId("albanian-reading-null-candidate")).toHaveTextContent("missing-shitës");
+      cleanup();
+    }
+  });
+
+  it.each([
+    ["one related form", (facts: readonly AlbanianKaikkiExactLexicalSourceFactV0_1[]) => {
+      const [primary, first] = facts;
+      return [{ ...primary!, relatedForms: [primary!.relatedForms![0]!] }, first!];
+    }],
+    ["one supported and one unresolved", (facts: readonly AlbanianKaikkiExactLexicalSourceFactV0_1[]) => {
+      const [primary, first] = facts;
+      return [{ ...primary!, relatedForms: [primary!.relatedForms![0]!, primary!.relatedForms![3]!] }, first!];
+    }],
+    ["duplicate target form", (facts: readonly AlbanianKaikkiExactLexicalSourceFactV0_1[]) => {
+      const [primary, first] = facts;
+      return [{ ...primary!, relatedForms: [primary!.relatedForms![0]!, primary!.relatedForms![0]!] }, first!];
+    }],
+    ["unanchored source link", (facts: readonly AlbanianKaikkiExactLexicalSourceFactV0_1[]) => {
+      const [primary, first, second] = facts;
+      return [primary!, first!, { ...second!, etymologyLinks: [] }];
+    }],
+    ["ambiguous target senses", (facts: readonly AlbanianKaikkiExactLexicalSourceFactV0_1[]) => {
+      const [primary, first, second] = facts;
+      return [primary!, first!, { ...second!, senses: [...second!.senses, { senseId: "other", glosses: ["other sense"] }] }];
+    }],
+    ["missing target meaning", (facts: readonly AlbanianKaikkiExactLexicalSourceFactV0_1[]) => {
+      const [primary, first, second] = facts;
+      return [primary!, first!, { ...second!, senses: [{ senseId: "no-meaning", glosses: [] }] }];
+    }],
+    ["duplicate primary noun records", (facts: readonly AlbanianKaikkiExactLexicalSourceFactV0_1[]) => {
+      return [...facts, { ...facts[0]!, sourceRecordId: "second-primary-noun", entryLocator: "jsonl://word/shit%C3%ABs/match/second" }];
+    }],
+  ] as const)("keeps the functional family Null for %s", async (_label, alter) => {
+    const reading = (await discoveryForFactsV0_1(alter(sellerFamilyFixtureFactsV0_1()), "shitës")).albanianLexicalReading;
+    expect(reading?.functionalFamilyReading).toBeNull();
+  });
+
+  it("keeps a mixed-operation derived-form set out of the AGENT family", async () => {
+    const [primary, first, second] = sellerFamilyFixtureFactsV0_1();
+    const primaryLight = fixtureFact({
+      ...primary!, form: "dritë",
+      sourceRecordId: "kaikki-albanian-jsonl:word=drit%C3%AB:ordinal=fixture",
+      entryLocator: "jsonl://word/drit%C3%AB/match/fixture",
+      senses: [{ senseId: "light-sense", glosses: ["light", "daylight"] }],
+      ipaObservations: [{ soundIndex: 0, ipa: "/dritə/", tags: [] }],
+      relatedForms: [
+        { form: "dritare", relation: "SOURCE_DERIVED_FORM", entryLocator: "jsonl://word/dritare" },
+        primary!.relatedForms![0]!, primary!.relatedForms![1]!,
+      ],
+    });
+    const relinked = [first!, second!].map((fact) => ({
+      ...fact, etymologyLinks: [{ sourceForm: "dritë", reference: "dritë#Albanian" }],
+    }));
+    const window = fixtureFact({
+      sourceRecordId: "kaikki-albanian-jsonl:word=dritare:ordinal=fixture",
+      entryLocator: "jsonl://word/dritare/match/fixture",
+      form: "dritare",
+      senses: [{ senseId: "window-sense", glosses: ["window, opening"] }],
+      etymologyText: "A window lets light through.",
+      etymologyLinks: [{ sourceForm: "dritë", reference: "dritë#Albanian" }],
+      ipaObservations: [{ soundIndex: 0, ipa: "/dritare/", tags: [] }],
+    });
+    const reading = (await discoveryForFactsV0_1([primaryLight, window, ...relinked], "dritë")).albanianLexicalReading;
+    expect(reading?.relatedCandidateEvaluations[0]?.functionalMeaningBridge.functionalHypothesis.functionalOperation).toBe("ENABLE_PASSAGE");
+    expect(reading?.relatedCandidateEvaluations.slice(1).map((item) => item.functionalMeaningBridge.functionalHypothesis.functionalOperation)).toEqual(["AGENT", "AGENT"]);
+    expect(reading?.functionalFamilyReading).toBeNull();
   });
 
   it("keeps the first source-linked comparison when no directional functional operation is supported", async () => {
