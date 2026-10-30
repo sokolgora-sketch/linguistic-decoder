@@ -1478,7 +1478,7 @@ function buildAgentFunctionalHypothesisV0_1(input: Readonly<{
     return null;
   }
   const existingWhitelistedAgentGloss = input.related.meaningGlosses.some((gloss) =>
-    /\b(?:fisher(?:man|woman)?|angler|farmer|hunter|seller|singer|trader|worker|teacher|driver|operator|professional|practitioner)\b/iu.test(gloss),
+    /\b(?:fisher(?:man|woman)?|angler|farmer|hunter|seller|singer|trader|worker|teacher|driver|operator|professional|practitioner|stableman|ostler)\b/iu.test(gloss),
   );
   if (!sourceSenseAgentEvidence && !(directDerivedForm && existingWhitelistedAgentGloss)) return null;
 
