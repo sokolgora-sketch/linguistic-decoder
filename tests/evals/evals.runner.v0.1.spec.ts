@@ -6,6 +6,7 @@ import { EVAL_SPEC_V0_1 } from "@/shared/evals/spec.v0.1";
 import { parseEvalRunBundleV0_1 } from "@/shared/evals/run.v0.1";
 import { scoreEvalRunBundleV0_1 } from "@/shared/evals/scoreEvalRun.v0.1";
 import { renderEvalReportMdV0_1 } from "@/shared/evals/renderEvalReportMd.v0.1";
+import { withEvalsArtifactWriteLockV0_1 } from "./evalsArtifactWriteLock.v0.1";
 
 function ensureDir(p: string) {
   fs.mkdirSync(p, { recursive: true });
@@ -65,42 +66,60 @@ describe("Evals runner v0.1 — baseline lock (out + baselines)", () => {
     const md = renderEvalReportMdV0_1(report);
     const json = JSON.stringify(report, null, 2) + "\n";
 
-    const outDir = path.join(root, "tests/validation/out");
-    ensureDir(outDir);
-
     const outBase = `evals.${report.specId}.${report.runId}.v0.1`;
+    const outDir = path.join(root, "tests/validation/out");
     const outMd = path.join(outDir, `${outBase}.md`);
     const outJson = path.join(outDir, `${outBase}.json`);
-
-    fs.writeFileSync(outMd, md, "utf8");
-    fs.writeFileSync(outJson, json, "utf8");
-
     const baseDir = path.join(root, "tests/validation/baselines");
-    ensureDir(baseDir);
-
     const baseMd = path.join(baseDir, `${outBase}.md`);
     const baseJson = path.join(baseDir, `${outBase}.json`);
-
     const ready = baselineReadyReport(report);
 
-    if (!ready) {
-      // still useful to have out artifacts; baselines remain unchanged
-      expect(fs.existsSync(outMd)).toBe(true);
-      expect(fs.existsSync(outJson)).toBe(true);
-      return;
-    }
+    withEvalsArtifactWriteLockV0_1(root, () => {
+      ensureDir(outDir);
+      fs.writeFileSync(outMd, md, "utf8");
+      fs.writeFileSync(outJson, json, "utf8");
 
-    // If baselines exist, compare; otherwise write once (bootstrap).
-    if (fs.existsSync(baseMd) && fs.existsSync(baseJson)) {
+      if (!ready) {
+        // still useful to have out artifacts; baselines remain unchanged
+        expect(fs.existsSync(outMd)).toBe(true);
+        expect(fs.existsSync(outJson)).toBe(true);
+        return;
+      }
+
+      ensureDir(baseDir);
+      const hasMd = fs.existsSync(baseMd);
+      const hasJson = fs.existsSync(baseJson);
+      if (hasMd !== hasJson) {
+        throw new Error(`Incomplete committed baseline pair for ${outBase}; refusing to write either file.`);
+      }
+      if (!hasMd) {
+        const allowWrite = (process.env.EVALS_WRITE_BASELINES ?? "").trim() === "1";
+        if (!allowWrite) {
+          throw new Error(
+            [
+              `Missing baselines for: ${outBase}`,
+              `Expected:`,
+              `- ${baseMd}`,
+              `- ${baseJson}`,
+              `To bootstrap explicitly, set EVALS_WRITE_BASELINES=1 after reviewing the generated reports.`,
+            ].join("\n")
+          );
+        }
+
+        fs.writeFileSync(baseMd, md, "utf8");
+        fs.writeFileSync(baseJson, json, "utf8");
+        expect(fs.existsSync(baseMd)).toBe(true);
+        expect(fs.existsSync(baseJson)).toBe(true);
+        return;
+      }
+
+      expect(fs.existsSync(baseMd)).toBe(true);
+      expect(fs.existsSync(baseJson)).toBe(true);
       const md0 = fs.readFileSync(baseMd, "utf8");
       const j0 = fs.readFileSync(baseJson, "utf8");
       expect(md).toBe(md0);
       expect(json).toBe(j0);
-    } else {
-      fs.writeFileSync(baseMd, md, "utf8");
-      fs.writeFileSync(baseJson, json, "utf8");
-      expect(fs.existsSync(baseMd)).toBe(true);
-      expect(fs.existsSync(baseJson)).toBe(true);
-    }
+    });
   });
 });
