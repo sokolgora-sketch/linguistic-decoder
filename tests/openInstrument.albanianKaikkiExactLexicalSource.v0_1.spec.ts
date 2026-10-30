@@ -2841,6 +2841,31 @@ describe("real Albanian exact lexical source integration v0.1", () => {
       expect(screen.getByTestId("albanian-reading-null-candidate")).toHaveTextContent("missing-shitës");
       cleanup();
     }
+
+    const cloneDiscovery = () => JSON.parse(JSON.stringify(result.discovery)) as Record<string, unknown>;
+    const familyOf = (discovery: Record<string, unknown>) =>
+      (discovery.albanianLexicalReading as Record<string, unknown>).functionalFamilyReading as Record<string, unknown>;
+    const candidatesOf = (discovery: Record<string, unknown>) =>
+      (discovery.albanianLexicalReading as Record<string, unknown>).relatedCandidateEvaluations as Record<string, unknown>[];
+    const familyMembersOf = (discovery: Record<string, unknown>) => familyOf(discovery).members as Record<string, unknown>[];
+
+    const capitalizationVariant = cloneDiscovery();
+    candidatesOf(capitalizationVariant).find((candidate) => candidate.relatedForm === "luleshitës")!.relatedForm = "LULESHITËS";
+    expect(adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: capitalizationVariant }).motivationDiscoveryV0_1)
+      .toMatchObject({ kind: "present" });
+
+    const unicodeVariant = cloneDiscovery();
+    candidatesOf(unicodeVariant).find((candidate) => candidate.relatedForm === "luleshitës")!.relatedForm = "luleshitës".normalize("NFD");
+    expect(adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: unicodeVariant }).motivationDiscoveryV0_1)
+      .toMatchObject({ kind: "present" });
+
+    const normalizedDuplicate = cloneDiscovery();
+    familyMembersOf(normalizedDuplicate).push({
+      ...familyMembersOf(normalizedDuplicate)[0]!,
+      form: "LULESHITËS".normalize("NFD"),
+    });
+    expect(adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: normalizedDuplicate }).motivationDiscoveryV0_1)
+      .toMatchObject({ kind: "missing", missing: "malformed" });
   });
 
   it.each([

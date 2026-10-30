@@ -1452,18 +1452,25 @@ function parseMotivationDiscoveryV0_1(
         typeof family.claimBoundary !== "string" ||
         family.noSingleWinner !== true || family.userDecisionPosture !== "user_decides" ||
         !Array.isArray(relatedCandidateEvaluations)) return false;
+      const normalizeAlbanianForm = (form: string): string =>
+        form.normalize("NFC").trim().toLocaleLowerCase("sq-AL");
       const forms = new Set<string>();
       return family.members.every((member) => {
+        const normalizedMemberForm = isRecord(member) && typeof member.form === "string"
+          ? normalizeAlbanianForm(member.form)
+          : "";
         if (!isRecord(member) || typeof member.form !== "string" || !member.form ||
-          forms.has(member.form) || typeof member.sourceRecordId !== "string" ||
+          !normalizedMemberForm || forms.has(normalizedMemberForm) || typeof member.sourceRecordId !== "string" ||
           typeof member.entryLocator !== "string" || typeof member.senseId !== "string" ||
           !member.senseId || !isStringArray(member.meaningGlosses) || member.meaningGlosses.length === 0 ||
           member.sourceRelation !== "SOURCE_DERIVED_FORM" ||
           member.sourceComparisonStatus !== "SUPPORTED" || member.functionalBridgeStatus !== "SUPPORTED" ||
           !isStringArray(member.evidenceBasis) || !member.evidenceBasis.includes("SOURCE_DERIVED_FORM_LINK")) return false;
-        forms.add(member.form);
+        forms.add(normalizedMemberForm);
         return relatedCandidateEvaluations.some((candidate) => isRecord(candidate) &&
-          candidate.relatedForm === member.form && candidate.sourceRelation === "SOURCE_DERIVED_FORM" &&
+          typeof candidate.relatedForm === "string" &&
+          normalizeAlbanianForm(candidate.relatedForm) === normalizedMemberForm &&
+          candidate.sourceRelation === "SOURCE_DERIVED_FORM" &&
           isRecord(candidate.sourceLinkedComparison) && candidate.sourceLinkedComparison.status === "SUPPORTED" &&
           isRecord(candidate.sourceLinkedComparison.related) &&
           candidate.sourceLinkedComparison.related.sourceRecordId === member.sourceRecordId &&
