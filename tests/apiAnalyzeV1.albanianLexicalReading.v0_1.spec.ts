@@ -128,8 +128,61 @@ jest.mock("@/shared/openInstrument/motivationEngineDiscoveryServerOnly.v0_1", ()
     pronunciationAuthority: "CURRENT_KAIKKI_RECORD_ONLY_UNBOUND_TO_FROZEN_PROFILE",
     sourceSnapshot: drite.sourceSnapshot,
   };
+  const qymyr = {
+    sourceRecordId: "kaikki-albanian-jsonl:word=qymyr:ordinal=0",
+    entryLocator: "jsonl://word/qymyr/match/0",
+    physicalRecordOrdinal: 10253,
+    language: "Albanian",
+    languageCode: "sq",
+    form: "qymyr",
+    partOfSpeech: "noun",
+    senses: [{ senseId: "en-qymyr-sq-noun-bRFMlfv1", glosses: ["coal"] }],
+    ipaObservations: [{ soundIndex: 0, ipa: "/cyˈmyɾ/", tags: [] }],
+    etymologyText: "Borrowed from Ottoman Turkish كومور (kömür), which in Rumelian dialects is kümür.",
+    sourceStatus: "observed_external_snapshot",
+    attestationTruth: "fact",
+    pronunciationAuthority: "CURRENT_KAIKKI_RECORD_ONLY_UNBOUND_TO_FROZEN_PROFILE",
+    sourceSnapshot: drite.sourceSnapshot,
+  };
+  const qymyrtar = {
+    sourceRecordId: "kaikki-albanian-jsonl:word=qymyrtar:ordinal=0",
+    entryLocator: "jsonl://word/qymyrtar/match/0",
+    physicalRecordOrdinal: 18329,
+    language: "Albanian",
+    languageCode: "sq",
+    form: "qymyrtar",
+    partOfSpeech: "noun",
+    senses: [{
+      senseId: "en-qymyrtar-sq-noun-51rw1lY3",
+      glosses: ["charcoal maker"],
+      categories: [{
+        name: "Occupations",
+        kind: "other",
+        parents: [],
+        source: "w",
+        orig: "sq:Occupations",
+        langcode: "sq",
+        _dis: null,
+      }],
+    }],
+    ipaObservations: [],
+    etymologyText: "From qymyr + tar.",
+    etymologyLinks: [
+      { sourceForm: "qymyr", reference: "qymyr#Albanian" },
+      { sourceForm: "tar", reference: "tar#Albanian" },
+    ],
+    etymologyTemplates: [{
+      name: "af",
+      args: { "1": "sq", "2": "qymyr", "3": "tar" },
+      expansion: "qymyr + tar",
+    }],
+    sourceStatus: "observed_external_snapshot",
+    attestationTruth: "fact",
+    pronunciationAuthority: "CURRENT_KAIKKI_RECORD_ONLY_UNBOUND_TO_FROZEN_PROFILE",
+    sourceSnapshot: drite.sourceSnapshot,
+  };
   const albanianProvider = lexicalSource.createAlbanianKaikkiServerOnlyExactLexicalSourceProviderForSyntheticFixtureV0_1({
-    facts: [drite, dritare, peshk, peshkatar, pele, pelar],
+    facts: [drite, dritare, peshk, peshkatar, pele, pelar, qymyr, qymyrtar],
   });
   const englishProvider = {
     query: async (query: unknown) => ({
@@ -182,6 +235,15 @@ async function analyzePeleV0_1(): Promise<any> {
     method: "POST",
     headers: { "content-type": "application/json" },
     body: JSON.stringify({ word: "pelë", language: "sq", alphabet: "albanian", providerExecution: "disabled" }),
+  }));
+  return { status: response.status, body: await response.json() };
+}
+
+async function analyzeQymyrtarV0_1(): Promise<any> {
+  const response = await POST(new Request("http://localhost/api/analyze-v1", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ word: "qymyrtar", language: "sq", alphabet: "albanian", providerExecution: "disabled" }),
   }));
   return { status: response.status, body: await response.json() };
 }
@@ -337,5 +399,63 @@ describe("analyze-v1 Albanian lexical reading reachability", () => {
         }),
       ]),
     });
+  });
+
+  it("projects direct qymyrtar input through the API as target-authored, source-bounded AGENT evidence", async () => {
+    const result = await analyzeQymyrtarV0_1();
+    expect(result.status).toBe(200);
+    const reading = result.body.motivationDiscoveryV0_1.albanianLexicalReading;
+    expect(reading).toMatchObject({
+      status: "SUPPORTED",
+      primarySourceFact: {
+        sourceRecordId: "kaikki-albanian-jsonl:word=qymyrtar:ordinal=0",
+        form: "qymyrtar",
+        meaningGlosses: ["charcoal maker"],
+        etymologyText: "From qymyr + tar.",
+      },
+      relatedForms: [],
+      relatedCandidateEvaluations: [expect.objectContaining({
+        relatedForm: "qymyrtar",
+        sourceRelation: "TARGET_AUTHORED_ETYMOLOGY_REFERENCE",
+        sourceLinkedComparison: expect.objectContaining({
+          status: "SUPPORTED",
+          relation: expect.objectContaining({
+            relation: "TARGET_AUTHORED_ETYMOLOGY_REFERENCE",
+            primarySourceRecordId: "kaikki-albanian-jsonl:word=qymyr:ordinal=0",
+            relatedSourceRecordId: "kaikki-albanian-jsonl:word=qymyrtar:ordinal=0",
+            direction: "RELATED_FORM_TO_PRIMARY_ETYMLOGY_REFERENCE",
+            referencedForm: "qymyr",
+            reference: "qymyr#Albanian",
+          }),
+        }),
+        functionalMeaningBridge: expect.objectContaining({
+          status: "SUPPORTED",
+          relatedForm: "qymyrtar",
+          functionalHypothesis: expect.objectContaining({
+            functionalOperation: "AGENT",
+            basis: expect.arrayContaining([
+              "TARGET_SOURCE_AUTHORED_ETYMOLOGY_REFERENCE",
+              "SOURCE_STRUCTURED_ALBANIAN_REFERENCE",
+              "SOURCE_ATTESTED_FINAL_SENSE_CATEGORY",
+            ]),
+            statement: expect.stringContaining("does not create a base-side SOURCE_DERIVED_FORM assertion"),
+          }),
+        }),
+      })],
+      functionalMeaningBridge: expect.objectContaining({
+        status: "SUPPORTED",
+        functionalHypothesis: expect.objectContaining({ functionalOperation: "AGENT" }),
+      }),
+      interpretation: expect.objectContaining({
+        status: "EXPLORATORY_ZHEJI_READING",
+        statement: expect.stringContaining("Integrated source-bounded functional reading"),
+        basis: expect.arrayContaining(["STRUCTURAL_EMBRYO_FUNCTION_REMAINS_UNKNOWN_OR_NULL"]),
+      }),
+    });
+    expect(reading.functionalMeaningBridge.functionalHypothesis.basis).not.toContain("SOURCE_DERIVED_FORM_LINK");
+    const batchCandidate = reading.occupationalRoleResearchCandidates?.candidates.find((candidate: any) => candidate.sourceRecord.lemma === "qymyrtar");
+    if (batchCandidate) {
+      expect(batchCandidate).toMatchObject({ functionalOperation: null, productionAuthorization: "NOT_AUTHORIZED" });
+    }
   });
 });

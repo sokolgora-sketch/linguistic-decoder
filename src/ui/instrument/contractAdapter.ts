@@ -1314,7 +1314,7 @@ function parseMotivationDiscoveryV0_1(
       (sourceLinkedComparison.status === "SUPPORTED" || sourceLinkedComparison.status === "NULL") &&
       isStringArray(sourceLinkedComparison.reasonCodes) &&
       isRecord(sourceLinkedComparison.relation) &&
-      (sourceLinkedComparison.relation.relation === "SOURCE_RELATED_FORM" || sourceLinkedComparison.relation.relation === "SOURCE_DERIVED_FORM") &&
+      (sourceLinkedComparison.relation.relation === "SOURCE_RELATED_FORM" || sourceLinkedComparison.relation.relation === "SOURCE_DERIVED_FORM" || sourceLinkedComparison.relation.relation === "TARGET_AUTHORED_ETYMOLOGY_REFERENCE") &&
       typeof sourceLinkedComparison.relation.primarySourceRecordId === "string" &&
       typeof sourceLinkedComparison.relation.primaryEntryLocator === "string" &&
       typeof sourceLinkedComparison.relation.relatedForm === "string" &&
@@ -1405,7 +1405,7 @@ function parseMotivationDiscoveryV0_1(
     const validRelatedCandidateComparison = (candidate: unknown): boolean => {
       if (!isRecord(candidate) || (candidate.status !== "SUPPORTED" && candidate.status !== "NULL") ||
         !isStringArray(candidate.reasonCodes) || !isRecord(candidate.relation) ||
-        (candidate.relation.relation !== "SOURCE_RELATED_FORM" && candidate.relation.relation !== "SOURCE_DERIVED_FORM") ||
+        (candidate.relation.relation !== "SOURCE_RELATED_FORM" && candidate.relation.relation !== "SOURCE_DERIVED_FORM" && candidate.relation.relation !== "TARGET_AUTHORED_ETYMOLOGY_REFERENCE") ||
         typeof candidate.relation.primarySourceRecordId !== "string" ||
         typeof candidate.relation.primaryEntryLocator !== "string" ||
         typeof candidate.relation.relatedForm !== "string" ||
@@ -1430,7 +1430,7 @@ function parseMotivationDiscoveryV0_1(
       Array.isArray(relatedCandidateEvaluations) && relatedCandidateEvaluations.every((candidate) => {
         const validCandidate = isRecord(candidate) &&
           typeof candidate.relatedForm === "string" &&
-          (candidate.sourceRelation === "SOURCE_RELATED_FORM" || candidate.sourceRelation === "SOURCE_DERIVED_FORM") &&
+          (candidate.sourceRelation === "SOURCE_RELATED_FORM" || candidate.sourceRelation === "SOURCE_DERIVED_FORM" || candidate.sourceRelation === "TARGET_AUTHORED_ETYMOLOGY_REFERENCE") &&
           (candidate.resolution === "RESOLVED" || candidate.resolution === "UNRESOLVED") &&
           validRelatedCandidateComparison(candidate.sourceLinkedComparison) &&
           validFunctionalMeaningBridgeValue(candidate.functionalMeaningBridge);

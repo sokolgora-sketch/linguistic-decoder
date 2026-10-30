@@ -276,11 +276,17 @@ export type AlbanianSourceLinkedRecordV0_1 = Readonly<{
   pronunciationVariants: readonly AlbanianSourceLinkedPronunciationV0_1[];
 }>;
 
+type AlbanianSourceEvidenceRelationV0_1 =
+  | "SOURCE_RELATED_FORM"
+  | "SOURCE_DERIVED_FORM"
+  /** The queried target cites a base in its own etymology; no base-side form link is implied. */
+  | "TARGET_AUTHORED_ETYMOLOGY_REFERENCE";
+
 export type AlbanianSourceLinkedComparisonV0_1 = Readonly<{
   status: "SUPPORTED" | "NULL";
   reasonCodes: readonly string[];
   relation: Readonly<{
-    relation: "SOURCE_RELATED_FORM" | "SOURCE_DERIVED_FORM";
+    relation: AlbanianSourceEvidenceRelationV0_1;
     primarySourceRecordId: string;
     primaryEntryLocator: string;
     relatedForm: string;
@@ -309,7 +315,7 @@ export type AlbanianSourceLinkedComparisonV0_1 = Readonly<{
 
 export type AlbanianRelatedCandidateEvaluationV0_1 = Readonly<{
   relatedForm: string;
-  sourceRelation: "SOURCE_RELATED_FORM" | "SOURCE_DERIVED_FORM";
+  sourceRelation: AlbanianSourceEvidenceRelationV0_1;
   resolution: "RESOLVED" | "UNRESOLVED";
   sourceLinkedComparison: AlbanianSourceLinkedComparisonV0_1;
   functionalMeaningBridge: AlbanianFunctionalMeaningBridgeV0_1;
@@ -1021,7 +1027,7 @@ function nullSourceLinkedComparisonV0_1(
   primary: AlbanianKaikkiExactLexicalSourceFactV0_1,
   relatedForm: Readonly<{
     form: string;
-    relation: "SOURCE_RELATED_FORM" | "SOURCE_DERIVED_FORM";
+    relation: AlbanianSourceEvidenceRelationV0_1;
   }>,
   relatedSourceRecordId: string | null,
   relatedEntryLocator: string,
@@ -1058,7 +1064,7 @@ function buildSourceLinkedComparisonV0_1(input: Readonly<{
   primaryAnalyses: readonly AlbanianKaikkiSourceIpaSevenVoiceAnalysisV0_1[];
   relatedForm: Readonly<{
     form: string;
-    relation: "SOURCE_RELATED_FORM" | "SOURCE_DERIVED_FORM";
+    relation: AlbanianSourceEvidenceRelationV0_1;
     entryLocator: string;
   }>;
   related: AlbanianKaikkiExactLexicalSourceFactV0_1 | null;
@@ -1116,6 +1122,82 @@ function buildSourceLinkedComparisonV0_1(input: Readonly<{
     related: relatedProjection,
     summary: sourceLinkedSummaryV0_1(primaryProjection, relatedProjection),
     claimBoundary: "The exact source-authored structured reference is preserved as attributed evidence. Computed IPA, Voice and consonantal context are descriptive only; no morphology, historical derivation, causation, or functional composition is claimed.",
+  });
+}
+
+async function buildTargetAuthoredEtymologyCandidateV0_1(input: Readonly<{
+  target: AlbanianKaikkiExactLexicalSourceFactV0_1;
+  targetFacts: readonly AlbanianKaikkiExactLexicalSourceFactV0_1[];
+  provider: AlbanianKaikkiServerOnlyExactLexicalSourceProviderV0_1;
+}>): Promise<AlbanianRelatedCandidateEvaluationV0_1 | null> {
+  if (
+    input.targetFacts.length !== 1 ||
+    input.targetFacts[0]?.sourceRecordId !== input.target.sourceRecordId ||
+    input.target.language !== "Albanian" ||
+    input.target.languageCode !== "sq" ||
+    input.target.partOfSpeech !== "noun"
+  ) {
+    return null;
+  }
+
+  const templates = input.target.etymologyTemplates?.filter((template) => template.name === "af") ?? [];
+  if (templates.length !== 1) return null;
+  const template = templates[0];
+  const baseForm = template?.args["2"]?.trim() ?? "";
+  const otherComponent = template?.args["3"]?.trim() ?? "";
+  if (template?.args["1"] !== "sq" || !baseForm || !otherComponent) return null;
+
+  const matchingReferences = (input.target.etymologyLinks ?? []).filter((link) =>
+    normalizedAlbanianFormV0_1(link.sourceForm) === normalizedAlbanianFormV0_1(baseForm),
+  );
+  if (matchingReferences.length !== 1 || !exactAlbanianSourceReferenceV0_1(matchingReferences[0]!, baseForm)) {
+    return null;
+  }
+
+  let baseResult: AlbanianKaikkiExactLexicalSourceLookupResultV0_1;
+  try {
+    baseResult = await input.provider.query(baseForm);
+  } catch {
+    return null;
+  }
+  if (baseResult.status !== "MATCHES_FOUND" || baseResult.facts.length !== 1) return null;
+  const base = baseResult.facts[0];
+  const baseMeaningfulSenses = base?.senses.filter((sense) => sense.glosses.some((gloss) => gloss.trim().length > 0)) ?? [];
+  if (
+    !base ||
+    base.language !== "Albanian" ||
+    base.languageCode !== "sq" ||
+    normalizedAlbanianFormV0_1(base.form) !== normalizedAlbanianFormV0_1(baseForm) ||
+    base.partOfSpeech !== "noun" ||
+    baseMeaningfulSenses.length !== 1
+  ) {
+    return null;
+  }
+
+  const relation = Object.freeze({
+    form: input.target.form,
+    relation: "TARGET_AUTHORED_ETYMOLOGY_REFERENCE" as const,
+    entryLocator: input.target.entryLocator,
+  });
+  const comparison = buildSourceLinkedComparisonV0_1({
+    primary: base,
+    primaryAnalyses: projectAlbanianKaikkiFactSourceIpaToSevenVoicesV0_1(base),
+    relatedForm: relation,
+    related: input.target,
+  });
+  const bridge = buildAlbanianFunctionalMeaningBridgeV0_1({
+    primary: sourceRecordProjectionV0_1(base, projectAlbanianKaikkiFactSourceIpaToSevenVoicesV0_1(base)),
+    comparison,
+    related: sourceRecordProjectionV0_1(input.target, projectAlbanianKaikkiFactSourceIpaToSevenVoicesV0_1(input.target)),
+    sourceRelation: relation.relation,
+  });
+
+  return Object.freeze({
+    relatedForm: input.target.form,
+    sourceRelation: relation.relation,
+    resolution: "RESOLVED" as const,
+    sourceLinkedComparison: comparison,
+    functionalMeaningBridge: bridge,
   });
 }
 
@@ -1439,27 +1521,79 @@ function hasExactTargetAuthoredAlbanianSuffixEvidenceV0_1(input: Readonly<{
     normalizedSourceTemplateTextV0_1(sourceExplanation) === normalizedSourceTemplateTextV0_1(`${base} + -${suffix}`.replace(/^/u, "From "));
 }
 
-function isSingleMeaningfulSourceSenseV0_1(
-  record: AlbanianSourceLinkedRecordV0_1,
-  expectedSenseId: string,
-): boolean {
-  const meaningfulSenses = (record.sourceSenses ?? []).filter((sense) =>
-    sense.glosses.some((gloss) => gloss.trim().length > 0),
+function hasExactTargetAuthoredEtymologyReferenceEvidenceV0_1(input: Readonly<{
+  primary: AlbanianSourceLinkedRecordV0_1;
+  related: AlbanianSourceLinkedRecordV0_1;
+  comparison: AlbanianSourceLinkedComparisonV0_1 | null;
+}>): boolean {
+  const comparison = input.comparison;
+  if (
+    comparison?.status !== "SUPPORTED" ||
+    comparison.relation.relation !== "TARGET_AUTHORED_ETYMOLOGY_REFERENCE" ||
+    comparison.relation.direction !== "RELATED_FORM_TO_PRIMARY_ETYMLOGY_REFERENCE" ||
+    comparison.relation.primarySourceRecordId !== input.primary.sourceRecordId ||
+    comparison.relation.primaryEntryLocator !== input.primary.entryLocator ||
+    comparison.relation.relatedSourceRecordId !== input.related.sourceRecordId ||
+    comparison.relation.relatedEntryLocator !== input.related.entryLocator ||
+    normalizedAlbanianFormV0_1(comparison.relation.relatedForm) !== normalizedAlbanianFormV0_1(input.related.form) ||
+    normalizedAlbanianFormV0_1(comparison.relation.referencedForm ?? "") !== normalizedAlbanianFormV0_1(input.primary.form)
+  ) {
+    return false;
+  }
+
+  const targetReferences = input.related.etymologyLinks.filter((link) =>
+    normalizedAlbanianFormV0_1(link.sourceForm) === normalizedAlbanianFormV0_1(input.primary.form),
   );
-  return meaningfulSenses.length === 1 && meaningfulSenses[0]?.senseId === expectedSenseId;
+  if (
+    targetReferences.length !== 1 ||
+    !exactAlbanianSourceReferenceV0_1(targetReferences[0]!, input.primary.form) ||
+    targetReferences[0]?.sourceForm !== comparison.relation.referencedForm ||
+    targetReferences[0]?.reference !== comparison.relation.reference
+  ) {
+    return false;
+  }
+
+  const templates = input.related.etymologyTemplates.filter((template) => template.name === "af");
+  if (templates.length !== 1) return false;
+  const template = templates[0];
+  if (!template) return false;
+  const base = template.args["2"]?.trim() ?? "";
+  const otherComponent = template.args["3"]?.trim() ?? "";
+  const expansionParts = template.expansion.split(" + ");
+  const expansionBase = expansionParts[0]?.trim() ?? "";
+  const expansionBaseRemainder = expansionBase.slice(input.primary.form.length).trim();
+  const expansionBaseIsExact = normalizedAlbanianFormV0_1(expansionBase) === normalizedAlbanianFormV0_1(input.primary.form) ||
+    (normalizedAlbanianFormV0_1(expansionBase.slice(0, input.primary.form.length)) === normalizedAlbanianFormV0_1(input.primary.form) &&
+      /^\(.+\)$/u.test(expansionBaseRemainder));
+  if (
+    template.args["1"] !== "sq" ||
+    normalizedAlbanianFormV0_1(base) !== normalizedAlbanianFormV0_1(input.primary.form) ||
+    otherComponent.length === 0 ||
+    expansionParts.length !== 2 ||
+    !expansionBaseIsExact ||
+    normalizedSourceTemplateTextV0_1(expansionParts[1] ?? "") !== normalizedSourceTemplateTextV0_1(otherComponent)
+  ) {
+    return false;
+  }
+
+  const sourceExplanation = input.related.etymologyText?.trim().replace(/[.!?]+$/u, "") ?? "";
+  return sourceExplanation.length > 0 &&
+    normalizedSourceTemplateTextV0_1(sourceExplanation) === normalizedSourceTemplateTextV0_1(`From ${template.expansion}`);
 }
 
 function buildAgentFunctionalHypothesisV0_1(input: Readonly<{
   primary: AlbanianSourceLinkedRecordV0_1;
   related: AlbanianSourceLinkedRecordV0_1;
   comparison: AlbanianSourceLinkedComparisonV0_1 | null;
-  sourceRelation: "SOURCE_RELATED_FORM" | "SOURCE_DERIVED_FORM" | null;
+  sourceRelation: AlbanianSourceEvidenceRelationV0_1 | null;
 }>): AlbanianFunctionalHypothesisV0_1 | null {
   const directDerivedForm = input.sourceRelation === "SOURCE_DERIVED_FORM";
   const targetAuthoredSuffixRelation = input.sourceRelation === "SOURCE_RELATED_FORM" &&
     hasExactTargetAuthoredAlbanianSuffixEvidenceV0_1(input);
+  const targetAuthoredEtymologyReference = input.sourceRelation === "TARGET_AUTHORED_ETYMOLOGY_REFERENCE" &&
+    hasExactTargetAuthoredEtymologyReferenceEvidenceV0_1(input);
   if (
-    (!directDerivedForm && !targetAuthoredSuffixRelation) ||
+    (!directDerivedForm && !targetAuthoredSuffixRelation && !targetAuthoredEtymologyReference) ||
     (input.primary.partOfSpeech !== "noun" && input.primary.partOfSpeech !== "verb") ||
     input.related.partOfSpeech !== "noun" ||
     !hasMeaningEvidenceV0_1(input.primary.meaningGlosses) ||
@@ -1471,26 +1605,38 @@ function buildAgentFunctionalHypothesisV0_1(input: Readonly<{
   const sourceSenseAgentEvidence = input.comparison?.status === "SUPPORTED"
     ? qualifyingSourceSenseAgentEvidenceV0_1(input.related)
     : null;
+  const meaningfulTargetSenses = (input.related.sourceSenses ?? []).filter((sense) =>
+    sense.glosses.some((gloss) => gloss.trim().length > 0),
+  );
   if (
-    targetAuthoredSuffixRelation &&
-    (!sourceSenseAgentEvidence || !isSingleMeaningfulSourceSenseV0_1(input.related, sourceSenseAgentEvidence.sense.senseId ?? ""))
+    (targetAuthoredSuffixRelation && !sourceSenseAgentEvidence) ||
+    ((targetAuthoredSuffixRelation || targetAuthoredEtymologyReference) &&
+      (meaningfulTargetSenses.length !== 1 || !meaningfulTargetSenses[0]?.senseId ||
+        (sourceSenseAgentEvidence && sourceSenseAgentEvidence.sense.senseId !== meaningfulTargetSenses[0]?.senseId)))
   ) {
     return null;
   }
   const existingWhitelistedAgentGloss = input.related.meaningGlosses.some((gloss) =>
     /\b(?:fisher(?:man|woman)?|angler|farmer|hunter|seller|singer|trader|worker|teacher|driver|operator|professional|practitioner|stableman|ostler)\b/iu.test(gloss),
   );
-  if (!sourceSenseAgentEvidence && !(directDerivedForm && existingWhitelistedAgentGloss)) return null;
+  if (
+    !sourceSenseAgentEvidence &&
+    !(directDerivedForm && existingWhitelistedAgentGloss) &&
+    !(targetAuthoredEtymologyReference && existingWhitelistedAgentGloss)
+  ) return null;
 
   const primaryMeaning = input.primary.meaningGlosses.join("; ");
   const relatedMeaning = input.related.meaningGlosses.join("; ");
   const functionalMeaning = sourceSenseAgentEvidence?.sense.glosses.join("; ") ?? relatedMeaning;
   const relatedHasSourceIpa = input.related.pronunciationVariants.some((variant) => variant.rawIpa !== null);
   const targetSuffixTemplate = input.related.etymologyTemplates.find((template) => template.name === "suffix");
+  const targetAuthoredTemplate = input.related.etymologyTemplates.find((template) => template.name === "af");
   const categoryBackedStatement = sourceSenseAgentEvidence
     ? ` The final source sense (“${functionalMeaning}”) carries the exact source-authored sq:Occupations category, with its sense identity preserved; the category is evidence for this lexical sense only, not for every use of the suffix or for an independent semantic law.`
     : "";
-  const statement = targetAuthoredSuffixRelation && targetSuffixTemplate
+  const statement = targetAuthoredEtymologyReference && targetAuthoredTemplate
+    ? `Source-bounded functional operation AGENT (exploratory): the directly queried target record ${input.related.form} (“${relatedMeaning}”) is linked to the resolved Albanian base record ${input.primary.form} (“${primaryMeaning}”) only by its own exact source-authored etymology reference ${input.comparison?.relation.reference ?? "Null"} and template ${targetAuthoredTemplate.expansion}. The identified target sense (“${functionalMeaning}”)${sourceSenseAgentEvidence ? " carries the exact source-authored sq:Occupations category" : " matches the existing bounded human-role source-gloss qualification"}. The target record does not create a base-side SOURCE_DERIVED_FORM assertion; this reading does not infer one, resolve the remaining template component, or establish a suffix rule. It is an exploratory AGENT reading for this source-qualified target sense only; no embryo meaning is claimed.`
+    : targetAuthoredSuffixRelation && targetSuffixTemplate
     ? `Source-bounded functional operation AGENT (exploratory): the base source record lists ${input.related.form} (“${relatedMeaning}”) as SOURCE_RELATED_FORM of ${input.primary.form} (“${primaryMeaning}”), not as a base-side derived-form link. The exact target record separately cites ${input.comparison?.relation.reference ?? "Null"} and attributes the template ${targetSuffixTemplate.expansion}; its uniquely identified source sense (“${functionalMeaning}”) carries sq:Occupations. The product models AGENT for this source-qualified target sense while preserving the source relation label. The attributed template is not independent proof of morphology, history, or a universal suffix rule, and no embryo meaning is claimed.`
     : `Source-bounded functional operation AGENT (exploratory): the source lists ${input.related.form} as a derived form of ${input.primary.form}; its glosses identify ${input.primary.form} as “${primaryMeaning}” and ${input.related.form} as “${relatedMeaning}”. The product preserves AGENT as an exploratory label for the related agent or profession gloss and this source-derived link; it does not assign an entity, resource, or other semantic role to the primary word beyond its source gloss.${categoryBackedStatement} This is a source-bounded product hypothesis, not proof of morphology, etymology, causation, or universal Voice semantics.`;
   return Object.freeze({
@@ -1499,13 +1645,20 @@ function buildAgentFunctionalHypothesisV0_1(input: Readonly<{
     basis: Object.freeze([
       "SOURCE_ATTESTED_PRIMARY_MEANING",
       "SOURCE_ATTESTED_AGENT_MEANING",
-      ...(targetAuthoredSuffixRelation
+      ...(targetAuthoredEtymologyReference
+        ? ["TARGET_SOURCE_AUTHORED_ETYMOLOGY_REFERENCE", "SOURCE_STRUCTURED_ALBANIAN_REFERENCE"]
+        : targetAuthoredSuffixRelation
         ? ["SOURCE_RELATED_FORM_LINK", "TARGET_SOURCE_AUTHORED_SUFFIX_TEMPLATE", "SOURCE_STRUCTURED_ALBANIAN_REFERENCE"]
         : ["SOURCE_DERIVED_FORM_LINK"]),
       ...(sourceSenseAgentEvidence ? ["SOURCE_ATTESTED_FINAL_SENSE_CATEGORY"] : []),
     ]),
     alternatives: Object.freeze([
-      ...(targetAuthoredSuffixRelation
+      ...(targetAuthoredEtymologyReference
+        ? [
+            "The target record supplies an etymology reference, not a base-side derived-form edge; no direction stronger than that source attribution is claimed.",
+            "The source-authored template's remaining component is not independently resolved and supports no suffix law or embryo meaning.",
+          ]
+        : targetAuthoredSuffixRelation
         ? [
             "The base record labels this as a related form; only the target record attributes the source reference and suffix template, and that attribution is not independent proof of morphology.",
             "The exact source category supports this identified lexical sense only; it establishes no universal suffix rule or independent embryo meaning.",
@@ -1525,7 +1678,7 @@ export function buildAlbanianFunctionalMeaningBridgeV0_1(input: Readonly<{
   primary: AlbanianSourceLinkedRecordV0_1;
   comparison: AlbanianSourceLinkedComparisonV0_1 | null;
   related?: AlbanianSourceLinkedRecordV0_1 | null;
-  sourceRelation?: "SOURCE_RELATED_FORM" | "SOURCE_DERIVED_FORM" | null;
+  sourceRelation?: AlbanianSourceEvidenceRelationV0_1 | null;
 }>): AlbanianFunctionalMeaningBridgeV0_1 {
   const related = input.related ?? input.comparison?.related ?? null;
   const sourceRelation = input.sourceRelation ?? input.comparison?.relation.relation ?? null;
@@ -1553,7 +1706,7 @@ export function buildAlbanianFunctionalMeaningBridgeV0_1(input: Readonly<{
   if (!agentFunctionalHypothesis && related !== null && !related.etymologyText?.trim()) {
     reasons.push("SOURCE_AUTHORED_FUNCTIONAL_EXPLANATION_MISSING");
   }
-  const entityToAttributedPropertyHypothesis = related && input.comparison
+  const entityToAttributedPropertyHypothesis = related && input.comparison && sourceRelation !== "TARGET_AUTHORED_ETYMOLOGY_REFERENCE"
     ? buildEntityToAttributedPropertyHypothesisV0_1({
         comparison: input.comparison,
         primary: input.comparison.primary,
@@ -1572,7 +1725,7 @@ export function buildAlbanianFunctionalMeaningBridgeV0_1(input: Readonly<{
     });
   }
 
-  const directionalHypothesis = related
+  const directionalHypothesis = related && sourceRelation !== "TARGET_AUTHORED_ETYMOLOGY_REFERENCE"
     ? buildDirectionalFunctionalHypothesisV0_1({
         primary: input.comparison?.primary ?? input.primary,
         related,
@@ -1932,11 +2085,24 @@ async function buildAlbanianLexicalReadingV0_1(input: Readonly<{
       functionalMeaningBridge: bridge,
     });
   });
-  const selectedRelatedCandidate = relatedCandidateEvaluations.find(({ sourceLinkedComparison, functionalMeaningBridge }) =>
+  const targetAuthoredEtymologyCandidate = input.sourceStatus.status === "MATCHES_FOUND"
+    ? await buildTargetAuthoredEtymologyCandidateV0_1({
+        target: primary,
+        targetFacts: input.facts.filter((fact) =>
+          normalizedAlbanianFormV0_1(fact.form) === normalizedAlbanianFormV0_1(input.word) &&
+          fact.partOfSpeech !== "name",
+        ),
+        provider: input.provider,
+      })
+    : null;
+  const allRelatedCandidateEvaluations = targetAuthoredEtymologyCandidate
+    ? Object.freeze([...relatedCandidateEvaluations, targetAuthoredEtymologyCandidate])
+    : Object.freeze(relatedCandidateEvaluations);
+  const selectedRelatedCandidate = allRelatedCandidateEvaluations.find(({ sourceLinkedComparison, functionalMeaningBridge }) =>
     sourceLinkedComparison.status === "SUPPORTED" && functionalMeaningBridge.status === "SUPPORTED",
-  ) ?? relatedCandidateEvaluations.find(({ functionalMeaningBridge }) => functionalMeaningBridge.status === "SUPPORTED")
-    ?? relatedCandidateEvaluations.find(({ sourceLinkedComparison }) => sourceLinkedComparison.status === "SUPPORTED")
-    ?? relatedCandidateEvaluations[0]
+  ) ?? allRelatedCandidateEvaluations.find(({ functionalMeaningBridge }) => functionalMeaningBridge.status === "SUPPORTED")
+    ?? allRelatedCandidateEvaluations.find(({ sourceLinkedComparison }) => sourceLinkedComparison.status === "SUPPORTED")
+    ?? allRelatedCandidateEvaluations[0]
     ?? null;
   const sourceLinkedComparison = selectedRelatedCandidate?.sourceLinkedComparison ?? null;
   const functionalMeaningBridge = selectedRelatedCandidate?.functionalMeaningBridge ?? buildAlbanianFunctionalMeaningBridgeV0_1({
@@ -2007,7 +2173,7 @@ async function buildAlbanianLexicalReadingV0_1(input: Readonly<{
         })
       : null,
     relatedForms: Object.freeze(relatedResults),
-    relatedCandidateEvaluations: Object.freeze(relatedCandidateEvaluations),
+    relatedCandidateEvaluations: allRelatedCandidateEvaluations,
     occupationalRoleResearchCandidates,
     fiveWindowsComparison,
     sourceLinkedComponentReading,
