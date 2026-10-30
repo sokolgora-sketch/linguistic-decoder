@@ -105,6 +105,13 @@ async function discoveryForFactsV0_1(
   word = facts[0]?.form ?? "",
 ) {
   const provider = createAlbanianKaikkiServerOnlyExactLexicalSourceProviderForSyntheticFixtureV0_1({ facts });
+  return discoveryForProviderV0_1(provider, word);
+}
+
+async function discoveryForProviderV0_1(
+  provider: AlbanianKaikkiServerOnlyExactLexicalSourceProviderV0_1,
+  word: string,
+) {
   const result = await buildMotivationEngineDiscoveryServerOnlyV0_1({
     word,
     inputLanguage: "sq",
@@ -114,6 +121,67 @@ async function discoveryForFactsV0_1(
     albanianLexicalSourceProvider: provider,
   });
   return result.discovery;
+}
+
+function targetFirstAgentFixtureFactsV0_1(input: Readonly<{
+  target: string;
+  targetGloss: string;
+  targetSenseId: string;
+  base: string;
+  baseGloss: string;
+  templateComponent: string;
+  templateExpansion?: string;
+  sourceEtymologyText?: string;
+  sourceOccupationCategory?: boolean;
+  otherTargetSense?: Readonly<{ senseId: string; gloss: string }>;
+}>): readonly AlbanianKaikkiExactLexicalSourceFactV0_1[] {
+  const category = {
+    name: "Occupations",
+    kind: "other",
+    parents: [],
+    source: "w",
+    orig: "sq:Occupations",
+    langcode: "sq",
+    _dis: null,
+  } as const;
+  const targetSenses = [
+    {
+      senseId: input.targetSenseId,
+      glosses: [input.targetGloss],
+      ...(input.sourceOccupationCategory ? { categories: [category] } : {}),
+    },
+    ...(input.otherTargetSense ? [{
+      senseId: input.otherTargetSense.senseId,
+      glosses: [input.otherTargetSense.gloss],
+    }] : []),
+  ];
+  const target = fixtureFact({
+    sourceRecordId: `kaikki-albanian-jsonl:word=${encodeURIComponent(input.target)}:ordinal=fixture`,
+    entryLocator: `jsonl://word/${encodeURIComponent(input.target)}/match/fixture`,
+    form: input.target,
+    partOfSpeech: "noun",
+    senses: targetSenses,
+    ipaObservations: [],
+    etymologyText: input.sourceEtymologyText ?? `From ${input.templateExpansion ?? `${input.base} + ${input.templateComponent}`}.`,
+    etymologyLinks: [
+      { sourceForm: input.base, reference: `${input.base}#Albanian` },
+      { sourceForm: input.templateComponent, reference: `${input.templateComponent}#Albanian` },
+    ],
+    etymologyTemplates: [{
+      name: "af",
+      args: { "1": "sq", "2": input.base, "3": input.templateComponent },
+      expansion: input.templateExpansion ?? `${input.base} + ${input.templateComponent}`,
+    }],
+  });
+  const base = fixtureFact({
+    sourceRecordId: `kaikki-albanian-jsonl:word=${encodeURIComponent(input.base)}:ordinal=fixture`,
+    entryLocator: `jsonl://word/${encodeURIComponent(input.base)}/match/fixture`,
+    form: input.base,
+    partOfSpeech: "noun",
+    senses: [{ senseId: `${input.base}-fixture-sense`, glosses: [input.baseGloss] }],
+    ipaObservations: [],
+  });
+  return Object.freeze([target, base]);
 }
 
 async function discoveryForFactV0_1(fact: AlbanianKaikkiExactLexicalSourceFactV0_1) {
@@ -831,6 +899,205 @@ describe("real Albanian exact lexical source integration v0.1", () => {
         expect(screen.getByTestId("albanian-reading-interpretation")).toHaveTextContent("Integrated source-bounded functional reading");
       }
     });
+  });
+
+  it("supports direct qymyrtar through the target-authored reference gate without inventing a base-side derived link", async () => {
+    const facts = targetFirstAgentFixtureFactsV0_1({
+      target: "qymyrtar",
+      targetGloss: "charcoal maker",
+      targetSenseId: "en-qymyrtar-sq-noun-51rw1lY3",
+      base: "qymyr",
+      baseGloss: "coal",
+      templateComponent: "tar",
+      sourceOccupationCategory: true,
+    });
+    const provider = createAlbanianKaikkiServerOnlyExactLexicalSourceProviderForSyntheticFixtureV0_1({ facts });
+    const query = jest.fn(provider.query);
+    const discovery = await discoveryForProviderV0_1({ ...provider, query }, "qymyrtar");
+    const reading = discovery.albanianLexicalReading;
+    const candidate = reading?.relatedCandidateEvaluations.find((item) => item.sourceRelation === "TARGET_AUTHORED_ETYMOLOGY_REFERENCE");
+
+    expect(query.mock.calls.map(([form]) => form)).toEqual(["qymyrtar", "qymyr"]);
+    expect(reading).toMatchObject({
+      status: "SUPPORTED",
+      primarySourceFact: { form: "qymyrtar", meaningGlosses: ["charcoal maker"] },
+      relatedForms: [],
+      sourceLinkedComparison: {
+        status: "SUPPORTED",
+        relation: {
+          relation: "TARGET_AUTHORED_ETYMOLOGY_REFERENCE",
+          primarySourceRecordId: "kaikki-albanian-jsonl:word=qymyr:ordinal=fixture",
+          relatedSourceRecordId: "kaikki-albanian-jsonl:word=qymyrtar:ordinal=fixture",
+          direction: "RELATED_FORM_TO_PRIMARY_ETYMLOGY_REFERENCE",
+          referencedForm: "qymyr",
+          reference: "qymyr#Albanian",
+        },
+      },
+      functionalMeaningBridge: {
+        status: "SUPPORTED",
+        relatedForm: "qymyrtar",
+        sourceFacts: {
+          primary: { form: "qymyr", meaningGlosses: ["coal"] },
+          related: { form: "qymyrtar", meaningGlosses: ["charcoal maker"] },
+        },
+        derivedStructure: null,
+        functionalHypothesis: {
+          status: "EXPLORATORY_FUNCTIONAL_HYPOTHESIS",
+          functionalOperation: "AGENT",
+          basis: expect.arrayContaining([
+            "TARGET_SOURCE_AUTHORED_ETYMOLOGY_REFERENCE",
+            "SOURCE_STRUCTURED_ALBANIAN_REFERENCE",
+            "SOURCE_ATTESTED_FINAL_SENSE_CATEGORY",
+          ]),
+          statement: expect.stringContaining("does not create a base-side SOURCE_DERIVED_FORM assertion"),
+        },
+      },
+      interpretation: {
+        status: "EXPLORATORY_ZHEJI_READING",
+        statement: expect.stringContaining("Integrated source-bounded functional reading"),
+        basis: expect.arrayContaining(["STRUCTURAL_EMBRYO_FUNCTION_REMAINS_UNKNOWN_OR_NULL"]),
+      },
+    });
+    expect(candidate?.sourceLinkedComparison.related?.sourceSenses?.[0]).toMatchObject({
+      senseId: "en-qymyrtar-sq-noun-51rw1lY3",
+      glosses: ["charcoal maker"],
+      categories: [expect.objectContaining({ name: "Occupations", orig: "sq:Occupations", langcode: "sq", source: "w" })],
+    });
+    expect(candidate?.functionalMeaningBridge.functionalHypothesis.basis).not.toContain("SOURCE_DERIVED_FORM_LINK");
+    expect(candidate?.functionalMeaningBridge.functionalHypothesis.alternatives).toEqual(expect.arrayContaining([
+      expect.stringContaining("not a base-side derived-form edge"),
+      expect.stringContaining("remaining component is not independently resolved"),
+    ]));
+    expect(candidate?.sourceLinkedComparison.related?.pronunciationVariants).toEqual([]);
+
+    const vm = adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: discovery });
+    expect(vm.motivationDiscoveryV0_1).toMatchObject({ kind: "present" });
+    if (vm.motivationDiscoveryV0_1?.kind !== "present") throw new Error("Expected target-first reading in the existing UI adapter");
+    render(createElement(MotivationDiscoveryCardV0_1, { discovery: vm.motivationDiscoveryV0_1 }));
+    expect(screen.getByTestId("albanian-reading-functional-bridge")).toHaveTextContent("qymyrtar");
+    expect(screen.getByTestId("albanian-reading-functional-bridge-operation")).toHaveTextContent("Functional operation: AGENT");
+    expect(screen.getByTestId("albanian-reading-related-candidate-evaluations")).toHaveTextContent("TARGET_AUTHORED_ETYMOLOGY_REFERENCE");
+    expect(screen.getByTestId("albanian-reading-related-candidate-evaluations")).toHaveTextContent("qymyr#Albanian");
+    expect(screen.getByTestId("albanian-source-linked-comparison")).toHaveTextContent("qymyr → qymyr#Albanian");
+    cleanup();
+  });
+
+  it("makes direct pelar reachable through the same target-authored reference gate", async () => {
+    const discovery = await discoveryForFactsV0_1(targetFirstAgentFixtureFactsV0_1({
+      target: "pelar",
+      targetGloss: "stableman, ostler, groom (especially mares)",
+      targetSenseId: "en-pelar-sq-noun-RnBYACSN",
+      base: "pelë",
+      baseGloss: "mare",
+      templateComponent: "-ar",
+      templateExpansion: "pelë (“mare”) + -ar",
+      sourceEtymologyText: "From pelë (“mare”) + -ar.",
+    }), "pelar");
+    expect(discovery.albanianLexicalReading).toMatchObject({
+      relatedForms: [],
+      sourceLinkedComparison: {
+        status: "SUPPORTED",
+        relation: { relation: "TARGET_AUTHORED_ETYMOLOGY_REFERENCE", referencedForm: "pelë", reference: "pelë#Albanian" },
+      },
+      functionalMeaningBridge: {
+        status: "SUPPORTED",
+        functionalHypothesis: { functionalOperation: "AGENT" },
+      },
+      interpretation: { status: "EXPLORATORY_ZHEJI_READING" },
+    });
+  });
+
+  it("keeps a non-human tool gloss containing maker without occupational authorization and ambiguous senses Null", async () => {
+    const toolMaker = await discoveryForFactsV0_1(targetFirstAgentFixtureFactsV0_1({
+      target: "qymyr-mjet",
+      targetGloss: "a charcoal maker tool",
+      targetSenseId: "tool-maker-sense",
+      base: "qymyr",
+      baseGloss: "coal",
+      templateComponent: "mjet",
+    }), "qymyr-mjet");
+    expect(toolMaker.albanianLexicalReading?.functionalMeaningBridge).toMatchObject({
+      status: "NULL",
+      functionalHypothesis: { status: "UNKNOWN_OR_NULL", functionalOperation: null, statement: null },
+    });
+    expect(toolMaker.albanianLexicalReading?.interpretation.status).toBe("UNKNOWN_OR_NULL");
+    expect(toolMaker.albanianLexicalReading?.relatedCandidateEvaluations[0]?.sourceRelation).toBe("TARGET_AUTHORED_ETYMOLOGY_REFERENCE");
+
+    const ambiguous = await discoveryForFactsV0_1(targetFirstAgentFixtureFactsV0_1({
+      target: "qymyrtar",
+      targetGloss: "charcoal maker",
+      targetSenseId: "en-qymyrtar-sq-noun-51rw1lY3",
+      base: "qymyr",
+      baseGloss: "coal",
+      templateComponent: "tar",
+      sourceOccupationCategory: true,
+      otherTargetSense: { senseId: "qymyrtar-abstract-sense", gloss: "the state of being a maker" },
+    }), "qymyrtar");
+    expect(ambiguous.albanianLexicalReading?.functionalMeaningBridge).toMatchObject({
+      status: "NULL",
+      functionalHypothesis: { status: "UNKNOWN_OR_NULL", functionalOperation: null, statement: null },
+    });
+    expect(ambiguous.albanianLexicalReading?.interpretation.status).toBe("UNKNOWN_OR_NULL");
+  });
+
+  it.each([
+    ["gjitar", "noun", "mammal"],
+    ["kombëtar", "adjective", "national"],
+    ["gjueti", "noun", "hunting"],
+  ] as const)("does not infer direct-input AGENT from the lexical shape of %s", async (form, partOfSpeech, gloss) => {
+    const result = await discoveryForFactV0_1(fixtureFact({
+      sourceRecordId: `kaikki-albanian-jsonl:word=${encodeURIComponent(form)}:ordinal=fixture`,
+      entryLocator: `jsonl://word/${encodeURIComponent(form)}/match/fixture`,
+      form,
+      partOfSpeech,
+      senses: [{ senseId: `${form}-sense-0`, glosses: [gloss] }],
+      ipaObservations: [],
+      relatedForms: [],
+      etymologyLinks: [],
+      etymologyTemplates: [],
+    }), form);
+
+    expect(result.albanianLexicalReading?.functionalMeaningBridge).toMatchObject({
+      status: "NULL",
+      relatedForm: null,
+      functionalHypothesis: { status: "UNKNOWN_OR_NULL", functionalOperation: null, statement: null },
+    });
+    expect(result.albanianLexicalReading?.relatedCandidateEvaluations).toEqual([]);
+    expect(result.albanianLexicalReading?.interpretation.status).toBe("UNKNOWN_OR_NULL");
+  });
+
+  it("keeps direct thëngjilltar Null when only target-side suffix wording is present", async () => {
+    const target = fixtureFact({
+      sourceRecordId: "kaikki-albanian-jsonl:word=th%C3%ABngjilltar:ordinal=fixture",
+      entryLocator: "jsonl://word/th%C3%ABngjilltar/match/fixture",
+      form: "thëngjilltar",
+      partOfSpeech: "noun",
+      senses: [{ senseId: "en-thëngjilltar-sq-noun-AMp0~85e", glosses: ["coal maker"] }],
+      ipaObservations: [],
+      relatedForms: [],
+      etymologyText: "From thëngjill (“ember, coal”) + -tar (“agent noun suffix”).",
+      etymologyLinks: [
+        { sourceForm: "thëngjill", reference: "thëngjill#Albanian" },
+        { sourceForm: "-tar", reference: "-tar#Albanian" },
+      ],
+      etymologyTemplates: [{
+        name: "suffix",
+        args: { "1": "sq", "2": "thëngjill", "3": "tar" },
+        expansion: "thëngjill + -tar",
+      }],
+    });
+    const provider = createAlbanianKaikkiServerOnlyExactLexicalSourceProviderForSyntheticFixtureV0_1({ facts: [target] });
+    const query = jest.fn(provider.query);
+    const result = await discoveryForProviderV0_1({ ...provider, query }, "thëngjilltar");
+
+    expect(query.mock.calls.map(([form]) => form)).toEqual(["thëngjilltar"]);
+    expect(result.albanianLexicalReading?.relatedForms).toEqual([]);
+    expect(result.albanianLexicalReading?.relatedCandidateEvaluations).toEqual([]);
+    expect(result.albanianLexicalReading?.functionalMeaningBridge).toMatchObject({
+      status: "NULL",
+      functionalHypothesis: { status: "UNKNOWN_OR_NULL", functionalOperation: null, statement: null },
+    });
+    expect(result.albanianLexicalReading?.interpretation.status).toBe("UNKNOWN_OR_NULL");
   });
 
   it.each([
