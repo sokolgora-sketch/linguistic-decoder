@@ -481,6 +481,100 @@ describe("real Albanian exact lexical source integration v0.1", () => {
     });
   });
 
+  it("does not promote non-role noun glosses or adjective targets from derived-form spelling", async () => {
+    const facts = [
+      fixtureFact({
+        sourceRecordId: "synthetic:agent-shape-control-root",
+        entryLocator: "jsonl://synthetic/agent-shape-control-root",
+        form: "agent-shape-control-root",
+        senses: [{ senseId: "agent-shape-control-root-1", glosses: ["control base"] }],
+        relatedForms: [
+          { form: "gjitar", relation: "SOURCE_DERIVED_FORM", entryLocator: "jsonl://synthetic/gjitar" },
+          { form: "kombëtar", relation: "SOURCE_DERIVED_FORM", entryLocator: "jsonl://synthetic/kombëtar" },
+        ],
+      }),
+      fixtureFact({
+        sourceRecordId: "synthetic:gjitar",
+        entryLocator: "jsonl://synthetic/gjitar/match/0",
+        form: "gjitar",
+        partOfSpeech: "noun",
+        senses: [{ senseId: "synthetic-gjitar-1", glosses: ["mammal"] }],
+      }),
+      fixtureFact({
+        sourceRecordId: "synthetic:kombëtar",
+        entryLocator: "jsonl://synthetic/kombëtar/match/0",
+        form: "kombëtar",
+        partOfSpeech: "adjective",
+        senses: [{ senseId: "synthetic-kombëtar-1", glosses: ["national"] }],
+      }),
+    ];
+    const result = await discoveryForFactsV0_1(facts, "agent-shape-control-root");
+
+    expect(result.albanianLexicalReading?.relatedCandidateEvaluations).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        relatedForm: "gjitar",
+        functionalMeaningBridge: expect.objectContaining({
+          status: "NULL",
+          functionalHypothesis: expect.objectContaining({ functionalOperation: null }),
+        }),
+      }),
+      expect.objectContaining({
+        relatedForm: "kombëtar",
+        functionalMeaningBridge: expect.objectContaining({
+          status: "NULL",
+          functionalHypothesis: expect.objectContaining({ functionalOperation: null }),
+        }),
+      }),
+    ]));
+  });
+
+  it("preserves the existing source-category-qualified fuzhnjë → fuzhnjar AGENT", async () => {
+    const occupations = {
+      name: "Occupations",
+      kind: null,
+      parents: [],
+      source: "w",
+      orig: "sq:Occupations",
+      langcode: "sq",
+      _dis: null,
+    } as const;
+    const result = await discoveryForFactsV0_1([
+      fixtureFact({
+        sourceRecordId: "kaikki-albanian-jsonl:word=fuzhnj%C3%AB:ordinal=0",
+        entryLocator: "jsonl://word/fuzhnj%C3%AB/match/0",
+        form: "fuzhnjë",
+        partOfSpeech: "noun",
+        senses: [{ senseId: "en-fuzhnjë-sq-noun-W19Jn~~T", glosses: ["kind of fishing spear consisting of a long shaft with many hooked extremities"] }],
+        relatedForms: [{ form: "fuzhnjar", relation: "SOURCE_DERIVED_FORM", entryLocator: "jsonl://word/fuzhnjar" }],
+      }),
+      fixtureFact({
+        sourceRecordId: "kaikki-albanian-jsonl:word=fuzhnjar:ordinal=0",
+        entryLocator: "jsonl://word/fuzhnjar/match/0",
+        form: "fuzhnjar",
+        partOfSpeech: "noun",
+        senses: [{
+          senseId: "en-fuzhnjar-sq-noun-l0FOuyMg",
+          glosses: ["person who uses a harpoon to catch fish"],
+          categories: [occupations],
+        }],
+        etymologyText: "From fuzhnjë + ar.",
+        etymologyLinks: [{ sourceForm: "fuzhnjë", reference: "fuzhnjë#Albanian" }],
+      }),
+    ], "fuzhnjë");
+
+    expect(result.albanianLexicalReading?.functionalMeaningBridge).toMatchObject({
+      status: "SUPPORTED",
+      relatedForm: "fuzhnjar",
+      functionalHypothesis: {
+        functionalOperation: "AGENT",
+        basis: expect.arrayContaining([
+          "SOURCE_DERIVED_FORM_LINK",
+          "SOURCE_ATTESTED_FINAL_SENSE_CATEGORY",
+        ]),
+      },
+    });
+  });
+
   it("recognizes a source-derived singer as the existing AGENT operation without changing the taxonomy", async () => {
     await withSyntheticSourceFileV0_1([
       {
@@ -1365,7 +1459,7 @@ describe("real Albanian exact lexical source integration v0.1", () => {
     }
   });
 
-  it("shows frozen occupational-role candidates while keeping the existing category-gated AGENT separate", async () => {
+  it("exposes pelë → pelar as a source-bounded AGENT reading while keeping research authorization Null", async () => {
     const occupations = {
       name: "Occupations",
       kind: "other",
@@ -1383,7 +1477,7 @@ describe("real Albanian exact lexical source integration v0.1", () => {
         form: "pelë",
         partOfSpeech: "noun",
         senses: [{ senseId: "en-pelë-sq-noun-B0ryv46E", glosses: ["mare"] }],
-        ipaObservations: [],
+        ipaObservations: [{ soundIndex: 0, ipa: "[pɛːl]", tags: [] }],
         relatedForms: [{ form: "pelar", relation: "SOURCE_DERIVED_FORM", entryLocator: "jsonl://word/pelar" }],
       }),
       fixtureFact({
@@ -1451,12 +1545,50 @@ describe("real Albanian exact lexical source integration v0.1", () => {
       expect.objectContaining({
         relatedForm: "pelar",
         sourceRelation: "SOURCE_DERIVED_FORM",
+        sourceLinkedComparison: expect.objectContaining({
+          status: "SUPPORTED",
+          relation: expect.objectContaining({ relation: "SOURCE_DERIVED_FORM", relatedForm: "pelar" }),
+        }),
         functionalMeaningBridge: expect.objectContaining({
-          status: "NULL",
-          functionalHypothesis: expect.objectContaining({ functionalOperation: null }),
+          status: "SUPPORTED",
+          sourceFacts: expect.objectContaining({
+            related: expect.objectContaining({
+              sourceRecordId: "kaikki-albanian-jsonl:word=pelar:ordinal=0",
+              sourceSenses: [expect.objectContaining({
+                senseId: "en-pelar-sq-noun-RnBYACSN",
+                glosses: ["stableman, ostler, groom (especially mares)"],
+              })],
+            }),
+          }),
+          functionalHypothesis: expect.objectContaining({
+            status: "EXPLORATORY_FUNCTIONAL_HYPOTHESIS",
+            functionalOperation: "AGENT",
+            basis: [
+              "SOURCE_ATTESTED_PRIMARY_MEANING",
+              "SOURCE_ATTESTED_AGENT_MEANING",
+              "SOURCE_DERIVED_FORM_LINK",
+            ],
+            statement: expect.stringContaining("stableman, ostler, groom (especially mares)"),
+          }),
         }),
       }),
     ]));
+    expect(peleReading).toMatchObject({
+      sourcePronunciation: { rawIpa: "[pɛːl]", status: "SUPPORTED", voicePath: ["E"] },
+      functionalMeaningBridge: {
+        status: "SUPPORTED",
+        relatedForm: "pelar",
+        functionalHypothesis: { functionalOperation: "AGENT" },
+      },
+      interpretation: {
+        status: "EXPLORATORY_ZHEJI_READING",
+        statement: expect.stringContaining("Integrated source-bounded functional reading"),
+        basis: expect.arrayContaining([
+          "SOURCE_ATTESTED_FUNCTIONAL_BRIDGE",
+          "STRUCTURAL_EMBRYO_FUNCTION_REMAINS_UNKNOWN_OR_NULL",
+        ]),
+      },
+    });
     const pelarCandidate = peleReading?.occupationalRoleResearchCandidates?.candidates.find((candidate) => candidate.sourceRecord.lemma === "pelar");
     expect(pelarCandidate).toMatchObject({
       senseId: "en-pelar-sq-noun-RnBYACSN",
@@ -1500,6 +1632,12 @@ describe("real Albanian exact lexical source integration v0.1", () => {
     expect(vm.motivationDiscoveryV0_1).toMatchObject({ kind: "present" });
     if (vm.motivationDiscoveryV0_1?.kind === "present") {
       render(createElement(MotivationDiscoveryCardV0_1, { discovery: vm.motivationDiscoveryV0_1 }));
+      expect(screen.getByTestId("albanian-reading-related-form")).toHaveTextContent("pelar");
+      expect(screen.getByTestId("albanian-reading-voice-path")).toHaveTextContent("E");
+      expect(screen.getByTestId("albanian-reading-functional-bridge")).toHaveTextContent("Source-bounded functional operation AGENT");
+      expect(screen.getByTestId("albanian-reading-functional-bridge-operation")).toHaveTextContent("Functional operation: AGENT");
+      expect(screen.getByTestId("albanian-reading-interpretation")).toHaveTextContent("Integrated source-bounded functional reading");
+      expect(screen.getByTestId("albanian-reading-interpretation")).toHaveTextContent("independent functional meaning for any structural embryo remains Unknown / Null");
       const batch = screen.getByTestId("albanian-occupational-role-research-candidates");
       expect(batch).toHaveTextContent("stableman, ostler, groom (especially mares)");
       expect(batch).toHaveTextContent("TYPED_WORKER_PATHS_OBSERVED");

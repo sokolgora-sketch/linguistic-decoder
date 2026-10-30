@@ -278,19 +278,47 @@ describe("analyze-v1 Albanian lexical reading reachability", () => {
     });
   });
 
-  it("projects the bounded pelar evidence through the API without authorizing AGENT", async () => {
+  it("projects the source-bounded pelar AGENT reading while keeping research authorization disabled", async () => {
     const result = await analyzePeleV0_1();
     expect(result.status).toBe(200);
     const reading = result.body.motivationDiscoveryV0_1.albanianLexicalReading;
     expect(reading.relatedCandidateEvaluations).toEqual(expect.arrayContaining([
       expect.objectContaining({
         relatedForm: "pelar",
+        sourceLinkedComparison: expect.objectContaining({
+          status: "SUPPORTED",
+          relation: expect.objectContaining({ relation: "SOURCE_DERIVED_FORM", relatedForm: "pelar" }),
+        }),
         functionalMeaningBridge: expect.objectContaining({
-          status: "NULL",
-          functionalHypothesis: expect.objectContaining({ functionalOperation: null }),
+          status: "SUPPORTED",
+          sourceFacts: expect.objectContaining({
+            related: expect.objectContaining({
+              sourceRecordId: "kaikki-albanian-jsonl:word=pelar:ordinal=0",
+              sourceSenses: [expect.objectContaining({
+                senseId: "en-pelar-sq-noun-RnBYACSN",
+                glosses: ["stableman, ostler, groom (especially mares)"],
+              })],
+            }),
+          }),
+          functionalHypothesis: expect.objectContaining({
+            functionalOperation: "AGENT",
+            basis: expect.arrayContaining([
+              "SOURCE_ATTESTED_AGENT_MEANING",
+              "SOURCE_DERIVED_FORM_LINK",
+            ]),
+            statement: expect.stringContaining("stableman, ostler, groom (especially mares)"),
+          }),
         }),
       }),
     ]));
+    expect(reading.interpretation).toMatchObject({
+      status: "EXPLORATORY_ZHEJI_READING",
+      statement: expect.stringContaining("Integrated source-bounded functional reading"),
+      basis: expect.arrayContaining([
+        "SOURCE_ATTESTED_FUNCTIONAL_BRIDGE",
+        "STRUCTURAL_EMBRYO_FUNCTION_REMAINS_UNKNOWN_OR_NULL",
+      ]),
+    });
     expect(reading.occupationalRoleResearchCandidates).toMatchObject({
       status: "CANDIDATES_FOUND",
       sourceArtifactSha256: "7a84eca776ebfac752e7251bb0822edc9cd1701d1d58060d4f8ef4b76a208fcc",
