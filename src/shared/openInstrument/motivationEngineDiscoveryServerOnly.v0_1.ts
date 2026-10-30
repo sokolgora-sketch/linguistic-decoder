@@ -151,6 +151,8 @@ export type AlbanianLexicalReadingV0_1 = Readonly<{
   }>[];
   /** Additive per-related-form evidence; the singular bridge below remains the selected primary bridge. */
   relatedCandidateEvaluations: readonly AlbanianRelatedCandidateEvaluationV0_1[];
+  /** Source-order synthesis of already-supported derived-form AGENT bridges only. */
+  functionalFamilyReading: AlbanianFunctionalFamilyReadingV0_1 | null;
   /** Bounded source/ontology research candidates; never authorizes a functional operation. */
   occupationalRoleResearchCandidates?: AlbanianOccupationalRoleCandidateBatchViewV0_1;
   /** Additive bounded comparison for the five configured source-backed window forms. */
@@ -319,6 +321,34 @@ export type AlbanianRelatedCandidateEvaluationV0_1 = Readonly<{
   resolution: "RESOLVED" | "UNRESOLVED";
   sourceLinkedComparison: AlbanianSourceLinkedComparisonV0_1;
   functionalMeaningBridge: AlbanianFunctionalMeaningBridgeV0_1;
+}>;
+
+export type AlbanianFunctionalFamilyReadingV0_1 = Readonly<{
+  status: "EXPLORATORY_FUNCTIONAL_FAMILY";
+  functionalOperation: "AGENT";
+  primary: Readonly<{
+    form: string;
+    sourceRecordId: string;
+    entryLocator: string;
+    senseId: string;
+    meaningGlosses: readonly string[];
+  }>;
+  members: readonly Readonly<{
+    form: string;
+    sourceRecordId: string;
+    entryLocator: string;
+    senseId: string;
+    meaningGlosses: readonly string[];
+    sourceRelation: "SOURCE_DERIVED_FORM";
+    sourceComparisonStatus: "SUPPORTED";
+    functionalBridgeStatus: "SUPPORTED";
+    evidenceBasis: readonly string[];
+  }>[];
+  statement: string;
+  alternatives: readonly string[];
+  claimBoundary: string;
+  noSingleWinner: true;
+  userDecisionPosture: "user_decides";
 }>;
 
 type AlbanianSourceLinkedComponentRelationV0_1 =
@@ -1952,6 +1982,113 @@ async function buildFiveWindowsComparisonV0_1(input: Readonly<{
   });
 }
 
+function buildAlbanianFunctionalFamilyReadingV0_1(input: Readonly<{
+  primary: AlbanianSourceLinkedRecordV0_1;
+  uniquePrimaryRecord: boolean;
+  sourceStatus: AlbanianKaikkiExactLexicalSourceStatusV0_1;
+  candidates: readonly AlbanianRelatedCandidateEvaluationV0_1[];
+  uniqueRelatedRecords: readonly boolean[];
+}>): AlbanianFunctionalFamilyReadingV0_1 | null {
+  const primarySenses = (input.primary.sourceSenses ?? []).filter((sense) =>
+    sense.senseId && hasMeaningEvidenceV0_1(sense.glosses),
+  );
+  if (
+    input.sourceStatus.status !== "MATCHES_FOUND" ||
+    !input.uniquePrimaryRecord ||
+    !input.primary.sourceRecordId || !input.primary.entryLocator ||
+    !hasMeaningEvidenceV0_1(input.primary.meaningGlosses) ||
+    primarySenses.length !== 1 || input.primary.sourceSenses?.length !== 1
+  ) return null;
+
+  // A family is a projection of existing bridges, never another AGENT classifier.
+  if (input.candidates.some((candidate) =>
+    candidate.sourceRelation === "SOURCE_DERIVED_FORM" &&
+    candidate.functionalMeaningBridge.status === "SUPPORTED" &&
+    candidate.functionalMeaningBridge.functionalHypothesis.functionalOperation !== "AGENT",
+  )) return null;
+
+  const formCounts = new Map<string, number>();
+  for (const candidate of input.candidates) {
+    if (candidate.sourceRelation !== "SOURCE_DERIVED_FORM") continue;
+    const form = normalizedAlbanianFormV0_1(candidate.relatedForm);
+    formCounts.set(form, (formCounts.get(form) ?? 0) + 1);
+  }
+
+  const members: AlbanianFunctionalFamilyReadingV0_1["members"][number][] = [];
+  input.candidates.forEach((candidate, index) => {
+    const comparison = candidate.sourceLinkedComparison;
+    const bridge = candidate.functionalMeaningBridge;
+    const related = comparison.related;
+    const bridgeFacts = bridge.sourceFacts;
+    const meaningfulSenses = (related?.sourceSenses ?? []).filter((sense) =>
+      sense.senseId && hasMeaningEvidenceV0_1(sense.glosses),
+    );
+    if (
+      candidate.sourceRelation !== "SOURCE_DERIVED_FORM" ||
+      candidate.resolution !== "RESOLVED" || !input.uniqueRelatedRecords[index] ||
+      (formCounts.get(normalizedAlbanianFormV0_1(candidate.relatedForm)) ?? 0) !== 1 ||
+      comparison.status !== "SUPPORTED" || comparison.relation.relation !== "SOURCE_DERIVED_FORM" ||
+      comparison.relation.direction !== "RELATED_FORM_TO_PRIMARY_ETYMLOGY_REFERENCE" ||
+      comparison.relation.primarySourceRecordId !== input.primary.sourceRecordId ||
+      comparison.relation.primaryEntryLocator !== input.primary.entryLocator ||
+      comparison.relation.relatedSourceRecordId !== related?.sourceRecordId ||
+      comparison.relation.relatedEntryLocator !== related?.entryLocator ||
+      normalizedAlbanianFormV0_1(comparison.relation.relatedForm) !== normalizedAlbanianFormV0_1(candidate.relatedForm) ||
+      comparison.primary.sourceRecordId !== input.primary.sourceRecordId ||
+      bridge.status !== "SUPPORTED" ||
+      bridge.functionalHypothesis.status !== "EXPLORATORY_FUNCTIONAL_HYPOTHESIS" ||
+      bridge.functionalHypothesis.functionalOperation !== "AGENT" ||
+      !bridge.functionalHypothesis.basis.includes("SOURCE_DERIVED_FORM_LINK") ||
+      bridgeFacts?.primary.sourceRecordId !== input.primary.sourceRecordId ||
+      bridgeFacts.primary.entryLocator !== input.primary.entryLocator ||
+      bridgeFacts.related?.sourceRecordId !== related?.sourceRecordId ||
+      bridgeFacts.related?.entryLocator !== related?.entryLocator ||
+      related?.partOfSpeech !== "noun" || !related.sourceRecordId || !related.entryLocator ||
+      !hasMeaningEvidenceV0_1(related.meaningGlosses) ||
+      meaningfulSenses.length !== 1 || related.sourceSenses?.length !== 1 ||
+      meaningfulSenses[0]?.senseId !== bridgeFacts.related?.sourceSenses[0]?.senseId
+    ) return;
+    members.push(Object.freeze({
+      form: related.form,
+      sourceRecordId: related.sourceRecordId,
+      entryLocator: related.entryLocator,
+      senseId: meaningfulSenses[0]!.senseId!,
+      meaningGlosses: Object.freeze([...meaningfulSenses[0]!.glosses]),
+      sourceRelation: "SOURCE_DERIVED_FORM" as const,
+      sourceComparisonStatus: "SUPPORTED" as const,
+      functionalBridgeStatus: "SUPPORTED" as const,
+      evidenceBasis: bridge.functionalHypothesis.basis,
+    }));
+  });
+  if (members.length < 2) return null;
+
+  const primarySense = primarySenses[0]!;
+  const primaryMeaning = primarySense.glosses.join("; ");
+  const memberMeanings = members.map((member) =>
+    `${member.form} (“${member.meaningGlosses.join("; ")}”)`,
+  ).join("; ");
+  return Object.freeze({
+    status: "EXPLORATORY_FUNCTIONAL_FAMILY" as const,
+    functionalOperation: "AGENT" as const,
+    primary: Object.freeze({
+      form: input.primary.form,
+      sourceRecordId: input.primary.sourceRecordId,
+      entryLocator: input.primary.entryLocator,
+      senseId: primarySense.senseId!,
+      meaningGlosses: Object.freeze([...primarySense.glosses]),
+    }),
+    members: Object.freeze(members),
+    statement: `The frozen Kaikki Albanian source attests ${input.primary.form} as “${primaryMeaning}” and lists these derived forms in source order: ${memberMeanings}. Each listed relation independently supports an exploratory AGENT reading under the existing source gates.`,
+    alternatives: Object.freeze([
+      "Other source-linked forms may remain unresolved or support no functional operation.",
+      "These observations come from one frozen source and do not establish independent corroboration or a shared embryo meaning.",
+    ]),
+    claimBoundary: "A source-bounded family of existing exploratory AGENT bridges, not a new AGENT rule, a suffix law, historical proof, or a unique winner.",
+    noSingleWinner: true,
+    userDecisionPosture: "user_decides" as const,
+  });
+}
+
 async function buildAlbanianLexicalReadingV0_1(input: Readonly<{
   word: string;
   facts: readonly AlbanianKaikkiExactLexicalSourceFactV0_1[];
@@ -1978,6 +2115,7 @@ async function buildAlbanianLexicalReadingV0_1(input: Readonly<{
       sourcePronunciation: null,
       relatedForms: Object.freeze([]),
       relatedCandidateEvaluations: Object.freeze([]),
+      functionalFamilyReading: null,
       occupationalRoleResearchCandidates,
       fiveWindowsComparison,
       sourceLinkedComponentReading: null,
@@ -2025,6 +2163,7 @@ async function buildAlbanianLexicalReadingV0_1(input: Readonly<{
           etymologyText: null,
         }),
         resolved: null,
+        uniqueRelatedRecord: false,
       });
     }
     try {
@@ -2032,6 +2171,8 @@ async function buildAlbanianLexicalReadingV0_1(input: Readonly<{
       const resolved = result.status === "MATCHES_FOUND"
         ? result.facts.find((fact) => fact.partOfSpeech !== "name") ?? result.facts[0] ?? null
         : null;
+      const uniqueRelatedRecord = result.status === "MATCHES_FOUND" &&
+        result.facts.filter((fact) => fact.partOfSpeech !== "name").length === 1;
       const publicResult = Object.freeze({
         form: relation.form,
         entryLocator: resolved?.entryLocator ?? relation.entryLocator,
@@ -2042,7 +2183,7 @@ async function buildAlbanianLexicalReadingV0_1(input: Readonly<{
         meaningGlosses: resolved ? distinctGlossesV0_1([resolved]) : Object.freeze([]),
         etymologyText: resolved?.etymologyText ?? null,
       });
-      return Object.freeze({ publicResult, resolved });
+      return Object.freeze({ publicResult, resolved, uniqueRelatedRecord });
     } catch {
       return Object.freeze({
         publicResult: Object.freeze({
@@ -2056,6 +2197,7 @@ async function buildAlbanianLexicalReadingV0_1(input: Readonly<{
           etymologyText: null,
         }),
         resolved: null,
+        uniqueRelatedRecord: false,
       });
     }
   }));
@@ -2098,6 +2240,16 @@ async function buildAlbanianLexicalReadingV0_1(input: Readonly<{
   const allRelatedCandidateEvaluations = targetAuthoredEtymologyCandidate
     ? Object.freeze([...relatedCandidateEvaluations, targetAuthoredEtymologyCandidate])
     : Object.freeze(relatedCandidateEvaluations);
+  const functionalFamilyReading = buildAlbanianFunctionalFamilyReadingV0_1({
+    primary: primaryProjection,
+    uniquePrimaryRecord: input.facts.filter((fact) =>
+      normalizedAlbanianFormV0_1(fact.form) === normalizedAlbanianFormV0_1(input.word) &&
+      fact.partOfSpeech === primary.partOfSpeech,
+    ).length === 1,
+    sourceStatus: input.sourceStatus,
+    candidates: allRelatedCandidateEvaluations,
+    uniqueRelatedRecords: relatedResultsWithFacts.map(({ uniqueRelatedRecord }) => uniqueRelatedRecord),
+  });
   const selectedRelatedCandidate = allRelatedCandidateEvaluations.find(({ sourceLinkedComparison, functionalMeaningBridge }) =>
     sourceLinkedComparison.status === "SUPPORTED" && functionalMeaningBridge.status === "SUPPORTED",
   ) ?? allRelatedCandidateEvaluations.find(({ functionalMeaningBridge }) => functionalMeaningBridge.status === "SUPPORTED")
@@ -2174,6 +2326,7 @@ async function buildAlbanianLexicalReadingV0_1(input: Readonly<{
       : null,
     relatedForms: Object.freeze(relatedResults),
     relatedCandidateEvaluations: allRelatedCandidateEvaluations,
+    functionalFamilyReading,
     occupationalRoleResearchCandidates,
     fiveWindowsComparison,
     sourceLinkedComponentReading,

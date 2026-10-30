@@ -1437,6 +1437,52 @@ function parseMotivationDiscoveryV0_1(
         return validCandidate;
       })
     );
+    const validFunctionalFamilyReading = (() => {
+      const family = reading.functionalFamilyReading;
+      if (family === undefined || family === null) return true; // Older payloads have no family projection.
+      if (!isRecord(family) || family.status !== "EXPLORATORY_FUNCTIONAL_FAMILY" ||
+        family.functionalOperation !== "AGENT" || !isRecord(family.primary) ||
+        !isRecord(primary) || family.primary.form !== primary.form ||
+        family.primary.sourceRecordId !== primary.sourceRecordId ||
+        family.primary.entryLocator !== primary.entryLocator ||
+        typeof family.primary.senseId !== "string" || !family.primary.senseId ||
+        !isStringArray(family.primary.meaningGlosses) || family.primary.meaningGlosses.length === 0 ||
+        !Array.isArray(family.members) || family.members.length < 2 ||
+        typeof family.statement !== "string" || !isStringArray(family.alternatives) ||
+        typeof family.claimBoundary !== "string" ||
+        family.noSingleWinner !== true || family.userDecisionPosture !== "user_decides" ||
+        !Array.isArray(relatedCandidateEvaluations)) return false;
+      const normalizeAlbanianForm = (form: string): string =>
+        form.normalize("NFC").trim().toLocaleLowerCase("sq-AL");
+      const forms = new Set<string>();
+      return family.members.every((member) => {
+        const normalizedMemberForm = isRecord(member) && typeof member.form === "string"
+          ? normalizeAlbanianForm(member.form)
+          : "";
+        if (!isRecord(member) || typeof member.form !== "string" || !member.form ||
+          !normalizedMemberForm || forms.has(normalizedMemberForm) || typeof member.sourceRecordId !== "string" ||
+          typeof member.entryLocator !== "string" || typeof member.senseId !== "string" ||
+          !member.senseId || !isStringArray(member.meaningGlosses) || member.meaningGlosses.length === 0 ||
+          member.sourceRelation !== "SOURCE_DERIVED_FORM" ||
+          member.sourceComparisonStatus !== "SUPPORTED" || member.functionalBridgeStatus !== "SUPPORTED" ||
+          !isStringArray(member.evidenceBasis) || !member.evidenceBasis.includes("SOURCE_DERIVED_FORM_LINK")) return false;
+        forms.add(normalizedMemberForm);
+        return relatedCandidateEvaluations.some((candidate) => isRecord(candidate) &&
+          typeof candidate.relatedForm === "string" &&
+          normalizeAlbanianForm(candidate.relatedForm) === normalizedMemberForm &&
+          candidate.sourceRelation === "SOURCE_DERIVED_FORM" &&
+          isRecord(candidate.sourceLinkedComparison) && candidate.sourceLinkedComparison.status === "SUPPORTED" &&
+          isRecord(candidate.sourceLinkedComparison.related) &&
+          candidate.sourceLinkedComparison.related.sourceRecordId === member.sourceRecordId &&
+          candidate.sourceLinkedComparison.related.entryLocator === member.entryLocator &&
+          Array.isArray(candidate.sourceLinkedComparison.related.sourceSenses) &&
+          candidate.sourceLinkedComparison.related.sourceSenses.some((sense) =>
+            isRecord(sense) && sense.senseId === member.senseId) &&
+          isRecord(candidate.functionalMeaningBridge) && candidate.functionalMeaningBridge.status === "SUPPORTED" &&
+          isRecord(candidate.functionalMeaningBridge.functionalHypothesis) &&
+          candidate.functionalMeaningBridge.functionalHypothesis.functionalOperation === "AGENT");
+      });
+    })();
     const validOccupationalRoleResearchCandidateBatch = (batch: unknown): boolean => {
       if (batch === undefined || batch === null) return true;
       if (!isRecord(batch) ||
@@ -1551,6 +1597,7 @@ function parseMotivationDiscoveryV0_1(
       validFiveWindowsComparison &&
       validFunctionalMeaningBridge &&
       validRelatedCandidateEvaluations &&
+      validFunctionalFamilyReading &&
       validOccupationalRoleResearchCandidateBatch(reading.occupationalRoleResearchCandidates) &&
       (reading.interpretation.status === "EXPLORATORY_ZHEJI_READING" || reading.interpretation.status === "UNKNOWN_OR_NULL") &&
       (reading.interpretation.statement === null || typeof reading.interpretation.statement === "string") &&

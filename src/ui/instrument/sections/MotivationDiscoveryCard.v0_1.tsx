@@ -1015,6 +1015,21 @@ export function MotivationDiscoveryCardV0_1({
               {albanianLexicalReading.functionalMeaningBridge.claimBoundary}
             </div>
           </div>
+          {albanianLexicalReading.functionalFamilyReading ? (
+            <section data-testid="albanian-functional-family-reading" className="mt-3 rounded-lg border border-[#355a52] bg-[#12211e] p-3 text-xs leading-5 text-[#c8e6dc]">
+              <div className="font-semibold uppercase tracking-[0.12em]">Functional Family · exploratory AGENT</div>
+              <p className="mt-1 text-sm">{albanianLexicalReading.functionalFamilyReading.statement}</p>
+              <ul className="mt-2 space-y-1">
+                {albanianLexicalReading.functionalFamilyReading.members.map((member) => (
+                  <li key={`${member.sourceRecordId}:${member.senseId}`}>
+                    {member.form} · {member.meaningGlosses.join("; ")} · {member.sourceRelation} · comparison {member.sourceComparisonStatus} · AGENT bridge {member.functionalBridgeStatus} · {member.sourceRecordId} · sense {member.senseId}
+                  </li>
+                ))}
+              </ul>
+              <p className="mt-2 text-[#9fbdb5]">Same frozen Kaikki source; no independent-source corroboration. {albanianLexicalReading.functionalFamilyReading.alternatives.join(" ")}</p>
+              <p className="mt-1 text-[10px] text-[#d5c28f]">{albanianLexicalReading.functionalFamilyReading.claimBoundary} No single winner; user decides.</p>
+            </section>
+          ) : null}
           {relatedCandidateEvaluations.length > 0 ? (
             <div
               data-testid="albanian-reading-related-candidate-evaluations"
