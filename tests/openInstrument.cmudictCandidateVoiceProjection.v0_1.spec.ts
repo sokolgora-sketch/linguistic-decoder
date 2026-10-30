@@ -34,8 +34,18 @@ function candidate(
   };
 }
 
+const evidenceBySourceForm = new Map<
+  string,
+  CmuDictCandidatePronunciationEvidenceV0_1
+>();
+
 function evidence(sourceForm = "stone"): CmuDictCandidatePronunciationEvidenceV0_1 {
-  return adaptCmuDictCandidateSourceEvidenceV0_1(candidate(sourceForm));
+  const existing = evidenceBySourceForm.get(sourceForm);
+  if (existing) return existing;
+
+  const adapted = adaptCmuDictCandidateSourceEvidenceV0_1(candidate(sourceForm));
+  evidenceBySourceForm.set(sourceForm, adapted);
+  return adapted;
 }
 
 function copy<T>(value: T): T {
@@ -57,6 +67,18 @@ function firstVariant(value: CmuDictCandidatePronunciationEvidenceV0_1) {
 }
 
 describe("CMUdict candidate Voice projection v0.1", () => {
+  it("reuses only deeply frozen source evidence for the exact fixture form", () => {
+    const stone = evidence("stone");
+    const read = evidence("read");
+
+    expect(evidence("stone")).toBe(stone);
+    expect(evidence("read")).toBe(read);
+    expect(stone).not.toBe(read);
+    expect(Object.isFrozen(stone)).toBe(true);
+    expect(Object.isFrozen(stone.variants)).toBe(true);
+    expect(Object.isFrozen(stone.variants[0])).toBe(true);
+  });
+
   it("accepts defined candidate source evidence", () => {
     const result = projectCmuDictCandidateVoiceProjectionV0_1(evidence());
     expect(result.status).toBe("defined");
