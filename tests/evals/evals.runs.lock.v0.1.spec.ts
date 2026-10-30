@@ -6,6 +6,7 @@ import { EVAL_SPEC_V0_1 } from "@/shared/evals/spec.v0.1";
 import { parseEvalRunBundleV0_1 } from "@/shared/evals/run.v0.1";
 import { scoreEvalRunBundleV0_1 } from "@/shared/evals/scoreEvalRun.v0.1";
 import { renderEvalReportMdV0_1 } from "@/shared/evals/renderEvalReportMd.v0.1";
+import { withEvalsArtifactWriteLockV0_1 } from "./evalsArtifactWriteLock.v0.1";
 
 function ensureDir(p: string) {
   fs.mkdirSync(p, { recursive: true });
@@ -28,9 +29,14 @@ function writeOrCompareBaseline(params: {
 
   const allowWrite = (process.env.EVALS_WRITE_BASELINES ?? "").trim() === "1";
 
-  const has = fs.existsSync(baseMd) && fs.existsSync(baseJson);
+  const hasMd = fs.existsSync(baseMd);
+  const hasJson = fs.existsSync(baseJson);
 
-  if (!has) {
+  if (hasMd !== hasJson) {
+    throw new Error(`Incomplete committed baseline pair for ${path.basename(basePathNoExt)}; refusing to write either file.`);
+  }
+
+  if (!hasMd) {
     if (!allowWrite) {
       throw new Error(
         [
@@ -125,10 +131,9 @@ describe("Evals run library v0.1 — score all runs + baseline lock", () => {
 
     const outDir = path.join(root, "tests/validation/out");
     const baseDir = path.join(root, "tests/validation/baselines");
-    ensureDir(outDir);
-    ensureDir(baseDir);
 
     const indexRows: IndexRow[] = [];
+    const renderedReports: Array<{ outBase: string; md: string; json: string }> = [];
 
     for (const f of files) {
       const runPath = path.join(runsDir, f);
@@ -140,14 +145,7 @@ describe("Evals run library v0.1 — score all runs + baseline lock", () => {
       const json = JSON.stringify(report, null, 2) + "\n";
 
       const outBase = `evals.${report.specId}.${report.runId}.v0.1`;
-      const outMd = path.join(outDir, `${outBase}.md`);
-      const outJson = path.join(outDir, `${outBase}.json`);
-
-      fs.writeFileSync(outMd, md, "utf8");
-      fs.writeFileSync(outJson, json, "utf8");
-
-      const basePathNoExt = path.join(baseDir, outBase);
-      writeOrCompareBaseline({ basePathNoExt, md, json });
+      renderedReports.push({ outBase, md, json });
 
       const t2 = findTask(report, "T2_");
       const t3 = findTask(report, "T3_");
@@ -175,12 +173,23 @@ describe("Evals run library v0.1 — score all runs + baseline lock", () => {
       2
     ) + "\n";
 
-    const indexOutMd = path.join(outDir, "evals.index.v0.1.md");
-    const indexOutJson = path.join(outDir, "evals.index.v0.1.json");
-    fs.writeFileSync(indexOutMd, indexMd, "utf8");
-    fs.writeFileSync(indexOutJson, indexJson, "utf8");
+    withEvalsArtifactWriteLockV0_1(root, () => {
+      ensureDir(outDir);
+      ensureDir(baseDir);
 
-    const indexBaseNoExt = path.join(baseDir, "evals.index.v0.1");
-    writeOrCompareBaseline({ basePathNoExt: indexBaseNoExt, md: indexMd, json: indexJson });
+      for (const { outBase, md, json } of renderedReports) {
+        fs.writeFileSync(path.join(outDir, `${outBase}.md`), md, "utf8");
+        fs.writeFileSync(path.join(outDir, `${outBase}.json`), json, "utf8");
+        writeOrCompareBaseline({ basePathNoExt: path.join(baseDir, outBase), md, json });
+      }
+
+      fs.writeFileSync(path.join(outDir, "evals.index.v0.1.md"), indexMd, "utf8");
+      fs.writeFileSync(path.join(outDir, "evals.index.v0.1.json"), indexJson, "utf8");
+      writeOrCompareBaseline({
+        basePathNoExt: path.join(baseDir, "evals.index.v0.1"),
+        md: indexMd,
+        json: indexJson,
+      });
+    });
   });
 });
