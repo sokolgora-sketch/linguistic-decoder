@@ -42,8 +42,21 @@ function candidate(sourceForm = "stone"): CmuDictCandidateAdapterInputV0_1 {
   };
 }
 
+const evidenceBySourceForm = Object.freeze({
+  a: adaptCmuDictCandidateSourceEvidenceV0_1(candidate("a")),
+  abstract: adaptCmuDictCandidateSourceEvidenceV0_1(candidate("abstract")),
+  mormonism: adaptCmuDictCandidateSourceEvidenceV0_1(candidate("mormonism")),
+  read: adaptCmuDictCandidateSourceEvidenceV0_1(candidate("read")),
+  stone: adaptCmuDictCandidateSourceEvidenceV0_1(candidate("stone")),
+  "word-that-is-not-in-cmudict": adaptCmuDictCandidateSourceEvidenceV0_1(
+    candidate("word-that-is-not-in-cmudict"),
+  ),
+});
+
 function evidence(sourceForm = "stone") {
-  return adaptCmuDictCandidateSourceEvidenceV0_1(candidate(sourceForm));
+  const result = evidenceBySourceForm[sourceForm as keyof typeof evidenceBySourceForm];
+  if (!result) throw new Error(`MISSING_IMMUTABLE_CMU_DICT_TEST_EVIDENCE:${sourceForm}`);
+  return result;
 }
 
 function voice(sourceForm = "stone"): CmuDictCandidateVoiceProjectionV0_1 {
@@ -72,7 +85,28 @@ function keysDeep(value: unknown, keys: string[] = []): string[] {
   return keys;
 }
 
+function isDeeplyFrozen(value: unknown, seen = new WeakSet<object>()): boolean {
+  if (value === null || typeof value !== "object" || seen.has(value)) return true;
+  seen.add(value);
+  return (
+    Object.isFrozen(value) &&
+    Object.values(value as Record<string, unknown>).every((child) =>
+      isDeeplyFrozen(child, seen),
+    )
+  );
+}
+
 describe("CMUdict candidate Gamma projection v0.1", () => {
+  it("reuses only deeply immutable source evidence keyed by exact test form", () => {
+    const stone = evidence();
+    const read = evidence("read");
+
+    expect(evidence("stone")).toBe(stone);
+    expect(isDeeplyFrozen(stone)).toBe(true);
+    expect(read).not.toBe(stone);
+    expect(read.candidateSourceForm).toBe("read");
+  });
+
   it("uses the exact projector identity", () => {
     expect(gamma().projectorId).toBe(
       CMUDICT_CANDIDATE_GAMMA_PROJECTION_PROJECTOR_ID_V0_1,
