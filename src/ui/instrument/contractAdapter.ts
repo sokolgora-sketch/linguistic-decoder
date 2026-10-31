@@ -1034,7 +1034,7 @@ function parseMotivationDiscoveryV0_1(
     );
     return valid;
   };
-  const validAlbanianLexicalReading = (reading: unknown): boolean => {
+  const validAlbanianLexicalReading = (reading: unknown, exactSourceFacts: unknown): boolean => {
     if (!isRecord(reading) || (reading.status !== "SUPPORTED" && reading.status !== "NULL") || !Array.isArray(reading.relatedForms) || !isRecord(reading.interpretation)) {
       return false;
     }
@@ -1289,11 +1289,140 @@ function parseMotivationDiscoveryV0_1(
             recordsForForm.every((record, recordIndex) => record.sourceRecordId === sourceRecordIds[recordIndex]);
         });
         if (!validResolution) return false;
+        const validSourceAuthoredAfTemplate = (): boolean => {
+          if (relation !== "SOURCE_AUTHORED_AF_TEMPLATE") return true;
+          const primary = sourceLinkedComponentReading.primary;
+          if (!isRecord(primary) || typeof primary.sourceRecordId !== "string" ||
+            typeof primary.entryLocator !== "string" || typeof primary.form !== "string" ||
+            typeof primary.etymologyText !== "string" && primary.etymologyText !== null ||
+            !Array.isArray(primary.etymologyLinks) || !Array.isArray(primary.etymologyTemplates) ||
+            componentRelation.primarySourceRecordId !== primary.sourceRecordId ||
+            componentRelation.primaryEntryLocator !== primary.entryLocator ||
+            componentRelation.sourceAuthoredExplanation !== primary.etymologyText) return false;
+          const projectedLinks = primary.etymologyLinks as unknown[];
+          const projectedTemplates = primary.etymologyTemplates as unknown[];
+          const primaryForm = primary.form as string;
+
+          const exactPrimaryFacts = Array.isArray(exactLexicalSourceFacts)
+            ? exactLexicalSourceFacts.filter((fact) => isRecord(fact) &&
+              fact.sourceRecordId === primary.sourceRecordId && fact.entryLocator === primary.entryLocator &&
+              fact.form === primary.form)
+            : [];
+          if (exactPrimaryFacts.length !== 1) return false;
+          const rawPrimary = exactPrimaryFacts[0];
+          const rawLinks = isRecord(rawPrimary) && Array.isArray(rawPrimary.etymologyLinks)
+            ? rawPrimary.etymologyLinks
+            : [];
+          if (!isRecord(rawPrimary) || rawPrimary.physicalRecordOrdinal !== primary.physicalRecordOrdinal ||
+            rawPrimary.partOfSpeech !== primary.partOfSpeech ||
+            (rawPrimary.etymologyText ?? null) !== primary.etymologyText ||
+            rawLinks.length !== projectedLinks.length ||
+            !rawLinks.every((link, index) => isRecord(link) &&
+              isRecord(projectedLinks[index]) &&
+              link.sourceForm === projectedLinks[index].sourceForm &&
+              link.reference === projectedLinks[index].reference)) return false;
+
+          const templates = projectedTemplates;
+          const afTemplates = templates.filter((template) => isRecord(template) && template.name === "af");
+          if (afTemplates.length === 0) return false;
+          const template = afTemplates[0];
+          if (!isRecord(template) || !isRecord(template.args) || typeof template.expansion !== "string") return false;
+          const rawTemplates = Array.isArray(rawPrimary.etymologyTemplates) ? rawPrimary.etymologyTemplates : [];
+          const sameTemplate = (projected: unknown, raw: unknown): boolean =>
+            isRecord(projected) && isRecord(raw) && projected.name === raw.name &&
+            projected.expansion === raw.expansion && isRecord(projected.args) && isRecord(raw.args) &&
+            (() => {
+              const projectedArgs = projected.args as Record<string, unknown>;
+              const rawArgs = raw.args as Record<string, unknown>;
+              return Object.keys(projectedArgs).sort().join("\u0000") === Object.keys(rawArgs).sort().join("\u0000") &&
+                Object.entries(projectedArgs).every(([key, value]) => rawArgs[key] === value);
+            })();
+          if (rawTemplates.length !== templates.length ||
+            !templates.every((projected, index) => sameTemplate(projected, rawTemplates[index]))) return false;
+
+          const templateArgs = template.args as Record<string, unknown>;
+          const numericKeys = Object.keys(templateArgs).filter((key) => /^\d+$/u.test(key))
+            .sort((left, right) => Number(left) - Number(right));
+          const componentForms: string[] = numericKeys.filter((key) => Number(key) >= 2)
+            .map((key) => templateArgs[key] as string);
+          const normalizedComponentForms = componentForms.map((form) => form.normalize("NFC").trim());
+          if (templateArgs["1"] !== "sq" || componentReferences.length !== componentForms.length ||
+            !componentForms.every((form, index) => {
+              const reference = componentReferences[index];
+              return typeof form === "string" && form.trim().length > 0 &&
+                isRecord(reference) && reference.sourceForm === normalizedComponentForms[index];
+            })) return false;
+
+          const auxiliaryKeys = Object.keys(templateArgs).filter((key) => !/^\d+$/u.test(key));
+          const supportedArgumentSet = numericKeys.join(",") === "1,2,3" && componentForms.length === 2 &&
+            auxiliaryKeys.every((key) => key === "t1" || key === "t2");
+          const hasReason = (code: string): boolean => reasonCodes.includes(code);
+          const ambiguousTemplate = afTemplates.length !== 1 || templates.length !== 1;
+          if (hasReason("SOURCE_AF_TEMPLATE_AMBIGUOUS") !== ambiguousTemplate ||
+            hasReason("SOURCE_AF_TEMPLATE_ARGUMENT_SET_INVALID") === supportedArgumentSet) return false;
+
+          const normalized = (form: string): string => form.normalize("NFC").trim().toLocaleLowerCase("sq-AL");
+          const formsInvalid = componentForms.length < 2 || normalizedComponentForms.some((form, index) =>
+            normalizedComponentForms.indexOf(form) !== index ||
+            normalized(form) === normalized(primaryForm),
+          );
+          const links = projectedLinks;
+          const referenceProjectionConsistent = componentForms.every((form, index) => {
+            const reference = componentReferences[index];
+            const matching = links.filter((link) => isRecord(link) && typeof link.sourceForm === "string" &&
+              normalized(link.sourceForm) === normalized(form));
+            return isRecord(reference) && reference.reference === (isRecord(matching[0]) ? matching[0].reference : null);
+          });
+          if (!referenceProjectionConsistent) return false;
+          const referenceSetMismatch = links.length !== componentForms.length;
+          const referenceNotPresent = componentForms.some((form) => !links.some((link) =>
+            isRecord(link) && typeof link.sourceForm === "string" && normalized(link.sourceForm) === normalized(form),
+          ));
+          const referenceAmbiguous = componentForms.some((form) => links.filter((link) =>
+            isRecord(link) && typeof link.sourceForm === "string" && normalized(link.sourceForm) === normalized(form),
+          ).length > 1);
+          const referenceIdentityInvalid = componentForms.some((form, index) => {
+            const matching = links.filter((link) => isRecord(link) && typeof link.sourceForm === "string" &&
+              normalized(link.sourceForm) === normalized(form));
+            if (matching.length === 0) return false;
+            if (!isRecord(matching[0]) || typeof matching[0].reference !== "string") return true;
+            const sourceReference = matching[0].reference as string;
+            const separator = sourceReference.indexOf("#");
+            return separator <= 0 || separator !== sourceReference.lastIndexOf("#") ||
+              normalized(sourceReference.slice(0, separator)) !== normalized(form) ||
+              sourceReference.slice(separator + 1) !== "Albanian";
+          });
+          if (hasReason("SOURCE_COMPONENT_FORMS_INVALID") !== formsInvalid ||
+            hasReason("SOURCE_COMPONENT_REFERENCE_SET_MISMATCH") !== referenceSetMismatch ||
+            hasReason("SOURCE_COMPONENT_REFERENCE_NOT_PRESENT") !== referenceNotPresent ||
+            hasReason("SOURCE_COMPONENT_REFERENCE_AMBIGUOUS") !== referenceAmbiguous ||
+            hasReason("SOURCE_COMPONENT_REFERENCE_IDENTITY_INVALID") !== referenceIdentityInvalid) return false;
+
+          const resolutionReasonCodes = componentResolutions.flatMap((resolution) =>
+            isRecord(resolution) && isStringArray(resolution.reasonCodes) ? resolution.reasonCodes : [],
+          );
+          if (resolutionReasonCodes.some((code) => !reasonCodes.includes(code)) ||
+            componentResolutions.some((resolution) => {
+              if (!isRecord(resolution) || !isStringArray(resolution.reasonCodes)) return false;
+              const codes = resolution.reasonCodes;
+              return resolution.status === "RESOLVED" && codes.length !== 0 ||
+                resolution.status === "UNRESOLVED" && codes.length === 0 ||
+                resolution.status === "AMBIGUOUS" &&
+                  !codes.some((code) => code === "SOURCE_COMPONENT_RECORD_AMBIGUOUS" ||
+                    code === "SOURCE_COMPONENT_RECORD_IDENTITY_DUPLICATE");
+            })) return false;
+          return componentRecords.length === componentResolutions.reduce<number>((total, resolution) =>
+            total + (isRecord(resolution) && Array.isArray(resolution.sourceRecordIds) ? resolution.sourceRecordIds.length : 0), 0);
+        };
         if (sourceLinkedComponentReading.status === "SUPPORTED") {
           return reasonCodes.length === 0 && (
             relation === "SOURCE_EXPLICIT_TWO_COMPONENT_COMPOUND" &&
               referenceCount === 2 && componentCount === 2 &&
               componentResolutions.every((resolution) => isRecord(resolution) && resolution.status === "RESOLVED") ||
+            relation === "SOURCE_AUTHORED_AF_TEMPLATE" &&
+              referenceCount === 2 && componentCount === 2 &&
+              componentResolutions.every((resolution) => isRecord(resolution) && resolution.status === "RESOLVED") &&
+              validSourceAuthoredAfTemplate() ||
             relation === "SOURCE_EXPLICIT_THREE_COMPONENT_COMPOUND" &&
               referenceCount === 3 && componentCount >= 3 &&
               componentResolutions.every((resolution) => isRecord(resolution) &&
@@ -1305,7 +1434,21 @@ function parseMotivationDiscoveryV0_1(
           return !reasonCodes.includes("SOURCE_COMPOUND_ARITY_UNSUPPORTED") &&
             reasonCodes.length > 0 &&
             referenceCount === 2 &&
-            componentCount <= referenceCount;
+            componentCount === componentResolutions.reduce<number>((total, resolution) =>
+              total + (isRecord(resolution) && Array.isArray(resolution.sourceRecordIds) ? resolution.sourceRecordIds.length : 0), 0);
+        }
+        if (relation === "SOURCE_AUTHORED_AF_TEMPLATE") {
+          const primary = sourceLinkedComponentReading.primary;
+          const template = isRecord(primary) && Array.isArray(primary.etymologyTemplates)
+            ? primary.etymologyTemplates.find((candidate) => isRecord(candidate) && candidate.name === "af")
+            : null;
+          const args = isRecord(template) && isRecord(template.args) ? template.args : null;
+          const componentArity = args
+            ? Object.keys(args).filter((key) => /^\d+$/u.test(key) && Number(key) >= 2).length
+            : -1;
+          return reasonCodes.length > 0 && validSourceAuthoredAfTemplate() &&
+            (componentArity === 2 || componentArity === 1 || componentArity === 3) &&
+            (componentArity === 2 || reasonCodes.includes("SOURCE_AF_TEMPLATE_ARGUMENT_SET_INVALID"));
         }
         if (relation === "SOURCE_EXPLICIT_THREE_COMPONENT_COMPOUND") {
           return reasonCodes.length > 0 && referenceCount === 3 && componentCount >= 0;
@@ -1522,7 +1665,132 @@ function parseMotivationDiscoveryV0_1(
         isStringArray(bridge.reasonCodes) &&
         typeof bridge.claimBoundary === "string";
     };
-    const validFunctionalMeaningBridge = validFunctionalMeaningBridgeValue(reading.functionalMeaningBridge);
+    const validDirectTargetRoleFunctionalBridge = (): boolean => {
+      const bridge = reading.functionalMeaningBridge;
+      if (!isRecord(bridge) || !isRecord(bridge.functionalHypothesis) ||
+        !isStringArray(bridge.functionalHypothesis.basis) ||
+        !bridge.functionalHypothesis.basis.includes("SOURCE_ATTESTED_TARGET_ROLE_CATEGORY")) return true;
+      const sourceFacts = bridge.sourceFacts;
+      const target = reading.primarySourceFact;
+      const componentReading = reading.sourceLinkedComponentReading;
+      if (!isRecord(sourceFacts) || !isRecord(sourceFacts.primary) || !isRecord(sourceFacts.structuredReference)) return false;
+      if (
+        bridge.status !== "SUPPORTED" ||
+        bridge.relatedForm !== null ||
+        bridge.derivedStructure !== null ||
+        bridge.functionalHypothesis.status !== "EXPLORATORY_FUNCTIONAL_HYPOTHESIS" ||
+        bridge.functionalHypothesis.functionalOperation !== "AGENT" ||
+        sourceFacts.related !== null ||
+        sourceFacts.structuredReference.referencedForm !== null ||
+        sourceFacts.structuredReference.reference !== null ||
+        !isRecord(target) || typeof target.form !== "string" || typeof target.sourceRecordId !== "string" ||
+        typeof target.entryLocator !== "string" || target.partOfSpeech !== "noun" ||
+        target.form !== sourceFacts.primary.form ||
+        target.sourceRecordId !== sourceFacts.primary.sourceRecordId ||
+        target.entryLocator !== sourceFacts.primary.entryLocator ||
+        !isRecord(componentReading) || !isRecord(componentReading.relation) ||
+        componentReading.relation.relation !== "SOURCE_AUTHORED_AF_TEMPLATE" ||
+        componentReading.relation.primarySourceRecordId !== target.sourceRecordId ||
+        componentReading.relation.primaryEntryLocator !== target.entryLocator ||
+        !Array.isArray(componentReading.relation.references) || componentReading.relation.references.length !== 2 ||
+        !isRecord(componentReading.primary) || componentReading.primary.sourceRecordId !== target.sourceRecordId ||
+        componentReading.primary.entryLocator !== target.entryLocator ||
+        !Array.isArray(exactSourceFacts)
+      ) return false;
+
+      const targetForm = typeof target.form === "string" ? target.form : null;
+      if (targetForm === null) return false;
+      const normalizeForm = (form: string): string => form.normalize("NFC").trim().toLocaleLowerCase("sq-AL");
+      const targetRecords = exactSourceFacts.filter((fact) => isRecord(fact) &&
+        fact.language === "Albanian" && fact.languageCode === "sq" &&
+        typeof fact.form === "string" && normalizeForm(fact.form) === normalizeForm(targetForm) &&
+        fact.partOfSpeech !== "name",
+      );
+      const expectedIdPrefix = `kaikki-albanian-jsonl:word=${encodeURIComponent(targetForm)}:ordinal=`;
+      const targetOrdinal = typeof target.sourceRecordId === "string"
+        ? target.sourceRecordId.slice(expectedIdPrefix.length)
+        : "";
+      if (
+        targetRecords.length !== 1 || targetRecords[0]?.sourceRecordId !== target.sourceRecordId ||
+        !/^\d+$/u.test(targetOrdinal) ||
+        targetRecords.filter((fact) => isRecord(fact) && fact.sourceRecordId === target.sourceRecordId).length !== 1
+      ) return false;
+
+      const sourceSenses = sourceFacts.primary.sourceSenses;
+      if (!Array.isArray(sourceSenses)) return false;
+      const roleSenses = sourceSenses.flatMap((sense) => {
+        if (!isRecord(sense) || typeof sense.senseId !== "string" || !sense.senseId ||
+          !isStringArray(sense.glosses) || !sense.glosses.some((gloss) => gloss.trim().length > 0) ||
+          !Array.isArray(sense.categories)) return [];
+        const categories = sense.categories.filter((category) => isRecord(category) &&
+          category.name === "Occupations" && category.orig === "sq:Occupations" &&
+          category.langcode === "sq" && category.source === "w",
+        );
+        return categories.length === 1 ? [{ sense, category: categories[0] }] : [];
+      });
+      if (roleSenses.length !== 1) return false;
+      const roleSenseId = roleSenses[0]?.sense.senseId;
+      if (typeof roleSenseId !== "string" || sourceSenses.filter((sense) => isRecord(sense) && sense.senseId === roleSenseId).length !== 1) {
+        return false;
+      }
+      const rawTarget = targetRecords[0];
+      if (!isRecord(rawTarget) || !Array.isArray(rawTarget.senses) ||
+        rawTarget.senses.filter((sense) => isRecord(sense) && sense.senseId === roleSenseId).length !== 1) return false;
+      const rawRoleSense = rawTarget.senses.find((sense) => isRecord(sense) && sense.senseId === roleSenseId);
+      const projectedRoleSense = sourceSenses.find((sense) => isRecord(sense) && sense.senseId === roleSenseId);
+      if (!isRecord(rawRoleSense) || !Array.isArray(rawRoleSense.categories) ||
+        !isRecord(projectedRoleSense) || !Array.isArray(projectedRoleSense.categories)) return false;
+      const isExactSourceOccupationCategory = (category: unknown): category is Record<string, unknown> =>
+        isRecord(category) && category.name === "Occupations" && category.orig === "sq:Occupations" &&
+        category.langcode === "sq" && category.source === "w";
+      const rawRoleCategories = rawRoleSense.categories.filter(isExactSourceOccupationCategory);
+      const projectedRoleCategories = projectedRoleSense.categories.filter(isExactSourceOccupationCategory);
+      if (rawRoleCategories.length !== 1 || projectedRoleCategories.length !== 1) return false;
+
+      const references = componentReading.relation.references as unknown[];
+      const componentPrimary = componentReading.primary;
+      const templates = Array.isArray(componentPrimary.etymologyTemplates)
+        ? componentPrimary.etymologyTemplates.filter((template) => isRecord(template) && template.name === "af")
+        : [];
+      if (templates.length !== 1 || !Array.isArray(componentPrimary.etymologyLinks) ||
+        componentPrimary.etymologyLinks.length !== 2) return false;
+      const template = templates[0];
+      if (!isRecord(template) || !isRecord(template.args)) return false;
+      const templateArguments = template.args;
+      const templateBaseForm = templateArguments["2"];
+      const templateComponentForm = templateArguments["3"];
+      if (templateArguments["1"] !== "sq" ||
+        Object.keys(templateArguments).some((argument) => !["1", "2", "3", "t1", "t2"].includes(argument)) ||
+        Object.keys(templateArguments).filter((argument) => /^\d+$/u.test(argument)).sort().join(",") !== "1,2,3" ||
+        Object.keys(templateArguments).filter((argument) => argument === "t1" || argument === "t2")
+          .some((argument) => typeof templateArguments[argument] !== "string") ||
+        typeof templateBaseForm !== "string" || typeof templateComponentForm !== "string" ||
+        typeof template.expansion !== "string" || typeof componentPrimary.etymologyText !== "string") return false;
+      const normalizeText = (text: string): string => text.normalize("NFC").trim().replace(/\s+/gu, " ").toLocaleLowerCase("sq-AL");
+      const expansionParts = template.expansion.split(/\s+\+\s+/u);
+      const matchesExpansionRoot = (part: string | undefined, form: string): boolean => {
+        if (!part) return false;
+        const normalizedPart = normalizeText(part);
+        const normalizedForm = normalizeText(form);
+        return normalizedPart === normalizedForm ||
+          (normalizedPart.startsWith(`${normalizedForm} (`) && normalizedPart.endsWith(")"));
+      };
+      if (expansionParts.length !== 2 ||
+        !matchesExpansionRoot(expansionParts[0], templateBaseForm) ||
+        !matchesExpansionRoot(expansionParts[1], templateComponentForm) ||
+        normalizeText(componentPrimary.etymologyText).replace(/[.!?]+$/u, "") !==
+          normalizeText(`A compound of ${template.expansion}`).replace(/[.!?]+$/u, "")) return false;
+      const links = componentPrimary.etymologyLinks as unknown[];
+      return references.every((reference, index) => {
+        const link = links[index];
+        return isRecord(reference) && isRecord(link) &&
+          reference.sourceForm === (index === 0 ? templateBaseForm : templateComponentForm) &&
+          reference.reference === `${reference.sourceForm}#Albanian` &&
+          link.sourceForm === reference.sourceForm && link.reference === reference.reference;
+      });
+    };
+    const validFunctionalMeaningBridge = validFunctionalMeaningBridgeValue(reading.functionalMeaningBridge) &&
+      validDirectTargetRoleFunctionalBridge();
     const validRelatedCandidateComparison = (candidate: unknown): boolean => {
       if (!isRecord(candidate) || (candidate.status !== "SUPPORTED" && candidate.status !== "NULL") ||
         !isStringArray(candidate.reasonCodes) || !isRecord(candidate.relation) ||
@@ -1764,7 +2032,7 @@ function parseMotivationDiscoveryV0_1(
       (!Array.isArray(exactLexicalSourceFacts) || !exactLexicalSourceFacts.every(validExactLexicalSourceFact))) ||
     (value.sourceIpaSevenVoiceAnalyses !== undefined &&
       (!Array.isArray(value.sourceIpaSevenVoiceAnalyses) || !value.sourceIpaSevenVoiceAnalyses.every(validSourceIpaSevenVoiceAnalysis)))
-      || (value.albanianLexicalReading !== undefined && !validAlbanianLexicalReading(value.albanianLexicalReading))
+      || (value.albanianLexicalReading !== undefined && !validAlbanianLexicalReading(value.albanianLexicalReading, value.exactLexicalSourceFacts))
   ) {
     return missing("malformed", "motivationDiscoveryV0_1 derived structure invalid");
   }

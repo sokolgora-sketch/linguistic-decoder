@@ -511,6 +511,9 @@ export function MotivationDiscoveryCardV0_1({
   const exactLexicalSourceFacts = value.exactLexicalSourceFacts ?? [];
   const sourceIpaSevenVoiceAnalyses = value.sourceIpaSevenVoiceAnalyses ?? [];
   const albanianLexicalReading = value.albanianLexicalReading;
+  const functionalMeaningBridge = albanianLexicalReading?.functionalMeaningBridge ?? null;
+  const isDirectTargetRoleReading = functionalMeaningBridge?.functionalHypothesis.basis
+    .includes("SOURCE_ATTESTED_TARGET_ROLE_CATEGORY") ?? false;
   const selectedPrimarySourceRecordId = albanianLexicalReading?.primarySourceFact?.sourceRecordId ?? null;
   const relatedCandidateEvaluations = albanianLexicalReading?.relatedCandidateEvaluations ?? [];
   const supportedRelatedCandidateEvaluations = relatedCandidateEvaluations.filter((candidate) =>
@@ -917,11 +920,12 @@ export function MotivationDiscoveryCardV0_1({
             >
               <div className="font-semibold uppercase tracking-[0.1em] text-[#b7d7e8]">SOURCE-LINKED COMPONENT READING</div>
               <div className="mt-1 text-[#a9c3d0]">
-                Source-authored component relation: {albanianLexicalReading.sourceLinkedComponentReading.relation.references
+                Source-authored component references: {albanianLexicalReading.sourceLinkedComponentReading.relation.references
                   .map((reference) => `${reference.sourceForm} → ${reference.reference ?? "Null"}`)
                   .join(" · ") || "Null"}
               </div>
-              {albanianLexicalReading.sourceLinkedComponentReading.relation.relation === "SOURCE_EXPLICIT_THREE_COMPONENT_COMPOUND" ? (
+              {albanianLexicalReading.sourceLinkedComponentReading.relation.relation === "SOURCE_EXPLICIT_THREE_COMPONENT_COMPOUND" ||
+              albanianLexicalReading.sourceLinkedComponentReading.relation.relation === "SOURCE_AUTHORED_AF_TEMPLATE" ? (
                 <div className="mt-1 text-[#a9c3d0]">
                   Component record resolution: {albanianLexicalReading.sourceLinkedComponentReading.componentResolutions
                     .map((resolution) => `${resolution.sourceForm}: ${resolution.status.toLocaleLowerCase("sq-AL")} (${resolution.sourceRecordIds.length} source record${resolution.sourceRecordIds.length === 1 ? "" : "s"})`)
@@ -1028,13 +1032,33 @@ export function MotivationDiscoveryCardV0_1({
             data-testid="albanian-functional-meaning-bridge"
             className="mt-3 rounded border border-[#66532e] bg-[#1b180f] p-3 text-[#f0ddb0]"
           >
-            <div className="font-semibold uppercase tracking-[0.1em]">FUNCTIONAL MEANING BRIDGE · EXPLORATORY ONLY</div>
+            <div className="font-semibold uppercase tracking-[0.1em]">
+              {isDirectTargetRoleReading ? "SOURCE-ATTESTED TARGET ROLE · EXPLORATORY ONLY" : "FUNCTIONAL MEANING BRIDGE · EXPLORATORY ONLY"}
+            </div>
             {albanianLexicalReading.functionalMeaningBridge.status === "SUPPORTED" &&
             albanianLexicalReading.functionalMeaningBridge.sourceFacts &&
             albanianLexicalReading.functionalMeaningBridge.functionalHypothesis.status === "EXPLORATORY_FUNCTIONAL_HYPOTHESIS" ? (
               <>
                 <div className="mt-2 rounded border border-[#594a2b] bg-[#211c12] p-2 text-xs">
                   <div className="font-semibold text-[#f5f7fb]">SOURCE_FACT</div>
+                  {isDirectTargetRoleReading ? (
+                    <>
+                      <div className="mt-1 break-words">
+                        Target record: {albanianLexicalReading.functionalMeaningBridge.sourceFacts.primary.sourceRecordId} · {albanianLexicalReading.functionalMeaningBridge.sourceFacts.primary.entryLocator}
+                      </div>
+                      <div className="mt-1 break-words">
+                        Target role sense: {albanianLexicalReading.functionalMeaningBridge.sourceFacts.primary.sourceSenses
+                          .filter((sense) => sense.categories.some((category) =>
+                            category.name === "Occupations" && category.orig === "sq:Occupations" &&
+                            category.langcode === "sq" && category.source === "w",
+                          ))
+                          .map((sense) => `${sense.senseId ?? "Null"} (“${sense.glosses.join("; ") || "Null"}”) · sq:Occupations · source w`)
+                          .join(" | ") || "Null"}
+                      </div>
+                      <div className="mt-1">No unique target-to-component sense alignment is claimed.</div>
+                    </>
+                  ) : (
+                    <>
                   <div className="mt-1">
                     {albanianLexicalReading.functionalMeaningBridge.sourceFacts.primary.form}: {albanianLexicalReading.functionalMeaningBridge.sourceFacts.primary.meaningGlosses.join("; ") || "Null"}
                   </div>
@@ -1044,6 +1068,8 @@ export function MotivationDiscoveryCardV0_1({
                   <div className="mt-1 break-words text-[#d5c28f]">
                     Source-authored explanation (attributed): {albanianLexicalReading.functionalMeaningBridge.sourceFacts.related?.sourceAuthoredExplanation ?? "Null"}
                   </div>
+                    </>
+                  )}
                 </div>
                 {albanianLexicalReading.functionalMeaningBridge.derivedStructure ? (
                   <div className="mt-2 rounded border border-[#594a2b] bg-[#211c12] p-2 text-xs">
@@ -1061,7 +1087,11 @@ export function MotivationDiscoveryCardV0_1({
                 ) : (
                   <div data-testid="albanian-reading-functional-bridge-derived-structure-null" className="mt-2 rounded border border-[#594a2b] bg-[#211c12] p-2 text-xs">
                     <div className="font-semibold text-[#f5f7fb]">DERIVED_STRUCTURE</div>
-                    <div className="mt-1">Null — source IPA is unavailable for one or both records; no Voice or phonological semantic relation is claimed.</div>
+                    <div className="mt-1">
+                      {isDirectTargetRoleReading
+                        ? "Null — no pairwise source comparison is claimed for this direct target-role reading; no Voice or phonological semantic relation is inferred."
+                        : "Null — source IPA is unavailable for one or both records; no Voice or phonological semantic relation is claimed."}
+                    </div>
                   </div>
                 )}
                 <div className="mt-2 rounded border border-[#594a2b] bg-[#211c12] p-2 text-xs">
