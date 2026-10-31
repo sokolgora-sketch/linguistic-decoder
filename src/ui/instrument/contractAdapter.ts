@@ -1289,6 +1289,131 @@ function parseMotivationDiscoveryV0_1(
             recordsForForm.every((record, recordIndex) => record.sourceRecordId === sourceRecordIds[recordIndex]);
         });
         if (!validResolution) return false;
+        const validSourceAuthoredAfTemplate = (): boolean => {
+          if (relation !== "SOURCE_AUTHORED_AF_TEMPLATE") return true;
+          const primary = sourceLinkedComponentReading.primary;
+          if (!isRecord(primary) || typeof primary.sourceRecordId !== "string" ||
+            typeof primary.entryLocator !== "string" || typeof primary.form !== "string" ||
+            typeof primary.etymologyText !== "string" && primary.etymologyText !== null ||
+            !Array.isArray(primary.etymologyLinks) || !Array.isArray(primary.etymologyTemplates) ||
+            componentRelation.primarySourceRecordId !== primary.sourceRecordId ||
+            componentRelation.primaryEntryLocator !== primary.entryLocator ||
+            componentRelation.sourceAuthoredExplanation !== primary.etymologyText) return false;
+          const projectedLinks = primary.etymologyLinks as unknown[];
+          const projectedTemplates = primary.etymologyTemplates as unknown[];
+          const primaryForm = primary.form as string;
+
+          const exactPrimaryFacts = Array.isArray(exactLexicalSourceFacts)
+            ? exactLexicalSourceFacts.filter((fact) => isRecord(fact) &&
+              fact.sourceRecordId === primary.sourceRecordId && fact.entryLocator === primary.entryLocator &&
+              fact.form === primary.form)
+            : [];
+          if (exactPrimaryFacts.length !== 1) return false;
+          const rawPrimary = exactPrimaryFacts[0];
+          const rawLinks = isRecord(rawPrimary) && Array.isArray(rawPrimary.etymologyLinks)
+            ? rawPrimary.etymologyLinks
+            : [];
+          if (!isRecord(rawPrimary) || rawPrimary.physicalRecordOrdinal !== primary.physicalRecordOrdinal ||
+            rawPrimary.partOfSpeech !== primary.partOfSpeech ||
+            (rawPrimary.etymologyText ?? null) !== primary.etymologyText ||
+            rawLinks.length !== projectedLinks.length ||
+            !rawLinks.every((link, index) => isRecord(link) &&
+              isRecord(projectedLinks[index]) &&
+              link.sourceForm === projectedLinks[index].sourceForm &&
+              link.reference === projectedLinks[index].reference)) return false;
+
+          const templates = projectedTemplates;
+          const afTemplates = templates.filter((template) => isRecord(template) && template.name === "af");
+          if (afTemplates.length === 0) return false;
+          const template = afTemplates[0];
+          if (!isRecord(template) || !isRecord(template.args) || typeof template.expansion !== "string") return false;
+          const rawTemplates = Array.isArray(rawPrimary.etymologyTemplates) ? rawPrimary.etymologyTemplates : [];
+          const sameTemplate = (projected: unknown, raw: unknown): boolean =>
+            isRecord(projected) && isRecord(raw) && projected.name === raw.name &&
+            projected.expansion === raw.expansion && isRecord(projected.args) && isRecord(raw.args) &&
+            (() => {
+              const projectedArgs = projected.args as Record<string, unknown>;
+              const rawArgs = raw.args as Record<string, unknown>;
+              return Object.keys(projectedArgs).sort().join("\u0000") === Object.keys(rawArgs).sort().join("\u0000") &&
+                Object.entries(projectedArgs).every(([key, value]) => rawArgs[key] === value);
+            })();
+          if (rawTemplates.length !== templates.length ||
+            !templates.every((projected, index) => sameTemplate(projected, rawTemplates[index]))) return false;
+
+          const templateArgs = template.args as Record<string, unknown>;
+          const numericKeys = Object.keys(templateArgs).filter((key) => /^\d+$/u.test(key))
+            .sort((left, right) => Number(left) - Number(right));
+          const componentForms: string[] = numericKeys.filter((key) => Number(key) >= 2)
+            .map((key) => templateArgs[key] as string);
+          const normalizedComponentForms = componentForms.map((form) => form.normalize("NFC").trim());
+          if (templateArgs["1"] !== "sq" || componentReferences.length !== componentForms.length ||
+            !componentForms.every((form, index) => {
+              const reference = componentReferences[index];
+              return typeof form === "string" && form.trim().length > 0 &&
+                isRecord(reference) && reference.sourceForm === normalizedComponentForms[index];
+            })) return false;
+
+          const auxiliaryKeys = Object.keys(templateArgs).filter((key) => !/^\d+$/u.test(key));
+          const supportedArgumentSet = numericKeys.join(",") === "1,2,3" && componentForms.length === 2 &&
+            auxiliaryKeys.every((key) => key === "t1" || key === "t2");
+          const hasReason = (code: string): boolean => reasonCodes.includes(code);
+          const ambiguousTemplate = afTemplates.length !== 1 || templates.length !== 1;
+          if (hasReason("SOURCE_AF_TEMPLATE_AMBIGUOUS") !== ambiguousTemplate ||
+            hasReason("SOURCE_AF_TEMPLATE_ARGUMENT_SET_INVALID") === supportedArgumentSet) return false;
+
+          const normalized = (form: string): string => form.normalize("NFC").trim().toLocaleLowerCase("sq-AL");
+          const formsInvalid = componentForms.length < 2 || normalizedComponentForms.some((form, index) =>
+            normalizedComponentForms.indexOf(form) !== index ||
+            normalized(form) === normalized(primaryForm),
+          );
+          const links = projectedLinks;
+          const referenceProjectionConsistent = componentForms.every((form, index) => {
+            const reference = componentReferences[index];
+            const matching = links.filter((link) => isRecord(link) && typeof link.sourceForm === "string" &&
+              normalized(link.sourceForm) === normalized(form));
+            return isRecord(reference) && reference.reference === (isRecord(matching[0]) ? matching[0].reference : null);
+          });
+          if (!referenceProjectionConsistent) return false;
+          const referenceSetMismatch = links.length !== componentForms.length;
+          const referenceNotPresent = componentForms.some((form) => !links.some((link) =>
+            isRecord(link) && typeof link.sourceForm === "string" && normalized(link.sourceForm) === normalized(form),
+          ));
+          const referenceAmbiguous = componentForms.some((form) => links.filter((link) =>
+            isRecord(link) && typeof link.sourceForm === "string" && normalized(link.sourceForm) === normalized(form),
+          ).length > 1);
+          const referenceIdentityInvalid = componentForms.some((form, index) => {
+            const matching = links.filter((link) => isRecord(link) && typeof link.sourceForm === "string" &&
+              normalized(link.sourceForm) === normalized(form));
+            if (matching.length === 0) return false;
+            if (!isRecord(matching[0]) || typeof matching[0].reference !== "string") return true;
+            const sourceReference = matching[0].reference as string;
+            const separator = sourceReference.indexOf("#");
+            return separator <= 0 || separator !== sourceReference.lastIndexOf("#") ||
+              normalized(sourceReference.slice(0, separator)) !== normalized(form) ||
+              sourceReference.slice(separator + 1) !== "Albanian";
+          });
+          if (hasReason("SOURCE_COMPONENT_FORMS_INVALID") !== formsInvalid ||
+            hasReason("SOURCE_COMPONENT_REFERENCE_SET_MISMATCH") !== referenceSetMismatch ||
+            hasReason("SOURCE_COMPONENT_REFERENCE_NOT_PRESENT") !== referenceNotPresent ||
+            hasReason("SOURCE_COMPONENT_REFERENCE_AMBIGUOUS") !== referenceAmbiguous ||
+            hasReason("SOURCE_COMPONENT_REFERENCE_IDENTITY_INVALID") !== referenceIdentityInvalid) return false;
+
+          const resolutionReasonCodes = componentResolutions.flatMap((resolution) =>
+            isRecord(resolution) && isStringArray(resolution.reasonCodes) ? resolution.reasonCodes : [],
+          );
+          if (resolutionReasonCodes.some((code) => !reasonCodes.includes(code)) ||
+            componentResolutions.some((resolution) => {
+              if (!isRecord(resolution) || !isStringArray(resolution.reasonCodes)) return false;
+              const codes = resolution.reasonCodes;
+              return resolution.status === "RESOLVED" && codes.length !== 0 ||
+                resolution.status === "UNRESOLVED" && codes.length === 0 ||
+                resolution.status === "AMBIGUOUS" &&
+                  !codes.some((code) => code === "SOURCE_COMPONENT_RECORD_AMBIGUOUS" ||
+                    code === "SOURCE_COMPONENT_RECORD_IDENTITY_DUPLICATE");
+            })) return false;
+          return componentRecords.length === componentResolutions.reduce<number>((total, resolution) =>
+            total + (isRecord(resolution) && Array.isArray(resolution.sourceRecordIds) ? resolution.sourceRecordIds.length : 0), 0);
+        };
         if (sourceLinkedComponentReading.status === "SUPPORTED") {
           return reasonCodes.length === 0 && (
             relation === "SOURCE_EXPLICIT_TWO_COMPONENT_COMPOUND" &&
@@ -1296,7 +1421,8 @@ function parseMotivationDiscoveryV0_1(
               componentResolutions.every((resolution) => isRecord(resolution) && resolution.status === "RESOLVED") ||
             relation === "SOURCE_AUTHORED_AF_TEMPLATE" &&
               referenceCount === 2 && componentCount === 2 &&
-              componentResolutions.every((resolution) => isRecord(resolution) && resolution.status === "RESOLVED") ||
+              componentResolutions.every((resolution) => isRecord(resolution) && resolution.status === "RESOLVED") &&
+              validSourceAuthoredAfTemplate() ||
             relation === "SOURCE_EXPLICIT_THREE_COMPONENT_COMPOUND" &&
               referenceCount === 3 && componentCount >= 3 &&
               componentResolutions.every((resolution) => isRecord(resolution) &&
@@ -1312,9 +1438,17 @@ function parseMotivationDiscoveryV0_1(
               total + (isRecord(resolution) && Array.isArray(resolution.sourceRecordIds) ? resolution.sourceRecordIds.length : 0), 0);
         }
         if (relation === "SOURCE_AUTHORED_AF_TEMPLATE") {
-          return reasonCodes.length > 0 && referenceCount === 2 &&
-            componentCount === componentResolutions.reduce<number>((total, resolution) =>
-              total + (isRecord(resolution) && Array.isArray(resolution.sourceRecordIds) ? resolution.sourceRecordIds.length : 0), 0);
+          const primary = sourceLinkedComponentReading.primary;
+          const template = isRecord(primary) && Array.isArray(primary.etymologyTemplates)
+            ? primary.etymologyTemplates.find((candidate) => isRecord(candidate) && candidate.name === "af")
+            : null;
+          const args = isRecord(template) && isRecord(template.args) ? template.args : null;
+          const componentArity = args
+            ? Object.keys(args).filter((key) => /^\d+$/u.test(key) && Number(key) >= 2).length
+            : -1;
+          return reasonCodes.length > 0 && validSourceAuthoredAfTemplate() &&
+            (componentArity === 2 || componentArity === 1 || componentArity === 3) &&
+            (componentArity === 2 || reasonCodes.includes("SOURCE_AF_TEMPLATE_ARGUMENT_SET_INVALID"));
         }
         if (relation === "SOURCE_EXPLICIT_THREE_COMPONENT_COMPOUND") {
           return reasonCodes.length > 0 && referenceCount === 3 && componentCount >= 0;

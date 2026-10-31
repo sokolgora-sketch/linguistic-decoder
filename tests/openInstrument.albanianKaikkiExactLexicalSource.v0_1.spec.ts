@@ -51,6 +51,84 @@ function fixtureFact(
   };
 }
 
+function unsupportedAfArityFixtureFactsV0_1(
+  example: "kalimtar" | "prurës",
+): readonly AlbanianKaikkiExactLexicalSourceFactV0_1[] {
+  if (example === "kalimtar") {
+    const component = (form: string, ordinal: number, physicalRecordOrdinal: number, partOfSpeech: string, senseId: string) => fixtureFact({
+      sourceRecordId: `kaikki-albanian-jsonl:word=${encodeURIComponent(form)}:ordinal=${ordinal}`,
+      entryLocator: `jsonl://word/${encodeURIComponent(form)}/match/${ordinal}`,
+      physicalRecordOrdinal,
+      form,
+      partOfSpeech,
+      senses: [{ senseId, glosses: [form] }],
+      ipaObservations: [],
+    });
+    return [
+      fixtureFact({
+        sourceRecordId: "kaikki-albanian-jsonl:word=kalimtar:ordinal=0",
+        entryLocator: "jsonl://word/kalimtar/match/0",
+        physicalRecordOrdinal: 4392,
+        form: "kalimtar",
+        partOfSpeech: "adj",
+        senses: [{ senseId: "en-kalimtar-sq-adj-8BUehbSv", glosses: ["transitive"] }],
+        etymologyText: "From kaloj + im + tar.",
+        etymologyLinks: [
+          { sourceForm: "kaloj", reference: "kaloj#Albanian" },
+          { sourceForm: "im", reference: "im#Albanian" },
+          { sourceForm: "tar", reference: "tar#Albanian" },
+        ],
+        etymologyTemplates: [{
+          name: "af",
+          args: { "1": "sq", "2": "kaloj", "3": "im", "4": "tar" },
+          expansion: "kaloj + im + tar",
+        }],
+        ipaObservations: [],
+      }),
+      component("kaloj", 0, 3374, "verb", "en-kaloj-sq-verb-36Iaz9AY"),
+      component("im", 0, 1085, "pron", "en-im-sq-pron-am1FLga5"),
+      component("im", 1, 1086, "noun", "en-im-sq-noun-W9uF~iF3"),
+      component("im", 2, 1087, "verb", "en-im-sq-verb-TO-8OvcU"),
+    ];
+  }
+
+  const wPlusDisambPeopleCategory = {
+    name: "People",
+    kind: "other",
+    parents: [],
+    source: "w+disamb",
+    orig: "sq:People",
+    langcode: "sq",
+    _dis: null,
+  } as const;
+  return [
+    fixtureFact({
+      sourceRecordId: "kaikki-albanian-jsonl:word=prur%C3%ABs:ordinal=0",
+      entryLocator: "jsonl://word/prur%C3%ABs/match/0",
+      physicalRecordOrdinal: 11285,
+      form: "prurës",
+      partOfSpeech: "noun",
+      senses: [{ senseId: "en-prurës-sq-noun-r8aOcTYu", glosses: ["messenger, one who brings news"], categories: [wPlusDisambPeopleCategory] }],
+      etymologyText: "From prur-, aorist stem of bie (“to bring”), + -ës.",
+      etymologyLinks: [
+        { sourceForm: "bie", reference: "bie#Albanian" },
+        { sourceForm: "-ës", reference: "-ës#Albanian" },
+      ],
+      etymologyTemplates: [{ name: "af", args: { "1": "sq", "2": "-ës" }, expansion: "-ës" }],
+      ipaObservations: [],
+    }),
+    fixtureFact({
+      sourceRecordId: "kaikki-albanian-jsonl:word=-%C3%ABs:ordinal=0",
+      entryLocator: "jsonl://word/-%C3%ABs/match/0",
+      physicalRecordOrdinal: 7944,
+      form: "-ës",
+      partOfSpeech: "suffix",
+      senses: [{ senseId: "en--ës-sq-suffix-5nXSOZjB", glosses: ["used to form agent nouns. -er"] }],
+      ipaObservations: [],
+    }),
+  ];
+}
+
 function sellerFamilyFixtureFactsV0_1(): readonly AlbanianKaikkiExactLexicalSourceFactV0_1[] {
   const names = ["flower seller", "drinks seller", "brandy seller"];
   const forms = ["luleshitës", "pijeshitës", "rakishitës"];
@@ -4666,6 +4744,82 @@ describe("real Albanian exact lexical source integration v0.1", () => {
       functionalHypothesis: { status: "UNKNOWN_OR_NULL", functionalOperation: null, statement: null },
     });
     expect(discovery.albanianLexicalReading?.composition.status).toBe("NULL");
+  });
+
+  it.each(["kalimtar", "prurës"] as const)(
+    "preserves the source-authored af Null payload for the pinned %s arity shape",
+    async (form) => {
+      const discovery = await discoveryForFactsV0_1(unsupportedAfArityFixtureFactsV0_1(form), form);
+      const reading = discovery.albanianLexicalReading?.sourceLinkedComponentReading;
+      expect(reading).toMatchObject({
+        status: "NULL",
+        reasonCodes: expect.arrayContaining(["SOURCE_AF_TEMPLATE_ARGUMENT_SET_INVALID"]),
+        relation: { relation: "SOURCE_AUTHORED_AF_TEMPLATE" },
+        functionalHypothesis: { status: "UNKNOWN_OR_NULL", functionalOperation: null, statement: null },
+      });
+      expect(reading?.relation.references).toHaveLength(form === "kalimtar" ? 3 : 1);
+
+      const vm = adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: discovery }).motivationDiscoveryV0_1;
+      expect(vm).toMatchObject({ kind: "present" });
+      if (vm?.kind !== "present") throw new Error("Expected source facts with bounded AF Null to remain visible");
+      expect(vm.value.albanianLexicalReading?.sourceLinkedComponentReading).toMatchObject({
+        status: "NULL",
+        relation: { relation: "SOURCE_AUTHORED_AF_TEMPLATE" },
+        functionalHypothesis: { status: "UNKNOWN_OR_NULL", functionalOperation: null },
+      });
+      expect(vm.value.albanianLexicalReading?.functionalMeaningBridge.functionalHypothesis.functionalOperation).toBeNull();
+    },
+  );
+
+  it.each([
+    ["missing AF arity reason", "prurës", (reading: Record<string, unknown>) => {
+      const sourceReading = reading.sourceLinkedComponentReading as Record<string, unknown>;
+      sourceReading.reasonCodes = (sourceReading.reasonCodes as string[])
+        .filter((code) => code !== "SOURCE_AF_TEMPLATE_ARGUMENT_SET_INVALID");
+    }],
+    ["missing source-reference-set reason", "prurës", (reading: Record<string, unknown>) => {
+      const sourceReading = reading.sourceLinkedComponentReading as Record<string, unknown>;
+      sourceReading.reasonCodes = (sourceReading.reasonCodes as string[])
+        .filter((code) => code !== "SOURCE_COMPONENT_REFERENCE_SET_MISMATCH");
+    }],
+    ["spurious source-reference-set reason", "kalimtar", (reading: Record<string, unknown>) => {
+      const sourceReading = reading.sourceLinkedComponentReading as Record<string, unknown>;
+      sourceReading.reasonCodes = [...sourceReading.reasonCodes as string[], "SOURCE_COMPONENT_REFERENCE_SET_MISMATCH"];
+    }],
+    ["reference and resolution count mismatch", "kalimtar", (reading: Record<string, unknown>) => {
+      const sourceReading = reading.sourceLinkedComponentReading as Record<string, unknown>;
+      (sourceReading.componentResolutions as unknown[]).pop();
+    }],
+    ["mismatched component source-record identity", "kalimtar", (reading: Record<string, unknown>) => {
+      const sourceReading = reading.sourceLinkedComponentReading as Record<string, unknown>;
+      const resolutions = sourceReading.componentResolutions as Array<Record<string, unknown>>;
+      resolutions[0]!.sourceRecordIds = ["forged-source-record-id"];
+    }],
+    ["duplicate component source-record identities", "kalimtar", (reading: Record<string, unknown>) => {
+      const sourceReading = reading.sourceLinkedComponentReading as Record<string, unknown>;
+      const resolutions = sourceReading.componentResolutions as Array<Record<string, unknown>>;
+      const ambiguous = resolutions[1]!;
+      const ids = ambiguous.sourceRecordIds as string[];
+      ambiguous.sourceRecordIds = [ids[0]!, ids[0]!];
+    }],
+    ["forged SUPPORTED state for unsupported arity", "prurës", (reading: Record<string, unknown>) => {
+      const sourceReading = reading.sourceLinkedComponentReading as Record<string, unknown>;
+      sourceReading.status = "SUPPORTED";
+      sourceReading.reasonCodes = [];
+    }],
+    ["template arguments that no longer match source references", "prurës", (reading: Record<string, unknown>) => {
+      const sourceReading = reading.sourceLinkedComponentReading as Record<string, unknown>;
+      const primary = sourceReading.primary as Record<string, unknown>;
+      const templates = primary.etymologyTemplates as Array<Record<string, unknown>>;
+      (templates[0]!.args as Record<string, string>)["2"] = "bie";
+    }],
+  ] as const)("rejects malformed AF Null payloads when %s", async (_label, form, mutate) => {
+    const discovery = await discoveryForFactsV0_1(unsupportedAfArityFixtureFactsV0_1(form), form);
+    const malformed = JSON.parse(JSON.stringify(discovery)) as Record<string, unknown>;
+    const reading = (malformed.albanianLexicalReading as Record<string, unknown>);
+    mutate(reading);
+    expect(adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: malformed }).motivationDiscoveryV0_1)
+      .toMatchObject({ kind: "missing", missing: "malformed" });
   });
 
   it("fails closed for source-authored compounds with four or more components", async () => {
