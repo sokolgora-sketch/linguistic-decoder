@@ -899,6 +899,90 @@ function parseMotivationDiscoveryV0_1(
     Array.isArray(value) && value.every((item) => typeof item === "string");
   const exactLexicalSourceStatus = value.exactLexicalSourceStatus;
   const exactLexicalSourceFacts = value.exactLexicalSourceFacts;
+  const validSourceAuthoredSuffixTemplateReading = (
+    componentReading: unknown,
+    expectedTarget?: unknown,
+  ): boolean => {
+    if (!isRecord(componentReading) || !isRecord(componentReading.relation) ||
+      componentReading.relation.relation !== "SOURCE_AUTHORED_SUFFIX_TEMPLATE" ||
+      !isRecord(componentReading.primary)) return false;
+    const relation = componentReading.relation;
+    const relationReferences = relation.references as unknown[];
+    const primary = componentReading.primary;
+    if (typeof primary.sourceRecordId !== "string" || typeof primary.entryLocator !== "string" ||
+      typeof primary.form !== "string" || typeof primary.physicalRecordOrdinal !== "number" ||
+      (primary.etymologyText !== null && typeof primary.etymologyText !== "string") ||
+      !Array.isArray(primary.etymologyLinks) || !Array.isArray(primary.etymologyTemplates) ||
+      relation.primarySourceRecordId !== primary.sourceRecordId ||
+      relation.primaryEntryLocator !== primary.entryLocator ||
+      relation.sourceAuthoredExplanation !== primary.etymologyText ||
+      !Array.isArray(relation.references) || relationReferences.length !== 2) return false;
+    if (expectedTarget !== undefined && (!isRecord(expectedTarget) ||
+      expectedTarget.sourceRecordId !== primary.sourceRecordId ||
+      expectedTarget.entryLocator !== primary.entryLocator || expectedTarget.form !== primary.form)) return false;
+
+    const exactFacts = Array.isArray(exactLexicalSourceFacts)
+      ? exactLexicalSourceFacts.filter((fact) => isRecord(fact) &&
+        fact.sourceRecordId === primary.sourceRecordId && fact.entryLocator === primary.entryLocator &&
+        fact.form === primary.form)
+      : [];
+    if (exactFacts.length !== 1) return false;
+    const raw = exactFacts[0];
+    if (!isRecord(raw) || raw.physicalRecordOrdinal !== primary.physicalRecordOrdinal ||
+      raw.partOfSpeech !== primary.partOfSpeech || (raw.etymologyText ?? null) !== primary.etymologyText ||
+      !Array.isArray(raw.etymologyLinks) || !Array.isArray(raw.etymologyTemplates)) return false;
+
+    const projectedLinks = primary.etymologyLinks as unknown[];
+    const rawLinks = raw.etymologyLinks as unknown[];
+    const projectedTemplates = primary.etymologyTemplates as unknown[];
+    const rawTemplates = raw.etymologyTemplates as unknown[];
+    const sameTemplate = (left: unknown, right: unknown): boolean => {
+      if (!isRecord(left) || !isRecord(right) || !isRecord(left.args) || !isRecord(right.args)) return false;
+      const leftArgs = left.args as Record<string, unknown>;
+      const rightArgs = right.args as Record<string, unknown>;
+      return left.name === right.name && left.expansion === right.expansion &&
+        Object.keys(leftArgs).sort().join("\u0000") === Object.keys(rightArgs).sort().join("\u0000") &&
+        Object.entries(leftArgs).every(([key, item]) => rightArgs[key] === item);
+    };
+    if (rawLinks.length !== projectedLinks.length || !rawLinks.every((link, index) =>
+      isRecord(link) && isRecord(projectedLinks[index]) &&
+      link.sourceForm === projectedLinks[index].sourceForm && link.reference === projectedLinks[index].reference) ||
+      rawTemplates.length !== projectedTemplates.length ||
+      !rawTemplates.every((template, index) => sameTemplate(template, projectedTemplates[index]))) return false;
+
+    const suffixTemplates = projectedTemplates.filter((template) => isRecord(template) && template.name === "suffix");
+    if (projectedTemplates.length !== 1 || suffixTemplates.length !== 1 ||
+      !isRecord(suffixTemplates[0]) || !isRecord(suffixTemplates[0].args) ||
+      typeof suffixTemplates[0].expansion !== "string") return false;
+    const template = suffixTemplates[0] as Record<string, unknown>;
+    const templateExpansion = template.expansion as string;
+    const args = template.args as Record<string, unknown>;
+    const argumentKeys = Object.keys(args).sort();
+    const base = typeof args["2"] === "string" ? args["2"].normalize("NFC").trim() : "";
+    const bareSuffix = typeof args["3"] === "string" ? args["3"].normalize("NFC").trim() : "";
+    if (argumentKeys.join(",") !== "1,2,3" || args["1"] !== "sq" || !base || !bareSuffix ||
+      bareSuffix.startsWith("-")) return false;
+    const componentForms = [base, `-${bareSuffix}`];
+    const normalizeText = (text: string): string =>
+      text.normalize("NFC").trim().replace(/\s+/gu, " ").toLocaleLowerCase("sq-AL");
+    const expectedExpansion = `${base} + -${bareSuffix}`;
+    const explanation = typeof primary.etymologyText === "string"
+      ? normalizeText(primary.etymologyText).replace(/[.!?]+$/u, "")
+      : "";
+    if (normalizeText(templateExpansion) !== normalizeText(expectedExpansion) ||
+      explanation !== normalizeText(`From ${expectedExpansion}`) || rawLinks.length !== 2 ||
+      projectedLinks.length !== 2) return false;
+
+    return componentForms.every((form, index) => {
+      const reference = relationReferences[index];
+      const projected = projectedLinks[index];
+      const rawLink = rawLinks[index];
+      return isRecord(reference) && isRecord(projected) && isRecord(rawLink) &&
+        reference.sourceForm === form && reference.reference === `${form}#Albanian` &&
+        projected.sourceForm === form && projected.reference === reference.reference &&
+        rawLink.sourceForm === form && rawLink.reference === reference.reference;
+    });
+  };
   const validExactLexicalSourceFact = (fact: unknown): boolean => {
     if (!isRecord(fact) || !isRecord(fact.sourceSnapshot) || !Array.isArray(fact.senses) || !Array.isArray(fact.ipaObservations)) {
       return false;
@@ -1423,6 +1507,10 @@ function parseMotivationDiscoveryV0_1(
               referenceCount === 2 && componentCount === 2 &&
               componentResolutions.every((resolution) => isRecord(resolution) && resolution.status === "RESOLVED") &&
               validSourceAuthoredAfTemplate() ||
+            relation === "SOURCE_AUTHORED_SUFFIX_TEMPLATE" &&
+              referenceCount === 2 && componentCount === 2 &&
+              componentResolutions.every((resolution) => isRecord(resolution) && resolution.status === "RESOLVED") &&
+              validSourceAuthoredSuffixTemplateReading(sourceLinkedComponentReading) ||
             relation === "SOURCE_EXPLICIT_THREE_COMPONENT_COMPOUND" &&
               referenceCount === 3 && componentCount >= 3 &&
               componentResolutions.every((resolution) => isRecord(resolution) &&
@@ -1449,6 +1537,12 @@ function parseMotivationDiscoveryV0_1(
           return reasonCodes.length > 0 && validSourceAuthoredAfTemplate() &&
             (componentArity === 2 || componentArity === 1 || componentArity === 3) &&
             (componentArity === 2 || reasonCodes.includes("SOURCE_AF_TEMPLATE_ARGUMENT_SET_INVALID"));
+        }
+        if (relation === "SOURCE_AUTHORED_SUFFIX_TEMPLATE") {
+          return reasonCodes.length > 0 && referenceCount === 2 &&
+            validSourceAuthoredSuffixTemplateReading(sourceLinkedComponentReading) &&
+            componentCount === componentResolutions.reduce<number>((total, resolution) =>
+              total + (isRecord(resolution) && Array.isArray(resolution.sourceRecordIds) ? resolution.sourceRecordIds.length : 0), 0);
         }
         if (relation === "SOURCE_EXPLICIT_THREE_COMPONENT_COMPOUND") {
           return reasonCodes.length > 0 && referenceCount === 3 && componentCount >= 0;
@@ -1673,6 +1767,9 @@ function parseMotivationDiscoveryV0_1(
       const sourceFacts = bridge.sourceFacts;
       const target = reading.primarySourceFact;
       const componentReading = reading.sourceLinkedComponentReading;
+      const componentRelationType = isRecord(componentReading) && isRecord(componentReading.relation)
+        ? componentReading.relation.relation
+        : null;
       if (!isRecord(sourceFacts) || !isRecord(sourceFacts.primary) || !isRecord(sourceFacts.structuredReference)) return false;
       if (
         bridge.status !== "SUPPORTED" ||
@@ -1689,7 +1786,8 @@ function parseMotivationDiscoveryV0_1(
         target.sourceRecordId !== sourceFacts.primary.sourceRecordId ||
         target.entryLocator !== sourceFacts.primary.entryLocator ||
         !isRecord(componentReading) || !isRecord(componentReading.relation) ||
-        componentReading.relation.relation !== "SOURCE_AUTHORED_AF_TEMPLATE" ||
+        (componentRelationType !== "SOURCE_AUTHORED_AF_TEMPLATE" &&
+          componentRelationType !== "SOURCE_AUTHORED_SUFFIX_TEMPLATE") ||
         componentReading.relation.primarySourceRecordId !== target.sourceRecordId ||
         componentReading.relation.primaryEntryLocator !== target.entryLocator ||
         !Array.isArray(componentReading.relation.references) || componentReading.relation.references.length !== 2 ||
@@ -1746,6 +1844,10 @@ function parseMotivationDiscoveryV0_1(
       const rawRoleCategories = rawRoleSense.categories.filter(isExactSourceOccupationCategory);
       const projectedRoleCategories = projectedRoleSense.categories.filter(isExactSourceOccupationCategory);
       if (rawRoleCategories.length !== 1 || projectedRoleCategories.length !== 1) return false;
+
+      if (componentRelationType === "SOURCE_AUTHORED_SUFFIX_TEMPLATE") {
+        return validSourceAuthoredSuffixTemplateReading(componentReading, target);
+      }
 
       const references = componentReading.relation.references as unknown[];
       const componentPrimary = componentReading.primary;
