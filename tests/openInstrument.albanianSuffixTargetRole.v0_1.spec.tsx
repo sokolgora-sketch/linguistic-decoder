@@ -107,7 +107,9 @@ function functionalBridge(reading: Reading): Record<string, unknown> {
   return reading.functionalMeaningBridge as Record<string, unknown>;
 }
 
-describe("source-authored suffix direct-target AGENT", () => {
+const describeWithRealSource = SOURCE_PATH ? describe : describe.skip;
+
+describeWithRealSource("source-authored suffix direct-target AGENT with the frozen source", () => {
   beforeAll(async () => {
     if (!SOURCE_PATH) throw new Error("Pinned real Kaikki source path is required for this test.");
     realProvider = await createAlbanianKaikkiServerOnlyExactLexicalSourceProviderV0_1(SOURCE_PATH);
@@ -226,7 +228,9 @@ describe("source-authored suffix direct-target AGENT", () => {
       expect(outputs[word]).toMatchObject({ status: "NULL", operation: null });
     }
   });
+});
 
+describe("source-authored suffix direct-target AGENT synthetic controls", () => {
   it.each([
     ["foreign references", { etymologyLinks: [
       { sourceForm: "testbase", reference: "testbase#French" },
@@ -274,7 +278,9 @@ describe("source-authored suffix direct-target AGENT", () => {
     expect(bridge.reasonCodes).toContain("SOURCE_TARGET_RECORD_IDENTITY_AMBIGUOUS");
     expect((bridge.functionalHypothesis as Record<string, unknown>).functionalOperation).toBeNull();
   });
+});
 
+describeWithRealSource("source-authored suffix direct-target AGENT adapter tampering with the frozen source", () => {
   it("rejects tampered suffix relation, reference, and role-category payloads in the adapter", () => {
     const cases: readonly [string, (body: ApiBody) => void][] = [
       ["relation", (body) => {
