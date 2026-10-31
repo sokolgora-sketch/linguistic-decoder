@@ -921,6 +921,13 @@ export function MotivationDiscoveryCardV0_1({
                   .map((reference) => `${reference.sourceForm} → ${reference.reference ?? "Null"}`)
                   .join(" · ") || "Null"}
               </div>
+              {albanianLexicalReading.sourceLinkedComponentReading.relation.relation === "SOURCE_EXPLICIT_THREE_COMPONENT_COMPOUND" ? (
+                <div className="mt-1 text-[#a9c3d0]">
+                  Component record resolution: {albanianLexicalReading.sourceLinkedComponentReading.componentResolutions
+                    .map((resolution) => `${resolution.sourceForm}: ${resolution.status.toLocaleLowerCase("sq-AL")} (${resolution.sourceRecordIds.length} source record${resolution.sourceRecordIds.length === 1 ? "" : "s"})`)
+                    .join(" · ") || "Null"}
+                </div>
+              ) : null}
               <div className="mt-1 break-words text-[#d5c28f]">
                 Source-authored explanation (attributed): {albanianLexicalReading.sourceLinkedComponentReading.relation.sourceAuthoredExplanation ?? "Null"}
               </div>
@@ -929,12 +936,28 @@ export function MotivationDiscoveryCardV0_1({
                   "Primary source record",
                   albanianLexicalReading.sourceLinkedComponentReading.primary,
                 )}
-                {albanianLexicalReading.sourceLinkedComponentReading.components.map((component) => (
-                  <div key={component.sourceRecordId}>
-                    {sourceLinkedRecordCardV0_1("Component source record", component)}
-                  </div>
-                ))}
+                {albanianLexicalReading.sourceLinkedComponentReading.relation.relation === "SOURCE_EXPLICIT_THREE_COMPONENT_COMPOUND"
+                  ? null
+                  : albanianLexicalReading.sourceLinkedComponentReading.components.map((component) => (
+                    <div key={component.sourceRecordId}>
+                      {sourceLinkedRecordCardV0_1("Component source record", component)}
+                    </div>
+                  ))}
               </div>
+              {albanianLexicalReading.sourceLinkedComponentReading.relation.relation === "SOURCE_EXPLICIT_THREE_COMPONENT_COMPOUND" ? (
+                <details className="mt-2 rounded border border-[#28443f] bg-[#0c1514] p-2 text-xs">
+                  <summary className="cursor-pointer font-semibold text-[#d7dde7]">
+                    Retained component source records and sense identities ({albanianLexicalReading.sourceLinkedComponentReading.components.length})
+                  </summary>
+                  <div className="mt-2 grid gap-2 sm:grid-cols-2">
+                    {albanianLexicalReading.sourceLinkedComponentReading.components.map((component) => (
+                      <div key={component.sourceRecordId}>
+                        {sourceLinkedRecordCardV0_1("Component source record", component)}
+                      </div>
+                    ))}
+                  </div>
+                </details>
+              ) : null}
               <div className="mt-3 rounded border border-[#355a72] bg-[#0d151c] p-2">
                 <div className="font-semibold text-[#f5f7fb]">Exploratory relationship</div>
                 <div className="mt-1 text-sm">
@@ -946,6 +969,53 @@ export function MotivationDiscoveryCardV0_1({
                   </div>
                 ) : null}
               </div>
+              {albanianLexicalReading.sourceLinkedComponentReading.relation.relation === "SOURCE_EXPLICIT_THREE_COMPONENT_COMPOUND" ? (
+                <div
+                  data-testid="albanian-source-linked-functional-hypothesis"
+                  className="mt-3 rounded border border-[#66532e] bg-[#1b180f] p-3 text-[#f0ddb0]"
+                >
+                  <div className="font-semibold uppercase tracking-[0.1em]">FUNCTIONAL HYPOTHESIS · UNCLASSIFIED</div>
+                  {albanianLexicalReading.sourceLinkedComponentReading.functionalHypothesis.status === "EXPLORATORY_FUNCTIONAL_HYPOTHESIS" ? (
+                    <>
+                      <div className="mt-2 text-sm">
+                        {albanianLexicalReading.sourceLinkedComponentReading.functionalHypothesis.statement}
+                      </div>
+                      <div className="mt-2 break-words text-[10px] text-[#d5c28f]">
+                        Evidence basis: {albanianLexicalReading.sourceLinkedComponentReading.functionalHypothesis.basis.join(" · ")}
+                      </div>
+                      <div className="mt-1 text-xs text-[#d5c28f]">
+                        Functional operation: none classified; no single sense winner; user decides. Composition and embryo function: Null.
+                      </div>
+                      <details className="mt-2 rounded border border-[#594a2b] bg-[#211c12] p-2 text-xs">
+                        <summary className="cursor-pointer font-semibold">Retained source-sense alternatives</summary>
+                        <ul className="mt-2 list-disc space-y-1 pl-5">
+                          {albanianLexicalReading.sourceLinkedComponentReading.functionalHypothesis.alternatives.map((alternative, index) => (
+                            <li key={`${index}:${alternative}`} className="break-words">{alternative}</li>
+                          ))}
+                        </ul>
+                      </details>
+                      <details className="mt-2 rounded border border-[#28443f] bg-[#0c1514] p-2 text-[10px] text-[#91aebb]">
+                        <summary className="cursor-pointer font-semibold">Functional hypothesis evidence references</summary>
+                        <div className="mt-2 break-words">
+                          {albanianLexicalReading.sourceLinkedComponentReading.functionalHypothesis.evidenceRefs
+                            .map((reference) => `${reference.sourceRecordId} · ${reference.entryLocator} · senses ${reference.senseIds.join(", ") || "Null"}`)
+                            .join(" | ")}
+                        </div>
+                      </details>
+                    </>
+                  ) : (
+                    <div className="mt-2 text-sm">
+                      UNKNOWN_OR_NULL — no source-qualified three-part role hypothesis is available.
+                      {albanianLexicalReading.sourceLinkedComponentReading.functionalHypothesis.reasonCodes.length
+                        ? ` Reasons: ${albanianLexicalReading.sourceLinkedComponentReading.functionalHypothesis.reasonCodes.join(", ")}.`
+                        : ""}
+                    </div>
+                  )}
+                  <div className="mt-2 text-[10px] text-[#91aebb]">
+                    {albanianLexicalReading.sourceLinkedComponentReading.functionalHypothesis.claimBoundary}
+                  </div>
+                </div>
+              ) : null}
               <div className="mt-2 text-[10px] text-[#91aebb]">
                 {albanianLexicalReading.sourceLinkedComponentReading.claimBoundary}
                 {albanianLexicalReading.sourceLinkedComponentReading.reasonCodes.length
