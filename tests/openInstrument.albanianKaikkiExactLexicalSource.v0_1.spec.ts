@@ -999,13 +999,26 @@ describe("real Albanian exact lexical source integration v0.1", () => {
     const vm = adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: discovery });
     expect(vm.motivationDiscoveryV0_1).toMatchObject({ kind: "present" });
     if (vm.motivationDiscoveryV0_1?.kind !== "present") throw new Error("Expected target-first reading in the existing UI adapter");
-    render(createElement(MotivationDiscoveryCardV0_1, { discovery: vm.motivationDiscoveryV0_1 }));
-    expect(screen.getByTestId("albanian-reading-functional-bridge")).toHaveTextContent("qymyrtar");
-    expect(screen.getByTestId("albanian-reading-functional-bridge-operation")).toHaveTextContent("Functional operation: AGENT");
-    expect(screen.getByTestId("albanian-reading-related-candidate-evaluations")).toHaveTextContent("TARGET_AUTHORED_ETYMOLOGY_REFERENCE");
-    expect(screen.getByTestId("albanian-reading-related-candidate-evaluations")).toHaveTextContent("qymyr#Albanian");
-    expect(screen.getByTestId("albanian-source-linked-comparison")).toHaveTextContent("qymyr → qymyr#Albanian");
-    cleanup();
+    const fjaloriFetch = jest.spyOn(globalThis, "fetch").mockRejectedValue(
+      new Error("external FjaloriShqip access is disabled in this synthetic-source integration test"),
+    );
+    try {
+      render(createElement(MotivationDiscoveryCardV0_1, { discovery: vm.motivationDiscoveryV0_1 }));
+      expect(screen.getByTestId("albanian-reading-functional-bridge")).toHaveTextContent("qymyrtar");
+      expect(screen.getByTestId("albanian-reading-functional-bridge-operation")).toHaveTextContent("Functional operation: AGENT");
+      expect(screen.getByTestId("albanian-reading-related-candidate-evaluations")).toHaveTextContent("TARGET_AUTHORED_ETYMOLOGY_REFERENCE");
+      expect(screen.getByTestId("albanian-reading-related-candidate-evaluations")).toHaveTextContent("qymyr#Albanian");
+      expect(screen.getByTestId("albanian-source-linked-comparison")).toHaveTextContent("qymyr → qymyr#Albanian");
+      expect(await screen.findByTestId("fjalori-evidence-null")).toHaveTextContent("UNKNOWN_OR_NULL");
+      expect(fjaloriFetch).toHaveBeenCalledTimes(1);
+      expect(fjaloriFetch).toHaveBeenCalledWith(
+        "https://fjalorishqip.org/api/v1/fjala/qymyrtar.json",
+        expect.objectContaining({ cache: "force-cache" }),
+      );
+    } finally {
+      cleanup();
+      fjaloriFetch.mockRestore();
+    }
   });
 
   it("makes direct pelar reachable through the same target-authored reference gate", async () => {
