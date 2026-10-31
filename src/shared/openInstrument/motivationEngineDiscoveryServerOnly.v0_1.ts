@@ -354,6 +354,7 @@ export type AlbanianFunctionalFamilyReadingV0_1 = Readonly<{
 type AlbanianSourceLinkedComponentRelationV0_1 =
   | "SOURCE_EXPLICIT_TWO_COMPONENT_COMPOUND"
   | "SOURCE_EXPLICIT_THREE_COMPONENT_COMPOUND"
+  | "SOURCE_AUTHORED_AF_TEMPLATE"
   | "SOURCE_COMPOUND_ARITY_UNSUPPORTED";
 
 type AlbanianSourceLinkedComponentResolutionV0_1 = Readonly<{
@@ -816,7 +817,7 @@ function exactAlbanianComponentReferenceV0_1(
     reference.slice(separatorIndex + 1) === "Albanian";
 }
 
-function compoundComponentReferencesV0_1(
+function sourceComponentReferencesV0_1(
   primary: AlbanianKaikkiExactLexicalSourceFactV0_1,
 ): Readonly<{
   relation: AlbanianSourceLinkedComponentRelationV0_1;
@@ -824,26 +825,50 @@ function compoundComponentReferencesV0_1(
   references: readonly Readonly<{ sourceForm: string; reference: string | null }>[];
   reasonCodes: readonly string[];
 }> | null {
-  const compoundTemplates = (primary.etymologyTemplates ?? []).filter((template) =>
+  const templates = primary.etymologyTemplates ?? [];
+  const afTemplates = templates.filter((template) => template.name === "af");
+  const compoundTemplates = templates.filter((template) =>
     template.name === "compound" && template.args["1"] === "sq",
   );
-  if (compoundTemplates.length === 0) return null;
+  const selectedTemplates = afTemplates.length > 0 ? afTemplates : compoundTemplates;
+  if (selectedTemplates.length === 0) return null;
 
   const reasons = new Set<string>();
-  if (compoundTemplates.length !== 1) reasons.add("SOURCE_COMPOUND_TEMPLATE_AMBIGUOUS");
-  const template = compoundTemplates[0];
+  const isAfTemplate = afTemplates.length > 0;
+  if (selectedTemplates.length !== 1 || (isAfTemplate && templates.length !== 1)) {
+    reasons.add(isAfTemplate ? "SOURCE_AF_TEMPLATE_AMBIGUOUS" : "SOURCE_COMPOUND_TEMPLATE_AMBIGUOUS");
+  }
+  const template = selectedTemplates[0];
   const componentArgumentEntries = template
     ? Object.entries(template.args)
       .filter(([argument]) => /^\d+$/.test(argument) && Number(argument) >= 2)
       .sort(([left], [right]) => Number(left) - Number(right))
     : [];
   const componentForms = componentArgumentEntries.map(([, form]) => form.normalize("NFC").trim());
-  const relation: AlbanianSourceLinkedComponentRelationV0_1 = componentForms.length > 3
-    ? "SOURCE_COMPOUND_ARITY_UNSUPPORTED"
-    : componentForms.length === 3
-      ? "SOURCE_EXPLICIT_THREE_COMPONENT_COMPOUND"
-      : "SOURCE_EXPLICIT_TWO_COMPONENT_COMPOUND";
+  const relation: AlbanianSourceLinkedComponentRelationV0_1 = isAfTemplate
+    ? "SOURCE_AUTHORED_AF_TEMPLATE"
+    : componentForms.length > 3
+      ? "SOURCE_COMPOUND_ARITY_UNSUPPORTED"
+      : componentForms.length === 3
+        ? "SOURCE_EXPLICIT_THREE_COMPONENT_COMPOUND"
+        : "SOURCE_EXPLICIT_TWO_COMPONENT_COMPOUND";
   if (componentForms.length > 3) reasons.add("SOURCE_COMPOUND_ARITY_UNSUPPORTED");
+  if (isAfTemplate) {
+    const numericArgumentNumbers = Object.keys(template?.args ?? {})
+      .filter((argument) => /^\d+$/u.test(argument))
+      .map(Number)
+      .sort((left, right) => left - right);
+    const auxiliaryArgumentNames = Object.keys(template?.args ?? {}).filter((argument) => !/^\d+$/u.test(argument));
+    if (
+      template?.args["1"] !== "sq" ||
+      numericArgumentNumbers.join(",") !== "1,2,3" ||
+      auxiliaryArgumentNames.some((argument) => argument !== "t1" && argument !== "t2") ||
+      auxiliaryArgumentNames.some((argument) => typeof template?.args[argument] !== "string") ||
+      componentForms.length !== 2
+    ) {
+      reasons.add("SOURCE_AF_TEMPLATE_ARGUMENT_SET_INVALID");
+    }
+  }
   if (componentForms.length < 2 || componentForms.some((form) => !form) ||
     componentForms.some((form, index) => componentForms.indexOf(form) !== index) ||
     componentForms.some((form) => normalizedAlbanianFormV0_1(form) === normalizedAlbanianFormV0_1(primary.form))) {
@@ -851,6 +876,9 @@ function compoundComponentReferencesV0_1(
   }
 
   const links = primary.etymologyLinks ?? [];
+  if (isAfTemplate && links.length !== componentForms.length) {
+    reasons.add("SOURCE_COMPONENT_REFERENCE_SET_MISMATCH");
+  }
   const references = componentForms.map((componentForm) => {
     const matching = links.filter((link) =>
       normalizedAlbanianFormV0_1(link.sourceForm) === normalizedAlbanianFormV0_1(componentForm),
@@ -885,6 +913,30 @@ function compoundComponentReferencesV0_1(
     const normalizedExplanation = normalizedSourceTemplateTextV0_1(authoredExplanation).replace(/[.]$/u, "");
     const expectedExplanation = normalizedSourceTemplateTextV0_1(`From ${componentForms.join(" + ")}`);
     if (normalizedExplanation !== expectedExplanation) reasons.add("SOURCE_COMPOUND_EXPLANATION_MISMATCH");
+  }
+  if (isAfTemplate && componentForms.length === 2 && template) {
+    const expansionParts = template.expansion.split(/\s+\+\s+/u);
+    const expansionPartMatchesForm = (part: string | undefined, form: string): boolean => {
+      if (!part) return false;
+      const normalizedPart = normalizedSourceTemplateTextV0_1(part);
+      const normalizedForm = normalizedSourceTemplateTextV0_1(form);
+      return normalizedPart === normalizedForm ||
+        (normalizedPart.startsWith(`${normalizedForm} (`) && normalizedPart.endsWith(")"));
+    };
+    if (
+      expansionParts.length !== 2 ||
+      !expansionPartMatchesForm(expansionParts[0], componentForms[0] ?? "") ||
+      !expansionPartMatchesForm(expansionParts[1], componentForms[1] ?? "")
+    ) {
+      reasons.add("SOURCE_AF_TEMPLATE_EXPANSION_MISMATCH");
+    }
+    const sourceExplanation = normalizedSourceTemplateTextV0_1(primary.etymologyText ?? "")
+      .replace(/[.!?]+$/u, "");
+    const expectedExplanation = normalizedSourceTemplateTextV0_1(`A compound of ${template.expansion}`)
+      .replace(/[.!?]+$/u, "");
+    if (!sourceExplanation || sourceExplanation !== expectedExplanation) {
+      reasons.add("SOURCE_AF_TEMPLATE_EXPLANATION_MISMATCH");
+    }
   }
 
   return Object.freeze({
@@ -1067,7 +1119,7 @@ async function buildSourceLinkedComponentReadingV0_1(input: Readonly<{
   primaryAnalyses: readonly AlbanianKaikkiSourceIpaSevenVoiceAnalysisV0_1[];
   provider: AlbanianKaikkiServerOnlyExactLexicalSourceProviderV0_1;
 }>): Promise<AlbanianSourceLinkedComponentReadingV0_1 | null> {
-  const componentEvidence = compoundComponentReferencesV0_1(input.primary);
+  const componentEvidence = sourceComponentReferencesV0_1(input.primary);
   if (!componentEvidence) return null;
 
   const components: AlbanianSourceLinkedRecordV0_1[] = [];
@@ -1111,12 +1163,12 @@ async function buildSourceLinkedComponentReadingV0_1(input: Readonly<{
           sourceForm: componentForm,
           reference,
           status: "AMBIGUOUS" as const,
-          sourceRecordIds: Object.freeze(isThreeComponent && !duplicateSourceIds
+          sourceRecordIds: Object.freeze(!duplicateSourceIds
             ? matches.map((fact) => fact.sourceRecordId)
             : []),
           reasonCodes: Object.freeze(ambiguousReasons),
         }));
-        if (isThreeComponent && !duplicateSourceIds) {
+        if (!duplicateSourceIds) {
           for (const match of matches) {
             components.push(sourceRecordProjectionV0_1(
               match,
@@ -1202,6 +1254,9 @@ async function buildSourceLinkedComponentReadingV0_1(input: Readonly<{
       componentResolutions,
     })
     : unknownComponentFunctionalHypothesisV0_1([]);
+  const exploratoryRelationshipStatement = componentEvidence.relation === "SOURCE_AUTHORED_AF_TEMPLATE"
+    ? `The queried source record attributes these component forms through its af template: ${componentText}. The exact Albanian references are retained as source facts; this does not prove derivation, align a unique component sense, or authorize a functional operation.`
+    : `The source records ${input.primary.form} (“${distinctGlossesV0_1([input.primary]).join("; ")}") as a compound of ${componentText}. This is a source-attributed component reading; the engine does not independently prove the derivation or add a semantic operation.`;
   return Object.freeze({
     status: "SUPPORTED",
     reasonCodes: Object.freeze([]),
@@ -1217,7 +1272,7 @@ async function buildSourceLinkedComponentReadingV0_1(input: Readonly<{
     componentResolutions: Object.freeze(componentResolutions),
     exploratoryRelationship: Object.freeze({
       status: "EXPLORATORY_SOURCE_COMPONENT_RELATION" as const,
-      statement: `The source records ${input.primary.form} (“${distinctGlossesV0_1([input.primary]).join("; ")}") as a compound of ${componentText}. This is a source-attributed component reading; the engine does not independently prove the derivation or add a semantic operation.`,
+      statement: exploratoryRelationshipStatement,
       alternatives: Object.freeze([
         "The source-authored compound account may be descriptive or historically contestable.",
         "The available records do not establish a universal sound-to-meaning rule.",
@@ -1229,7 +1284,9 @@ async function buildSourceLinkedComponentReadingV0_1(input: Readonly<{
       claimBoundary: "Exploratory product relationship only; source-authored etymology remains attributed and no morphology, causation, or Voice semantics is asserted.",
     }),
     functionalHypothesis,
-    claimBoundary: "The exact source-authored compound template and Albanian references are preserved. IPA and Voice structure remain Null when the source supplies no pronunciation; composition remains separately Null.",
+    claimBoundary: componentEvidence.relation === "SOURCE_AUTHORED_AF_TEMPLATE"
+      ? "The exact source-authored af template and Albanian references are preserved as attributed evidence. Ambiguous or unresolved component records remain visible without sense selection; no derivation, functional operation, or embryo meaning is claimed."
+      : "The exact source-authored compound template and Albanian references are preserved. IPA and Voice structure remain Null when the source supplies no pronunciation; composition remains separately Null.",
   });
 }
 
@@ -1910,6 +1967,97 @@ function qualifyingSourceSenseAgentEvidenceV0_1(
   return qualifyingSenses.length === 1 ? qualifyingSenses[0] ?? null : null;
 }
 
+function buildTargetRoleAgentFunctionalBridgeV0_1(input: Readonly<{
+  targetFact: AlbanianKaikkiExactLexicalSourceFactV0_1;
+  targetRecord: AlbanianSourceLinkedRecordV0_1;
+  queriedFacts: readonly AlbanianKaikkiExactLexicalSourceFactV0_1[];
+  queryForm: string;
+  componentReading: AlbanianSourceLinkedComponentReadingV0_1 | null;
+}>): AlbanianFunctionalMeaningBridgeV0_1 | null {
+  const targetRecords = input.queriedFacts.filter((fact) =>
+    fact.language === "Albanian" && fact.languageCode === "sq" &&
+    normalizedAlbanianFormV0_1(fact.form) === normalizedAlbanianFormV0_1(input.queryForm) &&
+    fact.partOfSpeech !== "name",
+  );
+  if (
+    targetRecords.length !== 1 ||
+    targetRecords[0]?.sourceRecordId !== input.targetFact.sourceRecordId ||
+    !hasValidUniqueAlbanianSourceRecordIdV0_1(input.targetFact, input.queriedFacts) ||
+    input.targetFact.language !== "Albanian" ||
+    input.targetFact.languageCode !== "sq" ||
+    input.targetFact.partOfSpeech !== "noun" ||
+    normalizedAlbanianFormV0_1(input.targetFact.form) !== normalizedAlbanianFormV0_1(input.queryForm)
+  ) {
+    return null;
+  }
+
+  const templateEvidence = sourceComponentReferencesV0_1(input.targetFact);
+  if (
+    !templateEvidence ||
+    templateEvidence.relation !== "SOURCE_AUTHORED_AF_TEMPLATE" ||
+    templateEvidence.reasonCodes.length > 0 ||
+    templateEvidence.references.length !== 2
+  ) {
+    return null;
+  }
+
+  const roleEvidence = qualifyingSourceSenseAgentEvidenceV0_1(input.targetRecord);
+  if (!roleEvidence || !roleEvidence.sense.senseId || !hasMeaningEvidenceV0_1(roleEvidence.sense.glosses)) {
+    return null;
+  }
+  const targetSenseRows = input.targetFact.senses.filter((sense) =>
+    sense.senseId === roleEvidence.sense.senseId,
+  );
+  if (targetSenseRows.length !== 1) return null;
+
+  const senseMeaning = roleEvidence.sense.glosses.join("; ");
+  const sourceReferences = templateEvidence.references
+    .map(({ sourceForm, reference }) => `${sourceForm} → ${reference ?? "Null"}`)
+    .join(" · ");
+  const template = input.targetFact.etymologyTemplates?.find((candidate) => candidate.name === "af");
+  if (!template) return null;
+  const componentAlternatives = (input.componentReading?.componentResolutions ?? []).map((resolution) => {
+    if (resolution.status === "AMBIGUOUS") {
+      return `${resolution.sourceForm} has ${resolution.sourceRecordIds.length} source records; all returned records and senses are retained without selecting or aligning one.`;
+    }
+    if (resolution.status === "UNRESOLVED") {
+      return `${resolution.sourceForm} remains unresolved; its source-authored reference does not establish a resolved lexical sense.`;
+    }
+    return `${resolution.sourceForm} has a resolved source record, but this target-role reading does not align one component sense.`;
+  });
+  const sourceFacts = bridgeRecordFactsV0_1(input.targetRecord, null, null);
+
+  return Object.freeze({
+    status: "SUPPORTED" as const,
+    truthLayers: Object.freeze([
+      "SOURCE_FACT" as const,
+      "EXPLORATORY_FUNCTIONAL_HYPOTHESIS" as const,
+    ]),
+    relatedForm: null,
+    sourceFacts,
+    derivedStructure: null,
+    functionalHypothesis: Object.freeze({
+      status: "EXPLORATORY_FUNCTIONAL_HYPOTHESIS" as const,
+      functionalOperation: "AGENT" as const,
+      statement: `Source-bounded target-role interpretation (exploratory): the directly queried Albanian noun ${input.targetFact.form} has source sense ${roleEvidence.sense.senseId} (“${senseMeaning}”) with the exact source-authored sq:Occupations category (category source: w). This category supports an exploratory AGENT reading for this identified target sense. The same target record attributes the af template “${template.expansion}” and the Albanian references ${sourceReferences}; those references do not create a base-side SOURCE_DERIVED_FORM assertion or select a component sense.`,
+      alternatives: Object.freeze([
+        "The source category applies only to the identified target sense; other target senses remain alternatives and are not selected.",
+        ...componentAlternatives,
+        "The target-authored template and references remain attributed source evidence; no historical relation, suffix law, independent embryo meaning, or Voice semantics is claimed.",
+      ]),
+      basis: Object.freeze([
+        "SOURCE_ATTESTED_TARGET_ROLE_CATEGORY",
+        "SOURCE_ATTESTED_FINAL_SENSE_CATEGORY",
+        "TARGET_SOURCE_AUTHORED_AF_TEMPLATE",
+        "SOURCE_STRUCTURED_ALBANIAN_REFERENCES",
+      ]),
+      claimBoundary: "Exploratory AGENT role for one exact source-identified target sense only. No target-to-base sense alignment, base-side derived-form relation, composition, historical etymology, suffix semantics, embryo function, or pronunciation semantics is asserted.",
+    }),
+    reasonCodes: Object.freeze([]),
+    claimBoundary: "The direct role reading is authorized by the exact source sense category and target identity. Target-authored component references remain separate attributed evidence; IPA and Voice are not used to classify the role.",
+  });
+}
+
 function normalizedSourceTemplateTextV0_1(value: string): string {
   return value.normalize("NFC").trim().replace(/\s+/gu, " ").toLocaleLowerCase("sq-AL");
 }
@@ -2559,7 +2707,7 @@ async function buildAlbanianLexicalReadingV0_1(input: Readonly<{
     fact.partOfSpeech !== "name",
   );
   const hasThreeComponentTarget = matchingTargetRecords.some((fact) =>
-    compoundComponentReferencesV0_1(fact)?.relation === "SOURCE_EXPLICIT_THREE_COMPONENT_COMPOUND",
+    sourceComponentReferencesV0_1(fact)?.relation === "SOURCE_EXPLICIT_THREE_COMPONENT_COMPOUND",
   );
   const targetIdentityReason = hasThreeComponentTarget
     ? matchingTargetRecords.length !== 1
@@ -2731,15 +2879,58 @@ async function buildAlbanianLexicalReadingV0_1(input: Readonly<{
     ?? allRelatedCandidateEvaluations[0]
     ?? null;
   const sourceLinkedComparison = selectedRelatedCandidate?.sourceLinkedComparison ?? null;
-  const functionalMeaningBridge = selectedRelatedCandidate?.functionalMeaningBridge ?? buildAlbanianFunctionalMeaningBridgeV0_1({
-    primary: primaryProjection,
-    comparison: null,
-  });
-  const sourceLinkedComponentReading = await buildSourceLinkedComponentReadingV0_1({
-    primary,
-    primaryAnalyses: input.analyses,
-    provider: input.provider,
-  });
+  const selectedRelatedFunctionalBridge = selectedRelatedCandidate?.functionalMeaningBridge ?? null;
+  const targetComponentEvidence = sourceComponentReferencesV0_1(primary);
+  const sourceLinkedComponentReading = targetComponentEvidence?.relation === "SOURCE_AUTHORED_AF_TEMPLATE" &&
+    selectedRelatedFunctionalBridge?.status === "SUPPORTED"
+    ? null
+    : await buildSourceLinkedComponentReadingV0_1({
+        primary,
+        primaryAnalyses: input.analyses,
+        provider: input.provider,
+      });
+  const targetRoleFunctionalBridge = input.sourceStatus.status === "MATCHES_FOUND"
+    ? buildTargetRoleAgentFunctionalBridgeV0_1({
+        targetFact: primary,
+        targetRecord: primaryProjection,
+        queriedFacts: input.facts,
+        queryForm: input.word,
+        componentReading: sourceLinkedComponentReading,
+      })
+    : null;
+  const targetRoleIdentityFailure = (() => {
+    const targetRecords = input.facts.filter((fact) =>
+      fact.language === "Albanian" && fact.languageCode === "sq" &&
+      normalizedAlbanianFormV0_1(fact.form) === normalizedAlbanianFormV0_1(input.word) &&
+      fact.partOfSpeech !== "name",
+    );
+    const targetRoleCandidates = targetRecords.filter((fact) => {
+      const componentReferences = sourceComponentReferencesV0_1(fact);
+      return fact.partOfSpeech === "noun" &&
+        componentReferences?.relation === "SOURCE_AUTHORED_AF_TEMPLATE" &&
+        componentReferences.reasonCodes.length === 0 &&
+        qualifyingSourceSenseAgentEvidenceV0_1(sourceRecordProjectionV0_1(fact, [])) !== null;
+    });
+    if (targetRoleCandidates.length > 0 && targetRecords.length > 1) {
+      return "SOURCE_TARGET_RECORD_IDENTITY_AMBIGUOUS";
+    }
+    if (targetRoleCandidates.length === 1 && targetRecords.length === 1 &&
+      !hasValidUniqueAlbanianSourceRecordIdV0_1(targetRecords[0]!, input.facts)) {
+      return "SOURCE_TARGET_RECORD_IDENTITY_INVALID";
+    }
+    return null;
+  })();
+  const functionalMeaningBridge = selectedRelatedFunctionalBridge?.status === "SUPPORTED"
+    ? selectedRelatedFunctionalBridge
+    : targetRoleFunctionalBridge ?? (targetRoleIdentityFailure
+        ? nullFunctionalMeaningBridgeV0_1({
+            sourceFacts: bridgeRecordFactsV0_1(primaryProjection, null, null),
+            reasonCodes: [targetRoleIdentityFailure],
+          })
+        : selectedRelatedFunctionalBridge ?? buildAlbanianFunctionalMeaningBridgeV0_1({
+            primary: primaryProjection,
+            comparison: null,
+          }));
 
   const compositionCandidate = relatedResultsWithFacts.find(({ resolved }) => resolved !== null);
   const relatedFact = compositionCandidate?.resolved ?? null;
