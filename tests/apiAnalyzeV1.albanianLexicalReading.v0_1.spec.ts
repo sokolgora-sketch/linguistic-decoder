@@ -184,8 +184,51 @@ jest.mock("@/shared/openInstrument/motivationEngineDiscoveryServerOnly.v0_1", ()
     pronunciationAuthority: "CURRENT_KAIKKI_RECORD_ONLY_UNBOUND_TO_FROZEN_PROFILE",
     sourceSnapshot: drite.sourceSnapshot,
   };
+  const mal = {
+    sourceRecordId: "kaikki-albanian-jsonl:word=mal:ordinal=0",
+    entryLocator: "jsonl://word/mal/match/0",
+    physicalRecordOrdinal: 126,
+    language: "Albanian",
+    languageCode: "sq",
+    form: "mal",
+    partOfSpeech: "noun",
+    senses: [
+      { senseId: "en-mal-sq-noun-1FNvJVWD", glosses: ["mount"] },
+      { senseId: "en-mal-sq-noun-O4DTj3aG", glosses: ["mountain"] },
+      { senseId: "en-mal-sq-noun-YZoszxJs", glosses: ["forest"] },
+      { senseId: "en-mal-sq-noun-FqyA2~S1", glosses: ["large amount of something"] },
+    ],
+    ipaObservations: [{ soundIndex: 0, ipa: "[mal]", tags: [] }],
+    relatedForms: [{ form: "malor", relation: "SOURCE_DERIVED_FORM", entryLocator: "jsonl://word/malor" }],
+    etymologyText: null,
+    sourceStatus: "observed_external_snapshot",
+    attestationTruth: "fact",
+    pronunciationAuthority: "CURRENT_KAIKKI_RECORD_ONLY_UNBOUND_TO_FROZEN_PROFILE",
+    sourceSnapshot: drite.sourceSnapshot,
+  };
+  const malor = {
+    sourceRecordId: "kaikki-albanian-jsonl:word=malor:ordinal=0",
+    entryLocator: "jsonl://word/malor/match/0",
+    physicalRecordOrdinal: 4391,
+    language: "Albanian",
+    languageCode: "sq",
+    form: "malor",
+    partOfSpeech: "adj",
+    senses: [{ senseId: "en-malor-sq-adj-Edmafqfe", glosses: ["mountainous"] }],
+    ipaObservations: [],
+    etymologyText: "From mal + -or.",
+    etymologyLinks: [
+      { sourceForm: "mal", reference: "mal#Albanian" },
+      { sourceForm: "-or", reference: "-or#Albanian" },
+    ],
+    etymologyTemplates: [{ name: "suffix", args: { "1": "sq", "2": "mal", "3": "-or" }, expansion: "mal + -or" }],
+    sourceStatus: "observed_external_snapshot",
+    attestationTruth: "fact",
+    pronunciationAuthority: "CURRENT_KAIKKI_RECORD_ONLY_UNBOUND_TO_FROZEN_PROFILE",
+    sourceSnapshot: drite.sourceSnapshot,
+  };
   const albanianProvider = lexicalSource.createAlbanianKaikkiServerOnlyExactLexicalSourceProviderForSyntheticFixtureV0_1({
-    facts: [drite, dritare, peshk, peshkatar, pele, pelar, qymyr, qymyrtar],
+    facts: [drite, dritare, peshk, peshkatar, pele, pelar, qymyr, qymyrtar, mal, malor],
   });
   const englishProvider = {
     query: async (query: unknown) => ({
@@ -256,6 +299,24 @@ async function analyzeQymyrtarV0_1(): Promise<any> {
     method: "POST",
     headers: { "content-type": "application/json" },
     body: JSON.stringify({ word: "qymyrtar", language: "sq", alphabet: "albanian", providerExecution: "disabled" }),
+  }));
+  return { status: response.status, body: await response.json() };
+}
+
+async function analyzeMalorV0_1(): Promise<any> {
+  const response = await POST(new Request("http://localhost/api/analyze-v1", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ word: "malor", language: "sq", alphabet: "albanian", providerExecution: "disabled" }),
+  }));
+  return { status: response.status, body: await response.json() };
+}
+
+async function analyzeMalV0_1(): Promise<any> {
+  const response = await POST(new Request("http://localhost/api/analyze-v1", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ word: "mal", language: "sq", alphabet: "albanian", providerExecution: "disabled" }),
   }));
   return { status: response.status, body: await response.json() };
 }
@@ -381,6 +442,83 @@ describe("analyze-v1 Albanian lexical reading reachability", () => {
       }),
       composition: { status: "NULL" },
     });
+  });
+
+  it("projects direct malor as the queried adjective with the base-attested entity-property bridge", async () => {
+    const result = await analyzeMalorV0_1();
+    expect(result.status).toBe(200);
+    const reading = result.body.motivationDiscoveryV0_1.albanianLexicalReading;
+    expect(reading.status).toBe("SUPPORTED");
+    expect(reading.primarySourceFact).toMatchObject({
+      sourceRecordId: "kaikki-albanian-jsonl:word=malor:ordinal=0",
+      form: "malor",
+      partOfSpeech: "adj",
+      meaningGlosses: ["mountainous"],
+    });
+    expect(reading.sourcePronunciation).toBeNull();
+    expect(reading.relatedForms).toEqual([]);
+    const candidate = reading.relatedCandidateEvaluations.find((item: any) => item.relatedForm === "malor");
+    expect(candidate).toMatchObject({
+      relatedForm: "malor",
+      sourceRelation: "SOURCE_DERIVED_FORM",
+      sourceLinkedComparison: {
+        status: "SUPPORTED",
+        relation: {
+          primarySourceRecordId: "kaikki-albanian-jsonl:word=mal:ordinal=0",
+          relatedSourceRecordId: "kaikki-albanian-jsonl:word=malor:ordinal=0",
+          relation: "SOURCE_DERIVED_FORM",
+          referencedForm: "mal",
+          reference: "mal#Albanian",
+        },
+      },
+      functionalMeaningBridge: {
+        status: "SUPPORTED",
+        functionalHypothesis: {
+          functionalOperation: null,
+          statement: expect.stringContaining("entity → attributed property"),
+        },
+      },
+    });
+    expect(reading.functionalMeaningBridge.status).toBe("SUPPORTED");
+    expect(reading.functionalMeaningBridge.sourceFacts.primary.form).toBe("mal");
+    expect(reading.functionalMeaningBridge.sourceFacts.related.form).toBe("malor");
+    expect(reading.functionalMeaningBridge.functionalHypothesis.functionalOperation).toBeNull();
+    expect(reading.interpretation.status).toBe("EXPLORATORY_ZHEJI_READING");
+    expect(reading.interpretation.statement).toContain("Integrated source-bounded functional reading");
+    expect(reading.interpretation.basis).toContain("STRUCTURAL_EMBRYO_FUNCTION_REMAINS_UNKNOWN_OR_NULL");
+    expect(reading.composition.status).toBe("NULL");
+    expect(reading.interpretation.alternatives).toContain(
+      "The base source record has multiple attested senses; this reading does not select or align one unique base sense.",
+    );
+  });
+
+  it("preserves direct mal's existing entity-property bridge and all attested base senses", async () => {
+    const result = await analyzeMalV0_1();
+    expect(result.status).toBe(200);
+    const reading = result.body.motivationDiscoveryV0_1.albanianLexicalReading;
+    expect(reading.primarySourceFact).toMatchObject({
+      sourceRecordId: "kaikki-albanian-jsonl:word=mal:ordinal=0",
+      form: "mal",
+      partOfSpeech: "noun",
+      meaningGlosses: ["mount", "mountain", "forest", "large amount of something"],
+    });
+    expect(reading.functionalMeaningBridge).toMatchObject({
+      status: "SUPPORTED",
+      relatedForm: "malor",
+      functionalHypothesis: {
+        functionalOperation: null,
+        statement: expect.stringContaining("entity → attributed property"),
+      },
+    });
+    expect(reading.functionalMeaningBridge.sourceFacts.primary.sourceSenses.map((sense: any) => sense.senseId)).toEqual([
+      "en-mal-sq-noun-1FNvJVWD",
+      "en-mal-sq-noun-O4DTj3aG",
+      "en-mal-sq-noun-YZoszxJs",
+      "en-mal-sq-noun-FqyA2~S1",
+    ]);
+    expect(reading.interpretation.alternatives).toContain(
+      "The base source record has multiple attested senses; this reading does not select or align one unique base sense.",
+    );
   });
 
   it("projects an integrated source-bounded AGENT reading through the API", async () => {
