@@ -369,6 +369,42 @@ async function discoveryForMalorDerivedFunctionalRelationTextV0_1(etymologyText:
   return discoveryForFactsV0_1([mal, malor], "mal");
 }
 
+function malorEntityPropertyFixtureFactsV0_1(input: Readonly<{
+  base?: Partial<AlbanianKaikkiExactLexicalSourceFactV0_1>;
+  target?: Partial<AlbanianKaikkiExactLexicalSourceFactV0_1>;
+  additionalFacts?: readonly AlbanianKaikkiExactLexicalSourceFactV0_1[];
+}> = {}): readonly AlbanianKaikkiExactLexicalSourceFactV0_1[] {
+  const base = fixtureFact({
+    sourceRecordId: "kaikki-albanian-jsonl:word=mal:ordinal=0",
+    entryLocator: "jsonl://word/mal/match/0",
+    form: "mal",
+    partOfSpeech: "noun",
+    senses: [{ senseId: "mal-mountain-fixture", glosses: ["mountain"] }],
+    relatedForms: [{ form: "malor", relation: "SOURCE_DERIVED_FORM", entryLocator: "jsonl://word/malor" }],
+    ...input.base,
+  });
+  const target = fixtureFact({
+    sourceRecordId: "kaikki-albanian-jsonl:word=malor:ordinal=0",
+    entryLocator: "jsonl://word/malor/match/0",
+    form: "malor",
+    partOfSpeech: "adj",
+    senses: [{ senseId: "malor-mountainous-fixture", glosses: ["mountainous"] }],
+    ipaObservations: [],
+    etymologyText: "From mal + -or.",
+    etymologyLinks: [
+      { sourceForm: "mal", reference: "mal#Albanian" },
+      { sourceForm: "-or", reference: "-or#Albanian" },
+    ],
+    etymologyTemplates: [{
+      name: "suffix",
+      args: { "1": "sq", "2": "mal", "3": "-or" },
+      expansion: "mal + -or",
+    }],
+    ...input.target,
+  });
+  return Object.freeze([base, target, ...(input.additionalFacts ?? [])]);
+}
+
 async function discoveryForDriteDritareRelationTextV0_1(etymologyText: string) {
   const drite = fixtureFact({
     sourceRecordId: "kaikki-albanian-jsonl:word=drit%C3%AB:ordinal=0",
@@ -2243,6 +2279,158 @@ describe("real Albanian exact lexical source integration v0.1", () => {
       expect(screen.getByTestId("albanian-reading-composition-null")).toHaveTextContent("Null");
       expect(screen.queryByTestId("albanian-reading-null-candidate-summary")).not.toBeInTheDocument();
     }
+  });
+
+  it("supports direct malor through the exact base-attested noun-to-adjective path and preserves the queried target", async () => {
+    const discovery = await discoveryForFactsV0_1(malorEntityPropertyFixtureFactsV0_1(), "malor");
+    const reading = discovery.albanianLexicalReading;
+    expect(reading?.status).toBe("SUPPORTED");
+    expect(reading?.primarySourceFact).toMatchObject({
+      sourceRecordId: "kaikki-albanian-jsonl:word=malor:ordinal=0",
+      form: "malor",
+      partOfSpeech: "adj",
+      meaningGlosses: ["mountainous"],
+    });
+    expect(reading?.sourcePronunciation).toBeNull();
+    expect(reading?.relatedForms).toEqual([]);
+    const candidate = reading?.relatedCandidateEvaluations.find((item) => item.relatedForm === "malor");
+    expect(candidate?.sourceRelation).toBe("SOURCE_DERIVED_FORM");
+    expect(candidate?.resolution).toBe("RESOLVED");
+    expect(candidate?.sourceLinkedComparison.status).toBe("SUPPORTED");
+    expect(candidate?.sourceLinkedComparison.relation).toMatchObject({
+      relation: "SOURCE_DERIVED_FORM",
+      primarySourceRecordId: "kaikki-albanian-jsonl:word=mal:ordinal=0",
+      relatedSourceRecordId: "kaikki-albanian-jsonl:word=malor:ordinal=0",
+      direction: "RELATED_FORM_TO_PRIMARY_ETYMLOGY_REFERENCE",
+      referencedForm: "mal",
+      reference: "mal#Albanian",
+    });
+    expect(candidate?.functionalMeaningBridge.status).toBe("SUPPORTED");
+    expect(candidate?.functionalMeaningBridge.sourceFacts.primary.form).toBe("mal");
+    expect(candidate?.functionalMeaningBridge.sourceFacts.related.form).toBe("malor");
+    expect(candidate?.functionalMeaningBridge.derivedStructure).toBeNull();
+    expect(candidate?.functionalMeaningBridge.functionalHypothesis).toMatchObject({
+      functionalOperation: null,
+      statement: expect.stringContaining("entity → attributed property"),
+      basis: expect.arrayContaining([
+        "SOURCE_ATTESTED_PRIMARY_MEANING",
+        "SOURCE_ATTESTED_PROPERTY_MEANING",
+        "SOURCE_AUTHORED_SUFFIX_EXPLANATION",
+        "SOURCE_STRUCTURED_FORM_REFERENCE",
+      ]),
+    });
+    expect(reading?.functionalMeaningBridge.status).toBe("SUPPORTED");
+    expect(reading?.functionalMeaningBridge.functionalHypothesis.functionalOperation).toBeNull();
+    expect(reading?.interpretation.status).toBe("EXPLORATORY_ZHEJI_READING");
+    expect(reading?.composition.status).toBe("NULL");
+    expect(reading?.interpretation.statement).toContain("malor");
+    expect(reading?.functionalMeaningBridge.functionalHypothesis.statement).toContain("mountainous");
+
+    const vm = adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: discovery });
+    expect(vm.motivationDiscoveryV0_1).toMatchObject({ kind: "present" });
+    if (vm.motivationDiscoveryV0_1?.kind === "present") {
+      render(createElement(MotivationDiscoveryCardV0_1, { discovery: vm.motivationDiscoveryV0_1 }));
+      expect(screen.getByTestId("albanian-lexical-reading")).toHaveTextContent("malor");
+      expect(screen.getByTestId("albanian-reading-meaning")).toHaveTextContent("mountainous");
+      expect(screen.getByTestId("albanian-reading-functional-bridge")).toHaveTextContent("entity → attributed property");
+      expect(screen.getByTestId("albanian-reading-functional-bridge-operation")).toHaveTextContent("Functional operation: none classified");
+      expect(screen.getByTestId("albanian-reading-related-candidate")).toHaveTextContent("SOURCE_DERIVED_FORM");
+      expect(screen.getByTestId("albanian-reading-functional-bridge-derived-structure-null")).toHaveTextContent("Null");
+      expect(screen.getByTestId("albanian-reading-composition-null")).toHaveTextContent("Null");
+      expect(screen.getByTestId("albanian-source-linked-comparison")).toHaveTextContent("mal#Albanian");
+    }
+  });
+
+  it.each([
+    ["missing base-authored derived-form edge", { base: { relatedForms: [] } }],
+    ["non-derived base relation", {
+      base: { relatedForms: [{ form: "malor", relation: "SOURCE_RELATED_FORM" as const, entryLocator: "jsonl://word/malor" }] },
+    }],
+    ["duplicate base relation", {
+      base: { relatedForms: [
+        { form: "malor", relation: "SOURCE_DERIVED_FORM" as const, entryLocator: "jsonl://word/malor" },
+        { form: "malor", relation: "SOURCE_DERIVED_FORM" as const, entryLocator: "jsonl://word/malor" },
+      ] },
+    }],
+    ["foreign target reference", {
+      target: { etymologyLinks: [{ sourceForm: "mal", reference: "mal#French" }, { sourceForm: "-or", reference: "-or#Albanian" }] },
+    }],
+    ["missing affix reference", {
+      target: { etymologyLinks: [{ sourceForm: "mal", reference: "mal#Albanian" }] },
+    }],
+    ["source explanation conflicts with the template", {
+      target: { etymologyText: "Not from mal + -or." },
+    }],
+    ["base link points to a different target locator", {
+      base: { relatedForms: [{ form: "malor", relation: "SOURCE_DERIVED_FORM" as const, entryLocator: "jsonl://word/malësor" }] },
+    }],
+    ["mismatched suffix template", {
+      target: {
+        etymologyText: "From mal + -tar.",
+        etymologyTemplates: [{ name: "suffix", args: { "1": "sq", "2": "mal", "3": "-tar" }, expansion: "mal + -tar" }],
+      },
+    }],
+    ["incompatible target POS", { target: { partOfSpeech: "noun" } }],
+    ["missing target meaning", { target: { senses: [{ senseId: "malor-empty-fixture", glosses: [] }] } }],
+    ["missing target sense identity", { target: { senses: [{ senseId: "", glosses: ["mountainous"] }] } }],
+    ["ambiguous target senses", {
+      target: { senses: [
+        { senseId: "malor-mountainous-fixture", glosses: ["mountainous"] },
+        { senseId: "malor-other-fixture", glosses: ["unrelated meaning"] },
+      ] },
+    }],
+    ["ambiguous base records", {
+      additionalFacts: [fixtureFact({
+        sourceRecordId: "kaikki-albanian-jsonl:word=mal:ordinal=1",
+        entryLocator: "jsonl://word/mal/match/1",
+        form: "mal",
+        partOfSpeech: "noun",
+        senses: [{ senseId: "mal-alt-fixture", glosses: ["forest"] }],
+      })],
+    }],
+    ["ambiguous target record identity", {
+      additionalFacts: [fixtureFact({
+        sourceRecordId: "kaikki-albanian-jsonl:word=malor:ordinal=1",
+        entryLocator: "jsonl://word/malor/match/1",
+        form: "malor",
+        partOfSpeech: "adj",
+        senses: [{ senseId: "malor-alt-fixture", glosses: ["mountain-like"] }],
+      })],
+    }],
+  ] as const)("keeps direct malor Null for %s", async (_label, overrides) => {
+    const discovery = await discoveryForFactsV0_1(
+      malorEntityPropertyFixtureFactsV0_1(overrides),
+      "malor",
+    );
+    expect(discovery.albanianLexicalReading?.primarySourceFact?.form).toBe("malor");
+    expect(discovery.albanianLexicalReading?.functionalMeaningBridge).toMatchObject({
+      status: "NULL",
+      functionalHypothesis: { status: "UNKNOWN_OR_NULL", functionalOperation: null, statement: null },
+    });
+    expect(discovery.albanianLexicalReading?.interpretation.status).toBe("UNKNOWN_OR_NULL");
+  });
+
+  it("keeps direct malor Null when the source provider fails to resolve mal", async () => {
+    const facts = malorEntityPropertyFixtureFactsV0_1();
+    const baseProvider = createAlbanianKaikkiServerOnlyExactLexicalSourceProviderForSyntheticFixtureV0_1({ facts });
+    const provider: AlbanianKaikkiServerOnlyExactLexicalSourceProviderV0_1 = {
+      ...baseProvider,
+      query: async (query) => query === "mal"
+        ? {
+            status: "UNAVAILABLE",
+            queryForm: "mal",
+            facts: [],
+            reasonCode: "ALBANIAN_SOURCE_READ_FAILURE",
+          }
+        : baseProvider.query(query),
+    };
+    const discovery = await discoveryForProviderV0_1(provider, "malor");
+    expect(discovery.albanianLexicalReading?.primarySourceFact?.form).toBe("malor");
+    expect(discovery.albanianLexicalReading?.functionalMeaningBridge).toMatchObject({
+      status: "NULL",
+      functionalHypothesis: { status: "UNKNOWN_OR_NULL", functionalOperation: null, statement: null },
+    });
+    expect(discovery.albanianLexicalReading?.interpretation.status).toBe("UNKNOWN_OR_NULL");
   });
 
   it("keeps the illumination fallback when no supported functional bridge exists", async () => {

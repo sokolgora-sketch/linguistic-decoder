@@ -1164,11 +1164,105 @@ async function buildTargetAuthoredEtymologyCandidateV0_1(input: Readonly<{
     input.targetFacts.length !== 1 ||
     input.targetFacts[0]?.sourceRecordId !== input.target.sourceRecordId ||
     input.target.language !== "Albanian" ||
-    input.target.languageCode !== "sq" ||
-    input.target.partOfSpeech !== "noun"
+    input.target.languageCode !== "sq"
   ) {
     return null;
   }
+
+  if (input.target.partOfSpeech === "adj") {
+    const suffixTemplates = input.target.etymologyTemplates?.filter((template) => template.name === "suffix") ?? [];
+    if (suffixTemplates.length !== 1) return null;
+    const template = suffixTemplates[0];
+    const baseForm = template?.args["2"]?.trim() ?? "";
+    const suffix = template?.args["3"]?.trim() ?? "";
+    const meaningfulTargetSenses = input.target.senses.filter((sense) =>
+      sense.senseId && sense.glosses.some((gloss) => gloss.trim().length > 0),
+    );
+    const targetReferences = (input.target.etymologyLinks ?? []).filter((link) =>
+      normalizedAlbanianFormV0_1(link.sourceForm) === normalizedAlbanianFormV0_1(baseForm),
+    );
+    const sourceExplanation = input.target.etymologyText?.trim().replace(/[.!?]+$/u, "") ?? "";
+    if (
+      !template ||
+      JSON.stringify(Object.keys(template.args).sort()) !== JSON.stringify(["1", "2", "3"]) ||
+      template.args["1"] !== "sq" ||
+      !baseForm ||
+      suffix !== "-or" ||
+      input.target.etymologyTemplates?.length !== 1 ||
+      normalizedSourceTemplateTextV0_1(template.expansion) !== normalizedSourceTemplateTextV0_1(`${baseForm} + ${suffix}`) ||
+      input.target.senses.length !== 1 ||
+      meaningfulTargetSenses.length !== 1 ||
+      targetReferences.length !== 1 ||
+      !exactAlbanianSourceReferenceV0_1(targetReferences[0]!, baseForm) ||
+      (input.target.etymologyLinks ?? []).length !== 2 ||
+      !(input.target.etymologyLinks ?? []).some((link) =>
+        normalizedAlbanianFormV0_1(link.sourceForm) === normalizedAlbanianFormV0_1(suffix) &&
+        exactAlbanianSourceReferenceV0_1(link, suffix),
+      ) ||
+      normalizedSourceTemplateTextV0_1(sourceExplanation) !== normalizedSourceTemplateTextV0_1(`From ${baseForm} + ${suffix}`)
+    ) {
+      return null;
+    }
+
+    let baseResult: AlbanianKaikkiExactLexicalSourceLookupResultV0_1;
+    try {
+      baseResult = await input.provider.query(baseForm);
+    } catch {
+      return null;
+    }
+    if (baseResult.status !== "MATCHES_FOUND") return null;
+    const baseFacts = baseResult.facts.filter((fact) =>
+      fact.language === "Albanian" &&
+      fact.languageCode === "sq" &&
+      fact.partOfSpeech !== "name" &&
+      normalizedAlbanianFormV0_1(fact.form) === normalizedAlbanianFormV0_1(baseForm),
+    );
+    if (baseFacts.length !== 1) return null;
+    const base = baseFacts[0];
+    if (!base || base.partOfSpeech !== "noun" || !hasMeaningEvidenceV0_1(distinctGlossesV0_1([base]))) return null;
+
+    const matchingBaseRelations = (base.relatedForms ?? []).filter((relation) =>
+      normalizedAlbanianFormV0_1(relation.form) === normalizedAlbanianFormV0_1(input.target.form),
+    );
+    const baseDerivedRelations = matchingBaseRelations.filter((relation) => relation.relation === "SOURCE_DERIVED_FORM");
+    const expectedTargetLocator = `jsonl://word/${encodeURIComponent(input.target.form)}`;
+    if (
+      matchingBaseRelations.length !== 1 ||
+      baseDerivedRelations.length !== 1 ||
+      baseDerivedRelations[0]?.entryLocator !== expectedTargetLocator
+    ) {
+      return null;
+    }
+
+    const relation = Object.freeze({
+      form: input.target.form,
+      relation: "SOURCE_DERIVED_FORM" as const,
+      entryLocator: baseDerivedRelations[0].entryLocator,
+    });
+    const baseAnalyses = projectAlbanianKaikkiFactSourceIpaToSevenVoicesV0_1(base);
+    const comparison = buildSourceLinkedComparisonV0_1({
+      primary: base,
+      primaryAnalyses: baseAnalyses,
+      relatedForm: relation,
+      related: input.target,
+    });
+    const bridge = buildAlbanianFunctionalMeaningBridgeV0_1({
+      primary: sourceRecordProjectionV0_1(base, baseAnalyses),
+      comparison,
+      related: sourceRecordProjectionV0_1(input.target, projectAlbanianKaikkiFactSourceIpaToSevenVoicesV0_1(input.target)),
+      sourceRelation: relation.relation,
+    });
+
+    return Object.freeze({
+      relatedForm: input.target.form,
+      sourceRelation: relation.relation,
+      resolution: "RESOLVED" as const,
+      sourceLinkedComparison: comparison,
+      functionalMeaningBridge: bridge,
+    });
+  }
+
+  if (input.target.partOfSpeech !== "noun") return null;
 
   const templates = input.target.etymologyTemplates?.filter((template) => template.name === "af") ?? [];
   let baseForm: string;
@@ -1498,6 +1592,9 @@ function buildEntityToAttributedPropertyHypothesisV0_1(input: Readonly<{
 
   const primaryMeaning = input.primary.meaningGlosses.join("; ");
   const relatedMeaning = input.related.meaningGlosses.join("; ");
+  const hasMultiplePrimarySenses = (input.primary.sourceSenses ?? []).filter((sense) =>
+    sense.senseId && sense.glosses.some((gloss) => gloss.trim().length > 0),
+  ).length > 1;
   return Object.freeze({
     functionalOperation: null,
     statement: `Source-bounded functional interpretation (exploratory): the source links ${input.related.form} (“${relatedMeaning}”) to ${input.primary.form} (“${primaryMeaning}”) and attributes its form to ${sourceExplanationStatement}. The product therefore models an entity → attributed property relationship: ${input.primary.form} supplies the entity concept and ${input.related.form} supplies a related property. This is a source-bounded product prompt, not proof of morphology, etymology, causation, or Voice semantics.`,
@@ -1508,6 +1605,9 @@ function buildEntityToAttributedPropertyHypothesisV0_1(input: Readonly<{
       "SOURCE_STRUCTURED_FORM_REFERENCE",
     ]),
     alternatives: Object.freeze([
+      ...(hasMultiplePrimarySenses
+        ? ["The base source record has multiple attested senses; this reading does not select or align one unique base sense."]
+        : []),
       "The source-authored suffix account may be descriptive or historically contestable rather than a complete derivational analysis.",
       "The adjective's ordinary contextual use may extend beyond the property gloss represented here.",
       "The related record has no source IPA in this snapshot, so no Voice or phonological semantic force is claimed.",
