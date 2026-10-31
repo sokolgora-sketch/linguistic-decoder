@@ -697,6 +697,18 @@ function normalizedAlbanianFormV0_1(value: string): string {
   return value.normalize("NFC").trim().toLocaleLowerCase("sq-AL");
 }
 
+function hasValidUniqueAlbanianSourceRecordIdV0_1(
+  fact: AlbanianKaikkiExactLexicalSourceFactV0_1,
+  facts: readonly AlbanianKaikkiExactLexicalSourceFactV0_1[],
+): boolean {
+  const prefix = `kaikki-albanian-jsonl:word=${encodeURIComponent(fact.form)}:ordinal=`;
+  const ordinal = fact.sourceRecordId.startsWith(prefix)
+    ? fact.sourceRecordId.slice(prefix.length)
+    : "";
+  return Boolean(ordinal) && /^\d+$/u.test(ordinal) &&
+    facts.filter((candidate) => candidate.sourceRecordId === fact.sourceRecordId).length === 1;
+}
+
 function distinctGlossesV0_1(
   facts: readonly Readonly<{
     senses: readonly Readonly<{ glosses: readonly string[] }>[];
@@ -2541,10 +2553,32 @@ async function buildAlbanianLexicalReadingV0_1(input: Readonly<{
     provider: input.provider,
   });
   const occupationalRoleResearchCandidates = getAlbanianOccupationalRoleCandidatesForWordV0_1(input.word);
-  const primary = input.facts.find((fact) =>
+  const matchingTargetRecords = input.facts.filter((fact) =>
+    fact.languageCode === "sq" && fact.language === "Albanian" &&
     normalizedAlbanianFormV0_1(fact.form) === normalizedAlbanianFormV0_1(input.word) &&
     fact.partOfSpeech !== "name",
-  ) ?? input.facts[0] ?? null;
+  );
+  const hasThreeComponentTarget = matchingTargetRecords.some((fact) =>
+    compoundComponentReferencesV0_1(fact)?.relation === "SOURCE_EXPLICIT_THREE_COMPONENT_COMPOUND",
+  );
+  const targetIdentityReason = hasThreeComponentTarget
+    ? matchingTargetRecords.length !== 1
+      ? new Set(matchingTargetRecords.map((fact) => fact.sourceRecordId)).size !== matchingTargetRecords.length
+        ? "SOURCE_TARGET_RECORD_IDENTITY_DUPLICATE"
+        : "SOURCE_TARGET_RECORD_IDENTITY_AMBIGUOUS"
+      : !matchingTargetRecords[0] ||
+        !hasValidUniqueAlbanianSourceRecordIdV0_1(matchingTargetRecords[0], input.facts)
+        ? "SOURCE_TARGET_RECORD_IDENTITY_INVALID"
+        : null
+    : null;
+  const primary = targetIdentityReason
+    ? null
+    : hasThreeComponentTarget
+      ? matchingTargetRecords[0] ?? null
+      : input.facts.find((fact) =>
+          normalizedAlbanianFormV0_1(fact.form) === normalizedAlbanianFormV0_1(input.word) &&
+          fact.partOfSpeech !== "name",
+        ) ?? input.facts[0] ?? null;
 
   if (!primary) {
     return Object.freeze({
@@ -2560,15 +2594,17 @@ async function buildAlbanianLexicalReadingV0_1(input: Readonly<{
       sourceLinkedComparison: null,
       functionalMeaningBridge: nullFunctionalMeaningBridgeV0_1({
         sourceFacts: null,
-        reasonCodes: Object.freeze(["PRIMARY_SOURCE_RECORD_NOT_FOUND"]),
+        reasonCodes: Object.freeze([targetIdentityReason ?? "PRIMARY_SOURCE_RECORD_NOT_FOUND"]),
       }),
       composition: nullCompositionV0_1(),
       interpretation: Object.freeze({
         status: "UNKNOWN_OR_NULL",
         statement: null,
         alternatives: Object.freeze([]),
-        basis: Object.freeze([]),
-        claimBoundary: "No exact Albanian source fact is available; no product reading is claimed.",
+        basis: Object.freeze(targetIdentityReason ? [targetIdentityReason] : []),
+        claimBoundary: targetIdentityReason
+          ? "The three-component target source identity is ambiguous or invalid; no target record or functional hypothesis is selected."
+          : "No exact Albanian source fact is available; no product reading is claimed.",
       }),
     });
   }

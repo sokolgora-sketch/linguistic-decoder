@@ -4303,6 +4303,76 @@ describe("real Albanian exact lexical source integration v0.1", () => {
     }
   });
 
+  it("fails closed when a three-component target has multiple Albanian source records", async () => {
+    const facts = [...zjarrfikesThreeComponentFixtureFactsV0_1()];
+    const target = facts[0]!;
+    facts.push({
+      ...target,
+      sourceRecordId: "kaikki-albanian-jsonl:word=zjarrfik%C3%ABs:ordinal=1",
+      entryLocator: "jsonl://word/zjarrfik%C3%ABs/match/1",
+      physicalRecordOrdinal: target.physicalRecordOrdinal + 1,
+      senses: [
+        { senseId: "en-zjarrfikës-sq-noun-second-record", glosses: ["fire service worker"] },
+      ],
+    });
+
+    const discovery = await discoveryForFactsV0_1(facts, "zjarrfikës");
+    const reading = discovery.albanianLexicalReading;
+
+    expect(reading).toMatchObject({
+      status: "NULL",
+      primarySourceFact: null,
+      sourcePronunciation: null,
+      sourceLinkedComponentReading: null,
+      sourceLinkedComparison: null,
+      functionalMeaningBridge: {
+        status: "NULL",
+        reasonCodes: ["SOURCE_TARGET_RECORD_IDENTITY_AMBIGUOUS"],
+      },
+      composition: { status: "NULL" },
+      interpretation: {
+        status: "UNKNOWN_OR_NULL",
+        statement: null,
+        basis: ["SOURCE_TARGET_RECORD_IDENTITY_AMBIGUOUS"],
+      },
+    });
+    expect(reading?.functionalMeaningBridge.functionalHypothesis.functionalOperation).toBeNull();
+    expect(discovery.exactLexicalSourceFacts).toHaveLength(2);
+    expect(discovery.exactLexicalSourceFacts.map((fact) => fact.sourceRecordId)).toEqual([
+      "kaikki-albanian-jsonl:word=zjarrfik%C3%ABs:ordinal=0",
+      "kaikki-albanian-jsonl:word=zjarrfik%C3%ABs:ordinal=1",
+    ]);
+    expect(discovery.exactLexicalSourceFacts.flatMap((fact) => fact.senses.map((sense) => sense.senseId))).toEqual([
+      "en-zjarrfikës-sq-noun-P9hAbGCJ",
+      "en-zjarrfikës-sq-noun-3IRd5pZ-",
+      "en-zjarrfikës-sq-noun-second-record",
+    ]);
+  });
+
+  it("fails closed when the unique three-component target has an invalid source record ID", async () => {
+    const facts = zjarrfikesThreeComponentFixtureFactsV0_1({
+      primary: { sourceRecordId: "unbound-zjarrfikës-record" },
+    });
+    const discovery = await discoveryForFactsV0_1(facts, "zjarrfikës");
+
+    expect(discovery.albanianLexicalReading).toMatchObject({
+      status: "NULL",
+      primarySourceFact: null,
+      functionalMeaningBridge: {
+        status: "NULL",
+        reasonCodes: ["SOURCE_TARGET_RECORD_IDENTITY_INVALID"],
+      },
+      interpretation: {
+        status: "UNKNOWN_OR_NULL",
+        basis: ["SOURCE_TARGET_RECORD_IDENTITY_INVALID"],
+      },
+    });
+    expect(discovery.exactLexicalSourceFacts[0]?.senses.map((sense) => sense.senseId)).toEqual([
+      "en-zjarrfikës-sq-noun-P9hAbGCJ",
+      "en-zjarrfikës-sq-noun-3IRd5pZ-",
+    ]);
+  });
+
   it.each([
     ["target occupation category absent", { primary: { senses: [{ senseId: "firefighter-only", glosses: ["firefighter"] }] } }],
     ["agent-forming suffix description negated", { suffix: { senses: [{ senseId: "suffix-negative", glosses: ["not used to form agent nouns"] }] } }],
