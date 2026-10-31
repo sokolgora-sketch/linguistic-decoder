@@ -184,6 +184,111 @@ jest.mock("@/shared/openInstrument/motivationEngineDiscoveryServerOnly.v0_1", ()
     pronunciationAuthority: "CURRENT_KAIKKI_RECORD_ONLY_UNBOUND_TO_FROZEN_PROFILE",
     sourceSnapshot: drite.sourceSnapshot,
   };
+  const zjarrfikes = {
+    sourceRecordId: "kaikki-albanian-jsonl:word=zjarrfik%C3%ABs:ordinal=0",
+    entryLocator: "jsonl://word/zjarrfik%C3%ABs/match/0",
+    physicalRecordOrdinal: 11480,
+    language: "Albanian",
+    languageCode: "sq",
+    form: "zjarrfikës",
+    partOfSpeech: "noun",
+    senses: [
+      { senseId: "en-zjarrfikës-sq-noun-P9hAbGCJ", glosses: ["firefighter"] },
+      {
+        senseId: "en-zjarrfikës-sq-noun-3IRd5pZ-",
+        glosses: ["fireman"],
+        categories: [{
+          name: "Occupations",
+          kind: "other",
+          parents: [],
+          source: "w+disamb",
+          orig: "sq:Occupations",
+          langcode: "sq",
+          _dis: null,
+        }],
+      },
+    ],
+    ipaObservations: [{ soundIndex: 0, ipa: "/zjarfikəse/", tags: [] }],
+    etymologyText: "From zjarr + fik + -ës.",
+    etymologyLinks: [
+      { sourceForm: "zjarr", reference: "zjarr#Albanian" },
+      { sourceForm: "fik", reference: "fik#Albanian" },
+      { sourceForm: "-ës", reference: "-ës#Albanian" },
+    ],
+    etymologyTemplates: [{
+      name: "compound",
+      args: { "1": "sq", "2": "zjarr", "3": "fik", "4": "-ës" },
+      expansion: "zjarr + fik + -ës",
+    }],
+    sourceStatus: "observed_external_snapshot",
+    attestationTruth: "fact",
+    pronunciationAuthority: "CURRENT_KAIKKI_RECORD_ONLY_UNBOUND_TO_FROZEN_PROFILE",
+    sourceSnapshot: drite.sourceSnapshot,
+  };
+  const zjarr = {
+    sourceRecordId: "kaikki-albanian-jsonl:word=zjarr:ordinal=0",
+    entryLocator: "jsonl://word/zjarr/match/0",
+    physicalRecordOrdinal: 2090,
+    language: "Albanian",
+    languageCode: "sq",
+    form: "zjarr",
+    partOfSpeech: "noun",
+    senses: [{ senseId: "zjarr-fire", glosses: ["fire"] }],
+    ipaObservations: [],
+    sourceStatus: "observed_external_snapshot",
+    attestationTruth: "fact",
+    pronunciationAuthority: "CURRENT_KAIKKI_RECORD_ONLY_UNBOUND_TO_FROZEN_PROFILE",
+    sourceSnapshot: drite.sourceSnapshot,
+  };
+  const fikNoun = {
+    sourceRecordId: "kaikki-albanian-jsonl:word=fik:ordinal=0",
+    entryLocator: "jsonl://word/fik/match/0",
+    physicalRecordOrdinal: 338,
+    language: "Albanian",
+    languageCode: "sq",
+    form: "fik",
+    partOfSpeech: "noun",
+    senses: [{ senseId: "en-fik-sq-noun-jDnGNIgm", glosses: ["fig"] }],
+    ipaObservations: [],
+    sourceStatus: "observed_external_snapshot",
+    attestationTruth: "fact",
+    pronunciationAuthority: "CURRENT_KAIKKI_RECORD_ONLY_UNBOUND_TO_FROZEN_PROFILE",
+    sourceSnapshot: drite.sourceSnapshot,
+  };
+  const fikVerb = {
+    sourceRecordId: "kaikki-albanian-jsonl:word=fik:ordinal=1",
+    entryLocator: "jsonl://word/fik/match/1",
+    physicalRecordOrdinal: 339,
+    language: "Albanian",
+    languageCode: "sq",
+    form: "fik",
+    partOfSpeech: "verb",
+    senses: [
+      { senseId: "en-fik-sq-verb-3UhMn1WK", glosses: ["to extinguish (fire)"] },
+      { senseId: "en-fik-sq-verb-j~6gALfc", glosses: ["to switch off, turn off"] },
+      { senseId: "en-fik-sq-verb-JbZbl6zi", glosses: ["to bring misfortune, ruin, destroy"] },
+    ],
+    ipaObservations: [],
+    sourceStatus: "observed_external_snapshot",
+    attestationTruth: "fact",
+    pronunciationAuthority: "CURRENT_KAIKKI_RECORD_ONLY_UNBOUND_TO_FROZEN_PROFILE",
+    sourceSnapshot: drite.sourceSnapshot,
+  };
+  const zesSuffix = {
+    sourceRecordId: "kaikki-albanian-jsonl:word=-%C3%ABs:ordinal=0",
+    entryLocator: "jsonl://word/-%C3%ABs/match/0",
+    physicalRecordOrdinal: 7944,
+    language: "Albanian",
+    languageCode: "sq",
+    form: "-ës",
+    partOfSpeech: "suffix",
+    senses: [{ senseId: "en--ës-sq-suffix-5nXSOZjB", glosses: ["used to form agent nouns. -er"] }],
+    ipaObservations: [],
+    sourceStatus: "observed_external_snapshot",
+    attestationTruth: "fact",
+    pronunciationAuthority: "CURRENT_KAIKKI_RECORD_ONLY_UNBOUND_TO_FROZEN_PROFILE",
+    sourceSnapshot: drite.sourceSnapshot,
+  };
   const mal = {
     sourceRecordId: "kaikki-albanian-jsonl:word=mal:ordinal=0",
     entryLocator: "jsonl://word/mal/match/0",
@@ -228,7 +333,7 @@ jest.mock("@/shared/openInstrument/motivationEngineDiscoveryServerOnly.v0_1", ()
     sourceSnapshot: drite.sourceSnapshot,
   };
   const albanianProvider = lexicalSource.createAlbanianKaikkiServerOnlyExactLexicalSourceProviderForSyntheticFixtureV0_1({
-    facts: [drite, dritare, peshk, peshkatar, pele, pelar, qymyr, qymyrtar, mal, malor],
+    facts: [drite, dritare, peshk, peshkatar, pele, pelar, qymyr, qymyrtar, zjarrfikes, zjarr, fikNoun, fikVerb, zesSuffix, mal, malor],
   });
   const englishProvider = {
     query: async (query: unknown) => ({
@@ -299,6 +404,15 @@ async function analyzeQymyrtarV0_1(): Promise<any> {
     method: "POST",
     headers: { "content-type": "application/json" },
     body: JSON.stringify({ word: "qymyrtar", language: "sq", alphabet: "albanian", providerExecution: "disabled" }),
+  }));
+  return { status: response.status, body: await response.json() };
+}
+
+async function analyzeZjarrfikesV0_1(): Promise<any> {
+  const response = await POST(new Request("http://localhost/api/analyze-v1", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ word: "zjarrfikës", language: "sq", alphabet: "albanian", providerExecution: "disabled" }),
   }));
   return { status: response.status, body: await response.json() };
 }
@@ -659,5 +773,51 @@ describe("analyze-v1 Albanian lexical reading reachability", () => {
     if (batchCandidate) {
       expect(batchCandidate).toMatchObject({ functionalOperation: null, productionAuthorization: "NOT_AUTHORIZED" });
     }
+  });
+
+  it("projects the three-component source hypothesis through the API without AGENT authorization", async () => {
+    const result = await analyzeZjarrfikesV0_1();
+    expect(result.status).toBe(200);
+    const reading = result.body.motivationDiscoveryV0_1.albanianLexicalReading;
+    expect(reading).toMatchObject({
+      status: "SUPPORTED",
+      primarySourceFact: {
+        sourceRecordId: "kaikki-albanian-jsonl:word=zjarrfik%C3%ABs:ordinal=0",
+        form: "zjarrfikës",
+        meaningGlosses: ["firefighter", "fireman"],
+      },
+      sourceLinkedComponentReading: {
+        status: "SUPPORTED",
+        relation: { relation: "SOURCE_EXPLICIT_THREE_COMPONENT_COMPOUND" },
+        componentResolutions: [
+          { sourceForm: "zjarr", status: "RESOLVED" },
+          { sourceForm: "fik", status: "AMBIGUOUS", sourceRecordIds: [
+            "kaikki-albanian-jsonl:word=fik:ordinal=0",
+            "kaikki-albanian-jsonl:word=fik:ordinal=1",
+          ] },
+          { sourceForm: "-ës", status: "RESOLVED" },
+        ],
+        functionalHypothesis: {
+          status: "EXPLORATORY_FUNCTIONAL_HYPOTHESIS",
+          functionalOperation: null,
+          evidenceRefs: expect.arrayContaining([
+            expect.objectContaining({
+              sourceRecordId: "kaikki-albanian-jsonl:word=fik:ordinal=0",
+              senseIds: ["en-fik-sq-noun-jDnGNIgm"],
+            }),
+            expect.objectContaining({
+              sourceRecordId: "kaikki-albanian-jsonl:word=fik:ordinal=1",
+              senseIds: ["en-fik-sq-verb-3UhMn1WK", "en-fik-sq-verb-j~6gALfc", "en-fik-sq-verb-JbZbl6zi"],
+            }),
+          ]),
+        },
+      },
+      functionalMeaningBridge: { status: "NULL" },
+      composition: { status: "NULL", interpretation: { status: "UNKNOWN_OR_NULL", statement: null } },
+      interpretation: { status: "UNKNOWN_OR_NULL", statement: null },
+    });
+    const hypothesis = reading.sourceLinkedComponentReading.functionalHypothesis;
+    expect(hypothesis.functionalOperation).toBeNull();
+    expect(hypothesis.statement).toContain("no component sense is aligned to a target sense");
   });
 });

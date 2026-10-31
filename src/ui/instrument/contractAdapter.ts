@@ -1246,23 +1246,59 @@ function parseMotivationDiscoveryV0_1(
     })();
     const sourceLinkedComponentReading = reading.sourceLinkedComponentReading;
     const validSourceLinkedComponentReading = sourceLinkedComponentReading === undefined || sourceLinkedComponentReading === null || (() => {
+      if (!isRecord(sourceLinkedComponentReading) ||
+        !isRecord(sourceLinkedComponentReading.relation) ||
+        !Array.isArray(sourceLinkedComponentReading.relation.references) ||
+        !Array.isArray(sourceLinkedComponentReading.components) ||
+        !Array.isArray(sourceLinkedComponentReading.componentResolutions)) return false;
+      const componentRelation = sourceLinkedComponentReading.relation;
+      const componentReferences = componentRelation.references as unknown[];
+      const componentRecords = sourceLinkedComponentReading.components as unknown[];
+      const componentResolutions = sourceLinkedComponentReading.componentResolutions as unknown[];
       const validRelationStatusCombination = (() => {
-        if (!isRecord(sourceLinkedComponentReading) ||
-          !isStringArray(sourceLinkedComponentReading.reasonCodes) ||
-          !isRecord(sourceLinkedComponentReading.relation) ||
-          !Array.isArray(sourceLinkedComponentReading.relation.references) ||
-          !Array.isArray(sourceLinkedComponentReading.components)) {
+        if (!isStringArray(sourceLinkedComponentReading.reasonCodes)) {
           return false;
         }
-        const relation = sourceLinkedComponentReading.relation.relation;
+        const relation = componentRelation.relation;
         const reasonCodes = sourceLinkedComponentReading.reasonCodes;
-        const referenceCount = sourceLinkedComponentReading.relation.references.length;
-        const componentCount = sourceLinkedComponentReading.components.length;
+        const referenceCount = componentReferences.length;
+        const componentCount = componentRecords.length;
+        if (!Array.isArray(componentResolutions) || componentResolutions.length !== referenceCount) return false;
+        const normalizedForm = (value: string): string =>
+          value.normalize("NFC").trim().toLocaleLowerCase("sq-AL");
+        const validResolution = componentResolutions.every((resolution, index) => {
+          const reference = componentReferences[index];
+          if (!isRecord(resolution) || !isRecord(reference) ||
+            typeof resolution.sourceForm !== "string" ||
+            resolution.sourceForm !== reference.sourceForm ||
+            resolution.reference !== reference.reference ||
+            (resolution.status !== "RESOLVED" && resolution.status !== "AMBIGUOUS" && resolution.status !== "UNRESOLVED") ||
+            !Array.isArray(resolution.sourceRecordIds) ||
+            !resolution.sourceRecordIds.every((sourceRecordId) => typeof sourceRecordId === "string" && sourceRecordId.length > 0) ||
+            new Set(resolution.sourceRecordIds).size !== resolution.sourceRecordIds.length ||
+            !isStringArray(resolution.reasonCodes)) return false;
+          const sourceRecordIds = resolution.sourceRecordIds as string[];
+          if ((resolution.status === "RESOLVED" && resolution.sourceRecordIds.length !== 1) ||
+            (resolution.status === "AMBIGUOUS" && resolution.sourceRecordIds.length === 1) ||
+            (resolution.status === "UNRESOLVED" && resolution.sourceRecordIds.length !== 0)) return false;
+          const recordsForForm = componentRecords.filter((component): component is Record<string, unknown> =>
+            isRecord(component) && typeof component.form === "string" &&
+            normalizedForm(component.form) === normalizedForm(resolution.sourceForm as string),
+          );
+          return recordsForForm.length === sourceRecordIds.length &&
+            recordsForForm.every((record, recordIndex) => record.sourceRecordId === sourceRecordIds[recordIndex]);
+        });
+        if (!validResolution) return false;
         if (sourceLinkedComponentReading.status === "SUPPORTED") {
-          return relation === "SOURCE_EXPLICIT_TWO_COMPONENT_COMPOUND" &&
-            reasonCodes.length === 0 &&
-            referenceCount === 2 &&
-            componentCount === 2;
+          return reasonCodes.length === 0 && (
+            relation === "SOURCE_EXPLICIT_TWO_COMPONENT_COMPOUND" &&
+              referenceCount === 2 && componentCount === 2 &&
+              componentResolutions.every((resolution) => isRecord(resolution) && resolution.status === "RESOLVED") ||
+            relation === "SOURCE_EXPLICIT_THREE_COMPONENT_COMPOUND" &&
+              referenceCount === 3 && componentCount >= 3 &&
+              componentResolutions.every((resolution) => isRecord(resolution) &&
+                (resolution.status === "RESOLVED" || resolution.status === "AMBIGUOUS"))
+          );
         }
         if (sourceLinkedComponentReading.status !== "NULL") return false;
         if (relation === "SOURCE_EXPLICIT_TWO_COMPONENT_COMPOUND") {
@@ -1271,16 +1307,102 @@ function parseMotivationDiscoveryV0_1(
             referenceCount === 2 &&
             componentCount <= referenceCount;
         }
+        if (relation === "SOURCE_EXPLICIT_THREE_COMPONENT_COMPOUND") {
+          return reasonCodes.length > 0 && referenceCount === 3 && componentCount >= 0;
+        }
         return relation === "SOURCE_COMPOUND_ARITY_UNSUPPORTED" &&
           reasonCodes.includes("SOURCE_COMPOUND_ARITY_UNSUPPORTED") &&
-          referenceCount > 2 &&
-          componentCount <= referenceCount;
+          referenceCount > 3;
+      })();
+      const functionalHypothesis = isRecord(sourceLinkedComponentReading)
+        ? sourceLinkedComponentReading.functionalHypothesis
+        : null;
+      const sourceReadingRecord = sourceLinkedComponentReading as Record<string, unknown>;
+      const sourceRelationRecord = sourceReadingRecord.relation as Record<string, unknown>;
+      const validSupportedThreeComponentSourceIdentity =
+        sourceReadingRecord.status !== "SUPPORTED" ||
+        sourceRelationRecord.relation !== "SOURCE_EXPLICIT_THREE_COMPONENT_COMPOUND" || (() => {
+          const primary = sourceReadingRecord.primary;
+          const references = sourceRelationRecord.references as unknown[];
+          if (!isRecord(primary) || typeof primary.sourceRecordId !== "string" ||
+            typeof primary.entryLocator !== "string" ||
+            sourceRelationRecord.primarySourceRecordId !== primary.sourceRecordId ||
+            sourceRelationRecord.primaryEntryLocator !== primary.entryLocator ||
+            typeof primary.etymologyText !== "string" ||
+            !Array.isArray(primary.etymologyTemplates) ||
+            !references.every((reference) => isRecord(reference) &&
+              typeof reference.sourceForm === "string" &&
+              reference.reference === reference.sourceForm + "#Albanian")) return false;
+          const templates = (primary.etymologyTemplates as unknown[]).filter((template) =>
+            isRecord(template) && template.name === "compound",
+          );
+          if (templates.length !== 1) return false;
+          const template = templates[0];
+          if (!isRecord(template) || !isRecord(template.args) ||
+            typeof template.expansion !== "string" || template.args["1"] !== "sq") return false;
+          const componentForms = references.map((reference) =>
+            (reference as Record<string, unknown>).sourceForm as string,
+          );
+          const numericArgumentNumbers = Object.keys(template.args)
+            .filter((argument) => /^\d+$/u.test(argument))
+            .map(Number)
+            .sort((left, right) => left - right);
+          const normalizeTemplateText = (value: string): string =>
+            value.normalize("NFC").trim().replace(/\s+/gu, " ").toLocaleLowerCase("sq-AL");
+          return numericArgumentNumbers.join(",") === "1,2,3,4" &&
+            template.args["2"] === componentForms[0] &&
+            template.args["3"] === componentForms[1] &&
+            template.args["4"] === componentForms[2] &&
+            normalizeTemplateText(template.expansion) === normalizeTemplateText(componentForms.join(" + ")) &&
+            normalizeTemplateText(primary.etymologyText).replace(/[.]$/u, "") ===
+              normalizeTemplateText("From " + componentForms.join(" + "));
+        })();
+      const validFunctionalHypothesis = (() => {
+        if (!isRecord(functionalHypothesis) ||
+          (functionalHypothesis.status !== "EXPLORATORY_FUNCTIONAL_HYPOTHESIS" &&
+            functionalHypothesis.status !== "UNKNOWN_OR_NULL") ||
+          functionalHypothesis.functionalOperation !== null ||
+          (functionalHypothesis.statement !== null && typeof functionalHypothesis.statement !== "string") ||
+          !isStringArray(functionalHypothesis.basis) ||
+          !isStringArray(functionalHypothesis.alternatives) ||
+          !isStringArray(functionalHypothesis.reasonCodes) ||
+          typeof functionalHypothesis.claimBoundary !== "string" ||
+          functionalHypothesis.noSingleWinner !== true ||
+          functionalHypothesis.userDecisionPosture !== "user_decides" ||
+          !Array.isArray(functionalHypothesis.evidenceRefs)) return false;
+        if (!Array.isArray(sourceLinkedComponentReading.components)) return false;
+        const sourceRecords: unknown[] = [sourceLinkedComponentReading.primary, ...componentRecords];
+        const validEvidenceRefs = functionalHypothesis.evidenceRefs.every((reference) =>
+          isRecord(reference) &&
+          typeof reference.sourceRecordId === "string" &&
+          typeof reference.entryLocator === "string" &&
+          isStringArray(reference.senseIds) &&
+          sourceRecords.some((record) => isRecord(record) &&
+            record.sourceRecordId === reference.sourceRecordId &&
+            record.entryLocator === reference.entryLocator &&
+            Array.isArray(record.sourceSenses) &&
+            (reference.senseIds as string[]).every((senseId) => (record.sourceSenses as unknown[]).some((sense: unknown) =>
+              isRecord(sense) && sense.senseId === senseId,
+            )),
+          ),
+        );
+        if (!validEvidenceRefs) return false;
+        if (functionalHypothesis.status === "EXPLORATORY_FUNCTIONAL_HYPOTHESIS") {
+          return sourceLinkedComponentReading.status === "SUPPORTED" &&
+            sourceLinkedComponentReading.relation.relation === "SOURCE_EXPLICIT_THREE_COMPONENT_COMPOUND" &&
+            typeof functionalHypothesis.statement === "string" && functionalHypothesis.statement.length > 0 &&
+            functionalHypothesis.basis.length > 0 && functionalHypothesis.evidenceRefs.length > 0 &&
+            functionalHypothesis.reasonCodes.length === 0;
+        }
+        return functionalHypothesis.statement === null;
       })();
       if (!isRecord(sourceLinkedComponentReading) ||
         (sourceLinkedComponentReading.status !== "SUPPORTED" && sourceLinkedComponentReading.status !== "NULL") ||
         !isStringArray(sourceLinkedComponentReading.reasonCodes) ||
         !isRecord(sourceLinkedComponentReading.relation) ||
         !validRelationStatusCombination ||
+        !validSupportedThreeComponentSourceIdentity ||
+        !validFunctionalHypothesis ||
         typeof sourceLinkedComponentReading.relation.primarySourceRecordId !== "string" ||
         typeof sourceLinkedComponentReading.relation.primaryEntryLocator !== "string" ||
         (sourceLinkedComponentReading.relation.sourceAuthoredExplanation !== null &&
@@ -1295,7 +1417,6 @@ function parseMotivationDiscoveryV0_1(
         !validSourceLinkedRecord(sourceLinkedComponentReading.primary) ||
         !Array.isArray(sourceLinkedComponentReading.components) ||
         !sourceLinkedComponentReading.components.every(validSourceLinkedRecord) ||
-        (sourceLinkedComponentReading.status === "SUPPORTED" && sourceLinkedComponentReading.components.length !== 2) ||
         !isRecord(sourceLinkedComponentReading.exploratoryRelationship) ||
         (sourceLinkedComponentReading.exploratoryRelationship.status !== "EXPLORATORY_SOURCE_COMPONENT_RELATION" &&
           sourceLinkedComponentReading.exploratoryRelationship.status !== "UNKNOWN_OR_NULL") ||

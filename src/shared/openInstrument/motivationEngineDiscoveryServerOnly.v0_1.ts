@@ -353,7 +353,33 @@ export type AlbanianFunctionalFamilyReadingV0_1 = Readonly<{
 
 type AlbanianSourceLinkedComponentRelationV0_1 =
   | "SOURCE_EXPLICIT_TWO_COMPONENT_COMPOUND"
+  | "SOURCE_EXPLICIT_THREE_COMPONENT_COMPOUND"
   | "SOURCE_COMPOUND_ARITY_UNSUPPORTED";
+
+type AlbanianSourceLinkedComponentResolutionV0_1 = Readonly<{
+  sourceForm: string;
+  reference: string | null;
+  status: "RESOLVED" | "AMBIGUOUS" | "UNRESOLVED";
+  sourceRecordIds: readonly string[];
+  reasonCodes: readonly string[];
+}>;
+
+type AlbanianSourceLinkedFunctionalHypothesisV0_1 = Readonly<{
+  status: "EXPLORATORY_FUNCTIONAL_HYPOTHESIS" | "UNKNOWN_OR_NULL";
+  functionalOperation: null;
+  statement: string | null;
+  basis: readonly string[];
+  alternatives: readonly string[];
+  evidenceRefs: readonly Readonly<{
+    sourceRecordId: string;
+    entryLocator: string;
+    senseIds: readonly string[];
+  }>[];
+  reasonCodes: readonly string[];
+  claimBoundary: string;
+  noSingleWinner: true;
+  userDecisionPosture: "user_decides";
+}>;
 
 export type AlbanianSourceLinkedComponentReadingV0_1 = Readonly<{
   status: "SUPPORTED" | "NULL";
@@ -370,12 +396,14 @@ export type AlbanianSourceLinkedComponentReadingV0_1 = Readonly<{
   }>;
   primary: AlbanianSourceLinkedRecordV0_1;
   components: readonly AlbanianSourceLinkedRecordV0_1[];
+  componentResolutions: readonly AlbanianSourceLinkedComponentResolutionV0_1[];
   exploratoryRelationship: Readonly<{
     status: "EXPLORATORY_SOURCE_COMPONENT_RELATION" | "UNKNOWN_OR_NULL";
     statement: string | null;
     alternatives: readonly string[];
     claimBoundary: string;
   }>;
+  functionalHypothesis: AlbanianSourceLinkedFunctionalHypothesisV0_1;
   claimBoundary: string;
 }>;
 
@@ -798,10 +826,12 @@ function compoundComponentReferencesV0_1(
       .sort(([left], [right]) => Number(left) - Number(right))
     : [];
   const componentForms = componentArgumentEntries.map(([, form]) => form.normalize("NFC").trim());
-  const relation: AlbanianSourceLinkedComponentRelationV0_1 = componentForms.length > 2
+  const relation: AlbanianSourceLinkedComponentRelationV0_1 = componentForms.length > 3
     ? "SOURCE_COMPOUND_ARITY_UNSUPPORTED"
-    : "SOURCE_EXPLICIT_TWO_COMPONENT_COMPOUND";
-  if (componentForms.length > 2) reasons.add("SOURCE_COMPOUND_ARITY_UNSUPPORTED");
+    : componentForms.length === 3
+      ? "SOURCE_EXPLICIT_THREE_COMPONENT_COMPOUND"
+      : "SOURCE_EXPLICIT_TWO_COMPONENT_COMPOUND";
+  if (componentForms.length > 3) reasons.add("SOURCE_COMPOUND_ARITY_UNSUPPORTED");
   if (componentForms.length < 2 || componentForms.some((form) => !form) ||
     componentForms.some((form, index) => componentForms.indexOf(form) !== index) ||
     componentForms.some((form) => normalizedAlbanianFormV0_1(form) === normalizedAlbanianFormV0_1(primary.form))) {
@@ -828,6 +858,23 @@ function compoundComponentReferencesV0_1(
     });
   });
 
+  if (componentForms.length === 3) {
+    if (links.length !== componentForms.length) reasons.add("SOURCE_COMPONENT_REFERENCE_SET_MISMATCH");
+    const numericArgumentNumbers = Object.keys(template?.args ?? {})
+      .filter((argument) => /^\d+$/u.test(argument))
+      .map(Number)
+      .sort((left, right) => left - right);
+    if (numericArgumentNumbers.join(",") !== "1,2,3,4") reasons.add("SOURCE_COMPOUND_TEMPLATE_ARGUMENT_SET_INVALID");
+    if (!template || normalizedSourceTemplateTextV0_1(template.expansion) !==
+      normalizedSourceTemplateTextV0_1(componentForms.join(" + "))) {
+      reasons.add("SOURCE_COMPOUND_TEMPLATE_EXPANSION_MISMATCH");
+    }
+    const authoredExplanation = primary.etymologyText ?? "";
+    const normalizedExplanation = normalizedSourceTemplateTextV0_1(authoredExplanation).replace(/[.]$/u, "");
+    const expectedExplanation = normalizedSourceTemplateTextV0_1(`From ${componentForms.join(" + ")}`);
+    if (normalizedExplanation !== expectedExplanation) reasons.add("SOURCE_COMPOUND_EXPLANATION_MISMATCH");
+  }
+
   return Object.freeze({
     relation,
     componentForms: Object.freeze(componentForms),
@@ -843,6 +890,7 @@ function nullSourceLinkedComponentReadingV0_1(input: Readonly<{
   componentForms: readonly string[];
   references: readonly Readonly<{ sourceForm: string; reference: string | null }>[];
   components: readonly AlbanianSourceLinkedRecordV0_1[];
+  componentResolutions: readonly AlbanianSourceLinkedComponentResolutionV0_1[];
   reasonCodes: readonly string[];
 }>): AlbanianSourceLinkedComponentReadingV0_1 {
   return Object.freeze({
@@ -857,13 +905,148 @@ function nullSourceLinkedComponentReadingV0_1(input: Readonly<{
     }),
     primary: sourceRecordProjectionV0_1(input.primary, input.primaryAnalyses),
     components: input.components,
+    componentResolutions: input.componentResolutions,
     exploratoryRelationship: Object.freeze({
       status: "UNKNOWN_OR_NULL" as const,
       statement: null,
       alternatives: Object.freeze([]),
       claimBoundary: "The source component evidence is incomplete or ambiguous; no component reading is claimed.",
     }),
+    functionalHypothesis: Object.freeze({
+      status: "UNKNOWN_OR_NULL" as const,
+      functionalOperation: null,
+      statement: null,
+      basis: Object.freeze([]),
+      alternatives: Object.freeze([]),
+      evidenceRefs: Object.freeze([]),
+      reasonCodes: Object.freeze([...new Set(input.reasonCodes)]),
+      claimBoundary: "No functional operation, sense alignment, composition, or embryo meaning is authorized by incomplete component evidence.",
+      noSingleWinner: true,
+      userDecisionPosture: "user_decides" as const,
+    }),
     claimBoundary: "Source-authored component references remain attributed evidence only; no engine-proven derivation, semantic operation, or functional composition is claimed.",
+  });
+}
+
+function affirmativeAgentNounSuffixSensesV0_1(
+  record: AlbanianSourceLinkedRecordV0_1,
+): readonly NonNullable<AlbanianSourceLinkedRecordV0_1["sourceSenses"]>[number][] {
+  return Object.freeze((record.sourceSenses ?? []).filter((sense) =>
+    Boolean(sense.senseId) && sense.glosses.some((gloss) =>
+      /^used to form agent nouns?(?:[.]|$)/u.test(normalizedSourceTemplateTextV0_1(gloss)),
+    ),
+  ));
+}
+
+function unknownComponentFunctionalHypothesisV0_1(
+  reasonCodes: readonly string[],
+): AlbanianSourceLinkedFunctionalHypothesisV0_1 {
+  return Object.freeze({
+    status: "UNKNOWN_OR_NULL" as const,
+    functionalOperation: null,
+    statement: null,
+    basis: Object.freeze([]),
+    alternatives: Object.freeze([]),
+    evidenceRefs: Object.freeze([]),
+    reasonCodes: Object.freeze([...new Set(reasonCodes)]),
+    claimBoundary: "Component evidence may describe source-authored structure, but no functional operation, sense alignment, composition, or embryo meaning is claimed.",
+    noSingleWinner: true,
+    userDecisionPosture: "user_decides" as const,
+  });
+}
+
+function buildThreeComponentFunctionalHypothesisV0_1(input: Readonly<{
+  primary: AlbanianSourceLinkedRecordV0_1;
+  components: readonly AlbanianSourceLinkedRecordV0_1[];
+  componentResolutions: readonly AlbanianSourceLinkedComponentResolutionV0_1[];
+}>): AlbanianSourceLinkedFunctionalHypothesisV0_1 {
+  const reasons: string[] = [];
+  if (input.primary.partOfSpeech !== "noun") reasons.push("TARGET_NOUN_POS_NOT_ATTESTED");
+
+  const occupationSenses = (input.primary.sourceSenses ?? []).filter((sense) =>
+    Boolean(sense.senseId) && sense.glosses.some((gloss) => gloss.trim().length > 0) &&
+    sense.categories.some((category) =>
+      category.name === "Occupations" &&
+      category.orig === "sq:Occupations" &&
+      category.langcode === "sq" &&
+      (category.source === "w" || category.source === "w+disamb"),
+    ),
+  );
+  if (occupationSenses.length !== 1) reasons.push("TARGET_OCCUPATION_SENSE_NOT_UNIQUE");
+
+  const [objectResolution, actionResolution, suffixResolution] = input.componentResolutions;
+  const recordsForResolution = (resolution: AlbanianSourceLinkedComponentResolutionV0_1 | undefined) =>
+    resolution ? input.components.filter((record) => resolution.sourceRecordIds.includes(record.sourceRecordId)) : [];
+  const objectRecords = recordsForResolution(objectResolution);
+  const actionRecords = recordsForResolution(actionResolution);
+  const suffixRecords = recordsForResolution(suffixResolution);
+  if (objectRecords.length !== 1 || objectRecords[0]?.partOfSpeech !== "noun" || objectResolution?.status !== "RESOLVED") {
+    reasons.push("OBJECT_COMPONENT_POS_OR_IDENTITY_UNRESOLVED");
+  }
+  const verbRecords = actionRecords.filter((record) => record.partOfSpeech === "verb");
+  if (verbRecords.length !== 1 || !verbRecords[0]) reasons.push("ACTION_COMPONENT_VERB_RECORD_NOT_UNIQUE");
+  if (suffixRecords.length !== 1 || suffixRecords[0]?.partOfSpeech !== "suffix" || suffixResolution?.status !== "RESOLVED") {
+    reasons.push("SUFFIX_COMPONENT_POS_OR_IDENTITY_UNRESOLVED");
+  }
+  const suffixAgentSenses = suffixRecords[0]
+    ? affirmativeAgentNounSuffixSensesV0_1(suffixRecords[0])
+    : [];
+  if (suffixAgentSenses.length !== 1) reasons.push("SOURCE_AGENT_NOUN_SUFFIX_DESCRIPTION_NOT_UNIQUE");
+
+  const evidenceRecords = [input.primary, ...input.components];
+  const incompleteSenseIdentity = evidenceRecords.some((record) =>
+    !record.sourceSenses?.length || record.sourceSenses.some((sense) =>
+      !sense.senseId?.trim() || !sense.glosses.some((gloss) => gloss.trim().length > 0),
+    ),
+  );
+  if (incompleteSenseIdentity) reasons.push("SOURCE_SENSE_IDENTITY_OR_MEANING_INCOMPLETE");
+  if (reasons.length > 0) return unknownComponentFunctionalHypothesisV0_1(reasons);
+
+  const objectRecord = objectRecords[0];
+  const actionRecord = verbRecords[0];
+  const suffixRecord = suffixRecords[0];
+  const occupationSense = occupationSenses[0];
+  const suffixSense = suffixAgentSenses[0];
+  if (!objectRecord || !actionRecord || !suffixRecord || !occupationSense || !suffixSense ||
+    !objectResolution || !actionResolution || !suffixResolution) {
+    return unknownComponentFunctionalHypothesisV0_1(["SOURCE_ROLE_EVIDENCE_MISSING"]);
+  }
+
+  const senseAlternative = (record: AlbanianSourceLinkedRecordV0_1): string[] =>
+    (record.sourceSenses ?? []).map((sense) =>
+      `${record.form} [${record.partOfSpeech ?? "POS Null"}] · ${sense.senseId ?? "Null sense ID"}: ${sense.glosses.join("; ") || "Null gloss"}`,
+    );
+  const alternatives = [
+    ...senseAlternative(input.primary),
+    ...input.components.flatMap(senseAlternative),
+    ...input.componentResolutions
+      .filter((resolution) => resolution.status === "AMBIGUOUS")
+      .map((resolution) => `${resolution.sourceForm}: multiple exact Albanian source records remain unresolved; no record or sense is selected.`),
+    "The source does not align a specific object or action sense with a specific target sense.",
+  ];
+  const evidenceRefs = evidenceRecords.map((record) => Object.freeze({
+    sourceRecordId: record.sourceRecordId,
+    entryLocator: record.entryLocator,
+    senseIds: Object.freeze((record.sourceSenses ?? []).flatMap((sense) => sense.senseId ? [sense.senseId] : [])),
+  }));
+
+  return Object.freeze({
+    status: "EXPLORATORY_FUNCTIONAL_HYPOTHESIS" as const,
+    functionalOperation: null,
+    statement: `A source-grounded object/action/role hypothesis can be explored: ${objectRecord.form} has a noun record with ${objectRecord.sourceSenses?.length ?? 0} retained senses; ${actionResolution.sourceForm} has a verb record among ${actionRecords.length} exact source records, with ${actionRecord.sourceSenses?.length ?? 0} retained verb senses; ${suffixRecord.form} has a source sense described as “${suffixSense.glosses.join("; ")}”; and the target has the separate ${occupationSense.senseId} occupation-category sense (${occupationSense.glosses.join("; ")}). The noun and verb alternatives remain unresolved: no component sense is aligned to a target sense, and no functional operation is classified.`,
+    basis: Object.freeze([
+      "SOURCE_AUTHORED_THREE_COMPONENT_COMPOUND",
+      "EXACT_ALBANIAN_COMPONENT_REFERENCES",
+      "SOURCE_COMPONENT_POS_NOUN_VERB_SUFFIX",
+      "SOURCE_SUFFIX_SENSE_DESCRIBES_AGENT_NOUN_FORMATION",
+      "TARGET_SOURCE_SENSE_HAS_SQ_OCCUPATIONS_CATEGORY",
+    ]),
+    alternatives: Object.freeze(alternatives),
+    evidenceRefs: Object.freeze(evidenceRefs),
+    reasonCodes: Object.freeze([]),
+    claimBoundary: "Research-level functional hypothesis only. The component and target senses are not cross-aligned; functionalOperation, composition, embryo function, and independent historical claims remain Null.",
+    noSingleWinner: true,
+    userDecisionPosture: "user_decides" as const,
   });
 }
 
@@ -876,8 +1059,12 @@ async function buildSourceLinkedComponentReadingV0_1(input: Readonly<{
   if (!componentEvidence) return null;
 
   const components: AlbanianSourceLinkedRecordV0_1[] = [];
+  const componentResolutions: AlbanianSourceLinkedComponentResolutionV0_1[] = [];
   const reasons = [...componentEvidence.reasonCodes];
-  for (const componentForm of componentEvidence.componentForms) {
+  const isThreeComponent = componentEvidence.relation === "SOURCE_EXPLICIT_THREE_COMPONENT_COMPOUND";
+  for (let componentIndex = 0; componentIndex < componentEvidence.componentForms.length; componentIndex += 1) {
+    const componentForm = componentEvidence.componentForms[componentIndex] ?? "";
+    const reference = componentEvidence.references[componentIndex]?.reference ?? null;
     try {
       const result = await input.provider.query(componentForm);
       const matches = result.status === "MATCHES_FOUND"
@@ -889,21 +1076,72 @@ async function buildSourceLinkedComponentReadingV0_1(input: Readonly<{
           )
         : [];
       if (matches.length === 0) {
-        reasons.push("SOURCE_COMPONENT_RECORD_NOT_FOUND");
+        const lookupReason = result.status === "UNAVAILABLE"
+          ? "SOURCE_COMPONENT_LOOKUP_UNAVAILABLE"
+          : "SOURCE_COMPONENT_RECORD_NOT_FOUND";
+        reasons.push(lookupReason);
+        componentResolutions.push(Object.freeze({
+          sourceForm: componentForm,
+          reference,
+          status: "UNRESOLVED" as const,
+          sourceRecordIds: Object.freeze([]),
+          reasonCodes: Object.freeze([lookupReason]),
+        }));
       } else if (matches.length > 1) {
-        reasons.push("SOURCE_COMPONENT_RECORD_AMBIGUOUS");
+        const duplicateSourceIds = new Set(matches.map((fact) => fact.sourceRecordId)).size !== matches.length;
+        const ambiguousReasons = ["SOURCE_COMPONENT_RECORD_AMBIGUOUS"];
+        if (duplicateSourceIds) {
+          reasons.push("SOURCE_COMPONENT_RECORD_IDENTITY_DUPLICATE");
+          ambiguousReasons.push("SOURCE_COMPONENT_RECORD_IDENTITY_DUPLICATE");
+        }
+        if (!isThreeComponent) reasons.push("SOURCE_COMPONENT_RECORD_AMBIGUOUS");
+        componentResolutions.push(Object.freeze({
+          sourceForm: componentForm,
+          reference,
+          status: "AMBIGUOUS" as const,
+          sourceRecordIds: Object.freeze(isThreeComponent && !duplicateSourceIds
+            ? matches.map((fact) => fact.sourceRecordId)
+            : []),
+          reasonCodes: Object.freeze(ambiguousReasons),
+        }));
+        if (isThreeComponent && !duplicateSourceIds) {
+          for (const match of matches) {
+            components.push(sourceRecordProjectionV0_1(
+              match,
+              projectAlbanianKaikkiFactSourceIpaToSevenVoicesV0_1(match),
+            ));
+          }
+        }
       } else {
-        components.push(sourceRecordProjectionV0_1(
-          matches[0],
-          projectAlbanianKaikkiFactSourceIpaToSevenVoicesV0_1(matches[0]),
-        ));
+        const match = matches[0];
+        if (match) {
+          components.push(sourceRecordProjectionV0_1(
+            match,
+            projectAlbanianKaikkiFactSourceIpaToSevenVoicesV0_1(match),
+          ));
+          componentResolutions.push(Object.freeze({
+            sourceForm: componentForm,
+            reference,
+            status: "RESOLVED" as const,
+            sourceRecordIds: Object.freeze([match.sourceRecordId]),
+            reasonCodes: Object.freeze([]),
+          }));
+        }
       }
     } catch {
       reasons.push("SOURCE_COMPONENT_RECORD_LOOKUP_FAILED");
+      componentResolutions.push(Object.freeze({
+        sourceForm: componentForm,
+        reference,
+        status: "UNRESOLVED" as const,
+        sourceRecordIds: Object.freeze([]),
+        reasonCodes: Object.freeze(["SOURCE_COMPONENT_RECORD_LOOKUP_FAILED"]),
+      }));
     }
   }
 
-  if (components.length !== componentEvidence.componentForms.length) {
+  const hasUnresolvedComponent = componentResolutions.some((resolution) => resolution.status === "UNRESOLVED");
+  if (hasUnresolvedComponent || components.length === 0) {
     return nullSourceLinkedComponentReadingV0_1({
       primary: input.primary,
       primaryAnalyses: input.primaryAnalyses,
@@ -911,6 +1149,7 @@ async function buildSourceLinkedComponentReadingV0_1(input: Readonly<{
       componentForms: componentEvidence.componentForms,
       references: componentEvidence.references,
       components: Object.freeze(components),
+      componentResolutions: Object.freeze(componentResolutions),
       reasonCodes: reasons,
     });
   }
@@ -929,13 +1168,28 @@ async function buildSourceLinkedComponentReadingV0_1(input: Readonly<{
       componentForms: componentEvidence.componentForms,
       references: componentEvidence.references,
       components: Object.freeze(components),
+      componentResolutions: Object.freeze(componentResolutions),
       reasonCodes: reasons,
     });
   }
 
-  const componentText = components.map((component) =>
-    `${component.form} (“${component.meaningGlosses.join("; ")}”)`,
-  ).join(" + ");
+  const componentText = isThreeComponent
+    ? componentResolutions.map((resolution) => {
+      const records = components.filter((component) => resolution.sourceRecordIds.includes(component.sourceRecordId));
+      const senseCount = records.reduce((total, component) => total + (component.sourceSenses?.length ?? 0), 0);
+      const posAlternatives = [...new Set(records.map((component) => component.partOfSpeech ?? "POS Null"))].join(" / ");
+      return `${resolution.sourceForm} (${records.length} source record${records.length === 1 ? "" : "s"}; ${posAlternatives || "POS unresolved"}; ${senseCount} source senses retained)`;
+    }).join(" + ")
+    : components.map((component) =>
+      `${component.form} (“${component.meaningGlosses.join("; ")}")`,
+    ).join(" + ");
+  const functionalHypothesis = isThreeComponent
+    ? buildThreeComponentFunctionalHypothesisV0_1({
+      primary: sourceRecordProjectionV0_1(input.primary, input.primaryAnalyses),
+      components,
+      componentResolutions,
+    })
+    : unknownComponentFunctionalHypothesisV0_1([]);
   return Object.freeze({
     status: "SUPPORTED",
     reasonCodes: Object.freeze([]),
@@ -948,6 +1202,7 @@ async function buildSourceLinkedComponentReadingV0_1(input: Readonly<{
     }),
     primary: sourceRecordProjectionV0_1(input.primary, input.primaryAnalyses),
     components: Object.freeze(components),
+    componentResolutions: Object.freeze(componentResolutions),
     exploratoryRelationship: Object.freeze({
       status: "EXPLORATORY_SOURCE_COMPONENT_RELATION" as const,
       statement: `The source records ${input.primary.form} (“${distinctGlossesV0_1([input.primary]).join("; ")}") as a compound of ${componentText}. This is a source-attributed component reading; the engine does not independently prove the derivation or add a semantic operation.`,
@@ -955,9 +1210,13 @@ async function buildSourceLinkedComponentReadingV0_1(input: Readonly<{
         "The source-authored compound account may be descriptive or historically contestable.",
         "The available records do not establish a universal sound-to-meaning rule.",
         "Component phonetic and Voice comparison is not performed in this reading.",
+        ...componentResolutions
+          .filter((resolution) => resolution.status === "AMBIGUOUS")
+          .map((resolution) => `${resolution.sourceForm} resolves to multiple source records; every record and sense is retained without selecting a winner.`),
       ]),
       claimBoundary: "Exploratory product relationship only; source-authored etymology remains attributed and no morphology, causation, or Voice semantics is asserted.",
     }),
+    functionalHypothesis,
     claimBoundary: "The exact source-authored compound template and Albanian references are preserved. IPA and Voice structure remain Null when the source supplies no pronunciation; composition remains separately Null.",
   });
 }
