@@ -6,6 +6,12 @@ import {
   SEVEN_VOICE_PHONOLOGICAL_CATEGORY_VALUES_V0_1,
 } from "@/shared/openInstrument/sevenVoicePhonologicalCategoryAuthority.v0_1";
 import { isVowelVoice } from "@/shared/vowels/vowelVoices.v0.1";
+import {
+  ALBANIAN_KAIKKI_LEXICAL_SOURCE_BYTES_V0_1,
+  ALBANIAN_KAIKKI_LEXICAL_SOURCE_FAMILY_ID_V0_1,
+  ALBANIAN_KAIKKI_LEXICAL_SOURCE_SHA256_V0_1,
+  ALBANIAN_KAIKKI_LEXICAL_SOURCE_URL_V0_1,
+} from "@/shared/openInstrument/albanianKaikkiExactLexicalSourceIdentity.v0_1";
 /**
  * UI contract adapter: raw analyze-v1 payload → TelemetryViewModel (VM).
  *
@@ -899,6 +905,90 @@ function parseMotivationDiscoveryV0_1(
     Array.isArray(value) && value.every((item) => typeof item === "string");
   const exactLexicalSourceStatus = value.exactLexicalSourceStatus;
   const exactLexicalSourceFacts = value.exactLexicalSourceFacts;
+  const validSourceAuthoredSuffixTemplateReading = (
+    componentReading: unknown,
+    expectedTarget?: unknown,
+  ): boolean => {
+    if (!isRecord(componentReading) || !isRecord(componentReading.relation) ||
+      componentReading.relation.relation !== "SOURCE_AUTHORED_SUFFIX_TEMPLATE" ||
+      !isRecord(componentReading.primary)) return false;
+    const relation = componentReading.relation;
+    const relationReferences = relation.references as unknown[];
+    const primary = componentReading.primary;
+    if (typeof primary.sourceRecordId !== "string" || typeof primary.entryLocator !== "string" ||
+      typeof primary.form !== "string" || typeof primary.physicalRecordOrdinal !== "number" ||
+      (primary.etymologyText !== null && typeof primary.etymologyText !== "string") ||
+      !Array.isArray(primary.etymologyLinks) || !Array.isArray(primary.etymologyTemplates) ||
+      relation.primarySourceRecordId !== primary.sourceRecordId ||
+      relation.primaryEntryLocator !== primary.entryLocator ||
+      relation.sourceAuthoredExplanation !== primary.etymologyText ||
+      !Array.isArray(relation.references) || relationReferences.length !== 2) return false;
+    if (expectedTarget !== undefined && (!isRecord(expectedTarget) ||
+      expectedTarget.sourceRecordId !== primary.sourceRecordId ||
+      expectedTarget.entryLocator !== primary.entryLocator || expectedTarget.form !== primary.form)) return false;
+
+    const exactFacts = Array.isArray(exactLexicalSourceFacts)
+      ? exactLexicalSourceFacts.filter((fact) => isRecord(fact) &&
+        fact.sourceRecordId === primary.sourceRecordId && fact.entryLocator === primary.entryLocator &&
+        fact.form === primary.form)
+      : [];
+    if (exactFacts.length !== 1) return false;
+    const raw = exactFacts[0];
+    if (!isRecord(raw) || raw.physicalRecordOrdinal !== primary.physicalRecordOrdinal ||
+      raw.partOfSpeech !== primary.partOfSpeech || (raw.etymologyText ?? null) !== primary.etymologyText ||
+      !Array.isArray(raw.etymologyLinks) || !Array.isArray(raw.etymologyTemplates)) return false;
+
+    const projectedLinks = primary.etymologyLinks as unknown[];
+    const rawLinks = raw.etymologyLinks as unknown[];
+    const projectedTemplates = primary.etymologyTemplates as unknown[];
+    const rawTemplates = raw.etymologyTemplates as unknown[];
+    const sameTemplate = (left: unknown, right: unknown): boolean => {
+      if (!isRecord(left) || !isRecord(right) || !isRecord(left.args) || !isRecord(right.args)) return false;
+      const leftArgs = left.args as Record<string, unknown>;
+      const rightArgs = right.args as Record<string, unknown>;
+      return left.name === right.name && left.expansion === right.expansion &&
+        Object.keys(leftArgs).sort().join("\u0000") === Object.keys(rightArgs).sort().join("\u0000") &&
+        Object.entries(leftArgs).every(([key, item]) => rightArgs[key] === item);
+    };
+    if (rawLinks.length !== projectedLinks.length || !rawLinks.every((link, index) =>
+      isRecord(link) && isRecord(projectedLinks[index]) &&
+      link.sourceForm === projectedLinks[index].sourceForm && link.reference === projectedLinks[index].reference) ||
+      rawTemplates.length !== projectedTemplates.length ||
+      !rawTemplates.every((template, index) => sameTemplate(template, projectedTemplates[index]))) return false;
+
+    const suffixTemplates = projectedTemplates.filter((template) => isRecord(template) && template.name === "suffix");
+    if (projectedTemplates.length !== 1 || suffixTemplates.length !== 1 ||
+      !isRecord(suffixTemplates[0]) || !isRecord(suffixTemplates[0].args) ||
+      typeof suffixTemplates[0].expansion !== "string") return false;
+    const template = suffixTemplates[0] as Record<string, unknown>;
+    const templateExpansion = template.expansion as string;
+    const args = template.args as Record<string, unknown>;
+    const argumentKeys = Object.keys(args).sort();
+    const base = typeof args["2"] === "string" ? args["2"].normalize("NFC").trim() : "";
+    const bareSuffix = typeof args["3"] === "string" ? args["3"].normalize("NFC").trim() : "";
+    if (argumentKeys.join(",") !== "1,2,3" || args["1"] !== "sq" || !base || !bareSuffix ||
+      bareSuffix.startsWith("-")) return false;
+    const componentForms = [base, `-${bareSuffix}`];
+    const normalizeText = (text: string): string =>
+      text.normalize("NFC").trim().replace(/\s+/gu, " ").toLocaleLowerCase("sq-AL");
+    const expectedExpansion = `${base} + -${bareSuffix}`;
+    const explanation = typeof primary.etymologyText === "string"
+      ? normalizeText(primary.etymologyText).replace(/[.!?]+$/u, "")
+      : "";
+    if (normalizeText(templateExpansion) !== normalizeText(expectedExpansion) ||
+      explanation !== normalizeText(`From ${expectedExpansion}`) || rawLinks.length !== 2 ||
+      projectedLinks.length !== 2) return false;
+
+    return componentForms.every((form, index) => {
+      const reference = relationReferences[index];
+      const projected = projectedLinks[index];
+      const rawLink = rawLinks[index];
+      return isRecord(reference) && isRecord(projected) && isRecord(rawLink) &&
+        reference.sourceForm === form && reference.reference === `${form}#Albanian` &&
+        projected.sourceForm === form && projected.reference === reference.reference &&
+        rawLink.sourceForm === form && rawLink.reference === reference.reference;
+    });
+  };
   const validExactLexicalSourceFact = (fact: unknown): boolean => {
     if (!isRecord(fact) || !isRecord(fact.sourceSnapshot) || !Array.isArray(fact.senses) || !Array.isArray(fact.ipaObservations)) {
       return false;
@@ -954,10 +1044,10 @@ function parseMotivationDiscoveryV0_1(
       fact.sourceStatus === "observed_external_snapshot" &&
       fact.attestationTruth === "fact" &&
       fact.pronunciationAuthority === "CURRENT_KAIKKI_RECORD_ONLY_UNBOUND_TO_FROZEN_PROFILE" &&
-      fact.sourceSnapshot.sourceFamilyId === "kaikki-albanian-jsonl-v0.1" &&
-      typeof fact.sourceSnapshot.sourceUrl === "string" &&
-      typeof fact.sourceSnapshot.sha256 === "string" &&
-      fact.sourceSnapshot.bytes === 67438537
+      fact.sourceSnapshot.sourceFamilyId === ALBANIAN_KAIKKI_LEXICAL_SOURCE_FAMILY_ID_V0_1 &&
+      fact.sourceSnapshot.sourceUrl === ALBANIAN_KAIKKI_LEXICAL_SOURCE_URL_V0_1 &&
+      fact.sourceSnapshot.sha256 === ALBANIAN_KAIKKI_LEXICAL_SOURCE_SHA256_V0_1 &&
+      fact.sourceSnapshot.bytes === ALBANIAN_KAIKKI_LEXICAL_SOURCE_BYTES_V0_1
     );
   };
   const validSourceIpaSevenVoiceAnalysis = (analysis: unknown): boolean => {
@@ -1423,6 +1513,10 @@ function parseMotivationDiscoveryV0_1(
               referenceCount === 2 && componentCount === 2 &&
               componentResolutions.every((resolution) => isRecord(resolution) && resolution.status === "RESOLVED") &&
               validSourceAuthoredAfTemplate() ||
+            relation === "SOURCE_AUTHORED_SUFFIX_TEMPLATE" &&
+              referenceCount === 2 && componentCount === 2 &&
+              componentResolutions.every((resolution) => isRecord(resolution) && resolution.status === "RESOLVED") &&
+              validSourceAuthoredSuffixTemplateReading(sourceLinkedComponentReading) ||
             relation === "SOURCE_EXPLICIT_THREE_COMPONENT_COMPOUND" &&
               referenceCount === 3 && componentCount >= 3 &&
               componentResolutions.every((resolution) => isRecord(resolution) &&
@@ -1449,6 +1543,12 @@ function parseMotivationDiscoveryV0_1(
           return reasonCodes.length > 0 && validSourceAuthoredAfTemplate() &&
             (componentArity === 2 || componentArity === 1 || componentArity === 3) &&
             (componentArity === 2 || reasonCodes.includes("SOURCE_AF_TEMPLATE_ARGUMENT_SET_INVALID"));
+        }
+        if (relation === "SOURCE_AUTHORED_SUFFIX_TEMPLATE") {
+          return reasonCodes.length > 0 && referenceCount === 2 &&
+            validSourceAuthoredSuffixTemplateReading(sourceLinkedComponentReading) &&
+            componentCount === componentResolutions.reduce<number>((total, resolution) =>
+              total + (isRecord(resolution) && Array.isArray(resolution.sourceRecordIds) ? resolution.sourceRecordIds.length : 0), 0);
         }
         if (relation === "SOURCE_EXPLICIT_THREE_COMPONENT_COMPOUND") {
           return reasonCodes.length > 0 && referenceCount === 3 && componentCount >= 0;
@@ -1667,19 +1767,30 @@ function parseMotivationDiscoveryV0_1(
     };
     const validDirectTargetRoleFunctionalBridge = (): boolean => {
       const bridge = reading.functionalMeaningBridge;
-      if (!isRecord(bridge) || !isRecord(bridge.functionalHypothesis) ||
-        !isStringArray(bridge.functionalHypothesis.basis) ||
-        !bridge.functionalHypothesis.basis.includes("SOURCE_ATTESTED_TARGET_ROLE_CATEGORY")) return true;
+      if (!isRecord(bridge) || !isRecord(bridge.functionalHypothesis)) return true;
+      const hypothesis = bridge.functionalHypothesis;
+      const basis = hypothesis.basis;
+      if (!isStringArray(basis)) return true;
+      const componentReading = reading.sourceLinkedComponentReading;
+      const componentRelationType = isRecord(componentReading) && isRecord(componentReading.relation)
+        ? componentReading.relation.relation
+        : null;
+      const claimsDirectTargetAgent = bridge.status === "SUPPORTED" && bridge.relatedForm === null &&
+        bridge.derivedStructure === null && hypothesis.status === "EXPLORATORY_FUNCTIONAL_HYPOTHESIS" &&
+        hypothesis.functionalOperation === "AGENT";
+      const hasTargetRoleBasis = basis.includes("SOURCE_ATTESTED_TARGET_ROLE_CATEGORY");
+      const hasTargetAuthoredTemplateRelation = componentRelationType === "SOURCE_AUTHORED_SUFFIX_TEMPLATE" ||
+        componentRelationType === "SOURCE_AUTHORED_AF_TEMPLATE";
+      if (!hasTargetRoleBasis && !(claimsDirectTargetAgent && hasTargetAuthoredTemplateRelation)) return true;
       const sourceFacts = bridge.sourceFacts;
       const target = reading.primarySourceFact;
-      const componentReading = reading.sourceLinkedComponentReading;
       if (!isRecord(sourceFacts) || !isRecord(sourceFacts.primary) || !isRecord(sourceFacts.structuredReference)) return false;
       if (
         bridge.status !== "SUPPORTED" ||
         bridge.relatedForm !== null ||
         bridge.derivedStructure !== null ||
-        bridge.functionalHypothesis.status !== "EXPLORATORY_FUNCTIONAL_HYPOTHESIS" ||
-        bridge.functionalHypothesis.functionalOperation !== "AGENT" ||
+        hypothesis.status !== "EXPLORATORY_FUNCTIONAL_HYPOTHESIS" ||
+        hypothesis.functionalOperation !== "AGENT" ||
         sourceFacts.related !== null ||
         sourceFacts.structuredReference.referencedForm !== null ||
         sourceFacts.structuredReference.reference !== null ||
@@ -1689,7 +1800,8 @@ function parseMotivationDiscoveryV0_1(
         target.sourceRecordId !== sourceFacts.primary.sourceRecordId ||
         target.entryLocator !== sourceFacts.primary.entryLocator ||
         !isRecord(componentReading) || !isRecord(componentReading.relation) ||
-        componentReading.relation.relation !== "SOURCE_AUTHORED_AF_TEMPLATE" ||
+        (componentRelationType !== "SOURCE_AUTHORED_AF_TEMPLATE" &&
+          componentRelationType !== "SOURCE_AUTHORED_SUFFIX_TEMPLATE") ||
         componentReading.relation.primarySourceRecordId !== target.sourceRecordId ||
         componentReading.relation.primaryEntryLocator !== target.entryLocator ||
         !Array.isArray(componentReading.relation.references) || componentReading.relation.references.length !== 2 ||
@@ -1716,6 +1828,40 @@ function parseMotivationDiscoveryV0_1(
         targetRecords.filter((fact) => isRecord(fact) && fact.sourceRecordId === target.sourceRecordId).length !== 1
       ) return false;
 
+      const rawTarget = targetRecords[0];
+      const componentPrimary = isRecord(componentReading) ? componentReading.primary : null;
+      if (!isRecord(rawTarget) || !Array.isArray(rawTarget.senses) || !isRecord(componentPrimary) ||
+        rawTarget.sourceRecordId !== target.sourceRecordId || rawTarget.entryLocator !== target.entryLocator ||
+        rawTarget.form !== target.form || rawTarget.partOfSpeech !== target.partOfSpeech ||
+        rawTarget.partOfSpeech !== "noun" || rawTarget.etymologyText !== target.etymologyText ||
+        componentPrimary.sourceRecordId !== target.sourceRecordId ||
+        componentPrimary.entryLocator !== target.entryLocator || componentPrimary.form !== target.form ||
+        componentPrimary.partOfSpeech !== rawTarget.partOfSpeech ||
+        componentPrimary.physicalRecordOrdinal !== rawTarget.physicalRecordOrdinal) return false;
+
+      const rawSenses = rawTarget.senses as unknown[];
+      if (!rawSenses.every((sense) => isRecord(sense) &&
+        (sense.senseId === null || typeof sense.senseId === "string") && isStringArray(sense.glosses))) return false;
+      const sameStringArray = (left: unknown, right: unknown): boolean =>
+        isStringArray(left) && isStringArray(right) && left.length === right.length &&
+        left.every((value, index) => value === right[index]);
+      const matchesRawSenseProjection = (projection: unknown): boolean =>
+        Array.isArray(projection) && projection.length === rawSenses.length &&
+        rawSenses.every((rawSense, index) => {
+          const projectedSense = projection[index];
+          return isRecord(rawSense) && isRecord(projectedSense) &&
+            projectedSense.senseId === rawSense.senseId &&
+            sameStringArray(projectedSense.glosses, rawSense.glosses);
+        });
+      const expectedMeaningGlosses = [...new Set(rawSenses.flatMap((sense) =>
+        isRecord(sense) && isStringArray(sense.glosses) ? sense.glosses : [],
+      ))];
+      if (!matchesRawSenseProjection(sourceFacts.primary.sourceSenses) ||
+        !matchesRawSenseProjection(componentPrimary.sourceSenses) ||
+        !sameStringArray(sourceFacts.primary.meaningGlosses, expectedMeaningGlosses) ||
+        !sameStringArray(target.meaningGlosses, expectedMeaningGlosses) ||
+        !sameStringArray(componentPrimary.meaningGlosses, expectedMeaningGlosses)) return false;
+
       const sourceSenses = sourceFacts.primary.sourceSenses;
       if (!Array.isArray(sourceSenses)) return false;
       const roleSenses = sourceSenses.flatMap((sense) => {
@@ -1733,13 +1879,12 @@ function parseMotivationDiscoveryV0_1(
       if (typeof roleSenseId !== "string" || sourceSenses.filter((sense) => isRecord(sense) && sense.senseId === roleSenseId).length !== 1) {
         return false;
       }
-      const rawTarget = targetRecords[0];
-      if (!isRecord(rawTarget) || !Array.isArray(rawTarget.senses) ||
-        rawTarget.senses.filter((sense) => isRecord(sense) && sense.senseId === roleSenseId).length !== 1) return false;
+      if (rawSenses.filter((sense) => isRecord(sense) && sense.senseId === roleSenseId).length !== 1) return false;
       const rawRoleSense = rawTarget.senses.find((sense) => isRecord(sense) && sense.senseId === roleSenseId);
       const projectedRoleSense = sourceSenses.find((sense) => isRecord(sense) && sense.senseId === roleSenseId);
       if (!isRecord(rawRoleSense) || !Array.isArray(rawRoleSense.categories) ||
         !isRecord(projectedRoleSense) || !Array.isArray(projectedRoleSense.categories)) return false;
+      if (!sameStringArray(projectedRoleSense.glosses, rawRoleSense.glosses)) return false;
       const isExactSourceOccupationCategory = (category: unknown): category is Record<string, unknown> =>
         isRecord(category) && category.name === "Occupations" && category.orig === "sq:Occupations" &&
         category.langcode === "sq" && category.source === "w";
@@ -1747,47 +1892,95 @@ function parseMotivationDiscoveryV0_1(
       const projectedRoleCategories = projectedRoleSense.categories.filter(isExactSourceOccupationCategory);
       if (rawRoleCategories.length !== 1 || projectedRoleCategories.length !== 1) return false;
 
+      const expectedTemplateBasis = componentRelationType === "SOURCE_AUTHORED_SUFFIX_TEMPLATE"
+        ? "TARGET_SOURCE_AUTHORED_SUFFIX_TEMPLATE"
+        : "TARGET_SOURCE_AUTHORED_AF_TEMPLATE";
+      if (!sameStringArray(basis, [
+        "SOURCE_ATTESTED_TARGET_ROLE_CATEGORY",
+        "SOURCE_ATTESTED_FINAL_SENSE_CATEGORY",
+        expectedTemplateBasis,
+        "SOURCE_STRUCTURED_ALBANIAN_REFERENCES",
+      ])) return false;
+
+      let validTemplateEvidence = false;
+      if (componentRelationType === "SOURCE_AUTHORED_SUFFIX_TEMPLATE") {
+        validTemplateEvidence = validSourceAuthoredSuffixTemplateReading(componentReading, target);
+      } else {
+        const references = componentReading.relation.references as unknown[];
+        const projectedTemplateArray = Array.isArray(componentPrimary.etymologyTemplates)
+          ? componentPrimary.etymologyTemplates
+          : [];
+        const rawTemplates = Array.isArray(rawTarget.etymologyTemplates) ? rawTarget.etymologyTemplates : [];
+        const projectedLinks = Array.isArray(componentPrimary.etymologyLinks) ? componentPrimary.etymologyLinks : [];
+        const rawLinks = Array.isArray(rawTarget.etymologyLinks) ? rawTarget.etymologyLinks : [];
+        if (!Array.isArray(componentPrimary.etymologyTemplates) || !Array.isArray(rawTarget.etymologyTemplates) ||
+          rawTemplates.length !== projectedTemplateArray.length ||
+          rawLinks.length !== projectedLinks.length || rawLinks.length !== 2) return false;
+        const sameTemplate = (left: unknown, right: unknown): boolean => {
+          if (!isRecord(left) || !isRecord(right) || !isRecord(left.args) || !isRecord(right.args)) return false;
+          const leftArgs = left.args as Record<string, unknown>;
+          const rightArgs = right.args as Record<string, unknown>;
+          return left.name === right.name && left.expansion === right.expansion &&
+            Object.keys(leftArgs).sort().join("\u0000") === Object.keys(rightArgs).sort().join("\u0000") &&
+            Object.entries(leftArgs).every(([key, value]) => rightArgs[key] === value);
+        };
+        if (!rawTemplates.every((template, index) => sameTemplate(template, projectedTemplateArray[index])) ||
+          !rawLinks.every((link, index) => isRecord(link) && isRecord(projectedLinks[index]) &&
+            link.sourceForm === projectedLinks[index].sourceForm && link.reference === projectedLinks[index].reference)) return false;
+        const projectedTemplates = projectedTemplateArray.filter((template) => isRecord(template) && template.name === "af");
+        if (projectedTemplates.length !== 1) return false;
+        const template = projectedTemplates[0];
+        if (!isRecord(template) || !isRecord(template.args)) return false;
+        const templateArguments = template.args;
+        const templateBaseForm = templateArguments["2"];
+        const templateComponentForm = templateArguments["3"];
+        if (templateArguments["1"] !== "sq" ||
+          Object.keys(templateArguments).some((argument) => !["1", "2", "3", "t1", "t2"].includes(argument)) ||
+          Object.keys(templateArguments).filter((argument) => /^\d+$/u.test(argument)).sort().join(",") !== "1,2,3" ||
+          Object.keys(templateArguments).filter((argument) => argument === "t1" || argument === "t2")
+            .some((argument) => typeof templateArguments[argument] !== "string") ||
+          typeof templateBaseForm !== "string" || typeof templateComponentForm !== "string" ||
+          typeof template.expansion !== "string" || typeof componentPrimary.etymologyText !== "string") return false;
+        const normalizeText = (text: string): string => text.normalize("NFC").trim().replace(/\s+/gu, " ").toLocaleLowerCase("sq-AL");
+        const expansionParts = template.expansion.split(/\s+\+\s+/u);
+        const matchesExpansionRoot = (part: string | undefined, form: string): boolean => {
+          if (!part) return false;
+          const normalizedPart = normalizeText(part);
+          const normalizedForm = normalizeText(form);
+          return normalizedPart === normalizedForm ||
+            (normalizedPart.startsWith(`${normalizedForm} (`) && normalizedPart.endsWith(")"));
+        };
+        if (expansionParts.length !== 2 ||
+          !matchesExpansionRoot(expansionParts[0], templateBaseForm) ||
+          !matchesExpansionRoot(expansionParts[1], templateComponentForm) ||
+          normalizeText(componentPrimary.etymologyText).replace(/[.!?]+$/u, "") !==
+            normalizeText(`A compound of ${template.expansion}`).replace(/[.!?]+$/u, "")) return false;
+        validTemplateEvidence = references.every((reference, index) => {
+          const link = projectedLinks[index];
+          return isRecord(reference) && isRecord(link) &&
+            reference.sourceForm === (index === 0 ? templateBaseForm : templateComponentForm) &&
+            reference.reference === `${reference.sourceForm}#Albanian` &&
+            link.sourceForm === reference.sourceForm && link.reference === reference.reference;
+        });
+      }
+      if (!validTemplateEvidence) return false;
+
+      const templateName = componentRelationType === "SOURCE_AUTHORED_SUFFIX_TEMPLATE" ? "suffix" : "af";
+      const rawTemplates = Array.isArray(rawTarget.etymologyTemplates) ? rawTarget.etymologyTemplates : [];
+      const matchingTemplates = rawTemplates.filter((template) => isRecord(template) && template.name === templateName);
+      if (matchingTemplates.length !== 1 || !isRecord(matchingTemplates[0]) ||
+        typeof matchingTemplates[0].expansion !== "string") return false;
       const references = componentReading.relation.references as unknown[];
-      const componentPrimary = componentReading.primary;
-      const templates = Array.isArray(componentPrimary.etymologyTemplates)
-        ? componentPrimary.etymologyTemplates.filter((template) => isRecord(template) && template.name === "af")
-        : [];
-      if (templates.length !== 1 || !Array.isArray(componentPrimary.etymologyLinks) ||
-        componentPrimary.etymologyLinks.length !== 2) return false;
-      const template = templates[0];
-      if (!isRecord(template) || !isRecord(template.args)) return false;
-      const templateArguments = template.args;
-      const templateBaseForm = templateArguments["2"];
-      const templateComponentForm = templateArguments["3"];
-      if (templateArguments["1"] !== "sq" ||
-        Object.keys(templateArguments).some((argument) => !["1", "2", "3", "t1", "t2"].includes(argument)) ||
-        Object.keys(templateArguments).filter((argument) => /^\d+$/u.test(argument)).sort().join(",") !== "1,2,3" ||
-        Object.keys(templateArguments).filter((argument) => argument === "t1" || argument === "t2")
-          .some((argument) => typeof templateArguments[argument] !== "string") ||
-        typeof templateBaseForm !== "string" || typeof templateComponentForm !== "string" ||
-        typeof template.expansion !== "string" || typeof componentPrimary.etymologyText !== "string") return false;
-      const normalizeText = (text: string): string => text.normalize("NFC").trim().replace(/\s+/gu, " ").toLocaleLowerCase("sq-AL");
-      const expansionParts = template.expansion.split(/\s+\+\s+/u);
-      const matchesExpansionRoot = (part: string | undefined, form: string): boolean => {
-        if (!part) return false;
-        const normalizedPart = normalizeText(part);
-        const normalizedForm = normalizeText(form);
-        return normalizedPart === normalizedForm ||
-          (normalizedPart.startsWith(`${normalizedForm} (`) && normalizedPart.endsWith(")"));
-      };
-      if (expansionParts.length !== 2 ||
-        !matchesExpansionRoot(expansionParts[0], templateBaseForm) ||
-        !matchesExpansionRoot(expansionParts[1], templateComponentForm) ||
-        normalizeText(componentPrimary.etymologyText).replace(/[.!?]+$/u, "") !==
-          normalizeText(`A compound of ${template.expansion}`).replace(/[.!?]+$/u, "")) return false;
-      const links = componentPrimary.etymologyLinks as unknown[];
-      return references.every((reference, index) => {
-        const link = links[index];
-        return isRecord(reference) && isRecord(link) &&
-          reference.sourceForm === (index === 0 ? templateBaseForm : templateComponentForm) &&
-          reference.reference === `${reference.sourceForm}#Albanian` &&
-          link.sourceForm === reference.sourceForm && link.reference === reference.reference;
+      const sourceReferences = references.map((reference) => {
+        if (!isRecord(reference) || typeof reference.sourceForm !== "string" || typeof reference.reference !== "string") {
+          return null;
+        }
+        return `${reference.sourceForm} → ${reference.reference}`;
       });
+      if (sourceReferences.some((reference) => reference === null)) return false;
+      const roleGlosses = rawRoleSense.glosses as string[];
+      const expectedStatement = `Source-bounded target-role interpretation (exploratory): the directly queried Albanian noun ${target.form} has source sense ${roleSenseId} (“${roleGlosses.join("; ")}”) with the exact source-authored sq:Occupations category (category source: w). This category supports an exploratory AGENT reading for this identified target sense. The same target record attributes the ${templateName} template “${matchingTemplates[0].expansion}” and the Albanian references ${sourceReferences.join(" · ")}; those references do not create a base-side SOURCE_DERIVED_FORM assertion or select a component sense.`;
+      return hypothesis.statement === expectedStatement;
     };
     const validFunctionalMeaningBridge = validFunctionalMeaningBridgeValue(reading.functionalMeaningBridge) &&
       validDirectTargetRoleFunctionalBridge();

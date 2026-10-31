@@ -355,6 +355,7 @@ type AlbanianSourceLinkedComponentRelationV0_1 =
   | "SOURCE_EXPLICIT_TWO_COMPONENT_COMPOUND"
   | "SOURCE_EXPLICIT_THREE_COMPONENT_COMPOUND"
   | "SOURCE_AUTHORED_AF_TEMPLATE"
+  | "SOURCE_AUTHORED_SUFFIX_TEMPLATE"
   | "SOURCE_COMPOUND_ARITY_UNSUPPORTED";
 
 type AlbanianSourceLinkedComponentResolutionV0_1 = Readonly<{
@@ -827,9 +828,59 @@ function sourceComponentReferencesV0_1(
 }> | null {
   const templates = primary.etymologyTemplates ?? [];
   const afTemplates = templates.filter((template) => template.name === "af");
+  const suffixTemplates = templates.filter((template) => template.name === "suffix");
   const compoundTemplates = templates.filter((template) =>
     template.name === "compound" && template.args["1"] === "sq",
   );
+
+  if (afTemplates.length === 0 && suffixTemplates.length > 0) {
+    const template = suffixTemplates[0];
+    if (!template || suffixTemplates.length !== 1 || templates.length !== 1) return null;
+    const argumentKeys = Object.keys(template.args).sort();
+    const baseForm = template.args["2"]?.normalize("NFC").trim() ?? "";
+    const bareSuffix = template.args["3"]?.normalize("NFC").trim() ?? "";
+    if (
+      argumentKeys.join(",") !== "1,2,3" ||
+      template.args["1"] !== "sq" ||
+      !baseForm ||
+      !bareSuffix ||
+      bareSuffix.startsWith("-")
+    ) return null;
+
+    const componentForms = [baseForm, `-${bareSuffix}`];
+    if (
+      componentForms.some((form, index) => componentForms.indexOf(form) !== index) ||
+      componentForms.some((form) => normalizedAlbanianFormV0_1(form) === normalizedAlbanianFormV0_1(primary.form)) ||
+      normalizedSourceTemplateTextV0_1(template.expansion) !==
+        normalizedSourceTemplateTextV0_1(`${baseForm} + -${bareSuffix}`)
+    ) return null;
+
+    const authoredExplanation = normalizedSourceTemplateTextV0_1(primary.etymologyText ?? "")
+      .replace(/[.!?]+$/u, "");
+    if (authoredExplanation !== normalizedSourceTemplateTextV0_1(`From ${baseForm} + -${bareSuffix}`)) return null;
+
+    const links = primary.etymologyLinks ?? [];
+    if (links.length !== componentForms.length) return null;
+    const references = componentForms.map((sourceForm, index) => {
+      const link = links[index];
+      if (
+        !link ||
+        normalizedAlbanianFormV0_1(link.sourceForm) !== normalizedAlbanianFormV0_1(sourceForm) ||
+        link.reference !== `${sourceForm}#Albanian` ||
+        !exactAlbanianComponentReferenceV0_1(link)
+      ) return null;
+      return Object.freeze({ sourceForm, reference: link.reference });
+    });
+    if (references.some((reference) => reference === null)) return null;
+
+    return Object.freeze({
+      relation: "SOURCE_AUTHORED_SUFFIX_TEMPLATE" as const,
+      componentForms: Object.freeze(componentForms),
+      references: Object.freeze(references as readonly Readonly<{ sourceForm: string; reference: string | null }> []),
+      reasonCodes: Object.freeze([]),
+    });
+  }
+
   const selectedTemplates = afTemplates.length > 0 ? afTemplates : compoundTemplates;
   if (selectedTemplates.length === 0) return null;
 
@@ -1256,6 +1307,8 @@ async function buildSourceLinkedComponentReadingV0_1(input: Readonly<{
     : unknownComponentFunctionalHypothesisV0_1([]);
   const exploratoryRelationshipStatement = componentEvidence.relation === "SOURCE_AUTHORED_AF_TEMPLATE"
     ? `The queried source record attributes these component forms through its af template: ${componentText}. The exact Albanian references are retained as source facts; this does not prove derivation, align a unique component sense, or authorize a functional operation.`
+    : componentEvidence.relation === "SOURCE_AUTHORED_SUFFIX_TEMPLATE"
+      ? `The queried source record attributes these component forms through its suffix template: ${componentText}. The exact Albanian references are retained as source facts; this does not independently establish suffix function, a derivation rule, a unique component sense, or an embryo meaning.`
     : `The source records ${input.primary.form} (“${distinctGlossesV0_1([input.primary]).join("; ")}") as a compound of ${componentText}. This is a source-attributed component reading; the engine does not independently prove the derivation or add a semantic operation.`;
   return Object.freeze({
     status: "SUPPORTED",
@@ -1286,6 +1339,8 @@ async function buildSourceLinkedComponentReadingV0_1(input: Readonly<{
     functionalHypothesis,
     claimBoundary: componentEvidence.relation === "SOURCE_AUTHORED_AF_TEMPLATE"
       ? "The exact source-authored af template and Albanian references are preserved as attributed evidence. Ambiguous or unresolved component records remain visible without sense selection; no derivation, functional operation, or embryo meaning is claimed."
+      : componentEvidence.relation === "SOURCE_AUTHORED_SUFFIX_TEMPLATE"
+        ? "The exact source-authored suffix template and Albanian references are preserved as attributed evidence. No suffix function, derivation rule, component-sense alignment, functional operation, or embryo meaning is claimed by this component reading."
       : "The exact source-authored compound template and Albanian references are preserved. IPA and Voice structure remain Null when the source supplies no pronunciation; composition remains separately Null.",
   });
 }
@@ -1994,7 +2049,8 @@ function buildTargetRoleAgentFunctionalBridgeV0_1(input: Readonly<{
   const templateEvidence = sourceComponentReferencesV0_1(input.targetFact);
   if (
     !templateEvidence ||
-    templateEvidence.relation !== "SOURCE_AUTHORED_AF_TEMPLATE" ||
+    (templateEvidence.relation !== "SOURCE_AUTHORED_AF_TEMPLATE" &&
+      templateEvidence.relation !== "SOURCE_AUTHORED_SUFFIX_TEMPLATE") ||
     templateEvidence.reasonCodes.length > 0 ||
     templateEvidence.references.length !== 2
   ) {
@@ -2014,7 +2070,9 @@ function buildTargetRoleAgentFunctionalBridgeV0_1(input: Readonly<{
   const sourceReferences = templateEvidence.references
     .map(({ sourceForm, reference }) => `${sourceForm} → ${reference ?? "Null"}`)
     .join(" · ");
-  const template = input.targetFact.etymologyTemplates?.find((candidate) => candidate.name === "af");
+  const isSuffixTemplate = templateEvidence.relation === "SOURCE_AUTHORED_SUFFIX_TEMPLATE";
+  const templateName = isSuffixTemplate ? "suffix" : "af";
+  const template = input.targetFact.etymologyTemplates?.find((candidate) => candidate.name === templateName);
   if (!template) return null;
   const componentAlternatives = (input.componentReading?.componentResolutions ?? []).map((resolution) => {
     if (resolution.status === "AMBIGUOUS") {
@@ -2039,16 +2097,16 @@ function buildTargetRoleAgentFunctionalBridgeV0_1(input: Readonly<{
     functionalHypothesis: Object.freeze({
       status: "EXPLORATORY_FUNCTIONAL_HYPOTHESIS" as const,
       functionalOperation: "AGENT" as const,
-      statement: `Source-bounded target-role interpretation (exploratory): the directly queried Albanian noun ${input.targetFact.form} has source sense ${roleEvidence.sense.senseId} (“${senseMeaning}”) with the exact source-authored sq:Occupations category (category source: w). This category supports an exploratory AGENT reading for this identified target sense. The same target record attributes the af template “${template.expansion}” and the Albanian references ${sourceReferences}; those references do not create a base-side SOURCE_DERIVED_FORM assertion or select a component sense.`,
+      statement: `Source-bounded target-role interpretation (exploratory): the directly queried Albanian noun ${input.targetFact.form} has source sense ${roleEvidence.sense.senseId} (“${senseMeaning}”) with the exact source-authored sq:Occupations category (category source: w). This category supports an exploratory AGENT reading for this identified target sense. The same target record attributes the ${templateName} template “${template.expansion}” and the Albanian references ${sourceReferences}; those references do not create a base-side SOURCE_DERIVED_FORM assertion or select a component sense.`,
       alternatives: Object.freeze([
         "The source category applies only to the identified target sense; other target senses remain alternatives and are not selected.",
         ...componentAlternatives,
-        "The target-authored template and references remain attributed source evidence; no historical relation, suffix law, independent embryo meaning, or Voice semantics is claimed.",
+        "The target-authored template and references remain attributed source evidence; no historical relation, suffix function, suffix law, independent embryo meaning, or Voice semantics is claimed.",
       ]),
       basis: Object.freeze([
         "SOURCE_ATTESTED_TARGET_ROLE_CATEGORY",
         "SOURCE_ATTESTED_FINAL_SENSE_CATEGORY",
-        "TARGET_SOURCE_AUTHORED_AF_TEMPLATE",
+        isSuffixTemplate ? "TARGET_SOURCE_AUTHORED_SUFFIX_TEMPLATE" : "TARGET_SOURCE_AUTHORED_AF_TEMPLATE",
         "SOURCE_STRUCTURED_ALBANIAN_REFERENCES",
       ]),
       claimBoundary: "Exploratory AGENT role for one exact source-identified target sense only. No target-to-base sense alignment, base-side derived-form relation, composition, historical etymology, suffix semantics, embryo function, or pronunciation semantics is asserted.",
@@ -2881,7 +2939,10 @@ async function buildAlbanianLexicalReadingV0_1(input: Readonly<{
   const sourceLinkedComparison = selectedRelatedCandidate?.sourceLinkedComparison ?? null;
   const selectedRelatedFunctionalBridge = selectedRelatedCandidate?.functionalMeaningBridge ?? null;
   const targetComponentEvidence = sourceComponentReferencesV0_1(primary);
-  const sourceLinkedComponentReading = targetComponentEvidence?.relation === "SOURCE_AUTHORED_AF_TEMPLATE" &&
+  const sourceLinkedComponentReading = (
+    targetComponentEvidence?.relation === "SOURCE_AUTHORED_AF_TEMPLATE" ||
+    targetComponentEvidence?.relation === "SOURCE_AUTHORED_SUFFIX_TEMPLATE"
+  ) &&
     selectedRelatedFunctionalBridge?.status === "SUPPORTED"
     ? null
     : await buildSourceLinkedComponentReadingV0_1({
@@ -2907,7 +2968,8 @@ async function buildAlbanianLexicalReadingV0_1(input: Readonly<{
     const targetRoleCandidates = targetRecords.filter((fact) => {
       const componentReferences = sourceComponentReferencesV0_1(fact);
       return fact.partOfSpeech === "noun" &&
-        componentReferences?.relation === "SOURCE_AUTHORED_AF_TEMPLATE" &&
+        (componentReferences?.relation === "SOURCE_AUTHORED_AF_TEMPLATE" ||
+          componentReferences?.relation === "SOURCE_AUTHORED_SUFFIX_TEMPLATE") &&
         componentReferences.reasonCodes.length === 0 &&
         qualifyingSourceSenseAgentEvidenceV0_1(sourceRecordProjectionV0_1(fact, [])) !== null;
     });

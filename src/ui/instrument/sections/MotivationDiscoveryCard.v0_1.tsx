@@ -924,8 +924,14 @@ export function MotivationDiscoveryCardV0_1({
                   .map((reference) => `${reference.sourceForm} → ${reference.reference ?? "Null"}`)
                   .join(" · ") || "Null"}
               </div>
+              {albanianLexicalReading.sourceLinkedComponentReading.relation.relation === "SOURCE_AUTHORED_SUFFIX_TEMPLATE" ? (
+                <div data-testid="albanian-source-linked-component-relation" className="mt-1 text-[#a9c3d0]">
+                  Source relation: SOURCE_AUTHORED_SUFFIX_TEMPLATE · attributed source template; no suffix function is inferred.
+                </div>
+              ) : null}
               {albanianLexicalReading.sourceLinkedComponentReading.relation.relation === "SOURCE_EXPLICIT_THREE_COMPONENT_COMPOUND" ||
-              albanianLexicalReading.sourceLinkedComponentReading.relation.relation === "SOURCE_AUTHORED_AF_TEMPLATE" ? (
+              albanianLexicalReading.sourceLinkedComponentReading.relation.relation === "SOURCE_AUTHORED_AF_TEMPLATE" ||
+              albanianLexicalReading.sourceLinkedComponentReading.relation.relation === "SOURCE_AUTHORED_SUFFIX_TEMPLATE" ? (
                 <div className="mt-1 text-[#a9c3d0]">
                   Component record resolution: {albanianLexicalReading.sourceLinkedComponentReading.componentResolutions
                     .map((resolution) => `${resolution.sourceForm}: ${resolution.status.toLocaleLowerCase("sq-AL")} (${resolution.sourceRecordIds.length} source record${resolution.sourceRecordIds.length === 1 ? "" : "s"})`)
