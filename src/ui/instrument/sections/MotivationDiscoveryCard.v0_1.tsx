@@ -13,6 +13,7 @@ import type {
   AlbanianSourceLinkedComparisonV0_1,
   AlbanianSourceLinkedRecordV0_1,
 } from "@/shared/openInstrument/motivationEngineDiscoveryServerOnly.v0_1";
+import { FjaloriCrossSourceEvidenceV0_1 } from "@/ui/instrument/sections/FjaloriCrossSourceEvidence.v0_1";
 import {
   aggregateMotivationDiscoveryCandidatesV0_1,
   measureMotivationDiscoveryAggregationV0_1,
@@ -870,6 +871,9 @@ export function MotivationDiscoveryCardV0_1({
                 </div>
               </div>
             </div>
+          ) : null}
+          {albanianLexicalReading.primarySourceFact ? (
+            <FjaloriCrossSourceEvidenceV0_1 word={value.inputWord} />
           ) : null}
           {albanianLexicalReading.sourceLinkedComparison ? (
             <div
