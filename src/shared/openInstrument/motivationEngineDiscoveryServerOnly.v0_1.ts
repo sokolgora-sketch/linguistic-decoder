@@ -1171,16 +1171,42 @@ async function buildTargetAuthoredEtymologyCandidateV0_1(input: Readonly<{
   }
 
   const templates = input.target.etymologyTemplates?.filter((template) => template.name === "af") ?? [];
-  if (templates.length !== 1) return null;
-  const template = templates[0];
-  const baseForm = template?.args["2"]?.trim() ?? "";
-  const otherComponent = template?.args["3"]?.trim() ?? "";
-  if (template?.args["1"] !== "sq" || !baseForm || !otherComponent) return null;
+  let baseForm: string;
+  if (templates.length === 1) {
+    const template = templates[0];
+    baseForm = template?.args["2"]?.trim() ?? "";
+    const otherComponent = template?.args["3"]?.trim() ?? "";
+    if (template?.args["1"] !== "sq" || !baseForm || !otherComponent) return null;
 
-  const matchingReferences = (input.target.etymologyLinks ?? []).filter((link) =>
-    normalizedAlbanianFormV0_1(link.sourceForm) === normalizedAlbanianFormV0_1(baseForm),
-  );
-  if (matchingReferences.length !== 1 || !exactAlbanianSourceReferenceV0_1(matchingReferences[0]!, baseForm)) {
+    const matchingReferences = (input.target.etymologyLinks ?? []).filter((link) =>
+      normalizedAlbanianFormV0_1(link.sourceForm) === normalizedAlbanianFormV0_1(baseForm),
+    );
+    if (matchingReferences.length !== 1 || !exactAlbanianSourceReferenceV0_1(matchingReferences[0]!, baseForm)) {
+      return null;
+    }
+  } else if (templates.length === 0) {
+    // Some source-authored target entries provide an exact Albanian lexical
+    // reference without an `af` template. Accept only one unambiguous lexical
+    // reference; hyphen-prefixed affix references are not base-word queries.
+    const lexicalReferences = (input.target.etymologyLinks ?? []).filter((link) => {
+      const sourceForm = link.sourceForm.normalize("NFC").trim();
+      return sourceForm.length > 0 &&
+        !sourceForm.startsWith("-") &&
+        normalizedAlbanianFormV0_1(sourceForm) !== normalizedAlbanianFormV0_1(input.target.form);
+    });
+    if (lexicalReferences.length !== 1) return null;
+    baseForm = lexicalReferences[0]!.sourceForm.normalize("NFC").trim();
+    if (!exactAlbanianSourceReferenceV0_1(lexicalReferences[0]!, baseForm)) return null;
+  } else {
+    return null;
+  }
+
+  // This is only a bounded lookup prefilter for the existing passage path;
+  // the resolved base must still pass the complete functional bridge below.
+  if (templates.length === 0 && (
+    !hasOpeningAccessMeaningV0_1(distinctGlossesV0_1([input.target])) ||
+    !hasSourceAuthoredTransmissionExplanationV0_1(input.target.etymologyText)
+  )) {
     return null;
   }
 
@@ -1190,8 +1216,17 @@ async function buildTargetAuthoredEtymologyCandidateV0_1(input: Readonly<{
   } catch {
     return null;
   }
-  if (baseResult.status !== "MATCHES_FOUND" || baseResult.facts.length !== 1) return null;
-  const base = baseResult.facts[0];
+  if (baseResult.status !== "MATCHES_FOUND") return null;
+  const baseFacts = templates.length === 1
+    ? baseResult.facts
+    : baseResult.facts.filter((fact) =>
+        fact.language === "Albanian" &&
+        fact.languageCode === "sq" &&
+        fact.partOfSpeech === "noun" &&
+        normalizedAlbanianFormV0_1(fact.form) === normalizedAlbanianFormV0_1(baseForm),
+      );
+  if (baseFacts.length !== 1) return null;
+  const base = baseFacts[0];
   const baseMeaningfulSenses = base?.senses.filter((sense) => sense.glosses.some((gloss) => gloss.trim().length > 0)) ?? [];
   if (
     !base ||
@@ -1199,7 +1234,8 @@ async function buildTargetAuthoredEtymologyCandidateV0_1(input: Readonly<{
     base.languageCode !== "sq" ||
     normalizedAlbanianFormV0_1(base.form) !== normalizedAlbanianFormV0_1(baseForm) ||
     base.partOfSpeech !== "noun" ||
-    baseMeaningfulSenses.length !== 1
+    (templates.length === 1 && baseMeaningfulSenses.length !== 1) ||
+    (templates.length === 0 && baseMeaningfulSenses.length === 0)
   ) {
     return null;
   }
@@ -1247,6 +1283,17 @@ function hasConservativePrimaryIlluminationEvidenceV0_1(
   // glosses are required, and explicit alternate senses fail closed. Related
   // forms never create an interpretation for the queried word.
   return illuminationGlossCount >= 2 && !competingOrUnrelatedGloss;
+}
+
+function hasOpeningAccessMeaningV0_1(glosses: readonly string[]): boolean {
+  return glosses.some((gloss) => /\b(?:window|opening|access)\b/iu.test(gloss.toLocaleLowerCase("en-US")));
+}
+
+function hasSourceAuthoredTransmissionExplanationV0_1(sourceExplanation: string | null | undefined): boolean {
+  const sourceExplanationText = sourceExplanation?.trim().toLocaleLowerCase("en-US") ?? "";
+  const negatesTransmission = /\b(?:does\s+not|do\s+not|did\s+not|doesn't|don't|didn't|never|cannot|can't|won't|not)\s+(?:\w+\s+){0,2}(?:let|lets|allow|allows|permit|permits|enable|enables|admit|admits)\b/iu.test(sourceExplanationText);
+  return !negatesTransmission &&
+    /\b(?:let|lets|allow|allows|permit|permits|enable|enables|admit|admits)\s+(?:the\s+)?(?:light|daylight|illumination)\s+(?:through|to\s+(?:enter|pass)|enter|pass)\b/iu.test(sourceExplanationText);
 }
 
 function nullCompositionV0_1(
@@ -1392,17 +1439,13 @@ function buildDirectionalFunctionalHypothesisV0_1(input: Readonly<{
   const primaryMeaning = input.primary.meaningGlosses.join("; ");
   const relatedMeaning = input.related.meaningGlosses.join("; ");
   const sourceExplanation = input.related.etymologyText?.trim() ?? "";
-  const relatedMeaningText = relatedMeaning.toLocaleLowerCase("en-US");
-  const sourceExplanationText = sourceExplanation.toLocaleLowerCase("en-US");
   const primaryHasIlluminationMeaning = hasConservativePrimaryIlluminationEvidenceV0_1({
     senses: input.primary.meaningGlosses.length > 0
       ? [{ glosses: input.primary.meaningGlosses }]
       : [],
   });
-  const relatedHasOpeningMeaning = /\b(?:window|opening|access)\b/iu.test(relatedMeaningText);
-  const negatesTransmission = /\b(?:does\s+not|do\s+not|did\s+not|doesn't|don't|didn't|never|cannot|can't|won't|not)\s+(?:\w+\s+){0,2}(?:let|lets|allow|allows|permit|permits|enable|enables|admit|admits)\b/iu.test(sourceExplanationText);
-  const sourceDescribesAffirmativeTransmission =
-    !negatesTransmission && /\b(?:let|lets|allow|allows|permit|permits|enable|enables|admit|admits)\s+(?:the\s+)?(?:light|daylight|illumination)\s+(?:through|to\s+(?:enter|pass)|enter|pass)\b/iu.test(sourceExplanationText);
+  const relatedHasOpeningMeaning = hasOpeningAccessMeaningV0_1(input.related.meaningGlosses);
+  const sourceDescribesAffirmativeTransmission = hasSourceAuthoredTransmissionExplanationV0_1(sourceExplanation);
 
   if (!primaryHasIlluminationMeaning || !relatedHasOpeningMeaning || !sourceDescribesAffirmativeTransmission) {
     return null;
@@ -1549,6 +1592,35 @@ function hasExactTargetAuthoredAlbanianSuffixEvidenceV0_1(input: Readonly<{
   const sourceExplanation = input.related.etymologyText?.trim().replace(/[.!?]+$/u, "") ?? "";
   return sourceExplanation.length > 0 &&
     normalizedSourceTemplateTextV0_1(sourceExplanation) === normalizedSourceTemplateTextV0_1(`${base} + -${suffix}`.replace(/^/u, "From "));
+}
+
+function hasExactTargetAuthoredAlbanianReferenceV0_1(input: Readonly<{
+  primary: AlbanianSourceLinkedRecordV0_1;
+  related: AlbanianSourceLinkedRecordV0_1;
+  comparison: AlbanianSourceLinkedComparisonV0_1 | null;
+}>): boolean {
+  const comparison = input.comparison;
+  if (
+    comparison?.status !== "SUPPORTED" ||
+    comparison.relation.relation !== "TARGET_AUTHORED_ETYMOLOGY_REFERENCE" ||
+    comparison.relation.direction !== "RELATED_FORM_TO_PRIMARY_ETYMLOGY_REFERENCE" ||
+    comparison.relation.primarySourceRecordId !== input.primary.sourceRecordId ||
+    comparison.relation.primaryEntryLocator !== input.primary.entryLocator ||
+    comparison.relation.relatedSourceRecordId !== input.related.sourceRecordId ||
+    comparison.relation.relatedEntryLocator !== input.related.entryLocator ||
+    normalizedAlbanianFormV0_1(comparison.relation.relatedForm) !== normalizedAlbanianFormV0_1(input.related.form) ||
+    normalizedAlbanianFormV0_1(comparison.relation.referencedForm ?? "") !== normalizedAlbanianFormV0_1(input.primary.form)
+  ) {
+    return false;
+  }
+
+  const targetReferences = input.related.etymologyLinks.filter((link) =>
+    normalizedAlbanianFormV0_1(link.sourceForm) === normalizedAlbanianFormV0_1(input.primary.form),
+  );
+  return targetReferences.length === 1 &&
+    exactAlbanianSourceReferenceV0_1(targetReferences[0]!, input.primary.form) &&
+    targetReferences[0]?.sourceForm === comparison.relation.referencedForm &&
+    targetReferences[0]?.reference === comparison.relation.reference;
 }
 
 function hasExactTargetAuthoredEtymologyReferenceEvidenceV0_1(input: Readonly<{
@@ -1755,7 +1827,14 @@ export function buildAlbanianFunctionalMeaningBridgeV0_1(input: Readonly<{
     });
   }
 
-  const directionalHypothesis = related && sourceRelation !== "TARGET_AUTHORED_ETYMOLOGY_REFERENCE"
+  const targetAuthoredReferenceIsExact = related && sourceRelation === "TARGET_AUTHORED_ETYMOLOGY_REFERENCE"
+    ? hasExactTargetAuthoredAlbanianReferenceV0_1({
+        primary: input.comparison?.primary ?? input.primary,
+        related,
+        comparison: input.comparison,
+      })
+    : sourceRelation !== "TARGET_AUTHORED_ETYMOLOGY_REFERENCE";
+  const directionalHypothesis = related && targetAuthoredReferenceIsExact
     ? buildDirectionalFunctionalHypothesisV0_1({
         primary: input.comparison?.primary ?? input.primary,
         related,

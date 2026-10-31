@@ -44,7 +44,10 @@ jest.mock("@/shared/openInstrument/motivationEngineDiscoveryServerOnly.v0_1", ()
     senses: [{ senseId: "dritare-window", glosses: ["window", "access to knowledge"] }],
     ipaObservations: [{ soundIndex: 0, ipa: "/dɾiˈtaɾɛ/", tags: [] }],
     etymologyText: "From dritë (“light”) + -are (“-er”), meaning to let light through or similar.",
-    etymologyLinks: [{ sourceForm: "dritë", reference: "dritë#Albanian" }],
+    etymologyLinks: [
+      { sourceForm: "dritë", reference: "dritë#Albanian" },
+      { sourceForm: "-are", reference: "-are#Albanian" },
+    ],
     sourceStatus: "observed_external_snapshot",
     attestationTruth: "fact",
     pronunciationAuthority: "CURRENT_KAIKKI_RECORD_ONLY_UNBOUND_TO_FROZEN_PROFILE",
@@ -216,6 +219,15 @@ async function analyzeDriteV0_1(): Promise<any> {
   return { status: response.status, body: await response.json() };
 }
 
+async function analyzeDritareV0_1(): Promise<any> {
+  const response = await POST(new Request("http://localhost/api/analyze-v1", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ word: "dritare", language: "sq", alphabet: "albanian", providerExecution: "disabled" }),
+  }));
+  return { status: response.status, body: await response.json() };
+}
+
 async function analyzePeshkV0_1(): Promise<any> {
   const response = await POST(new Request("http://localhost/api/analyze-v1", {
     method: "POST",
@@ -317,6 +329,58 @@ describe("analyze-v1 Albanian lexical reading reachability", () => {
       "SOURCE_AUTHORED_TRANSMISSION_EXPLANATION",
       "STRUCTURAL_EMBRYO_FUNCTION_REMAINS_UNKNOWN_OR_NULL",
     ]));
+  });
+
+  it("projects direct dritare as the primary input with the existing directional passage bridge", async () => {
+    const result = await analyzeDritareV0_1();
+    expect(result.status).toBe(200);
+    expect(result.body.motivationDiscoveryV0_1.albanianLexicalReading).toMatchObject({
+      status: "SUPPORTED",
+      primarySourceFact: {
+        sourceRecordId: "kaikki-albanian-jsonl:word=dritare:ordinal=0",
+        form: "dritare",
+        meaningGlosses: ["window", "access to knowledge"],
+      },
+      functionalMeaningBridge: {
+        status: "SUPPORTED",
+        relatedForm: "dritare",
+        sourceFacts: {
+          primary: { form: "dritë", meaningGlosses: ["light", "light (such as a lamp)"] },
+          related: { form: "dritare", sourceAuthoredExplanation: "From dritë (“light”) + -are (“-er”), meaning to let light through or similar." },
+        },
+        functionalHypothesis: {
+          status: "EXPLORATORY_FUNCTIONAL_HYPOTHESIS",
+          functionalOperation: "ENABLE_PASSAGE",
+        },
+      },
+      relatedCandidateEvaluations: [expect.objectContaining({
+        relatedForm: "dritare",
+        sourceRelation: "TARGET_AUTHORED_ETYMOLOGY_REFERENCE",
+        sourceLinkedComparison: expect.objectContaining({
+          status: "SUPPORTED",
+          relation: expect.objectContaining({
+            primarySourceRecordId: "kaikki-albanian-jsonl:word=drit%C3%AB:ordinal=0",
+            relatedSourceRecordId: "kaikki-albanian-jsonl:word=dritare:ordinal=0",
+            direction: "RELATED_FORM_TO_PRIMARY_ETYMLOGY_REFERENCE",
+            referencedForm: "dritë",
+            reference: "dritë#Albanian",
+          }),
+        }),
+        functionalMeaningBridge: expect.objectContaining({
+          status: "SUPPORTED",
+          functionalHypothesis: expect.objectContaining({ functionalOperation: "ENABLE_PASSAGE" }),
+        }),
+      })],
+      interpretation: expect.objectContaining({
+        status: "EXPLORATORY_ZHEJI_READING",
+        basis: expect.arrayContaining([
+          "SOURCE_ATTESTED_FUNCTIONAL_BRIDGE",
+          "SOURCE_AUTHORED_TRANSMISSION_EXPLANATION",
+          "STRUCTURAL_EMBRYO_FUNCTION_REMAINS_UNKNOWN_OR_NULL",
+        ]),
+      }),
+      composition: { status: "NULL" },
+    });
   });
 
   it("projects an integrated source-bounded AGENT reading through the API", async () => {

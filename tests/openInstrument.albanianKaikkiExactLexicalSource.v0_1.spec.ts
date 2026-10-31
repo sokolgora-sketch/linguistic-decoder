@@ -134,6 +134,41 @@ async function discoveryForFactsV0_1(
   return discoveryForProviderV0_1(provider, word);
 }
 
+function dritareTargetFirstFixtureFactsV0_1(): readonly AlbanianKaikkiExactLexicalSourceFactV0_1[] {
+  return [
+    fixtureFact({
+      sourceRecordId: "kaikki-albanian-jsonl:word=dritare:ordinal=0",
+      entryLocator: "jsonl://word/dritare/match/0",
+      physicalRecordOrdinal: 2171,
+      form: "dritare",
+      senses: [
+        { senseId: "en-dritare-sq-noun-RP97AsgN", glosses: ["window"] },
+        { senseId: "en-dritare-sq-noun-~k6zu7Ra", glosses: ["access to the sea"] },
+        { senseId: "en-dritare-sq-noun-1Zl6eJVE", glosses: ["key, opening, access to knowledge (that helps broadening your horizon of knowledge)"] },
+        { senseId: "en-dritare-sq-noun-CIjOT75H", glosses: ["free time (between work hours or lessons)"] },
+      ],
+      ipaObservations: [{ soundIndex: 0, ipa: "/dɾiˈtaɾɛ/", tags: [] }],
+      etymologyText: "From dritë (“light”) + -are (“-er”), meaning to let light through or similar.",
+      etymologyLinks: [
+        { sourceForm: "dritë", reference: "dritë#Albanian" },
+        { sourceForm: "-are", reference: "-are#Albanian" },
+      ],
+    }),
+    fixtureFact({
+      sourceRecordId: "kaikki-albanian-jsonl:word=drit%C3%AB:ordinal=0",
+      entryLocator: "jsonl://word/drit%C3%AB/match/0",
+      physicalRecordOrdinal: 3461,
+      form: "dritë",
+      senses: [
+        { senseId: "en-dritë-sq-noun-macCYXLU", glosses: ["light"] },
+        { senseId: "en-dritë-sq-noun-ssgdmJru", glosses: ["light (such as a lamp)"] },
+        { senseId: "en-dritë-sq-noun-r6wyfnNp", glosses: ["firefly"] },
+      ],
+      ipaObservations: [{ soundIndex: 0, ipa: "/ˈdɾitə/", tags: [] }],
+    }),
+  ];
+}
+
 async function discoveryForProviderV0_1(
   provider: AlbanianKaikkiServerOnlyExactLexicalSourceProviderV0_1,
   word: string,
@@ -1077,6 +1112,163 @@ describe("real Albanian exact lexical source integration v0.1", () => {
       functionalHypothesis: { status: "UNKNOWN_OR_NULL", functionalOperation: null, statement: null },
     });
     expect(ambiguous.albanianLexicalReading?.interpretation.status).toBe("UNKNOWN_OR_NULL");
+  });
+
+  it("supports direct dritare through its exact target-authored Albanian reference without changing the queried word", async () => {
+    const discovery = await discoveryForFactsV0_1(dritareTargetFirstFixtureFactsV0_1(), "dritare");
+    const reading = discovery.albanianLexicalReading;
+
+    expect(reading).toMatchObject({
+      status: "SUPPORTED",
+      primarySourceFact: {
+        sourceRecordId: "kaikki-albanian-jsonl:word=dritare:ordinal=0",
+        form: "dritare",
+        meaningGlosses: expect.arrayContaining(["window", "access to the sea", "free time (between work hours or lessons)"]),
+      },
+      sourcePronunciation: { rawIpa: "/dɾiˈtaɾɛ/", status: "SUPPORTED", voicePath: ["I", "A", "E"] },
+      functionalMeaningBridge: {
+        status: "SUPPORTED",
+        relatedForm: "dritare",
+        functionalHypothesis: expect.objectContaining({
+          functionalOperation: "ENABLE_PASSAGE",
+          statement: expect.stringContaining("models dritë as an enabling input and dritare as a structure"),
+          basis: expect.arrayContaining(["SOURCE_AUTHORED_TRANSMISSION_EXPLANATION"]),
+        }),
+      },
+      interpretation: { status: "EXPLORATORY_ZHEJI_READING" },
+      composition: { status: "NULL" },
+    });
+    expect(reading?.relatedCandidateEvaluations).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        relatedForm: "dritare",
+        sourceRelation: "TARGET_AUTHORED_ETYMOLOGY_REFERENCE",
+        sourceLinkedComparison: expect.objectContaining({
+          status: "SUPPORTED",
+          relation: expect.objectContaining({
+            relation: "TARGET_AUTHORED_ETYMOLOGY_REFERENCE",
+            primarySourceRecordId: "kaikki-albanian-jsonl:word=drit%C3%AB:ordinal=0",
+            relatedSourceRecordId: "kaikki-albanian-jsonl:word=dritare:ordinal=0",
+            direction: "RELATED_FORM_TO_PRIMARY_ETYMLOGY_REFERENCE",
+            referencedForm: "dritë",
+            reference: "dritë#Albanian",
+          }),
+        }),
+        functionalMeaningBridge: expect.objectContaining({
+          status: "SUPPORTED",
+          functionalHypothesis: expect.objectContaining({ functionalOperation: "ENABLE_PASSAGE" }),
+        }),
+      }),
+    ]));
+    expect(reading?.functionalMeaningBridge.sourceFacts?.primary?.sourceSenses.map(({ senseId }) => senseId)).toEqual([
+      "en-dritë-sq-noun-macCYXLU",
+      "en-dritë-sq-noun-ssgdmJru",
+      "en-dritë-sq-noun-r6wyfnNp",
+    ]);
+    expect(reading?.functionalMeaningBridge.sourceFacts?.related?.sourceSenses.map(({ senseId }) => senseId)).toEqual([
+      "en-dritare-sq-noun-RP97AsgN",
+      "en-dritare-sq-noun-~k6zu7Ra",
+      "en-dritare-sq-noun-1Zl6eJVE",
+      "en-dritare-sq-noun-CIjOT75H",
+    ]);
+
+    const vm = adaptAnalysisToTelemetryVM({
+      motivationDiscoveryV0_1: { ...discovery, exactLexicalSourceFacts: undefined, sourceIpaSevenVoiceAnalyses: undefined },
+    });
+    expect(vm.motivationDiscoveryV0_1).toMatchObject({ kind: "present" });
+    if (vm.motivationDiscoveryV0_1?.kind === "present") {
+      render(createElement(MotivationDiscoveryCardV0_1, { discovery: vm.motivationDiscoveryV0_1 }));
+      expect(screen.getByTestId("albanian-reading-meaning")).toHaveTextContent("window");
+      expect(screen.getByTestId("albanian-reading-voice-path")).toHaveTextContent("I → A → E");
+      expect(screen.getByTestId("albanian-reading-functional-bridge-operation")).toHaveTextContent("Functional operation: ENABLE_PASSAGE");
+      expect(screen.getByTestId("albanian-reading-functional-bridge")).toHaveTextContent("models dritë as an enabling input and dritare as a structure");
+      expect(screen.getByTestId("albanian-reading-composition-null")).toHaveTextContent("Null");
+    }
+  });
+
+  it("keeps target-first passage Null for missing or foreign references and borrowed window controls", async () => {
+    for (const [form, reference] of [
+      ["dritare", null],
+      ["dritare", "dritë#French"],
+      ["finestër", "dritë#Italian"],
+      ["fënjeshtër", "dritë#German"],
+    ] as const) {
+      const [target, base] = dritareTargetFirstFixtureFactsV0_1();
+      const targetLinks = reference === null
+        ? []
+        : [{ sourceForm: "dritë", reference }];
+      const queryTarget = {
+        ...target,
+        sourceRecordId: `kaikki-albanian-jsonl:word=${encodeURIComponent(form)}:ordinal=fixture`,
+        entryLocator: `jsonl://word/${encodeURIComponent(form)}/match/fixture`,
+        form,
+        etymologyLinks: targetLinks,
+      };
+      const discovery = await discoveryForFactsV0_1([queryTarget, base], form);
+      expect(discovery.albanianLexicalReading?.functionalMeaningBridge).toMatchObject({
+        status: "NULL",
+        functionalHypothesis: { status: "UNKNOWN_OR_NULL", functionalOperation: null, statement: null },
+      });
+      expect(discovery.albanianLexicalReading?.relatedCandidateEvaluations).toEqual([]);
+      expect(discovery.albanianLexicalReading?.interpretation.status).toBe("UNKNOWN_OR_NULL");
+    }
+
+    const [target, base] = dritareTargetFirstFixtureFactsV0_1();
+    const noExplanation = await discoveryForFactsV0_1([
+      { ...target, etymologyText: null },
+      base,
+    ], "dritare");
+    expect(noExplanation.albanianLexicalReading?.relatedCandidateEvaluations).toEqual([]);
+    expect(noExplanation.albanianLexicalReading?.functionalMeaningBridge.functionalHypothesis.functionalOperation).toBeNull();
+  });
+
+  it("fails closed for negated transmission, conflicting base senses, duplicate source records, or missing IPA structure", async () => {
+    const [target, base] = dritareTargetFirstFixtureFactsV0_1();
+    const negated = await discoveryForFactsV0_1([{
+      ...target,
+      etymologyText: "From dritë (“light”) + -are (“-er”), meaning to not let light through.",
+    }, base], "dritare");
+    expect(negated.albanianLexicalReading?.functionalMeaningBridge).toMatchObject({
+      status: "NULL",
+      functionalHypothesis: { status: "UNKNOWN_OR_NULL", functionalOperation: null, statement: null },
+      reasonCodes: expect.arrayContaining(["SOURCE_LINKED_RELATION_NOT_SUPPORTED"]),
+    });
+    expect(negated.albanianLexicalReading?.relatedCandidateEvaluations).toEqual([]);
+
+    const conflictingBase = await discoveryForFactsV0_1([target, {
+      ...base,
+      senses: [
+        ...base.senses,
+        { senseId: "en-dritë-sq-noun-conflict", glosses: ["clarity"] },
+      ],
+    }], "dritare");
+    expect(conflictingBase.albanianLexicalReading?.functionalMeaningBridge.status).toBe("NULL");
+    expect(conflictingBase.albanianLexicalReading?.functionalMeaningBridge.functionalHypothesis.functionalOperation).toBeNull();
+
+    const duplicateBase = await discoveryForFactsV0_1([target, base, {
+      ...base,
+      sourceRecordId: "kaikki-albanian-jsonl:word=drit%C3%AB:ordinal=1",
+      entryLocator: "jsonl://word/drit%C3%AB/match/1",
+    }], "dritare");
+    expect(duplicateBase.albanianLexicalReading?.relatedCandidateEvaluations).toEqual([]);
+    expect(duplicateBase.albanianLexicalReading?.functionalMeaningBridge.status).toBe("NULL");
+
+    const duplicateTarget = await discoveryForFactsV0_1([target, {
+      ...target,
+      sourceRecordId: "kaikki-albanian-jsonl:word=dritare:ordinal=1",
+      entryLocator: "jsonl://word/dritare/match/1",
+    }, base], "dritare");
+    expect(duplicateTarget.albanianLexicalReading?.relatedCandidateEvaluations).toEqual([]);
+    expect(duplicateTarget.albanianLexicalReading?.functionalMeaningBridge.status).toBe("NULL");
+
+    const missingStructure = await discoveryForFactsV0_1([
+      { ...target, ipaObservations: [] },
+      { ...base, ipaObservations: [] },
+    ], "dritare");
+    expect(missingStructure.albanianLexicalReading?.functionalMeaningBridge).toMatchObject({
+      status: "NULL",
+      reasonCodes: expect.arrayContaining(["DERIVED_STRUCTURE_NOT_SUPPORTED_FOR_BOTH_RECORDS"]),
+      functionalHypothesis: { status: "UNKNOWN_OR_NULL", functionalOperation: null, statement: null },
+    });
   });
 
   it.each([
@@ -3922,7 +4114,7 @@ describe("real Albanian exact lexical source integration v0.1", () => {
     });
   });
 
-  it("exposes the bounded Five Windows comparison with source-gated classifications and four additional queries", async () => {
+  it("exposes the bounded Five Windows comparison with four comparison queries plus one target-reference lookup", async () => {
     const facts = fiveWindowsFixtureFactsV0_1();
     const baseProvider = createAlbanianKaikkiServerOnlyExactLexicalSourceProviderForSyntheticFixtureV0_1({ facts });
     const queries: string[] = [];
@@ -3943,7 +4135,7 @@ describe("real Albanian exact lexical source integration v0.1", () => {
     });
     const comparison = result.discovery.albanianLexicalReading?.fiveWindowsComparison;
 
-    expect(queries).toEqual(["dritare", "fënjeshtër", "finestër", "penxhere", "derkë"]);
+    expect(queries).toEqual(["dritare", "fënjeshtër", "finestër", "penxhere", "derkë", "dritë"]);
     expect(comparison).toMatchObject({
       comparisonId: "FIVE_WINDOWS",
       queryForm: "dritare",
