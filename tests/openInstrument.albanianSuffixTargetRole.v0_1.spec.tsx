@@ -209,8 +209,13 @@ describeWithRealSource("source-authored suffix direct-target AGENT with the froz
   it("preserves real-source base, AF, AGENT, compound, and Null controls", async () => {
     const outputs: Record<string, { status: unknown; operation: unknown; relation: unknown }> = {};
     for (const word of ["shkencë", "orëndreqës", "zjarrfikës", "pelar", "bletar", "luleshitës", "fuzhnjar", "thëngjilltar", "gjitar", "kombëtar"]) {
-      const reading = realReading(await realDiscovery(word));
+      const discovery = await realDiscovery(word);
+      const reading = realReading(discovery);
       const bridge = functionalBridge(reading);
+      if (["shkencë", "orëndreqës", "pelar"].includes(word)) {
+        expect(adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: discovery }).motivationDiscoveryV0_1?.kind)
+          .toBe("present");
+      }
       outputs[word] = {
         status: bridge.status,
         operation: (bridge.functionalHypothesis as Record<string, unknown>).functionalOperation,
@@ -281,8 +286,32 @@ describe("source-authored suffix direct-target AGENT synthetic controls", () => 
 });
 
 describeWithRealSource("source-authored suffix direct-target AGENT adapter tampering with the frozen source", () => {
-  it("rejects tampered suffix relation, reference, and role-category payloads in the adapter", () => {
+  it("rejects altered source identity, sense meaning, statement, basis, and template evidence in the adapter", () => {
     const cases: readonly [string, (body: ApiBody) => void][] = [
+      ["source SHA-256", (body) => {
+        const discovery = body.motivationDiscoveryV0_1 as Record<string, unknown>;
+        const facts = discovery.exactLexicalSourceFacts as Record<string, unknown>[];
+        const target = facts.find((fact) => fact.form === "shkencëtar")!;
+        (target.sourceSnapshot as Record<string, unknown>).sha256 = "0".repeat(64);
+      }],
+      ["source URL", (body) => {
+        const discovery = body.motivationDiscoveryV0_1 as Record<string, unknown>;
+        const facts = discovery.exactLexicalSourceFacts as Record<string, unknown>[];
+        const target = facts.find((fact) => fact.form === "shkencëtar")!;
+        (target.sourceSnapshot as Record<string, unknown>).sourceUrl = "https://example.invalid/dictionary.jsonl";
+      }],
+      ["source family", (body) => {
+        const discovery = body.motivationDiscoveryV0_1 as Record<string, unknown>;
+        const facts = discovery.exactLexicalSourceFacts as Record<string, unknown>[];
+        const target = facts.find((fact) => fact.form === "shkencëtar")!;
+        (target.sourceSnapshot as Record<string, unknown>).sourceFamilyId = "other-source-v1";
+      }],
+      ["source byte count", (body) => {
+        const discovery = body.motivationDiscoveryV0_1 as Record<string, unknown>;
+        const facts = discovery.exactLexicalSourceFacts as Record<string, unknown>[];
+        const target = facts.find((fact) => fact.form === "shkencëtar")!;
+        (target.sourceSnapshot as Record<string, unknown>).bytes = SOURCE_BYTES + 1;
+      }],
       ["relation", (body) => {
         const discovery = body.motivationDiscoveryV0_1 as Record<string, unknown>;
         const reading = discovery.albanianLexicalReading as Record<string, unknown>;
@@ -304,6 +333,98 @@ describeWithRealSource("source-authored suffix direct-target AGENT adapter tampe
         const categories = senses[0]!.categories as Record<string, unknown>[];
         const occupation = categories.find((category) => category.orig === "sq:Occupations")!;
         occupation.source = "w+disamb";
+      }],
+      ["projected role-sense gloss", (body) => {
+        const discovery = body.motivationDiscoveryV0_1 as Record<string, unknown>;
+        const reading = discovery.albanianLexicalReading as Record<string, unknown>;
+        const bridge = reading.functionalMeaningBridge as Record<string, unknown>;
+        const sourceFacts = bridge.sourceFacts as Record<string, unknown>;
+        const primary = sourceFacts.primary as Record<string, unknown>;
+        const senses = primary.sourceSenses as Record<string, unknown>[];
+        (senses[0]!.glosses as string[])[0] = "an unsupported meaning";
+      }],
+      ["raw role-sense gloss", (body) => {
+        const discovery = body.motivationDiscoveryV0_1 as Record<string, unknown>;
+        const facts = discovery.exactLexicalSourceFacts as Record<string, unknown>[];
+        const target = facts.find((fact) => fact.form === "shkencëtar")!;
+        const senses = target.senses as Record<string, unknown>[];
+        (senses[0]!.glosses as string[])[0] = "an unsupported meaning";
+      }],
+      ["component source-sense projection", (body) => {
+        const discovery = body.motivationDiscoveryV0_1 as Record<string, unknown>;
+        const reading = discovery.albanianLexicalReading as Record<string, unknown>;
+        const component = reading.sourceLinkedComponentReading as Record<string, unknown>;
+        const primary = component.primary as Record<string, unknown>;
+        const senses = primary.sourceSenses as Record<string, unknown>[];
+        (senses[0]!.glosses as string[])[0] = "an unsupported meaning";
+      }],
+      ["bridge meaning gloss", (body) => {
+        const discovery = body.motivationDiscoveryV0_1 as Record<string, unknown>;
+        const reading = discovery.albanianLexicalReading as Record<string, unknown>;
+        const bridge = reading.functionalMeaningBridge as Record<string, unknown>;
+        const sourceFacts = bridge.sourceFacts as Record<string, unknown>;
+        (sourceFacts.primary as Record<string, unknown>).meaningGlosses = ["an unsupported meaning"];
+      }],
+      ["displayed statement", (body) => {
+        const discovery = body.motivationDiscoveryV0_1 as Record<string, unknown>;
+        const reading = discovery.albanianLexicalReading as Record<string, unknown>;
+        const bridge = reading.functionalMeaningBridge as Record<string, unknown>;
+        (bridge.functionalHypothesis as Record<string, unknown>).statement =
+          "This unsupported text replaces the source-bounded explanation.";
+      }],
+      ["substituted projected source sense", (body) => {
+        const discovery = body.motivationDiscoveryV0_1 as Record<string, unknown>;
+        const reading = discovery.albanianLexicalReading as Record<string, unknown>;
+        const bridge = reading.functionalMeaningBridge as Record<string, unknown>;
+        const sourceFacts = bridge.sourceFacts as Record<string, unknown>;
+        const senses = (sourceFacts.primary as Record<string, unknown>).sourceSenses as Record<string, unknown>[];
+        senses[0]!.senseId = "unattested-target-sense";
+      }],
+      ["missing raw target sense", (body) => {
+        const discovery = body.motivationDiscoveryV0_1 as Record<string, unknown>;
+        const facts = discovery.exactLexicalSourceFacts as Record<string, unknown>[];
+        const target = facts.find((fact) => fact.form === "shkencëtar")!;
+        target.senses = [];
+      }],
+      ["removed direct-target basis marker", (body) => {
+        const discovery = body.motivationDiscoveryV0_1 as Record<string, unknown>;
+        const reading = discovery.albanianLexicalReading as Record<string, unknown>;
+        const bridge = reading.functionalMeaningBridge as Record<string, unknown>;
+        const hypothesis = bridge.functionalHypothesis as Record<string, unknown>;
+        hypothesis.basis = (hypothesis.basis as string[]).filter((item) =>
+          item !== "SOURCE_ATTESTED_TARGET_ROLE_CATEGORY",
+        );
+      }],
+      ["missing suffix evidence basis", (body) => {
+        const discovery = body.motivationDiscoveryV0_1 as Record<string, unknown>;
+        const reading = discovery.albanianLexicalReading as Record<string, unknown>;
+        const bridge = reading.functionalMeaningBridge as Record<string, unknown>;
+        const hypothesis = bridge.functionalHypothesis as Record<string, unknown>;
+        hypothesis.basis = (hypothesis.basis as string[]).filter((item) =>
+          item !== "TARGET_SOURCE_AUTHORED_SUFFIX_TEMPLATE",
+        );
+      }],
+      ["manipulated direct-target basis marker", (body) => {
+        const discovery = body.motivationDiscoveryV0_1 as Record<string, unknown>;
+        const reading = discovery.albanianLexicalReading as Record<string, unknown>;
+        const bridge = reading.functionalMeaningBridge as Record<string, unknown>;
+        const hypothesis = bridge.functionalHypothesis as Record<string, unknown>;
+        hypothesis.basis = (hypothesis.basis as string[]).map((item) =>
+          item === "SOURCE_ATTESTED_TARGET_ROLE_CATEGORY" ? "UNREVIEWED_TARGET_ROLE" : item,
+        );
+      }],
+      ["forged template base", (body) => {
+        const discovery = body.motivationDiscoveryV0_1 as Record<string, unknown>;
+        const facts = discovery.exactLexicalSourceFacts as Record<string, unknown>[];
+        const target = facts.find((fact) => fact.form === "shkencëtar")!;
+        const templates = target.etymologyTemplates as Record<string, unknown>[];
+        (templates[0]!.args as Record<string, unknown>)["2"] = "unattested-base";
+      }],
+      ["mismatched direct-target record identity", (body) => {
+        const discovery = body.motivationDiscoveryV0_1 as Record<string, unknown>;
+        const reading = discovery.albanianLexicalReading as Record<string, unknown>;
+        const component = reading.sourceLinkedComponentReading as Record<string, unknown>;
+        (component.relation as Record<string, unknown>).primarySourceRecordId = "forged-record-id";
       }],
     ];
     for (const [_label, mutate] of cases) {

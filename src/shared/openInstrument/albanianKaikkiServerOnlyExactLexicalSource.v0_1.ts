@@ -1,18 +1,24 @@
 import { createHash } from "node:crypto";
 import { createReadStream, readFileSync } from "node:fs";
 import { open, stat, type FileHandle } from "node:fs/promises";
+import {
+  ALBANIAN_KAIKKI_LEXICAL_SOURCE_BYTES_V0_1,
+  ALBANIAN_KAIKKI_LEXICAL_SOURCE_FAMILY_ID_V0_1,
+  ALBANIAN_KAIKKI_LEXICAL_SOURCE_SHA256_V0_1,
+  ALBANIAN_KAIKKI_LEXICAL_SOURCE_URL_V0_1,
+} from "./albanianKaikkiExactLexicalSourceIdentity.v0_1";
+
+export {
+  ALBANIAN_KAIKKI_LEXICAL_SOURCE_BYTES_V0_1,
+  ALBANIAN_KAIKKI_LEXICAL_SOURCE_FAMILY_ID_V0_1,
+  ALBANIAN_KAIKKI_LEXICAL_SOURCE_SHA256_V0_1,
+  ALBANIAN_KAIKKI_LEXICAL_SOURCE_URL_V0_1,
+} from "./albanianKaikkiExactLexicalSourceIdentity.v0_1";
 
 export const ALBANIAN_KAIKKI_SERVER_ONLY_EXACT_LEXICAL_SOURCE_PROVIDER_ID_V0_1 =
   "open-instrument.albanian-kaikki-server-only-exact-lexical-source.v0.1" as const;
 export const ALBANIAN_KAIKKI_LEXICAL_SOURCE_PATH_ENV_V0_1 =
   "OPEN_INSTRUMENT_ALBANIAN_LEXICAL_SOURCE_PATH" as const;
-export const ALBANIAN_KAIKKI_LEXICAL_SOURCE_URL_V0_1 =
-  "https://kaikki.org/dictionary/Albanian/kaikki.org-dictionary-Albanian.jsonl" as const;
-export const ALBANIAN_KAIKKI_LEXICAL_SOURCE_FAMILY_ID_V0_1 =
-  "kaikki-albanian-jsonl-v0.1" as const;
-export const ALBANIAN_KAIKKI_LEXICAL_SOURCE_SHA256_V0_1 =
-  "7a84eca776ebfac752e7251bb0822edc9cd1701d1d58060d4f8ef4b76a208fcc" as const;
-export const ALBANIAN_KAIKKI_LEXICAL_SOURCE_BYTES_V0_1 = 67438537 as const;
 export const ALBANIAN_KAIKKI_LEXICAL_PRONUNCIATION_AUTHORITY_V0_1 =
   "CURRENT_KAIKKI_RECORD_ONLY_UNBOUND_TO_FROZEN_PROFILE" as const;
 export const ALBANIAN_KAIKKI_COLD_START_DIAGNOSTICS_ENV_V0_1 =
