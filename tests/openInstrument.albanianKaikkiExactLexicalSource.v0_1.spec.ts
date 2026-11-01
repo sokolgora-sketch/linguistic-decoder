@@ -5863,6 +5863,14 @@ describe("sense-conditioned functional reasoning v0.4", () => {
       sourceAssertionOrdinal: 0,
       reasonCodes: ["SOURCE_SENSE_ORDINAL_MISMATCH"],
     }],
+    ["explicit source-sense owner with a legacy marker", {
+      assertionScope: "SOURCE_SENSE",
+      sourceSenseId: null,
+      sourceSenseOrdinal: 0,
+      sourceSenseIdentityStatus: "UNKNOWN_OR_NULL",
+      sourceAssertionOrdinal: 0,
+      reasonCodes: ["SOURCE_RELATION_PROVENANCE_NOT_PROJECTED"],
+    }],
   ] as const)("keeps functional AGENT Null for %s", async (_label, assertion) => {
     const primarySenses = assertion.sourceSenseId === "duplicate-owner"
       ? [
@@ -5922,11 +5930,85 @@ describe("sense-conditioned functional reasoning v0.4", () => {
       primary: forgedComparison.primary,
       comparison: forgedComparison,
       related: forgedComparison.related,
+      sourceRelationAssertion: candidate.sourceRelationAssertion,
       sourceRelation: "SOURCE_DERIVED_FORM",
     });
     expect(forgedBridge).toMatchObject({
       status: "NULL",
       functionalHypothesis: { status: "UNKNOWN_OR_NULL", functionalOperation: null, statement: null },
     });
+  });
+
+  it("fails closed when a comparison claims another valid sense than the source relation edge", async () => {
+    const assertion: AlbanianKaikkiSourceRelationAssertionV0_1 = {
+      assertionScope: "SOURCE_SENSE",
+      sourceSenseId: "fish-owner",
+      sourceSenseOrdinal: 0,
+      sourceSenseIdentityStatus: "VERIFIED",
+      sourceAssertionOrdinal: 0,
+      reasonCodes: [],
+    };
+    const discovery = await discoveryForFactsV0_1(sourceSenseAgentFixtures(assertion), "sense-agent-base");
+    const candidate = discovery.albanianLexicalReading?.relatedCandidateEvaluations.find((item) =>
+      item.relatedForm === "sense-agent-target",
+    );
+    if (!candidate?.sourceLinkedComparison.related) {
+      throw new Error("Expected a source-linked candidate for the forged same-record owner control");
+    }
+    const forgedComparison = {
+      ...candidate.sourceLinkedComparison,
+      relation: {
+        ...candidate.sourceLinkedComparison.relation,
+        sourceRelationAssertion: {
+          ...assertion,
+          sourceSenseId: "unrelated-primary",
+          sourceSenseOrdinal: 1,
+        },
+      },
+    } as typeof candidate.sourceLinkedComparison;
+    const forgedBridge = buildAlbanianFunctionalMeaningBridgeV0_1({
+      primary: forgedComparison.primary,
+      comparison: forgedComparison,
+      related: forgedComparison.related,
+      sourceRelationAssertion: candidate.sourceRelationAssertion,
+      sourceRelation: "SOURCE_DERIVED_FORM",
+    });
+    expect(forgedBridge).toMatchObject({
+      status: "NULL",
+      functionalHypothesis: { status: "UNKNOWN_OR_NULL", functionalOperation: null, statement: null },
+    });
+  });
+
+  it("preserves legacy record-level meanings when individual source senses were not projected", async () => {
+    const legacyAssertion: AlbanianKaikkiSourceRelationAssertionV0_1 = {
+      assertionScope: "UNKNOWN_OR_NULL",
+      sourceSenseId: null,
+      sourceSenseOrdinal: null,
+      sourceSenseIdentityStatus: "UNKNOWN_OR_NULL",
+      sourceAssertionOrdinal: null,
+      reasonCodes: ["SOURCE_RELATION_PROVENANCE_NOT_PROJECTED"],
+    };
+    const discovery = await discoveryForFactsV0_1(sourceSenseAgentFixtures(legacyAssertion), "sense-agent-base");
+    const candidate = discovery.albanianLexicalReading?.relatedCandidateEvaluations.find((item) =>
+      item.relatedForm === "sense-agent-target",
+    );
+    if (!candidate?.sourceLinkedComparison.related) {
+      throw new Error("Expected a source-linked candidate for the legacy projection control");
+    }
+    const legacyPrimary = { ...candidate.sourceLinkedComparison.primary, sourceSenses: undefined };
+    const legacyComparison = { ...candidate.sourceLinkedComparison, primary: legacyPrimary };
+    const legacyBridge = buildAlbanianFunctionalMeaningBridgeV0_1({
+      primary: legacyPrimary,
+      comparison: legacyComparison,
+      related: legacyComparison.related,
+      sourceRelationAssertion: candidate.sourceRelationAssertion,
+      sourceRelation: "SOURCE_DERIVED_FORM",
+    });
+    expect(legacyBridge).toMatchObject({
+      status: "SUPPORTED",
+      functionalHypothesis: { functionalOperation: "AGENT" },
+    });
+    expect(legacyBridge.functionalHypothesis.statement).toContain("fish; seller");
+    expect(legacyBridge.functionalHypothesis.statement).not.toContain("fish-owner");
   });
 });

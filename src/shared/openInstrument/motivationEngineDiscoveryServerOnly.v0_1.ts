@@ -1646,6 +1646,7 @@ async function buildTargetAuthoredEtymologyCandidateV0_1(input: Readonly<{
       primary: sourceRecordProjectionV0_1(base, baseAnalyses),
       comparison,
       related: sourceRecordProjectionV0_1(input.target, projectAlbanianKaikkiFactSourceIpaToSevenVoicesV0_1(input.target)),
+      sourceRelationAssertion: relation.sourceRelationAssertion,
       sourceRelation: relation.relation,
     });
 
@@ -1747,6 +1748,7 @@ async function buildTargetAuthoredEtymologyCandidateV0_1(input: Readonly<{
     primary: sourceRecordProjectionV0_1(base, projectAlbanianKaikkiFactSourceIpaToSevenVoicesV0_1(base)),
     comparison,
     related: sourceRecordProjectionV0_1(input.target, projectAlbanianKaikkiFactSourceIpaToSevenVoicesV0_1(input.target)),
+    sourceRelationAssertion: relation.sourceRelationAssertion,
     sourceRelation: relation.relation,
   });
 
@@ -1802,16 +1804,45 @@ type AlbanianSourceFunctionalMeaningSelectionV0_1 = Readonly<{
   selectedGlosses: readonly string[];
 }>;
 
+function sameSourceRelationAssertionV0_1(
+  left: AlbanianKaikkiSourceRelationAssertionV0_1 | null | undefined,
+  right: AlbanianKaikkiSourceRelationAssertionV0_1 | null | undefined,
+): boolean {
+  const normalizedLeft = left ?? null;
+  const normalizedRight = right ?? null;
+  if (normalizedLeft === null || normalizedRight === null) return normalizedLeft === normalizedRight;
+  return normalizedLeft.assertionScope === normalizedRight.assertionScope &&
+    normalizedLeft.sourceSenseId === normalizedRight.sourceSenseId &&
+    normalizedLeft.sourceSenseOrdinal === normalizedRight.sourceSenseOrdinal &&
+    normalizedLeft.sourceSenseIdentityStatus === normalizedRight.sourceSenseIdentityStatus &&
+    normalizedLeft.sourceAssertionOrdinal === normalizedRight.sourceAssertionOrdinal &&
+    normalizedLeft.reasonCodes.length === normalizedRight.reasonCodes.length &&
+    normalizedLeft.reasonCodes.every((reason, index) => reason === normalizedRight.reasonCodes[index]);
+}
+
 function sourceFunctionalMeaningSelectionV0_1(input: Readonly<{
   record: AlbanianSourceLinkedRecordV0_1;
   comparison: AlbanianSourceLinkedComparisonV0_1 | null | undefined;
+  sourceRelationAssertion: AlbanianKaikkiSourceRelationAssertionV0_1 | null;
   matchesGloss?: (gloss: string) => boolean;
 }>): AlbanianSourceFunctionalMeaningSelectionV0_1 {
   const allSenses = Object.freeze([...(input.record.sourceSenses ?? [])]);
   const matchesGloss = input.matchesGloss ?? (() => true);
-  const assertion = input.comparison?.relation.sourceRelationAssertion;
-  const legacyProvenance = assertion === null || assertion === undefined ||
-    assertion.reasonCodes.includes("SOURCE_RELATION_PROVENANCE_NOT_PROJECTED");
+  const assertion = input.sourceRelationAssertion ?? null;
+  const assertionIsBoundToSourceEdge = input.comparison
+    ? sameSourceRelationAssertionV0_1(assertion, input.comparison.relation.sourceRelationAssertion)
+    : assertion === null;
+  if (!assertionIsBoundToSourceEdge) {
+    return Object.freeze({
+      authority: "SOURCE_SENSE_UNVERIFIED" as const,
+      selectedSenses: Object.freeze([]),
+      alternativeSenses: allSenses,
+      selectedGlosses: Object.freeze([]),
+    });
+  }
+  const legacyProvenance = assertion === null ||
+    (assertion.assertionScope === "UNKNOWN_OR_NULL" &&
+      assertion.reasonCodes.includes("SOURCE_RELATION_PROVENANCE_NOT_PROJECTED"));
   const relationOwnsThisRecord = !input.comparison ||
     input.comparison.relation.primarySourceRecordId === input.record.sourceRecordId;
 
@@ -1828,15 +1859,6 @@ function sourceFunctionalMeaningSelectionV0_1(input: Readonly<{
       ownerCandidates.length === 1 &&
       allSenses.filter((sense) => sense.senseId === assertion.sourceSenseId).length === 1;
     if (!ownerIsVerified) {
-      if (legacyProvenance) {
-        const selectedSenses = Object.freeze(allSenses.filter((sense) => sense.glosses.some(matchesGloss)));
-        return Object.freeze({
-          authority: "LEGACY_OR_UNOWNED" as const,
-          selectedSenses,
-          alternativeSenses: Object.freeze(allSenses.filter((sense) => !selectedSenses.includes(sense))),
-          selectedGlosses: Object.freeze([...new Set(selectedSenses.flatMap((sense) => sense.glosses))]),
-        });
-      }
       return Object.freeze({
         authority: "SOURCE_SENSE_UNVERIFIED" as const,
         selectedSenses: Object.freeze([]),
@@ -1870,11 +1892,14 @@ function sourceFunctionalMeaningSelectionV0_1(input: Readonly<{
     });
   }
   const selectedSenses = Object.freeze(allSenses.filter((sense) => sense.glosses.some(matchesGloss)));
+  const selectedGlosses = input.record.sourceSenses === undefined
+    ? input.record.meaningGlosses.filter(matchesGloss)
+    : selectedSenses.flatMap((sense) => sense.glosses);
   return Object.freeze({
     authority,
     selectedSenses,
     alternativeSenses: Object.freeze(allSenses.filter((sense) => !selectedSenses.includes(sense))),
-    selectedGlosses: Object.freeze([...new Set(selectedSenses.flatMap((sense) => sense.glosses))]),
+    selectedGlosses: Object.freeze([...new Set(selectedGlosses)]),
   });
 }
 
@@ -2036,15 +2061,18 @@ function buildDirectionalFunctionalHypothesisV0_1(input: Readonly<{
   primary: AlbanianSourceLinkedRecordV0_1;
   related: AlbanianSourceLinkedRecordV0_1;
   comparison: AlbanianSourceLinkedComparisonV0_1 | null;
+  sourceRelationAssertion: AlbanianKaikkiSourceRelationAssertionV0_1 | null;
 }>): AlbanianFunctionalHypothesisV0_1 | null {
   const primarySelection = sourceFunctionalMeaningSelectionV0_1({
     record: input.primary,
     comparison: input.comparison,
+    sourceRelationAssertion: input.sourceRelationAssertion,
     matchesGloss: (gloss) => /\b(?:light|daylight|illumination|illuminat(?:e|ed|ing)|bright(?:ness)?)\b/iu.test(gloss),
   });
   const relatedSelection = sourceFunctionalMeaningSelectionV0_1({
     record: input.related,
     comparison: null,
+    sourceRelationAssertion: null,
     matchesGloss: (gloss) => /\b(?:window|opening|access)\b/iu.test(gloss),
   });
   if (primarySelection.authority === "SOURCE_SENSE_UNVERIFIED" ||
@@ -2091,6 +2119,7 @@ function buildEntityToAttributedPropertyHypothesisV0_1(input: Readonly<{
   comparison: AlbanianSourceLinkedComparisonV0_1;
   primary: AlbanianSourceLinkedRecordV0_1;
   related: AlbanianSourceLinkedRecordV0_1;
+  sourceRelationAssertion: AlbanianKaikkiSourceRelationAssertionV0_1 | null;
 }>): AlbanianFunctionalHypothesisV0_1 | null {
   if (
     input.comparison.status !== "SUPPORTED" ||
@@ -2106,6 +2135,7 @@ function buildEntityToAttributedPropertyHypothesisV0_1(input: Readonly<{
   const primaryMeaningSelection = sourceFunctionalMeaningSelectionV0_1({
     record: input.primary,
     comparison: input.comparison,
+    sourceRelationAssertion: input.sourceRelationAssertion,
   });
   if (primaryMeaningSelection.authority === "SOURCE_SENSE_UNVERIFIED" ||
     primaryMeaningSelection.selectedGlosses.length === 0) {
@@ -2420,6 +2450,7 @@ function buildAgentFunctionalHypothesisV0_1(input: Readonly<{
   primary: AlbanianSourceLinkedRecordV0_1;
   related: AlbanianSourceLinkedRecordV0_1;
   comparison: AlbanianSourceLinkedComparisonV0_1 | null;
+  sourceRelationAssertion: AlbanianKaikkiSourceRelationAssertionV0_1 | null;
   sourceRelation: AlbanianSourceEvidenceRelationV0_1 | null;
 }>): AlbanianFunctionalHypothesisV0_1 | null {
   const directDerivedForm = input.sourceRelation === "SOURCE_DERIVED_FORM";
@@ -2440,6 +2471,7 @@ function buildAgentFunctionalHypothesisV0_1(input: Readonly<{
   const primaryMeaningSelection = sourceFunctionalMeaningSelectionV0_1({
     record: input.primary,
     comparison: input.comparison,
+    sourceRelationAssertion: input.sourceRelationAssertion,
   });
   if (primaryMeaningSelection.authority === "SOURCE_SENSE_UNVERIFIED" ||
     primaryMeaningSelection.selectedGlosses.length === 0) {
@@ -2528,6 +2560,7 @@ export function buildAlbanianFunctionalMeaningBridgeV0_1(input: Readonly<{
   primary: AlbanianSourceLinkedRecordV0_1;
   comparison: AlbanianSourceLinkedComparisonV0_1 | null;
   related?: AlbanianSourceLinkedRecordV0_1 | null;
+  sourceRelationAssertion: AlbanianKaikkiSourceRelationAssertionV0_1 | null;
   sourceRelation?: AlbanianSourceEvidenceRelationV0_1 | null;
 }>): AlbanianFunctionalMeaningBridgeV0_1 {
   const related = input.related ?? input.comparison?.related ?? null;
@@ -2540,6 +2573,7 @@ export function buildAlbanianFunctionalMeaningBridgeV0_1(input: Readonly<{
         primary: input.primary,
         related,
         comparison: input.comparison,
+        sourceRelationAssertion: input.sourceRelationAssertion,
         sourceRelation,
       })
     : null;
@@ -2561,6 +2595,7 @@ export function buildAlbanianFunctionalMeaningBridgeV0_1(input: Readonly<{
         comparison: input.comparison,
         primary: input.comparison.primary,
         related,
+        sourceRelationAssertion: input.sourceRelationAssertion,
       })
     : null;
   if (derivedStructure === null && entityToAttributedPropertyHypothesis === null && !agentFunctionalHypothesis) {
@@ -2587,6 +2622,7 @@ export function buildAlbanianFunctionalMeaningBridgeV0_1(input: Readonly<{
         primary: input.comparison?.primary ?? input.primary,
         related,
         comparison: input.comparison,
+        sourceRelationAssertion: input.sourceRelationAssertion,
       })
     : null;
   const functionalHypothesis = directionalHypothesis ?? entityToAttributedPropertyHypothesis ?? agentFunctionalHypothesis;
@@ -3072,6 +3108,7 @@ async function buildAlbanianLexicalReadingV0_1(input: Readonly<{
       related: resolved
         ? sourceRecordProjectionV0_1(resolved, projectAlbanianKaikkiFactSourceIpaToSevenVoicesV0_1(resolved))
         : null,
+      sourceRelationAssertion: relatedForm.sourceRelationAssertion,
       sourceRelation: relatedForm.relation,
     });
     return Object.freeze({
@@ -3168,6 +3205,7 @@ async function buildAlbanianLexicalReadingV0_1(input: Readonly<{
         : selectedRelatedFunctionalBridge ?? buildAlbanianFunctionalMeaningBridgeV0_1({
             primary: primaryProjection,
             comparison: null,
+            sourceRelationAssertion: null,
           }));
 
   const compositionCandidate = relatedResultsWithFacts.find(({ resolved }) => resolved !== null);
