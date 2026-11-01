@@ -21,8 +21,32 @@ import {
 } from "@/shared/openInstrument/albanianKaikkiServerOnlyExactLexicalSource.v0_1";
 import { createAlbanianKaikkiServerOnlyProductionProviderV0_1 } from "@/shared/openInstrument/albanianKaikkiServerOnlySourceDelivery.v0_1";
 import {
+  ALBANIAN_KAIKKI_LEXICAL_SOURCE_BYTES_V0_1,
+  ALBANIAN_KAIKKI_LEXICAL_SOURCE_FAMILY_ID_V0_1,
+  ALBANIAN_KAIKKI_LEXICAL_SOURCE_SHA256_V0_1,
+  ALBANIAN_KAIKKI_LEXICAL_SOURCE_URL_V0_1,
+} from "@/shared/openInstrument/albanianKaikkiExactLexicalSourceIdentity.v0_1";
+import {
+  normalizeAlbaNetLemmaV0_1,
   getProductionAlbaNetSourceV0_1,
+  type AlbaNetSourceFamilyAdapterV0_1,
 } from "@/shared/openInstrument/albanetSourceFamilyAdapter.v0_1";
+import {
+  ALBANET_SOURCE_FAMILY_ID_V0_1,
+  ALBANET_SOURCE_FILE_SHA256_V0_1,
+  ALBANET_SOURCE_REPOSITORY_V0_1,
+  ALBANET_SOURCE_REVISION_V0_1,
+  ALBANET_SOURCE_TITLE_V0_1,
+} from "@/shared/openInstrument/albanetSourceIdentity.v0_1";
+import {
+  ALBANIAN_SENSE_ALIGNED_LEXICAL_ROLE_ALTERNATIVES_V0_1,
+  ALBANIAN_SENSE_ALIGNED_LEXICAL_ROLE_CLAIM_BOUNDARY_V0_1,
+  ALBANIAN_SENSE_ALIGNED_LEXICAL_ROLE_LINEAGE_STATUS_V0_1,
+  ALBANIAN_SENSE_ALIGNED_LEXICAL_ROLE_PREDICATE_ID_V0_1,
+  ALBANIAN_SENSE_ALIGNED_LEXICAL_ROLE_REVIEWED_DEFINITIONS_V0_1,
+  ALBANIAN_SENSE_ALIGNED_LEXICAL_ROLE_SCHEMA_V0_1,
+  ALBANIAN_SENSE_ALIGNED_LEXICAL_ROLE_STATEMENT_V0_1,
+} from "@/shared/openInstrument/albanianSenseAlignedLexicalRolePolicy.v0_1";
 import {
   getProductionLexinSourceV0_1,
 } from "@/shared/openInstrument/lexinSourceFamilyAdapter.v0_1";
@@ -157,6 +181,8 @@ export type AlbanianLexicalReadingV0_1 = Readonly<{
   functionalFamilyReading: AlbanianFunctionalFamilyReadingV0_1 | null;
   /** Bounded source/ontology research candidates; never authorizes a functional operation. */
   occupationalRoleResearchCandidates?: AlbanianOccupationalRoleCandidateBatchViewV0_1;
+  /** Sense-owned Kaikki synonym → pinned AlbaNet evidence; functionalOperation remains Null. */
+  senseAlignedLexicalRole?: AlbanianSenseAlignedLexicalRoleEvidenceV0_1;
   /** Additive bounded comparison for the five configured source-backed window forms. */
   fiveWindowsComparison?: AlbanianFiveWindowsComparisonV0_1 | null;
   sourceLinkedComponentReading?: AlbanianSourceLinkedComponentReadingV0_1 | null;
@@ -171,6 +197,55 @@ export type AlbanianLexicalReadingV0_1 = Readonly<{
     basis: readonly string[];
     claimBoundary: string;
   }>;
+}>;
+
+export type AlbanianSenseAlignedLexicalRoleEvidenceV0_1 = Readonly<{
+  schemaVersion: typeof ALBANIAN_SENSE_ALIGNED_LEXICAL_ROLE_SCHEMA_V0_1;
+  status: "SUPPORTED" | "NULL";
+  targetSourceRecordId: string | null;
+  candidates: readonly Readonly<{
+    sourceFact: Readonly<{
+      sourceRecordId: string;
+      entryLocator: string;
+      sourceFamilyId: typeof ALBANIAN_KAIKKI_LEXICAL_SOURCE_FAMILY_ID_V0_1;
+      sourceUrl: typeof ALBANIAN_KAIKKI_LEXICAL_SOURCE_URL_V0_1;
+      sourceSha256: typeof ALBANIAN_KAIKKI_LEXICAL_SOURCE_SHA256_V0_1;
+      sourceBytes: typeof ALBANIAN_KAIKKI_LEXICAL_SOURCE_BYTES_V0_1;
+      form: string;
+      sourceSenseOrdinal: number;
+      sourceSenseId: string | null;
+      glosses: readonly string[];
+      synonymOrdinal: number | null;
+      synonym: string | null;
+    }>;
+    crossSourceFact: Readonly<{
+      sourceRecordId: string;
+      sourceFamilyId: typeof ALBANET_SOURCE_FAMILY_ID_V0_1;
+      sourceTitle: typeof ALBANET_SOURCE_TITLE_V0_1;
+      sourceRevision: typeof ALBANET_SOURCE_REVISION_V0_1;
+      sourceUrl: typeof ALBANET_SOURCE_REPOSITORY_V0_1;
+      sourceSha256: typeof ALBANET_SOURCE_FILE_SHA256_V0_1;
+      entryLocator: string;
+      lemma: string;
+      synsetId: string;
+      definitions: readonly string[];
+    }> | null;
+    inference: Readonly<{
+      status: "SUPPORTED" | "UNKNOWN_OR_NULL";
+      roleLabel: "HUMAN_ROLE" | null;
+      predicateId: typeof ALBANIAN_SENSE_ALIGNED_LEXICAL_ROLE_PREDICATE_ID_V0_1 | null;
+      statement: string | null;
+    }>;
+    functionalOperation: null;
+    reasonCodes: readonly string[];
+  }>[];
+  reasonCodes: readonly string[];
+  alternatives: readonly string[];
+  lineageIndependence: typeof ALBANIAN_SENSE_ALIGNED_LEXICAL_ROLE_LINEAGE_STATUS_V0_1;
+  functionalOperation: null;
+  noSingleWinner: true;
+  userDecisionPosture: "user_decides";
+  claimBoundary: string;
 }>;
 
 export type AlbanianFunctionalMeaningBridgeTruthLayerV0_1 =
@@ -273,6 +348,7 @@ export type AlbanianSourceLinkedRecordV0_1 = Readonly<{
     sourceSenseOrdinal: number;
     senseId: string | null;
     glosses: readonly string[];
+    synonyms?: readonly string[];
     categories: readonly AlbanianKaikkiExactLexicalSourceCategoryV0_1[];
   }>[];
   etymologyText: string | null;
@@ -806,6 +882,7 @@ function sourceRecordProjectionV0_1(
       sourceSenseOrdinal,
       senseId: sense.senseId,
       glosses: Object.freeze([...sense.glosses]),
+      synonyms: Object.freeze([...(sense.synonyms ?? [])]),
       categories: Object.freeze([...(sense.categories ?? [])]),
     }))),
     etymologyText: fact.etymologyText ?? null,
@@ -2954,12 +3031,286 @@ function buildAlbanianFunctionalFamilyReadingV0_1(input: Readonly<{
   });
 }
 
+function nullSenseAlignedLexicalRoleEvidenceV0_1(
+  reasonCodes: readonly string[],
+  targetSourceRecordId: string | null = null,
+): AlbanianSenseAlignedLexicalRoleEvidenceV0_1 {
+  return Object.freeze({
+    schemaVersion: ALBANIAN_SENSE_ALIGNED_LEXICAL_ROLE_SCHEMA_V0_1,
+    status: "NULL",
+    targetSourceRecordId,
+    candidates: Object.freeze([]),
+    reasonCodes: Object.freeze([...reasonCodes]),
+    alternatives: ALBANIAN_SENSE_ALIGNED_LEXICAL_ROLE_ALTERNATIVES_V0_1,
+    lineageIndependence: ALBANIAN_SENSE_ALIGNED_LEXICAL_ROLE_LINEAGE_STATUS_V0_1,
+    functionalOperation: null,
+    noSingleWinner: true,
+    userDecisionPosture: "user_decides",
+    claimBoundary: ALBANIAN_SENSE_ALIGNED_LEXICAL_ROLE_CLAIM_BOUNDARY_V0_1,
+  });
+}
+
+async function buildAlbanianSenseAlignedLexicalRoleEvidenceV0_1(input: Readonly<{
+  word: string;
+  facts: readonly AlbanianKaikkiExactLexicalSourceFactV0_1[];
+  sourceStatus: AlbanianKaikkiExactLexicalSourceStatusV0_1;
+  albanetSourceAdapter: AlbaNetSourceFamilyAdapterV0_1 | null;
+}>): Promise<AlbanianSenseAlignedLexicalRoleEvidenceV0_1> {
+  if (input.sourceStatus.status !== "MATCHES_FOUND") {
+    return nullSenseAlignedLexicalRoleEvidenceV0_1([
+      input.sourceStatus.reasonCode ?? "KAIKKI_TARGET_SOURCE_NOT_AVAILABLE",
+    ]);
+  }
+  if (!input.albanetSourceAdapter) {
+    return nullSenseAlignedLexicalRoleEvidenceV0_1(["ALBANET_SOURCE_ADAPTER_UNAVAILABLE"]);
+  }
+
+  const matchingTargetFacts = input.facts.filter((fact) =>
+    fact.language === "Albanian" && fact.languageCode === "sq" &&
+    normalizeAlbaNetLemmaV0_1(fact.form) === normalizeAlbaNetLemmaV0_1(input.word) &&
+    fact.partOfSpeech !== "name",
+  );
+  if (matchingTargetFacts.length !== 1) {
+    return nullSenseAlignedLexicalRoleEvidenceV0_1([
+      matchingTargetFacts.length === 0
+        ? "KAIKKI_TARGET_RECORD_NOT_FOUND"
+        : "KAIKKI_TARGET_RECORD_IDENTITY_AMBIGUOUS",
+    ]);
+  }
+  const target = matchingTargetFacts[0]!;
+  if (input.facts.filter((fact) => fact.sourceRecordId === target.sourceRecordId).length !== 1) {
+    return nullSenseAlignedLexicalRoleEvidenceV0_1(
+      ["KAIKKI_TARGET_RECORD_IDENTITY_DUPLICATE"],
+      target.sourceRecordId,
+    );
+  }
+  if (
+    target.sourceSnapshot.sourceFamilyId !== ALBANIAN_KAIKKI_LEXICAL_SOURCE_FAMILY_ID_V0_1 ||
+    target.sourceSnapshot.sha256 !== ALBANIAN_KAIKKI_LEXICAL_SOURCE_SHA256_V0_1 ||
+    target.sourceSnapshot.bytes !== ALBANIAN_KAIKKI_LEXICAL_SOURCE_BYTES_V0_1
+  ) {
+    return nullSenseAlignedLexicalRoleEvidenceV0_1(
+      ["KAIKKI_SOURCE_IDENTITY_UNVERIFIED"],
+      target.sourceRecordId,
+    );
+  }
+
+  type PendingCandidate = Readonly<{
+    sourceSenseOrdinal: number;
+    sourceSenseId: string | null;
+    glosses: readonly string[];
+    synonymOrdinal: number | null;
+    synonym: string | null;
+    preflightReason: string | null;
+  }>;
+  const pendingCandidates: PendingCandidate[] = target.senses.flatMap<PendingCandidate>((sense, sourceSenseOrdinal) => {
+    const synonyms = sense.synonyms ?? [];
+    const sourceSenseId = sense.senseId;
+    const senseIdentityCount = sourceSenseId
+      ? target.senses.filter((candidate) => candidate.senseId === sourceSenseId).length
+      : 0;
+    if (synonyms.length === 0) {
+      return [Object.freeze({
+        sourceSenseOrdinal,
+        sourceSenseId,
+        glosses: Object.freeze([...sense.glosses]),
+        synonymOrdinal: null,
+        synonym: null,
+        preflightReason: senseIdentityCount === 1
+          ? "SOURCE_SENSE_SYNONYM_MISSING"
+          : sourceSenseId ? "SOURCE_SENSE_IDENTITY_AMBIGUOUS" : "SOURCE_SENSE_IDENTITY_MISSING",
+      })];
+    }
+    return synonyms.map((synonym, synonymOrdinal) => {
+      const sameSenseOccurrences = synonyms.filter((candidate) =>
+        normalizeAlbaNetLemmaV0_1(candidate) === normalizeAlbaNetLemmaV0_1(synonym),
+      ).length;
+      const ownerCount = target.senses.filter((candidate) =>
+        (candidate.synonyms ?? []).some((candidateSynonym) =>
+          normalizeAlbaNetLemmaV0_1(candidateSynonym) === normalizeAlbaNetLemmaV0_1(synonym),
+        ),
+      ).length;
+      const preflightReason = !sourceSenseId
+        ? "SOURCE_SENSE_IDENTITY_MISSING"
+        : senseIdentityCount !== 1
+          ? "SOURCE_SENSE_IDENTITY_AMBIGUOUS"
+          : sameSenseOccurrences !== 1
+            ? "SOURCE_SENSE_SYNONYM_DUPLICATE"
+            : ownerCount !== 1
+              ? "SOURCE_SYNONYM_SENSE_OWNERSHIP_AMBIGUOUS"
+              : null;
+      return Object.freeze({
+        sourceSenseOrdinal,
+        sourceSenseId,
+        glosses: Object.freeze([...sense.glosses]),
+        synonymOrdinal,
+        synonym,
+        preflightReason,
+      });
+    });
+  });
+  if (pendingCandidates.length === 0) {
+    return nullSenseAlignedLexicalRoleEvidenceV0_1(
+      ["SOURCE_SENSES_NOT_AVAILABLE"],
+      target.sourceRecordId,
+    );
+  }
+
+  const candidates = await Promise.all(pendingCandidates.map(async (pending) => {
+    const sourceFact = Object.freeze({
+      sourceRecordId: target.sourceRecordId,
+      entryLocator: target.entryLocator,
+      sourceFamilyId: ALBANIAN_KAIKKI_LEXICAL_SOURCE_FAMILY_ID_V0_1,
+      sourceUrl: ALBANIAN_KAIKKI_LEXICAL_SOURCE_URL_V0_1,
+      sourceSha256: ALBANIAN_KAIKKI_LEXICAL_SOURCE_SHA256_V0_1,
+      sourceBytes: ALBANIAN_KAIKKI_LEXICAL_SOURCE_BYTES_V0_1,
+      form: target.form,
+      sourceSenseOrdinal: pending.sourceSenseOrdinal,
+      sourceSenseId: pending.sourceSenseId,
+      glosses: pending.glosses,
+      synonymOrdinal: pending.synonymOrdinal,
+      synonym: pending.synonym,
+    });
+    const unresolved = (
+      reason: string,
+      crossSourceFact: AlbanianSenseAlignedLexicalRoleEvidenceV0_1["candidates"][number]["crossSourceFact"] = null,
+    ) => Object.freeze({
+      sourceFact,
+      crossSourceFact,
+      inference: Object.freeze({
+        status: "UNKNOWN_OR_NULL" as const,
+        roleLabel: null,
+        predicateId: null,
+        statement: null,
+      }),
+      functionalOperation: null,
+      reasonCodes: Object.freeze([reason]),
+    });
+
+    if (pending.preflightReason) return unresolved(pending.preflightReason);
+    if (pending.synonym === null) return unresolved("SOURCE_SENSE_SYNONYM_MISSING");
+
+    let sourceLemmaRecordCount: number;
+    try {
+      sourceLemmaRecordCount = input.albanetSourceAdapter!.getLemmaRecords(pending.synonym).length;
+    } catch {
+      return unresolved("ALBANET_ADAPTER_QUERY_FAILED");
+    }
+    if (sourceLemmaRecordCount === 0) {
+      return unresolved("ALBANET_LEMMA_NOT_FOUND_OR_DEFINITION_MISSING");
+    }
+    if (sourceLemmaRecordCount !== 1) {
+      return unresolved("ALBANET_LEMMA_SYNSET_AMBIGUOUS");
+    }
+
+    let adapterResult: GenericFunctionalWitnessSourceAdapterResultV1;
+    try {
+      adapterResult = input.albanetSourceAdapter!.query({
+        schemaVersion: "open-instrument.generic-functional-witness-discovery.v1",
+        embryo: pending.synonym,
+        voicePath: Object.freeze([]),
+        queryNormalization: "EXACT_NFC",
+      });
+    } catch {
+      return unresolved("ALBANET_ADAPTER_QUERY_FAILED");
+    }
+    if (!adapterResult.ok) return unresolved("ALBANET_ADAPTER_QUERY_FAILED");
+    if (adapterResult.records.length === 0) {
+      return unresolved("ALBANET_LEMMA_NOT_FOUND_OR_DEFINITION_MISSING");
+    }
+    if (adapterResult.records.length !== 1) {
+      return unresolved("ALBANET_LEMMA_SYNSET_AMBIGUOUS");
+    }
+
+    const record = adapterResult.records[0]!;
+    const provenance = record.sourceProvenance;
+    const details = record.sourceDetails;
+    const validAlbaNetIdentity = Boolean(
+      pending.synonym && record.queryForm === pending.synonym &&
+      record.evidenceFamily === "lexical_dictionary" && record.language === "Albanian" &&
+      record.sourceFormNormalization === "EXACT_PRESERVED" &&
+      normalizeAlbaNetLemmaV0_1(record.sourceForm) === normalizeAlbaNetLemmaV0_1(pending.synonym) &&
+      record.sourceId === `${ALBANET_SOURCE_FAMILY_ID_V0_1}:${details?.synsetId}:lemma=${encodeURIComponent(record.sourceForm)}` &&
+      record.attestationTruth === "fact" && record.sourceStatus === "research_candidate" &&
+      provenance?.sourceRecordId === record.sourceId &&
+      provenance.sourceTraditionId === ALBANET_SOURCE_FAMILY_ID_V0_1 &&
+      provenance.sourceTitle === ALBANET_SOURCE_TITLE_V0_1 &&
+      provenance.sourceDateOrVersion === `omw-data ${ALBANET_SOURCE_REVISION_V0_1}` &&
+      provenance.sourceUrlOrArchiveRef === ALBANET_SOURCE_REPOSITORY_V0_1 &&
+      provenance.sourceHashOrArchiveHash === `sha256:${ALBANET_SOURCE_FILE_SHA256_V0_1}` &&
+      provenance.entryLocator === record.citationRefs[1] &&
+      record.citationRefs[0] === ALBANET_SOURCE_REPOSITORY_V0_1 &&
+      details?.synsetId && details.definitions.length > 0 &&
+      record.gloss === details.definitions.join(" · ")
+    );
+    if (!validAlbaNetIdentity || !provenance || !details) {
+      return unresolved("ALBANET_SOURCE_IDENTITY_UNVERIFIED");
+    }
+
+    const crossSourceFact = Object.freeze({
+      sourceRecordId: record.sourceId,
+      sourceFamilyId: ALBANET_SOURCE_FAMILY_ID_V0_1,
+      sourceTitle: ALBANET_SOURCE_TITLE_V0_1,
+      sourceRevision: ALBANET_SOURCE_REVISION_V0_1,
+      sourceUrl: ALBANET_SOURCE_REPOSITORY_V0_1,
+      sourceSha256: ALBANET_SOURCE_FILE_SHA256_V0_1,
+      entryLocator: provenance.entryLocator,
+      lemma: record.sourceForm,
+      synsetId: details.synsetId,
+      definitions: Object.freeze([...details.definitions]),
+    });
+    if (details.definitions.length !== 1) {
+      return unresolved("ALBANET_DEFINITION_AMBIGUOUS", crossSourceFact);
+    }
+    const rule = ALBANIAN_SENSE_ALIGNED_LEXICAL_ROLE_REVIEWED_DEFINITIONS_V0_1.find((candidate) =>
+      candidate.sourceFamilyId === provenance.sourceTraditionId &&
+      candidate.sourceRevision === ALBANET_SOURCE_REVISION_V0_1 &&
+      candidate.sourceSha256 === ALBANET_SOURCE_FILE_SHA256_V0_1 &&
+      candidate.lemma === record.sourceForm &&
+      candidate.synsetId === details.synsetId &&
+      candidate.definition === details.definitions[0] &&
+      candidate.reviewStatus === "REVIEWED_EXACT_SOURCE_DEFINITION",
+    );
+    if (!rule) return unresolved("ALBANET_DEFINITION_NOT_REVIEWED_FOR_HUMAN_ROLE", crossSourceFact);
+
+    return Object.freeze({
+      sourceFact,
+      crossSourceFact,
+      inference: Object.freeze({
+        status: "SUPPORTED" as const,
+        roleLabel: rule.roleLabel,
+        predicateId: rule.predicateId,
+        statement: ALBANIAN_SENSE_ALIGNED_LEXICAL_ROLE_STATEMENT_V0_1,
+      }),
+      functionalOperation: null,
+      reasonCodes: Object.freeze([]),
+    });
+  }));
+  const hasSupportedCandidate = candidates.some((candidate) => candidate.inference.status === "SUPPORTED");
+  return Object.freeze({
+    schemaVersion: ALBANIAN_SENSE_ALIGNED_LEXICAL_ROLE_SCHEMA_V0_1,
+    status: hasSupportedCandidate ? "SUPPORTED" : "NULL",
+    targetSourceRecordId: target.sourceRecordId,
+    candidates: Object.freeze(candidates),
+    reasonCodes: hasSupportedCandidate ? Object.freeze([]) : Object.freeze([
+      ...new Set(candidates.flatMap((candidate) => [...candidate.reasonCodes])),
+    ]),
+    alternatives: ALBANIAN_SENSE_ALIGNED_LEXICAL_ROLE_ALTERNATIVES_V0_1,
+    lineageIndependence: ALBANIAN_SENSE_ALIGNED_LEXICAL_ROLE_LINEAGE_STATUS_V0_1,
+    functionalOperation: null,
+    noSingleWinner: true,
+    userDecisionPosture: "user_decides",
+    claimBoundary: ALBANIAN_SENSE_ALIGNED_LEXICAL_ROLE_CLAIM_BOUNDARY_V0_1,
+  });
+}
+
 async function buildAlbanianLexicalReadingV0_1(input: Readonly<{
   word: string;
   facts: readonly AlbanianKaikkiExactLexicalSourceFactV0_1[];
   analyses: readonly AlbanianKaikkiSourceIpaSevenVoiceAnalysisV0_1[];
   sourceStatus: AlbanianKaikkiExactLexicalSourceStatusV0_1;
   provider: AlbanianKaikkiServerOnlyExactLexicalSourceProviderV0_1;
+  albanetSourceAdapter: AlbaNetSourceFamilyAdapterV0_1 | null;
 }>): Promise<AlbanianLexicalReadingV0_1> {
   const fiveWindowsComparison = await buildFiveWindowsComparisonV0_1({
     word: input.word,
@@ -2994,6 +3345,12 @@ async function buildAlbanianLexicalReadingV0_1(input: Readonly<{
           normalizedAlbanianFormV0_1(fact.form) === normalizedAlbanianFormV0_1(input.word) &&
           fact.partOfSpeech !== "name",
         ) ?? input.facts[0] ?? null;
+  const senseAlignedLexicalRole = await buildAlbanianSenseAlignedLexicalRoleEvidenceV0_1({
+    word: input.word,
+    facts: input.facts,
+    sourceStatus: input.sourceStatus,
+    albanetSourceAdapter: input.albanetSourceAdapter,
+  });
 
   if (!primary) {
     return Object.freeze({
@@ -3004,6 +3361,7 @@ async function buildAlbanianLexicalReadingV0_1(input: Readonly<{
       relatedCandidateEvaluations: Object.freeze([]),
       functionalFamilyReading: null,
       occupationalRoleResearchCandidates,
+      senseAlignedLexicalRole,
       fiveWindowsComparison,
       sourceLinkedComponentReading: null,
       sourceLinkedComparison: null,
@@ -3270,6 +3628,7 @@ async function buildAlbanianLexicalReadingV0_1(input: Readonly<{
     relatedCandidateEvaluations: allRelatedCandidateEvaluations,
     functionalFamilyReading,
     occupationalRoleResearchCandidates,
+    senseAlignedLexicalRole,
     fiveWindowsComparison,
     sourceLinkedComponentReading,
     sourceLinkedComparison,
@@ -3293,7 +3652,7 @@ export async function buildMotivationEngineDiscoveryServerOnlyV0_1(input: {
   profileDerivedVoicePath?: readonly string[] | null;
   provider?: EnglishKaikkiServerOnlyExactIndexProviderV0_1;
   albanianLexicalSourceProvider?: AlbanianKaikkiServerOnlyExactLexicalSourceProviderV0_1;
-  albanetSourceAdapter?: GenericFunctionalWitnessSourceAdapterV1 | null;
+  albanetSourceAdapter?: AlbaNetSourceFamilyAdapterV0_1 | null;
   lexinSourceAdapter?: GenericFunctionalWitnessSourceAdapterV1 | null;
 }): Promise<MotivationEngineDiscoveryServerOnlyResultV0_1> {
   const provider = input.provider ?? await getProductionProviderV0_1();
@@ -3375,6 +3734,7 @@ export async function buildMotivationEngineDiscoveryServerOnlyV0_1(input: {
         analyses: sourceIpaSevenVoiceAnalyses,
         sourceStatus: exactLexicalSourceStatus,
         provider: albanianLexicalSourceProvider,
+        albanetSourceAdapter,
       }),
     }),
     englishProvider: resolved.operationalStatus,

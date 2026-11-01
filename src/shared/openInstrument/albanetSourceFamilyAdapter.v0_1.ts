@@ -1,6 +1,31 @@
 import { createHash } from "node:crypto";
 import { lstat, readFile, realpath } from "node:fs/promises";
 import { isAbsolute, relative } from "node:path";
+import {
+  ALBANET_SOURCE_FAMILY_ADAPTER_ID_V0_1,
+  ALBANET_SOURCE_FAMILY_ID_V0_1,
+  ALBANET_SOURCE_FILE_BYTES_V0_1,
+  ALBANET_SOURCE_FILE_RELATIVE_PATH_V0_1,
+  ALBANET_SOURCE_FILE_SHA256_V0_1,
+  ALBANET_SOURCE_LICENSE_V0_1,
+  ALBANET_SOURCE_PATH_ENV_V0_1,
+  ALBANET_SOURCE_REPOSITORY_V0_1,
+  ALBANET_SOURCE_REVISION_V0_1,
+  ALBANET_SOURCE_TITLE_V0_1,
+} from "./albanetSourceIdentity.v0_1";
+
+export {
+  ALBANET_SOURCE_FAMILY_ADAPTER_ID_V0_1,
+  ALBANET_SOURCE_FAMILY_ID_V0_1,
+  ALBANET_SOURCE_FILE_BYTES_V0_1,
+  ALBANET_SOURCE_FILE_RELATIVE_PATH_V0_1,
+  ALBANET_SOURCE_FILE_SHA256_V0_1,
+  ALBANET_SOURCE_LICENSE_V0_1,
+  ALBANET_SOURCE_PATH_ENV_V0_1,
+  ALBANET_SOURCE_REPOSITORY_V0_1,
+  ALBANET_SOURCE_REVISION_V0_1,
+  ALBANET_SOURCE_TITLE_V0_1,
+} from "./albanetSourceIdentity.v0_1";
 
 import type {
   GenericFunctionalWitnessSourceAdapterV1,
@@ -18,25 +43,6 @@ type AlbaNetUnavailableReasonCodeV0_1 =
   | "ALBANET_SOURCE_SHA256_MISMATCH"
   | "ALBANET_SOURCE_PARSE_FAILURE";
 
-export const ALBANET_SOURCE_FAMILY_ADAPTER_ID_V0_1 =
-  "open-instrument.albanet-source-family-adapter.v0.1" as const;
-export const ALBANET_SOURCE_FAMILY_ID_V0_1 =
-  "albanet-omw-sq-v0.1" as const;
-export const ALBANET_SOURCE_TITLE_V0_1 =
-  "Albanet via Open Multilingual Wordnet data" as const;
-export const ALBANET_SOURCE_REPOSITORY_V0_1 =
-  "https://github.com/omwn/omw-data" as const;
-export const ALBANET_SOURCE_REVISION_V0_1 =
-  "406bf83b3c507a3d1f26e88252d5d66893fd36bf" as const;
-export const ALBANET_SOURCE_FILE_RELATIVE_PATH_V0_1 =
-  "wns/als/wn-data-als.tab" as const;
-export const ALBANET_SOURCE_FILE_SHA256_V0_1 =
-  "5a3c72ec0681fdd1b217c134b04fcb7a03b595163111dc06ce7f9333f70d1ba4" as const;
-export const ALBANET_SOURCE_FILE_BYTES_V0_1 = 932373 as const;
-export const ALBANET_SOURCE_LICENSE_V0_1 = "CC BY 3.0" as const;
-export const ALBANET_SOURCE_PATH_ENV_V0_1 =
-  "OPEN_INSTRUMENT_ALBANET_SOURCE_PATH" as const;
-
 export type AlbaNetSourceRecordV0_1 = Readonly<{
   sourceRecordId: string;
   synsetId: string;
@@ -47,12 +53,17 @@ export type AlbaNetSourceRecordV0_1 = Readonly<{
   entryLocator: string;
 }>;
 
+export type AlbaNetSourceFamilyAdapterV0_1 = GenericFunctionalWitnessSourceAdapterV1 & Readonly<{
+  /** All exact lemma matches, including synsets that have no definition. */
+  getLemmaRecords: (lemma: string) => readonly AlbaNetSourceRecordV0_1[];
+}>;
+
 export type AlbaNetSourceLoadResultV0_1 = Readonly<
   | {
       status: "READY";
       sourcePath: string;
       records: readonly AlbaNetSourceRecordV0_1[];
-      adapter: GenericFunctionalWitnessSourceAdapterV1;
+      adapter: AlbaNetSourceFamilyAdapterV0_1;
     }
   | {
       status: "UNAVAILABLE";
@@ -210,7 +221,7 @@ function projectRecordV0_1(
 
 export function createAlbaNetSourceFamilyAdapterV0_1(
   records: readonly AlbaNetSourceRecordV0_1[],
-): GenericFunctionalWitnessSourceAdapterV1 {
+): AlbaNetSourceFamilyAdapterV0_1 {
   const recordsByLemma = new Map<string, readonly AlbaNetSourceRecordV0_1[]>();
   for (const record of records) {
     const key = normalizeAlbaNetLemmaV0_1(record.lemma);
@@ -223,6 +234,9 @@ export function createAlbaNetSourceFamilyAdapterV0_1(
   return Object.freeze({
     adapterId: ALBANET_SOURCE_FAMILY_ADAPTER_ID_V0_1,
     candidateVoicePathPolicy: "NULL_UNAUTHORIZED" as const,
+    getLemmaRecords(lemma: string): readonly AlbaNetSourceRecordV0_1[] {
+      return recordsByLemma.get(normalizeAlbaNetLemmaV0_1(lemma)) ?? Object.freeze([]);
+    },
     query(input: GenericFunctionalWitnessQueryV1): GenericFunctionalWitnessSourceAdapterResultV1 {
       const recordsForLemma = recordsByLemma.get(normalizeAlbaNetLemmaV0_1(input.embryo)) ?? [];
       return {

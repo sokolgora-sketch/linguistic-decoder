@@ -158,6 +158,8 @@ export function createAlbanianKaikkiSourceDiagnosticContextV0_1():
 export type AlbanianKaikkiExactLexicalSourceSenseV0_1 = Readonly<{
   senseId: string | null;
   glosses: readonly string[];
+  /** Source-authored synonym forms, retained under this exact source sense. */
+  synonyms?: readonly string[];
   /** Source-authored categories kept at sense scope; never promoted to entry scope. */
   categories?: readonly AlbanianKaikkiExactLexicalSourceCategoryV0_1[];
 }>;
@@ -368,6 +370,16 @@ function stringArrayV0_1(value: unknown): readonly string[] {
     : Object.freeze([]);
 }
 
+function synonymArrayV0_1(value: unknown): readonly string[] {
+  return Array.isArray(value)
+    ? Object.freeze(value.flatMap((item) => {
+        const synonymWord = isRecordV0_1(item) ? item.word : item;
+        const text = textV0_1(synonymWord);
+        return text ? [text] : [];
+      }))
+    : Object.freeze([]);
+}
+
 function stringRecordV0_1(value: unknown): Readonly<Record<string, string>> {
   if (!isRecordV0_1(value)) return Object.freeze({});
   const entries = Object.entries(value).flatMap(([key, item]) => {
@@ -382,6 +394,7 @@ function projectSenseV0_1(value: unknown): AlbanianKaikkiExactLexicalSourceSense
   return Object.freeze({
     senseId: textV0_1(sense.id),
     glosses: stringArrayV0_1(sense.glosses),
+    synonyms: synonymArrayV0_1(sense.synonyms),
     categories: Array.isArray(sense.categories)
       ? Object.freeze(sense.categories.map((value) => {
           const category = isRecordV0_1(value) ? value : {};
