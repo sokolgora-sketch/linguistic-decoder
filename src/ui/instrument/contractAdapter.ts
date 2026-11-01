@@ -2323,9 +2323,10 @@ function parseMotivationDiscoveryV0_1(
         }
         if (relatedCandidateEvaluations.some((candidate) => isRecord(candidate) &&
           candidate.sourceRelation === "TARGET_AUTHORED_ETYMOLOGY_REFERENCE" &&
-          (candidate.sourceRelationAssertion !== null || !isRecord(candidate.sourceLinkedComparison) ||
+          ((candidate.sourceRelationAssertion !== null && candidate.sourceRelationAssertion !== undefined) || !isRecord(candidate.sourceLinkedComparison) ||
             !isRecord(candidate.sourceLinkedComparison.relation) ||
-            candidate.sourceLinkedComparison.relation.sourceRelationAssertion !== null))) return false;
+            (candidate.sourceLinkedComparison.relation.sourceRelationAssertion !== null &&
+              candidate.sourceLinkedComparison.relation.sourceRelationAssertion !== undefined)))) return false;
       }
       if (isRecord(selectedComparison) && isRecord(selectedComparison.relation)) {
         const selectedRelation = selectedComparison.relation;

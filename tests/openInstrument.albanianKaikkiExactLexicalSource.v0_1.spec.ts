@@ -1321,6 +1321,40 @@ describe("real Albanian exact lexical source integration v0.1", () => {
       cleanup();
       fjaloriFetch.mockRestore();
     }
+
+    const legacyPayload = JSON.parse(JSON.stringify(discovery)) as Record<string, unknown>;
+    const legacyReading = legacyPayload.albanianLexicalReading as Record<string, unknown>;
+    const legacyCandidates = legacyReading.relatedCandidateEvaluations as Record<string, unknown>[];
+    const legacyTargetFirstCandidate = legacyCandidates.find((item) =>
+      item.sourceRelation === "TARGET_AUTHORED_ETYMOLOGY_REFERENCE",
+    );
+    if (!legacyTargetFirstCandidate) throw new Error("Expected target-authored candidate for legacy adapter regression");
+    delete legacyTargetFirstCandidate.sourceRelationAssertion;
+    const legacyCandidateComparison = legacyTargetFirstCandidate.sourceLinkedComparison as Record<string, unknown>;
+    delete (legacyCandidateComparison.relation as Record<string, unknown>).sourceRelationAssertion;
+    const legacySelectedComparison = legacyReading.sourceLinkedComparison as Record<string, unknown>;
+    delete (legacySelectedComparison.relation as Record<string, unknown>).sourceRelationAssertion;
+    expect(adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: legacyPayload }).motivationDiscoveryV0_1).toMatchObject({
+      kind: "present",
+    });
+
+    const forgedLegacyPayload = JSON.parse(JSON.stringify(legacyPayload)) as Record<string, unknown>;
+    const forgedLegacyReading = forgedLegacyPayload.albanianLexicalReading as Record<string, unknown>;
+    const forgedLegacyCandidate = (forgedLegacyReading.relatedCandidateEvaluations as Record<string, unknown>[])
+      .find((item) => item.sourceRelation === "TARGET_AUTHORED_ETYMOLOGY_REFERENCE");
+    if (!forgedLegacyCandidate) throw new Error("Expected target-authored candidate for forged ownership regression");
+    forgedLegacyCandidate.sourceRelationAssertion = {
+      assertionScope: "SOURCE_SENSE",
+      sourceSenseId: "unrelated-sense",
+      sourceSenseOrdinal: 0,
+      sourceSenseIdentityStatus: "VERIFIED",
+      sourceAssertionOrdinal: 0,
+      reasonCodes: [],
+    };
+    expect(adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: forgedLegacyPayload }).motivationDiscoveryV0_1).toMatchObject({
+      kind: "missing",
+      missing: "malformed",
+    });
   });
 
   it("supports an exact target-role sense while retaining ambiguous and unresolved af components without alignment", async () => {
