@@ -118,11 +118,21 @@ function isAlbanianSourceRecordSelectionInputV0_1(
   language: unknown,
   alphabet: unknown,
 ): boolean {
-  return [language, alphabet].some((value) => {
-    if (typeof value !== "string") return false;
-    const normalized = value.normalize("NFC").trim().toLocaleLowerCase("en-US");
-    return normalized === "sq" || normalized === "albanian";
-  });
+  const normalizedLanguage = typeof language === "string"
+    ? language.normalize("NFC").trim().toLocaleLowerCase("en-US")
+    : "";
+  const normalizedAlphabet = typeof alphabet === "string"
+    ? alphabet.normalize("NFC").trim().toLocaleLowerCase("en-US")
+    : "";
+  const hasAlbanianLanguage = normalizedLanguage === "sq" || normalizedLanguage === "albanian";
+  const hasAlbanianProfile = normalizedAlphabet === "albanian";
+  const languageIsCompatible = !normalizedLanguage || hasAlbanianLanguage;
+  // Generic Latin and Auto are compatible with Albanian; other named profiles are not.
+  const alphabetIsCompatible = !normalizedAlphabet ||
+    normalizedAlphabet === "auto" || normalizedAlphabet === "albanian" || normalizedAlphabet === "latin";
+
+  return languageIsCompatible && alphabetIsCompatible &&
+    (hasAlbanianLanguage || hasAlbanianProfile);
 }
 
 function hasDuplicateTopLevelJsonPropertyV0_1(
@@ -1720,7 +1730,7 @@ export async function POST(req: Request) {
     !isAlbanianSourceRecordSelectionInputV0_1(language, alphabetParsed)
   ) {
     return invalidRequestResponseV0_1(
-      '"albanianSourceRecordId" can only be used with an explicitly Albanian language or alphabet.',
+      '"albanianSourceRecordId" requires a consistent Albanian language and alphabet profile.',
       "ALBANIAN_SOURCE_RECORD_SELECTOR_REQUIRES_ALBANIAN_INPUT",
     );
   }
@@ -1875,7 +1885,7 @@ if (!word) {
     !isAlbanianSourceRecordSelectionInputV0_1(language, alphabetParsed)
   ) {
     return invalidRequestResponseV0_1(
-      '"albanianSourceRecordId" can only be used with an explicitly Albanian language or alphabet.',
+      '"albanianSourceRecordId" requires a consistent Albanian language and alphabet profile.',
       "ALBANIAN_SOURCE_RECORD_SELECTOR_REQUIRES_ALBANIAN_INPUT",
     );
   }

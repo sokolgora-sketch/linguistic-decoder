@@ -3569,7 +3569,7 @@ async function buildAlbanianLexicalReadingV0_1(input: Readonly<{
     : Object.freeze(relatedCandidateEvaluations);
   const functionalFamilyReading = buildAlbanianFunctionalFamilyReadingV0_1({
     primary: primaryProjection,
-    uniquePrimaryRecord: evaluatedFacts.filter((fact) =>
+    uniquePrimaryRecord: input.facts.filter((fact) =>
       normalizedAlbanianFormV0_1(fact.form) === normalizedAlbanianFormV0_1(input.word) &&
       fact.partOfSpeech === primary.partOfSpeech,
     ).length === 1,

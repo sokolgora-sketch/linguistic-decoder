@@ -4121,6 +4121,57 @@ describe("real Albanian exact lexical source integration v0.1", () => {
     expect(reading?.functionalFamilyReading).toBeNull();
   });
 
+  it("keeps family uniqueness across the full duplicate-record population while preserving selected AGENT bridges", async () => {
+    const [primary, ...derivedFacts] = sellerFamilyFixtureFactsV0_1();
+    const duplicatePrimaryFacts = [0, 1].map((ordinal) => fixtureFact({
+      ...primary!,
+      sourceRecordId: `kaikki-albanian-jsonl:word=shit%C3%ABs:ordinal=${ordinal}`,
+      entryLocator: `jsonl://word/shit%C3%ABs/match/${ordinal}`,
+      physicalRecordOrdinal: 12 + ordinal,
+      senses: [{
+        senseId: `shit%C3%ABs-owner-${ordinal}-sense`,
+        glosses: [ordinal === 0 ? "seller, vendor" : "merchant"],
+      }],
+    }));
+    const facts = [...duplicatePrimaryFacts, ...derivedFacts];
+
+    const ordinary = (await discoveryForFactsV0_1(facts, "shitës")).albanianLexicalReading;
+    expect(ordinary?.primarySourceFact?.sourceRecordId)
+      .toBe("kaikki-albanian-jsonl:word=shit%C3%ABs:ordinal=0");
+    expect(ordinary?.functionalFamilyReading).toBeNull();
+
+    for (const ordinal of [0, 1]) {
+      const selected = (await discoveryForFactsV0_1(
+        facts,
+        "shitës",
+        `kaikki-albanian-jsonl:word=shit%C3%ABs:ordinal=${ordinal}`,
+      )).albanianLexicalReading;
+      expect(selected?.primarySourceFact?.sourceRecordId)
+        .toBe(`kaikki-albanian-jsonl:word=shit%C3%ABs:ordinal=${ordinal}`);
+      expect(selected?.functionalMeaningBridge).toMatchObject({
+        status: "SUPPORTED",
+        functionalHypothesis: { functionalOperation: "AGENT" },
+        sourceFacts: {
+          primary: {
+            sourceRecordId: `kaikki-albanian-jsonl:word=shit%C3%ABs:ordinal=${ordinal}`,
+            entryLocator: `jsonl://word/shit%C3%ABs/match/${ordinal}`,
+          },
+        },
+      });
+      const qualifyingDerivedAgentBridges = selected?.relatedCandidateEvaluations.filter((candidate) =>
+        candidate.sourceRelation === "SOURCE_DERIVED_FORM" &&
+        candidate.functionalMeaningBridge.status === "SUPPORTED" &&
+        candidate.functionalMeaningBridge.functionalHypothesis.functionalOperation === "AGENT",
+      );
+      expect(qualifyingDerivedAgentBridges).toHaveLength(3);
+      expect(qualifyingDerivedAgentBridges?.every((candidate) =>
+        candidate.functionalMeaningBridge.sourceFacts?.primary?.sourceRecordId ===
+          `kaikki-albanian-jsonl:word=shit%C3%ABs:ordinal=${ordinal}`,
+      )).toBe(true);
+      expect(selected?.functionalFamilyReading).toBeNull();
+    }
+  });
+
   it("keeps a mixed-operation derived-form set out of the AGENT family", async () => {
     const [primary, first, second] = sellerFamilyFixtureFactsV0_1();
     const primaryLight = fixtureFact({

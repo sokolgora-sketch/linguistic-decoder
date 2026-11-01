@@ -748,6 +748,41 @@ describe("analyze-v1 Albanian lexical reading reachability", () => {
       reason: "ALBANIAN_SOURCE_RECORD_SELECTOR_REQUIRES_ALBANIAN_INPUT",
     });
     expect(runAnalysisMock).not.toHaveBeenCalled();
+
+    runAnalysisMock.mockClear();
+    const conflictingLanguageResponse = await POST(new Request("http://localhost/api/analyze-v1", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        word: "krye",
+        language: "en",
+        alphabet: "albanian",
+        providerExecution: "disabled",
+        albanianSourceRecordId: "kaikki-albanian-jsonl:word=krye:ordinal=1",
+      }),
+    }));
+    expect(conflictingLanguageResponse.status).toBe(400);
+    expect(await conflictingLanguageResponse.json()).toMatchObject({
+      reason: "ALBANIAN_SOURCE_RECORD_SELECTOR_REQUIRES_ALBANIAN_INPUT",
+    });
+    expect(runAnalysisMock).not.toHaveBeenCalled();
+
+    runAnalysisMock.mockClear();
+    const conflictingAlphabetUrl = new URL("http://localhost/api/analyze-v1");
+    conflictingAlphabetUrl.searchParams.set("word", "krye");
+    conflictingAlphabetUrl.searchParams.set("language", "sq");
+    conflictingAlphabetUrl.searchParams.set("alphabet", "sanskrit");
+    conflictingAlphabetUrl.searchParams.set("providerExecution", "disabled");
+    conflictingAlphabetUrl.searchParams.set(
+      "albanianSourceRecordId",
+      "kaikki-albanian-jsonl:word=krye:ordinal=1",
+    );
+    const conflictingAlphabetResponse = await GET(new Request(conflictingAlphabetUrl));
+    expect(conflictingAlphabetResponse.status).toBe(400);
+    expect(await conflictingAlphabetResponse.json()).toMatchObject({
+      reason: "ALBANIAN_SOURCE_RECORD_SELECTOR_REQUIRES_ALBANIAN_INPUT",
+    });
+    expect(runAnalysisMock).not.toHaveBeenCalled();
   });
 
   it.each([
