@@ -56,6 +56,8 @@ type Props =
         wordForMask?: string;
         carrierIpa?: string;
         targetSenseLabel?: string | null;
+      onAnalyzeAlbanianSourceRecord?: (sourceRecordId: string) => void;
+      sourceRecordSelectionDisabled?: boolean;
       debug?: boolean;
       onCopyFullJson?: () => void;
     }
@@ -66,6 +68,8 @@ type Props =
         wordForMask?: string;
         carrierIpa?: string;
         targetSenseLabel?: string | null;
+      onAnalyzeAlbanianSourceRecord?: (sourceRecordId: string) => void;
+      sourceRecordSelectionDisabled?: boolean;
       debug?: boolean;
       onCopyFullJson?: () => void;
     };
@@ -521,6 +525,8 @@ export function InstrumentPanel(props: Props) {
               <MotivationDiscoveryCardV0_1
                 discovery={vm.motivationDiscoveryV0_1}
                 interpretation={vm.functionalMotivationInterpretationV0_2}
+                onAnalyzeAlbanianSourceRecord={props.onAnalyzeAlbanianSourceRecord}
+                sourceRecordSelectionDisabled={props.sourceRecordSelectionDisabled}
               />
 
               {primaryNullStatus ? (

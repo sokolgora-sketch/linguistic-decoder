@@ -247,9 +247,10 @@ async function analysisFor(word: string) {
 async function discoveryForFactsV0_1(
   facts: readonly AlbanianKaikkiExactLexicalSourceFactV0_1[],
   word = facts[0]?.form ?? "",
+  albanianSourceRecordId?: string,
 ) {
   const provider = createAlbanianKaikkiServerOnlyExactLexicalSourceProviderForSyntheticFixtureV0_1({ facts });
-  return discoveryForProviderV0_1(provider, word);
+  return discoveryForProviderV0_1(provider, word, albanianSourceRecordId);
 }
 
 function dritareTargetFirstFixtureFactsV0_1(): readonly AlbanianKaikkiExactLexicalSourceFactV0_1[] {
@@ -381,9 +382,11 @@ function zjarrfikesThreeComponentFixtureFactsV0_1(overrides: Readonly<{
 async function discoveryForProviderV0_1(
   provider: AlbanianKaikkiServerOnlyExactLexicalSourceProviderV0_1,
   word: string,
+  albanianSourceRecordId?: string,
 ) {
   const result = await buildMotivationEngineDiscoveryServerOnlyV0_1({
     word,
+    albanianSourceRecordId,
     inputLanguage: "sq",
     inputProfile: "albanian",
     analysis: await analysisFor(word),
@@ -4118,6 +4121,57 @@ describe("real Albanian exact lexical source integration v0.1", () => {
     expect(reading?.functionalFamilyReading).toBeNull();
   });
 
+  it("keeps family uniqueness across the full duplicate-record population while preserving selected AGENT bridges", async () => {
+    const [primary, ...derivedFacts] = sellerFamilyFixtureFactsV0_1();
+    const duplicatePrimaryFacts = [0, 1].map((ordinal) => fixtureFact({
+      ...primary!,
+      sourceRecordId: `kaikki-albanian-jsonl:word=shit%C3%ABs:ordinal=${ordinal}`,
+      entryLocator: `jsonl://word/shit%C3%ABs/match/${ordinal}`,
+      physicalRecordOrdinal: 12 + ordinal,
+      senses: [{
+        senseId: `shit%C3%ABs-owner-${ordinal}-sense`,
+        glosses: [ordinal === 0 ? "seller, vendor" : "merchant"],
+      }],
+    }));
+    const facts = [...duplicatePrimaryFacts, ...derivedFacts];
+
+    const ordinary = (await discoveryForFactsV0_1(facts, "shitës")).albanianLexicalReading;
+    expect(ordinary?.primarySourceFact?.sourceRecordId)
+      .toBe("kaikki-albanian-jsonl:word=shit%C3%ABs:ordinal=0");
+    expect(ordinary?.functionalFamilyReading).toBeNull();
+
+    for (const ordinal of [0, 1]) {
+      const selected = (await discoveryForFactsV0_1(
+        facts,
+        "shitës",
+        `kaikki-albanian-jsonl:word=shit%C3%ABs:ordinal=${ordinal}`,
+      )).albanianLexicalReading;
+      expect(selected?.primarySourceFact?.sourceRecordId)
+        .toBe(`kaikki-albanian-jsonl:word=shit%C3%ABs:ordinal=${ordinal}`);
+      expect(selected?.functionalMeaningBridge).toMatchObject({
+        status: "SUPPORTED",
+        functionalHypothesis: { functionalOperation: "AGENT" },
+        sourceFacts: {
+          primary: {
+            sourceRecordId: `kaikki-albanian-jsonl:word=shit%C3%ABs:ordinal=${ordinal}`,
+            entryLocator: `jsonl://word/shit%C3%ABs/match/${ordinal}`,
+          },
+        },
+      });
+      const qualifyingDerivedAgentBridges = selected?.relatedCandidateEvaluations.filter((candidate) =>
+        candidate.sourceRelation === "SOURCE_DERIVED_FORM" &&
+        candidate.functionalMeaningBridge.status === "SUPPORTED" &&
+        candidate.functionalMeaningBridge.functionalHypothesis.functionalOperation === "AGENT",
+      );
+      expect(qualifyingDerivedAgentBridges).toHaveLength(3);
+      expect(qualifyingDerivedAgentBridges?.every((candidate) =>
+        candidate.functionalMeaningBridge.sourceFacts?.primary?.sourceRecordId ===
+          `kaikki-albanian-jsonl:word=shit%C3%ABs:ordinal=${ordinal}`,
+      )).toBe(true);
+      expect(selected?.functionalFamilyReading).toBeNull();
+    }
+  });
+
   it("keeps a mixed-operation derived-form set out of the AGENT family", async () => {
     const [primary, first, second] = sellerFamilyFixtureFactsV0_1();
     const primaryLight = fixtureFact({
@@ -5138,6 +5192,24 @@ describe("real Albanian exact lexical source integration v0.1", () => {
       "en-zjarrfikës-sq-noun-3IRd5pZ-",
       "en-zjarrfikës-sq-noun-second-record",
     ]);
+
+    const explicitlySelected = await discoveryForFactsV0_1(
+      facts,
+      "zjarrfikës",
+      "kaikki-albanian-jsonl:word=zjarrfik%C3%ABs:ordinal=0",
+    );
+    expect(explicitlySelected.albanianLexicalReading).toMatchObject({
+      status: "NULL",
+      primarySourceFact: null,
+      functionalMeaningBridge: {
+        status: "NULL",
+        reasonCodes: ["SOURCE_TARGET_RECORD_IDENTITY_AMBIGUOUS"],
+      },
+      interpretation: {
+        status: "UNKNOWN_OR_NULL",
+        basis: ["SOURCE_TARGET_RECORD_IDENTITY_AMBIGUOUS"],
+      },
+    });
   });
 
   it("fails closed when the unique three-component target has an invalid source record ID", async () => {
@@ -5723,6 +5795,36 @@ const pinnedAlbanianSourceTestV0_1 = process.env[ALBANIAN_KAIKKI_LEXICAL_SOURCE_
   ? it
   : it.skip;
 
+describe("explicit Albanian source-record selector fail-closed behavior v0.1", () => {
+  const ownerId = "kaikki-albanian-jsonl:word=krye:ordinal=1";
+  const owner = fixtureFact({
+    sourceRecordId: ownerId,
+    entryLocator: "jsonl://word/krye/match/1",
+    physicalRecordOrdinal: 90001,
+    form: "krye",
+    partOfSpeech: "noun",
+    senses: [{ senseId: "krye-owner-sense", glosses: ["owner record"] }],
+    ipaObservations: [],
+  });
+
+  it.each([
+    ["malformed ordinal", "kaikki-albanian-jsonl:word=krye:ordinal=01", [owner], "ALBANIAN_SOURCE_RECORD_ID_INVALID"],
+    ["unresolved identity", "kaikki-albanian-jsonl:word=krye:ordinal=9", [owner], "ALBANIAN_SOURCE_RECORD_ID_UNRESOLVED"],
+    ["duplicate identity", ownerId, [owner, { ...owner, physicalRecordOrdinal: 90002 }], "ALBANIAN_SOURCE_RECORD_ID_DUPLICATE"],
+    ["unverified snapshot", ownerId, [{ ...owner, sourceSnapshot: { ...owner.sourceSnapshot, sha256: "0".repeat(64) } }], "ALBANIAN_SOURCE_RECORD_PROVENANCE_UNVERIFIED"],
+  ] as const)("returns Null for %s without falling back to another source record", async (_label, selector, facts, reasonCode) => {
+    const discovery = await discoveryForFactsV0_1(facts, "krye", selector);
+    expect(discovery.albanianLexicalReading).toMatchObject({
+      status: "NULL",
+      primarySourceFact: null,
+      relatedForms: [],
+      relatedCandidateEvaluations: [],
+      functionalMeaningBridge: { status: "NULL", reasonCodes: [reasonCode] },
+      interpretation: { status: "UNKNOWN_OR_NULL", basis: [reasonCode] },
+    });
+  });
+});
+
 describe("pinned Albanian raw synonym projection v0.1", () => {
   pinnedAlbanianSourceTestV0_1("projects the requested real-source synonym objects without flattening senses", async () => {
     const provider = await createAlbanianKaikkiServerOnlyExactLexicalSourceProviderV0_1(
@@ -5748,6 +5850,136 @@ describe("pinned Albanian raw synonym projection v0.1", () => {
     expect(mjek).toMatchObject({ status: "MATCHES_FOUND", facts: [{ senses: expect.arrayContaining([
       expect.objectContaining({ synonyms: ["doktor"] }),
     ]) }] });
+  });
+});
+
+describe("pinned Albanian exact source-record selection v0.1", () => {
+  pinnedAlbanianSourceTestV0_1("evaluates krye and shtrazë only through the explicitly selected real owner record", async () => {
+    const provider = await createAlbanianKaikkiServerOnlyExactLexicalSourceProviderV0_1(
+      process.env[ALBANIAN_KAIKKI_LEXICAL_SOURCE_PATH_ENV_V0_1],
+    );
+    const kryeResult = await provider.query("krye");
+    const shtrazeResult = await provider.query("shtrazë");
+    expect(kryeResult.status).toBe("MATCHES_FOUND");
+    expect(shtrazeResult.status).toBe("MATCHES_FOUND");
+    if (kryeResult.status !== "MATCHES_FOUND" || shtrazeResult.status !== "MATCHES_FOUND") return;
+
+    const kryeOrdinal0 = "kaikki-albanian-jsonl:word=krye:ordinal=0";
+    const kryeOrdinal1 = "kaikki-albanian-jsonl:word=krye:ordinal=1";
+    const shtrazeOrdinal0 = "kaikki-albanian-jsonl:word=shtraz%C3%AB:ordinal=0";
+    const shtrazeOrdinal1 = "kaikki-albanian-jsonl:word=shtraz%C3%AB:ordinal=1";
+    const kryeOwner = kryeResult.facts.find((fact) => fact.sourceRecordId === kryeOrdinal1);
+    const shtrazeOwner = shtrazeResult.facts.find((fact) => fact.sourceRecordId === shtrazeOrdinal1);
+    expect(kryeResult.facts.map((fact) => fact.sourceRecordId)).toContain(kryeOrdinal0);
+    expect(kryeOwner?.relatedForms?.find((relation) => relation.form === "kryegjahtar")).toMatchObject({
+      relation: "SOURCE_DERIVED_FORM",
+      sourceRelationAssertion: {
+        assertionScope: "SOURCE_RECORD",
+        sourceSenseId: null,
+        sourceSenseIdentityStatus: "NOT_APPLICABLE",
+      },
+    });
+    expect(shtrazeResult.facts.map((fact) => fact.sourceRecordId)).toContain(shtrazeOrdinal0);
+    expect(shtrazeOwner?.relatedForms?.find((relation) => relation.form === "shtraznik")).toMatchObject({
+      relation: "SOURCE_DERIVED_FORM",
+      sourceRelationAssertion: {
+        assertionScope: "SOURCE_SENSE",
+        sourceSenseId: "en-shtrazë-sq-noun-kwBU1fVd",
+        sourceSenseOrdinal: 0,
+        sourceSenseIdentityStatus: "VERIFIED",
+      },
+    });
+
+    const ordinaryKrye = await discoveryForProviderV0_1(provider, "krye");
+    const ordinaryShtraze = await discoveryForProviderV0_1(provider, "shtrazë");
+    expect(ordinaryKrye.albanianLexicalReading?.primarySourceFact?.sourceRecordId).toBe(kryeOrdinal0);
+    expect(ordinaryShtraze.albanianLexicalReading?.primarySourceFact?.sourceRecordId).toBe(shtrazeOrdinal0);
+    expect(ordinaryKrye.albanianLexicalReading?.functionalMeaningBridge.status).toBe("NULL");
+    expect(ordinaryShtraze.albanianLexicalReading?.functionalMeaningBridge.status).toBe("NULL");
+
+    const selectedKrye = await discoveryForProviderV0_1(provider, "krye", kryeOrdinal1);
+    const selectedKryeReading = selectedKrye.albanianLexicalReading;
+    expect(selectedKryeReading?.primarySourceFact?.sourceRecordId).toBe(kryeOrdinal1);
+    expect(selectedKrye).toMatchObject({ noSingleWinner: true, userDecisionPosture: "user_decides" });
+    expect(selectedKryeReading?.functionalMeaningBridge).toMatchObject({
+      status: "SUPPORTED",
+      truthLayers: expect.arrayContaining(["SOURCE_FACT", "EXPLORATORY_FUNCTIONAL_HYPOTHESIS"]),
+      functionalHypothesis: { status: "EXPLORATORY_FUNCTIONAL_HYPOTHESIS", functionalOperation: "AGENT" },
+    });
+    expect(selectedKryeReading?.primarySourceFact?.meaningGlosses).toEqual(
+      kryeOwner?.senses.flatMap((sense) => sense.glosses),
+    );
+    expect(selectedKryeReading?.relatedForms.map((relation) => relation.form)).toEqual(
+      kryeOwner?.relatedForms?.map((relation) => relation.form),
+    );
+    expect(selectedKryeReading?.relatedForms.map((relation) => relation.form)).toContain("kryegjahtar");
+    expect(selectedKrye.exactLexicalSourceFacts.map((fact) => fact.sourceRecordId)).toContain(kryeOrdinal0);
+    expect(selectedKryeReading?.relatedCandidateEvaluations).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        relatedForm: "kryegjahtar",
+        sourceRelation: "SOURCE_DERIVED_FORM",
+        sourceRelationAssertion: expect.objectContaining({
+          assertionScope: "SOURCE_RECORD",
+          sourceSenseId: null,
+          sourceSenseIdentityStatus: "NOT_APPLICABLE",
+        }),
+        sourceLinkedComparison: expect.objectContaining({ status: "SUPPORTED" }),
+        functionalMeaningBridge: expect.objectContaining({
+          status: "SUPPORTED",
+          functionalHypothesis: expect.objectContaining({ functionalOperation: "AGENT" }),
+        }),
+      }),
+    ]));
+
+    const selectedShtraze = await discoveryForProviderV0_1(provider, "shtrazë", shtrazeOrdinal1);
+    const selectedShtrazeReading = selectedShtraze.albanianLexicalReading;
+    expect(selectedShtrazeReading?.primarySourceFact?.sourceRecordId).toBe(shtrazeOrdinal1);
+    expect(selectedShtraze).toMatchObject({ noSingleWinner: true, userDecisionPosture: "user_decides" });
+    expect(selectedShtrazeReading?.functionalMeaningBridge).toMatchObject({
+      status: "SUPPORTED",
+      truthLayers: expect.arrayContaining(["SOURCE_FACT", "EXPLORATORY_FUNCTIONAL_HYPOTHESIS"]),
+      functionalHypothesis: { status: "EXPLORATORY_FUNCTIONAL_HYPOTHESIS", functionalOperation: "AGENT" },
+    });
+    expect(selectedShtrazeReading?.primarySourceFact?.meaningGlosses).toEqual(
+      shtrazeOwner?.senses.flatMap((sense) => sense.glosses),
+    );
+    expect(selectedShtrazeReading?.relatedForms.map((relation) => relation.form)).toEqual(
+      shtrazeOwner?.relatedForms?.map((relation) => relation.form),
+    );
+    expect(selectedShtrazeReading?.relatedForms.map((relation) => relation.form)).toContain("shtraznik");
+    expect(selectedShtraze.exactLexicalSourceFacts.map((fact) => fact.sourceRecordId)).toContain(shtrazeOrdinal0);
+    expect(selectedShtrazeReading?.relatedCandidateEvaluations).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        relatedForm: "shtraznik",
+        sourceRelation: "SOURCE_DERIVED_FORM",
+        sourceRelationAssertion: expect.objectContaining({
+          assertionScope: "SOURCE_SENSE",
+          sourceSenseId: "en-shtrazë-sq-noun-kwBU1fVd",
+          sourceSenseIdentityStatus: "VERIFIED",
+        }),
+        sourceLinkedComparison: expect.objectContaining({ status: "SUPPORTED" }),
+        functionalMeaningBridge: expect.objectContaining({
+          status: "SUPPORTED",
+          functionalHypothesis: expect.objectContaining({ functionalOperation: "AGENT" }),
+        }),
+      }),
+    ]));
+
+    const selectedKryeOrdinal0 = await discoveryForProviderV0_1(provider, "krye", kryeOrdinal0);
+    const selectedShtrazeOrdinal0 = await discoveryForProviderV0_1(provider, "shtrazë", shtrazeOrdinal0);
+    expect(selectedKryeOrdinal0.albanianLexicalReading?.functionalMeaningBridge.status).toBe("NULL");
+    expect(selectedShtrazeOrdinal0.albanianLexicalReading?.functionalMeaningBridge.status).toBe("NULL");
+
+    const selectedVm = adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: selectedKrye });
+    expect(selectedVm.motivationDiscoveryV0_1.kind).toBe("present");
+    if (selectedVm.motivationDiscoveryV0_1.kind === "present") {
+      render(createElement(MotivationDiscoveryCardV0_1, { discovery: selectedVm.motivationDiscoveryV0_1 }));
+      expect(screen.getByText("SELECTED PRIMARY SOURCE RECORD")).toBeInTheDocument();
+      expect(screen.getByText("ALTERNATIVE SOURCE RECORD — NOT EVALUATED AS THE SELECTED PRIMARY READING")).toBeInTheDocument();
+      expect(screen.getAllByText(/kryegjahtar/).length).toBeGreaterThan(0);
+      expect(screen.getAllByText(/Assertion scope: SOURCE_RECORD/).length).toBeGreaterThan(0);
+    }
+    cleanup();
   });
 });
 

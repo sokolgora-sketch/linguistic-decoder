@@ -794,6 +794,58 @@ function hasValidUniqueAlbanianSourceRecordIdV0_1(
     facts.filter((candidate) => candidate.sourceRecordId === fact.sourceRecordId).length === 1;
 }
 
+function resolveAlbanianSourceRecordSelectionV0_1(input: Readonly<{
+  word: string;
+  sourceRecordId: string;
+  facts: readonly AlbanianKaikkiExactLexicalSourceFactV0_1[];
+}>): Readonly<{
+  fact: AlbanianKaikkiExactLexicalSourceFactV0_1 | null;
+  reasonCode: string | null;
+}> {
+  const match = /^kaikki-albanian-jsonl:word=([^:]+):ordinal=(?:0|[1-9]\d*)$/u.exec(input.sourceRecordId);
+  if (!match) {
+    return Object.freeze({ fact: null, reasonCode: "ALBANIAN_SOURCE_RECORD_ID_INVALID" });
+  }
+
+  let idLemma: string;
+  try {
+    idLemma = decodeURIComponent(match[1]!);
+  } catch {
+    return Object.freeze({ fact: null, reasonCode: "ALBANIAN_SOURCE_RECORD_ID_INVALID" });
+  }
+  if (normalizedAlbanianFormV0_1(idLemma) !== normalizedAlbanianFormV0_1(input.word)) {
+    return Object.freeze({ fact: null, reasonCode: "ALBANIAN_SOURCE_RECORD_WORD_MISMATCH" });
+  }
+
+  const matches = input.facts.filter((fact) => fact.sourceRecordId === input.sourceRecordId);
+  if (matches.length === 0) {
+    return Object.freeze({ fact: null, reasonCode: "ALBANIAN_SOURCE_RECORD_ID_UNRESOLVED" });
+  }
+  if (matches.length !== 1) {
+    return Object.freeze({ fact: null, reasonCode: "ALBANIAN_SOURCE_RECORD_ID_DUPLICATE" });
+  }
+
+  const fact = matches[0]!;
+  if (fact.language !== "Albanian" || fact.languageCode !== "sq" || fact.partOfSpeech === "name") {
+    return Object.freeze({ fact: null, reasonCode: "ALBANIAN_SOURCE_RECORD_LANGUAGE_OR_TYPE_MISMATCH" });
+  }
+  if (normalizedAlbanianFormV0_1(fact.form) !== normalizedAlbanianFormV0_1(input.word)) {
+    return Object.freeze({ fact: null, reasonCode: "ALBANIAN_SOURCE_RECORD_WORD_MISMATCH" });
+  }
+  if (
+    fact.sourceSnapshot.sourceFamilyId !== ALBANIAN_KAIKKI_LEXICAL_SOURCE_FAMILY_ID_V0_1 ||
+    fact.sourceSnapshot.sourceUrl !== ALBANIAN_KAIKKI_LEXICAL_SOURCE_URL_V0_1 ||
+    fact.sourceSnapshot.sha256 !== ALBANIAN_KAIKKI_LEXICAL_SOURCE_SHA256_V0_1 ||
+    fact.sourceSnapshot.bytes !== ALBANIAN_KAIKKI_LEXICAL_SOURCE_BYTES_V0_1
+  ) {
+    return Object.freeze({ fact: null, reasonCode: "ALBANIAN_SOURCE_RECORD_PROVENANCE_UNVERIFIED" });
+  }
+  if (!hasValidUniqueAlbanianSourceRecordIdV0_1(fact, input.facts)) {
+    return Object.freeze({ fact: null, reasonCode: "ALBANIAN_SOURCE_RECORD_ID_INVALID" });
+  }
+  return Object.freeze({ fact, reasonCode: null });
+}
+
 function distinctGlossesV0_1(
   facts: readonly Readonly<{
     senses: readonly Readonly<{ glosses: readonly string[] }>[];
@@ -3306,18 +3358,13 @@ async function buildAlbanianSenseAlignedLexicalRoleEvidenceV0_1(input: Readonly<
 
 async function buildAlbanianLexicalReadingV0_1(input: Readonly<{
   word: string;
+  albanianSourceRecordId?: string;
   facts: readonly AlbanianKaikkiExactLexicalSourceFactV0_1[];
   analyses: readonly AlbanianKaikkiSourceIpaSevenVoiceAnalysisV0_1[];
   sourceStatus: AlbanianKaikkiExactLexicalSourceStatusV0_1;
   provider: AlbanianKaikkiServerOnlyExactLexicalSourceProviderV0_1;
   albanetSourceAdapter: AlbaNetSourceFamilyAdapterV0_1 | null;
 }>): Promise<AlbanianLexicalReadingV0_1> {
-  const fiveWindowsComparison = await buildFiveWindowsComparisonV0_1({
-    word: input.word,
-    facts: input.facts,
-    sourceStatus: input.sourceStatus,
-    provider: input.provider,
-  });
   const occupationalRoleResearchCandidates = getAlbanianOccupationalRoleCandidatesForWordV0_1(input.word);
   const matchingTargetRecords = input.facts.filter((fact) =>
     fact.languageCode === "sq" && fact.language === "Albanian" &&
@@ -3337,17 +3384,43 @@ async function buildAlbanianLexicalReadingV0_1(input: Readonly<{
         ? "SOURCE_TARGET_RECORD_IDENTITY_INVALID"
         : null
     : null;
+  const hasExplicitSourceRecordSelection = input.albanianSourceRecordId !== undefined;
+  const explicitSourceRecordSelection = !hasExplicitSourceRecordSelection
+    ? null
+    : input.sourceStatus.status === "NOT_QUERIED"
+      ? Object.freeze({ fact: null, reasonCode: "ALBANIAN_SOURCE_RECORD_SELECTOR_REQUIRES_ALBANIAN_INPUT" })
+      : resolveAlbanianSourceRecordSelectionV0_1({
+          word: input.word,
+          sourceRecordId: input.albanianSourceRecordId!,
+          facts: input.facts,
+        });
+  const sourceRecordSelectionReason = targetIdentityReason ?? explicitSourceRecordSelection?.reasonCode ?? null;
   const primary = targetIdentityReason
     ? null
     : hasThreeComponentTarget
-      ? matchingTargetRecords[0] ?? null
-      : input.facts.find((fact) =>
-          normalizedAlbanianFormV0_1(fact.form) === normalizedAlbanianFormV0_1(input.word) &&
-          fact.partOfSpeech !== "name",
-        ) ?? input.facts[0] ?? null;
+      ? hasExplicitSourceRecordSelection
+        ? explicitSourceRecordSelection?.fact ?? null
+        : matchingTargetRecords[0] ?? null
+      : hasExplicitSourceRecordSelection
+        ? explicitSourceRecordSelection?.fact ?? null
+        : input.facts.find((fact) =>
+            normalizedAlbanianFormV0_1(fact.form) === normalizedAlbanianFormV0_1(input.word) &&
+            fact.partOfSpeech !== "name",
+          ) ?? input.facts[0] ?? null;
+  const evaluatedFacts = hasExplicitSourceRecordSelection
+    ? primary ? Object.freeze([primary]) : Object.freeze([])
+    : input.facts;
+  const fiveWindowsComparison = hasExplicitSourceRecordSelection && !primary
+    ? null
+    : await buildFiveWindowsComparisonV0_1({
+        word: input.word,
+        facts: evaluatedFacts,
+        sourceStatus: input.sourceStatus,
+        provider: input.provider,
+      });
   const senseAlignedLexicalRole = await buildAlbanianSenseAlignedLexicalRoleEvidenceV0_1({
     word: input.word,
-    facts: input.facts,
+    facts: evaluatedFacts,
     sourceStatus: input.sourceStatus,
     albanetSourceAdapter: input.albanetSourceAdapter,
   });
@@ -3367,16 +3440,18 @@ async function buildAlbanianLexicalReadingV0_1(input: Readonly<{
       sourceLinkedComparison: null,
       functionalMeaningBridge: nullFunctionalMeaningBridgeV0_1({
         sourceFacts: null,
-        reasonCodes: Object.freeze([targetIdentityReason ?? "PRIMARY_SOURCE_RECORD_NOT_FOUND"]),
+        reasonCodes: Object.freeze([sourceRecordSelectionReason ?? "PRIMARY_SOURCE_RECORD_NOT_FOUND"]),
       }),
       composition: nullCompositionV0_1(),
       interpretation: Object.freeze({
         status: "UNKNOWN_OR_NULL",
         statement: null,
         alternatives: Object.freeze([]),
-        basis: Object.freeze(targetIdentityReason ? [targetIdentityReason] : []),
+        basis: Object.freeze(sourceRecordSelectionReason ? [sourceRecordSelectionReason] : []),
         claimBoundary: targetIdentityReason
           ? "The three-component target source identity is ambiguous or invalid; no target record or functional hypothesis is selected."
+          : sourceRecordSelectionReason
+            ? "The explicit Albanian source-record selection is invalid, mismatched, or unresolved; no source record or functional hypothesis is selected."
           : "No exact Albanian source fact is available; no product reading is claimed.",
       }),
     });
@@ -3482,7 +3557,7 @@ async function buildAlbanianLexicalReadingV0_1(input: Readonly<{
   const targetAuthoredEtymologyCandidate = input.sourceStatus.status === "MATCHES_FOUND"
     ? await buildTargetAuthoredEtymologyCandidateV0_1({
         target: primary,
-        targetFacts: input.facts.filter((fact) =>
+        targetFacts: evaluatedFacts.filter((fact) =>
           normalizedAlbanianFormV0_1(fact.form) === normalizedAlbanianFormV0_1(input.word) &&
           fact.partOfSpeech !== "name",
         ),
@@ -3526,13 +3601,13 @@ async function buildAlbanianLexicalReadingV0_1(input: Readonly<{
     ? buildTargetRoleAgentFunctionalBridgeV0_1({
         targetFact: primary,
         targetRecord: primaryProjection,
-        queriedFacts: input.facts,
+        queriedFacts: evaluatedFacts,
         queryForm: input.word,
         componentReading: sourceLinkedComponentReading,
       })
     : null;
   const targetRoleIdentityFailure = (() => {
-    const targetRecords = input.facts.filter((fact) =>
+    const targetRecords = evaluatedFacts.filter((fact) =>
       fact.language === "Albanian" && fact.languageCode === "sq" &&
       normalizedAlbanianFormV0_1(fact.form) === normalizedAlbanianFormV0_1(input.word) &&
       fact.partOfSpeech !== "name",
@@ -3645,6 +3720,7 @@ async function buildAlbanianLexicalReadingV0_1(input: Readonly<{
  */
 export async function buildMotivationEngineDiscoveryServerOnlyV0_1(input: {
   word: string;
+  albanianSourceRecordId?: string;
   inputLanguage: string;
   inputProfile: string;
   analysis: AnalyzeWordResultV1;
@@ -3730,6 +3806,7 @@ export async function buildMotivationEngineDiscoveryServerOnlyV0_1(input: {
       sourceIpaSevenVoiceAnalyses,
       albanianLexicalReading: await buildAlbanianLexicalReadingV0_1({
         word: input.word,
+        albanianSourceRecordId: input.albanianSourceRecordId,
         facts: exactLexicalSourceFacts,
         analyses: sourceIpaSevenVoiceAnalyses,
         sourceStatus: exactLexicalSourceStatus,

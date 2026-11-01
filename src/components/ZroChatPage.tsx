@@ -89,7 +89,10 @@ type AnalyzeV1InvalidRequestReasonV0_1 =
   | "INVALID_REQUEST_BODY"
   | "MISSING_WORD"
   | "INVALID_MODE"
-  | "INVALID_ALPHABET";
+  | "INVALID_ALPHABET"
+  | "INVALID_ALBANIAN_SOURCE_RECORD_ID"
+  | "DUPLICATE_ALBANIAN_SOURCE_RECORD_ID"
+  | "ALBANIAN_SOURCE_RECORD_SELECTOR_REQUIRES_ALBANIAN_INPUT";
 
 const ANALYZE_V1_REQUEST_REASON_COPY_V0_1: Record<
   AnalyzeV1InvalidRequestReasonV0_1,
@@ -100,6 +103,9 @@ const ANALYZE_V1_REQUEST_REASON_COPY_V0_1: Record<
   MISSING_WORD: "A word is required.",
   INVALID_MODE: "The requested mode is invalid.",
   INVALID_ALPHABET: "The requested alphabet is invalid.",
+  INVALID_ALBANIAN_SOURCE_RECORD_ID: "The Albanian source-record identifier is invalid.",
+  DUPLICATE_ALBANIAN_SOURCE_RECORD_ID: "Select at most one Albanian source record.",
+  ALBANIAN_SOURCE_RECORD_SELECTOR_REQUIRES_ALBANIAN_INPUT: "An exact Albanian source record requires an Albanian analysis.",
 };
 
 const ANALYZE_V1_MODE_OPTIONS: ReadonlyArray<{ value: Mode; label: string }> = [
@@ -186,6 +192,9 @@ export default function ZroChatPage() {
     word: string;
     ipa?: string;
     targetSenseLabel?: string;
+    mode?: Mode;
+    alphabet?: AlphabetId;
+    albanianSourceRecordId?: string;
   } | null>(null);
   const [busy, setBusy] = React.useState(false);
   const [validation, setValidation] = React.useState<string | null>(null);
@@ -222,11 +231,18 @@ export default function ZroChatPage() {
     targetSenseRaw?: string,
     mode: Mode = "strict",
     alphabet: AlphabetId = "auto",
+    albanianSourceRecordId?: string,
   ) {
     const w = word.trim();
     const ipaTrim = (ipaRaw ?? "").trim();
     const targetSenseTrim = (targetSenseRaw ?? "").trim();
-    const runMeta = { word: w, ipa: ipaTrim || undefined };
+    const runMeta = {
+      word: w,
+      ipa: ipaTrim || undefined,
+      mode,
+      alphabet,
+      albanianSourceRecordId,
+    };
     if (!w) {
       setValidation('Type a word before analyzing.');
       return;
@@ -237,7 +253,11 @@ export default function ZroChatPage() {
     setDebug(null);
     setRecurrenceResearch(null);
 
-    const userMsg: Msg = { id: uid(), role: 'user', text: w };
+    const userMsg: Msg = {
+      id: uid(),
+      role: 'user',
+      text: albanianSourceRecordId ? `${w} · exact source record ${albanianSourceRecordId}` : w,
+    };
     const assistantMsg: Msg = { id: uid(), role: 'assistant', text: 'Analyzing…' };
 
     setMessages(prev => [...prev, userMsg, assistantMsg]);
@@ -259,7 +279,10 @@ export default function ZroChatPage() {
       } catch {
         // Preserve the normal request when the browser location is unavailable.
       }
-      const url = `/api/analyze-v1?word=${encodeURIComponent(w)}&mode=${encodeURIComponent(mode)}${alphabetQuery}${providerExecutionQuery}${ipaTrim ? `&ipa=${encodeURIComponent(ipaTrim)}` : ""}${targetSenseTrim ? `&targetSenseLabel=${encodeURIComponent(targetSenseTrim)}` : ""}`;
+      const sourceRecordSelectorQuery = albanianSourceRecordId
+        ? `&language=sq&albanianSourceRecordId=${encodeURIComponent(albanianSourceRecordId)}`
+        : "";
+      const url = `/api/analyze-v1?word=${encodeURIComponent(w)}&mode=${encodeURIComponent(mode)}${alphabetQuery}${providerExecutionQuery}${ipaTrim ? `&ipa=${encodeURIComponent(ipaTrim)}` : ""}${targetSenseTrim ? `&targetSenseLabel=${encodeURIComponent(targetSenseTrim)}` : ""}${sourceRecordSelectorQuery}`;
       const res = await fetch(url, { method: 'GET' });
       const json: unknown =
         typeof res.json === 'function' ? await res.json() : null;
@@ -551,6 +574,18 @@ export default function ZroChatPage() {
               wordForMask={lastRun?.word}
               carrierIpa={lastRun?.ipa}
               targetSenseLabel={lastRun?.targetSenseLabel}
+              sourceRecordSelectionDisabled={busy}
+              onAnalyzeAlbanianSourceRecord={(sourceRecordId) => {
+                if (busy || !lastRun) return;
+                void runAnalysis(
+                  lastRun.word,
+                  lastRun.ipa,
+                  lastRun.targetSenseLabel,
+                  lastRun.mode ?? analysisMode,
+                  lastRun.alphabet ?? analysisAlphabet,
+                  sourceRecordId,
+                );
+              }}
             />
           </UiErrorBoundary>
         ) : (

@@ -30,6 +30,18 @@ describe("/chat error-state contract", () => {
       error:
         'Invalid JSON body. Expected: { word: string, mode?: "strict"|"open", alphabet?: string }',
     },
+    {
+      reason: "INVALID_ALBANIAN_SOURCE_RECORD_ID",
+      error: 'Invalid "albanianSourceRecordId". Expected one exact Kaikki Albanian source-record ID.',
+    },
+    {
+      reason: "DUPLICATE_ALBANIAN_SOURCE_RECORD_ID",
+      error: 'Supply "albanianSourceRecordId" at most once.',
+    },
+    {
+      reason: "ALBANIAN_SOURCE_RECORD_SELECTOR_REQUIRES_ALBANIAN_INPUT",
+      error: '"albanianSourceRecordId" can only be used for an Albanian analysis.',
+    },
   ])(
     "surfaces the structured $reason request error without rendering it as analysis",
     async ({ reason, error }) => {
