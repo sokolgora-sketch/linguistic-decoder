@@ -5814,6 +5814,33 @@ describe("sense-conditioned functional reasoning v0.4", () => {
     ]));
   });
 
+  it("keeps legacy competing meanings in the ENABLE_PASSAGE gate without source-sense rows", async () => {
+    const discovery = await discoveryForFactsV0_1(dritareTargetFirstFixtureFactsV0_1(), "dritare");
+    const candidate = discovery.albanianLexicalReading?.relatedCandidateEvaluations.find((item) =>
+      item.sourceRelation === "TARGET_AUTHORED_ETYMOLOGY_REFERENCE",
+    );
+    if (!candidate?.sourceLinkedComparison.related) {
+      throw new Error("Expected a target-authored dritë → dritare candidate for the legacy passage control");
+    }
+    const legacyPrimary = {
+      ...candidate.sourceLinkedComparison.primary,
+      meaningGlosses: ["light", "daylight", "access"],
+      sourceSenses: undefined,
+    };
+    const legacyComparison = { ...candidate.sourceLinkedComparison, primary: legacyPrimary };
+    const legacyBridge = buildAlbanianFunctionalMeaningBridgeV0_1({
+      primary: legacyPrimary,
+      comparison: legacyComparison,
+      related: legacyComparison.related,
+      sourceRelationAssertion: candidate.sourceRelationAssertion,
+      sourceRelation: candidate.sourceRelation,
+    });
+    expect(legacyBridge).toMatchObject({
+      status: "NULL",
+      functionalHypothesis: { status: "UNKNOWN_OR_NULL", functionalOperation: null, statement: null },
+    });
+  });
+
   it("uses a verified source-sense owner for AGENT and retains the other primary sense as an alternative", async () => {
     const assertion: AlbanianKaikkiSourceRelationAssertionV0_1 = {
       assertionScope: "SOURCE_SENSE",

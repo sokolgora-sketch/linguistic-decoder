@@ -2084,10 +2084,11 @@ function buildDirectionalFunctionalHypothesisV0_1(input: Readonly<{
   const relatedMeaning = relatedSelection.selectedGlosses.join("; ");
   const sourceExplanation = input.related.etymologyText?.trim() ?? "";
   const primaryHasIlluminationMeaning = hasConservativePrimaryIlluminationGlossesV0_1(primarySelection.selectedGlosses);
+  const primaryGlossesForCompetingCheck = input.primary.sourceSenses === undefined
+    ? input.primary.meaningGlosses
+    : distinctGlossesV0_1([{ senses: input.primary.sourceSenses }]);
   const primaryHasUnselectedCompetingMeaning = primarySelection.authority !== "SOURCE_SENSE_VERIFIED" &&
-    hasCompetingOrUnrelatedIlluminationGlossV0_1(distinctGlossesV0_1([{
-      senses: input.primary.sourceSenses ?? [],
-    }]));
+    hasCompetingOrUnrelatedIlluminationGlossV0_1(primaryGlossesForCompetingCheck);
   const relatedHasOpeningMeaning = hasOpeningAccessMeaningV0_1(relatedSelection.selectedGlosses);
   const sourceDescribesAffirmativeTransmission = hasSourceAuthoredTransmissionExplanationV0_1(sourceExplanation);
 
