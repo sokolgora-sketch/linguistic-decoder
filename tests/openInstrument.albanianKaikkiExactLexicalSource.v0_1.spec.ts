@@ -73,6 +73,23 @@ function fixtureFact(
   };
 }
 
+function legacyPayloadWithoutSenseOwnershipV0_1<T>(value: T): T {
+  const copy = JSON.parse(JSON.stringify(value)) as unknown;
+  const stripOwnership = (node: unknown): void => {
+    if (Array.isArray(node)) {
+      node.forEach(stripOwnership);
+      return;
+    }
+    if (!node || typeof node !== "object") return;
+    const record = node as Record<string, unknown>;
+    delete record.sourceRelationAssertion;
+    delete record.sourceSenseOrdinal;
+    Object.values(record).forEach(stripOwnership);
+  };
+  stripOwnership(copy);
+  return copy as T;
+}
+
 function unsupportedAfArityFixtureFactsV0_1(
   example: "kalimtar" | "prurës",
 ): readonly AlbanianKaikkiExactLexicalSourceFactV0_1[] {
@@ -2505,6 +2522,52 @@ describe("real Albanian exact lexical source integration v0.1", () => {
       kind: "missing",
       missing: "malformed",
     });
+  });
+
+  it("accepts legacy target-first provenance omissions and duplicate unowned source links", async () => {
+    const targetFirstDiscovery = await discoveryForFactsV0_1(
+      malorEntityPropertyFixtureFactsV0_1(),
+      "malor",
+    );
+    expect(targetFirstDiscovery.albanianLexicalReading?.relatedCandidateEvaluations).toEqual(
+      expect.arrayContaining([expect.objectContaining({ sourceRelation: "SOURCE_DERIVED_FORM" })]),
+    );
+    expect(adaptAnalysisToTelemetryVM({
+      motivationDiscoveryV0_1: legacyPayloadWithoutSenseOwnershipV0_1(targetFirstDiscovery),
+    }).motivationDiscoveryV0_1).toMatchObject({ kind: "present" });
+
+    const recordAssertion = (sourceAssertionOrdinal: number): AlbanianKaikkiSourceRelationAssertionV0_1 => ({
+      assertionScope: "SOURCE_RECORD",
+      sourceSenseId: null,
+      sourceSenseOrdinal: null,
+      sourceSenseIdentityStatus: "NOT_APPLICABLE",
+      sourceAssertionOrdinal,
+      reasonCodes: [],
+    });
+    const duplicateBaseFacts = malorEntityPropertyFixtureFactsV0_1({
+      base: {
+        relatedForms: [0, 1].map((sourceAssertionOrdinal) => ({
+          form: "malor",
+          relation: "SOURCE_DERIVED_FORM",
+          entryLocator: "jsonl://word/malor",
+          sourceRelationAssertion: recordAssertion(sourceAssertionOrdinal),
+        })),
+      },
+    });
+    const duplicateBaseDiscovery = await discoveryForFactsV0_1(duplicateBaseFacts, "mal");
+    expect(duplicateBaseDiscovery.albanianLexicalReading?.relatedForms).toHaveLength(2);
+    expect(duplicateBaseDiscovery.albanianLexicalReading?.sourceLinkedComparison?.relation.relation).toBe("SOURCE_DERIVED_FORM");
+    expect(adaptAnalysisToTelemetryVM({
+      motivationDiscoveryV0_1: duplicateBaseDiscovery,
+    }).motivationDiscoveryV0_1).toMatchObject({ kind: "present" });
+
+    const legacyDuplicateDiscovery = legacyPayloadWithoutSenseOwnershipV0_1(duplicateBaseDiscovery);
+    const legacyReading = legacyDuplicateDiscovery.albanianLexicalReading;
+    expect(legacyReading?.relatedForms).toHaveLength(2);
+    expect(legacyReading?.sourceLinkedComparison?.relation.sourceRelationAssertion).toBeUndefined();
+    expect(adaptAnalysisToTelemetryVM({
+      motivationDiscoveryV0_1: legacyDuplicateDiscovery,
+    }).motivationDiscoveryV0_1).toMatchObject({ kind: "present" });
   });
 
   it("keeps duplicate and missing source-sense identities explicitly Unknown/Null at the adapter", async () => {

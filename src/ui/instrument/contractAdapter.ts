@@ -2187,6 +2187,8 @@ function parseMotivationDiscoveryV0_1(
         left === undefined || right === undefined
           ? left === undefined && right === undefined
           : sameSourceRelationAssertion(left, right);
+      const validOptionalSourceRelationAssertion = (assertion: unknown, senses: unknown): boolean =>
+        assertion === undefined || validSourceRelationAssertion(assertion, senses);
       const exactFact = exactPrimarySourceFact;
       const candidates = Array.isArray(relatedCandidateEvaluations) ? relatedCandidateEvaluations : [];
       const selectedComparison = reading.sourceLinkedComparison;
@@ -2214,7 +2216,7 @@ function parseMotivationDiscoveryV0_1(
               !isRecord(candidate.sourceLinkedComparison) || !isRecord(candidate.sourceLinkedComparison.primary) ||
               candidate.sourceLinkedComparison.primary.sourceRecordId !== primaryRecord?.sourceRecordId ||
               candidate.sourceLinkedComparison.primary.entryLocator !== primaryRecord?.entryLocator ||
-              !validSourceRelationAssertion(candidate.sourceRelationAssertion,
+              !validOptionalSourceRelationAssertion(candidate.sourceRelationAssertion,
                 candidate.sourceLinkedComparison.primary.sourceSenses)) return false;
           }
           for (const candidate of targetFirstCandidates) {
@@ -2231,7 +2233,7 @@ function parseMotivationDiscoveryV0_1(
               comparison.related.sourceRecordId !== primaryRecord?.sourceRecordId ||
               comparison.related.entryLocator !== primaryRecord?.entryLocator ||
               !sameNormalizedAlbanianRelationForm(comparison.related.form, primaryRecord?.form) ||
-              !validSourceRelationAssertion(candidate.sourceRelationAssertion,
+              !validOptionalSourceRelationAssertion(candidate.sourceRelationAssertion,
                 comparison.primary.sourceSenses) ||
               !sameOrLegacyAssertion(candidate.sourceRelationAssertion, relation.sourceRelationAssertion)) return false;
           }
@@ -2239,7 +2241,7 @@ function parseMotivationDiscoveryV0_1(
           !isRecord(selectedComparison.relation) || !isRecord(selectedComparison.primary) ||
           selectedComparison.relation.relation !== reading.relatedForms[0]?.relation ||
           selectedComparison.relation.relatedForm !== reading.relatedForms[0]?.form ||
-          !validSourceRelationAssertion(selectedComparison.relation.sourceRelationAssertion,
+          !validOptionalSourceRelationAssertion(selectedComparison.relation.sourceRelationAssertion,
             selectedComparison.primary.sourceSenses)) return false;
         const selectedComparisonRecord = isRecord(selectedComparison) ? selectedComparison : null;
         const selectedRelation = selectedComparisonRecord && isRecord(selectedComparisonRecord.relation)
@@ -2317,7 +2319,7 @@ function parseMotivationDiscoveryV0_1(
             comparison.related.sourceRecordId !== exactFact.sourceRecordId ||
             comparison.related.entryLocator !== exactFact.entryLocator ||
             !sameNormalizedAlbanianRelationForm(comparison.related.form, exactFact.form) ||
-            !validSourceRelationAssertion(candidate.sourceRelationAssertion,
+            !validOptionalSourceRelationAssertion(candidate.sourceRelationAssertion,
               comparison.primary.sourceSenses) ||
             !sameOrLegacyAssertion(candidate.sourceRelationAssertion, relation.sourceRelationAssertion)) return false;
         }
@@ -2336,7 +2338,11 @@ function parseMotivationDiscoveryV0_1(
               edge.relation === selectedRelation.relation &&
               sameNormalizedAlbanianRelationForm(edge.form, selectedRelation.relatedForm) &&
               sameOrLegacyAssertion(edge.sourceRelationAssertion, selectedRelation.sourceRelationAssertion));
-            if (matchedEdges.length !== 1 || selectedRelation.primaryEntryLocator !== exactFact.entryLocator) return false;
+            const legacyUnownedDuplicateSelection = matchedEdges.length > 1 &&
+              selectedRelation.sourceRelationAssertion === undefined &&
+              matchedEdges.every((edge) => isRecord(edge) && edge.sourceRelationAssertion === undefined);
+            if ((matchedEdges.length !== 1 && !legacyUnownedDuplicateSelection) ||
+              selectedRelation.primaryEntryLocator !== exactFact.entryLocator) return false;
           } else {
             const matchedCandidates = sourceCandidates.filter((candidate) => isRecord(candidate) &&
               isRecord(candidate.sourceLinkedComparison) && isRecord(candidate.sourceLinkedComparison.relation) &&
