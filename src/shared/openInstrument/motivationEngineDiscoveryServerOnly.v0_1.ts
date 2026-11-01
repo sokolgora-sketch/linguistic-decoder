@@ -1646,6 +1646,7 @@ async function buildTargetAuthoredEtymologyCandidateV0_1(input: Readonly<{
       primary: sourceRecordProjectionV0_1(base, baseAnalyses),
       comparison,
       related: sourceRecordProjectionV0_1(input.target, projectAlbanianKaikkiFactSourceIpaToSevenVoicesV0_1(input.target)),
+      sourceRelationAssertion: relation.sourceRelationAssertion,
       sourceRelation: relation.relation,
     });
 
@@ -1747,6 +1748,7 @@ async function buildTargetAuthoredEtymologyCandidateV0_1(input: Readonly<{
     primary: sourceRecordProjectionV0_1(base, projectAlbanianKaikkiFactSourceIpaToSevenVoicesV0_1(base)),
     comparison,
     related: sourceRecordProjectionV0_1(input.target, projectAlbanianKaikkiFactSourceIpaToSevenVoicesV0_1(input.target)),
+    sourceRelationAssertion: relation.sourceRelationAssertion,
     sourceRelation: relation.relation,
   });
 
@@ -1763,7 +1765,12 @@ async function buildTargetAuthoredEtymologyCandidateV0_1(input: Readonly<{
 function hasConservativePrimaryIlluminationEvidenceV0_1(
   fact: Readonly<{ senses: readonly Readonly<{ glosses: readonly string[] }>[] }>,
 ): boolean {
-  const glosses = distinctGlossesV0_1([fact]);
+  return hasConservativePrimaryIlluminationGlossesV0_1(distinctGlossesV0_1([fact]));
+}
+
+function hasConservativePrimaryIlluminationGlossesV0_1(
+  glosses: readonly string[],
+): boolean {
   const illuminationGlossCount = glosses.filter((gloss) =>
     /\b(?:light|daylight|illumination|illuminat(?:e|ed|ing)|bright(?:ness)?)\b/iu.test(gloss),
   ).length;
@@ -1778,8 +1785,133 @@ function hasConservativePrimaryIlluminationEvidenceV0_1(
   return illuminationGlossCount >= 2 && !competingOrUnrelatedGloss;
 }
 
+function hasCompetingOrUnrelatedIlluminationGlossV0_1(glosses: readonly string[]): boolean {
+  return glosses.some((gloss) =>
+    /\b(?:weight|not\s+heavy|easy|opening|access|knowledge|vision|clarity|clear)\b/iu.test(gloss),
+  );
+}
+
 function hasOpeningAccessMeaningV0_1(glosses: readonly string[]): boolean {
   return glosses.some((gloss) => /\b(?:window|opening|access)\b/iu.test(gloss.toLocaleLowerCase("en-US")));
+}
+
+type AlbanianSourceLinkedSenseV0_1 = NonNullable<AlbanianSourceLinkedRecordV0_1["sourceSenses"]>[number];
+
+type AlbanianSourceFunctionalMeaningSelectionV0_1 = Readonly<{
+  authority: "SOURCE_SENSE_VERIFIED" | "SOURCE_RECORD_SCOPED" | "LEGACY_OR_UNOWNED" | "SOURCE_SENSE_UNVERIFIED";
+  selectedSenses: readonly AlbanianSourceLinkedSenseV0_1[];
+  alternativeSenses: readonly AlbanianSourceLinkedSenseV0_1[];
+  selectedGlosses: readonly string[];
+}>;
+
+function sameSourceRelationAssertionV0_1(
+  left: AlbanianKaikkiSourceRelationAssertionV0_1 | null | undefined,
+  right: AlbanianKaikkiSourceRelationAssertionV0_1 | null | undefined,
+): boolean {
+  const normalizedLeft = left ?? null;
+  const normalizedRight = right ?? null;
+  if (normalizedLeft === null || normalizedRight === null) return normalizedLeft === normalizedRight;
+  return normalizedLeft.assertionScope === normalizedRight.assertionScope &&
+    normalizedLeft.sourceSenseId === normalizedRight.sourceSenseId &&
+    normalizedLeft.sourceSenseOrdinal === normalizedRight.sourceSenseOrdinal &&
+    normalizedLeft.sourceSenseIdentityStatus === normalizedRight.sourceSenseIdentityStatus &&
+    normalizedLeft.sourceAssertionOrdinal === normalizedRight.sourceAssertionOrdinal &&
+    normalizedLeft.reasonCodes.length === normalizedRight.reasonCodes.length &&
+    normalizedLeft.reasonCodes.every((reason, index) => reason === normalizedRight.reasonCodes[index]);
+}
+
+function sourceFunctionalMeaningSelectionV0_1(input: Readonly<{
+  record: AlbanianSourceLinkedRecordV0_1;
+  comparison: AlbanianSourceLinkedComparisonV0_1 | null | undefined;
+  sourceRelationAssertion: AlbanianKaikkiSourceRelationAssertionV0_1 | null;
+  matchesGloss?: (gloss: string) => boolean;
+}>): AlbanianSourceFunctionalMeaningSelectionV0_1 {
+  const allSenses = Object.freeze([...(input.record.sourceSenses ?? [])]);
+  const matchesGloss = input.matchesGloss ?? (() => true);
+  const assertion = input.sourceRelationAssertion ?? null;
+  const assertionIsBoundToSourceEdge = input.comparison
+    ? sameSourceRelationAssertionV0_1(assertion, input.comparison.relation.sourceRelationAssertion)
+    : assertion === null;
+  if (!assertionIsBoundToSourceEdge) {
+    return Object.freeze({
+      authority: "SOURCE_SENSE_UNVERIFIED" as const,
+      selectedSenses: Object.freeze([]),
+      alternativeSenses: allSenses,
+      selectedGlosses: Object.freeze([]),
+    });
+  }
+  const legacyProvenance = assertion === null ||
+    (assertion.assertionScope === "UNKNOWN_OR_NULL" &&
+      assertion.reasonCodes.includes("SOURCE_RELATION_PROVENANCE_NOT_PROJECTED"));
+  const relationOwnsThisRecord = !input.comparison ||
+    input.comparison.relation.primarySourceRecordId === input.record.sourceRecordId;
+
+  if (assertion?.assertionScope === "SOURCE_SENSE") {
+    const ownerCandidates = assertion.sourceSenseId === null || assertion.sourceSenseOrdinal === null
+      ? []
+      : allSenses.filter((sense) =>
+          sense.sourceSenseOrdinal === assertion.sourceSenseOrdinal && sense.senseId === assertion.sourceSenseId,
+        );
+    const ownerIsVerified = relationOwnsThisRecord &&
+      assertion.sourceSenseIdentityStatus === "VERIFIED" &&
+      assertion.sourceSenseId !== null &&
+      assertion.sourceSenseOrdinal !== null &&
+      ownerCandidates.length === 1 &&
+      allSenses.filter((sense) => sense.senseId === assertion.sourceSenseId).length === 1;
+    if (!ownerIsVerified) {
+      return Object.freeze({
+        authority: "SOURCE_SENSE_UNVERIFIED" as const,
+        selectedSenses: Object.freeze([]),
+        alternativeSenses: allSenses,
+        selectedGlosses: Object.freeze([]),
+      });
+    }
+    const owner = ownerCandidates[0];
+    const selectedSenses = owner && owner.glosses.some(matchesGloss)
+      ? Object.freeze([owner])
+      : Object.freeze([]);
+    return Object.freeze({
+      authority: "SOURCE_SENSE_VERIFIED" as const,
+      selectedSenses,
+      alternativeSenses: Object.freeze(allSenses.filter((sense) => !selectedSenses.includes(sense))),
+      selectedGlosses: Object.freeze([...new Set(selectedSenses.flatMap((sense) => sense.glosses))]),
+    });
+  }
+
+  const authority = assertion?.assertionScope === "SOURCE_RECORD"
+    ? "SOURCE_RECORD_SCOPED" as const
+    : legacyProvenance
+    ? "LEGACY_OR_UNOWNED" as const
+    : "SOURCE_SENSE_UNVERIFIED" as const;
+  if (authority === "SOURCE_SENSE_UNVERIFIED" || !relationOwnsThisRecord) {
+    return Object.freeze({
+      authority: "SOURCE_SENSE_UNVERIFIED" as const,
+      selectedSenses: Object.freeze([]),
+      alternativeSenses: allSenses,
+      selectedGlosses: Object.freeze([]),
+    });
+  }
+  const selectedSenses = Object.freeze(allSenses.filter((sense) => sense.glosses.some(matchesGloss)));
+  const selectedGlosses = input.record.sourceSenses === undefined
+    ? input.record.meaningGlosses.filter(matchesGloss)
+    : selectedSenses.flatMap((sense) => sense.glosses);
+  return Object.freeze({
+    authority,
+    selectedSenses,
+    alternativeSenses: Object.freeze(allSenses.filter((sense) => !selectedSenses.includes(sense))),
+    selectedGlosses: Object.freeze([...new Set(selectedGlosses)]),
+  });
+}
+
+function sourceFunctionalSenseAlternativeTextV0_1(
+  label: string,
+  senses: readonly AlbanianSourceLinkedSenseV0_1[],
+): readonly string[] {
+  return Object.freeze(senses
+    .filter((sense) => sense.glosses.length > 0)
+    .map((sense) =>
+      `${label} source sense ${sense.senseId ?? "Null"} (ordinal ${sense.sourceSenseOrdinal}) remains an alternative: “${sense.glosses.join("; ")}”; it is not selected for this functional interpretation.`,
+    ));
 }
 
 function hasSourceAuthoredTransmissionExplanationV0_1(sourceExplanation: string | null | undefined): boolean {
@@ -1928,19 +2060,40 @@ type AlbanianFunctionalHypothesisV0_1 = Readonly<{
 function buildDirectionalFunctionalHypothesisV0_1(input: Readonly<{
   primary: AlbanianSourceLinkedRecordV0_1;
   related: AlbanianSourceLinkedRecordV0_1;
+  comparison: AlbanianSourceLinkedComparisonV0_1 | null;
+  sourceRelationAssertion: AlbanianKaikkiSourceRelationAssertionV0_1 | null;
 }>): AlbanianFunctionalHypothesisV0_1 | null {
-  const primaryMeaning = input.primary.meaningGlosses.join("; ");
-  const relatedMeaning = input.related.meaningGlosses.join("; ");
-  const sourceExplanation = input.related.etymologyText?.trim() ?? "";
-  const primaryHasIlluminationMeaning = hasConservativePrimaryIlluminationEvidenceV0_1({
-    senses: input.primary.meaningGlosses.length > 0
-      ? [{ glosses: input.primary.meaningGlosses }]
-      : [],
+  const primarySelection = sourceFunctionalMeaningSelectionV0_1({
+    record: input.primary,
+    comparison: input.comparison,
+    sourceRelationAssertion: input.sourceRelationAssertion,
+    matchesGloss: (gloss) => /\b(?:light|daylight|illumination|illuminat(?:e|ed|ing)|bright(?:ness)?)\b/iu.test(gloss),
   });
-  const relatedHasOpeningMeaning = hasOpeningAccessMeaningV0_1(input.related.meaningGlosses);
+  const relatedSelection = sourceFunctionalMeaningSelectionV0_1({
+    record: input.related,
+    comparison: null,
+    sourceRelationAssertion: null,
+    matchesGloss: (gloss) => /\b(?:window|opening|access)\b/iu.test(gloss),
+  });
+  if (primarySelection.authority === "SOURCE_SENSE_UNVERIFIED" ||
+    primarySelection.selectedGlosses.length === 0 ||
+    relatedSelection.selectedGlosses.length === 0) {
+    return null;
+  }
+  const primaryMeaning = primarySelection.selectedGlosses.join("; ");
+  const relatedMeaning = relatedSelection.selectedGlosses.join("; ");
+  const sourceExplanation = input.related.etymologyText?.trim() ?? "";
+  const primaryHasIlluminationMeaning = hasConservativePrimaryIlluminationGlossesV0_1(primarySelection.selectedGlosses);
+  const primaryGlossesForCompetingCheck = input.primary.sourceSenses === undefined
+    ? input.primary.meaningGlosses
+    : distinctGlossesV0_1([{ senses: input.primary.sourceSenses }]);
+  const primaryHasUnselectedCompetingMeaning = primarySelection.authority !== "SOURCE_SENSE_VERIFIED" &&
+    hasCompetingOrUnrelatedIlluminationGlossV0_1(primaryGlossesForCompetingCheck);
+  const relatedHasOpeningMeaning = hasOpeningAccessMeaningV0_1(relatedSelection.selectedGlosses);
   const sourceDescribesAffirmativeTransmission = hasSourceAuthoredTransmissionExplanationV0_1(sourceExplanation);
 
-  if (!primaryHasIlluminationMeaning || !relatedHasOpeningMeaning || !sourceDescribesAffirmativeTransmission) {
+  if (!primaryHasIlluminationMeaning || primaryHasUnselectedCompetingMeaning ||
+    !relatedHasOpeningMeaning || !sourceDescribesAffirmativeTransmission) {
     return null;
   }
 
@@ -1954,6 +2107,8 @@ function buildDirectionalFunctionalHypothesisV0_1(input: Readonly<{
       "SOURCE_DERIVED_PRONUNCIATION_STRUCTURE",
     ]),
     alternatives: Object.freeze([
+      ...sourceFunctionalSenseAlternativeTextV0_1(input.primary.form, primarySelection.alternativeSenses),
+      ...sourceFunctionalSenseAlternativeTextV0_1(input.related.form, relatedSelection.alternativeSenses),
       "The source-authored explanation may be approximate, contested, or ordinary lexical description rather than a demonstrated derivation.",
       "The opening or access sense may be figurative or context-specific rather than a physical transmission function.",
       "The computed Voice paths and consonantal contexts are phonological observations and may have no semantic force.",
@@ -1965,6 +2120,7 @@ function buildEntityToAttributedPropertyHypothesisV0_1(input: Readonly<{
   comparison: AlbanianSourceLinkedComparisonV0_1;
   primary: AlbanianSourceLinkedRecordV0_1;
   related: AlbanianSourceLinkedRecordV0_1;
+  sourceRelationAssertion: AlbanianKaikkiSourceRelationAssertionV0_1 | null;
 }>): AlbanianFunctionalHypothesisV0_1 | null {
   if (
     input.comparison.status !== "SUPPORTED" ||
@@ -1974,6 +2130,16 @@ function buildEntityToAttributedPropertyHypothesisV0_1(input: Readonly<{
     !hasMeaningEvidenceV0_1(input.primary.meaningGlosses) ||
     !hasMeaningEvidenceV0_1(input.related.meaningGlosses)
   ) {
+    return null;
+  }
+
+  const primaryMeaningSelection = sourceFunctionalMeaningSelectionV0_1({
+    record: input.primary,
+    comparison: input.comparison,
+    sourceRelationAssertion: input.sourceRelationAssertion,
+  });
+  if (primaryMeaningSelection.authority === "SOURCE_SENSE_UNVERIFIED" ||
+    primaryMeaningSelection.selectedGlosses.length === 0) {
     return null;
   }
 
@@ -1989,14 +2155,18 @@ function buildEntityToAttributedPropertyHypothesisV0_1(input: Readonly<{
   if (!suffixTemplate || sourceExplanationText !== expectedSourceExplanation) return null;
   const sourceExplanationStatement = sourceExplanation.replace(/[.!?]\s*$/u, "");
 
-  const primaryMeaning = input.primary.meaningGlosses.join("; ");
+  const primaryMeaning = primaryMeaningSelection.selectedGlosses.join("; ");
   const relatedMeaning = input.related.meaningGlosses.join("; ");
   const hasMultiplePrimarySenses = (input.primary.sourceSenses ?? []).filter((sense) =>
     sense.senseId && sense.glosses.some((gloss) => gloss.trim().length > 0),
   ).length > 1;
   return Object.freeze({
     functionalOperation: null,
-    statement: `Source-bounded functional interpretation (exploratory): the source links ${input.related.form} (“${relatedMeaning}”) to ${input.primary.form} (“${primaryMeaning}”) and attributes its form to ${sourceExplanationStatement}. The product therefore models an entity → attributed property relationship: ${input.primary.form} supplies the entity concept and ${input.related.form} supplies a related property. This is a source-bounded product prompt, not proof of morphology, etymology, causation, or Voice semantics.`,
+    statement: `Source-bounded functional interpretation (exploratory): the source links ${input.related.form} (“${relatedMeaning}”) to ${input.primary.form} (“${primaryMeaning}”) and attributes its form to ${sourceExplanationStatement}. The product therefore models an entity → attributed property relationship: ${input.primary.form} supplies the entity concept and ${input.related.form} supplies a related property.${primaryMeaningSelection.authority === "SOURCE_SENSE_VERIFIED"
+      ? ` The selected source sense is ${primaryMeaningSelection.selectedSenses[0]?.senseId ?? "Null"} at ordinal ${primaryMeaningSelection.selectedSenses[0]?.sourceSenseOrdinal ?? "Null"}; other source senses are not used for this functional reading.`
+      : primaryMeaningSelection.authority === "SOURCE_RECORD_SCOPED"
+      ? " The relation is source-record-scoped; no individual primary source sense is selected."
+      : " No individual primary source sense is selected because the available payload does not establish sense ownership."} This is a source-bounded product prompt, not proof of morphology, etymology, causation, or Voice semantics.`,
     basis: Object.freeze([
       "SOURCE_ATTESTED_PRIMARY_MEANING",
       "SOURCE_ATTESTED_PROPERTY_MEANING",
@@ -2004,7 +2174,8 @@ function buildEntityToAttributedPropertyHypothesisV0_1(input: Readonly<{
       "SOURCE_STRUCTURED_FORM_REFERENCE",
     ]),
     alternatives: Object.freeze([
-      ...(hasMultiplePrimarySenses
+      ...sourceFunctionalSenseAlternativeTextV0_1(input.primary.form, primaryMeaningSelection.alternativeSenses),
+      ...(hasMultiplePrimarySenses && primaryMeaningSelection.authority !== "SOURCE_SENSE_VERIFIED"
         ? ["The base source record has multiple attested senses; this reading does not select or align one unique base sense."]
         : []),
       "The source-authored suffix account may be descriptive or historically contestable rather than a complete derivational analysis.",
@@ -2280,6 +2451,7 @@ function buildAgentFunctionalHypothesisV0_1(input: Readonly<{
   primary: AlbanianSourceLinkedRecordV0_1;
   related: AlbanianSourceLinkedRecordV0_1;
   comparison: AlbanianSourceLinkedComparisonV0_1 | null;
+  sourceRelationAssertion: AlbanianKaikkiSourceRelationAssertionV0_1 | null;
   sourceRelation: AlbanianSourceEvidenceRelationV0_1 | null;
 }>): AlbanianFunctionalHypothesisV0_1 | null {
   const directDerivedForm = input.sourceRelation === "SOURCE_DERIVED_FORM";
@@ -2294,6 +2466,16 @@ function buildAgentFunctionalHypothesisV0_1(input: Readonly<{
     !hasMeaningEvidenceV0_1(input.primary.meaningGlosses) ||
     !hasMeaningEvidenceV0_1(input.related.meaningGlosses)
   ) {
+    return null;
+  }
+
+  const primaryMeaningSelection = sourceFunctionalMeaningSelectionV0_1({
+    record: input.primary,
+    comparison: input.comparison,
+    sourceRelationAssertion: input.sourceRelationAssertion,
+  });
+  if (primaryMeaningSelection.authority === "SOURCE_SENSE_UNVERIFIED" ||
+    primaryMeaningSelection.selectedGlosses.length === 0) {
     return null;
   }
 
@@ -2320,7 +2502,7 @@ function buildAgentFunctionalHypothesisV0_1(input: Readonly<{
     !(targetAuthoredEtymologyReference && existingWhitelistedAgentGloss)
   ) return null;
 
-  const primaryMeaning = input.primary.meaningGlosses.join("; ");
+  const primaryMeaning = primaryMeaningSelection.selectedGlosses.join("; ");
   const relatedMeaning = input.related.meaningGlosses.join("; ");
   const functionalMeaning = sourceSenseAgentEvidence?.sense.glosses.join("; ") ?? relatedMeaning;
   const relatedHasSourceIpa = input.related.pronunciationVariants.some((variant) => variant.rawIpa !== null);
@@ -2329,11 +2511,16 @@ function buildAgentFunctionalHypothesisV0_1(input: Readonly<{
   const categoryBackedStatement = sourceSenseAgentEvidence
     ? ` The final source sense (“${functionalMeaning}”) carries the exact source-authored sq:Occupations category, with its sense identity preserved; the category is evidence for this lexical sense only, not for every use of the suffix or for an independent semantic law.`
     : "";
+  const primaryMeaningScopeStatement = primaryMeaningSelection.authority === "SOURCE_SENSE_VERIFIED"
+    ? ` The selected primary source sense is ${primaryMeaningSelection.selectedSenses[0]?.senseId ?? "Null"} at ordinal ${primaryMeaningSelection.selectedSenses[0]?.sourceSenseOrdinal ?? "Null"}; other primary senses are not used for this functional reading.`
+    : primaryMeaningSelection.authority === "SOURCE_RECORD_SCOPED"
+    ? " The primary relation is source-record-scoped; no individual primary source sense is selected."
+    : " No individual primary source sense is selected because the available payload does not establish sense ownership.";
   const statement = targetAuthoredEtymologyReference && targetAuthoredTemplate
-    ? `Source-bounded functional operation AGENT (exploratory): the directly queried target record ${input.related.form} (“${relatedMeaning}”) is linked to the resolved Albanian base record ${input.primary.form} (“${primaryMeaning}”) only by its own exact source-authored etymology reference ${input.comparison?.relation.reference ?? "Null"} and template ${targetAuthoredTemplate.expansion}. The identified target sense (“${functionalMeaning}”)${sourceSenseAgentEvidence ? " carries the exact source-authored sq:Occupations category" : " matches the existing bounded human-role source-gloss qualification"}. The target record does not create a base-side SOURCE_DERIVED_FORM assertion; this reading does not infer one, resolve the remaining template component, or establish a suffix rule. It is an exploratory AGENT reading for this source-qualified target sense only; no embryo meaning is claimed.`
+    ? `Source-bounded functional operation AGENT (exploratory): the directly queried target record ${input.related.form} (“${relatedMeaning}”) is linked to the resolved Albanian base record ${input.primary.form} (“${primaryMeaning}”) only by its own exact source-authored etymology reference ${input.comparison?.relation.reference ?? "Null"} and template ${targetAuthoredTemplate.expansion}. The identified target sense (“${functionalMeaning}”)${sourceSenseAgentEvidence ? " carries the exact source-authored sq:Occupations category" : " matches the existing bounded human-role source-gloss qualification"}. The target record does not create a base-side SOURCE_DERIVED_FORM assertion; this reading does not infer one, resolve the remaining template component, or establish a suffix rule.${primaryMeaningScopeStatement} It is an exploratory AGENT reading for this source-qualified target sense only; no embryo meaning is claimed.`
     : targetAuthoredSuffixRelation && targetSuffixTemplate
-    ? `Source-bounded functional operation AGENT (exploratory): the base source record lists ${input.related.form} (“${relatedMeaning}”) as SOURCE_RELATED_FORM of ${input.primary.form} (“${primaryMeaning}”), not as a base-side derived-form link. The exact target record separately cites ${input.comparison?.relation.reference ?? "Null"} and attributes the template ${targetSuffixTemplate.expansion}; its uniquely identified source sense (“${functionalMeaning}”) carries sq:Occupations. The product models AGENT for this source-qualified target sense while preserving the source relation label. The attributed template is not independent proof of morphology, history, or a universal suffix rule, and no embryo meaning is claimed.`
-    : `Source-bounded functional operation AGENT (exploratory): the source lists ${input.related.form} as a derived form of ${input.primary.form}; its glosses identify ${input.primary.form} as “${primaryMeaning}” and ${input.related.form} as “${relatedMeaning}”. The product preserves AGENT as an exploratory label for the related agent or profession gloss and this source-derived link; it does not assign an entity, resource, or other semantic role to the primary word beyond its source gloss.${categoryBackedStatement} This is a source-bounded product hypothesis, not proof of morphology, etymology, causation, or universal Voice semantics.`;
+    ? `Source-bounded functional operation AGENT (exploratory): the base source record lists ${input.related.form} (“${relatedMeaning}”) as SOURCE_RELATED_FORM of ${input.primary.form} (“${primaryMeaning}”), not as a base-side derived-form link. The exact target record separately cites ${input.comparison?.relation.reference ?? "Null"} and attributes the template ${targetSuffixTemplate.expansion}; its uniquely identified source sense (“${functionalMeaning}”) carries sq:Occupations. The product models AGENT for this source-qualified target sense while preserving the source relation label.${primaryMeaningScopeStatement} The attributed template is not independent proof of morphology, history, or a universal suffix rule, and no embryo meaning is claimed.`
+    : `Source-bounded functional operation AGENT (exploratory): the source lists ${input.related.form} as a derived form of ${input.primary.form}; its glosses identify ${input.primary.form} as “${primaryMeaning}” and ${input.related.form} as “${relatedMeaning}”. The product preserves AGENT as an exploratory label for the related agent or profession gloss and this source-derived link; it does not assign an entity, resource, or other semantic role to the primary word beyond its source gloss.${categoryBackedStatement}${primaryMeaningScopeStatement} This is a source-bounded product hypothesis, not proof of morphology, etymology, causation, or universal Voice semantics.`;
   return Object.freeze({
     functionalOperation: "AGENT" as const,
     statement,
@@ -2348,6 +2535,7 @@ function buildAgentFunctionalHypothesisV0_1(input: Readonly<{
       ...(sourceSenseAgentEvidence ? ["SOURCE_ATTESTED_FINAL_SENSE_CATEGORY"] : []),
     ]),
     alternatives: Object.freeze([
+      ...sourceFunctionalSenseAlternativeTextV0_1(input.primary.form, primaryMeaningSelection.alternativeSenses),
       ...(targetAuthoredEtymologyReference
         ? [
             "The target record supplies an etymology reference, not a base-side derived-form edge; no direction stronger than that source attribution is claimed.",
@@ -2373,6 +2561,7 @@ export function buildAlbanianFunctionalMeaningBridgeV0_1(input: Readonly<{
   primary: AlbanianSourceLinkedRecordV0_1;
   comparison: AlbanianSourceLinkedComparisonV0_1 | null;
   related?: AlbanianSourceLinkedRecordV0_1 | null;
+  sourceRelationAssertion: AlbanianKaikkiSourceRelationAssertionV0_1 | null;
   sourceRelation?: AlbanianSourceEvidenceRelationV0_1 | null;
 }>): AlbanianFunctionalMeaningBridgeV0_1 {
   const related = input.related ?? input.comparison?.related ?? null;
@@ -2385,6 +2574,7 @@ export function buildAlbanianFunctionalMeaningBridgeV0_1(input: Readonly<{
         primary: input.primary,
         related,
         comparison: input.comparison,
+        sourceRelationAssertion: input.sourceRelationAssertion,
         sourceRelation,
       })
     : null;
@@ -2406,6 +2596,7 @@ export function buildAlbanianFunctionalMeaningBridgeV0_1(input: Readonly<{
         comparison: input.comparison,
         primary: input.comparison.primary,
         related,
+        sourceRelationAssertion: input.sourceRelationAssertion,
       })
     : null;
   if (derivedStructure === null && entityToAttributedPropertyHypothesis === null && !agentFunctionalHypothesis) {
@@ -2431,6 +2622,8 @@ export function buildAlbanianFunctionalMeaningBridgeV0_1(input: Readonly<{
     ? buildDirectionalFunctionalHypothesisV0_1({
         primary: input.comparison?.primary ?? input.primary,
         related,
+        comparison: input.comparison,
+        sourceRelationAssertion: input.sourceRelationAssertion,
       })
     : null;
   const functionalHypothesis = directionalHypothesis ?? entityToAttributedPropertyHypothesis ?? agentFunctionalHypothesis;
@@ -2916,6 +3109,7 @@ async function buildAlbanianLexicalReadingV0_1(input: Readonly<{
       related: resolved
         ? sourceRecordProjectionV0_1(resolved, projectAlbanianKaikkiFactSourceIpaToSevenVoicesV0_1(resolved))
         : null,
+      sourceRelationAssertion: relatedForm.sourceRelationAssertion,
       sourceRelation: relatedForm.relation,
     });
     return Object.freeze({
@@ -3012,6 +3206,7 @@ async function buildAlbanianLexicalReadingV0_1(input: Readonly<{
         : selectedRelatedFunctionalBridge ?? buildAlbanianFunctionalMeaningBridgeV0_1({
             primary: primaryProjection,
             comparison: null,
+            sourceRelationAssertion: null,
           }));
 
   const compositionCandidate = relatedResultsWithFacts.find(({ resolved }) => resolved !== null);
