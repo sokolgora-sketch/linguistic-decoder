@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { GET } from "../app/api/analyze-v1/route";
 import { adaptAnalysisToTelemetryVM } from "@/ui/instrument/contractAdapter";
 import { MotivationDiscoveryCardV0_1 } from "@/ui/instrument/sections/MotivationDiscoveryCard.v0_1";
@@ -112,6 +112,155 @@ function model(overrides: Partial<MotivationDiscoveryV0_1VM> = {}): MotivationDi
 }
 
 describe("Motivation Discovery Lab presentation v0.1", () => {
+  it("offers an explicit action for an alternative Albanian source record with its identity and gloss", () => {
+    const sourceSnapshot = {
+      sourceFamilyId: "kaikki-albanian-jsonl-v0.1",
+      sourceUrl: "https://kaikki.org/dictionary/Albanian/kaikki.org-dictionary-Albanian.jsonl",
+      sha256: "7a84eca776ebfac752e7251bb0822edc9cd1701d1d58060d4f8ef4b76a208fcc",
+      bytes: 67438537,
+    };
+    const sourceFact = (ordinal: number, gloss: string) => ({
+      sourceRecordId: `kaikki-albanian-jsonl:word=krye:ordinal=${ordinal}`,
+      entryLocator: `jsonl://word/krye/match/${ordinal}`,
+      physicalRecordOrdinal: ordinal,
+      language: "Albanian" as const,
+      languageCode: "sq" as const,
+      form: "krye",
+      partOfSpeech: "noun",
+      senses: [{ senseId: `krye-${ordinal}`, glosses: [gloss] }],
+      ipaObservations: [],
+      sourceStatus: "observed_external_snapshot" as const,
+      attestationTruth: "fact" as const,
+      pronunciationAuthority: "CURRENT_KAIKKI_RECORD_ONLY_UNBOUND_TO_FROZEN_PROFILE" as const,
+      sourceSnapshot,
+    });
+    const facts = [sourceFact(0, "head, chief"), sourceFact(1, "beginning, chapter")];
+    const onAnalyzeAlbanianSourceRecord = jest.fn();
+
+    render(
+      <MotivationDiscoveryCardV0_1
+        discovery={{
+          kind: "present",
+          value: model({
+            inputWord: "krye",
+            inputLanguage: "sq",
+            exactLexicalSourceStatus: { status: "MATCHES_FOUND", queryForm: "krye", reasonCode: null },
+            exactLexicalSourceFacts: facts,
+          })
+        }}
+        onAnalyzeAlbanianSourceRecord={onAnalyzeAlbanianSourceRecord}
+      />,
+    );
+
+    const alternativeId = "kaikki-albanian-jsonl:word=krye:ordinal=1";
+    expect(screen.getAllByText("beginning, chapter").length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/Albanian · noun/)).toHaveLength(2);
+    expect(screen.getAllByText((_, element) =>
+      element?.textContent?.includes(`Source record: ${alternativeId}`) ?? false,
+    ).length).toBeGreaterThan(0);
+    expect(screen.getAllByText("SOURCE RECORD SELECTION UNKNOWN")).toHaveLength(2);
+    fireEvent.click(screen.getByRole("button", {
+      name: `Analyze exact Albanian source record ${alternativeId}`,
+    }));
+    expect(onAnalyzeAlbanianSourceRecord).toHaveBeenCalledTimes(1);
+    expect(onAnalyzeAlbanianSourceRecord).toHaveBeenCalledWith(alternativeId);
+  });
+
+  it("does not offer a selector for a duplicated exact source identity", () => {
+    const sourceSnapshot = {
+      sourceFamilyId: "kaikki-albanian-jsonl-v0.1",
+      sourceUrl: "https://kaikki.org/dictionary/Albanian/kaikki.org-dictionary-Albanian.jsonl",
+      sha256: "7a84eca776ebfac752e7251bb0822edc9cd1701d1d58060d4f8ef4b76a208fcc",
+      bytes: 67438537,
+    };
+    const duplicateFact = {
+      sourceRecordId: "kaikki-albanian-jsonl:word=krye:ordinal=1",
+      entryLocator: "jsonl://word/krye/match/1",
+      physicalRecordOrdinal: 1,
+      language: "Albanian" as const,
+      languageCode: "sq" as const,
+      form: "krye",
+      partOfSpeech: "noun",
+      senses: [{ senseId: "krye-1", glosses: ["beginning"] }],
+      ipaObservations: [],
+      sourceStatus: "observed_external_snapshot" as const,
+      attestationTruth: "fact" as const,
+      pronunciationAuthority: "CURRENT_KAIKKI_RECORD_ONLY_UNBOUND_TO_FROZEN_PROFILE" as const,
+      sourceSnapshot,
+    };
+
+    render(
+      <MotivationDiscoveryCardV0_1
+        discovery={{
+          kind: "present",
+          value: model({
+            inputWord: "krye",
+            inputLanguage: "sq",
+            exactLexicalSourceStatus: { status: "MATCHES_FOUND", queryForm: "krye", reasonCode: null },
+            exactLexicalSourceFacts: [duplicateFact, { ...duplicateFact }],
+          })
+        }}
+        onAnalyzeAlbanianSourceRecord={() => undefined}
+      />,
+    );
+
+    expect(screen.queryByTestId("albanian-source-record-select")).toBeNull();
+    expect(screen.getAllByTestId("albanian-source-record-unselectable")).toHaveLength(2);
+  });
+
+  it("keeps proper-name records visible without offering them for lexical evaluation", () => {
+    const sourceSnapshot = {
+      sourceFamilyId: "kaikki-albanian-jsonl-v0.1",
+      sourceUrl: "https://kaikki.org/dictionary/Albanian/kaikki.org-dictionary-Albanian.jsonl",
+      sha256: "7a84eca776ebfac752e7251bb0822edc9cd1701d1d58060d4f8ef4b76a208fcc",
+      bytes: 67438537,
+    };
+    const common = {
+      entryLocator: "jsonl://word/krye/match/0",
+      physicalRecordOrdinal: 0,
+      language: "Albanian" as const,
+      languageCode: "sq" as const,
+      form: "krye",
+      senses: [{ senseId: "krye-sense", glosses: ["head"] }],
+      ipaObservations: [],
+      sourceStatus: "observed_external_snapshot" as const,
+      attestationTruth: "fact" as const,
+      pronunciationAuthority: "CURRENT_KAIKKI_RECORD_ONLY_UNBOUND_TO_FROZEN_PROFILE" as const,
+      sourceSnapshot,
+    };
+    const commonNoun = {
+      ...common,
+      sourceRecordId: "kaikki-albanian-jsonl:word=krye:ordinal=0",
+      partOfSpeech: "noun",
+    };
+    const properName = {
+      ...common,
+      sourceRecordId: "kaikki-albanian-jsonl:word=krye:ordinal=1",
+      partOfSpeech: "name",
+    };
+
+    render(
+      <MotivationDiscoveryCardV0_1
+        discovery={{
+          kind: "present",
+          value: model({
+            inputWord: "krye",
+            inputLanguage: "sq",
+            exactLexicalSourceStatus: { status: "MATCHES_FOUND", queryForm: "krye", reasonCode: null },
+            exactLexicalSourceFacts: [commonNoun, properName],
+          })
+        }}
+        onAnalyzeAlbanianSourceRecord={() => undefined}
+      />,
+    );
+
+    expect(screen.getByText(/Albanian · name/)).toBeInTheDocument();
+    expect(screen.getAllByTestId("albanian-source-record-select")).toHaveLength(1);
+    expect(screen.getByTestId("albanian-source-record-unselectable")).toHaveTextContent(
+      "not a unique selectable Albanian lexical record",
+    );
+  });
+
   it("shows a Latin source candidate with an explicit lexical-only boundary", async () => {
     const response = await GET(
       new Request("http://localhost/api/analyze-v1?word=bamoar&mode=strict&alphabet=auto"),

@@ -1,4 +1,4 @@
-import { POST } from "@/app/api/analyze-v1/route";
+import { GET, POST } from "@/app/api/analyze-v1/route";
 
 jest.mock("@/shared/openInstrument/motivationEngineDiscoveryServerOnly.v0_1", () => {
   const actual = jest.requireActual(
@@ -332,8 +332,143 @@ jest.mock("@/shared/openInstrument/motivationEngineDiscoveryServerOnly.v0_1", ()
     pronunciationAuthority: "CURRENT_KAIKKI_RECORD_ONLY_UNBOUND_TO_FROZEN_PROFILE",
     sourceSnapshot: drite.sourceSnapshot,
   };
+  const kryeOrdinal0 = {
+    sourceRecordId: "kaikki-albanian-jsonl:word=krye:ordinal=0",
+    entryLocator: "jsonl://word/krye/match/0",
+    physicalRecordOrdinal: 40000,
+    language: "Albanian",
+    languageCode: "sq",
+    form: "krye",
+    partOfSpeech: "noun",
+    senses: [{ senseId: "krye-first-head", glosses: ["first-record-only"] }],
+    ipaObservations: [],
+    relatedForms: [],
+    sourceStatus: "observed_external_snapshot",
+    attestationTruth: "fact",
+    pronunciationAuthority: "CURRENT_KAIKKI_RECORD_ONLY_UNBOUND_TO_FROZEN_PROFILE",
+    sourceSnapshot: drite.sourceSnapshot,
+  };
+  const kryeOrdinal1 = {
+    sourceRecordId: "kaikki-albanian-jsonl:word=krye:ordinal=1",
+    entryLocator: "jsonl://word/krye/match/1",
+    physicalRecordOrdinal: 40001,
+    language: "Albanian",
+    languageCode: "sq",
+    form: "krye",
+    partOfSpeech: "noun",
+    senses: [
+      { senseId: "krye-second-head", glosses: ["second-record-leader"] },
+      { senseId: "krye-second-chapter", glosses: ["second-record-chapter"] },
+    ],
+    ipaObservations: [],
+    relatedForms: [{
+      form: "kryegjahtar",
+      relation: "SOURCE_DERIVED_FORM",
+      entryLocator: "jsonl://word/kryegjahtar",
+      sourceRelationAssertion: {
+        assertionScope: "SOURCE_RECORD",
+        sourceSenseId: null,
+        sourceSenseOrdinal: null,
+        sourceSenseIdentityStatus: "NOT_APPLICABLE",
+        sourceAssertionOrdinal: 34,
+        reasonCodes: [],
+      },
+    }],
+    sourceStatus: "observed_external_snapshot",
+    attestationTruth: "fact",
+    pronunciationAuthority: "CURRENT_KAIKKI_RECORD_ONLY_UNBOUND_TO_FROZEN_PROFILE",
+    sourceSnapshot: drite.sourceSnapshot,
+  };
+  const kryegjahtar = {
+    sourceRecordId: "kaikki-albanian-jsonl:word=kryegjahtar:ordinal=0",
+    entryLocator: "jsonl://word/kryegjahtar/match/0",
+    physicalRecordOrdinal: 40002,
+    language: "Albanian",
+    languageCode: "sq",
+    form: "kryegjahtar",
+    partOfSpeech: "noun",
+    senses: [{ senseId: "kryegjahtar-hunter", glosses: ["experienced hunter heading a hunting party"] }],
+    ipaObservations: [],
+    etymologyLinks: [{ sourceForm: "krye", reference: "krye#Albanian" }],
+    sourceStatus: "observed_external_snapshot",
+    attestationTruth: "fact",
+    pronunciationAuthority: "CURRENT_KAIKKI_RECORD_ONLY_UNBOUND_TO_FROZEN_PROFILE",
+    sourceSnapshot: drite.sourceSnapshot,
+  };
+  const shtrazeOrdinal0 = {
+    sourceRecordId: "kaikki-albanian-jsonl:word=shtraz%C3%AB:ordinal=0",
+    entryLocator: "jsonl://word/shtraz%C3%AB/match/0",
+    physicalRecordOrdinal: 40003,
+    language: "Albanian",
+    languageCode: "sq",
+    form: "shtrazë",
+    partOfSpeech: "noun",
+    senses: [{ senseId: "shtraze-first-bed", glosses: ["first-record-bed"] }],
+    ipaObservations: [],
+    relatedForms: [],
+    sourceStatus: "observed_external_snapshot",
+    attestationTruth: "fact",
+    pronunciationAuthority: "CURRENT_KAIKKI_RECORD_ONLY_UNBOUND_TO_FROZEN_PROFILE",
+    sourceSnapshot: drite.sourceSnapshot,
+  };
+  const shtrazeOrdinal1 = {
+    sourceRecordId: "kaikki-albanian-jsonl:word=shtraz%C3%AB:ordinal=1",
+    entryLocator: "jsonl://word/shtraz%C3%AB/match/1",
+    physicalRecordOrdinal: 40004,
+    language: "Albanian",
+    languageCode: "sq",
+    form: "shtrazë",
+    partOfSpeech: "noun",
+    senses: [{ senseId: "en-shtrazë-sq-noun-kwBU1fVd", glosses: ["guard", "supervision"] }],
+    ipaObservations: [],
+    relatedForms: [{
+      form: "shtraznik",
+      relation: "SOURCE_DERIVED_FORM",
+      entryLocator: "jsonl://word/shtraznik",
+      sourceRelationAssertion: {
+        assertionScope: "SOURCE_SENSE",
+        sourceSenseId: "en-shtrazë-sq-noun-kwBU1fVd",
+        sourceSenseOrdinal: 0,
+        sourceSenseIdentityStatus: "VERIFIED",
+        sourceAssertionOrdinal: 0,
+        reasonCodes: [],
+      },
+    }],
+    sourceStatus: "observed_external_snapshot",
+    attestationTruth: "fact",
+    pronunciationAuthority: "CURRENT_KAIKKI_RECORD_ONLY_UNBOUND_TO_FROZEN_PROFILE",
+    sourceSnapshot: drite.sourceSnapshot,
+  };
+  const shtraznik = {
+    sourceRecordId: "kaikki-albanian-jsonl:word=shtraznik:ordinal=0",
+    entryLocator: "jsonl://word/shtraznik/match/0",
+    physicalRecordOrdinal: 40005,
+    language: "Albanian",
+    languageCode: "sq",
+    form: "shtraznik",
+    partOfSpeech: "noun",
+    senses: [{
+      senseId: "en-shtraznik-sq-noun-qdQDTaB9",
+      glosses: ["guard"],
+      categories: [{
+        name: "Occupations",
+        kind: "other",
+        parents: [],
+        source: "w",
+        orig: "sq:Occupations",
+        langcode: "sq",
+        _dis: null,
+      }],
+    }],
+    ipaObservations: [],
+    etymologyLinks: [{ sourceForm: "shtrazë", reference: "shtrazë#Albanian" }],
+    sourceStatus: "observed_external_snapshot",
+    attestationTruth: "fact",
+    pronunciationAuthority: "CURRENT_KAIKKI_RECORD_ONLY_UNBOUND_TO_FROZEN_PROFILE",
+    sourceSnapshot: drite.sourceSnapshot,
+  };
   const albanianProvider = lexicalSource.createAlbanianKaikkiServerOnlyExactLexicalSourceProviderForSyntheticFixtureV0_1({
-    facts: [drite, dritare, peshk, peshkatar, pele, pelar, qymyr, qymyrtar, zjarrfikes, zjarr, fikNoun, fikVerb, zesSuffix, mal, malor],
+    facts: [drite, dritare, peshk, peshkatar, pele, pelar, qymyr, qymyrtar, zjarrfikes, zjarr, fikNoun, fikVerb, zesSuffix, mal, malor, kryeOrdinal0, kryeOrdinal1, kryegjahtar, shtrazeOrdinal0, shtrazeOrdinal1, shtraznik],
   });
   const englishProvider = {
     query: async (query: unknown) => ({
@@ -441,6 +576,157 @@ describe("analyze-v1 Albanian lexical reading reachability", () => {
   afterEach(() => {
     if (originalMode === undefined) delete process.env.OPEN_INSTRUMENT_PUBLIC_BETA_MODE;
     else process.env.OPEN_INSTRUMENT_PUBLIC_BETA_MODE = originalMode;
+  });
+
+  it("keeps ordinary duplicate-record lookup compatible and evaluates only an explicitly selected record", async () => {
+    const makePost = (word: string, selector?: string) => POST(new Request("http://localhost/api/analyze-v1", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        word,
+        language: "sq",
+        alphabet: "albanian",
+        providerExecution: "disabled",
+        ...(selector !== undefined ? { albanianSourceRecordId: selector } : {}),
+      }),
+    }));
+
+    const ordinaryKryeResponse = await makePost("krye");
+    const ordinaryKrye = await ordinaryKryeResponse.json();
+    const ordinaryKryeReading = ordinaryKrye.motivationDiscoveryV0_1.albanianLexicalReading;
+    expect(ordinaryKryeResponse.status).toBe(200);
+    expect(ordinaryKryeReading.primarySourceFact).toMatchObject({
+      sourceRecordId: "kaikki-albanian-jsonl:word=krye:ordinal=0",
+      meaningGlosses: ["first-record-only"],
+    });
+    expect(ordinaryKryeReading.functionalMeaningBridge.status).toBe("NULL");
+
+    const selectedKryeResponse = await makePost("krye", "kaikki-albanian-jsonl:word=krye:ordinal=1");
+    const selectedKrye = await selectedKryeResponse.json();
+    const selectedKryeReading = selectedKrye.motivationDiscoveryV0_1.albanianLexicalReading;
+    expect(selectedKryeResponse.status).toBe(200);
+    expect(selectedKryeReading.primarySourceFact).toMatchObject({
+      sourceRecordId: "kaikki-albanian-jsonl:word=krye:ordinal=1",
+      meaningGlosses: ["second-record-leader", "second-record-chapter"],
+    });
+    expect(selectedKryeReading.primarySourceFact.meaningGlosses).not.toContain("first-record-only");
+    expect(selectedKryeReading.relatedForms.map((candidate: any) => candidate.form)).toEqual(["kryegjahtar"]);
+    expect(selectedKryeReading.relatedCandidateEvaluations[0]).toMatchObject({
+      sourceRelation: "SOURCE_DERIVED_FORM",
+      sourceRelationAssertion: { assertionScope: "SOURCE_RECORD", sourceSenseId: null },
+      sourceLinkedComparison: { status: "SUPPORTED" },
+      functionalMeaningBridge: {
+        status: "SUPPORTED",
+        functionalHypothesis: { functionalOperation: "AGENT" },
+      },
+    });
+
+    const selectedShtrazeResponse = await makePost("shtrazë", "kaikki-albanian-jsonl:word=shtraz%C3%AB:ordinal=1");
+    const selectedShtraze = await selectedShtrazeResponse.json();
+    const selectedShtrazeReading = selectedShtraze.motivationDiscoveryV0_1.albanianLexicalReading;
+    expect(selectedShtrazeResponse.status).toBe(200);
+    expect(selectedShtrazeReading.primarySourceFact).toMatchObject({
+      sourceRecordId: "kaikki-albanian-jsonl:word=shtraz%C3%AB:ordinal=1",
+      meaningGlosses: ["guard", "supervision"],
+    });
+    expect(selectedShtrazeReading.relatedCandidateEvaluations[0]).toMatchObject({
+      sourceRelationAssertion: {
+        assertionScope: "SOURCE_SENSE",
+        sourceSenseId: "en-shtrazë-sq-noun-kwBU1fVd",
+        sourceSenseIdentityStatus: "VERIFIED",
+      },
+      functionalMeaningBridge: {
+        status: "SUPPORTED",
+        functionalHypothesis: { functionalOperation: "AGENT" },
+      },
+    });
+  });
+
+  it("preserves the unique-record reading when its exact ID is explicitly selected", async () => {
+    const ordinary = await analyzeDriteV0_1();
+    const selectedResponse = await POST(new Request("http://localhost/api/analyze-v1", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        word: "dritë",
+        language: "sq",
+        alphabet: "albanian",
+        providerExecution: "disabled",
+        albanianSourceRecordId: "kaikki-albanian-jsonl:word=drit%C3%AB:ordinal=0",
+      }),
+    }));
+    const selected = await selectedResponse.json();
+
+    expect(selectedResponse.status).toBe(200);
+    expect(selected.motivationDiscoveryV0_1.albanianLexicalReading).toEqual(
+      ordinary.body.motivationDiscoveryV0_1.albanianLexicalReading,
+    );
+  });
+
+  it("supports exact record selection over GET and fails closed on invalid selectors", async () => {
+    const url = new URL("http://localhost/api/analyze-v1");
+    url.searchParams.set("word", "shtrazë");
+    url.searchParams.set("language", "sq");
+    url.searchParams.set("alphabet", "albanian");
+    url.searchParams.set("providerExecution", "disabled");
+    url.searchParams.set("albanianSourceRecordId", "kaikki-albanian-jsonl:word=shtraz%C3%AB:ordinal=1");
+    const getResponse = await GET(new Request(url));
+    const getBody = await getResponse.json();
+    expect(getResponse.status).toBe(200);
+    expect(getBody.motivationDiscoveryV0_1.albanianLexicalReading.primarySourceFact.sourceRecordId)
+      .toBe("kaikki-albanian-jsonl:word=shtraz%C3%AB:ordinal=1");
+
+    const wrongWordResponse = await POST(new Request("http://localhost/api/analyze-v1", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        word: "krye",
+        language: "sq",
+        alphabet: "albanian",
+        providerExecution: "disabled",
+        albanianSourceRecordId: "kaikki-albanian-jsonl:word=shtraz%C3%AB:ordinal=1",
+      }),
+    }));
+    const wrongWord = await wrongWordResponse.json();
+    expect(wrongWordResponse.status).toBe(200);
+    expect(wrongWord.motivationDiscoveryV0_1.albanianLexicalReading).toMatchObject({
+      status: "NULL",
+      primarySourceFact: null,
+      functionalMeaningBridge: {
+        status: "NULL",
+        reasonCodes: ["ALBANIAN_SOURCE_RECORD_WORD_MISMATCH"],
+      },
+    });
+
+    const invalidResponse = await POST(new Request("http://localhost/api/analyze-v1", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ word: "krye", albanianSourceRecordId: 42 }),
+    }));
+    expect(invalidResponse.status).toBe(400);
+    expect(await invalidResponse.json()).toMatchObject({ reason: "INVALID_ALBANIAN_SOURCE_RECORD_ID" });
+
+    const duplicateQuery = new URL("http://localhost/api/analyze-v1?word=krye&language=sq&alphabet=albanian");
+    duplicateQuery.searchParams.append("albanianSourceRecordId", "kaikki-albanian-jsonl:word=krye:ordinal=0");
+    duplicateQuery.searchParams.append("albanianSourceRecordId", "kaikki-albanian-jsonl:word=krye:ordinal=1");
+    const duplicateResponse = await GET(new Request(duplicateQuery));
+    expect(duplicateResponse.status).toBe(400);
+    expect(await duplicateResponse.json()).toMatchObject({ reason: "DUPLICATE_ALBANIAN_SOURCE_RECORD_ID" });
+
+    const nonAlbanianResponse = await POST(new Request("http://localhost/api/analyze-v1", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        word: "study",
+        language: "en",
+        alphabet: "latin",
+        albanianSourceRecordId: "kaikki-albanian-jsonl:word=krye:ordinal=1",
+      }),
+    }));
+    expect(nonAlbanianResponse.status).toBe(400);
+    expect(await nonAlbanianResponse.json()).toMatchObject({
+      reason: "ALBANIAN_SOURCE_RECORD_SELECTOR_REQUIRES_ALBANIAN_INPUT",
+    });
   });
 
   it.each([

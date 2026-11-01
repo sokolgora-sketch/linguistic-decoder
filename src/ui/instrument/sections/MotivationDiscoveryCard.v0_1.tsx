@@ -492,9 +492,13 @@ function Candidate({
 export function MotivationDiscoveryCardV0_1({
   discovery,
   interpretation,
+  onAnalyzeAlbanianSourceRecord,
+  sourceRecordSelectionDisabled = false,
 }: {
   discovery: PresentOrMissing<MotivationDiscoveryV0_1VM> | undefined;
   interpretation?: PresentOrMissing<FunctionalMotivationInterpretationV0_2VM>;
+  onAnalyzeAlbanianSourceRecord?: (sourceRecordId: string) => void;
+  sourceRecordSelectionDisabled?: boolean;
 }) {
   if (!discovery || discovery.kind !== "present") return null;
   const value = discovery.value;
@@ -509,6 +513,13 @@ export function MotivationDiscoveryCardV0_1({
     (witness) => witness.representative.structuralComparison.presentationClassification === "LEXICAL_ENTRY_CONFIRMATION",
   ).length;
   const exactLexicalSourceFacts = value.exactLexicalSourceFacts ?? [];
+  const exactSourceRecordIdCounts = new Map<string, number>();
+  for (const fact of exactLexicalSourceFacts) {
+    exactSourceRecordIdCounts.set(
+      fact.sourceRecordId,
+      (exactSourceRecordIdCounts.get(fact.sourceRecordId) ?? 0) + 1,
+    );
+  }
   const sourceIpaSevenVoiceAnalyses = value.sourceIpaSevenVoiceAnalyses ?? [];
   const albanianLexicalReading = value.albanianLexicalReading;
   const functionalMeaningBridge = albanianLexicalReading?.functionalMeaningBridge ?? null;
@@ -630,9 +641,9 @@ export function MotivationDiscoveryCardV0_1({
           </div>
           {exactLexicalSourceFacts.length ? (
             <div className="mt-3 space-y-3">
-              {exactLexicalSourceFacts.map((fact) => (
+              {exactLexicalSourceFacts.map((fact, factIndex) => (
                 <article
-                  key={fact.sourceRecordId}
+                  key={`${fact.sourceRecordId}:${factIndex}`}
                   className="rounded border border-[#303843] bg-[#0d1117] p-2"
                 >
                   <div className="flex flex-wrap items-baseline gap-2">
@@ -658,6 +669,28 @@ export function MotivationDiscoveryCardV0_1({
                   <div className="break-words text-[#9fb1bf]">
                     Source record: {fact.sourceRecordId} · {fact.entryLocator}
                   </div>
+                  {exactLexicalSourceFacts.length > 1 && onAnalyzeAlbanianSourceRecord ? (
+                    fact.language === "Albanian" && fact.languageCode === "sq" && fact.partOfSpeech !== "name" &&
+                    /^kaikki-albanian-jsonl:word=[^:]+:ordinal=(?:0|[1-9]\d*)$/u.test(fact.sourceRecordId) &&
+                    exactSourceRecordIdCounts.get(fact.sourceRecordId) === 1 ? (
+                      fact.sourceRecordId === selectedPrimarySourceRecordId ? null : (
+                        <button
+                          type="button"
+                          data-testid="albanian-source-record-select"
+                          aria-label={`Analyze exact Albanian source record ${fact.sourceRecordId}`}
+                          disabled={sourceRecordSelectionDisabled}
+                          onClick={() => onAnalyzeAlbanianSourceRecord(fact.sourceRecordId)}
+                          className="mt-2 rounded border border-[#52697f] px-2 py-1 text-xs text-[#d7e8f5] hover:bg-[#1a2631] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#d8bb7a] disabled:opacity-50"
+                        >
+                          Analyze this exact source record
+                        </button>
+                      )
+                    ) : (
+                      <div data-testid="albanian-source-record-unselectable" className="mt-2 text-xs text-[#d5c28f]">
+                        This record is not a unique selectable Albanian lexical record.
+                      </div>
+                    )
+                  ) : null}
                   <div className="break-words text-[#9fb1bf]">
                     Snapshot: {fact.sourceSnapshot.sha256} · {fact.sourceSnapshot.bytes} bytes
                   </div>
