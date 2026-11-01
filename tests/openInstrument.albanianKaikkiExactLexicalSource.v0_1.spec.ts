@@ -11,8 +11,11 @@ import {
 import {
   createAlbanianKaikkiServerOnlyExactLexicalSourceProviderForSyntheticSourceFileV0_1,
   createAlbanianKaikkiServerOnlyExactLexicalSourceProviderForSyntheticFixtureV0_1,
+  createAlbanianKaikkiServerOnlyExactLexicalSourceProviderV0_1,
   createAlbanianKaikkiServerOnlyUnavailableProviderV0_1,
+  ALBANIAN_KAIKKI_LEXICAL_SOURCE_PATH_ENV_V0_1,
   type AlbanianKaikkiExactLexicalSourceFactV0_1,
+  type AlbanianKaikkiSourceRelationAssertionV0_1,
   type AlbanianKaikkiServerOnlyExactLexicalSourceProviderV0_1,
 } from "@/shared/openInstrument/albanianKaikkiServerOnlyExactLexicalSource.v0_1";
 import {
@@ -26,8 +29,26 @@ import { createElement } from "react";
 import { cleanup, render, screen } from "@testing-library/react";
 
 function fixtureFact(
-  overrides: Partial<AlbanianKaikkiExactLexicalSourceFactV0_1> = {},
+  overrides: Omit<Partial<AlbanianKaikkiExactLexicalSourceFactV0_1>, "relatedForms"> & {
+    relatedForms?: readonly Readonly<{
+      form: string;
+      relation: "SOURCE_RELATED_FORM" | "SOURCE_DERIVED_FORM";
+      entryLocator: string;
+      sourceRelationAssertion?: AlbanianKaikkiSourceRelationAssertionV0_1;
+    }>[];
+  } = {},
 ): AlbanianKaikkiExactLexicalSourceFactV0_1 {
+  const relatedForms = overrides.relatedForms?.map((relation) => Object.freeze({
+    ...relation,
+    sourceRelationAssertion: relation.sourceRelationAssertion ?? Object.freeze({
+      assertionScope: "UNKNOWN_OR_NULL" as const,
+      sourceSenseId: null,
+      sourceSenseOrdinal: null,
+      sourceSenseIdentityStatus: "UNKNOWN_OR_NULL" as const,
+      sourceAssertionOrdinal: null,
+      reasonCodes: Object.freeze(["SOURCE_RELATION_PROVENANCE_NOT_PROJECTED"]),
+    }),
+  }));
   return {
     sourceRecordId: "kaikki-albanian-jsonl:word=nënë:ordinal=0",
     entryLocator: "jsonl://word/nënë/match/0",
@@ -48,7 +69,25 @@ function fixtureFact(
       bytes: 67438537,
     },
     ...overrides,
+    ...(relatedForms ? { relatedForms: Object.freeze(relatedForms) } : {}),
   };
+}
+
+function legacyPayloadWithoutSenseOwnershipV0_1<T>(value: T): T {
+  const copy = JSON.parse(JSON.stringify(value)) as unknown;
+  const stripOwnership = (node: unknown): void => {
+    if (Array.isArray(node)) {
+      node.forEach(stripOwnership);
+      return;
+    }
+    if (!node || typeof node !== "object") return;
+    const record = node as Record<string, unknown>;
+    delete record.sourceRelationAssertion;
+    delete record.sourceSenseOrdinal;
+    Object.values(record).forEach(stripOwnership);
+  };
+  stripOwnership(copy);
+  return copy as T;
 }
 
 function unsupportedAfArityFixtureFactsV0_1(
@@ -640,7 +679,7 @@ type SyntheticSourceRecordV0_1 = Readonly<{
   lang_code: "sq";
   pos: string;
   senses: readonly Readonly<{
-    id: string;
+    id?: string | null;
     glosses: readonly string[];
     categories?: readonly Readonly<{
       name: string;
@@ -1299,6 +1338,40 @@ describe("real Albanian exact lexical source integration v0.1", () => {
       cleanup();
       fjaloriFetch.mockRestore();
     }
+
+    const legacyPayload = JSON.parse(JSON.stringify(discovery)) as Record<string, unknown>;
+    const legacyReading = legacyPayload.albanianLexicalReading as Record<string, unknown>;
+    const legacyCandidates = legacyReading.relatedCandidateEvaluations as Record<string, unknown>[];
+    const legacyTargetFirstCandidate = legacyCandidates.find((item) =>
+      item.sourceRelation === "TARGET_AUTHORED_ETYMOLOGY_REFERENCE",
+    );
+    if (!legacyTargetFirstCandidate) throw new Error("Expected target-authored candidate for legacy adapter regression");
+    delete legacyTargetFirstCandidate.sourceRelationAssertion;
+    const legacyCandidateComparison = legacyTargetFirstCandidate.sourceLinkedComparison as Record<string, unknown>;
+    delete (legacyCandidateComparison.relation as Record<string, unknown>).sourceRelationAssertion;
+    const legacySelectedComparison = legacyReading.sourceLinkedComparison as Record<string, unknown>;
+    delete (legacySelectedComparison.relation as Record<string, unknown>).sourceRelationAssertion;
+    expect(adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: legacyPayload }).motivationDiscoveryV0_1).toMatchObject({
+      kind: "present",
+    });
+
+    const forgedLegacyPayload = JSON.parse(JSON.stringify(legacyPayload)) as Record<string, unknown>;
+    const forgedLegacyReading = forgedLegacyPayload.albanianLexicalReading as Record<string, unknown>;
+    const forgedLegacyCandidate = (forgedLegacyReading.relatedCandidateEvaluations as Record<string, unknown>[])
+      .find((item) => item.sourceRelation === "TARGET_AUTHORED_ETYMOLOGY_REFERENCE");
+    if (!forgedLegacyCandidate) throw new Error("Expected target-authored candidate for forged ownership regression");
+    forgedLegacyCandidate.sourceRelationAssertion = {
+      assertionScope: "SOURCE_SENSE",
+      sourceSenseId: "unrelated-sense",
+      sourceSenseOrdinal: 0,
+      sourceSenseIdentityStatus: "VERIFIED",
+      sourceAssertionOrdinal: 0,
+      reasonCodes: [],
+    };
+    expect(adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: forgedLegacyPayload }).motivationDiscoveryV0_1).toMatchObject({
+      kind: "missing",
+      missing: "malformed",
+    });
   });
 
   it("supports an exact target-role sense while retaining ambiguous and unresolved af components without alignment", async () => {
@@ -2192,6 +2265,363 @@ describe("real Albanian exact lexical source integration v0.1", () => {
           ],
         }],
       });
+    });
+  });
+
+  it("preserves record and sense owners, duplicate links, missing IDs, and duplicate IDs", async () => {
+    await withSyntheticSourceFileV0_1([
+      {
+        word: "owner-form",
+        lang_code: "sq",
+        pos: "noun",
+        related: [{ word: "shared-form" }],
+        senses: [
+          { id: "owner-sense-0", glosses: ["first meaning"], related: [{ word: "shared-form" }], derived: [{ word: "shared-form" }] },
+          { id: "owner-sense-1", glosses: ["second meaning"], related: [{ word: "shared-form" }] },
+          { id: "duplicate-id", glosses: ["duplicate one"], derived: [{ word: "duplicate-target" }] },
+          { id: "duplicate-id", glosses: ["duplicate two"], derived: [{ word: "duplicate-target" }] },
+          { id: null, glosses: ["missing ID"], related: [{ word: "missing-target" }] },
+        ],
+        sounds: [],
+      },
+    ], async ({ provider }) => {
+      const result = await provider.query("owner-form");
+      expect(result).toMatchObject({
+        status: "MATCHES_FOUND",
+        facts: [{
+          relatedForms: [
+            {
+              form: "shared-form",
+              relation: "SOURCE_RELATED_FORM",
+              sourceRelationAssertion: {
+                assertionScope: "SOURCE_RECORD",
+                sourceSenseId: null,
+                sourceSenseOrdinal: null,
+                sourceSenseIdentityStatus: "NOT_APPLICABLE",
+                sourceAssertionOrdinal: 0,
+                reasonCodes: [],
+              },
+            },
+            {
+              form: "shared-form",
+              relation: "SOURCE_RELATED_FORM",
+              sourceRelationAssertion: {
+                assertionScope: "SOURCE_SENSE",
+                sourceSenseId: "owner-sense-0",
+                sourceSenseOrdinal: 0,
+                sourceSenseIdentityStatus: "VERIFIED",
+                sourceAssertionOrdinal: 0,
+                reasonCodes: [],
+              },
+            },
+            {
+              form: "shared-form",
+              relation: "SOURCE_RELATED_FORM",
+              sourceRelationAssertion: {
+                assertionScope: "SOURCE_SENSE",
+                sourceSenseId: "owner-sense-1",
+                sourceSenseOrdinal: 1,
+                sourceSenseIdentityStatus: "VERIFIED",
+                sourceAssertionOrdinal: 0,
+                reasonCodes: [],
+              },
+            },
+            {
+              form: "missing-target",
+              relation: "SOURCE_RELATED_FORM",
+              sourceRelationAssertion: {
+                assertionScope: "SOURCE_SENSE",
+                sourceSenseId: null,
+                sourceSenseOrdinal: 4,
+                sourceSenseIdentityStatus: "UNKNOWN_OR_NULL",
+                sourceAssertionOrdinal: 0,
+                reasonCodes: ["SOURCE_SENSE_ID_MISSING"],
+              },
+            },
+            {
+              form: "shared-form",
+              relation: "SOURCE_DERIVED_FORM",
+              sourceRelationAssertion: {
+                assertionScope: "SOURCE_SENSE",
+                sourceSenseId: "owner-sense-0",
+                sourceSenseOrdinal: 0,
+                sourceSenseIdentityStatus: "VERIFIED",
+                sourceAssertionOrdinal: 0,
+                reasonCodes: [],
+              },
+            },
+            {
+              form: "duplicate-target",
+              relation: "SOURCE_DERIVED_FORM",
+              sourceRelationAssertion: {
+                assertionScope: "SOURCE_SENSE",
+                sourceSenseId: "duplicate-id",
+                sourceSenseOrdinal: 2,
+                sourceSenseIdentityStatus: "UNKNOWN_OR_NULL",
+                sourceAssertionOrdinal: 0,
+                reasonCodes: ["SOURCE_SENSE_ID_DUPLICATE"],
+              },
+            },
+            {
+              form: "duplicate-target",
+              relation: "SOURCE_DERIVED_FORM",
+              sourceRelationAssertion: {
+                assertionScope: "SOURCE_SENSE",
+                sourceSenseId: "duplicate-id",
+                sourceSenseOrdinal: 3,
+                sourceSenseIdentityStatus: "UNKNOWN_OR_NULL",
+                sourceAssertionOrdinal: 0,
+                reasonCodes: ["SOURCE_SENSE_ID_DUPLICATE"],
+              },
+            },
+          ],
+        }],
+      });
+    });
+  });
+
+  it("carries relation ownership through engine, adapter, and the existing source-evidence UI", async () => {
+    const sourceSenseAssertion: AlbanianKaikkiSourceRelationAssertionV0_1 = {
+      assertionScope: "SOURCE_SENSE",
+      sourceSenseId: "owner-sense-1",
+      sourceSenseOrdinal: 1,
+      sourceSenseIdentityStatus: "VERIFIED",
+      sourceAssertionOrdinal: 0,
+      reasonCodes: [],
+    };
+    const primary = fixtureFact({
+      sourceRecordId: "kaikki-albanian-jsonl:word=owner-form:ordinal=0",
+      entryLocator: "jsonl://word/owner-form/match/0",
+      form: "owner-form",
+      senses: [
+        { senseId: "owner-sense-0", glosses: ["record sense"] },
+        { senseId: "owner-sense-1", glosses: ["owning sense meaning"] },
+      ],
+      ipaObservations: [],
+      relatedForms: [
+        {
+          form: "shared-form",
+          relation: "SOURCE_RELATED_FORM",
+          entryLocator: "jsonl://word/shared-form",
+          sourceRelationAssertion: {
+            assertionScope: "SOURCE_RECORD",
+            sourceSenseId: null,
+            sourceSenseOrdinal: null,
+            sourceSenseIdentityStatus: "NOT_APPLICABLE",
+            sourceAssertionOrdinal: 0,
+            reasonCodes: [],
+          },
+        },
+        {
+          form: "shared-form",
+          relation: "SOURCE_RELATED_FORM",
+          entryLocator: "jsonl://word/shared-form",
+          sourceRelationAssertion: sourceSenseAssertion,
+        },
+      ],
+    });
+    const discovery = await discoveryForFactsV0_1([primary], "owner-form");
+    const reading = discovery.albanianLexicalReading;
+    expect(reading?.relatedForms.map((relation) => relation.sourceRelationAssertion)).toEqual([
+      primary.relatedForms?.[0]?.sourceRelationAssertion,
+      sourceSenseAssertion,
+    ]);
+    expect(reading?.relatedCandidateEvaluations.map((candidate) => candidate.sourceRelationAssertion)).toEqual([
+      primary.relatedForms?.[0]?.sourceRelationAssertion,
+      sourceSenseAssertion,
+    ]);
+    expect(reading?.relatedCandidateEvaluations[0]).toMatchObject({
+      resolution: "UNRESOLVED",
+      sourceLinkedComparison: {
+        status: "NULL",
+        relation: { sourceRelationAssertion: primary.relatedForms?.[0]?.sourceRelationAssertion },
+      },
+      functionalMeaningBridge: { status: "NULL" },
+    });
+    expect(reading?.relatedCandidateEvaluations[1]?.sourceLinkedComparison.relation.sourceRelationAssertion).toEqual(sourceSenseAssertion);
+
+    const vm = adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: discovery });
+    expect(vm.motivationDiscoveryV0_1).toMatchObject({ kind: "present" });
+    if (vm.motivationDiscoveryV0_1?.kind === "present") {
+      render(createElement(MotivationDiscoveryCardV0_1, { discovery: vm.motivationDiscoveryV0_1 }));
+      const ownerLines = screen.getAllByTestId("albanian-source-relation-owner");
+      expect(ownerLines[0]).toHaveTextContent("Assertion scope: SOURCE_RECORD");
+      expect(ownerLines[0]).toHaveTextContent("no owning source sense is claimed");
+      expect(ownerLines[1]).toHaveTextContent("Assertion scope: SOURCE_SENSE");
+      expect(ownerLines[1]).toHaveTextContent("owner-sense-1");
+      expect(ownerLines[1]).toHaveTextContent("ordinal: 1");
+      expect(ownerLines[1]).toHaveTextContent("owning sense meaning");
+    }
+    cleanup();
+
+    const forgedOwnerPayload = JSON.parse(JSON.stringify(discovery)) as Record<string, unknown>;
+    const forgedReading = forgedOwnerPayload.albanianLexicalReading as Record<string, unknown>;
+    const forgedRelated = forgedReading.relatedForms as Record<string, unknown>[];
+    const forgedAssertion = forgedRelated[1]?.sourceRelationAssertion as Record<string, unknown>;
+    forgedAssertion.sourceSenseOrdinal = 0;
+    expect(adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: forgedOwnerPayload }).motivationDiscoveryV0_1).toMatchObject({
+      kind: "missing",
+      missing: "malformed",
+    });
+
+    const missingOwnerSensePayload = JSON.parse(JSON.stringify(discovery)) as Record<string, unknown>;
+    const missingOwnerReading = missingOwnerSensePayload.albanianLexicalReading as Record<string, unknown>;
+    const missingOwnerCandidates = missingOwnerReading.relatedCandidateEvaluations as Record<string, unknown>[];
+    const missingOwnerComparison = missingOwnerCandidates[1]?.sourceLinkedComparison as Record<string, unknown>;
+    const missingOwnerPrimary = missingOwnerComparison.primary as Record<string, unknown>;
+    delete missingOwnerPrimary.sourceSenses;
+    expect(adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: missingOwnerSensePayload }).motivationDiscoveryV0_1).toMatchObject({
+      kind: "missing",
+      missing: "malformed",
+    });
+
+    const wrongOwnerRecordPayload = JSON.parse(JSON.stringify(discovery)) as Record<string, unknown>;
+    const wrongOwnerReading = wrongOwnerRecordPayload.albanianLexicalReading as Record<string, unknown>;
+    const wrongOwnerCandidates = wrongOwnerReading.relatedCandidateEvaluations as Record<string, unknown>[];
+    const wrongOwnerComparison = wrongOwnerCandidates[1]?.sourceLinkedComparison as Record<string, unknown>;
+    const wrongOwnerPrimary = wrongOwnerComparison.primary as Record<string, unknown>;
+    wrongOwnerPrimary.sourceRecordId = "kaikki-albanian-jsonl:word=other-record:ordinal=0";
+    expect(adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: wrongOwnerRecordPayload }).motivationDiscoveryV0_1).toMatchObject({
+      kind: "missing",
+      missing: "malformed",
+    });
+
+    const mismatchedRelationPayload = JSON.parse(JSON.stringify(discovery)) as Record<string, unknown>;
+    const mismatchedReading = mismatchedRelationPayload.albanianLexicalReading as Record<string, unknown>;
+    const mismatchedCandidates = mismatchedReading.relatedCandidateEvaluations as Record<string, unknown>[];
+    const secondCandidate = mismatchedCandidates[1];
+    const secondComparison = secondCandidate?.sourceLinkedComparison as Record<string, unknown>;
+    const secondRelation = secondComparison.relation as Record<string, unknown>;
+    secondRelation.relation = "SOURCE_DERIVED_FORM";
+    expect(adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: mismatchedRelationPayload }).motivationDiscoveryV0_1).toMatchObject({
+      kind: "missing",
+      missing: "malformed",
+    });
+
+    const reorderedLinksPayload = JSON.parse(JSON.stringify(discovery)) as Record<string, unknown>;
+    const reorderedLinks = (reorderedLinksPayload.exactLexicalSourceFacts as Record<string, unknown>[])[0]?.relatedForms as unknown[];
+    reorderedLinks.reverse();
+    expect(adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: reorderedLinksPayload }).motivationDiscoveryV0_1).toMatchObject({
+      kind: "missing",
+      missing: "malformed",
+    });
+
+    const reorderedSensesPayload = JSON.parse(JSON.stringify(discovery)) as Record<string, unknown>;
+    const reorderedSenses = (reorderedSensesPayload.exactLexicalSourceFacts as Record<string, unknown>[])[0]?.senses as unknown[];
+    reorderedSenses.reverse();
+    expect(adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: reorderedSensesPayload }).motivationDiscoveryV0_1).toMatchObject({
+      kind: "missing",
+      missing: "malformed",
+    });
+
+    const alteredExactRelationPayload = JSON.parse(JSON.stringify(discovery)) as Record<string, unknown>;
+    const alteredExactFacts = alteredExactRelationPayload.exactLexicalSourceFacts as Record<string, unknown>[];
+    const alteredExactEdges = alteredExactFacts[0]?.relatedForms as Record<string, unknown>[];
+    if (alteredExactEdges[1]) alteredExactEdges[1].relation = "SOURCE_DERIVED_FORM";
+    expect(adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: alteredExactRelationPayload }).motivationDiscoveryV0_1).toMatchObject({
+      kind: "missing",
+      missing: "malformed",
+    });
+  });
+
+  it("accepts legacy target-first provenance omissions and duplicate unowned source links", async () => {
+    const targetFirstDiscovery = await discoveryForFactsV0_1(
+      malorEntityPropertyFixtureFactsV0_1(),
+      "malor",
+    );
+    expect(targetFirstDiscovery.albanianLexicalReading?.relatedCandidateEvaluations).toEqual(
+      expect.arrayContaining([expect.objectContaining({ sourceRelation: "SOURCE_DERIVED_FORM" })]),
+    );
+    expect(adaptAnalysisToTelemetryVM({
+      motivationDiscoveryV0_1: legacyPayloadWithoutSenseOwnershipV0_1(targetFirstDiscovery),
+    }).motivationDiscoveryV0_1).toMatchObject({ kind: "present" });
+
+    const recordAssertion = (sourceAssertionOrdinal: number): AlbanianKaikkiSourceRelationAssertionV0_1 => ({
+      assertionScope: "SOURCE_RECORD",
+      sourceSenseId: null,
+      sourceSenseOrdinal: null,
+      sourceSenseIdentityStatus: "NOT_APPLICABLE",
+      sourceAssertionOrdinal,
+      reasonCodes: [],
+    });
+    const duplicateBaseFacts = malorEntityPropertyFixtureFactsV0_1({
+      base: {
+        relatedForms: [0, 1].map((sourceAssertionOrdinal) => ({
+          form: "malor",
+          relation: "SOURCE_DERIVED_FORM",
+          entryLocator: "jsonl://word/malor",
+          sourceRelationAssertion: recordAssertion(sourceAssertionOrdinal),
+        })),
+      },
+    });
+    const duplicateBaseDiscovery = await discoveryForFactsV0_1(duplicateBaseFacts, "mal");
+    expect(duplicateBaseDiscovery.albanianLexicalReading?.relatedForms).toHaveLength(2);
+    expect(duplicateBaseDiscovery.albanianLexicalReading?.sourceLinkedComparison?.relation.relation).toBe("SOURCE_DERIVED_FORM");
+    expect(adaptAnalysisToTelemetryVM({
+      motivationDiscoveryV0_1: duplicateBaseDiscovery,
+    }).motivationDiscoveryV0_1).toMatchObject({ kind: "present" });
+
+    const legacyDuplicateDiscovery = legacyPayloadWithoutSenseOwnershipV0_1(duplicateBaseDiscovery);
+    const legacyReading = legacyDuplicateDiscovery.albanianLexicalReading;
+    expect(legacyReading?.relatedForms).toHaveLength(2);
+    expect(legacyReading?.sourceLinkedComparison?.relation.sourceRelationAssertion).toBeUndefined();
+    expect(adaptAnalysisToTelemetryVM({
+      motivationDiscoveryV0_1: legacyDuplicateDiscovery,
+    }).motivationDiscoveryV0_1).toMatchObject({ kind: "present" });
+  });
+
+  it("keeps duplicate and missing source-sense identities explicitly Unknown/Null at the adapter", async () => {
+    const duplicateAssertion: AlbanianKaikkiSourceRelationAssertionV0_1 = {
+      assertionScope: "SOURCE_SENSE",
+      sourceSenseId: "duplicate-sense-id",
+      sourceSenseOrdinal: 1,
+      sourceSenseIdentityStatus: "UNKNOWN_OR_NULL",
+      sourceAssertionOrdinal: 0,
+      reasonCodes: ["SOURCE_SENSE_ID_DUPLICATE"],
+    };
+    const missingAssertion: AlbanianKaikkiSourceRelationAssertionV0_1 = {
+      assertionScope: "SOURCE_SENSE",
+      sourceSenseId: null,
+      sourceSenseOrdinal: 2,
+      sourceSenseIdentityStatus: "UNKNOWN_OR_NULL",
+      sourceAssertionOrdinal: 0,
+      reasonCodes: ["SOURCE_SENSE_ID_MISSING"],
+    };
+    const primary = fixtureFact({
+      sourceRecordId: "kaikki-albanian-jsonl:word=uncertain-owner:ordinal=0",
+      entryLocator: "jsonl://word/uncertain-owner/match/0",
+      form: "uncertain-owner",
+      senses: [
+        { senseId: "duplicate-sense-id", glosses: ["first duplicate"] },
+        { senseId: "duplicate-sense-id", glosses: ["second duplicate"] },
+        { senseId: null, glosses: ["unidentified sense"] },
+      ],
+      ipaObservations: [],
+      relatedForms: [
+        {
+          form: "duplicate-target",
+          relation: "SOURCE_RELATED_FORM",
+          entryLocator: "jsonl://word/duplicate-target",
+          sourceRelationAssertion: duplicateAssertion,
+        },
+        {
+          form: "missing-id-target",
+          relation: "SOURCE_DERIVED_FORM",
+          entryLocator: "jsonl://word/missing-id-target",
+          sourceRelationAssertion: missingAssertion,
+        },
+      ],
+    });
+    const discovery = await discoveryForFactsV0_1([primary], "uncertain-owner");
+    expect(discovery.albanianLexicalReading?.relatedForms.map((relation) => relation.sourceRelationAssertion)).toEqual([
+      duplicateAssertion,
+      missingAssertion,
+    ]);
+    expect(discovery.albanianLexicalReading?.relatedCandidateEvaluations.every((candidate) =>
+      candidate.functionalMeaningBridge.status === "NULL",
+    )).toBe(true);
+    expect(adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: discovery }).motivationDiscoveryV0_1).toMatchObject({
+      kind: "present",
     });
   });
 
@@ -5224,5 +5654,100 @@ describe("real Albanian exact lexical source integration v0.1", () => {
       expect(screen.getAllByTestId("albanian-five-windows-member")).toHaveLength(5);
       expect(screen.getByTestId("albanian-five-windows-comparison")).toHaveTextContent("ALBANIAN_SOURCE_PATH_NOT_CONFIGURED");
     }
+  });
+});
+
+const pinnedAlbanianSourceTestV0_1 = process.env[ALBANIAN_KAIKKI_LEXICAL_SOURCE_PATH_ENV_V0_1]
+  ? it
+  : it.skip;
+
+describe("pinned Albanian sense-owned source relation provenance v0.3", () => {
+  pinnedAlbanianSourceTestV0_1.each([
+    {
+      form: "mashkull",
+      relatedForm: "mashkullor",
+      sourceSenseId: "en-mashkull-sq-noun-DSSOgsYs",
+    },
+    {
+      form: "ngjit",
+      relatedForm: "ngjicë",
+      sourceSenseId: "en-ngjit-sq-verb-~XJQOpnT",
+    },
+    {
+      form: "breshër",
+      relatedForm: "breshni",
+      sourceSenseId: "en-breshër-sq-noun-H2Y5qKUc",
+    },
+  ])("retains the exact real-source owner for $form → $relatedForm", async ({ form, relatedForm, sourceSenseId }) => {
+    const provider = await createAlbanianKaikkiServerOnlyExactLexicalSourceProviderV0_1(
+      process.env[ALBANIAN_KAIKKI_LEXICAL_SOURCE_PATH_ENV_V0_1],
+    );
+    const sourceResult = await provider.query(form);
+    expect(sourceResult.status).toBe("MATCHES_FOUND");
+    if (sourceResult.status !== "MATCHES_FOUND") return;
+    const primary = sourceResult.facts.find((fact) => fact.form === form && fact.partOfSpeech !== "name");
+    expect(primary).toBeDefined();
+    const ownedEdges = primary?.relatedForms?.filter((edge) => edge.form === relatedForm) ?? [];
+    expect(ownedEdges).toHaveLength(1);
+    expect(ownedEdges[0]).toMatchObject({
+      relation: "SOURCE_DERIVED_FORM",
+      sourceRelationAssertion: {
+        assertionScope: "SOURCE_SENSE",
+        sourceSenseId,
+        sourceSenseOrdinal: expect.any(Number),
+        sourceSenseIdentityStatus: "VERIFIED",
+        sourceAssertionOrdinal: expect.any(Number),
+        reasonCodes: [],
+      },
+    });
+
+    const discovery = await discoveryForProviderV0_1(provider, form);
+    const reading = discovery.albanianLexicalReading;
+    const relatedCandidates = reading?.relatedCandidateEvaluations.filter((candidate) => candidate.relatedForm === relatedForm) ?? [];
+    expect(relatedCandidates).toHaveLength(1);
+    expect(relatedCandidates[0]?.sourceRelationAssertion).toEqual(ownedEdges[0]?.sourceRelationAssertion);
+    expect(relatedCandidates[0]?.sourceLinkedComparison.relation.sourceRelationAssertion).toEqual(ownedEdges[0]?.sourceRelationAssertion);
+    expect(relatedCandidates[0]?.functionalMeaningBridge.status).toBe("NULL");
+
+    const vm = adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: discovery });
+    expect(vm.motivationDiscoveryV0_1).toMatchObject({ kind: "present" });
+    if (vm.motivationDiscoveryV0_1?.kind === "present") {
+      render(createElement(MotivationDiscoveryCardV0_1, { discovery: vm.motivationDiscoveryV0_1 }));
+      const ownerLine = screen.getAllByTestId("albanian-source-relation-owner").find((line) =>
+        line.textContent?.includes(sourceSenseId),
+      );
+      const ownerSenseOrdinal = ownedEdges[0]?.sourceRelationAssertion.sourceSenseOrdinal;
+      const expectedOwnerMeaning = ownerSenseOrdinal === null || ownerSenseOrdinal === undefined
+        ? null
+        : primary?.senses[ownerSenseOrdinal]?.glosses.join("; ") ?? null;
+      expect(ownerLine).toBeDefined();
+      expect(ownerLine).toHaveTextContent(`Assertion scope: SOURCE_SENSE`);
+      expect(ownerLine).toHaveTextContent(sourceSenseId);
+      expect(expectedOwnerMeaning).not.toBeNull();
+      expect(ownerLine?.textContent).toContain(`source meaning at that ordinal: ${expectedOwnerMeaning}`);
+    }
+    cleanup();
+  });
+
+  pinnedAlbanianSourceTestV0_1("retains an actual record-scoped Albanian relation without inventing a sense owner", async () => {
+    const provider = await createAlbanianKaikkiServerOnlyExactLexicalSourceProviderV0_1(
+      process.env[ALBANIAN_KAIKKI_LEXICAL_SOURCE_PATH_ENV_V0_1],
+    );
+    const result = await provider.query("de");
+    expect(result.status).toBe("MATCHES_FOUND");
+    if (result.status !== "MATCHES_FOUND") return;
+    const record = result.facts.find((fact) => fact.form === "de");
+    const edge = record?.relatedForms?.find((relation) => relation.form === "hajde");
+    expect(edge).toMatchObject({
+      relation: "SOURCE_RELATED_FORM",
+      sourceRelationAssertion: {
+        assertionScope: "SOURCE_RECORD",
+        sourceSenseId: null,
+        sourceSenseOrdinal: null,
+        sourceSenseIdentityStatus: "NOT_APPLICABLE",
+        sourceAssertionOrdinal: expect.any(Number),
+        reasonCodes: [],
+      },
+    });
   });
 });

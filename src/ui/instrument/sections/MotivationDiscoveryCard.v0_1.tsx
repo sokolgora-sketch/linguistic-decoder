@@ -670,17 +670,40 @@ export function MotivationDiscoveryCardV0_1({
                         <div className="text-[10px] text-[#7f8b99]">
                           These are source-provided form links belonging to this lexical record. Alternative-record links are not evaluated in the selected primary functional reading.
                         </div>
-                        {fact.relatedForms.map((relation, relationIndex) => (
-                          <div
-                            key={`${fact.sourceRecordId}:${relationIndex}:${relation.form}:${relation.entryLocator}`}
-                            data-testid="albanian-source-record-link"
-                            className="break-words"
-                          >
-                            <span className="font-mono text-[#d7dde7]">{relation.form}</span>{" · "}
-                            {relation.relation}{" · "}
-                            {relation.entryLocator}
-                          </div>
-                        ))}
+                        {fact.relatedForms.map((relation, relationIndex) => {
+                          const assertion = relation.sourceRelationAssertion;
+                          const scope = assertion?.assertionScope ?? "UNKNOWN_OR_NULL";
+                          const ownerOrdinal = assertion?.sourceSenseOrdinal;
+                          const ownerSense = scope === "SOURCE_SENSE" && Number.isInteger(ownerOrdinal)
+                            ? fact.senses[ownerOrdinal as number]
+                            : null;
+                          const ownerIdentity = assertion?.sourceSenseIdentityStatus === "VERIFIED"
+                            ? assertion.sourceSenseId
+                            : assertion?.sourceSenseId
+                              ? `Unknown/Null — non-unique source sense ID ${assertion.sourceSenseId}`
+                              : "Unknown/Null";
+                          return (
+                            <div
+                              key={`${fact.sourceRecordId}:${relationIndex}:${relation.form}:${relation.entryLocator}`}
+                              data-testid="albanian-source-record-link"
+                              className="break-words"
+                            >
+                              <div>
+                                <span className="font-mono text-[#d7dde7]">{relation.form}</span>{" · "}
+                                {relation.relation}{" · "}
+                                {relation.entryLocator}
+                              </div>
+                              <div data-testid="albanian-source-relation-owner">
+                                Assertion scope: {scope}
+                                {scope === "SOURCE_RECORD"
+                                  ? " · no owning source sense is claimed"
+                                  : scope === "SOURCE_SENSE"
+                                    ? ` · source sense: ${ownerIdentity} · ordinal: ${ownerOrdinal ?? "Null"} · source meaning at that ordinal: ${ownerSense?.glosses.join("; ") || "Null"}`
+                                    : ` · source sense owner: Unknown/Null${assertion?.reasonCodes.length ? ` · ${assertion.reasonCodes.join(", ")}` : ""}`}
+                              </div>
+                            </div>
+                          );
+                        })}
                       </div>
                     </details>
                   ) : null}
@@ -1150,13 +1173,13 @@ export function MotivationDiscoveryCardV0_1({
                 {supportedRelatedCandidateEvaluations.length} bounded functional relationship{supportedRelatedCandidateEvaluations.length === 1 ? "" : "s"} shown; {nullRelatedCandidateCount} other evaluated link{nullRelatedCandidateCount === 1 ? "" : "s"} remain Null.
               </div>
               <div className="mt-2 space-y-2">
-                {supportedRelatedCandidateEvaluations.map((candidate) => {
+                {supportedRelatedCandidateEvaluations.map((candidate, candidateIndex) => {
                   const bridge = candidate.functionalMeaningBridge;
                   const relatedFact = bridge.sourceFacts?.related;
                   const derivedStructure = bridge.derivedStructure;
                   return (
                     <article
-                      key={`${candidate.sourceRelation}:${candidate.relatedForm}`}
+                      key={`${candidate.sourceRelation}:${candidate.relatedForm}:${candidateIndex}`}
                       data-testid="albanian-reading-related-candidate"
                       className="rounded border border-[#355a52] bg-[#0e1b19] p-2"
                     >
@@ -1209,12 +1232,12 @@ export function MotivationDiscoveryCardV0_1({
                     data-testid="albanian-reading-null-candidate-evaluations"
                     className="mt-2 space-y-2 text-[#d5c28f]"
                   >
-                    {nullRelatedCandidateEvaluations.map((candidate) => {
+                    {nullRelatedCandidateEvaluations.map((candidate, candidateIndex) => {
                       const comparison = candidate.sourceLinkedComparison;
                       const bridge = candidate.functionalMeaningBridge;
                       return (
                         <article
-                          key={`${candidate.sourceRelation}:${candidate.relatedForm}`}
+                          key={`${candidate.sourceRelation}:${candidate.relatedForm}:${candidateIndex}`}
                           data-testid="albanian-reading-null-candidate"
                           className="rounded border border-[#66532e] bg-[#17140e] p-2"
                         >
@@ -1326,9 +1349,9 @@ export function MotivationDiscoveryCardV0_1({
               These are source-provided form links, not verified family, etymology, or meaning-extension claims.
             </div>
             <div className="mt-2 flex flex-wrap gap-2">
-              {albanianLexicalReading.relatedForms.map((related) => (
+              {albanianLexicalReading.relatedForms.map((related, relatedIndex) => (
                 <span
-                  key={`${related.form}:${related.entryLocator}`}
+                  key={`${related.form}:${related.entryLocator}:${relatedIndex}`}
                   data-testid="albanian-reading-related-form"
                   className="rounded border border-[#355a52] bg-[#12211e] px-2 py-1 text-[#c8e6dc]"
                 >

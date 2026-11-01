@@ -16,6 +16,7 @@ import {
   type AlbanianKaikkiExactLexicalSourceEtymologyTemplateV0_1,
   type AlbanianKaikkiExactLexicalSourceLookupResultV0_1,
   type AlbanianKaikkiExactLexicalSourceStatusV0_1,
+  type AlbanianKaikkiSourceRelationAssertionV0_1,
   type AlbanianKaikkiServerOnlyExactLexicalSourceProviderV0_1,
 } from "@/shared/openInstrument/albanianKaikkiServerOnlyExactLexicalSource.v0_1";
 import { createAlbanianKaikkiServerOnlyProductionProviderV0_1 } from "@/shared/openInstrument/albanianKaikkiServerOnlySourceDelivery.v0_1";
@@ -142,6 +143,7 @@ export type AlbanianLexicalReadingV0_1 = Readonly<{
     form: string;
     entryLocator: string;
     relation: "SOURCE_RELATED_FORM" | "SOURCE_DERIVED_FORM";
+    sourceRelationAssertion: AlbanianKaikkiSourceRelationAssertionV0_1;
     resolution: "RESOLVED" | "UNRESOLVED";
     sourceRecordId: string | null;
     partOfSpeech: string | null;
@@ -268,6 +270,7 @@ export type AlbanianSourceLinkedRecordV0_1 = Readonly<{
   partOfSpeech: string | null;
   meaningGlosses: readonly string[];
   sourceSenses?: readonly Readonly<{
+    sourceSenseOrdinal: number;
     senseId: string | null;
     glosses: readonly string[];
     categories: readonly AlbanianKaikkiExactLexicalSourceCategoryV0_1[];
@@ -297,6 +300,8 @@ export type AlbanianSourceLinkedComparisonV0_1 = Readonly<{
     direction: "RELATED_FORM_TO_PRIMARY_ETYMLOGY_REFERENCE";
     referencedForm: string | null;
     reference: string | null;
+    /** Null for target-authored etymology references, not source form-link assertions. */
+    sourceRelationAssertion: AlbanianKaikkiSourceRelationAssertionV0_1 | null;
   }>;
   primary: AlbanianSourceLinkedRecordV0_1;
   related: AlbanianSourceLinkedRecordV0_1 | null;
@@ -318,6 +323,8 @@ export type AlbanianSourceLinkedComparisonV0_1 = Readonly<{
 export type AlbanianRelatedCandidateEvaluationV0_1 = Readonly<{
   relatedForm: string;
   sourceRelation: AlbanianSourceEvidenceRelationV0_1;
+  /** Null for target-authored etymology references, not source form-link assertions. */
+  sourceRelationAssertion: AlbanianKaikkiSourceRelationAssertionV0_1 | null;
   resolution: "RESOLVED" | "UNRESOLVED";
   sourceLinkedComparison: AlbanianSourceLinkedComparisonV0_1;
   functionalMeaningBridge: AlbanianFunctionalMeaningBridgeV0_1;
@@ -795,7 +802,8 @@ function sourceRecordProjectionV0_1(
     form: fact.form,
     partOfSpeech: fact.partOfSpeech,
     meaningGlosses: distinctGlossesV0_1([fact]),
-    sourceSenses: Object.freeze(fact.senses.map((sense) => Object.freeze({
+    sourceSenses: Object.freeze(fact.senses.map((sense, sourceSenseOrdinal) => Object.freeze({
+      sourceSenseOrdinal,
       senseId: sense.senseId,
       glosses: Object.freeze([...sense.glosses]),
       categories: Object.freeze([...(sense.categories ?? [])]),
@@ -1441,6 +1449,7 @@ function nullSourceLinkedComparisonV0_1(
   relatedForm: Readonly<{
     form: string;
     relation: AlbanianSourceEvidenceRelationV0_1;
+    sourceRelationAssertion: AlbanianKaikkiSourceRelationAssertionV0_1 | null;
   }>,
   relatedSourceRecordId: string | null,
   relatedEntryLocator: string,
@@ -1460,6 +1469,7 @@ function nullSourceLinkedComparisonV0_1(
       direction: "RELATED_FORM_TO_PRIMARY_ETYMLOGY_REFERENCE" as const,
       referencedForm: null,
       reference: null,
+      sourceRelationAssertion: relatedForm.sourceRelationAssertion,
     }),
     primary: sourceRecordProjectionV0_1(primary, primaryAnalyses),
     related: null,
@@ -1479,6 +1489,7 @@ function buildSourceLinkedComparisonV0_1(input: Readonly<{
     form: string;
     relation: AlbanianSourceEvidenceRelationV0_1;
     entryLocator: string;
+    sourceRelationAssertion: AlbanianKaikkiSourceRelationAssertionV0_1 | null;
   }>;
   related: AlbanianKaikkiExactLexicalSourceFactV0_1 | null;
 }>): AlbanianSourceLinkedComparisonV0_1 {
@@ -1530,6 +1541,7 @@ function buildSourceLinkedComparisonV0_1(input: Readonly<{
       direction: "RELATED_FORM_TO_PRIMARY_ETYMLOGY_REFERENCE" as const,
       referencedForm: matchingLinks[0].sourceForm,
       reference: matchingLinks[0].reference,
+      sourceRelationAssertion: input.relatedForm.sourceRelationAssertion,
     }),
     primary: primaryProjection,
     related: relatedProjection,
@@ -1621,6 +1633,7 @@ async function buildTargetAuthoredEtymologyCandidateV0_1(input: Readonly<{
       form: input.target.form,
       relation: "SOURCE_DERIVED_FORM" as const,
       entryLocator: baseDerivedRelations[0].entryLocator,
+      sourceRelationAssertion: baseDerivedRelations[0].sourceRelationAssertion,
     });
     const baseAnalyses = projectAlbanianKaikkiFactSourceIpaToSevenVoicesV0_1(base);
     const comparison = buildSourceLinkedComparisonV0_1({
@@ -1639,6 +1652,7 @@ async function buildTargetAuthoredEtymologyCandidateV0_1(input: Readonly<{
     return Object.freeze({
       relatedForm: input.target.form,
       sourceRelation: relation.relation,
+      sourceRelationAssertion: relation.sourceRelationAssertion,
       resolution: "RESOLVED" as const,
       sourceLinkedComparison: comparison,
       functionalMeaningBridge: bridge,
@@ -1721,6 +1735,7 @@ async function buildTargetAuthoredEtymologyCandidateV0_1(input: Readonly<{
     form: input.target.form,
     relation: "TARGET_AUTHORED_ETYMOLOGY_REFERENCE" as const,
     entryLocator: input.target.entryLocator,
+    sourceRelationAssertion: null,
   });
   const comparison = buildSourceLinkedComparisonV0_1({
     primary: base,
@@ -1738,6 +1753,7 @@ async function buildTargetAuthoredEtymologyCandidateV0_1(input: Readonly<{
   return Object.freeze({
     relatedForm: input.target.form,
     sourceRelation: relation.relation,
+    sourceRelationAssertion: null,
     resolution: "RESOLVED" as const,
     sourceLinkedComparison: comparison,
     functionalMeaningBridge: bridge,
@@ -2836,6 +2852,7 @@ async function buildAlbanianLexicalReadingV0_1(input: Readonly<{
           form: relation.form,
           entryLocator: relation.entryLocator,
           relation: relation.relation,
+          sourceRelationAssertion: relation.sourceRelationAssertion,
           resolution: "UNRESOLVED" as const,
           sourceRecordId: null,
           partOfSpeech: null,
@@ -2857,6 +2874,7 @@ async function buildAlbanianLexicalReadingV0_1(input: Readonly<{
         form: relation.form,
         entryLocator: resolved?.entryLocator ?? relation.entryLocator,
         relation: relation.relation,
+        sourceRelationAssertion: relation.sourceRelationAssertion,
         resolution: resolved ? "RESOLVED" as const : "UNRESOLVED" as const,
         sourceRecordId: resolved?.sourceRecordId ?? null,
         partOfSpeech: resolved?.partOfSpeech ?? null,
@@ -2870,6 +2888,7 @@ async function buildAlbanianLexicalReadingV0_1(input: Readonly<{
           form: relation.form,
           entryLocator: relation.entryLocator,
           relation: relation.relation,
+          sourceRelationAssertion: relation.sourceRelationAssertion,
           resolution: "UNRESOLVED" as const,
           sourceRecordId: null,
           partOfSpeech: null,
@@ -2902,6 +2921,7 @@ async function buildAlbanianLexicalReadingV0_1(input: Readonly<{
     return Object.freeze({
       relatedForm: publicResult.form,
       sourceRelation: publicResult.relation,
+      sourceRelationAssertion: publicResult.sourceRelationAssertion,
       resolution: publicResult.resolution,
       sourceLinkedComparison: comparison,
       functionalMeaningBridge: bridge,
