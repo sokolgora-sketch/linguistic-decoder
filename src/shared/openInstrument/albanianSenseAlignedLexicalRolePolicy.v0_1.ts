@@ -1,0 +1,56 @@
+import {
+  ALBANET_SOURCE_FAMILY_ID_V0_1,
+  ALBANET_SOURCE_FILE_SHA256_V0_1,
+  ALBANET_SOURCE_REPOSITORY_V0_1,
+  ALBANET_SOURCE_REVISION_V0_1,
+  ALBANET_SOURCE_TITLE_V0_1,
+} from "./albanetSourceIdentity.v0_1";
+
+export {
+  ALBANET_SOURCE_FAMILY_ID_V0_1,
+  ALBANET_SOURCE_FILE_SHA256_V0_1,
+  ALBANET_SOURCE_REPOSITORY_V0_1,
+  ALBANET_SOURCE_REVISION_V0_1,
+  ALBANET_SOURCE_TITLE_V0_1,
+} from "./albanetSourceIdentity.v0_1";
+
+export const ALBANIAN_SENSE_ALIGNED_LEXICAL_ROLE_SCHEMA_V0_1 =
+  "open-instrument.albanian-sense-aligned-lexical-role.v0.1" as const;
+
+export const ALBANIAN_SENSE_ALIGNED_LEXICAL_ROLE_PREDICATE_ID_V0_1 =
+  "albanian.exact-source-definition.human-role.v0.1" as const;
+
+/** Exact source-definition tuples only; no independent source lineage or expert review is asserted. */
+export const ALBANIAN_SENSE_ALIGNED_LEXICAL_ROLE_REVIEWED_DEFINITIONS_V0_1 = Object.freeze([
+  Object.freeze({
+    predicateId: ALBANIAN_SENSE_ALIGNED_LEXICAL_ROLE_PREDICATE_ID_V0_1,
+    reviewStatus: "REVIEWED_EXACT_SOURCE_DEFINITION" as const,
+    sourceFamilyId: ALBANET_SOURCE_FAMILY_ID_V0_1,
+    sourceRevision: ALBANET_SOURCE_REVISION_V0_1,
+    sourceSha256: ALBANET_SOURCE_FILE_SHA256_V0_1,
+    sourceTitle: ALBANET_SOURCE_TITLE_V0_1,
+    sourceUrl: ALBANET_SOURCE_REPOSITORY_V0_1,
+    lemma: "zejtar",
+    synsetId: "09974648-n",
+    definition: "një punëtor i afte qe praktikon një zanat",
+    roleLabel: "HUMAN_ROLE" as const,
+    rationale: "The exact definition identifies a worker who practices a craft.",
+  }),
+  Object.freeze({
+    predicateId: ALBANIAN_SENSE_ALIGNED_LEXICAL_ROLE_PREDICATE_ID_V0_1,
+    reviewStatus: "REVIEWED_EXACT_SOURCE_DEFINITION" as const,
+    sourceFamilyId: ALBANET_SOURCE_FAMILY_ID_V0_1,
+    sourceRevision: ALBANET_SOURCE_REVISION_V0_1,
+    sourceSha256: ALBANET_SOURCE_FILE_SHA256_V0_1,
+    sourceTitle: ALBANET_SOURCE_TITLE_V0_1,
+    sourceUrl: ALBANET_SOURCE_REPOSITORY_V0_1,
+    lemma: "aktor",
+    synsetId: "09765278-n",
+    definition: "aktoret teatrale",
+    roleLabel: "HUMAN_ROLE" as const,
+    rationale: "The exact definition denotes theatrical actors.",
+  }),
+] as const);
+
+export const ALBANIAN_SENSE_ALIGNED_LEXICAL_ROLE_LINEAGE_STATUS_V0_1 =
+  "INDEPENDENCE_NOT_ESTABLISHED" as const;

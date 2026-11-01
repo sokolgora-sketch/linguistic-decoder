@@ -50,7 +50,7 @@ function sourceLinkedRecordCardV0_1(
   record: AlbanianSourceLinkedRecordV0_1,
 ) {
   const sourceSenseEvidence = (record.sourceSenses ?? []).map((sense) =>
-    `${sense.senseId ?? "Null sense ID"}: ${sense.glosses.join("; ") || "Null gloss"}${sense.categories.length
+    `${sense.senseId ?? "Null sense ID"}: ${sense.glosses.join("; ") || "Null gloss"} · synonyms ${sense.synonyms?.join(", ") || "Null"}${sense.categories.length
       ? ` · categories ${sense.categories.map((category) => `${category.name} (${category.orig ?? "no source label"}; ${category.langcode ?? "no language"}; ${category.source ?? "no category source"})`).join(", ")}`
       : " · no source category"}`,
   ).join(" · ");
@@ -900,6 +900,62 @@ export function MotivationDiscoveryCardV0_1({
           ) : null}
           {albanianLexicalReading.primarySourceFact ? (
             <FjaloriCrossSourceEvidenceV0_1 word={value.inputWord} />
+          ) : null}
+          {albanianLexicalReading.senseAlignedLexicalRole ? (
+            <section
+              data-testid="albanian-sense-aligned-lexical-role"
+              className="mt-3 rounded border border-[#5a4b31] bg-[#19170f] p-3 text-xs leading-5 text-[#f0ddb0]"
+            >
+              <div className="font-semibold uppercase tracking-[0.1em]">
+                SENSE-ALIGNED LEXICAL ROLE · {albanianLexicalReading.senseAlignedLexicalRole.status}
+              </div>
+              <div className="mt-1 text-[10px] text-[#c8b98f]">
+                Kaikki and AlbaNet lineage independence: {albanianLexicalReading.senseAlignedLexicalRole.lineageIndependence}.
+              </div>
+              <div className="mt-2 space-y-2">
+                {albanianLexicalReading.senseAlignedLexicalRole.candidates.map((candidate) => (
+                  <article
+                    key={`${candidate.sourceFact.sourceRecordId}:${candidate.sourceFact.sourceSenseOrdinal}:${candidate.sourceFact.synonymOrdinal ?? "none"}`}
+                    className="rounded border border-[#594a2b] bg-[#211c12] p-2"
+                  >
+                    <div className="font-semibold text-[#f5f7fb]">SOURCE_FACT · Kaikki</div>
+                    <div className="break-words">
+                      {candidate.sourceFact.form} · sense {candidate.sourceFact.sourceSenseOrdinal + 1} · {candidate.sourceFact.sourceSenseId ?? "Null sense ID"}
+                    </div>
+                    <div className="break-words">Gloss: {candidate.sourceFact.glosses.join("; ") || "Null"}</div>
+                    <div className="break-words">Sense-owned synonym: {candidate.sourceFact.synonym ?? "Null"}</div>
+                    <div className="break-all text-[10px] text-[#c8b98f]">
+                      {candidate.sourceFact.sourceFamilyId} · sha256:{candidate.sourceFact.sourceSha256} · {candidate.sourceFact.sourceUrl} · {candidate.sourceFact.sourceRecordId} · {candidate.sourceFact.entryLocator}
+                    </div>
+                    {candidate.crossSourceFact ? (
+                      <>
+                        <div className="mt-2 font-semibold text-[#f5f7fb]">CROSS_SOURCE_FACT · AlbaNet</div>
+                        <div className="break-words">
+                          {candidate.crossSourceFact.lemma} · synset {candidate.crossSourceFact.synsetId} · {candidate.crossSourceFact.definitions.join("; ") || "Null definition"}
+                        </div>
+                        <div className="break-all text-[10px] text-[#c8b98f]">
+                          {candidate.crossSourceFact.sourceTitle} · {candidate.crossSourceFact.sourceRevision} · sha256:{candidate.crossSourceFact.sourceSha256} · {candidate.crossSourceFact.entryLocator}
+                        </div>
+                      </>
+                    ) : (
+                      <div className="mt-2">CROSS_SOURCE_FACT · AlbaNet: Null</div>
+                    )}
+                    <div className="mt-2 font-semibold text-[#f5f7fb]">
+                      INFERENCE · {candidate.inference.status === "SUPPORTED" ? candidate.inference.roleLabel : "UNKNOWN_OR_NULL"}
+                    </div>
+                    {candidate.inference.statement ? <div className="break-words">{candidate.inference.statement}</div> : null}
+                    {candidate.inference.predicateId ? <div className="break-words text-[10px]">Predicate: {candidate.inference.predicateId}</div> : null}
+                    <div>Functional operation: Null</div>
+                    {candidate.reasonCodes.length ? <div>Reasons: {candidate.reasonCodes.join(", ")}</div> : null}
+                  </article>
+                ))}
+                {!albanianLexicalReading.senseAlignedLexicalRole.candidates.length ? (
+                  <div>UNKNOWN_OR_NULL · {albanianLexicalReading.senseAlignedLexicalRole.reasonCodes.join(", ") || "no candidate evidence"}</div>
+                ) : null}
+              </div>
+              <div className="mt-2">Alternatives: {albanianLexicalReading.senseAlignedLexicalRole.alternatives.join(" ")}</div>
+              <div className="mt-1 text-[10px]">{albanianLexicalReading.senseAlignedLexicalRole.claimBoundary} No single winner; user decides.</div>
+            </section>
           ) : null}
           {albanianLexicalReading.sourceLinkedComparison ? (
             <div

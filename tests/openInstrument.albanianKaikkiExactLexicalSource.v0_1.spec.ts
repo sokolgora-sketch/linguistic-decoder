@@ -741,7 +741,7 @@ const indexedFixtureRecordsV0_1: readonly SyntheticSourceRecordV0_1[] = [
     word: "nënë",
     lang_code: "sq",
     pos: "noun",
-    senses: [{ id: "nene-1", glosses: ["mother", "grandmother"] }],
+    senses: [{ id: "nene-1", glosses: ["mother", "grandmother"], synonyms: ["mëmë"] }],
     sounds: [{ ipa: "/nənə/", tags: [] }, { ipa: "/nɛːnɛ/", tags: ["variant"] }],
   },
   {
@@ -4338,7 +4338,7 @@ describe("real Albanian exact lexical source integration v0.1", () => {
       expect(nene.result.status === "MATCHES_FOUND" ? nene.result.facts : []).toHaveLength(2);
       expect(nene.result.status === "MATCHES_FOUND" ? nene.result.facts.map((fact) => fact.physicalRecordOrdinal) : []).toEqual([0, 1]);
       expect(nene.result.status === "MATCHES_FOUND" ? nene.result.facts[0]?.senses : []).toEqual([
-        { senseId: "nene-1", glosses: ["mother", "grandmother"], categories: [] },
+        { senseId: "nene-1", glosses: ["mother", "grandmother"], synonyms: ["mëmë"], categories: [] },
       ]);
       expect(nene.result.status === "MATCHES_FOUND" ? nene.result.facts[0]?.ipaObservations : []).toEqual([
         { soundIndex: 0, ipa: "/nənə/", tags: [] },

@@ -12,6 +12,20 @@ import {
   ALBANIAN_KAIKKI_LEXICAL_SOURCE_SHA256_V0_1,
   ALBANIAN_KAIKKI_LEXICAL_SOURCE_URL_V0_1,
 } from "@/shared/openInstrument/albanianKaikkiExactLexicalSourceIdentity.v0_1";
+import {
+  ALBANET_SOURCE_FAMILY_ID_V0_1,
+  ALBANET_SOURCE_FILE_RELATIVE_PATH_V0_1,
+  ALBANET_SOURCE_FILE_SHA256_V0_1,
+  ALBANET_SOURCE_REPOSITORY_V0_1,
+  ALBANET_SOURCE_REVISION_V0_1,
+  ALBANET_SOURCE_TITLE_V0_1,
+} from "@/shared/openInstrument/albanetSourceIdentity.v0_1";
+import {
+  ALBANIAN_SENSE_ALIGNED_LEXICAL_ROLE_LINEAGE_STATUS_V0_1,
+  ALBANIAN_SENSE_ALIGNED_LEXICAL_ROLE_PREDICATE_ID_V0_1,
+  ALBANIAN_SENSE_ALIGNED_LEXICAL_ROLE_REVIEWED_DEFINITIONS_V0_1,
+  ALBANIAN_SENSE_ALIGNED_LEXICAL_ROLE_SCHEMA_V0_1,
+} from "@/shared/openInstrument/albanianSenseAlignedLexicalRolePolicy.v0_1";
 /**
  * UI contract adapter: raw analyze-v1 payload → TelemetryViewModel (VM).
  *
@@ -1110,7 +1124,8 @@ function parseMotivationDiscoveryV0_1(
       fact.senses.every((sense) =>
         isRecord(sense) &&
         (sense.senseId === null || typeof sense.senseId === "string") &&
-        isStringArray(sense.glosses)
+        isStringArray(sense.glosses) &&
+        (sense.synonyms === undefined || isStringArray(sense.synonyms))
       ) &&
       fact.ipaObservations.every((observation) =>
         isRecord(observation) &&
@@ -1374,6 +1389,7 @@ function parseMotivationDiscoveryV0_1(
         (sense.sourceSenseOrdinal === undefined ||
           (Number.isInteger(sense.sourceSenseOrdinal) && sense.sourceSenseOrdinal === sourceSenseOrdinal)) &&
         isStringArray(sense.glosses) &&
+        (sense.synonyms === undefined || isStringArray(sense.synonyms)) &&
         Array.isArray(sense.categories) &&
         sense.categories.every(validSourceCategory),
       )
@@ -1403,6 +1419,115 @@ function parseMotivationDiscoveryV0_1(
           typeof template.expansion === "string",
         ) &&
         record.pronunciationVariants.every(validSourceLinkedPronunciation);
+    };
+    const validSenseAlignedLexicalRole = (value: unknown): boolean => {
+      if (value === undefined) return true;
+      if (!isRecord(value) || value.schemaVersion !== ALBANIAN_SENSE_ALIGNED_LEXICAL_ROLE_SCHEMA_V0_1 ||
+        (value.status !== "SUPPORTED" && value.status !== "NULL") ||
+        (value.targetSourceRecordId !== null && typeof value.targetSourceRecordId !== "string") ||
+        !Array.isArray(value.candidates) || !isStringArray(value.reasonCodes) ||
+        !isStringArray(value.alternatives) ||
+        value.lineageIndependence !== ALBANIAN_SENSE_ALIGNED_LEXICAL_ROLE_LINEAGE_STATUS_V0_1 ||
+        value.functionalOperation !== null || value.noSingleWinner !== true ||
+        value.userDecisionPosture !== "user_decides" || typeof value.claimBoundary !== "string") return false;
+
+      const exactFacts = Array.isArray(exactSourceFacts) ? exactSourceFacts : [];
+      let supportedCount = 0;
+      for (const candidate of value.candidates) {
+        if (!isRecord(candidate) || !isRecord(candidate.sourceFact) || !isRecord(candidate.inference) ||
+          candidate.functionalOperation !== null || !isStringArray(candidate.reasonCodes)) return false;
+        const sourceFact = candidate.sourceFact;
+        const sourceSenseOrdinal = sourceFact.sourceSenseOrdinal;
+        const sourceSenseId = sourceFact.sourceSenseId;
+        const sourceGlosses = sourceFact.glosses;
+        const synonymOrdinal = sourceFact.synonymOrdinal;
+        const synonym = sourceFact.synonym;
+        if (typeof sourceFact.sourceRecordId !== "string" || typeof sourceFact.entryLocator !== "string" ||
+          sourceFact.sourceFamilyId !== ALBANIAN_KAIKKI_LEXICAL_SOURCE_FAMILY_ID_V0_1 ||
+          sourceFact.sourceUrl !== ALBANIAN_KAIKKI_LEXICAL_SOURCE_URL_V0_1 ||
+          sourceFact.sourceSha256 !== ALBANIAN_KAIKKI_LEXICAL_SOURCE_SHA256_V0_1 ||
+          sourceFact.sourceBytes !== ALBANIAN_KAIKKI_LEXICAL_SOURCE_BYTES_V0_1 ||
+          typeof sourceFact.form !== "string" || typeof sourceSenseOrdinal !== "number" ||
+          !Number.isInteger(sourceSenseOrdinal) || sourceSenseOrdinal < 0 ||
+          (sourceSenseId !== null && typeof sourceSenseId !== "string") ||
+          !isStringArray(sourceGlosses) ||
+          (synonymOrdinal !== null && (typeof synonymOrdinal !== "number" || !Number.isInteger(synonymOrdinal) || synonymOrdinal < 0)) ||
+          (synonym !== null && typeof synonym !== "string")) return false;
+        const linkedFacts = exactFacts.filter((fact) => isRecord(fact) &&
+          fact.sourceRecordId === sourceFact.sourceRecordId && fact.entryLocator === sourceFact.entryLocator &&
+          fact.form === sourceFact.form);
+        if (linkedFacts.length !== 1 || !isRecord(linkedFacts[0]) || !Array.isArray(linkedFacts[0].senses) ||
+          !isRecord(linkedFacts[0].sourceSnapshot) ||
+          linkedFacts[0].sourceSnapshot.sha256 !== ALBANIAN_KAIKKI_LEXICAL_SOURCE_SHA256_V0_1 ||
+          linkedFacts[0].sourceSnapshot.sourceFamilyId !== ALBANIAN_KAIKKI_LEXICAL_SOURCE_FAMILY_ID_V0_1 ||
+          linkedFacts[0].sourceSnapshot.bytes !== ALBANIAN_KAIKKI_LEXICAL_SOURCE_BYTES_V0_1 ||
+          value.targetSourceRecordId !== sourceFact.sourceRecordId) return false;
+        const linkedSense = linkedFacts[0].senses[sourceSenseOrdinal];
+        if (!isRecord(linkedSense) || linkedSense.senseId !== sourceSenseId ||
+          !Array.isArray(linkedSense.glosses) || linkedSense.glosses.length !== sourceGlosses.length ||
+          !linkedSense.glosses.every((gloss, index) => gloss === sourceGlosses[index])) return false;
+        if (synonym === null) {
+          if (synonymOrdinal !== null) return false;
+        } else {
+          if (typeof synonymOrdinal !== "number" || !Number.isInteger(synonymOrdinal) || !Array.isArray(linkedSense.synonyms) ||
+            linkedSense.synonyms[synonymOrdinal] !== synonym) return false;
+        }
+
+        let reviewedRule: typeof ALBANIAN_SENSE_ALIGNED_LEXICAL_ROLE_REVIEWED_DEFINITIONS_V0_1[number] | null = null;
+        if (candidate.crossSourceFact !== null) {
+          const cross = candidate.crossSourceFact;
+          if (!isRecord(cross)) return false;
+          const definitions = cross.definitions;
+          if (typeof cross.sourceRecordId !== "string" ||
+            cross.sourceFamilyId !== ALBANET_SOURCE_FAMILY_ID_V0_1 ||
+            cross.sourceTitle !== ALBANET_SOURCE_TITLE_V0_1 ||
+            cross.sourceRevision !== ALBANET_SOURCE_REVISION_V0_1 ||
+            cross.sourceUrl !== ALBANET_SOURCE_REPOSITORY_V0_1 ||
+            cross.sourceSha256 !== ALBANET_SOURCE_FILE_SHA256_V0_1 ||
+            typeof cross.entryLocator !== "string" || typeof cross.lemma !== "string" ||
+            typeof cross.synsetId !== "string" || !isStringArray(definitions) ||
+            cross.sourceRecordId !== `${ALBANET_SOURCE_FAMILY_ID_V0_1}:${cross.synsetId}:lemma=${encodeURIComponent(cross.lemma)}` ||
+            cross.entryLocator !== `${ALBANET_SOURCE_FILE_RELATIVE_PATH_V0_1}#synset=${cross.synsetId};lemma=${encodeURIComponent(cross.lemma)}` ||
+            synonym === null ||
+            cross.lemma.normalize("NFC").trim().toLocaleLowerCase("en-US").normalize("NFC") !==
+              synonym.normalize("NFC").trim().toLocaleLowerCase("en-US").normalize("NFC")) return false;
+          if (definitions.length === 1) {
+            reviewedRule = ALBANIAN_SENSE_ALIGNED_LEXICAL_ROLE_REVIEWED_DEFINITIONS_V0_1.find((rule) =>
+              rule.lemma === cross.lemma && rule.synsetId === cross.synsetId &&
+              rule.definition === definitions[0] && rule.sourceFamilyId === cross.sourceFamilyId &&
+              rule.sourceRevision === cross.sourceRevision && rule.sourceSha256 === cross.sourceSha256 &&
+              rule.sourceTitle === cross.sourceTitle && rule.sourceUrl === cross.sourceUrl &&
+              rule.reviewStatus === "REVIEWED_EXACT_SOURCE_DEFINITION",
+            ) ?? null;
+          }
+        }
+        if (candidate.inference.status === "SUPPORTED") {
+          supportedCount += 1;
+          const ownerOccurrences = linkedFacts[0].senses.flatMap((sense, senseOrdinal) =>
+            isRecord(sense) && Array.isArray(sense.synonyms)
+              ? sense.synonyms.flatMap((synonym, synonymOrdinal) =>
+                  typeof synonym === "string" && typeof sourceFact.synonym === "string" &&
+                  synonym.normalize("NFC").trim().toLocaleLowerCase("en-US").normalize("NFC") ===
+                    sourceFact.synonym.normalize("NFC").trim().toLocaleLowerCase("en-US").normalize("NFC")
+                    ? [{ senseOrdinal, synonymOrdinal }]
+                    : [],
+                )
+              : [],
+          );
+          if (candidate.inference.roleLabel !== "HUMAN_ROLE" ||
+            candidate.inference.predicateId !== ALBANIAN_SENSE_ALIGNED_LEXICAL_ROLE_PREDICATE_ID_V0_1 ||
+            typeof candidate.inference.statement !== "string" || candidate.reasonCodes.length !== 0 ||
+            !reviewedRule || sourceSenseId === null || ownerOccurrences.length !== 1 ||
+            ownerOccurrences[0]?.senseOrdinal !== sourceSenseOrdinal ||
+            ownerOccurrences[0]?.synonymOrdinal !== synonymOrdinal) return false;
+        } else if (candidate.inference.status !== "UNKNOWN_OR_NULL" ||
+          candidate.inference.roleLabel !== null || candidate.inference.predicateId !== null ||
+          candidate.inference.statement !== null || candidate.reasonCodes.length === 0) {
+          return false;
+        }
+      }
+      return (value.status === "SUPPORTED") === (supportedCount > 0) &&
+        (supportedCount > 0 ? value.reasonCodes.length === 0 : value.reasonCodes.length > 0);
     };
     const validFiveWindowsComparison = reading.fiveWindowsComparison === undefined || reading.fiveWindowsComparison === null || (() => {
       const expectedForms = ["dritare", "fënjeshtër", "finestër", "penxhere", "derkë"];
@@ -2522,6 +2647,7 @@ function parseMotivationDiscoveryV0_1(
       validRelatedCandidateEvaluations &&
       validFunctionalFamilyReading &&
       validOccupationalRoleResearchCandidateBatch(reading.occupationalRoleResearchCandidates) &&
+      validSenseAlignedLexicalRole(reading.senseAlignedLexicalRole) &&
       validRelationOwnershipBindings() &&
       (reading.interpretation.status === "EXPLORATORY_ZHEJI_READING" || reading.interpretation.status === "UNKNOWN_OR_NULL") &&
       (reading.interpretation.statement === null || typeof reading.interpretation.statement === "string") &&

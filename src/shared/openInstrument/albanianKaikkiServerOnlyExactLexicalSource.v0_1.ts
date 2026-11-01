@@ -158,6 +158,8 @@ export function createAlbanianKaikkiSourceDiagnosticContextV0_1():
 export type AlbanianKaikkiExactLexicalSourceSenseV0_1 = Readonly<{
   senseId: string | null;
   glosses: readonly string[];
+  /** Source-authored synonym forms, retained under this exact source sense. */
+  synonyms?: readonly string[];
   /** Source-authored categories kept at sense scope; never promoted to entry scope. */
   categories?: readonly AlbanianKaikkiExactLexicalSourceCategoryV0_1[];
 }>;
@@ -382,6 +384,7 @@ function projectSenseV0_1(value: unknown): AlbanianKaikkiExactLexicalSourceSense
   return Object.freeze({
     senseId: textV0_1(sense.id),
     glosses: stringArrayV0_1(sense.glosses),
+    synonyms: stringArrayV0_1(sense.synonyms),
     categories: Array.isArray(sense.categories)
       ? Object.freeze(sense.categories.map((value) => {
           const category = isRecordV0_1(value) ? value : {};
