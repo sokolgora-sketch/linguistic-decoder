@@ -178,10 +178,21 @@ export type AlbanianKaikkiExactLexicalSourceIpaObservationV0_1 = Readonly<{
   tags: readonly string[];
 }>;
 
+export type AlbanianKaikkiSourceRelationAssertionV0_1 = Readonly<{
+  assertionScope: "SOURCE_RECORD" | "SOURCE_SENSE" | "UNKNOWN_OR_NULL";
+  sourceSenseId: string | null;
+  sourceSenseOrdinal: number | null;
+  sourceSenseIdentityStatus: "VERIFIED" | "UNKNOWN_OR_NULL" | "NOT_APPLICABLE";
+  /** Zero-based position in this owner's source `related` or `derived` array. */
+  sourceAssertionOrdinal: number | null;
+  reasonCodes: readonly string[];
+}>;
+
 export type AlbanianKaikkiExactLexicalSourceRelatedFormV0_1 = Readonly<{
   form: string;
   relation: "SOURCE_RELATED_FORM" | "SOURCE_DERIVED_FORM";
   entryLocator: string;
+  sourceRelationAssertion: AlbanianKaikkiSourceRelationAssertionV0_1;
 }>;
 
 export type AlbanianKaikkiExactLexicalSourceEtymologyLinkV0_1 = Readonly<{
@@ -409,9 +420,13 @@ function sourceFactV0_1(
   const form = textV0_1(record.word);
   if (!form || record.lang_code !== "sq") return null;
 
+  const rawSenses = Array.isArray(record.senses) ? record.senses : [];
   const senses = Array.isArray(record.senses)
     ? Object.freeze(record.senses.map(projectSenseV0_1))
     : Object.freeze([]);
+  const rawSenseIds = rawSenses.map((value) =>
+    isRecordV0_1(value) ? textV0_1(value.id) : null,
+  );
   const ipaObservations = Array.isArray(record.sounds)
     ? Object.freeze(record.sounds.map(projectSoundV0_1))
     : Object.freeze([]);
@@ -436,35 +451,59 @@ function sourceFactV0_1(
   const sourceFormLinksV0_1 = (
     value: unknown,
     relation: AlbanianKaikkiExactLexicalSourceRelatedFormV0_1["relation"],
+    assertionScope: "SOURCE_RECORD" | "SOURCE_SENSE",
+    sourceSenseOrdinal: number | null = null,
   ) => Array.isArray(value)
-    ? value.flatMap((item) => {
+    ? value.flatMap((item, sourceAssertionOrdinal) => {
         const relatedRecord = isRecordV0_1(item) ? item : null;
         const relatedForm = relatedRecord ? textV0_1(relatedRecord.word) : null;
         if (!relatedForm) return [];
         const relatedEncodedForm = encodeURIComponent(relatedForm);
+        const sourceSenseId = sourceSenseOrdinal === null
+          ? null
+          : rawSenseIds[sourceSenseOrdinal] ?? null;
+        const sourceSenseIdCount = sourceSenseId === null
+          ? 0
+          : rawSenseIds.filter((senseId) => senseId === sourceSenseId).length;
+        const sourceSenseIdentityStatus = assertionScope === "SOURCE_RECORD"
+          ? "NOT_APPLICABLE" as const
+          : sourceSenseId !== null && sourceSenseIdCount === 1
+            ? "VERIFIED" as const
+            : "UNKNOWN_OR_NULL" as const;
+        const sourceSenseIdentityReasonCodes = assertionScope === "SOURCE_RECORD"
+          ? Object.freeze([])
+          : sourceSenseId === null
+            ? Object.freeze(["SOURCE_SENSE_ID_MISSING"])
+            : sourceSenseIdCount !== 1
+              ? Object.freeze(["SOURCE_SENSE_ID_DUPLICATE"])
+              : Object.freeze([]);
         return [{
           form: relatedForm,
           relation,
           entryLocator: `jsonl://word/${relatedEncodedForm}`,
+          sourceRelationAssertion: Object.freeze({
+            assertionScope,
+            sourceSenseId,
+            sourceSenseOrdinal,
+            sourceSenseIdentityStatus,
+            sourceAssertionOrdinal,
+            reasonCodes: sourceSenseIdentityReasonCodes,
+          }),
         }];
       })
     : [];
-  const senseDerivedForms = Array.isArray(record.senses)
-    ? record.senses.flatMap((value) => {
-        if (!isRecordV0_1(value)) return [];
-        return sourceFormLinksV0_1(value.derived, "SOURCE_DERIVED_FORM");
-      })
-    : [];
-  const senseRelatedForms = Array.isArray(record.senses)
-    ? record.senses.flatMap((value) => {
-        if (!isRecordV0_1(value)) return [];
-        return sourceFormLinksV0_1(value.related, "SOURCE_RELATED_FORM");
-      })
-    : [];
+  const senseDerivedForms = rawSenses.flatMap((value, sourceSenseOrdinal) => {
+    if (!isRecordV0_1(value)) return [];
+    return sourceFormLinksV0_1(value.derived, "SOURCE_DERIVED_FORM", "SOURCE_SENSE", sourceSenseOrdinal);
+  });
+  const senseRelatedForms = rawSenses.flatMap((value, sourceSenseOrdinal) => {
+    if (!isRecordV0_1(value)) return [];
+    return sourceFormLinksV0_1(value.related, "SOURCE_RELATED_FORM", "SOURCE_SENSE", sourceSenseOrdinal);
+  });
   const relatedForms = Array.isArray(record.related) || Array.isArray(record.derived) || senseRelatedForms.length > 0 || senseDerivedForms.length > 0
     ? Object.freeze([
-        ...sourceFormLinksV0_1(record.related, "SOURCE_RELATED_FORM"),
-        ...sourceFormLinksV0_1(record.derived, "SOURCE_DERIVED_FORM"),
+        ...sourceFormLinksV0_1(record.related, "SOURCE_RELATED_FORM", "SOURCE_RECORD"),
+        ...sourceFormLinksV0_1(record.derived, "SOURCE_DERIVED_FORM", "SOURCE_RECORD"),
         ...senseRelatedForms,
         ...senseDerivedForms,
       ])

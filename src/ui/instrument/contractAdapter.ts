@@ -903,6 +903,110 @@ function parseMotivationDiscoveryV0_1(
     : null;
   const isStringArray = (value: unknown): value is string[] =>
     Array.isArray(value) && value.every((item) => typeof item === "string");
+  const validSourceRelationAssertion = (
+    assertion: unknown,
+    senses: unknown,
+  ): boolean => {
+    if (!isRecord(assertion) || !isStringArray(assertion.reasonCodes)) return false;
+    if (assertion.assertionScope === "UNKNOWN_OR_NULL") {
+      return assertion.sourceSenseId === null &&
+        assertion.sourceSenseOrdinal === null &&
+        assertion.sourceSenseIdentityStatus === "UNKNOWN_OR_NULL" &&
+        assertion.sourceAssertionOrdinal === null &&
+        assertion.reasonCodes.length === 1 &&
+        assertion.reasonCodes[0] === "SOURCE_RELATION_PROVENANCE_NOT_PROJECTED";
+    }
+    if (!Number.isInteger(assertion.sourceAssertionOrdinal) || (assertion.sourceAssertionOrdinal as number) < 0) return false;
+    if (assertion.assertionScope === "SOURCE_RECORD") {
+      return assertion.sourceSenseId === null &&
+        assertion.sourceSenseOrdinal === null &&
+        assertion.sourceSenseIdentityStatus === "NOT_APPLICABLE" &&
+        assertion.reasonCodes.length === 0;
+    }
+    if (assertion.assertionScope !== "SOURCE_SENSE" ||
+      !Number.isInteger(assertion.sourceSenseOrdinal) || (assertion.sourceSenseOrdinal as number) < 0 ||
+      (assertion.sourceSenseId !== null && typeof assertion.sourceSenseId !== "string")) return false;
+    if (!Array.isArray(senses)) {
+      return assertion.sourceSenseIdentityStatus === "UNKNOWN_OR_NULL" &&
+          ((assertion.sourceSenseId === null && assertion.reasonCodes.length === 1 && assertion.reasonCodes[0] === "SOURCE_SENSE_ID_MISSING") ||
+            (typeof assertion.sourceSenseId === "string" && assertion.reasonCodes.length === 1 && assertion.reasonCodes[0] === "SOURCE_SENSE_ID_DUPLICATE"));
+    }
+    if ((assertion.sourceSenseOrdinal as number) >= senses.length) return false;
+    const owner = senses[assertion.sourceSenseOrdinal as number];
+    if (!isRecord(owner) || (owner.senseId !== null && typeof owner.senseId !== "string") ||
+      assertion.sourceSenseId !== owner.senseId) return false;
+    const ownerId = owner.senseId;
+    const ownerIdCount = typeof ownerId === "string"
+      ? senses.filter((sense) => isRecord(sense) && sense.senseId === ownerId).length
+      : 0;
+    const expectedStatus = typeof ownerId === "string" && ownerId.length > 0 && ownerIdCount === 1
+      ? "VERIFIED"
+      : "UNKNOWN_OR_NULL";
+    const expectedReason = expectedStatus === "VERIFIED"
+      ? null
+      : typeof ownerId === "string" && ownerId.length > 0
+        ? "SOURCE_SENSE_ID_DUPLICATE"
+        : "SOURCE_SENSE_ID_MISSING";
+    return assertion.sourceSenseIdentityStatus === expectedStatus &&
+      (expectedReason === null
+        ? assertion.reasonCodes.length === 0
+        : assertion.reasonCodes.length === 1 && assertion.reasonCodes[0] === expectedReason);
+  };
+  const validExactRelationEdges = (relations: unknown, senses: unknown): boolean => {
+    if (!Array.isArray(relations)) return false;
+    const hasAssertion = relations.map((edge) => isRecord(edge) && "sourceRelationAssertion" in edge);
+    // Older payloads may predate this additive projection; current provider output always includes it.
+    if (hasAssertion.length > 0 && hasAssertion.some(Boolean) && hasAssertion.some((present) => !present)) return false;
+    if (!hasAssertion.some(Boolean)) return relations.every((edge) => isRecord(edge) &&
+      typeof edge.form === "string" && typeof edge.entryLocator === "string" &&
+      (edge.relation === "SOURCE_RELATED_FORM" || edge.relation === "SOURCE_DERIVED_FORM"));
+    let prior: readonly number[] | null = null;
+    const priorOrdinals = new Map<string, number>();
+    for (const edge of relations) {
+      if (!isRecord(edge) || typeof edge.form !== "string" || typeof edge.entryLocator !== "string" ||
+        (edge.relation !== "SOURCE_RELATED_FORM" && edge.relation !== "SOURCE_DERIVED_FORM") ||
+        !validSourceRelationAssertion(edge.sourceRelationAssertion, senses)) return false;
+      const assertion = edge.sourceRelationAssertion;
+      if (!isRecord(assertion) || assertion.assertionScope === "UNKNOWN_OR_NULL") continue;
+      const scope = assertion.assertionScope;
+      const relationRank = edge.relation === "SOURCE_RELATED_FORM" ? 0 : 1;
+      const key = scope === "SOURCE_RECORD"
+        ? `record:${edge.relation}`
+        : `sense:${assertion.sourceSenseOrdinal}:${edge.relation}`;
+      const ownerRank = scope === "SOURCE_RECORD"
+        ? relationRank
+        : (edge.relation === "SOURCE_RELATED_FORM" ? 2 : 3);
+      const order = scope === "SOURCE_RECORD"
+        ? [ownerRank, -1, assertion.sourceAssertionOrdinal as number]
+        : [ownerRank, assertion.sourceSenseOrdinal as number, assertion.sourceAssertionOrdinal as number];
+      if (prior && (order[0]! < prior[0]! ||
+        (order[0] === prior[0] && order[1]! < prior[1]!) ||
+        (order[0] === prior[0] && order[1] === prior[1] && order[2]! <= prior[2]!))) return false;
+      const priorOrdinal = priorOrdinals.get(key);
+      if (priorOrdinal !== undefined && (assertion.sourceAssertionOrdinal as number) <= priorOrdinal) return false;
+      priorOrdinals.set(key, assertion.sourceAssertionOrdinal as number);
+      prior = order;
+    }
+    return true;
+  };
+  const sameSourceRelationAssertion = (left: unknown, right: unknown): boolean => {
+    if (!isRecord(left) || !isRecord(right) ||
+      left.assertionScope !== right.assertionScope ||
+      left.sourceSenseId !== right.sourceSenseId ||
+      left.sourceSenseOrdinal !== right.sourceSenseOrdinal ||
+      left.sourceSenseIdentityStatus !== right.sourceSenseIdentityStatus ||
+      left.sourceAssertionOrdinal !== right.sourceAssertionOrdinal ||
+      !isStringArray(left.reasonCodes) || !isStringArray(right.reasonCodes)) return false;
+    const leftReasons = left.reasonCodes;
+    const rightReasons = right.reasonCodes;
+    return leftReasons.length === rightReasons.length &&
+      leftReasons.every((reason, index) => reason === rightReasons[index]);
+  };
+  const normalizeAlbanianRelationForm = (form: string): string =>
+    form.normalize("NFC").trim().toLocaleLowerCase("sq-AL");
+  const sameNormalizedAlbanianRelationForm = (left: unknown, right: unknown): boolean =>
+    typeof left === "string" && typeof right === "string" &&
+    normalizeAlbanianRelationForm(left) === normalizeAlbanianRelationForm(right);
   const exactLexicalSourceStatus = value.exactLexicalSourceStatus;
   const exactLexicalSourceFacts = value.exactLexicalSourceFacts;
   const validSourceAuthoredSuffixTemplateReading = (
@@ -1034,12 +1138,7 @@ function parseMotivationDiscoveryV0_1(
         )
       )) &&
       (fact.relatedForms === undefined || (
-        Array.isArray(fact.relatedForms) && fact.relatedForms.every((relation) =>
-          isRecord(relation) &&
-          typeof relation.form === "string" &&
-          (relation.relation === "SOURCE_RELATED_FORM" || relation.relation === "SOURCE_DERIVED_FORM") &&
-          typeof relation.entryLocator === "string"
-        )
+        Array.isArray(fact.relatedForms) && validExactRelationEdges(fact.relatedForms, fact.senses)
       )) &&
       fact.sourceStatus === "observed_external_snapshot" &&
       fact.attestationTruth === "fact" &&
@@ -1130,6 +1229,14 @@ function parseMotivationDiscoveryV0_1(
     }
     const primary = reading.primarySourceFact;
     const pronunciation = reading.sourcePronunciation;
+    const exactPrimarySourceFacts = isRecord(primary) && Array.isArray(exactSourceFacts)
+      ? exactSourceFacts.filter((fact) => isRecord(fact) &&
+          fact.sourceRecordId === primary.sourceRecordId && fact.entryLocator === primary.entryLocator && fact.form === primary.form)
+      : [];
+    const exactPrimarySourceFact = exactPrimarySourceFacts.length === 1 && isRecord(exactPrimarySourceFacts[0])
+      ? exactPrimarySourceFacts[0]
+      : null;
+    const primaryRecord = isRecord(primary) ? primary : null;
     const validPrimary = primary === null || (
       isRecord(primary) &&
       typeof primary.sourceRecordId === "string" &&
@@ -1149,17 +1256,40 @@ function parseMotivationDiscoveryV0_1(
       isStringArray(pronunciation.voicePath) &&
       isStringArray(pronunciation.reasonCodes)
     );
-    const validRelated = reading.relatedForms.every((relation) =>
-      isRecord(relation) &&
-      typeof relation.form === "string" &&
-      typeof relation.entryLocator === "string" &&
-      (relation.relation === "SOURCE_RELATED_FORM" || relation.relation === "SOURCE_DERIVED_FORM") &&
-      (relation.resolution === "RESOLVED" || relation.resolution === "UNRESOLVED") &&
-      (relation.sourceRecordId === null || typeof relation.sourceRecordId === "string") &&
-      (relation.partOfSpeech === null || typeof relation.partOfSpeech === "string") &&
-      (relation.etymologyText === null || typeof relation.etymologyText === "string") &&
-      isStringArray(relation.meaningGlosses)
-    );
+    const sourceSensesForProjectedRelation = (relation: Record<string, unknown>): unknown => {
+      if (exactPrimarySourceFact) return exactPrimarySourceFact.senses;
+      if (relation.sourceRelationAssertion === undefined || !Array.isArray(reading.relatedCandidateEvaluations) ||
+        typeof primaryRecord?.sourceRecordId !== "string") return undefined;
+      const matches = reading.relatedCandidateEvaluations.filter((candidate) =>
+        isRecord(candidate) && candidate.sourceRelation === relation.relation &&
+        sameNormalizedAlbanianRelationForm(candidate.relatedForm, relation.form) &&
+        sameSourceRelationAssertion(candidate.sourceRelationAssertion, relation.sourceRelationAssertion) &&
+        isRecord(candidate.sourceLinkedComparison) && isRecord(candidate.sourceLinkedComparison.primary) &&
+        isRecord(candidate.sourceLinkedComparison.relation) &&
+        candidate.sourceLinkedComparison.primary.sourceRecordId === primaryRecord.sourceRecordId &&
+        candidate.sourceLinkedComparison.primary.entryLocator === primaryRecord.entryLocator &&
+        candidate.sourceLinkedComparison.relation.primarySourceRecordId === primaryRecord.sourceRecordId &&
+        candidate.sourceLinkedComparison.relation.primaryEntryLocator === primaryRecord.entryLocator &&
+        candidate.sourceLinkedComparison.relation.relation === relation.relation &&
+        sameNormalizedAlbanianRelationForm(candidate.sourceLinkedComparison.relation.relatedForm, relation.form),
+      );
+      if (matches.length !== 1) return undefined;
+      const comparison = (matches[0] as Record<string, unknown>).sourceLinkedComparison;
+      return isRecord(comparison) && isRecord(comparison.primary) ? comparison.primary.sourceSenses : undefined;
+    };
+    const validRelated = reading.relatedForms.every((relation) => {
+      if (!isRecord(relation) || typeof relation.form !== "string" || typeof relation.entryLocator !== "string" ||
+        (relation.relation !== "SOURCE_RELATED_FORM" && relation.relation !== "SOURCE_DERIVED_FORM") ||
+        (relation.resolution !== "RESOLVED" && relation.resolution !== "UNRESOLVED") ||
+        (relation.sourceRecordId !== null && typeof relation.sourceRecordId !== "string") ||
+        (relation.partOfSpeech !== null && typeof relation.partOfSpeech !== "string") ||
+        (relation.etymologyText !== null && typeof relation.etymologyText !== "string") ||
+        !isStringArray(relation.meaningGlosses)) return false;
+      return relation.sourceRelationAssertion === undefined || validSourceRelationAssertion(
+        relation.sourceRelationAssertion,
+        sourceSensesForProjectedRelation(relation),
+      );
+    });
     const validCompositionStructure = (structure: unknown): boolean => {
       if (structure === null) return true;
       if (!isRecord(structure)) return false;
@@ -1238,15 +1368,17 @@ function parseMotivationDiscoveryV0_1(
       (category.langcode === null || typeof category.langcode === "string") &&
       (category._dis === null || typeof category._dis === "string");
     const validSourceSenses = (value: unknown): boolean => value === undefined || (
-      Array.isArray(value) && value.every((sense) =>
+      Array.isArray(value) && value.every((sense, sourceSenseOrdinal) =>
         isRecord(sense) &&
         (sense.senseId === null || typeof sense.senseId === "string") &&
+        (sense.sourceSenseOrdinal === undefined ||
+          (Number.isInteger(sense.sourceSenseOrdinal) && sense.sourceSenseOrdinal === sourceSenseOrdinal)) &&
         isStringArray(sense.glosses) &&
         Array.isArray(sense.categories) &&
         sense.categories.every(validSourceCategory),
       )
     );
-    const validSourceLinkedRecord = (record: unknown): boolean => {
+    const validSourceLinkedRecord = (record: unknown): record is Record<string, unknown> => {
       if (!isRecord(record) || !Array.isArray(record.etymologyLinks) || !Array.isArray(record.etymologyTemplates) || !Array.isArray(record.pronunciationVariants)) {
         return false;
       }
@@ -1687,6 +1819,12 @@ function parseMotivationDiscoveryV0_1(
       sourceLinkedComparison.relation.direction === "RELATED_FORM_TO_PRIMARY_ETYMLOGY_REFERENCE" &&
       (sourceLinkedComparison.relation.referencedForm === null || typeof sourceLinkedComparison.relation.referencedForm === "string") &&
       (sourceLinkedComparison.relation.reference === null || typeof sourceLinkedComparison.relation.reference === "string") &&
+      (sourceLinkedComparison.relation.relation === "TARGET_AUTHORED_ETYMOLOGY_REFERENCE"
+        ? sourceLinkedComparison.relation.sourceRelationAssertion === null || sourceLinkedComparison.relation.sourceRelationAssertion === undefined
+        : sourceLinkedComparison.relation.sourceRelationAssertion === undefined || validSourceRelationAssertion(
+            sourceLinkedComparison.relation.sourceRelationAssertion,
+            isRecord(sourceLinkedComparison.primary) ? sourceLinkedComparison.primary.sourceSenses : undefined,
+          )) &&
       validSourceLinkedRecord(sourceLinkedComparison.primary) &&
       (sourceLinkedComparison.related === null || validSourceLinkedRecord(sourceLinkedComparison.related)) &&
       isRecord(sourceLinkedComparison.summary) &&
@@ -1997,7 +2135,12 @@ function parseMotivationDiscoveryV0_1(
         (candidate.relation.referencedForm !== null && typeof candidate.relation.referencedForm !== "string") ||
         (candidate.relation.reference !== null && typeof candidate.relation.reference !== "string") ||
         !validSourceLinkedRecord(candidate.primary) ||
+        candidate.primary.sourceRecordId !== candidate.relation.primarySourceRecordId ||
+        candidate.primary.entryLocator !== candidate.relation.primaryEntryLocator ||
         (candidate.related !== null && !validSourceLinkedRecord(candidate.related)) ||
+        (candidate.related !== null &&
+          (candidate.related.sourceRecordId !== candidate.relation.relatedSourceRecordId ||
+            candidate.related.entryLocator !== candidate.relation.relatedEntryLocator)) ||
         !isRecord(candidate.summary) ||
         !["EXACT_SUPPORTED_PATH_SET_MATCH", "SHARED_INITIAL_VOICE_DIFFERENT_LATER_PATH", "DIFFERENT_SUPPORTED_VOICE_PATHS", "UNKNOWN"].includes(candidate.summary.voicePathRelationship as string) ||
         !["EXACT_SUPPORTED_CONTEXT_SET_MATCH", "DIFFERENT_SUPPORTED_CONTEXTS", "UNKNOWN"].includes(candidate.summary.consonantalContextRelationship as string) ||
@@ -2013,12 +2156,203 @@ function parseMotivationDiscoveryV0_1(
         const validCandidate = isRecord(candidate) &&
           typeof candidate.relatedForm === "string" &&
           (candidate.sourceRelation === "SOURCE_RELATED_FORM" || candidate.sourceRelation === "SOURCE_DERIVED_FORM" || candidate.sourceRelation === "TARGET_AUTHORED_ETYMOLOGY_REFERENCE") &&
+          (candidate.sourceRelation === "TARGET_AUTHORED_ETYMOLOGY_REFERENCE"
+            ? (candidate.sourceRelationAssertion === null || candidate.sourceRelationAssertion === undefined) &&
+              isRecord(candidate.sourceLinkedComparison) && isRecord(candidate.sourceLinkedComparison.relation) &&
+              (candidate.sourceLinkedComparison.relation.sourceRelationAssertion === null || candidate.sourceLinkedComparison.relation.sourceRelationAssertion === undefined)
+            : candidate.sourceRelationAssertion === undefined
+              ? isRecord(candidate.sourceLinkedComparison) && isRecord(candidate.sourceLinkedComparison.relation) &&
+                candidate.sourceLinkedComparison.relation.sourceRelationAssertion === undefined
+              : validSourceRelationAssertion(candidate.sourceRelationAssertion,
+                  isRecord(candidate.sourceLinkedComparison) && isRecord(candidate.sourceLinkedComparison.primary)
+                    ? candidate.sourceLinkedComparison.primary.sourceSenses
+                    : undefined) &&
+                isRecord(candidate.sourceLinkedComparison) && isRecord(candidate.sourceLinkedComparison.relation) &&
+                sameSourceRelationAssertion(candidate.sourceRelationAssertion, candidate.sourceLinkedComparison.relation.sourceRelationAssertion)) &&
           (candidate.resolution === "RESOLVED" || candidate.resolution === "UNRESOLVED") &&
           validRelatedCandidateComparison(candidate.sourceLinkedComparison) &&
           validFunctionalMeaningBridgeValue(candidate.functionalMeaningBridge);
         return validCandidate;
       })
     );
+    const validRelationOwnershipBindings = (): boolean => {
+      if (!Array.isArray(reading.relatedForms)) return false;
+      const isSourceRelationKind = (relation: unknown): relation is "SOURCE_RELATED_FORM" | "SOURCE_DERIVED_FORM" =>
+        relation === "SOURCE_RELATED_FORM" || relation === "SOURCE_DERIVED_FORM";
+      const candidateComparison = (candidate: Record<string, unknown>): Record<string, unknown> | null =>
+        isRecord(candidate.sourceLinkedComparison) ? candidate.sourceLinkedComparison : null;
+      const comparisonRelation = (comparison: Record<string, unknown> | null): Record<string, unknown> | null =>
+        comparison && isRecord(comparison.relation) ? comparison.relation : null;
+      const sameOrLegacyAssertion = (left: unknown, right: unknown): boolean =>
+        left === undefined || right === undefined
+          ? left === undefined && right === undefined
+          : sameSourceRelationAssertion(left, right);
+      const exactFact = exactPrimarySourceFact;
+      const candidates = Array.isArray(relatedCandidateEvaluations) ? relatedCandidateEvaluations : [];
+      const selectedComparison = reading.sourceLinkedComparison;
+      const hasSourceAssertion = reading.relatedForms.length > 0 ||
+        candidates.some((candidate) => isRecord(candidate) && isSourceRelationKind(candidate.sourceRelation)) ||
+        (isRecord(selectedComparison) && isRecord(selectedComparison.relation) &&
+          isSourceRelationKind(selectedComparison.relation.relation));
+      if (!exactFact) {
+        if (!hasSourceAssertion) return true;
+        const sourceCandidates = candidates.filter((candidate): candidate is Record<string, unknown> =>
+          isRecord(candidate) && isSourceRelationKind(candidate.sourceRelation));
+        if (sourceCandidates.length > 0) {
+          const primaryCandidates = sourceCandidates.filter((candidate) =>
+            comparisonRelation(candidateComparison(candidate))?.primarySourceRecordId === primaryRecord?.sourceRecordId);
+          const targetFirstCandidates = sourceCandidates.filter((candidate) =>
+            comparisonRelation(candidateComparison(candidate))?.primarySourceRecordId !== primaryRecord?.sourceRecordId);
+          if (primaryCandidates.length !== reading.relatedForms.length || targetFirstCandidates.length > 1) return false;
+          for (let index = 0; index < primaryCandidates.length; index += 1) {
+            const candidate = primaryCandidates[index];
+            const projected = reading.relatedForms[index];
+            if (!isRecord(candidate) || !isRecord(projected) ||
+              !sameNormalizedAlbanianRelationForm(candidate.relatedForm, projected.form) ||
+              candidate.sourceRelation !== projected.relation ||
+              !sameOrLegacyAssertion(candidate.sourceRelationAssertion, projected.sourceRelationAssertion) ||
+              !isRecord(candidate.sourceLinkedComparison) || !isRecord(candidate.sourceLinkedComparison.primary) ||
+              candidate.sourceLinkedComparison.primary.sourceRecordId !== primaryRecord?.sourceRecordId ||
+              candidate.sourceLinkedComparison.primary.entryLocator !== primaryRecord?.entryLocator ||
+              !validSourceRelationAssertion(candidate.sourceRelationAssertion,
+                candidate.sourceLinkedComparison.primary.sourceSenses)) return false;
+          }
+          for (const candidate of targetFirstCandidates) {
+            if (!isRecord(candidate) || !isRecord(candidate.sourceLinkedComparison) ||
+              !isRecord(candidate.sourceLinkedComparison.primary) || !isRecord(candidate.sourceLinkedComparison.related) ||
+              !isRecord(candidate.sourceLinkedComparison.relation)) return false;
+            const comparison = candidateComparison(candidate);
+            const relation = comparisonRelation(comparison);
+            if (!comparison || !relation || !isRecord(comparison.primary) || !isRecord(comparison.related)) return false;
+            if (candidate.sourceRelation !== relation.relation ||
+              !sameNormalizedAlbanianRelationForm(candidate.relatedForm, relation.relatedForm) ||
+              relation.relatedSourceRecordId !== primaryRecord?.sourceRecordId ||
+              relation.relatedEntryLocator !== primaryRecord?.entryLocator ||
+              comparison.related.sourceRecordId !== primaryRecord?.sourceRecordId ||
+              comparison.related.entryLocator !== primaryRecord?.entryLocator ||
+              !sameNormalizedAlbanianRelationForm(comparison.related.form, primaryRecord?.form) ||
+              !validSourceRelationAssertion(candidate.sourceRelationAssertion,
+                comparison.primary.sourceSenses) ||
+              !sameOrLegacyAssertion(candidate.sourceRelationAssertion, relation.sourceRelationAssertion)) return false;
+          }
+        } else if (reading.relatedForms.length !== 1 || !isRecord(selectedComparison) ||
+          !isRecord(selectedComparison.relation) || !isRecord(selectedComparison.primary) ||
+          selectedComparison.relation.relation !== reading.relatedForms[0]?.relation ||
+          selectedComparison.relation.relatedForm !== reading.relatedForms[0]?.form ||
+          !validSourceRelationAssertion(selectedComparison.relation.sourceRelationAssertion,
+            selectedComparison.primary.sourceSenses)) return false;
+        const selectedComparisonRecord = isRecord(selectedComparison) ? selectedComparison : null;
+        const selectedRelation = selectedComparisonRecord && isRecord(selectedComparisonRecord.relation)
+          ? selectedComparisonRecord.relation
+          : null;
+        if (selectedComparisonRecord && selectedRelation && isSourceRelationKind(selectedRelation.relation)) {
+          const matched = sourceCandidates.filter((candidate) => isRecord(candidate) &&
+              comparisonRelation(candidateComparison(candidate))?.primarySourceRecordId === selectedRelation.primarySourceRecordId &&
+              comparisonRelation(candidateComparison(candidate))?.primaryEntryLocator === selectedRelation.primaryEntryLocator &&
+              candidate.sourceRelation === selectedRelation.relation &&
+              sameNormalizedAlbanianRelationForm(candidate.relatedForm, selectedRelation.relatedForm) &&
+              sameOrLegacyAssertion(candidate.sourceRelationAssertion, selectedRelation.sourceRelationAssertion));
+          const legacyMatched = sourceCandidates.length === 0
+            ? reading.relatedForms.filter((relation) => isRecord(relation) &&
+              relation.relation === selectedRelation.relation &&
+              sameNormalizedAlbanianRelationForm(relation.form, selectedRelation.relatedForm) &&
+              sameOrLegacyAssertion(relation.sourceRelationAssertion, selectedRelation.sourceRelationAssertion))
+            : [];
+          if ((sourceCandidates.length > 0 ? matched.length : legacyMatched.length) !== 1) return false;
+          if (selectedRelation.primarySourceRecordId === primaryRecord?.sourceRecordId) {
+            if (selectedRelation.primaryEntryLocator !== primaryRecord?.entryLocator) return false;
+          } else if (sourceCandidates.length === 0 || !matched.some((candidate) => isRecord(candidate) &&
+            candidateComparison(candidate) && isRecord(candidateComparison(candidate)?.primary) &&
+            (candidateComparison(candidate)?.primary as Record<string, unknown>).sourceRecordId === selectedRelation.primarySourceRecordId &&
+            (candidateComparison(candidate)?.primary as Record<string, unknown>).entryLocator === selectedRelation.primaryEntryLocator)) return false;
+        }
+        return true;
+      }
+      const exactEdges = Array.isArray(exactFact.relatedForms) ? exactFact.relatedForms : [];
+      if (reading.relatedForms.length !== exactEdges.length) return false;
+      for (let index = 0; index < exactEdges.length; index += 1) {
+        const exactEdge = exactEdges[index];
+        const projectedEdge = reading.relatedForms[index];
+        if (!isRecord(exactEdge) || !isRecord(projectedEdge) ||
+          projectedEdge.form !== exactEdge.form || projectedEdge.relation !== exactEdge.relation ||
+          !sameOrLegacyAssertion(projectedEdge.sourceRelationAssertion, exactEdge.sourceRelationAssertion)) return false;
+        if (exactEdge.sourceRelationAssertion !== undefined &&
+          !validSourceRelationAssertion(exactEdge.sourceRelationAssertion, exactFact.senses)) return false;
+      }
+      const sourceCandidates = Array.isArray(relatedCandidateEvaluations)
+        ? relatedCandidateEvaluations.filter((candidate): candidate is Record<string, unknown> =>
+            isRecord(candidate) && isSourceRelationKind(candidate.sourceRelation))
+        : [];
+      if (Array.isArray(relatedCandidateEvaluations)) {
+        const primaryCandidates = sourceCandidates.filter((candidate) =>
+          comparisonRelation(candidateComparison(candidate))?.primarySourceRecordId === exactFact.sourceRecordId);
+        const targetFirstCandidates = sourceCandidates.filter((candidate) =>
+          comparisonRelation(candidateComparison(candidate))?.primarySourceRecordId !== exactFact.sourceRecordId);
+        if (primaryCandidates.length !== exactEdges.length || targetFirstCandidates.length > 1) return false;
+        for (let index = 0; index < exactEdges.length; index += 1) {
+          const exactEdge = exactEdges[index];
+          const candidate = primaryCandidates[index];
+          if (!isRecord(exactEdge) || !isRecord(candidate) ||
+            !sameNormalizedAlbanianRelationForm(candidate.relatedForm, exactEdge.form) ||
+            candidate.sourceRelation !== exactEdge.relation ||
+            !sameOrLegacyAssertion(candidate.sourceRelationAssertion, exactEdge.sourceRelationAssertion) ||
+            !isRecord(candidate.sourceLinkedComparison) || !isRecord(candidate.sourceLinkedComparison.relation) ||
+            candidate.sourceLinkedComparison.relation.relation !== exactEdge.relation ||
+            !sameNormalizedAlbanianRelationForm(candidate.sourceLinkedComparison.relation.relatedForm, exactEdge.form) ||
+            candidate.sourceLinkedComparison.relation.primarySourceRecordId !== exactFact.sourceRecordId ||
+            candidate.sourceLinkedComparison.relation.primaryEntryLocator !== exactFact.entryLocator ||
+            !sameOrLegacyAssertion(candidate.sourceLinkedComparison.relation.sourceRelationAssertion, exactEdge.sourceRelationAssertion)) return false;
+        }
+        for (const candidate of targetFirstCandidates) {
+          if (!isRecord(candidate) || !isRecord(candidate.sourceLinkedComparison) ||
+            !isRecord(candidate.sourceLinkedComparison.primary) || !isRecord(candidate.sourceLinkedComparison.related) ||
+            !isRecord(candidate.sourceLinkedComparison.relation)) return false;
+          const comparison = candidateComparison(candidate);
+          const relation = comparisonRelation(comparison);
+          if (!comparison || !relation || !isRecord(comparison.primary) || !isRecord(comparison.related)) return false;
+          if (candidate.sourceRelation !== relation.relation ||
+            !sameNormalizedAlbanianRelationForm(candidate.relatedForm, relation.relatedForm) ||
+            relation.relatedSourceRecordId !== exactFact.sourceRecordId ||
+            relation.relatedEntryLocator !== exactFact.entryLocator ||
+            comparison.related.sourceRecordId !== exactFact.sourceRecordId ||
+            comparison.related.entryLocator !== exactFact.entryLocator ||
+            !sameNormalizedAlbanianRelationForm(comparison.related.form, exactFact.form) ||
+            !validSourceRelationAssertion(candidate.sourceRelationAssertion,
+              comparison.primary.sourceSenses) ||
+            !sameOrLegacyAssertion(candidate.sourceRelationAssertion, relation.sourceRelationAssertion)) return false;
+        }
+        if (relatedCandidateEvaluations.some((candidate) => isRecord(candidate) &&
+          candidate.sourceRelation === "TARGET_AUTHORED_ETYMOLOGY_REFERENCE" &&
+          (candidate.sourceRelationAssertion !== null || !isRecord(candidate.sourceLinkedComparison) ||
+            !isRecord(candidate.sourceLinkedComparison.relation) ||
+            candidate.sourceLinkedComparison.relation.sourceRelationAssertion !== null))) return false;
+      }
+      if (isRecord(selectedComparison) && isRecord(selectedComparison.relation)) {
+        const selectedRelation = selectedComparison.relation;
+        if (isSourceRelationKind(selectedRelation.relation)) {
+          if (selectedRelation.primarySourceRecordId === exactFact.sourceRecordId) {
+            const matchedEdges = exactEdges.filter((edge) => isRecord(edge) &&
+              edge.relation === selectedRelation.relation &&
+              sameNormalizedAlbanianRelationForm(edge.form, selectedRelation.relatedForm) &&
+              sameOrLegacyAssertion(edge.sourceRelationAssertion, selectedRelation.sourceRelationAssertion));
+            if (matchedEdges.length !== 1 || selectedRelation.primaryEntryLocator !== exactFact.entryLocator) return false;
+          } else {
+            const matchedCandidates = sourceCandidates.filter((candidate) => isRecord(candidate) &&
+              isRecord(candidate.sourceLinkedComparison) && isRecord(candidate.sourceLinkedComparison.relation) &&
+              candidate.sourceLinkedComparison.relation.primarySourceRecordId === selectedRelation.primarySourceRecordId &&
+              candidate.sourceLinkedComparison.relation.primaryEntryLocator === selectedRelation.primaryEntryLocator &&
+              candidate.sourceLinkedComparison.relation.relation === selectedRelation.relation &&
+              sameNormalizedAlbanianRelationForm(candidate.sourceLinkedComparison.relation.relatedForm, selectedRelation.relatedForm) &&
+              sameOrLegacyAssertion(candidate.sourceRelationAssertion, selectedRelation.sourceRelationAssertion));
+            if (matchedCandidates.length !== 1) return false;
+          }
+        } else if (selectedRelation.relation === "TARGET_AUTHORED_ETYMOLOGY_REFERENCE" &&
+          selectedRelation.sourceRelationAssertion !== null && selectedRelation.sourceRelationAssertion !== undefined) {
+          return false;
+        }
+      }
+      return true;
+    };
     const validFunctionalFamilyReading = (() => {
       const family = reading.functionalFamilyReading;
       if (family === undefined || family === null) return true; // Older payloads have no family projection.
@@ -2181,6 +2515,7 @@ function parseMotivationDiscoveryV0_1(
       validRelatedCandidateEvaluations &&
       validFunctionalFamilyReading &&
       validOccupationalRoleResearchCandidateBatch(reading.occupationalRoleResearchCandidates) &&
+      validRelationOwnershipBindings() &&
       (reading.interpretation.status === "EXPLORATORY_ZHEJI_READING" || reading.interpretation.status === "UNKNOWN_OR_NULL") &&
       (reading.interpretation.statement === null || typeof reading.interpretation.statement === "string") &&
       isStringArray(reading.interpretation.alternatives) &&
