@@ -1,5 +1,13 @@
 import { GET, POST } from "@/app/api/analyze-v1/route";
 
+jest.mock("@/lib/runAnalysisDeterministic", () => {
+  const actual = jest.requireActual("@/lib/runAnalysisDeterministic");
+  return {
+    ...actual,
+    runAnalysisDeterministic: jest.fn(actual.runAnalysisDeterministic),
+  };
+});
+
 jest.mock("@/shared/openInstrument/motivationEngineDiscoveryServerOnly.v0_1", () => {
   const actual = jest.requireActual(
     "@/shared/openInstrument/motivationEngineDiscoveryServerOnly.v0_1",
@@ -574,6 +582,7 @@ describe("analyze-v1 Albanian lexical reading reachability", () => {
   const originalMode = process.env.OPEN_INSTRUMENT_PUBLIC_BETA_MODE;
 
   afterEach(() => {
+    jest.clearAllMocks();
     if (originalMode === undefined) delete process.env.OPEN_INSTRUMENT_PUBLIC_BETA_MODE;
     else process.env.OPEN_INSTRUMENT_PUBLIC_BETA_MODE = originalMode;
   });
@@ -713,6 +722,17 @@ describe("analyze-v1 Albanian lexical reading reachability", () => {
     expect(duplicateResponse.status).toBe(400);
     expect(await duplicateResponse.json()).toMatchObject({ reason: "DUPLICATE_ALBANIAN_SOURCE_RECORD_ID" });
 
+    const duplicatePostResponse = await POST(new Request("http://localhost/api/analyze-v1", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: '{"word":"krye","language":"sq","alphabet":"albanian","providerExecution":"disabled","albanianSourceRecordId":"kaikki-albanian-jsonl:word=krye:ordinal=0","albanianSourceRecordId":"kaikki-albanian-jsonl:word=krye:ordinal=1"}',
+    }));
+    expect(duplicatePostResponse.status).toBe(400);
+    expect(await duplicatePostResponse.json()).toMatchObject({ reason: "DUPLICATE_ALBANIAN_SOURCE_RECORD_ID" });
+
+    const runAnalysisMock = jest.requireMock("@/lib/runAnalysisDeterministic")
+      .runAnalysisDeterministic as jest.Mock;
+    runAnalysisMock.mockClear();
     const nonAlbanianResponse = await POST(new Request("http://localhost/api/analyze-v1", {
       method: "POST",
       headers: { "content-type": "application/json" },
@@ -727,6 +747,7 @@ describe("analyze-v1 Albanian lexical reading reachability", () => {
     expect(await nonAlbanianResponse.json()).toMatchObject({
       reason: "ALBANIAN_SOURCE_RECORD_SELECTOR_REQUIRES_ALBANIAN_INPUT",
     });
+    expect(runAnalysisMock).not.toHaveBeenCalled();
   });
 
   it.each([

@@ -114,6 +114,96 @@ function isValidAlbanianSourceRecordIdInputV0_1(value: unknown): value is string
     value.trim() === value && !/[\u0000-\u001f\u007f]/u.test(value);
 }
 
+function isAlbanianSourceRecordSelectionInputV0_1(
+  language: unknown,
+  alphabet: unknown,
+): boolean {
+  return [language, alphabet].some((value) => {
+    if (typeof value !== "string") return false;
+    const normalized = value.normalize("NFC").trim().toLocaleLowerCase("en-US");
+    return normalized === "sq" || normalized === "albanian";
+  });
+}
+
+function hasDuplicateTopLevelJsonPropertyV0_1(
+  json: string,
+  propertyName: string,
+): boolean {
+  let cursor = 0;
+  const skipWhitespace = () => {
+    while (/\s/u.test(json[cursor] ?? "")) cursor += 1;
+  };
+
+  skipWhitespace();
+  if (json[cursor] !== "{") return false;
+  cursor += 1;
+  let found = false;
+
+  while (cursor < json.length) {
+    skipWhitespace();
+    if (json[cursor] === "}") return false;
+    if (json[cursor] !== '"') return false;
+
+    const keyStart = cursor;
+    cursor += 1;
+    while (cursor < json.length) {
+      if (json[cursor] === "\\") {
+        cursor += 2;
+      } else if (json[cursor] === '"') {
+        cursor += 1;
+        break;
+      } else {
+        cursor += 1;
+      }
+    }
+
+    let key: unknown;
+    try {
+      key = JSON.parse(json.slice(keyStart, cursor));
+    } catch {
+      return false;
+    }
+    skipWhitespace();
+    if (json[cursor] !== ":") return false;
+    cursor += 1;
+    if (key === propertyName) {
+      if (found) return true;
+      found = true;
+    }
+
+    let nesting = 0;
+    let inString = false;
+    while (cursor < json.length) {
+      const char = json[cursor];
+      if (inString) {
+        if (char === "\\") {
+          cursor += 2;
+          continue;
+        }
+        if (char === '"') inString = false;
+      } else if (char === '"') {
+        inString = true;
+      } else if (char === "{" || char === "[") {
+        nesting += 1;
+      } else if (char === "}" || char === "]") {
+        if (nesting === 0) break;
+        nesting -= 1;
+      } else if (char === "," && nesting === 0) {
+        break;
+      }
+      cursor += 1;
+    }
+
+    if (json[cursor] === ",") {
+      cursor += 1;
+      continue;
+    }
+    return false;
+  }
+
+  return false;
+}
+
 function classifyPostBodyFailureV0_1(
   body: unknown,
 ): AnalyzeV1InvalidRequestReasonV0_1 {
@@ -1442,12 +1532,6 @@ async function runAnalyzeV1Orchestration(
         value.normalize("NFC").trim().toLocaleLowerCase("en-US") === "sq" ||
         value.normalize("NFC").trim().toLocaleLowerCase("en-US") === "albanian",
       );
-      if (albanianSourceRecordId !== undefined && !isAlbanianDiscoveryInput) {
-        return invalidRequestResponseV0_1(
-          '"albanianSourceRecordId" can only be used for an Albanian analysis.',
-          "ALBANIAN_SOURCE_RECORD_SELECTOR_REQUIRES_ALBANIAN_INPUT",
-        );
-      }
       const discoveryResult = !publicBetaDeterministicOnly && providerExecution === "disabled" && !isAlbanianDiscoveryInput
         ? {
             discovery: projectMotivationEngineDiscoverySourceFamiliesV0_1(
@@ -1507,6 +1591,7 @@ export async function POST(req: Request) {
   const gatesOn = applyDevOriginClaimGates(req.url);
 
   let body: unknown;
+  let rawBodyText: string | undefined;
   if (req.body === undefined && typeof (req as Request & { json?: unknown }).json === "function") {
     // Preserve compatibility with minimal test doubles; real Request objects
     // use the bounded byte-stream path below.
@@ -1527,6 +1612,7 @@ export async function POST(req: Request) {
       return publicBetaRequestTooLargeResponseV0_1(boundedBody.reason);
     }
     try {
+      rawBodyText = boundedBody.text;
       body = JSON.parse(boundedBody.text) as unknown;
     } catch {
       return invalidRequestResponseV0_1(
@@ -1534,6 +1620,16 @@ export async function POST(req: Request) {
         "MALFORMED_JSON",
       );
     }
+  }
+
+  if (
+    rawBodyText !== undefined &&
+    hasDuplicateTopLevelJsonPropertyV0_1(rawBodyText, "albanianSourceRecordId")
+  ) {
+    return invalidRequestResponseV0_1(
+      'Supply "albanianSourceRecordId" at most once.',
+      "DUPLICATE_ALBANIAN_SOURCE_RECORD_ID",
+    );
   }
 
   const parsed = BodySchema.safeParse(body);
@@ -1618,6 +1714,16 @@ export async function POST(req: Request) {
     );
   }
   const alphabetParsed = normalizedAlphabet.value;
+
+  if (
+    albanianSourceRecordId !== undefined &&
+    !isAlbanianSourceRecordSelectionInputV0_1(language, alphabetParsed)
+  ) {
+    return invalidRequestResponseV0_1(
+      '"albanianSourceRecordId" can only be used with an explicitly Albanian language or alphabet.',
+      "ALBANIAN_SOURCE_RECORD_SELECTOR_REQUIRES_ALBANIAN_INPUT",
+    );
+  }
 
   const normalizedProviderExecution = normalizeProviderExecutionV0_1(
     providerExecutionRaw,
@@ -1763,6 +1869,16 @@ if (!word) {
     );
   }
   const alphabetParsed = normalizedAlphabet.value;
+
+  if (
+    albanianSourceRecordId !== undefined &&
+    !isAlbanianSourceRecordSelectionInputV0_1(language, alphabetParsed)
+  ) {
+    return invalidRequestResponseV0_1(
+      '"albanianSourceRecordId" can only be used with an explicitly Albanian language or alphabet.',
+      "ALBANIAN_SOURCE_RECORD_SELECTOR_REQUIRES_ALBANIAN_INPUT",
+    );
+  }
 
   const normalizedProviderExecution = normalizeProviderExecutionV0_1(
     providerExecutionRaw,
