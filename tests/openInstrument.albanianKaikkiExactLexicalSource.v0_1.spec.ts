@@ -682,6 +682,7 @@ type SyntheticSourceRecordV0_1 = Readonly<{
   senses: readonly Readonly<{
     id?: string | null;
     glosses: readonly string[];
+    synonyms?: readonly (string | Readonly<{ word?: unknown }>)[];
     categories?: readonly Readonly<{
       name: string;
       kind?: string;
@@ -4355,6 +4356,66 @@ describe("real Albanian exact lexical source integration v0.1", () => {
     });
   });
 
+  it("projects raw Kaikki synonym objects under their owning senses through the indexed provider", async () => {
+    await withSyntheticSourceFileV0_1([
+      {
+        word: "zanatçi",
+        lang_code: "sq",
+        pos: "noun",
+        senses: [
+          {
+            id: "en-zanatçi-sq-noun-j1cZU1Us",
+            glosses: ["craftsman, artisan"],
+            synonyms: [{ word: "zejtar" }, { word: "" }, { word: 42 }],
+          },
+          {
+            id: "en-zanatçi-sq-noun-AzycDuJd",
+            glosses: ["master, expert"],
+            synonyms: ["mjeshtër"],
+          },
+        ],
+        sounds: [],
+      },
+      {
+        word: "veprues",
+        lang_code: "sq",
+        pos: "noun",
+        senses: [{ id: "en-veprues-sq-noun-KfI-FzAy", glosses: ["actor, actress"], synonyms: [{ word: "aktor" }] }],
+        sounds: [],
+      },
+      {
+        word: "mjek",
+        lang_code: "sq",
+        pos: "noun",
+        senses: [{ id: "en-mjek-sq-noun-fixture", glosses: ["doctor, medic"], synonyms: [{ word: "doktor" }] }],
+        sounds: [],
+      },
+    ], async ({ provider }) => {
+      const zanatci = await provider.query("zanatçi");
+      const veprues = await provider.query("veprues");
+      const mjek = await provider.query("mjek");
+
+      expect(zanatci).toMatchObject({
+        status: "MATCHES_FOUND",
+        facts: [{
+          form: "zanatçi",
+          senses: [
+            { senseId: "en-zanatçi-sq-noun-j1cZU1Us", synonyms: ["zejtar"] },
+            { senseId: "en-zanatçi-sq-noun-AzycDuJd", synonyms: ["mjeshtër"] },
+          ],
+        }],
+      });
+      expect(veprues).toMatchObject({
+        status: "MATCHES_FOUND",
+        facts: [{ senses: [{ senseId: "en-veprues-sq-noun-KfI-FzAy", synonyms: ["aktor"] }] }],
+      });
+      expect(mjek).toMatchObject({
+        status: "MATCHES_FOUND",
+        facts: [{ senses: [{ senseId: "en-mjek-sq-noun-fixture", synonyms: ["doktor"] }] }],
+      });
+    });
+  });
+
   it("preserves Ë, ë, and Y lookup identity and returns explicit Null for a miss", async () => {
     await withSyntheticSourceFileV0_1(indexedFixtureRecordsV0_1, async ({ provider }) => {
       const decomposedDrite = await provider.query("DRIT" + "E\u0308");
@@ -5661,6 +5722,34 @@ describe("real Albanian exact lexical source integration v0.1", () => {
 const pinnedAlbanianSourceTestV0_1 = process.env[ALBANIAN_KAIKKI_LEXICAL_SOURCE_PATH_ENV_V0_1]
   ? it
   : it.skip;
+
+describe("pinned Albanian raw synonym projection v0.1", () => {
+  pinnedAlbanianSourceTestV0_1("projects the requested real-source synonym objects without flattening senses", async () => {
+    const provider = await createAlbanianKaikkiServerOnlyExactLexicalSourceProviderV0_1(
+      process.env[ALBANIAN_KAIKKI_LEXICAL_SOURCE_PATH_ENV_V0_1],
+    );
+    const results = await Promise.all(["zanatçi", "veprues", "mjek"].map((word) => provider.query(word)));
+    const zanatci = results[0];
+    const veprues = results[1];
+    const mjek = results[2];
+
+    expect(zanatci).toMatchObject({ status: "MATCHES_FOUND" });
+    if (zanatci.status !== "MATCHES_FOUND") return;
+    const zanatciFact = zanatci.facts.find((fact) => fact.form === "zanatçi" && fact.partOfSpeech !== "name");
+    expect(zanatciFact).toBeDefined();
+    expect(zanatciFact?.senses).toEqual(expect.arrayContaining([
+      expect.objectContaining({ synonyms: ["zejtar"] }),
+      expect.objectContaining({ synonyms: ["mjeshtër"] }),
+    ]));
+
+    expect(veprues).toMatchObject({ status: "MATCHES_FOUND", facts: [{ senses: expect.arrayContaining([
+      expect.objectContaining({ synonyms: ["aktor"] }),
+    ]) }] });
+    expect(mjek).toMatchObject({ status: "MATCHES_FOUND", facts: [{ senses: expect.arrayContaining([
+      expect.objectContaining({ synonyms: ["doktor"] }),
+    ]) }] });
+  });
+});
 
 describe("pinned Albanian sense-owned source relation provenance v0.3", () => {
   pinnedAlbanianSourceTestV0_1.each([
