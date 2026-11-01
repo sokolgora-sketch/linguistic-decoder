@@ -53,12 +53,17 @@ export type AlbaNetSourceRecordV0_1 = Readonly<{
   entryLocator: string;
 }>;
 
+export type AlbaNetSourceFamilyAdapterV0_1 = GenericFunctionalWitnessSourceAdapterV1 & Readonly<{
+  /** All exact lemma matches, including synsets that have no definition. */
+  getLemmaRecords: (lemma: string) => readonly AlbaNetSourceRecordV0_1[];
+}>;
+
 export type AlbaNetSourceLoadResultV0_1 = Readonly<
   | {
       status: "READY";
       sourcePath: string;
       records: readonly AlbaNetSourceRecordV0_1[];
-      adapter: GenericFunctionalWitnessSourceAdapterV1;
+      adapter: AlbaNetSourceFamilyAdapterV0_1;
     }
   | {
       status: "UNAVAILABLE";
@@ -216,7 +221,7 @@ function projectRecordV0_1(
 
 export function createAlbaNetSourceFamilyAdapterV0_1(
   records: readonly AlbaNetSourceRecordV0_1[],
-): GenericFunctionalWitnessSourceAdapterV1 {
+): AlbaNetSourceFamilyAdapterV0_1 {
   const recordsByLemma = new Map<string, readonly AlbaNetSourceRecordV0_1[]>();
   for (const record of records) {
     const key = normalizeAlbaNetLemmaV0_1(record.lemma);
@@ -229,6 +234,9 @@ export function createAlbaNetSourceFamilyAdapterV0_1(
   return Object.freeze({
     adapterId: ALBANET_SOURCE_FAMILY_ADAPTER_ID_V0_1,
     candidateVoicePathPolicy: "NULL_UNAUTHORIZED" as const,
+    getLemmaRecords(lemma: string): readonly AlbaNetSourceRecordV0_1[] {
+      return recordsByLemma.get(normalizeAlbaNetLemmaV0_1(lemma)) ?? Object.freeze([]);
+    },
     query(input: GenericFunctionalWitnessQueryV1): GenericFunctionalWitnessSourceAdapterResultV1 {
       const recordsForLemma = recordsByLemma.get(normalizeAlbaNetLemmaV0_1(input.embryo)) ?? [];
       return {

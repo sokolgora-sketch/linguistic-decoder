@@ -21,10 +21,13 @@ import {
   ALBANET_SOURCE_TITLE_V0_1,
 } from "@/shared/openInstrument/albanetSourceIdentity.v0_1";
 import {
+  ALBANIAN_SENSE_ALIGNED_LEXICAL_ROLE_ALTERNATIVES_V0_1,
+  ALBANIAN_SENSE_ALIGNED_LEXICAL_ROLE_CLAIM_BOUNDARY_V0_1,
   ALBANIAN_SENSE_ALIGNED_LEXICAL_ROLE_LINEAGE_STATUS_V0_1,
   ALBANIAN_SENSE_ALIGNED_LEXICAL_ROLE_PREDICATE_ID_V0_1,
   ALBANIAN_SENSE_ALIGNED_LEXICAL_ROLE_REVIEWED_DEFINITIONS_V0_1,
   ALBANIAN_SENSE_ALIGNED_LEXICAL_ROLE_SCHEMA_V0_1,
+  ALBANIAN_SENSE_ALIGNED_LEXICAL_ROLE_STATEMENT_V0_1,
 } from "@/shared/openInstrument/albanianSenseAlignedLexicalRolePolicy.v0_1";
 /**
  * UI contract adapter: raw analyze-v1 payload → TelemetryViewModel (VM).
@@ -1426,10 +1429,14 @@ function parseMotivationDiscoveryV0_1(
         (value.status !== "SUPPORTED" && value.status !== "NULL") ||
         (value.targetSourceRecordId !== null && typeof value.targetSourceRecordId !== "string") ||
         !Array.isArray(value.candidates) || !isStringArray(value.reasonCodes) ||
-        !isStringArray(value.alternatives) ||
+        !Array.isArray(value.alternatives) ||
+        value.alternatives.length !== ALBANIAN_SENSE_ALIGNED_LEXICAL_ROLE_ALTERNATIVES_V0_1.length ||
+        !value.alternatives.every((alternative, index) =>
+          alternative === ALBANIAN_SENSE_ALIGNED_LEXICAL_ROLE_ALTERNATIVES_V0_1[index]) ||
         value.lineageIndependence !== ALBANIAN_SENSE_ALIGNED_LEXICAL_ROLE_LINEAGE_STATUS_V0_1 ||
         value.functionalOperation !== null || value.noSingleWinner !== true ||
-        value.userDecisionPosture !== "user_decides" || typeof value.claimBoundary !== "string") return false;
+        value.userDecisionPosture !== "user_decides" ||
+        value.claimBoundary !== ALBANIAN_SENSE_ALIGNED_LEXICAL_ROLE_CLAIM_BOUNDARY_V0_1) return false;
 
       const exactFacts = Array.isArray(exactSourceFacts) ? exactSourceFacts : [];
       let supportedCount = 0;
@@ -1516,8 +1523,10 @@ function parseMotivationDiscoveryV0_1(
           );
           if (candidate.inference.roleLabel !== "HUMAN_ROLE" ||
             candidate.inference.predicateId !== ALBANIAN_SENSE_ALIGNED_LEXICAL_ROLE_PREDICATE_ID_V0_1 ||
-            typeof candidate.inference.statement !== "string" || candidate.reasonCodes.length !== 0 ||
-            !reviewedRule || sourceSenseId === null || ownerOccurrences.length !== 1 ||
+            candidate.inference.statement !== ALBANIAN_SENSE_ALIGNED_LEXICAL_ROLE_STATEMENT_V0_1 ||
+            candidate.reasonCodes.length !== 0 || !reviewedRule || sourceSenseId === null ||
+            linkedFacts[0].senses.filter((sense) => isRecord(sense) && sense.senseId === sourceSenseId).length !== 1 ||
+            ownerOccurrences.length !== 1 ||
             ownerOccurrences[0]?.senseOrdinal !== sourceSenseOrdinal ||
             ownerOccurrences[0]?.synonymOrdinal !== synonymOrdinal) return false;
         } else if (candidate.inference.status !== "UNKNOWN_OR_NULL" ||

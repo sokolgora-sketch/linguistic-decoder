@@ -29,6 +29,7 @@ import {
 import {
   normalizeAlbaNetLemmaV0_1,
   getProductionAlbaNetSourceV0_1,
+  type AlbaNetSourceFamilyAdapterV0_1,
 } from "@/shared/openInstrument/albanetSourceFamilyAdapter.v0_1";
 import {
   ALBANET_SOURCE_FAMILY_ID_V0_1,
@@ -38,10 +39,13 @@ import {
   ALBANET_SOURCE_TITLE_V0_1,
 } from "@/shared/openInstrument/albanetSourceIdentity.v0_1";
 import {
+  ALBANIAN_SENSE_ALIGNED_LEXICAL_ROLE_ALTERNATIVES_V0_1,
+  ALBANIAN_SENSE_ALIGNED_LEXICAL_ROLE_CLAIM_BOUNDARY_V0_1,
   ALBANIAN_SENSE_ALIGNED_LEXICAL_ROLE_LINEAGE_STATUS_V0_1,
   ALBANIAN_SENSE_ALIGNED_LEXICAL_ROLE_PREDICATE_ID_V0_1,
   ALBANIAN_SENSE_ALIGNED_LEXICAL_ROLE_REVIEWED_DEFINITIONS_V0_1,
   ALBANIAN_SENSE_ALIGNED_LEXICAL_ROLE_SCHEMA_V0_1,
+  ALBANIAN_SENSE_ALIGNED_LEXICAL_ROLE_STATEMENT_V0_1,
 } from "@/shared/openInstrument/albanianSenseAlignedLexicalRolePolicy.v0_1";
 import {
   getProductionLexinSourceV0_1,
@@ -3037,15 +3041,12 @@ function nullSenseAlignedLexicalRoleEvidenceV0_1(
     targetSourceRecordId,
     candidates: Object.freeze([]),
     reasonCodes: Object.freeze([...reasonCodes]),
-    alternatives: Object.freeze([
-      "No unique sense-owned synonym to qualified AlbaNet definition path is available.",
-      "No morphology, historical derivation, embryo function, Seven-Voices meaning, or functional operation is inferred.",
-    ]),
+    alternatives: ALBANIAN_SENSE_ALIGNED_LEXICAL_ROLE_ALTERNATIVES_V0_1,
     lineageIndependence: ALBANIAN_SENSE_ALIGNED_LEXICAL_ROLE_LINEAGE_STATUS_V0_1,
     functionalOperation: null,
     noSingleWinner: true,
     userDecisionPosture: "user_decides",
-    claimBoundary: "This evidence path can label a specifically aligned lexical sense as a human role only when its exact AlbaNet definition has a reviewed rule. It never authorizes a functional operation.",
+    claimBoundary: ALBANIAN_SENSE_ALIGNED_LEXICAL_ROLE_CLAIM_BOUNDARY_V0_1,
   });
 }
 
@@ -3053,7 +3054,7 @@ async function buildAlbanianSenseAlignedLexicalRoleEvidenceV0_1(input: Readonly<
   word: string;
   facts: readonly AlbanianKaikkiExactLexicalSourceFactV0_1[];
   sourceStatus: AlbanianKaikkiExactLexicalSourceStatusV0_1;
-  albanetSourceAdapter: GenericFunctionalWitnessSourceAdapterV1 | null;
+  albanetSourceAdapter: AlbaNetSourceFamilyAdapterV0_1 | null;
 }>): Promise<AlbanianSenseAlignedLexicalRoleEvidenceV0_1> {
   if (input.sourceStatus.status !== "MATCHES_FOUND") {
     return nullSenseAlignedLexicalRoleEvidenceV0_1([
@@ -3189,6 +3190,19 @@ async function buildAlbanianSenseAlignedLexicalRoleEvidenceV0_1(input: Readonly<
     if (pending.preflightReason) return unresolved(pending.preflightReason);
     if (pending.synonym === null) return unresolved("SOURCE_SENSE_SYNONYM_MISSING");
 
+    let sourceLemmaRecordCount: number;
+    try {
+      sourceLemmaRecordCount = input.albanetSourceAdapter!.getLemmaRecords(pending.synonym).length;
+    } catch {
+      return unresolved("ALBANET_ADAPTER_QUERY_FAILED");
+    }
+    if (sourceLemmaRecordCount === 0) {
+      return unresolved("ALBANET_LEMMA_NOT_FOUND_OR_DEFINITION_MISSING");
+    }
+    if (sourceLemmaRecordCount !== 1) {
+      return unresolved("ALBANET_LEMMA_SYNSET_AMBIGUOUS");
+    }
+
     let adapterResult: GenericFunctionalWitnessSourceAdapterResultV1;
     try {
       adapterResult = input.albanetSourceAdapter!.query({
@@ -3266,7 +3280,7 @@ async function buildAlbanianSenseAlignedLexicalRoleEvidenceV0_1(input: Readonly<
         status: "SUPPORTED" as const,
         roleLabel: rule.roleLabel,
         predicateId: rule.predicateId,
-        statement: `This exact Kaikki sense is linked through its source-owned synonym to the reviewed AlbaNet definition, which supports the lexical label ${rule.roleLabel}.`,
+        statement: ALBANIAN_SENSE_ALIGNED_LEXICAL_ROLE_STATEMENT_V0_1,
       }),
       functionalOperation: null,
       reasonCodes: Object.freeze([]),
@@ -3281,17 +3295,12 @@ async function buildAlbanianSenseAlignedLexicalRoleEvidenceV0_1(input: Readonly<
     reasonCodes: hasSupportedCandidate ? Object.freeze([]) : Object.freeze([
       ...new Set(candidates.flatMap((candidate) => [...candidate.reasonCodes])),
     ]),
-    alternatives: Object.freeze([
-      "Each result remains attached to its exact Kaikki sense; another sense of the same word is not merged into it.",
-      "Kaikki and AlbaNet lineage independence is not established by these records.",
-      "The lexical role label does not imply morphology, historical derivation, embryo function, or Seven-Voices meaning.",
-      "No functional operation is classified; functionalOperation remains Null.",
-    ]),
+    alternatives: ALBANIAN_SENSE_ALIGNED_LEXICAL_ROLE_ALTERNATIVES_V0_1,
     lineageIndependence: ALBANIAN_SENSE_ALIGNED_LEXICAL_ROLE_LINEAGE_STATUS_V0_1,
     functionalOperation: null,
     noSingleWinner: true,
     userDecisionPosture: "user_decides",
-    claimBoundary: "A reviewed exact-definition predicate can label a uniquely linked source sense as HUMAN_ROLE. The label is lexical and sense-specific; it does not authorize the existing AGENT operation or any morphology, historical, embryo, or Seven-Voices claim.",
+    claimBoundary: ALBANIAN_SENSE_ALIGNED_LEXICAL_ROLE_CLAIM_BOUNDARY_V0_1,
   });
 }
 
@@ -3301,7 +3310,7 @@ async function buildAlbanianLexicalReadingV0_1(input: Readonly<{
   analyses: readonly AlbanianKaikkiSourceIpaSevenVoiceAnalysisV0_1[];
   sourceStatus: AlbanianKaikkiExactLexicalSourceStatusV0_1;
   provider: AlbanianKaikkiServerOnlyExactLexicalSourceProviderV0_1;
-  albanetSourceAdapter: GenericFunctionalWitnessSourceAdapterV1 | null;
+  albanetSourceAdapter: AlbaNetSourceFamilyAdapterV0_1 | null;
 }>): Promise<AlbanianLexicalReadingV0_1> {
   const fiveWindowsComparison = await buildFiveWindowsComparisonV0_1({
     word: input.word,
@@ -3643,7 +3652,7 @@ export async function buildMotivationEngineDiscoveryServerOnlyV0_1(input: {
   profileDerivedVoicePath?: readonly string[] | null;
   provider?: EnglishKaikkiServerOnlyExactIndexProviderV0_1;
   albanianLexicalSourceProvider?: AlbanianKaikkiServerOnlyExactLexicalSourceProviderV0_1;
-  albanetSourceAdapter?: GenericFunctionalWitnessSourceAdapterV1 | null;
+  albanetSourceAdapter?: AlbaNetSourceFamilyAdapterV0_1 | null;
   lexinSourceAdapter?: GenericFunctionalWitnessSourceAdapterV1 | null;
 }): Promise<MotivationEngineDiscoveryServerOnlyResultV0_1> {
   const provider = input.provider ?? await getProductionProviderV0_1();

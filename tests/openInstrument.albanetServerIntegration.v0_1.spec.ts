@@ -28,7 +28,6 @@ import {
   type AlbaNetSourceRecordV0_1,
   type AlbaNetSourceLoadResultV0_1,
 } from "@/shared/openInstrument/albanetSourceFamilyAdapter.v0_1";
-import type { GenericFunctionalWitnessSourceAdapterV1 } from "@/shared/openInstrument/genericFunctionalWitnessDiscovery.v1";
 import { adaptAnalysisToTelemetryVM } from "@/ui/instrument/contractAdapter";
 import { MotivationDiscoveryCardV0_1 } from "@/ui/instrument/sections/MotivationDiscoveryCard.v0_1";
 import { cleanup, render, screen } from "@testing-library/react";
@@ -125,8 +124,7 @@ describe("AlbaNet server-only Discovery integration v0.1", () => {
       relationTypes: ["als:def", "als:exe", "als:lemma"],
       entryLocator: "wns/als/wn-data-als.tab#synset=00000001-n;lemma=di",
     }];
-    const albanetSourceAdapter: GenericFunctionalWitnessSourceAdapterV1 =
-      createAlbaNetSourceFamilyAdapterV0_1(records);
+    const albanetSourceAdapter = createAlbaNetSourceFamilyAdapterV0_1(records);
     const word = "study";
     const heart = buildHeartInstrumentV1(word);
 

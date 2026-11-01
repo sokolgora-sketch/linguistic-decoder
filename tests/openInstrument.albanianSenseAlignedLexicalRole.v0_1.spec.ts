@@ -223,6 +223,43 @@ describe("sense-aligned Albanian lexical role evidence v0.1", () => {
     };
     expect(adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: forgedDiscovery }).motivationDiscoveryV0_1)
       .toMatchObject({ kind: "missing" });
+
+    const duplicateSenseIdDiscovery = {
+      ...discovery,
+      exactLexicalSourceFacts: discovery.exactLexicalSourceFacts.map((sourceFact) => ({
+        ...sourceFact,
+        senses: sourceFact.senses.map((sense, index) => index === 1
+          ? { ...sense, senseId: sourceFact.senses[0]?.senseId ?? null }
+          : sense),
+      })),
+    };
+    expect(adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: duplicateSenseIdDiscovery }).motivationDiscoveryV0_1)
+      .toMatchObject({ kind: "missing" });
+
+    const forgedClaimBoundary = {
+      ...discovery,
+      albanianLexicalReading: {
+        ...readingValue,
+        senseAlignedLexicalRole: { ...role, claimBoundary: "This proves the productive -çi suffix is an AGENT operation." },
+      },
+    };
+    expect(adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: forgedClaimBoundary }).motivationDiscoveryV0_1)
+      .toMatchObject({ kind: "missing" });
+
+    const forgedStatement = {
+      ...discovery,
+      albanianLexicalReading: {
+        ...readingValue,
+        senseAlignedLexicalRole: {
+          ...role,
+          candidates: role.candidates.map((candidate) => candidate === supportedCandidate
+            ? { ...candidate, inference: { ...candidate.inference, statement: "The Seven Voices prove this suffix means worker." } }
+            : candidate),
+        },
+      },
+    };
+    expect(adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: forgedStatement }).motivationDiscoveryV0_1)
+      .toMatchObject({ kind: "missing" });
   });
 
   it("generalizes through veprues sense 1 → aktor without selecting a functional operation", async () => {
@@ -306,6 +343,18 @@ describe("sense-aligned Albanian lexical role evidence v0.1", () => {
     expect(ambiguous.albanianLexicalReading?.senseAlignedLexicalRole).toMatchObject({
       status: "NULL",
       candidates: [{ reasonCodes: ["ALBANET_LEMMA_SYNSET_AMBIGUOUS"], crossSourceFact: null }],
+    });
+
+    const hiddenDefinitionlessAmbiguity = await discover("zanatçi", kaikkiFact("zanatçi", [
+      sourceSense("sense-hidden-ambiguity", ["craftsman"], ["zejtar"]),
+    ]), [
+      albanetRecord("09974648-n", "zejtar", "një punëtor i afte qe praktikon një zanat"),
+      { ...albanetRecord("10020890-n", "zejtar", "placeholder"), definitions: [] },
+    ]);
+    expect(hiddenDefinitionlessAmbiguity.albanianLexicalReading?.senseAlignedLexicalRole).toMatchObject({
+      status: "NULL",
+      candidates: [{ reasonCodes: ["ALBANET_LEMMA_SYNSET_AMBIGUOUS"], crossSourceFact: null }],
+      functionalOperation: null,
     });
 
     const unreviewed = await discover("zanatçi", kaikkiFact("zanatçi", [
