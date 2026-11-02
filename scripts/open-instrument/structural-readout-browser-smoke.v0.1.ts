@@ -17,6 +17,7 @@ type SmokeCase = {
 
 type InteractionPhase = "BEFORE_FIRST_ANALYZE" | "DURING_ANALYZE" | "AFTER_ANALYZE";
 type ResourceClass = "EXTERNAL_REQUEST" | "API_CALL" | "ROUTE" | "ASSET" | "LOCAL_RESOURCE";
+type ConsoleClassification = "UNCLASSIFIED" | "EXPECTED_OPTIONAL_FVR_NOT_AVAILABLE";
 
 type InteractionContext = {
   index: number;
@@ -40,16 +41,23 @@ type HttpErrorDiagnostic = {
   resourceType: string;
   resourceClass: ResourceClass;
   timing: InteractionTiming;
+  responseBodyStatus: string | null;
+  responseConceptId: string | null;
+  expectedOptionalFvrNotAvailable: boolean;
 };
 
 type ConsoleDiagnostic = {
+  diagnosticIndex: number;
   type: string;
   message: string;
+  classification: ConsoleClassification;
+  matchedHttpErrorIndex: number | null;
   location: { url: string; lineNumber: number; columnNumber: number };
   timing: InteractionTiming;
 };
 
 type CaseResult = {
+  analyzeInteractionIndex: number;
   word: string;
   viewport: "desktop" | "mobile";
   expectedVoices: string;
@@ -115,6 +123,9 @@ const CASES: SmokeCase[] = [
 
 const ALBANIAN_DIGRAPHS = new Set(["dh", "gj", "ll", "nj", "rr", "sh", "th", "xh", "zh"]);
 const PAGE_TIMEOUT_MS = 60_000;
+const EXPECTED_OPTIONAL_FVR_404_CONSOLE =
+  "Failed to load resource: the server responded with a status of 404 (Not Found)";
+const STRUCTURAL_SMOKE_WORDS = new Set(CASES.map((testCase) => exactWord(testCase.word)));
 
 function assert(condition: unknown, message: string): asserts condition {
   if (!condition) throw new Error(message);
@@ -263,6 +274,7 @@ async function main(): Promise<void> {
   const consoleErrors: string[] = [];
   const consoleDiagnostics: ConsoleDiagnostic[] = [];
   const httpErrors: HttpErrorDiagnostic[] = [];
+  const httpResponseInspections: Promise<void>[] = [];
   let currentInteraction: InteractionContext | null = null;
   const pageErrors: string[] = [];
   const hydrationErrors: string[] = [];
@@ -295,8 +307,11 @@ async function main(): Promise<void> {
       const location = message.location();
       consoleErrors.push(text);
       consoleDiagnostics.push({
+        diagnosticIndex: consoleDiagnostics.length,
         type: message.type(),
         message: text,
+        classification: "UNCLASSIFIED",
+        matchedHttpErrorIndex: null,
         location: {
           url: location.url,
           lineNumber: location.lineNumber,
@@ -313,7 +328,7 @@ async function main(): Promise<void> {
       if (status < 400) return;
       const request = response.request();
       const requestUrl = new URL(request.url());
-      httpErrors.push({
+      const diagnostic: HttpErrorDiagnostic = {
         status,
         url: request.url(),
         path: `${requestUrl.pathname}${requestUrl.search}`,
@@ -321,7 +336,40 @@ async function main(): Promise<void> {
         resourceType: request.resourceType(),
         resourceClass: classifyResource(request, localOrigin),
         timing: timingForInteraction(currentInteraction),
-      });
+        responseBodyStatus: null,
+        responseConceptId: null,
+        expectedOptionalFvrNotAvailable: false,
+      };
+      httpErrors.push(diagnostic);
+      // This exact optional research route uses 404/not_available for concepts without an admitted FVR cohort.
+      // Validate its JSON response and the current smoke input before classifying it as expected.
+      if (
+        status === 404 &&
+        request.method() === "GET" &&
+        request.resourceType() === "fetch" &&
+        requestUrl.origin === localOrigin &&
+        requestUrl.pathname === "/api/research/fvr"
+      ) {
+        httpResponseInspections.push((async () => {
+          try {
+            const body = await response.json() as Record<string, unknown>;
+            const queryConcept = requestUrl.searchParams.get("concept");
+            diagnostic.responseBodyStatus =
+              typeof body.status === "string" ? body.status : null;
+            diagnostic.responseConceptId =
+              typeof body.conceptId === "string" ? body.conceptId : null;
+            diagnostic.expectedOptionalFvrNotAvailable =
+              diagnostic.resourceClass === "API_CALL" &&
+              diagnostic.responseBodyStatus === "not_available" &&
+              queryConcept !== null &&
+              queryConcept === queryConcept.normalize("NFC").trim() &&
+              diagnostic.responseConceptId === queryConcept &&
+              STRUCTURAL_SMOKE_WORDS.has(exactWord(queryConcept));
+          } catch {
+            diagnostic.expectedOptionalFvrNotAvailable = false;
+          }
+        })());
+      }
     });
     page.on("pageerror", (error) => pageErrors.push(error.message.slice(0, 500)));
     page.on("requestfailed", (request) => {
@@ -348,6 +396,7 @@ async function main(): Promise<void> {
         ? []
         : expectedGraphemes(testCase.word).map((grapheme) => grapheme.toLocaleUpperCase("en-US"));
       const result: CaseResult = {
+        analyzeInteractionIndex: report.analyzeInteractions + 1,
         word: testCase.word,
         viewport,
         expectedVoices: expectedVoicePath,
@@ -512,12 +561,7 @@ async function main(): Promise<void> {
         result.localRequestFailures = localRequestFailures.slice(requestFailureOffset);
         result.httpErrors = httpErrors.slice(httpErrorOffset);
         result.consoleDiagnostics = consoleDiagnostics.slice(consoleDiagnosticOffset);
-        assert(
-          result.httpErrors.length === 0,
-          `HTTP error response(s) for ${testCase.word}: ${result.httpErrors.map((item) => `${item.status} ${item.method} ${item.url} [${item.resourceClass}]`).join("; ")}`,
-        );
         assert(pageErrors.length === pageErrorOffset, `Browser runtime error for ${testCase.word}: ${pageErrors.slice(pageErrorOffset).join("; ")}`);
-        assert(consoleErrors.length === consoleOffset, `Browser console error for ${testCase.word}: ${consoleErrors.slice(consoleOffset).join("; ")}`);
         assert(result.hydrationErrors.length === 0, `Hydration error for ${testCase.word}: ${result.hydrationErrors.join("; ")}`);
         assert(result.localRequestFailures.length === 0, `Local request failed for ${testCase.word}: ${result.localRequestFailures.join("; ")}`);
         result.outcome = "PASS";
@@ -550,16 +594,70 @@ async function main(): Promise<void> {
     const mobileCase = CASES.find((testCase) => testCase.word === "ËNDËRR");
     assert(mobileCase, "The unfamiliar-word mobile case is missing.");
     await runCase(mobileCase, "mobile");
+    await page.waitForTimeout(150);
+    await Promise.all(httpResponseInspections);
+
+    for (const [httpErrorIndex, httpError] of httpErrors.entries()) {
+      if (!httpError.expectedOptionalFvrNotAvailable) continue;
+      const matchingConsoleError = consoleDiagnostics.find((diagnostic) =>
+        diagnostic.classification === "UNCLASSIFIED" &&
+        diagnostic.message === EXPECTED_OPTIONAL_FVR_404_CONSOLE &&
+        diagnostic.timing.interactionIndex === httpError.timing.interactionIndex
+      );
+      if (matchingConsoleError) {
+        matchingConsoleError.classification = "EXPECTED_OPTIONAL_FVR_NOT_AVAILABLE";
+        matchingConsoleError.matchedHttpErrorIndex = httpErrorIndex;
+      }
+    }
+
+    const unexpectedHttpErrors = httpErrors.filter(
+      (diagnostic) => !diagnostic.expectedOptionalFvrNotAvailable,
+    );
+    const unexpectedConsoleDiagnostics = consoleDiagnostics.filter(
+      (diagnostic) => diagnostic.classification === "UNCLASSIFIED",
+    );
+    for (const result of report.cases) {
+      result.httpErrors = httpErrors.filter(
+        (diagnostic) => diagnostic.timing.interactionIndex === result.analyzeInteractionIndex,
+      );
+      result.consoleDiagnostics = consoleDiagnostics.filter(
+        (diagnostic) => diagnostic.timing.interactionIndex === result.analyzeInteractionIndex,
+      );
+      const optionalConsoleCount = result.consoleDiagnostics.filter(
+        (diagnostic) => diagnostic.classification === "EXPECTED_OPTIONAL_FVR_NOT_AVAILABLE",
+      ).length;
+      let optionalMessagesToRemove = optionalConsoleCount;
+      result.browserErrors = result.browserErrors.filter((message) => {
+        if (message === EXPECTED_OPTIONAL_FVR_404_CONSOLE && optionalMessagesToRemove > 0) {
+          optionalMessagesToRemove -= 1;
+          return false;
+        }
+        return true;
+      });
+      const caseFailures = [
+        ...result.httpErrors
+          .filter((diagnostic) => !diagnostic.expectedOptionalFvrNotAvailable)
+          .map((diagnostic) => `Unexpected HTTP ${diagnostic.status} ${diagnostic.method} ${diagnostic.url} [${diagnostic.resourceClass}]`),
+        ...result.consoleDiagnostics
+          .filter((diagnostic) => diagnostic.classification === "UNCLASSIFIED")
+          .map((diagnostic) => `Unexpected console error: ${diagnostic.message} at ${diagnostic.location.url}:${diagnostic.location.lineNumber}:${diagnostic.location.columnNumber}`),
+      ];
+      if (caseFailures.length > 0) {
+        result.outcome = "FAIL";
+        result.failure = [result.failure, ...caseFailures].filter(Boolean).join("; ").slice(0, 1000);
+      }
+    }
 
     if (blockedExternalHosts.size > 0) {
       report.fatalError = `Unexpected external requests were blocked: ${[...blockedExternalHosts].sort().join(", ")}`;
     }
-    if (httpErrors.length > 0) {
-      const details = httpErrors.map((item) => `${item.status} ${item.method} ${item.url} [${item.resourceClass}, ${item.resourceType}, ${item.timing.phase} #${item.timing.interactionIndex ?? "none"} +${item.timing.offsetFromAnalyzeMs ?? "n/a"}ms]`);
+    if (unexpectedHttpErrors.length > 0) {
+      const details = unexpectedHttpErrors.map((item) => `${item.status} ${item.method} ${item.url} [${item.resourceClass}, ${item.resourceType}, ${item.timing.phase} #${item.timing.interactionIndex ?? "none"} +${item.timing.offsetFromAnalyzeMs ?? "n/a"}ms]`);
       report.fatalError = [report.fatalError, ...details].filter(Boolean).join("; ");
     }
-    if (pageErrors.length > 0 || hydrationErrors.length > 0 || consoleErrors.length > 0) {
-      report.fatalError = [report.fatalError, ...pageErrors, ...hydrationErrors, ...consoleErrors].filter(Boolean).join("; ");
+    if (pageErrors.length > 0 || hydrationErrors.length > 0 || unexpectedConsoleDiagnostics.length > 0) {
+      const details = unexpectedConsoleDiagnostics.map((item) => `${item.message} at ${item.location.url}:${item.location.lineNumber}:${item.location.columnNumber}`);
+      report.fatalError = [report.fatalError, ...pageErrors, ...hydrationErrors, ...details].filter(Boolean).join("; ");
     }
     if (report.analyzeInteractions !== 15) {
       report.fatalError = [report.fatalError, `Expected 15 Analyze interactions, observed ${report.analyzeInteractions}.`].filter(Boolean).join("; ");
@@ -592,6 +690,8 @@ async function main(): Promise<void> {
     await writeFile(join(artifactDirectory, "result-matrix.json"), `${JSON.stringify(report, null, 2)}\n`, "utf8");
   }
 
+  console.log(`HTTP_ERROR_DIAGNOSTICS=${JSON.stringify(report.httpErrors)}`);
+  console.log(`CONSOLE_ERROR_DIAGNOSTICS=${JSON.stringify(report.consoleDiagnostics)}`);
   assert(report.outcome === "PASS", `Hosted structural browser smoke ${report.outcome}: ${report.fatalError ?? "one or more cases failed"}`);
   assert(report.analyzeInteractions === 15, `Expected 15 Analyze interactions, observed ${report.analyzeInteractions}.`);
   console.log(`STRUCTURAL_BROWSER_SMOKE=${report.outcome}`);
