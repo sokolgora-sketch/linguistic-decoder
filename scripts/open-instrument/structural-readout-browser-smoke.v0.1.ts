@@ -3,7 +3,7 @@
 import { mkdir, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, relative } from "node:path";
-import { chromium, type Browser, type Page } from "playwright";
+import { chromium, type Browser, type Page, type Request } from "playwright";
 import { startNextServer } from "../../tests/helpers/ownedNextServer";
 
 type SmokeCase = {
@@ -13,6 +13,40 @@ type SmokeCase = {
   expectedSourceSegmentation?: string;
   screenshot?: boolean;
   unsupportedStructuralInput?: boolean;
+};
+
+type InteractionPhase = "BEFORE_FIRST_ANALYZE" | "DURING_ANALYZE" | "AFTER_ANALYZE";
+type ResourceClass = "EXTERNAL_REQUEST" | "API_CALL" | "ROUTE" | "ASSET" | "LOCAL_RESOURCE";
+
+type InteractionContext = {
+  index: number;
+  word: string;
+  startedAt: number;
+  completedAt: number | null;
+};
+
+type InteractionTiming = {
+  interactionIndex: number | null;
+  word: string | null;
+  phase: InteractionPhase;
+  offsetFromAnalyzeMs: number | null;
+};
+
+type HttpErrorDiagnostic = {
+  status: number;
+  url: string;
+  path: string;
+  method: string;
+  resourceType: string;
+  resourceClass: ResourceClass;
+  timing: InteractionTiming;
+};
+
+type ConsoleDiagnostic = {
+  type: string;
+  message: string;
+  location: { url: string; lineNumber: number; columnNumber: number };
+  timing: InteractionTiming;
 };
 
 type CaseResult = {
@@ -37,6 +71,8 @@ type CaseResult = {
   browserErrors: string[];
   hydrationErrors: string[];
   localRequestFailures: string[];
+  httpErrors: HttpErrorDiagnostic[];
+  consoleDiagnostics: ConsoleDiagnostic[];
   screenshot: string | null;
   outcome: "PASS" | "FAIL";
   failure: string | null;
@@ -44,13 +80,15 @@ type CaseResult = {
 
 type SmokeReport = {
   schemaVersion: "pr2283.hosted-structural-browser-smoke.v0.1";
-  expectedHead: string;
+  currentHead: string | null;
   expectedMain: string;
   page: string;
   browser: { name: string; version: string } | null;
   analyzeInteractions: number;
   blockedExternalHosts: string[];
   consoleErrors: string[];
+  consoleDiagnostics: ConsoleDiagnostic[];
+  httpErrors: HttpErrorDiagnostic[];
   pageErrors: string[];
   hydrationErrors: string[];
   cases: CaseResult[];
@@ -152,6 +190,37 @@ function validateRenderedComponents(word: string, graphemes: string[], alternati
   }
 }
 
+function classifyResource(request: Request, localOrigin: string): ResourceClass {
+  const requestUrl = new URL(request.url());
+  const resourceType = request.resourceType();
+  if (requestUrl.origin !== localOrigin) return "EXTERNAL_REQUEST";
+  if (requestUrl.pathname.startsWith("/api/") || resourceType === "xhr" || resourceType === "fetch") return "API_CALL";
+  if (resourceType === "document") return "ROUTE";
+  if (
+    ["font", "image", "media", "manifest", "script", "stylesheet"].includes(resourceType) ||
+    requestUrl.pathname.startsWith("/_next/") ||
+    /\.(?:css|mjs?|png|jpe?g|gif|svg|ico|woff2?|ttf|eot)$/iu.test(requestUrl.pathname)
+  ) return "ASSET";
+  return "LOCAL_RESOURCE";
+}
+
+function timingForInteraction(interaction: InteractionContext | null): InteractionTiming {
+  if (!interaction) {
+    return {
+      interactionIndex: null,
+      word: null,
+      phase: "BEFORE_FIRST_ANALYZE",
+      offsetFromAnalyzeMs: null,
+    };
+  }
+  return {
+    interactionIndex: interaction.index,
+    word: interaction.word,
+    phase: interaction.completedAt === null ? "DURING_ANALYZE" : "AFTER_ANALYZE",
+    offsetFromAnalyzeMs: Math.max(0, Date.now() - interaction.startedAt),
+  };
+}
+
 function nestedApiWord(value: unknown): string | null {
   if (typeof value !== "object" || value === null) return null;
   const record = value as Record<string, unknown>;
@@ -171,13 +240,15 @@ async function main(): Promise<void> {
 
   const report: SmokeReport = {
     schemaVersion: "pr2283.hosted-structural-browser-smoke.v0.1",
-    expectedHead: "94fa7f2a0db1ee3cacf4fd63703f0c8bc18cfe6a",
+    currentHead: process.env.OPEN_INSTRUMENT_PR_HEAD ?? null,
     expectedMain: "ca821ffc55b4a4c00947010fcaf6a7444926e3fb",
     page: "/chat?debug=1",
     browser: null,
     analyzeInteractions: 0,
     blockedExternalHosts: [],
     consoleErrors: [],
+    consoleDiagnostics: [],
+    httpErrors: [],
     pageErrors: [],
     hydrationErrors: [],
     cases: [],
@@ -190,11 +261,18 @@ async function main(): Promise<void> {
   let page: Page | undefined;
   const blockedExternalHosts = new Set<string>();
   const consoleErrors: string[] = [];
+  const consoleDiagnostics: ConsoleDiagnostic[] = [];
+  const httpErrors: HttpErrorDiagnostic[] = [];
+  let currentInteraction: InteractionContext | null = null;
   const pageErrors: string[] = [];
   const hydrationErrors: string[] = [];
   const localRequestFailures: string[] = [];
 
   try {
+    assert(
+      report.currentHead !== null && /^[a-f0-9]{40}$/iu.test(report.currentHead),
+      "OPEN_INSTRUMENT_PR_HEAD must contain the exact 40-character GitHub PR head SHA.",
+    );
     server = await startNextServer("start");
     const localOrigin = new URL(server.base).origin;
     browser = await chromium.launch({ headless: true });
@@ -214,10 +292,36 @@ async function main(): Promise<void> {
     page.on("console", (message) => {
       if (message.type() !== "error") return;
       const text = message.text().slice(0, 500);
+      const location = message.location();
       consoleErrors.push(text);
+      consoleDiagnostics.push({
+        type: message.type(),
+        message: text,
+        location: {
+          url: location.url,
+          lineNumber: location.lineNumber,
+          columnNumber: location.columnNumber,
+        },
+        timing: timingForInteraction(currentInteraction),
+      });
       if (/hydration|hydrated|server html|text content does not match/iu.test(text)) {
         hydrationErrors.push(text);
       }
+    });
+    page.on("response", (response) => {
+      const status = response.status();
+      if (status < 400) return;
+      const request = response.request();
+      const requestUrl = new URL(request.url());
+      httpErrors.push({
+        status,
+        url: request.url(),
+        path: `${requestUrl.pathname}${requestUrl.search}`,
+        method: request.method(),
+        resourceType: request.resourceType(),
+        resourceClass: classifyResource(request, localOrigin),
+        timing: timingForInteraction(currentInteraction),
+      });
     });
     page.on("pageerror", (error) => pageErrors.push(error.message.slice(0, 500)));
     page.on("requestfailed", (request) => {
@@ -265,11 +369,15 @@ async function main(): Promise<void> {
         browserErrors: [],
         hydrationErrors: [],
         localRequestFailures: [],
+        httpErrors: [],
+        consoleDiagnostics: [],
         screenshot: null,
         outcome: "FAIL",
         failure: null,
       };
       const consoleOffset = consoleErrors.length;
+      const consoleDiagnosticOffset = consoleDiagnostics.length;
+      const httpErrorOffset = httpErrors.length;
       const pageErrorOffset = pageErrors.length;
       const hydrationOffset = hydrationErrors.length;
       const requestFailureOffset = localRequestFailures.length;
@@ -283,8 +391,14 @@ async function main(): Promise<void> {
           return candidateUrl.origin === localOrigin &&
             candidateUrl.pathname === "/api/analyze-v1";
         }, { timeout: PAGE_TIMEOUT_MS });
-        await page.getByRole("button", { name: "Analyze" }).click();
         report.analyzeInteractions += 1;
+        currentInteraction = {
+          index: report.analyzeInteractions,
+          word: testCase.word,
+          startedAt: Date.now(),
+          completedAt: null,
+        };
+        await page.getByRole("button", { name: "Analyze" }).click();
         const apiResponse = await apiResponsePromise;
         result.apiStatus = apiResponse.status();
         assert(apiResponse.ok(), `Analyze API returned HTTP ${apiResponse.status()} for ${testCase.word}.`);
@@ -396,6 +510,12 @@ async function main(): Promise<void> {
         result.browserErrors = [...consoleErrors.slice(consoleOffset), ...pageErrors.slice(pageErrorOffset)];
         result.hydrationErrors = hydrationErrors.slice(hydrationOffset);
         result.localRequestFailures = localRequestFailures.slice(requestFailureOffset);
+        result.httpErrors = httpErrors.slice(httpErrorOffset);
+        result.consoleDiagnostics = consoleDiagnostics.slice(consoleDiagnosticOffset);
+        assert(
+          result.httpErrors.length === 0,
+          `HTTP error response(s) for ${testCase.word}: ${result.httpErrors.map((item) => `${item.status} ${item.method} ${item.url} [${item.resourceClass}]`).join("; ")}`,
+        );
         assert(pageErrors.length === pageErrorOffset, `Browser runtime error for ${testCase.word}: ${pageErrors.slice(pageErrorOffset).join("; ")}`);
         assert(consoleErrors.length === consoleOffset, `Browser console error for ${testCase.word}: ${consoleErrors.slice(consoleOffset).join("; ")}`);
         assert(result.hydrationErrors.length === 0, `Hydration error for ${testCase.word}: ${result.hydrationErrors.join("; ")}`);
@@ -406,6 +526,8 @@ async function main(): Promise<void> {
         result.browserErrors = [...consoleErrors.slice(consoleOffset), ...pageErrors.slice(pageErrorOffset)];
         result.hydrationErrors = hydrationErrors.slice(hydrationOffset);
         result.localRequestFailures = localRequestFailures.slice(requestFailureOffset);
+        result.httpErrors = httpErrors.slice(httpErrorOffset);
+        result.consoleDiagnostics = consoleDiagnostics.slice(consoleDiagnosticOffset);
         if (page) {
           try {
             const failureName = `${safeSlug(testCase.word)}.${viewport}.failure.png`;
@@ -418,6 +540,7 @@ async function main(): Promise<void> {
         }
       }
       report.cases.push(result);
+      if (currentInteraction) currentInteraction.completedAt = Date.now();
       console.log(`${viewport.toUpperCase()}_${safeSlug(testCase.word)}=${result.outcome}`);
     };
 
@@ -430,6 +553,10 @@ async function main(): Promise<void> {
 
     if (blockedExternalHosts.size > 0) {
       report.fatalError = `Unexpected external requests were blocked: ${[...blockedExternalHosts].sort().join(", ")}`;
+    }
+    if (httpErrors.length > 0) {
+      const details = httpErrors.map((item) => `${item.status} ${item.method} ${item.url} [${item.resourceClass}, ${item.resourceType}, ${item.timing.phase} #${item.timing.interactionIndex ?? "none"} +${item.timing.offsetFromAnalyzeMs ?? "n/a"}ms]`);
+      report.fatalError = [report.fatalError, ...details].filter(Boolean).join("; ");
     }
     if (pageErrors.length > 0 || hydrationErrors.length > 0 || consoleErrors.length > 0) {
       report.fatalError = [report.fatalError, ...pageErrors, ...hydrationErrors, ...consoleErrors].filter(Boolean).join("; ");
@@ -446,6 +573,8 @@ async function main(): Promise<void> {
   } finally {
     report.blockedExternalHosts = [...blockedExternalHosts].sort();
     report.consoleErrors = consoleErrors;
+    report.consoleDiagnostics = consoleDiagnostics;
+    report.httpErrors = httpErrors;
     report.pageErrors = pageErrors;
     report.hydrationErrors = hydrationErrors;
     if (browser) {

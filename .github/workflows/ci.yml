@@ -131,6 +131,7 @@ jobs:
 
       - name: Open Instrument structural readout browser smoke
         env:
+          OPEN_INSTRUMENT_PR_HEAD: ${{ github.event.pull_request.head.sha || github.sha }}
           OPEN_INSTRUMENT_STRUCTURAL_SMOKE_ARTIFACT_DIR: ${{ runner.temp }}/open-instrument-structural-smoke
         run: npm run open-instrument:structural-browser-smoke
 
