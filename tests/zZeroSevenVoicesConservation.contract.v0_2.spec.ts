@@ -181,4 +181,72 @@ describe("lossless Seven-Voices structural decomposition v0.2", () => {
     ]);
     expect(analysis.hypotheses).toEqual([]);
   });
+
+  it.each(["dh", "gj", "ll", "nj", "rr", "sh", "th", "xh", "zh"])(
+    "segments the Albanian digraph %s as one grapheme with source offsets",
+    (digraph) => {
+      const analysis = analyzeStructuralInputV0_2(digraph.toLocaleUpperCase("en-US"));
+
+      expect(analysis.inputGraphemes).toMatchObject([
+        {
+          grapheme: digraph,
+          graphemeKind: "digraph",
+          basisSpan: { start: 0, end: 2 },
+          sourceSpan: { start: 0, end: 2 },
+          sourcePositions: [0, 1],
+        },
+      ]);
+    },
+  );
+
+  it("keeps Albanian ç as one source-positioned letter", () => {
+    const analysis = analyzeStructuralInputV0_2("Ç");
+
+    expect(analysis.analysisStatus).toBe("analyzed");
+    expect(analysis.inputGraphemes).toMatchObject([
+      {
+        grapheme: "ç",
+        graphemeKind: "single_letter",
+        basisSpan: { start: 0, end: 1 },
+        sourceSpan: { start: 0, end: 1 },
+      },
+    ]);
+  });
+
+  it.each([
+    { word: "SHKRUAJ", voices: ["U", "A"] },
+    { word: "SHKRIM", voices: ["I"] },
+    { word: "SHKRONJË", voices: ["O", "Ë"] },
+  ])("retains the complete vowel path for $word and rejects reductions through SH/NJ", ({
+    word,
+    voices,
+  }) => {
+    const analysis = analyzeStructuralInputV0_2(word);
+
+    expect(analysis.analysisStatus).toBe("analyzed");
+    expect(analysis.inputVoiceSequenceStatus).toBe("complete");
+    expect(analysis.inputVoiceEvents.map((event) => event.voice)).toEqual(voices);
+    expect(analysis.inputVoiceEvents.map((event) => event.order)).toEqual(
+      voices.map((_, index) => index + 1),
+    );
+    expect(analysis.inputGraphemes.map((grapheme) => grapheme.grapheme)).toContain("sh");
+    if (word === "SHKRONJË") {
+      expect(analysis.inputGraphemes.map((grapheme) => grapheme.grapheme)).toContain("nj");
+    }
+    expect(analysis.excludedHypotheses.length).toBeGreaterThan(0);
+    expect(analysis.excludedHypotheses.every(
+      (excluded) => excluded.reasonCode === "albanian_digraph_boundary_split",
+    )).toBe(true);
+
+    for (const hypothesis of analysis.hypotheses) {
+      const decomposition = hypothesis.losslessDecomposition;
+      expect(decomposition.conservation.noDigraphSplit).toBe(true);
+      expect(decomposition.conservation.inputEventIds).toEqual(
+        decomposition.conservation.terminalEventIds,
+      );
+      expect(decomposition.conservation.inputGraphemeIds).toEqual(
+        decomposition.conservation.terminalGraphemeIds,
+      );
+    }
+  });
 });

@@ -27,6 +27,16 @@ export type StructuralVoiceEventV0_2 = {
   pronunciationAuthority: "not_established";
 };
 
+export type AlbanianOrthographicGraphemeV0_2 = {
+  graphemeId: string;
+  grapheme: string;
+  graphemeKind: "single_letter" | "digraph";
+  basisSpan: { start: number; end: number };
+  sourceSpan: { start: number; end: number };
+  sourcePositions: number[];
+  sourcePositionUnit: "unicode_code_point_in_nfc_input";
+};
+
 export type StructuralComponentV0_2 = {
   componentId: string;
   parentComponentId: string | null;
@@ -39,6 +49,8 @@ export type StructuralComponentV0_2 = {
   sourcePositions: number[];
   sourceCharacters: string[];
   sourcePositionUnit: "unicode_code_point_in_nfc_input";
+  graphemeIds: string[];
+  frameStatus: "contains_voice_event" | "consonantal_frame";
   voiceEvents: StructuralVoiceEventV0_2[];
   claimBoundary: "structural_component_only";
   lexicalAttestation: "not_evaluated";
@@ -52,6 +64,7 @@ export type StructuralDecompositionV0_2 = {
   basisPositionUnit: "unicode_code_point_in_normalized_basis";
   sourcePositionUnit: "unicode_code_point_in_nfc_input";
   inputVoiceEvents: StructuralVoiceEventV0_2[];
+  inputGraphemes: AlbanianOrthographicGraphemeV0_2[];
   components: StructuralComponentV0_2[];
   terminalComponentIds: string[];
   reconstructedBasis: string;
@@ -59,7 +72,11 @@ export type StructuralDecompositionV0_2 = {
     status: "complete";
     inputEventIds: string[];
     terminalEventIds: string[];
+    inputGraphemeIds: string[];
+    terminalGraphemeIds: string[];
     eventOrderPreserved: true;
+    graphemeOrderPreserved: true;
+    noDigraphSplit: true;
     noEventsAdded: true;
     noEventsDropped: true;
     normalizedBasisReconstructed: true;
@@ -83,6 +100,14 @@ export type StructuralInputAnalysisV0_2 = {
     | "structural_form_too_long"
     | "conservation_validation_failed";
   inputVoiceEvents: StructuralVoiceEventV0_2[];
+  inputGraphemes: AlbanianOrthographicGraphemeV0_2[];
+  excludedHypotheses: Array<{
+    hypothesisId: string;
+    reasonCode: "albanian_digraph_boundary_split";
+    digraph: string;
+    splitBasisPosition: number;
+    splitSourcePosition: number;
+  }>;
   inputVoiceEventCount: number | null;
   basisPositionUnit: "unicode_code_point_in_normalized_basis";
   sourcePositionUnit: "unicode_code_point_in_nfc_input";
@@ -100,9 +125,57 @@ type NormalizedInputV0_2 = {
   basis: string;
   sourcePositions: number[];
   sourceCharacters: string[];
+  graphemes: AlbanianOrthographicGraphemeV0_2[];
 };
 
 const MAX_STRUCTURAL_FORM_LENGTH_V0_2 = 80;
+const ALBANIAN_DIGRAPHS_V0_2 = new Set([
+  "dh",
+  "gj",
+  "ll",
+  "nj",
+  "rr",
+  "sh",
+  "th",
+  "xh",
+  "zh",
+]);
+
+function segmentAlbanianGraphemesV0_2(
+  basis: string,
+  sourcePositions: readonly number[],
+): AlbanianOrthographicGraphemeV0_2[] {
+  const characters = Array.from(basis);
+  const graphemes: AlbanianOrthographicGraphemeV0_2[] = [];
+
+  for (let index = 0; index < characters.length;) {
+    const firstPosition = sourcePositions[index];
+    if (firstPosition === undefined) return [];
+
+    const pair = `${characters[index] ?? ""}${characters[index + 1] ?? ""}`;
+    const secondPosition = sourcePositions[index + 1];
+    const isDigraph =
+      ALBANIAN_DIGRAPHS_V0_2.has(pair) &&
+      secondPosition === firstPosition + 1;
+    const end = index + (isDigraph ? 2 : 1);
+    const positions = sourcePositions.slice(index, end);
+    const lastPosition = positions.at(-1);
+    if (lastPosition === undefined) return [];
+
+    graphemes.push({
+      graphemeId: `grapheme-${graphemes.length + 1}`,
+      grapheme: characters.slice(index, end).join(""),
+      graphemeKind: isDigraph ? "digraph" : "single_letter",
+      basisSpan: { start: index, end },
+      sourceSpan: { start: firstPosition, end: lastPosition + 1 },
+      sourcePositions: [...positions],
+      sourcePositionUnit: "unicode_code_point_in_nfc_input",
+    });
+    index = end;
+  }
+
+  return graphemes;
+}
 
 function normalizeInputV0_2(value: unknown): NormalizedInputV0_2 {
   const inputForm = String(value ?? "").normalize("NFC");
@@ -111,11 +184,17 @@ function normalizeInputV0_2(value: unknown): NormalizedInputV0_2 {
   const hasUnsupportedUnicodeLetter = Array.from(raw).some(
     (symbol) =>
       /[\p{L}\p{M}]/u.test(symbol) &&
-      !/[a-zë]/u.test(symbol),
+      !/[a-zçë]/u.test(symbol),
   );
 
   if (hasUnsupportedUnicodeLetter) {
-    return { inputForm, basis: "", sourcePositions: [], sourceCharacters: [] };
+    return {
+      inputForm,
+      basis: "",
+      sourcePositions: [],
+      sourceCharacters: [],
+      graphemes: [],
+    };
   }
 
   const leadingTrimLength = inputForm.length - inputForm.trimStart().length;
@@ -126,17 +205,19 @@ function normalizeInputV0_2(value: unknown): NormalizedInputV0_2 {
 
   Array.from(trimmedForm).forEach((sourceCharacter, index) => {
     const normalizedCharacter = sourceCharacter.toLocaleLowerCase("en-US");
-    if (!/^[a-zë]$/u.test(normalizedCharacter)) return;
+    if (!/^[a-zçë]$/u.test(normalizedCharacter)) return;
     basis.push(normalizedCharacter);
     sourcePositions.push(sourceOffset + index);
     sourceCharacters.push(sourceCharacter);
   });
 
+  const normalizedBasis = basis.join("");
   return {
     inputForm,
-    basis: basis.join(""),
+    basis: normalizedBasis,
     sourcePositions,
     sourceCharacters,
+    graphemes: segmentAlbanianGraphemesV0_2(normalizedBasis, sourcePositions),
   };
 }
 
@@ -183,6 +264,13 @@ function decompositionV0_2(
 ): StructuralDecompositionV0_2 | null {
   const basisCharacters = Array.from(normalized.basis);
   const componentSource = (start: number, end: number) => {
+    const validBoundaries = new Set([0, basisCharacters.length]);
+    for (const grapheme of normalized.graphemes) {
+      validBoundaries.add(grapheme.basisSpan.start);
+      validBoundaries.add(grapheme.basisSpan.end);
+    }
+    if (!validBoundaries.has(start) || !validBoundaries.has(end)) return null;
+
     const sourcePositions = normalized.sourcePositions.slice(start, end);
     const sourceCharacters = normalized.sourceCharacters.slice(start, end);
     const first = sourcePositions[0];
@@ -205,6 +293,13 @@ function decompositionV0_2(
   ): StructuralComponentV0_2 | null => {
     const source = componentSource(start, end);
     if (!source) return null;
+    const voiceEvents = inputVoiceEvents.filter(
+      (event) => event.basisPosition >= start && event.basisPosition < end,
+    );
+    const graphemes = normalized.graphemes.filter(
+      (grapheme) =>
+        grapheme.basisSpan.start >= start && grapheme.basisSpan.end <= end,
+    );
     return {
       componentId,
       parentComponentId,
@@ -215,9 +310,9 @@ function decompositionV0_2(
       basisSpan: { start, end },
       ...source,
       sourcePositionUnit: "unicode_code_point_in_nfc_input",
-      voiceEvents: inputVoiceEvents.filter(
-        (event) => event.basisPosition >= start && event.basisPosition < end,
-      ),
+      graphemeIds: graphemes.map((grapheme) => grapheme.graphemeId),
+      frameStatus: voiceEvents.length > 0 ? "contains_voice_event" : "consonantal_frame",
+      voiceEvents,
       claimBoundary: "structural_component_only",
       lexicalAttestation: "not_evaluated",
       meaning: null,
@@ -299,10 +394,17 @@ function decompositionV0_2(
     .sort((left, right) => left.basisPosition - right.basisPosition);
   const inputEventIds = inputVoiceEvents.map((event) => event.eventId);
   const terminalEventIds = terminalEvents.map((event) => event.eventId);
+  const inputGraphemeIds = normalized.graphemes.map((grapheme) => grapheme.graphemeId);
+  const terminalGraphemeIds = terminals
+    .flatMap((component) => component.graphemeIds)
+    .sort((left, right) =>
+      Number(left.slice("grapheme-".length)) - Number(right.slice("grapheme-".length)),
+    );
 
   if (
     reconstructedBasis !== normalized.basis ||
-    JSON.stringify(terminalEventIds) !== JSON.stringify(inputEventIds)
+    JSON.stringify(terminalEventIds) !== JSON.stringify(inputEventIds) ||
+    JSON.stringify(terminalGraphemeIds) !== JSON.stringify(inputGraphemeIds)
   ) {
     return null;
   }
@@ -314,6 +416,7 @@ function decompositionV0_2(
     basisPositionUnit: "unicode_code_point_in_normalized_basis",
     sourcePositionUnit: "unicode_code_point_in_nfc_input",
     inputVoiceEvents: [...inputVoiceEvents],
+    inputGraphemes: [...normalized.graphemes],
     components,
     terminalComponentIds: terminals.map((component) => component.componentId),
     reconstructedBasis,
@@ -321,7 +424,11 @@ function decompositionV0_2(
       status: "complete",
       inputEventIds,
       terminalEventIds,
+      inputGraphemeIds,
+      terminalGraphemeIds,
       eventOrderPreserved: true,
+      graphemeOrderPreserved: true,
+      noDigraphSplit: true,
       noEventsAdded: true,
       noEventsDropped: true,
       normalizedBasisReconstructed: true,
@@ -338,6 +445,8 @@ export function analyzeStructuralInputV0_2(input: string): StructuralInputAnalys
     inputForm: normalized.inputForm,
     normalizedBasis: normalized.basis,
     inputVoiceEvents: [] as StructuralVoiceEventV0_2[],
+    inputGraphemes: normalized.graphemes,
+    excludedHypotheses: [] as StructuralInputAnalysisV0_2["excludedHypotheses"],
     inputVoiceEventCount: null as number | null,
     basisPositionUnit: "unicode_code_point_in_normalized_basis" as const,
     sourcePositionUnit: "unicode_code_point_in_nfc_input" as const,
@@ -369,23 +478,84 @@ export function analyzeStructuralInputV0_2(input: string): StructuralInputAnalys
     };
   }
 
-  const hypotheses = discoverStructuralHypothesesV0_1(input).map((hypothesis) => {
-    if (hypothesis.basis !== normalized.basis) return null;
+  const hypotheses: StructuralHypothesisWithConservationV0_2[] = [];
+  const excludedHypotheses: StructuralInputAnalysisV0_2["excludedHypotheses"] = [];
+  let conservationFailure = false;
+
+  for (const hypothesis of discoverStructuralHypothesesV0_1(input)) {
+    if (hypothesis.basis !== normalized.basis) {
+      conservationFailure = true;
+      continue;
+    }
+
+    const graphemeBoundaries = new Set([0, normalized.sourcePositions.length]);
+    for (const grapheme of normalized.graphemes) {
+      graphemeBoundaries.add(grapheme.basisSpan.start);
+      graphemeBoundaries.add(grapheme.basisSpan.end);
+    }
+    let parentStart = 0;
+    let parentEnd = normalized.sourcePositions.length;
+    let firstSplit: { grapheme: AlbanianOrthographicGraphemeV0_2; position: number } | null = null;
+
+    for (const step of hypothesis.reductionSteps) {
+      const extractedStart = parentStart + step.fromSpan.start;
+      const extractedEnd = parentStart + step.fromSpan.end;
+      const isRightPeel =
+        step.operationId === "peel_right_vowel_led_expansion" ||
+        step.operationId === "peel_right_consonant_led_expansion";
+      const retainedStart = isRightPeel ? parentStart : extractedEnd;
+      const retainedEnd = isRightPeel ? extractedStart : parentEnd;
+      const boundaries = [extractedStart, extractedEnd, retainedStart, retainedEnd];
+      const splitAt = boundaries.find((position) => !graphemeBoundaries.has(position));
+
+      if (splitAt !== undefined) {
+        const grapheme = normalized.graphemes.find(
+          (item) => item.graphemeKind === "digraph" &&
+            item.basisSpan.start < splitAt && item.basisSpan.end > splitAt,
+        );
+        if (grapheme) firstSplit = { grapheme, position: splitAt };
+        break;
+      }
+
+      parentStart = retainedStart;
+      parentEnd = retainedEnd;
+    }
+
+    if (firstSplit) {
+      const sourcePosition = normalized.sourcePositions[firstSplit.position];
+      if (sourcePosition === undefined) {
+        conservationFailure = true;
+        continue;
+      }
+      excludedHypotheses.push({
+        hypothesisId: hypothesis.hypothesisId,
+        reasonCode: "albanian_digraph_boundary_split",
+        digraph: firstSplit.grapheme.grapheme.toLocaleUpperCase("en-US"),
+        splitBasisPosition: firstSplit.position,
+        splitSourcePosition: sourcePosition,
+      });
+      continue;
+    }
+
     const losslessDecomposition = decompositionV0_2(
       normalized,
       inputVoiceEvents,
       hypothesis,
     );
-    return losslessDecomposition
-      ? { ...hypothesis, losslessDecomposition }
-      : null;
-  });
+    if (!losslessDecomposition) {
+      conservationFailure = true;
+      continue;
+    }
+    hypotheses.push({ ...hypothesis, losslessDecomposition });
+  }
 
-  if (hypotheses.some((hypothesis) => hypothesis === null)) {
+  if (conservationFailure) {
     return {
       ...base,
       analysisStatus: "conservation_validation_failed",
       inputVoiceEvents,
+      inputGraphemes: normalized.graphemes,
+      excludedHypotheses,
       inputVoiceEventCount: inputVoiceEvents.length,
       inputVoiceSequenceStatus: "complete",
     };
@@ -395,9 +565,11 @@ export function analyzeStructuralInputV0_2(input: string): StructuralInputAnalys
     ...base,
     analysisStatus: "analyzed",
     inputVoiceEvents,
+    inputGraphemes: normalized.graphemes,
+    excludedHypotheses,
     inputVoiceEventCount: inputVoiceEvents.length,
     inputVoiceSequenceStatus: "complete",
-    hypotheses: hypotheses as StructuralHypothesisWithConservationV0_2[],
+    hypotheses,
   };
 }
 

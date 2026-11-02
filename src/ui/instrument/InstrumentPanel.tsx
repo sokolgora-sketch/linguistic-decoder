@@ -47,6 +47,8 @@ import { OriginClaimCard } from '@/components/OriginClaimCard';
 import { cn } from "@/lib/utils";
 import { safeText } from "./safeText";
 import { MT } from "@/ui/typography/marketingType.v0.1";
+import { adaptAlbanianStructuralEvidenceToVMV0_1 } from "./albanianStructuralEvidenceAdapter.v0_1";
+import { AlbanianStructuralEvidenceCardV0_1 } from "./sections/AlbanianStructuralEvidenceCard.v0_1";
 
 type Props =
   | {
@@ -262,6 +264,11 @@ export function InstrumentPanel(props: Props) {
   }, [inputVm, inputPayload]);
 
   const isValidVm = isTelemetryVm(vm);
+  const structuralInput = props.wordForMask ?? (isValidVm ? vm.readout?.word : "");
+  const albanianStructuralEvidence = React.useMemo(
+    () => adaptAlbanianStructuralEvidenceToVMV0_1(structuralInput),
+    [structuralInput],
+  );
 
   const primaryNullStatus =
     isValidVm &&
@@ -543,6 +550,12 @@ export function InstrumentPanel(props: Props) {
               ) : null}
 
               <PrimaryReadingOrientationCardV0_1 vm={vm} />
+
+              {albanianStructuralEvidence ? (
+                <AlbanianStructuralEvidenceCardV0_1
+                  evidence={albanianStructuralEvidence}
+                />
+              ) : null}
 
               <DoctrineReadingCard doctrineReading={vm.doctrineReading} />
 
