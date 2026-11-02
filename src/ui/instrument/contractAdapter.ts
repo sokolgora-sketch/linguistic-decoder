@@ -95,7 +95,6 @@ import {
 } from "@/shared/openInstrument/functionalMotivationInterpretation.v0_2";
 import {
   getReviewedExternalLexiconProductionSourceRowsV0_1,
-  isReviewedExternalLexiconSourceIdInProductionMembershipV0_1,
 } from "@/shared/reviewedExternalLexiconSourceRowRegistry.v0_1";
 import type {
   GenericFunctionalWitnessRuntimeProjectionV1,
@@ -2859,10 +2858,6 @@ function parseMotivationDiscoveryV0_1(
     const typedCandidate = candidate as unknown as MotivationDiscoveryCandidateV0_1VM;
     const typedSourceFact = typedCandidate.sourceFact;
     const typedComparison = typedCandidate.structuralComparison;
-    const isReviewedLexicalSource =
-      isReviewedExternalLexiconSourceIdInProductionMembershipV0_1(
-        typedSourceFact.sourceId,
-      );
     const sourceProvenance = sourceProvenanceForUi(
       typedSourceFact.sourceId,
       typedSourceFact.sourceProvenance,
@@ -2880,15 +2875,12 @@ function parseMotivationDiscoveryV0_1(
       },
       structuralComparison: {
         ...typedComparison,
-        ...(isReviewedLexicalSource
-          ? {
-              candidateRepresentationKind: "orthographic_profile_derived" as const,
-              representationCompatibility:
-                "NOT_COMPARABLE_ACROSS_REPRESENTATIONS" as const,
-              voiceRelationship:
-                "NOT_COMPARABLE_ACROSS_REPRESENTATIONS" as const,
-            }
-          : {}),
+        // Discovery candidates are lexical source forms. The payload's
+        // representation label is not evidence of a reviewed pronunciation.
+        candidateRepresentationKind: "orthographic_profile_derived",
+        representationCompatibility:
+          "NOT_COMPARABLE_ACROSS_REPRESENTATIONS",
+        voiceRelationship: "NOT_COMPARABLE_ACROSS_REPRESENTATIONS",
         candidateVoicePath,
       },
     });
@@ -2951,35 +2943,23 @@ function projectFunctionalMotivationInterpretationForUiV0_2(
   return {
     ...value,
     candidates: value.candidates.map((candidate) => {
-      const isReviewedLexicalSource =
-        isReviewedExternalLexiconSourceIdInProductionMembershipV0_1(
-          candidate.sourceFact.sourceId,
-        );
       const sourceProvenance = sourceProvenanceForUi(
         candidate.sourceFact.sourceId,
         candidate.sourceFact.sourceProvenance,
       );
-      const hasReviewedSpokenRepresentation =
-        candidate.correspondence.candidateRepresentationKind ===
-          "production_spoken" &&
-        !isReviewedLexicalSource;
-      const correspondence = hasReviewedSpokenRepresentation
-        ? candidate.correspondence
-        : {
-            ...candidate.correspondence,
-            ...(isReviewedLexicalSource
-              ? {
-                  candidateRepresentationKind:
-                    "orthographic_profile_derived" as const,
-                  representationCompatibility:
-                    "NOT_COMPARABLE_ACROSS_REPRESENTATIONS" as const,
-                  voiceRelationship:
-                    "NOT_COMPARABLE_ACROSS_REPRESENTATIONS" as const,
-                }
-              : {}),
-            candidateVoicePath: [],
-            candidateVoicePathStatus: "NULL_UNAUTHORIZED" as const,
-          };
+      // This lexical-source contract carries no independently reviewed
+      // candidate pronunciation mapping. Preserve input-side Voice evidence,
+      // but derive candidate representation and authority fail-closed.
+      const correspondence = {
+        ...candidate.correspondence,
+        candidateRepresentationKind: "orthographic_profile_derived" as const,
+        representationCompatibility:
+          "NOT_COMPARABLE_ACROSS_REPRESENTATIONS" as const,
+        voiceRelationship:
+          "NOT_COMPARABLE_ACROSS_REPRESENTATIONS" as const,
+        candidateVoicePath: [],
+        candidateVoicePathStatus: "NULL_UNAUTHORIZED" as const,
+      };
 
       return {
         ...candidate,

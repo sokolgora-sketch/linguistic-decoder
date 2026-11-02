@@ -51,7 +51,7 @@ describe("analyze-v1 Functional Motivation Interpretation v0.2 boundary", () => 
     )).toBe(true);
   });
 
-  it("does not let an unreviewed production_spoken label authorize a supplied candidate path", async () => {
+  it("does not let caller-supplied spoken labels or authority pass through the UI projection", async () => {
     const payload = await analyze({
       word: "study",
       mode: "strict",
@@ -59,7 +59,7 @@ describe("analyze-v1 Functional Motivation Interpretation v0.2 boundary", () => 
       providerExecution: "disabled",
     });
     const sourceCandidate = payload.motivationDiscoveryV0_1.candidates[0];
-    const forgedCandidate = {
+    const forgedDiscoveryCandidate = {
       ...sourceCandidate,
       candidateVoicePath: ["I"],
       sourceFact: {
@@ -70,24 +70,88 @@ describe("analyze-v1 Functional Motivation Interpretation v0.2 boundary", () => 
       structuralComparison: {
         ...sourceCandidate.structuralComparison,
         candidateRepresentationKind: "production_spoken",
+        representationCompatibility: "SAME_REPRESENTATION",
+        voiceRelationship: "EXACT_ORDERED_VOICE_MATCH",
         candidateVoicePath: ["I"],
+      },
+    };
+    const sourceInterpretationCandidate =
+      payload.functionalMotivationInterpretationV0_2.candidates.find(
+        (candidate: { candidateId: string }) =>
+          candidate.candidateId === sourceCandidate.candidateId,
+      );
+    expect(sourceInterpretationCandidate).toBeDefined();
+    const forgedInterpretationCandidate = {
+      ...sourceInterpretationCandidate,
+      sourceFact: {
+        ...sourceInterpretationCandidate.sourceFact,
+        sourceId: "unreviewed.synthetic.candidate.v0_1",
+        sourceProvenance: undefined,
+      },
+      correspondence: {
+        ...sourceInterpretationCandidate.correspondence,
+        candidateRepresentationKind: "production_spoken",
+        representationCompatibility: "SAME_REPRESENTATION",
+        voiceRelationship: "EXACT_ORDERED_VOICE_MATCH",
+        candidateVoicePath: ["I"],
+        candidateVoicePathStatus: "AUTHORIZED",
       },
     };
     const forgedPayload = {
       ...payload,
       motivationDiscoveryV0_1: {
         ...payload.motivationDiscoveryV0_1,
-        candidates: [forgedCandidate],
+        candidates: [forgedDiscoveryCandidate],
+      },
+      functionalMotivationInterpretationV0_2: {
+        ...payload.functionalMotivationInterpretationV0_2,
+        candidates: [forgedInterpretationCandidate],
       },
     };
 
-    const visible = adaptAnalysisToTelemetryVM(forgedPayload)
-      .motivationDiscoveryV0_1;
-    expect(visible.kind).toBe("present");
-    if (visible.kind !== "present") throw new Error("Expected UI discovery");
-    expect(visible.value.candidates[0].candidateVoicePath).toEqual([]);
-    expect(visible.value.candidates[0].structuralComparison.candidateVoicePath)
-      .toEqual([]);
+    const visible = adaptAnalysisToTelemetryVM(forgedPayload);
+    const visibleDiscovery = visible.motivationDiscoveryV0_1;
+    expect(visibleDiscovery.kind).toBe("present");
+    if (visibleDiscovery.kind !== "present") throw new Error("Expected UI discovery");
+    expect(visibleDiscovery.value.candidates[0]).toMatchObject({
+      candidateVoicePath: [],
+      structuralComparison: {
+        candidateRepresentationKind: "orthographic_profile_derived",
+        representationCompatibility: "NOT_COMPARABLE_ACROSS_REPRESENTATIONS",
+        voiceRelationship: "NOT_COMPARABLE_ACROSS_REPRESENTATIONS",
+        candidateVoicePath: [],
+      },
+    });
+
+    const visibleInterpretation = visible.functionalMotivationInterpretationV0_2;
+    expect(visibleInterpretation.kind).toBe("present");
+    if (visibleInterpretation.kind !== "present") {
+      throw new Error("Expected UI interpretation");
+    }
+    expect(visibleInterpretation.value.candidates[0].correspondence).toMatchObject({
+      candidateRepresentationKind: "orthographic_profile_derived",
+      representationCompatibility: "NOT_COMPARABLE_ACROSS_REPRESENTATIONS",
+      voiceRelationship: "NOT_COMPARABLE_ACROSS_REPRESENTATIONS",
+      candidateVoicePath: [],
+      candidateVoicePathStatus: "NULL_UNAUTHORIZED",
+    });
+    expect(visibleInterpretation.value.candidates[0].correspondence.inputVoicePath)
+      .toEqual(sourceInterpretationCandidate.correspondence.inputVoicePath);
+
+    render(
+      <MotivationDiscoveryCardV0_1
+        discovery={visibleDiscovery}
+        interpretation={visibleInterpretation}
+      />,
+    );
+    expect(screen.getByText("NULL_UNAUTHORIZED")).toBeInTheDocument();
+    expect(screen.queryByText("AUTHORIZED")).not.toBeInTheDocument();
+    expect(
+      screen.getByText("Candidate representation").nextElementSibling,
+    ).toHaveTextContent("orthographic_profile_derived");
+    // Input-side spoken authority remains visible and is not erased by the
+    // candidate-side fail-closed projection.
+    expect(screen.getByText("production_spoken")).toBeInTheDocument();
   });
 
   it("emits an additive structural record while missing target sense stays Null", async () => {
