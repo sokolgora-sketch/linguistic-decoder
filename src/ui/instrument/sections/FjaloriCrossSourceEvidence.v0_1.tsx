@@ -215,9 +215,9 @@ export function FjaloriCrossSourceEvidenceV0_1({ word }: Readonly<{ word: string
             {evidence.hasPartOfSpeech ? " Part-of-speech attribution is not used to align senses." : " No part-of-speech field is available."}
             {" "}The source description remains separate from the existing ZË-RO interpretation and does not change functional operation, AGENT, pronunciation, or embryo interpretation.
           </p>
-          {canonicalWord === "dritare" ? (
+          {canonicalWord === "dritare" && evidence.description ? (
             <aside className="mt-2 rounded border border-[#594a2b] bg-[#19170f] p-2 text-[#e6d9ae]" data-testid="fjalori-dritare-separation">
-              <div><strong>Source-described function:</strong> the FjaloriShqip description says this window opening lets light and air enter.</div>
+              <div><strong>Source-described meaning:</strong> the exact FjaloriShqip Albanian description is shown above as the meaning stated in that record.</div>
               <div className="mt-1"><strong>Existing ZË-RO reading:</strong> remains separately displayed in this Albanian Word Reading panel; this form match does not align its senses.</div>
               <div className="mt-1"><strong>Structure and history:</strong> any source-authored etymology shown by ZË-RO remains attributed source text, not independently verified by this description. Embryo-level function is UNKNOWN_OR_NULL.</div>
             </aside>

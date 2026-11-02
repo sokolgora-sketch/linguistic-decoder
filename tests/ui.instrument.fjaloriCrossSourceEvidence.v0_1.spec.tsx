@@ -86,10 +86,20 @@ describe("FjaloriShqip Albanian meaning evidence v0.1", () => {
     render(<FjaloriCrossSourceEvidenceV0_1 word="dritare" />);
 
     expect(await screen.findByText("Përshkrim i burimit për dritare")).toBeInTheDocument();
-    expect(screen.getByTestId("fjalori-dritare-separation")).toHaveTextContent("lets light and air enter");
+    expect(screen.getByTestId("fjalori-dritare-separation")).toHaveTextContent("the exact FjaloriShqip Albanian description is shown above");
     expect(screen.getByTestId("fjalori-dritare-separation")).toHaveTextContent("displayed in this Albanian Word Reading panel");
     expect(screen.getByTestId("fjalori-dritare-separation")).toHaveTextContent("not independently verified");
     expect(screen.getByTestId("fjalori-dritare-separation")).toHaveTextContent("Embryo-level function is UNKNOWN_OR_NULL");
+    expect(screen.getByTestId("fjalori-dritare-separation")).not.toHaveTextContent("lets light and air enter");
+  });
+
+  it("does not show a dritare source-meaning claim when its description is unavailable", async () => {
+    global.fetch = jest.fn().mockResolvedValue(responseFor("dritare", { description: null })) as unknown as typeof fetch;
+
+    render(<FjaloriCrossSourceEvidenceV0_1 word="dritare" />);
+
+    expect(await screen.findByTestId("fjalori-evidence-null")).toHaveTextContent("no attributable Albanian author description");
+    expect(screen.queryByTestId("fjalori-dritare-separation")).not.toBeInTheDocument();
   });
 
   it("preserves separate entry lineages for duplicate records such as gjitar", async () => {
