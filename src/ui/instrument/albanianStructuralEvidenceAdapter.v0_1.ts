@@ -7,11 +7,10 @@ import {
   ALBANIAN_JETE_SOURCE_RECORD_V0_1,
   ALBANIAN_STRUCTURAL_SOURCE_IDENTITY_V0_1,
   ALBANIAN_STRUCTURAL_SOURCE_RECORDS_V0_1,
-  type AlbanianStructuralBoundaryStatusV0_1,
   type AlbanianStructuralSourceRecordV0_1,
 } from "@/shared/openInstrument/albanianStructuralSourceEvidence.v0_1";
 
-export type AlbanianStructuralComponentVMV0_1 = {
+type AlbanianStructuralComponentVMV0_1 = {
   form: string;
   basisSpan: { start: number; end: number };
   sourceSpan: { start: number; end: number };
@@ -20,71 +19,70 @@ export type AlbanianStructuralComponentVMV0_1 = {
   frameStatus: "contains_voice_event" | "consonantal_frame";
 };
 
+type GhegProposalVMV0_1 = {
+  userProposedStatement: "PLAN + JET → PLANET";
+  proposedForm: "JET";
+  proposalStatus: "USER_HYPOTHESIS";
+  sourceAttestationStatus: "UNKNOWN";
+  sourceBoundaryStatus: "UNKNOWN";
+  proposedOrthographicVoicePath: ["E"];
+  sourceHeadwordForm: "JETË";
+  sourceHeadwordRecordId: string;
+  sourceHeadwordEntryLocator: string;
+  sourceHeadwordLine: number;
+  sourceRegister: "not_marked_by_headword_record";
+  dialectalSenseIds: readonly string[];
+  bareJetFormInThisNounRecord: false;
+  sourceOrthographicVoicePath: ["E", "Ë"];
+  pronunciationAuthority: "not_established";
+  historicalDerivation: "not_claimed";
+};
+
+type SourceSurfaceSegmentationV0_1 = {
+  status: "SOURCE_REPORTED" | "MISMATCH";
+  kind: "prefix" | "suffix";
+  affix: string;
+  sourceField: string;
+  sourceScope: "source_record_level";
+  adjudication: "source_reported_not_independently_adjudicated";
+  boundaryCodePointOffset: number | null;
+  left: AlbanianStructuralComponentVMV0_1 | null;
+  right: AlbanianStructuralComponentVMV0_1 | null;
+  sourceBaseSurfaceAlignment: "EXACT_FORM_RECONSTRUCTION" | "UNKNOWN";
+  explanation: string;
+};
+
 export type AlbanianStructuralEvidenceVMV0_1 = {
-  schemaVersion: "z-zero.albanian-structural-evidence.v0_1";
+  schemaVersion: "z-zero.orthographic-structural-evidence.v0_1";
   inputForm: string;
-  sourceLemma: string;
   analysis: StructuralInputAnalysisV0_2;
-  sourceIdentity: typeof ALBANIAN_STRUCTURAL_SOURCE_IDENTITY_V0_1;
-  sourceRecord: AlbanianStructuralSourceRecordV0_1;
-  surfacePartition: {
-    provenance: "existing_structural_edge_partition" | "source_reported_suffix_boundary";
-    left: AlbanianStructuralComponentVMV0_1;
-    right: AlbanianStructuralComponentVMV0_1;
-    reconstructedForm: string;
-    eventIdsInOrder: string[];
-  };
-  boundaryComparison: {
-    classification: AlbanianStructuralBoundaryStatusV0_1;
-    structuralBoundaryCodePointOffset: number;
-    sourceBoundaryCodePointOffset: number | null;
-    sourceField: string | null;
-    sourceBoundary: string | null;
+  sourceReference: {
+    status: "SAME_FORM_SOURCE_REFERENCE";
+    sourceIdentity: typeof ALBANIAN_STRUCTURAL_SOURCE_IDENTITY_V0_1;
+    sourceRecord: AlbanianStructuralSourceRecordV0_1;
+    sourceSurfaceSegmentation: SourceSurfaceSegmentationV0_1 | null;
+    engineReductionComparison: {
+      status: "MATCHED_ENGINE_REDUCTION" | "NO_MATCHING_REDUCTION" | "UNKNOWN";
+      sourceBoundaryCodePointOffset: number | null;
+      engineBoundaryCodePointOffsets: number[];
+    };
     exactTargetSenseAlignment: "UNKNOWN";
-    explanation: string;
-  };
-  structuralAlternatives: Array<{
-    embryo: string;
-    expansionChain: string[];
-    claimBoundary: "structural_hypothesis_only";
-    functionalSupportStatus: "unknown";
-  }>;
+    ghegProposal: GhegProposalVMV0_1 | null;
+  } | null;
   representationAuthority: "orthographic";
   pronunciationAuthority: "not_established";
+  lexicalIdentity: "not_inferred_from_form";
   historicalOriginClaim: "not_claimed";
-  ghegProposal: {
-    userProposedStatement: "PLAN + JET → PLANET";
-    proposedForm: "JET";
-    proposalStatus: "USER_HYPOTHESIS";
-    sourceAttestationStatus: "UNKNOWN";
-    sourceBoundaryStatus: "UNKNOWN";
-    proposedOrthographicVoicePath: ["E"];
-    sourceHeadwordForm: "JETË";
-    sourceHeadwordRecordId: string;
-    sourceHeadwordEntryLocator: string;
-    sourceHeadwordLine: number;
-    sourceRegister: "not_marked_by_headword_record";
-    dialectalSenseIds: readonly string[];
-    bareJetFormInThisNounRecord: false;
-    sourceOrthographicVoicePath: ["E", "Ë"];
-    pronunciationAuthority: "not_established";
-    historicalDerivation: "not_claimed";
-  } | null;
 };
 
-const STRUCTURAL_PARTITION_OFFSET_V0_1: Record<string, number> = {
-  planet: 4,
-  shkruaj: 5,
-};
-
-function normalizeLookupForm(value: unknown): string | null {
+function exactSourceReferenceKey(value: unknown): string | null {
   if (typeof value !== "string") return null;
-  const normalized = value.normalize("NFC").trim().toLocaleLowerCase("en-US");
+  const key = value.normalize("NFC").trim().toLocaleLowerCase("en-US");
   return Object.prototype.hasOwnProperty.call(
     ALBANIAN_STRUCTURAL_SOURCE_RECORDS_V0_1,
-    normalized,
+    key,
   )
-    ? normalized
+    ? key
     : null;
 }
 
@@ -124,15 +122,112 @@ function componentAt(
   };
 }
 
+function actualEngineBoundaryOffsets(
+  analysis: StructuralInputAnalysisV0_2,
+): number[] {
+  const formLength = Array.from(analysis.normalizedBasis).length;
+  const offsets = new Set<number>();
+
+  for (const hypothesis of analysis.hypotheses) {
+    let parentStart = 0;
+    let parentEnd = formLength;
+    for (const step of hypothesis.reductionSteps) {
+      const extractedStart = parentStart + step.fromSpan.start;
+      const extractedEnd = parentStart + step.fromSpan.end;
+      const isRightPeel =
+        step.operationId === "peel_right_vowel_led_expansion" ||
+        step.operationId === "peel_right_consonant_led_expansion";
+      offsets.add(isRightPeel ? extractedStart : extractedEnd);
+      parentStart = isRightPeel ? parentStart : extractedEnd;
+      parentEnd = isRightPeel ? extractedStart : parentEnd;
+    }
+  }
+
+  return [...offsets].sort((left, right) => left - right);
+}
+
+function sourceSurfaceSegmentation(
+  analysis: StructuralInputAnalysisV0_2,
+  record: AlbanianStructuralSourceRecordV0_1,
+): SourceSurfaceSegmentationV0_1 | null {
+  const morphology = record.morphology;
+  if (!morphology) return null;
+
+  const basis = analysis.normalizedBasis;
+  const affix = morphology.affix.normalize("NFC").toLocaleLowerCase("en-US");
+  const basisLength = Array.from(basis).length;
+  const affixLength = Array.from(affix).length;
+  const matchesSurface = morphology.kind === "prefix"
+    ? basis.startsWith(affix)
+    : basis.endsWith(affix);
+  const boundary = morphology.kind === "prefix" ? affixLength : basisLength - affixLength;
+  const left = matchesSurface ? componentAt(analysis, 0, boundary) : null;
+  const right = matchesSurface ? componentAt(analysis, boundary, basisLength) : null;
+  const sourceBaseSurfaceAlignment = morphology.kind === "prefix"
+    ? `${affix}${morphology.sourceBaseForm}` === basis
+    : `${morphology.sourceBaseForm}${affix}` === basis;
+
+  if (!matchesSurface || !left || !right) {
+    return {
+      status: "MISMATCH",
+      kind: morphology.kind,
+      affix: morphology.affix,
+      sourceField: morphology.sourceField,
+      sourceScope: morphology.sourceScope,
+      adjudication: morphology.adjudication,
+      boundaryCodePointOffset: null,
+      left: null,
+      right: null,
+      sourceBaseSurfaceAlignment: "UNKNOWN",
+      explanation: `The record reports ${morphology.kind} ${morphology.affix}, but it does not yield a grapheme-aligned surface boundary for this form.`,
+    };
+  }
+
+  return {
+    status: "SOURCE_REPORTED",
+    kind: morphology.kind,
+    affix: morphology.affix,
+    sourceField: morphology.sourceField,
+    sourceScope: morphology.sourceScope,
+    adjudication: morphology.adjudication,
+    boundaryCodePointOffset: boundary,
+    left,
+    right,
+    sourceBaseSurfaceAlignment: sourceBaseSurfaceAlignment
+      ? "EXACT_FORM_RECONSTRUCTION"
+      : "UNKNOWN",
+    explanation: sourceBaseSurfaceAlignment
+      ? `The source-reported ${morphology.kind} and base reconstruct this form at record level; this does not establish exact target-sense identity.`
+      : `The source-reported affix matches this surface boundary. The source base is not established as the left surface component, and exact target-sense identity is unknown.`,
+  };
+}
+
+function ghegProposalForPlanet(): GhegProposalVMV0_1 {
+  return {
+    userProposedStatement: "PLAN + JET → PLANET",
+    proposedForm: "JET",
+    proposalStatus: "USER_HYPOTHESIS",
+    sourceAttestationStatus: "UNKNOWN",
+    sourceBoundaryStatus: "UNKNOWN",
+    proposedOrthographicVoicePath: ["E"],
+    sourceHeadwordForm: "JETË",
+    sourceHeadwordRecordId: ALBANIAN_JETE_SOURCE_RECORD_V0_1.sourceRecordId,
+    sourceHeadwordEntryLocator: ALBANIAN_JETE_SOURCE_RECORD_V0_1.entryLocator,
+    sourceHeadwordLine: ALBANIAN_JETE_SOURCE_RECORD_V0_1.sourceFileLine,
+    sourceRegister: ALBANIAN_JETE_SOURCE_RECORD_V0_1.sourceRegister,
+    dialectalSenseIds: ALBANIAN_JETE_SOURCE_RECORD_V0_1.dialectalSenseIds,
+    bareJetFormInThisNounRecord: ALBANIAN_JETE_SOURCE_RECORD_V0_1.bareJetFormInThisNounRecord,
+    sourceOrthographicVoicePath: ["E", "Ë"],
+    pronunciationAuthority: "not_established",
+    historicalDerivation: "not_claimed",
+  };
+}
+
 export function adaptAlbanianStructuralEvidenceToVMV0_1(
   value: unknown,
 ): AlbanianStructuralEvidenceVMV0_1 | null {
-  const lookup = normalizeLookupForm(value);
-  if (!lookup) return null;
-
-  const sourceRecord = ALBANIAN_STRUCTURAL_SOURCE_RECORDS_V0_1[lookup];
-  if (!sourceRecord) return null;
-  const analysis = analyzeStructuralInputV0_2(lookup);
+  if (typeof value !== "string") return null;
+  const analysis = analyzeStructuralInputV0_2(value);
   if (
     analysis.analysisStatus !== "analyzed" ||
     analysis.inputVoiceSequenceStatus !== "complete"
@@ -140,118 +235,45 @@ export function adaptAlbanianStructuralEvidenceToVMV0_1(
     return null;
   }
 
-  const sourceMorphology = sourceRecord.morphology;
-  const rightSurface = sourceMorphology?.kind === "suffix"
-    ? sourceMorphology.affix
+  const referenceKey = exactSourceReferenceKey(value);
+  const sourceRecord = referenceKey
+    ? ALBANIAN_STRUCTURAL_SOURCE_RECORDS_V0_1[referenceKey]
     : null;
-  const splitOffset = rightSurface
-    ? Array.from(analysis.normalizedBasis).length - Array.from(rightSurface).length
-    : STRUCTURAL_PARTITION_OFFSET_V0_1[lookup];
-  if (splitOffset === undefined) return null;
-
-  const left = componentAt(analysis, 0, splitOffset);
-  const right = componentAt(
-    analysis,
-    splitOffset,
-    Array.from(analysis.normalizedBasis).length,
-  );
-  if (!left || !right) return null;
-
-  const reconstructedForm = `${left.form}${right.form}`.toLocaleLowerCase("en-US");
-  const eventIdsInOrder = [...left.voiceEvents, ...right.voiceEvents].map(
-    (event) => event.eventId,
-  );
-  const inputEventIds = analysis.inputVoiceEvents.map((event) => event.eventId);
-  if (
-    reconstructedForm !== analysis.normalizedBasis ||
-    JSON.stringify(eventIdsInOrder) !== JSON.stringify(inputEventIds)
-  ) {
-    return null;
-  }
-
-  let classification: AlbanianStructuralBoundaryStatusV0_1;
-  let sourceBoundaryCodePointOffset: number | null = null;
-  let explanation: string;
-  if (!sourceMorphology) {
-    classification = "STRUCTURAL_ONLY";
-    explanation = sourceRecord.sourceCaveat;
-  } else if (sourceMorphology.kind === "suffix") {
-    sourceBoundaryCodePointOffset = splitOffset;
-    classification = right.form.toLocaleLowerCase("en-US") === sourceMorphology.affix
-      ? "SOURCE_SUPPORTED"
-      : "MISMATCH";
-    explanation = classification === "SOURCE_SUPPORTED"
-      ? `The source-reported suffix -${sourceMorphology.affix} matches the right surface component. The source base form is not established as an exact match for the left component; sense alignment remains unknown.`
-      : `The structural right component does not match the source-reported suffix -${sourceMorphology.affix}.`;
-  } else {
-    sourceBoundaryCodePointOffset = Array.from(sourceMorphology.affix).length;
-    classification = sourceBoundaryCodePointOffset === splitOffset
-      ? "SOURCE_SUPPORTED"
-      : "MISMATCH";
-    explanation = classification === "SOURCE_SUPPORTED"
-      ? `The source-reported prefix ${sourceMorphology.affix}- matches the structural boundary.`
-      : `The structural split SHKRU | AJ differs from the record-level template ${sourceMorphology.affix}- + ${sourceMorphology.sourceBaseForm}. The source record also lists competing etymology accounts.`;
-  }
-
-  const ghegProposal = lookup === "planet"
+  const sourceSegmentation = sourceRecord
+    ? sourceSurfaceSegmentation(analysis, sourceRecord)
+    : null;
+  const engineOffsets = actualEngineBoundaryOffsets(analysis);
+  const sourceBoundary = sourceSegmentation?.status === "SOURCE_REPORTED"
+    ? sourceSegmentation.boundaryCodePointOffset
+    : null;
+  const sourceReference = sourceRecord && referenceKey
     ? {
-        userProposedStatement: "PLAN + JET → PLANET" as const,
-        proposedForm: "JET" as const,
-        proposalStatus: "USER_HYPOTHESIS" as const,
-        sourceAttestationStatus: "UNKNOWN" as const,
-        sourceBoundaryStatus: "UNKNOWN" as const,
-        proposedOrthographicVoicePath: ["E"] as ["E"],
-        sourceHeadwordForm: "JETË" as const,
-        sourceHeadwordRecordId: ALBANIAN_JETE_SOURCE_RECORD_V0_1.sourceRecordId,
-        sourceHeadwordEntryLocator: ALBANIAN_JETE_SOURCE_RECORD_V0_1.entryLocator,
-        sourceHeadwordLine: ALBANIAN_JETE_SOURCE_RECORD_V0_1.sourceFileLine,
-        sourceRegister: ALBANIAN_JETE_SOURCE_RECORD_V0_1.sourceRegister,
-        dialectalSenseIds: ALBANIAN_JETE_SOURCE_RECORD_V0_1.dialectalSenseIds,
-        bareJetFormInThisNounRecord: ALBANIAN_JETE_SOURCE_RECORD_V0_1.bareJetFormInThisNounRecord,
-        sourceOrthographicVoicePath: ["E", "Ë"] as ["E", "Ë"],
-        pronunciationAuthority: "not_established" as const,
-        historicalDerivation: "not_claimed" as const,
+        status: "SAME_FORM_SOURCE_REFERENCE" as const,
+        sourceIdentity: ALBANIAN_STRUCTURAL_SOURCE_IDENTITY_V0_1,
+        sourceRecord,
+        sourceSurfaceSegmentation: sourceSegmentation,
+        engineReductionComparison: {
+          status: sourceBoundary === null
+            ? "UNKNOWN" as const
+            : engineOffsets.includes(sourceBoundary)
+              ? "MATCHED_ENGINE_REDUCTION" as const
+              : "NO_MATCHING_REDUCTION" as const,
+          sourceBoundaryCodePointOffset: sourceBoundary,
+          engineBoundaryCodePointOffsets: engineOffsets,
+        },
+        exactTargetSenseAlignment: "UNKNOWN" as const,
+        ghegProposal: referenceKey === "planet" ? ghegProposalForPlanet() : null,
       }
     : null;
 
   return {
-    schemaVersion: "z-zero.albanian-structural-evidence.v0_1",
+    schemaVersion: "z-zero.orthographic-structural-evidence.v0_1",
     inputForm: analysis.inputForm,
-    sourceLemma: sourceRecord.sourceLemma,
     analysis,
-    sourceIdentity: ALBANIAN_STRUCTURAL_SOURCE_IDENTITY_V0_1,
-    sourceRecord,
-    surfacePartition: {
-      provenance: sourceMorphology?.kind === "suffix"
-        ? "source_reported_suffix_boundary"
-        : "existing_structural_edge_partition",
-      left,
-      right,
-      reconstructedForm,
-      eventIdsInOrder,
-    },
-    boundaryComparison: {
-      classification,
-      structuralBoundaryCodePointOffset: splitOffset,
-      sourceBoundaryCodePointOffset,
-      sourceField: sourceMorphology?.sourceField ?? null,
-      sourceBoundary: sourceMorphology
-        ? sourceMorphology.kind === "suffix"
-          ? `-${sourceMorphology.affix}`
-          : `${sourceMorphology.affix}- + ${sourceMorphology.sourceBaseForm}`
-        : null,
-      exactTargetSenseAlignment: "UNKNOWN",
-      explanation,
-    },
-    structuralAlternatives: analysis.hypotheses.map((hypothesis) => ({
-      embryo: hypothesis.embryo,
-      expansionChain: hypothesis.expansionChain,
-      claimBoundary: "structural_hypothesis_only",
-      functionalSupportStatus: "unknown",
-    })),
+    sourceReference,
     representationAuthority: "orthographic",
     pronunciationAuthority: "not_established",
+    lexicalIdentity: "not_inferred_from_form",
     historicalOriginClaim: "not_claimed",
-    ghegProposal,
   };
 }
