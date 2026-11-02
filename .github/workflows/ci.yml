@@ -37,6 +37,8 @@ jobs:
           echo "1cf20269b3d9516c66b8470b60208699e48e0a3ff78608107054078e91bc6d6d  tests/fixtures/openInstrument/analysis-capability-baseline.v1.json" | sha256sum --check
 
       - name: Check current-runtime Open Instrument regression baseline reproducibility
+        env:
+          OPEN_INSTRUMENT_EXTERNAL_SOURCE_ROOT: ""
         run: npm run open-instrument:analysis-capability-regression-baseline -- --check
 
       - name: Validate Open Instrument provider execution preflight static fixture

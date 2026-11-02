@@ -2863,16 +2863,14 @@ function parseMotivationDiscoveryV0_1(
       isReviewedExternalLexiconSourceIdInProductionMembershipV0_1(
         typedSourceFact.sourceId,
       );
-    const hasReviewedSpokenRepresentation =
-      typedComparison.candidateRepresentationKind === "production_spoken" &&
-      !isReviewedLexicalSource;
     const sourceProvenance = sourceProvenanceForUi(
       typedSourceFact.sourceId,
       typedSourceFact.sourceProvenance,
     );
-    const candidateVoicePath = hasReviewedSpokenRepresentation
-      ? typedCandidate.candidateVoicePath
-      : [];
+    // A caller-supplied representation label is not candidate pronunciation
+    // authority. No reviewed candidate-side pronunciation mapping is carried
+    // by this discovery contract, so keep the UI projection Null.
+    const candidateVoicePath: string[] = [];
     candidates.push({
       ...typedCandidate,
       candidateVoicePath,

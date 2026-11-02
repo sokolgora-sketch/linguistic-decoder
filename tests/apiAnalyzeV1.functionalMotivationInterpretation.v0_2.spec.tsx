@@ -15,6 +15,81 @@ async function analyze(body: Record<string, unknown>) {
 }
 
 describe("analyze-v1 Functional Motivation Interpretation v0.2 boundary", () => {
+  it.each([
+    ["damage", "reviewed.external.gheg-da.damage.candidate.v0_1"],
+    ["study", "reviewed.external.di.knowledge.candidate.v0_1"],
+    ["father", "reviewed.external.albanian-at.father.candidate.v0_1"],
+  ])("keeps raw API and UI candidate Voice paths Null for %s", async (word, sourceId) => {
+    const payload = await analyze({
+      word,
+      mode: "strict",
+      alphabet: "auto",
+      providerExecution: "disabled",
+    });
+    const rawCandidates = payload.motivationDiscoveryV0_1.candidates.filter(
+      (candidate: { sourceFact: { sourceId: string } }) =>
+        candidate.sourceFact.sourceId === sourceId,
+    );
+
+    expect(rawCandidates.length).toBeGreaterThan(0);
+    expect(rawCandidates.every((candidate: {
+      candidateVoicePath: readonly string[];
+      structuralComparison: { candidateVoicePath: readonly string[] };
+    }) => candidate.candidateVoicePath.length === 0 &&
+      candidate.structuralComparison.candidateVoicePath.length === 0)).toBe(true);
+
+    const visible = adaptAnalysisToTelemetryVM(payload).motivationDiscoveryV0_1;
+    expect(visible.kind).toBe("present");
+    if (visible.kind !== "present") throw new Error("Expected UI discovery");
+    const visibleCandidates = visible.value.candidates.filter(
+      (candidate) => candidate.sourceFact.sourceId === sourceId,
+    );
+    expect(visibleCandidates.length).toBeGreaterThan(0);
+    expect(visibleCandidates.every((candidate) =>
+      candidate.candidateVoicePath.length === 0 &&
+      candidate.structuralComparison.candidateVoicePath.length === 0,
+    )).toBe(true);
+  });
+
+  it("does not let an unreviewed production_spoken label authorize a supplied candidate path", async () => {
+    const payload = await analyze({
+      word: "study",
+      mode: "strict",
+      alphabet: "auto",
+      providerExecution: "disabled",
+    });
+    const sourceCandidate = payload.motivationDiscoveryV0_1.candidates[0];
+    const forgedCandidate = {
+      ...sourceCandidate,
+      candidateVoicePath: ["I"],
+      sourceFact: {
+        ...sourceCandidate.sourceFact,
+        sourceId: "unreviewed.synthetic.candidate.v0_1",
+        sourceProvenance: undefined,
+      },
+      structuralComparison: {
+        ...sourceCandidate.structuralComparison,
+        candidateRepresentationKind: "production_spoken",
+        candidateVoicePath: ["I"],
+      },
+    };
+    const forgedPayload = {
+      ...payload,
+      motivationDiscoveryV0_1: {
+        ...payload.motivationDiscoveryV0_1,
+        candidates: [forgedCandidate],
+      },
+    };
+
+    const visible = adaptAnalysisToTelemetryVM(forgedPayload)
+      .motivationDiscoveryV0_1;
+    expect(visible.kind).toBe("present");
+    if (visible.kind !== "present") throw new Error("Expected UI discovery");
+    expect(visible.value.candidates[0].candidateVoicePath).toEqual([]);
+    expect(visible.value.candidates[0].structuralComparison.candidateVoicePath)
+      .toEqual([]);
+  });
+
   it("emits an additive structural record while missing target sense stays Null", async () => {
     const payload = await analyze({
       word: "study",
