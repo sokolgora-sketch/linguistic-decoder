@@ -105,7 +105,7 @@ export function AlbanianStructuralEvidenceCardV0_1({
           </p>
           <p>Source record: {evidence.ghegProposal.sourceHeadwordRecordId}; entry locator: {evidence.ghegProposal.sourceHeadwordEntryLocator}.</p>
           <p>
-            This noun record has dialectal-tagged senses under the written headword {evidence.ghegProposal.sourceHeadwordForm}; it contains no bare JET noun form. This does not establish the proposed spelling's dialect or pronunciation.
+            This noun record has dialectal-tagged senses under the written headword {evidence.ghegProposal.sourceHeadwordForm}; it contains no bare JET noun form. This does not establish the proposed spelling&apos;s dialect or pronunciation.
           </p>
           <p>
             The source does not establish the proposed Gheg form or a historical derivation. Pronunciation authority remains not established.
