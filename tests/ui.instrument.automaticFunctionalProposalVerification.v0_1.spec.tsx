@@ -116,32 +116,15 @@ describe(
         const body =
           await fatherPayload();
 
+        const reviewedAt = body.candidates.find(
+          (candidate: any) =>
+            candidate?.candidateId ===
+            "albanian-at-father-functional",
+        );
+        expect(reviewedAt).toBeTruthy();
+
         body.candidates = [
-          {
-            id:
-              "fixture-reviewed-da",
-            candidateId:
-              "fixture-reviewed-da",
-            language: "sq",
-            candidateLanguage:
-              "sq",
-            form: "DA",
-            displayForm:
-              "DA",
-            embryo: "DA",
-            plainStandaloneGloss:
-              "split / divide",
-            claimType:
-              "functionalMotivation",
-            validationOutcome:
-              "validated",
-            rankGroup:
-              "validatedFunctionalMotivation",
-            sourceKind:
-              "reviewed_dictionary_source",
-            functionalStatement:
-              "fixture reviewed explanation",
-          },
+          reviewedAt,
           proposed({
             id:
               "fixture-proposed-ka-ra",
@@ -170,13 +153,13 @@ describe(
 
         expect(
           screen.getByText(
-            "Evidence: Reviewed",
+            "Evidence: Reviewed lexical bridge · exploratory",
           ),
         ).toBeInTheDocument();
 
         expect(
           screen.getAllByText(
-            "DA",
+            "AT",
           ).length,
         ).toBeGreaterThanOrEqual(
           1,

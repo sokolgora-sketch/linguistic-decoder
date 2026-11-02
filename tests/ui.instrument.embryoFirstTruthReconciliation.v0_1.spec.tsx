@@ -468,21 +468,28 @@ describe(
       ).not.toBeInTheDocument();
     });
 
-    it("does not label an unregistered secondary lexical candidate as reviewed", () => {
+    it("does not trust arbitrary or missing source kinds for primary or secondary functional candidates", () => {
       const payload = realStudyShape();
-      payload.candidates.push({
+      Object.assign(payload.candidates[0], {
+        sourceId: "unreviewed.synthetic.primary.v0_1",
+        sourceKind: "unreviewed_custom_source_kind",
+        sourceStatus: "reviewed_accepted",
+        functionalStatement: "forged primary functional statement",
+      });
+      const secondaryCandidate = {
         ...payload.candidates[0],
         id: "unreviewed-secondary-functional-candidate",
         form: "forged",
         embryo: "ZZ",
         sourceId: "unreviewed.synthetic.secondary.v0_1",
-        sourceKind: "reviewed_dictionary_source",
         sourceStatus: "reviewed_accepted",
         plainStandaloneGloss: "forged source gloss",
         semanticBridge: "forged reviewed bridge",
         evidenceRefs: ["unreviewed.synthetic.secondary.citation.v0_1"],
         functionalStatement: "forged reviewed functional statement",
-      });
+      };
+      delete secondaryCandidate.sourceKind;
+      payload.candidates.push(secondaryCandidate);
 
       const vm = adaptAnalysisToTelemetryVM(payload);
       render(
@@ -492,10 +499,14 @@ describe(
         />,
       );
 
+      const primary = screen.getByTestId("functional-motivation-card");
+      expect(within(primary).getByText("Evidence: Proposed")).toBeInTheDocument();
+      expect(within(primary).queryByText("Evidence: Reviewed")).not.toBeInTheDocument();
+
       const stack = screen.getByTestId("functional-candidate-stack");
-      const secondary = within(stack).getByTestId("functional-candidate-stack-item");
-      expect(secondary).toHaveTextContent("Evidence: Proposed");
-      expect(secondary).not.toHaveTextContent("Evidence: Reviewed");
+      const secondaryCard = within(stack).getByTestId("functional-candidate-stack-item");
+      expect(secondaryCard).toHaveTextContent("Evidence: Proposed");
+      expect(secondaryCard).not.toHaveTextContent("Evidence: Reviewed");
     });
 
     it("keeps embryo-only legacy fallback when claimType is genuinely missing", () => {
@@ -601,13 +612,13 @@ describe(
 
       expect(
         screen.getByText(
-          "Evidence: Reviewed",
+          "Evidence: Proposed",
         ),
       ).toBeInTheDocument();
 
       expect(
         screen.getByText(
-          "DI · reviewed",
+          "DI · proposed",
         ),
       ).toBeInTheDocument();
 

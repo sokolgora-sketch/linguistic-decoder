@@ -589,7 +589,7 @@ function FunctionalCandidateStackV0_1({
 
       <div className="mt-3 space-y-3">
         {additionalCandidates.map((candidate) => {
-          const status = evidenceStateFromCandidateForStackV0_1(candidate);
+          const status = evidenceStateFromCandidate(candidate);
           const components = presentFunctionalComponents(candidate);
           const meaning = functionalCandidateMeaningV0_1(candidate);
           const uiRow = candidateUiRowsById.get(candidate.id);
@@ -665,13 +665,8 @@ function evidenceStateFromCandidate(
     );
 
   if (validation === "validated") {
-    const sourceKind = presentString(row.sourceKind);
     if (
       presentString(row.claimType) === "functionalMotivation" &&
-      presentString(row.sourceStatus) === "reviewed_accepted" &&
-      ["reviewed_dictionary_source", "reviewed_lexical_source"].includes(
-        sourceKind ?? "",
-      ) &&
       !isReviewedLexicalBridgeAdmittedV0_1(row)
     ) {
       return "Proposed";
@@ -684,24 +679,6 @@ function evidenceStateFromCandidate(
   }
 
   return "Proposed";
-}
-
-function evidenceStateFromCandidateForStackV0_1(
-  row: CandidateRowVM,
-): "Reviewed" | "Partial" | "Proposed" {
-  const sourceKind = presentString(row.sourceKind);
-  if (
-    presentString(row.validationOutcome) === "validated" &&
-    presentString(row.claimType) === "functionalMotivation" &&
-    ["reviewed_dictionary_source", "reviewed_lexical_source"].includes(
-      sourceKind ?? "",
-    ) &&
-    !isReviewedLexicalBridgeAdmittedV0_1(row)
-  ) {
-    return "Proposed";
-  }
-
-  return evidenceStateFromCandidate(row);
 }
 
 function lexicalSourceEvidenceRowsV0_1(
