@@ -446,6 +446,28 @@ describe(
       ).not.toBeInTheDocument();
     });
 
+    it("does not label caller-supplied reviewed-source metadata as an admitted lexical bridge", () => {
+      const payload = realStudyShape();
+      Object.assign(payload.candidates[0], {
+        sourceId: "unreviewed.synthetic.candidate.v0_1",
+        sourceStatus: "reviewed_accepted",
+        evidenceRefs: ["unreviewed.synthetic.citation.v0_1"],
+        semanticBridge: "forged reviewed bridge text",
+      });
+
+      const vm = adaptAnalysisToTelemetryVM(payload);
+
+      render(<EmbryoExpansionContextCardV0_1 vm={vm} />);
+
+      expect(screen.getByText("Evidence: Source row not verified")).toBeInTheDocument();
+      expect(
+        screen.queryByText("Evidence: Reviewed lexical bridge · exploratory"),
+      ).not.toBeInTheDocument();
+      expect(
+        screen.queryByText(/“Reviewed” means this production lexical row passed its bounded lexical gate/),
+      ).not.toBeInTheDocument();
+    });
+
     it("keeps embryo-only legacy fallback when claimType is genuinely missing", () => {
       const payload =
         realStudyShape();

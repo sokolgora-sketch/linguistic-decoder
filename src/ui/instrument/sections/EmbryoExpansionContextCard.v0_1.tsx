@@ -9,6 +9,7 @@ import type {
 } from "@/ui/telemetry/types";
 import type { GenericFunctionalWitnessRuntimeProjectionV1 } from "@/shared/openInstrument/genericFunctionalWitnessRuntimeProjection.v1";
 import type { WordSpecificFunctionalDepthV0_1 } from "@/shared/openInstrument/wordSpecificFunctionalDepth.v0_1";
+import { getReviewedExternalLexiconProductionSourceRowsV0_1 } from "@/shared/reviewedExternalLexiconSourceRowRegistry.v0_1";
 
 import { buildCandidateRowsFromVM } from "@/ui/candidates/candidateModel";
 import type { UICandidateRow } from "@/ui/candidates/candidateModel";
@@ -178,6 +179,56 @@ function presentString(
     value.value.trim();
 
   return text || null;
+}
+
+function isReviewedLexicalBridgeAdmittedV0_1(
+  row: CandidateRowVM,
+): boolean {
+  const sourceId = presentString(row.sourceId);
+  const language = presentString(row.language);
+  const form = presentString(row.form);
+  const sourceKind = presentString(row.sourceKind);
+  const sourceStatus = presentString(row.sourceStatus);
+  const embryo = presentString(row.embryo);
+  const gloss = presentString(row.plainStandaloneGloss);
+  const semanticBridge = presentString(row.semanticBridge);
+  const evidenceRefs = row.evidenceRefs?.kind === "present"
+    ? row.evidenceRefs.value
+    : [];
+  if (
+    !sourceId || !language || !form || !sourceKind || !sourceStatus ||
+    !embryo || !gloss || !semanticBridge ||
+    presentString(row.claimType) !== "functionalMotivation" ||
+    presentString(row.validationOutcome) !== "validated"
+  ) {
+    return false;
+  }
+
+  const reviewedSourceRow =
+    getReviewedExternalLexiconProductionSourceRowsV0_1().find(
+      (candidate) => candidate.sourceId === sourceId &&
+        candidate.candidateId === row.id,
+    );
+  if (!reviewedSourceRow) return false;
+
+  const normalize = (value: string) =>
+    value.normalize("NFC").trim().toLocaleLowerCase("en-US");
+  const hasReviewedCitation = reviewedSourceRow.externalCitations.some(
+    (citation) => citation.citationStatus === "reviewed_accepted" &&
+      evidenceRefs.includes(citation.citationId),
+  );
+
+  return Boolean(
+    reviewedSourceRow.isolatedStandaloneForm &&
+    sourceKind === reviewedSourceRow.sourceKind &&
+    sourceStatus === reviewedSourceRow.sourceStatus &&
+    normalize(language) === normalize(reviewedSourceRow.candidateLanguage) &&
+    normalize(form) === normalize(reviewedSourceRow.isolatedStandaloneForm) &&
+    normalize(embryo) === normalize(reviewedSourceRow.embryo) &&
+    normalize(gloss) === normalize(reviewedSourceRow.plainStandaloneGloss ?? "") &&
+    semanticBridge === reviewedSourceRow.semanticBridge &&
+    hasReviewedCitation,
+  );
 }
 
 function humanLanguage(
@@ -607,6 +658,17 @@ function evidenceStateFromCandidate(
     );
 
   if (validation === "validated") {
+    const sourceKind = presentString(row.sourceKind);
+    if (
+      presentString(row.claimType) === "functionalMotivation" &&
+      presentString(row.sourceStatus) === "reviewed_accepted" &&
+      ["reviewed_dictionary_source", "reviewed_lexical_source"].includes(
+        sourceKind ?? "",
+      ) &&
+      !isReviewedLexicalBridgeAdmittedV0_1(row)
+    ) {
+      return "Proposed";
+    }
     return "Reviewed";
   }
 
@@ -1115,6 +1177,16 @@ export function EmbryoExpansionContextCardV0_1({
     ) === "genericFunctionalHypothesis";
 
   const isReviewedLexicalFunctionalCandidate =
+    isReviewedLexicalBridgeAdmittedV0_1(primaryCandidate) &&
+    primaryValidation === "validated" &&
+    presentString(primaryCandidate.claimType) === "functionalMotivation" &&
+    presentString(primaryCandidate.sourceStatus) === "reviewed_accepted" &&
+    ["reviewed_dictionary_source", "reviewed_lexical_source"].includes(
+      presentString(primaryCandidate.sourceKind) ?? "",
+    );
+
+  const isUnverifiedReviewedLexicalFunctionalCandidate =
+    !isReviewedLexicalBridgeAdmittedV0_1(primaryCandidate) &&
     primaryValidation === "validated" &&
     presentString(primaryCandidate.claimType) === "functionalMotivation" &&
     presentString(primaryCandidate.sourceStatus) === "reviewed_accepted" &&
@@ -1628,6 +1700,8 @@ export function EmbryoExpansionContextCardV0_1({
               ? "Research hypothesis"
               : isReviewedLexicalFunctionalCandidate
               ? "Evidence: Reviewed lexical bridge · exploratory"
+              : isUnverifiedReviewedLexicalFunctionalCandidate
+                ? "Evidence: Source row not verified"
               : `Evidence: ${evidenceStatus}`}
           </div>
 
