@@ -5363,7 +5363,7 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
       {
         "candidateId": "albanian-da-dam-damage-functional",
         "candidateLanguage": "sq",
-        "claimBoundary": "functional motivation evidence only; not historical origin",
+        "claimBoundary": "reviewed lexical functional evidence only; this does not establish exact target-sense correspondence or an independently demonstrated embryo function, and it makes no historical-origin claim",
         "claimType": "functionalMotivation",
         "confidenceTag": "speculative",
         "displayForm": "Gheg DA split damage candidate",
@@ -6452,7 +6452,7 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
         {
           "candidateId": "albanian-da-dam-damage-functional",
           "candidateLanguage": "sq",
-          "claimBoundary": "functional motivation evidence only; not historical origin",
+          "claimBoundary": "reviewed lexical functional evidence only; this does not establish exact target-sense correspondence or an independently demonstrated embryo function, and it makes no historical-origin claim",
           "claimType": "functionalMotivation",
           "confidenceTag": "speculative",
           "decomposition": {
@@ -7179,7 +7179,7 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
           {
             "authorityClass": "reviewed_functional",
             "candidateId": "albanian-da-dam-damage-functional",
-            "claimBoundary": "functional motivation evidence only; not historical origin",
+            "claimBoundary": "reviewed lexical functional evidence only; this does not establish exact target-sense correspondence or an independently demonstrated embryo function, and it makes no historical-origin claim",
             "embryo": "DA",
             "evidenceRefs": [
               "reviewed.external.gheg-da.damage.candidate.citation.v0_1",
@@ -7370,7 +7370,7 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
         {
           "authorityClass": "reviewed_functional",
           "candidateId": "albanian-da-dam-damage-functional",
-          "claimBoundary": "functional motivation evidence only; not historical origin",
+          "claimBoundary": "reviewed lexical functional evidence only; this does not establish exact target-sense correspondence or an independently demonstrated embryo function, and it makes no historical-origin claim",
           "embryo": "DA",
           "evidenceRefs": [
             "reviewed.external.gheg-da.damage.candidate.citation.v0_1",
@@ -9045,7 +9045,7 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
       {
         "candidateId": "albanian-at-father-functional",
         "candidateLanguage": "sq",
-        "claimBoundary": "functional motivation evidence only; not historical origin",
+        "claimBoundary": "reviewed lexical functional evidence only; this does not establish exact target-sense correspondence or an independently demonstrated embryo function, and it makes no historical-origin claim",
         "claimType": "functionalMotivation",
         "confidenceTag": "speculative",
         "displayForm": "AT",
@@ -10436,7 +10436,7 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
         {
           "candidateId": "albanian-at-father-functional",
           "candidateLanguage": "sq",
-          "claimBoundary": "functional motivation evidence only; not historical origin",
+          "claimBoundary": "reviewed lexical functional evidence only; this does not establish exact target-sense correspondence or an independently demonstrated embryo function, and it makes no historical-origin claim",
           "claimType": "functionalMotivation",
           "confidenceTag": "speculative",
           "decomposition": {
@@ -11216,7 +11216,7 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
           {
             "authorityClass": "reviewed_functional",
             "candidateId": "albanian-at-father-functional",
-            "claimBoundary": "functional motivation evidence only; not historical origin",
+            "claimBoundary": "reviewed lexical functional evidence only; this does not establish exact target-sense correspondence or an independently demonstrated embryo function, and it makes no historical-origin claim",
             "embryo": "AT",
             "evidenceRefs": [
               "reviewed.external.albanian-at.father.citation.v0_1",
@@ -11404,7 +11404,7 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
         {
           "authorityClass": "reviewed_functional",
           "candidateId": "albanian-at-father-functional",
-          "claimBoundary": "functional motivation evidence only; not historical origin",
+          "claimBoundary": "reviewed lexical functional evidence only; this does not establish exact target-sense correspondence or an independently demonstrated embryo function, and it makes no historical-origin claim",
           "embryo": "AT",
           "evidenceRefs": [
             "reviewed.external.albanian-at.father.citation.v0_1",
@@ -31818,7 +31818,7 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
       {
         "candidateId": "albanian-di-know-functional",
         "candidateLanguage": "sq",
-        "claimBoundary": "functional motivation evidence only; not historical origin",
+        "claimBoundary": "reviewed lexical functional evidence only; this does not establish exact target-sense correspondence or an independently demonstrated embryo function, and it makes no historical-origin claim",
         "claimType": "functionalMotivation",
         "confidenceTag": "speculative",
         "displayForm": "DI know knowledge candidate",
@@ -33598,7 +33598,7 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
         {
           "candidateId": "albanian-di-know-functional",
           "candidateLanguage": "sq",
-          "claimBoundary": "functional motivation evidence only; not historical origin",
+          "claimBoundary": "reviewed lexical functional evidence only; this does not establish exact target-sense correspondence or an independently demonstrated embryo function, and it makes no historical-origin claim",
           "claimType": "functionalMotivation",
           "confidenceTag": "speculative",
           "decomposition": {
@@ -34653,7 +34653,7 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
           {
             "authorityClass": "reviewed_functional",
             "candidateId": "albanian-di-know-functional",
-            "claimBoundary": "functional motivation evidence only; not historical origin",
+            "claimBoundary": "reviewed lexical functional evidence only; this does not establish exact target-sense correspondence or an independently demonstrated embryo function, and it makes no historical-origin claim",
             "embryo": "DI",
             "evidenceRefs": [
               "reviewed.external.di.knowledge.candidate.citation.v0_1",
@@ -34895,7 +34895,7 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
         {
           "authorityClass": "reviewed_functional",
           "candidateId": "albanian-di-know-functional",
-          "claimBoundary": "functional motivation evidence only; not historical origin",
+          "claimBoundary": "reviewed lexical functional evidence only; this does not establish exact target-sense correspondence or an independently demonstrated embryo function, and it makes no historical-origin claim",
           "embryo": "DI",
           "evidenceRefs": [
             "reviewed.external.di.knowledge.candidate.citation.v0_1",

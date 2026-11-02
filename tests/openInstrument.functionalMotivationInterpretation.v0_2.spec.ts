@@ -372,6 +372,42 @@ describe("Functional Motivation Interpretation v0.2 projector", () => {
     expect(di?.hypothesis.status).toBe("UNKNOWN_OR_NULL");
   });
 
+  it("does not authorize a spelling-derived path when its representation is relabeled as spoken", async () => {
+    const lexicalAdapter = createAlbanianLexicalSubstrateWitnessAdapterV0_1();
+    const sourceFormExtractingAdapter: GenericFunctionalWitnessSourceAdapterV1 = {
+      ...lexicalAdapter,
+      candidateVoicePathPolicy: "SOURCE_FORM_EXTRACTED",
+    };
+    const { heart, discovery } = await discoveryFor(
+      "study",
+      "en",
+      undefined,
+      [sourceFormExtractingAdapter],
+    );
+    const relabeledDiscovery = {
+      ...discovery,
+      candidates: discovery.candidates.map((candidate) => ({
+        ...candidate,
+        structuralComparison: {
+          ...candidate.structuralComparison,
+          candidateRepresentationKind: "production_spoken" as const,
+        },
+      })),
+    };
+
+    const result = buildFunctionalMotivationInterpretationV0_2({
+      discovery: relabeledDiscovery,
+      targetSense: null,
+      heart,
+    });
+    const di = result.candidates.find((candidate) => candidate.candidateEmbryo === "DI");
+
+    expect(di?.correspondence.candidateVoicePath).toEqual(["I"]);
+    expect(di?.correspondence.candidateRepresentationKind).toBe("production_spoken");
+    expect(di?.correspondence.candidateVoicePathStatus).toBe("NULL_UNAUTHORIZED");
+    expect(di?.hypothesis.status).toBe("UNKNOWN_OR_NULL");
+  });
+
   it("covers a previously unprepared input selected by a declared inflection rule", async () => {
     // Selection rule declared before inspecting the result: pluralize the
     // prepared base ending in y using the repository's ordinary -ies pattern.

@@ -93,6 +93,11 @@ describe("analyze-v1 Functional Motivation Interpretation v0.2 boundary", () => 
       sourceId: "reviewed.external.gheg-da.damage.candidate.v0_1",
       citationRefs: ["reviewed.external.gheg-da.damage.candidate.citation.v0_1"],
       sourceProvenance: {
+        sourceTitle: "Linguistic variation within the Northwestern Gheg Albanian dialect",
+        sourceDateOrVersion: "2023; volume 8, issue 1; article 5501",
+        sourceUrlOrArchiveRef: "https://doi.org/10.3765/plsa.v8i1.5501",
+        entryLocator: "Example (4), page 3; footnote 1",
+        sourceHashOrArchiveHash: "doi:10.3765/plsa.v8i1.5501",
         languageVariety: null,
         attestedGrammarNote:
           "Malsia/Northwestern Gheg Albanian verb form; paper lists Malsia da [dɔː] with Shkodër/Lezhë [dɔː], [ndɔː] in example (4)",
@@ -117,6 +122,37 @@ describe("analyze-v1 Functional Motivation Interpretation v0.2 boundary", () => 
       status: "experimental",
       validationOutcome: "validated",
       rankGroup: "validatedFunctionalMotivation",
+      claimBoundary:
+        "reviewed lexical functional evidence only; this does not establish exact target-sense correspondence or an independently demonstrated embryo function, and it makes no historical-origin claim",
+    });
+  });
+
+  it("keeps the AT source note descriptive and its candidate Voice path Null", async () => {
+    const payload = await analyze({
+      word: "father",
+      mode: "strict",
+      alphabet: "auto",
+      providerExecution: "disabled",
+    });
+    const at = payload.functionalMotivationInterpretationV0_2.candidates.find(
+      (candidate: { candidateEmbryo: string }) => candidate.candidateEmbryo === "AT",
+    );
+
+    expect(at).toMatchObject({
+      sourceFact: {
+        sourceId: "reviewed.external.albanian-at.father.candidate.v0_1",
+        sourceProvenance: {
+          entryLocator:
+            "at [m] (tg) {2} 'father'; Alb. atë [m] (tg) 'father' (AE 83)",
+          languageVariety: null,
+          attestedGrammarNote:
+            "(tg) marks the form as both Tosk and Gheg; the entry also records Albanian atë as father.",
+        },
+      },
+      correspondence: {
+        candidateVoicePath: [],
+        candidateVoicePathStatus: "NULL_UNAUTHORIZED",
+      },
     });
   });
 
@@ -165,7 +201,6 @@ describe("analyze-v1 Functional Motivation Interpretation v0.2 boundary", () => 
         interpretation={vm.functionalMotivationInterpretationV0_2}
       />,
     );
-
     expect(screen.getAllByText("Candidate Voice authority").length).toBeGreaterThan(0);
     expect(screen.getAllByText("NULL_UNAUTHORIZED").length).toBeGreaterThan(0);
     expect(screen.getAllByText(/Source-authored grammar\/dialect\/pronunciation note \(descriptive only; not a structured dialect profile or Voice mapping\): Malsia\/Northwestern Gheg Albanian verb form/).length).toBeGreaterThan(0);

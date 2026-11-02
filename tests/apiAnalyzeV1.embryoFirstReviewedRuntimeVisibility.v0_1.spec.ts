@@ -81,7 +81,13 @@ describe(
         "split or divided",
       );
       expect(String(candidate.claimBoundary)).toContain(
-        "not historical origin",
+        "does not establish exact target-sense correspondence",
+      );
+      expect(String(candidate.claimBoundary)).toContain(
+        "independently demonstrated embryo function",
+      );
+      expect(String(candidate.claimBoundary)).toContain(
+        "no historical-origin claim",
       );
 
       const da = rootMapKey(body, "DA");
@@ -149,7 +155,13 @@ describe(
         "study and learning",
       );
       expect(String(candidate.claimBoundary)).toContain(
-        "not historical origin",
+        "does not establish exact target-sense correspondence",
+      );
+      expect(String(candidate.claimBoundary)).toContain(
+        "independently demonstrated embryo function",
+      );
+      expect(String(candidate.claimBoundary)).toContain(
+        "no historical-origin claim",
       );
 
       const di = rootMapKey(body, "DI");

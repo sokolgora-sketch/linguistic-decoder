@@ -361,8 +361,14 @@ function Candidate({
             </div>
             <div className="mt-2 space-y-3">
               {records.map((record, index) => {
-                const attestedGrammarNote =
-                  record.sourceFact.sourceProvenance?.attestedGrammarNote?.trim();
+                const interpretedSourceFact =
+                  interpretation?.sourceFact.sourceId === record.sourceFact.sourceId
+                    ? interpretation.sourceFact
+                    : null;
+                const attestedGrammarNote = (
+                  record.sourceFact.sourceProvenance?.attestedGrammarNote ??
+                  interpretedSourceFact?.sourceProvenance?.attestedGrammarNote
+                )?.trim();
 
                 return (
                   <div
