@@ -259,7 +259,10 @@ function sourceProvenanceIsValidV1(value: unknown, sourceId: string): boolean {
     exactTextV1(value.entryLocator) &&
     (value.sourceHashOrArchiveHash === null ||
       exactTextV1(value.sourceHashOrArchiveHash)) &&
-    (value.languageVariety === null || exactTextV1(value.languageVariety))
+    (value.languageVariety === null || exactTextV1(value.languageVariety)) &&
+    (value.attestedGrammarNote === undefined ||
+      value.attestedGrammarNote === null ||
+      exactTextV1(value.attestedGrammarNote))
   );
 }
 

@@ -341,6 +341,37 @@ describe("Functional Motivation Interpretation v0.2 projector", () => {
     expect(latin?.sourceFact.entryLocator).toContain("amo");
   });
 
+  it("does not authorize an orthography-derived Voice path from a nonempty path alone", async () => {
+    const lexicalAdapter = createAlbanianLexicalSubstrateWitnessAdapterV0_1();
+    const sourceFormExtractingAdapter: GenericFunctionalWitnessSourceAdapterV1 = {
+      ...lexicalAdapter,
+      candidateVoicePathPolicy: "SOURCE_FORM_EXTRACTED",
+    };
+    const { heart, discovery } = await discoveryFor(
+      "study",
+      "en",
+      undefined,
+      [sourceFormExtractingAdapter],
+    );
+
+    const result = buildFunctionalMotivationInterpretationV0_2({
+      discovery,
+      targetSense: null,
+      heart,
+    });
+    const di = result.candidates.find((candidate) => candidate.candidateEmbryo === "DI");
+
+    expect(di?.correspondence.candidateVoicePath).toEqual(["I"]);
+    expect(di?.correspondence.candidateRepresentationKind).toBe(
+      "orthographic_profile_derived",
+    );
+    expect(di?.correspondence.candidateVoicePathStatus).toBe("NULL_UNAUTHORIZED");
+    expect(di?.correspondence.voiceRelationship).toBe(
+      "NOT_COMPARABLE_ACROSS_REPRESENTATIONS",
+    );
+    expect(di?.hypothesis.status).toBe("UNKNOWN_OR_NULL");
+  });
+
   it("covers a previously unprepared input selected by a declared inflection rule", async () => {
     // Selection rule declared before inspecting the result: pluralize the
     // prepared base ending in y using the repository's ordinary -ies pattern.

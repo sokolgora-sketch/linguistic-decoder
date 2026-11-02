@@ -2,6 +2,9 @@ import type {
   MotivationEngineDiscoveryCandidateV0_1,
   MotivationEngineDiscoveryV0_1,
 } from "@/shared/openInstrument/motivationEngineDiscovery.v0_1";
+import type {
+  GenericFunctionalWitnessSourceProvenanceV1,
+} from "@/shared/openInstrument/genericFunctionalWitnessDiscovery.v1";
 import type { HeartInstrumentV1 } from "@/v1/heartInstrument.v1";
 
 export const FUNCTIONAL_MOTIVATION_INTERPRETATION_SCHEMA_V0_2 =
@@ -39,6 +42,7 @@ export type FunctionalMotivationSourceFactV0_2 = Readonly<{
   citationRefs: readonly string[];
   sourceUrlOrArchiveRef: string | null;
   entryLocator: string | null;
+  sourceProvenance?: GenericFunctionalWitnessSourceProvenanceV1;
 }>;
 
 export type FunctionalMotivationNucleusEventV0_2 = Readonly<{
@@ -204,6 +208,31 @@ function isRecordV0_2(value: unknown): value is RecordV0_2 {
   return value !== null && typeof value === "object" && !Array.isArray(value);
 }
 
+function validSourceProvenanceV0_2(value: unknown, sourceId: string): boolean {
+  if (!isRecordV0_2(value)) return false;
+  const requiredText = [
+    value.sourceRecordId,
+    value.sourceTraditionId,
+    value.sourceTitle,
+    value.sourceDateOrVersion,
+    value.sourceUrlOrArchiveRef,
+    value.entryLocator,
+  ];
+  return (
+    value.sourceRecordId === sourceId &&
+    requiredText.every((item) => typeof item === "string" && item.length > 0 && item.trim() === item) &&
+    (value.sourceHashOrArchiveHash === null ||
+      (typeof value.sourceHashOrArchiveHash === "string" && value.sourceHashOrArchiveHash.length > 0)) &&
+    (value.languageVariety === null ||
+      (typeof value.languageVariety === "string" && value.languageVariety.length > 0)) &&
+    (value.attestedGrammarNote === undefined ||
+      value.attestedGrammarNote === null ||
+      (typeof value.attestedGrammarNote === "string" &&
+        value.attestedGrammarNote.length > 0 &&
+        value.attestedGrammarNote.trim() === value.attestedGrammarNote))
+  );
+}
+
 function compareTextV0_2(left: string, right: string): number {
   return left < right ? -1 : left > right ? 1 : 0;
 }
@@ -259,6 +288,9 @@ function sourceFactFromCandidateV0_2(
     citationRefs: [...candidate.sourceFact.evidenceRefs].sort(compareTextV0_2),
     sourceUrlOrArchiveRef: candidate.sourceFact.sourceUrlOrArchiveRef,
     entryLocator: candidate.sourceFact.entryLocator,
+    ...(candidate.sourceFact.sourceProvenance
+      ? { sourceProvenance: { ...candidate.sourceFact.sourceProvenance } }
+      : {}),
   };
 }
 
@@ -501,7 +533,9 @@ function candidateInterpretationV0_2(
       representationCompatibility: comparison.representationCompatibility,
       inputVoicePath: [...comparison.inputVoicePath],
       candidateVoicePath: [...comparison.candidateVoicePath],
-      candidateVoicePathStatus: comparison.candidateVoicePath.length > 0
+      candidateVoicePathStatus: comparison.candidateRepresentationKind ===
+        "production_spoken" &&
+        comparison.candidateVoicePath.length > 0
         ? "AUTHORIZED"
         : "NULL_UNAUTHORIZED",
       voiceRelationship: comparison.voiceRelationship,
@@ -648,7 +682,9 @@ function validSourceFactV0_2(value: unknown): value is FunctionalMotivationSourc
     typeof value.attestationTruth === "string" &&
     stringArrayV0_2(value.citationRefs) &&
     (value.sourceUrlOrArchiveRef === null || typeof value.sourceUrlOrArchiveRef === "string") &&
-    (value.entryLocator === null || typeof value.entryLocator === "string")
+    (value.entryLocator === null || typeof value.entryLocator === "string") &&
+    (value.sourceProvenance === undefined ||
+      validSourceProvenanceV0_2(value.sourceProvenance, value.sourceId))
   );
 }
 

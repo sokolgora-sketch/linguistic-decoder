@@ -66,7 +66,7 @@ describe(
 
       expect(
         screen.getByText(
-          "Evidence: Reviewed",
+          "Evidence: Reviewed lexical bridge · exploratory",
         ),
       ).toBeInTheDocument();
 
@@ -112,7 +112,7 @@ describe(
         "functional-candidate-stack-item",
       );
 
-      expect(within(primary).getByText("Evidence: Reviewed")).toBeInTheDocument();
+      expect(within(primary).getByText("Evidence: Reviewed lexical bridge · exploratory")).toBeInTheDocument();
       expect(within(primary).getAllByText("DI", { exact: true }).length).toBeGreaterThanOrEqual(1);
       expect(within(stackItem).getByText("SHTU + DI", { exact: true })).toBeInTheDocument();
       expect(within(stackItem).getByText("Evidence: Partial")).toBeInTheDocument();
@@ -142,7 +142,7 @@ describe(
 
       expect(
         screen.getByText(
-          "Evidence: Reviewed",
+          "Evidence: Reviewed lexical bridge · exploratory",
         ),
       ).toBeInTheDocument();
 
@@ -157,6 +157,11 @@ describe(
           "DA · reviewed",
         ),
       ).toBeInTheDocument();
+      expect(screen.getByText(
+        "“Reviewed” means this production lexical row passed its bounded lexical gate and matched reviewed RootMap evidence. It does not establish cross-source identity, target-sense correspondence, or independently demonstrate embryo function.",
+      )).toBeInTheDocument();
+      expect(screen.getByText("Exploratory functional bridge")).toBeInTheDocument();
+      expect(screen.getByText("Reviewed lexical bridge evidence")).toBeInTheDocument();
     });
 
     it("keeps father on the shared reviewed AT embryo-first path", async () => {
@@ -169,7 +174,7 @@ describe(
 
       expect(
         screen.getByText(
-          "Evidence: Reviewed",
+          "Evidence: Reviewed lexical bridge · exploratory",
         ),
       ).toBeInTheDocument();
 
@@ -251,7 +256,7 @@ describe(
 
       expect(
         screen.getByText(
-          "Evidence: Reviewed",
+          "Evidence: Reviewed lexical bridge · exploratory",
         ),
       ).toBeInTheDocument();
 

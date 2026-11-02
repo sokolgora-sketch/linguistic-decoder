@@ -771,7 +771,7 @@ function WordSpecificFunctionalDepthSummaryV0_1({
 
   const authorityLabel =
     value.authorityClass === "reviewed_functional"
-      ? "Reviewed functional motivation"
+      ? "Reviewed lexical bridge evidence"
       : "Research functional hypothesis";
 
   return (
@@ -902,6 +902,11 @@ function GenericFunctionalWitnesses({
                   {provenance ? (
                     <div className="mt-2 text-xs leading-5 text-slate-600 dark:text-slate-400">
                       {`${provenance.sourceTitle} · ${provenance.entryLocator}`}
+                    </div>
+                  ) : null}
+                  {provenance?.attestedGrammarNote ? (
+                    <div className="mt-2 text-xs leading-5 text-slate-600 dark:text-slate-400">
+                      Source-authored grammar/dialect/pronunciation note (descriptive only; not a structured dialect profile or Voice mapping): {provenance.attestedGrammarNote}
                     </div>
                   ) : null}
 
@@ -1104,6 +1109,14 @@ export function EmbryoExpansionContextCardV0_1({
     presentString(
       primaryCandidate.claimType,
     ) === "genericFunctionalHypothesis";
+
+  const isReviewedLexicalFunctionalCandidate =
+    primaryValidation === "validated" &&
+    presentString(primaryCandidate.claimType) === "functionalMotivation" &&
+    presentString(primaryCandidate.sourceStatus) === "reviewed_accepted" &&
+    ["reviewed_dictionary_source", "reviewed_lexical_source"].includes(
+      presentString(primaryCandidate.sourceKind) ?? "",
+    );
 
   const useLegacyRootMapComposition =
     !isCompositionCandidate(
@@ -1609,6 +1622,8 @@ export function EmbryoExpansionContextCardV0_1({
                 : "Evidence: None available"
               : isResearchFunctionalCandidate
               ? "Research hypothesis"
+              : isReviewedLexicalFunctionalCandidate
+              ? "Evidence: Reviewed lexical bridge · exploratory"
               : `Evidence: ${evidenceStatus}`}
           </div>
 
@@ -1677,7 +1692,9 @@ export function EmbryoExpansionContextCardV0_1({
         <div className="text-xs font-semibold uppercase tracking-[0.14em] text-blue-700 dark:text-blue-200">
           {isGenericFunctionalCandidate
             ? "Bounded doctrinal reading"
-            : `How it can motivate "${word || "this word"}"`}
+            : isReviewedLexicalFunctionalCandidate
+              ? "Exploratory functional bridge"
+              : `How it can motivate "${word || "this word"}"`}
         </div>
 
         <div className="mt-2 text-base leading-7 text-slate-900 dark:text-slate-100">
@@ -1686,6 +1703,11 @@ export function EmbryoExpansionContextCardV0_1({
               ? "This reading is generated under the ZË-RO Seven-Voices framework. No external lexical evidence is currently attached."
               : "A functional explanation was not emitted.")}
         </div>
+        {isReviewedLexicalFunctionalCandidate ? (
+          <p className="mt-3 border-t border-blue-300/70 pt-3 text-xs leading-5 text-slate-700 dark:border-blue-400/25 dark:text-slate-300">
+            “Reviewed” means this production lexical row passed its bounded lexical gate and matched reviewed RootMap evidence. It does not establish cross-source identity, target-sense correspondence, or independently demonstrate embryo function.
+          </p>
+        ) : null}
       </div>
 
       {witnessProjection || isGenericFunctionalCandidate ? (

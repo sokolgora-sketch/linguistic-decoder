@@ -111,10 +111,10 @@ describe("Open Instrument primary reading orientation card v0.1", () => {
   );
 
   it.each([
-    ["damage", "A → A → E", "Reviewed functional motivation"],
+    ["damage", "A → A → E", "Reviewed lexical bridge evidence"],
     ["mother", "O → E", "No supported word-specific functional motivation yet."],
     ["stone", "O → E", "No supported word-specific functional motivation yet."],
-    ["father", "A → E", "Reviewed functional motivation"],
+    ["father", "A → E", "Reviewed lexical bridge evidence"],
     ["water", "A → E", "No supported word-specific functional motivation yet."],
   ])(
     "keeps path layers and word-specific authority separate for %s",

@@ -36,7 +36,7 @@ describe("Motivation Engine Discovery first vertical v0.1", () => {
       candidate.sourceFact.sourceId === "reviewed.external.di.knowledge.candidate.v0_1",
     )).toBe(true);
     expect(result.candidates.some((candidate) =>
-      candidate.candidateEmbryo === "DI" && candidate.candidateVoicePath.includes("I"),
+      candidate.candidateEmbryo === "DI" && candidate.candidateVoicePath.length === 0,
     )).toBe(true);
     expect(result.candidates.every((candidate) => candidate.noSingleWinner)).toBe(true);
     expect(result.candidates.every((candidate) => candidate.userDecisionPosture === "user_decides")).toBe(true);
@@ -54,7 +54,8 @@ describe("Motivation Engine Discovery first vertical v0.1", () => {
       consonantalCarrierRelationship: "INPUT_CARRIER_CONTEXT_ONLY",
     });
     expect(di?.structuralComparison.inputVoicePath.length).toBeGreaterThan(0);
-    expect(di?.structuralComparison.candidateVoicePath).toEqual(["I"]);
+    expect(di?.candidateVoicePath).toEqual([]);
+    expect(di?.structuralComparison.candidateVoicePath).toEqual([]);
     expect(di?.structuralComparison.candidateConsonantalStructure).toBeNull();
     expect(di?.structuralComparison.authorizedOperationIds).toContain("y_to_i");
     expect(di?.functionalInterpretation).toMatchObject({

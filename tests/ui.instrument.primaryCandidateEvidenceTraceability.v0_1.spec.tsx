@@ -69,7 +69,7 @@ describe("Open Instrument primary candidate evidence traceability v0.1", () => {
     render(<InstrumentPanel payload={body} />);
 
     const overview = screen.getByRole("tabpanel");
-    expect(within(overview).getByText("Evidence: Reviewed")).toBeVisible();
+    expect(within(overview).getByText("Evidence: Reviewed lexical bridge · exploratory")).toBeVisible();
     expect(within(overview).getByText("Evidence sources")).toHaveClass(
       "text-slate-800",
     );

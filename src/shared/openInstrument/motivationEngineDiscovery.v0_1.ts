@@ -6,6 +6,7 @@ import {
   GENERIC_FUNCTIONAL_WITNESS_DISCOVERY_SCHEMA_V1,
   queryGenericFunctionalWitnessesV1,
   type GenericFunctionalWitnessV1,
+  type GenericFunctionalWitnessSourceProvenanceV1,
 } from "@/shared/openInstrument/genericFunctionalWitnessDiscovery.v1";
 import {
   createAlbanianLexicalSubstrateWitnessAdapterV0_1,
@@ -106,6 +107,7 @@ export type MotivationEngineDiscoveryCandidateV0_1 = Readonly<{
     evidenceRefs: readonly string[];
     sourceUrlOrArchiveRef: string | null;
     entryLocator: string | null;
+    sourceProvenance?: GenericFunctionalWitnessSourceProvenanceV1;
   }>;
   derivedStructure: Readonly<{
     minRootId: string;
@@ -509,6 +511,9 @@ function buildCandidate(
       evidenceRefs: [...witness.citationRefs],
       sourceUrlOrArchiveRef: witness.sourceProvenance?.sourceUrlOrArchiveRef ?? null,
       entryLocator: witness.sourceProvenance?.entryLocator ?? null,
+      ...(witness.sourceProvenance
+        ? { sourceProvenance: { ...witness.sourceProvenance } }
+        : {}),
     },
     derivedStructure: {
       minRootId: matchContext.minRootId,

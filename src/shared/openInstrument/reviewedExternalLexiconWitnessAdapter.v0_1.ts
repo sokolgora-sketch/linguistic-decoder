@@ -76,6 +76,7 @@ function projectRow(
       entryLocator: citation.entryLocator ?? "",
       sourceHashOrArchiveHash: citation.sourceHashOrArchiveHash,
       languageVariety: null,
+      attestedGrammarNote: citation.attestedGrammarNote,
     },
   };
 }
@@ -92,6 +93,7 @@ export function createReviewedExternalLexiconWitnessAdapterV0_1():
 
   return Object.freeze({
     adapterId: REVIEWED_EXTERNAL_LEXICON_WITNESS_ADAPTER_ID_V0_1,
+    candidateVoicePathPolicy: "NULL_UNAUTHORIZED" as const,
     query(
       input: GenericFunctionalWitnessQueryV1,
     ): GenericFunctionalWitnessSourceAdapterResultV1 {

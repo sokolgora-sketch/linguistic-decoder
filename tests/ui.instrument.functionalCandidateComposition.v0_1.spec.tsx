@@ -68,7 +68,7 @@ describe(
 
       expect(
         screen.getByText(
-          "Evidence: Reviewed",
+          "Evidence: Reviewed lexical bridge · exploratory",
         ),
       ).toBeInTheDocument();
 

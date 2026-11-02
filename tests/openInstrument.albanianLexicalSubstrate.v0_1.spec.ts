@@ -73,11 +73,13 @@ describe("bounded Albanian lexical substrate v0.1", () => {
   });
 
   it("retrieves DI generically without the target-specific reviewed adapter", () => {
+    const adapter = createAlbanianLexicalSubstrateWitnessAdapterV0_1();
     const result = queryGenericFunctionalWitnessesV1(
       query("DI"),
-      [createAlbanianLexicalSubstrateWitnessAdapterV0_1()],
+      [adapter],
     );
 
+    expect(adapter.candidateVoicePathPolicy).toBe("NULL_UNAUTHORIZED");
     expect(result.status).toBe("MATCHES_FOUND");
     expect(result.matches).toHaveLength(1);
     expect(result.matches[0]).toMatchObject({
@@ -87,6 +89,30 @@ describe("bounded Albanian lexical substrate v0.1", () => {
       sourceAttestation: "SOURCE_RECORD_ONLY",
       functionalCorrespondence: "NOT_EVALUATED",
       targetMeaning: "NOT_CLAIMED",
+      candidateVoicePathPolicy: "NULL_UNAUTHORIZED",
+      languageVariety: null,
+      sourceProvenance: {
+        languageVariety: null,
+        attestedGrammarNote:
+          "Albanian standalone verb di; entry lists IPA /di/, aorist dita, participle ditur, and glosses the verb as to know.",
+      },
+    });
+  });
+
+  it("preserves the reviewed Northwestern Gheg DA note as descriptive provenance", () => {
+    const result = queryGenericFunctionalWitnessesV1(
+      query("DA", ["A"]),
+      [createAlbanianLexicalSubstrateWitnessAdapterV0_1()],
+    );
+
+    expect(result.matches[0]).toMatchObject({
+      candidateVoicePathPolicy: "NULL_UNAUTHORIZED",
+      languageVariety: null,
+      sourceProvenance: {
+        languageVariety: null,
+        attestedGrammarNote:
+          "Malsia/Northwestern Gheg Albanian verb form; paper lists Malsia da [dɔː] with Shkodër/Lezhë [dɔː], [ndɔː] in example (4)",
+      },
     });
   });
 

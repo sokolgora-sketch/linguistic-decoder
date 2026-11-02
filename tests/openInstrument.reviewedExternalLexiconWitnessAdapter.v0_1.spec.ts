@@ -17,10 +17,12 @@ function query(embryo: string) {
 
 describe("reviewed external lexicon generic witness adapter v0.1", () => {
   it("projects the existing reviewed AT row by embryo without a target row", () => {
+    const adapter = createReviewedExternalLexiconWitnessAdapterV0_1();
     const result = queryGenericFunctionalWitnessesV1(query("AT"), [
-      createReviewedExternalLexiconWitnessAdapterV0_1(),
+      adapter,
     ]);
 
+    expect(adapter.candidateVoicePathPolicy).toBe("NULL_UNAUTHORIZED");
     expect(result.status).toBe("MATCHES_FOUND");
     expect(result.matches).toHaveLength(1);
     expect(result.matches[0]).toMatchObject({
@@ -30,6 +32,7 @@ describe("reviewed external lexicon generic witness adapter v0.1", () => {
       language: "sq",
       sourceStatus: "reviewed_candidate",
       sourceAuthorityStatus: "reviewed_accepted",
+      candidateVoicePathPolicy: "NULL_UNAUTHORIZED",
       sourceAttestation: "SOURCE_RECORD_ONLY",
       functionalCorrespondence: "NOT_EVALUATED",
       targetMeaning: "NOT_CLAIMED",
@@ -46,9 +49,33 @@ describe("reviewed external lexicon generic witness adapter v0.1", () => {
         "reviewed.external.albanian-at.father.candidate.v0_1",
       entryLocator: "at [m] (tg) {2} 'father'; Alb. atë [m] (tg) 'father' (AE 83)",
       sourceUrlOrArchiveRef: "https://ieed.ullet.net/alb.html",
+      languageVariety: null,
+      attestedGrammarNote:
+        "(tg) marks the form as both Tosk and Gheg; the entry also records Albanian atë as father.",
     });
     expect(JSON.stringify(result)).not.toContain("targetWord");
     expect(JSON.stringify(result)).not.toContain("semanticBridge");
+  });
+
+  it("preserves DA and DI source-authored notes without turning them into dialect or Voice authority", () => {
+    const adapter = createReviewedExternalLexiconWitnessAdapterV0_1();
+    const da = queryGenericFunctionalWitnessesV1(query("DA"), [adapter]);
+    const di = queryGenericFunctionalWitnessesV1(query("DI"), [adapter]);
+
+    expect(da.matches[0]).toMatchObject({
+      candidateVoicePathPolicy: "NULL_UNAUTHORIZED",
+      languageVariety: null,
+      sourceProvenance: {
+        languageVariety: null,
+        attestedGrammarNote:
+          "Malsia/Northwestern Gheg Albanian verb form; paper lists Malsia da [dɔː] with Shkodër/Lezhë [dɔː], [ndɔː] in example (4)",
+      },
+    });
+    expect(di.matches[0]?.sourceProvenance).toMatchObject({
+      languageVariety: null,
+      attestedGrammarNote:
+        "Albanian standalone verb di; entry lists IPA /di/, aorist dita, participle ditur, and glosses the verb as to know.",
+    });
   });
 
   it("queries all existing reviewed production rows generically and rejects absent embryos", () => {

@@ -920,6 +920,30 @@ function parseMotivationDiscoveryV0_1(
     : null;
   const isStringArray = (value: unknown): value is string[] =>
     Array.isArray(value) && value.every((item) => typeof item === "string");
+  const sourceProvenanceIsValid = (value: unknown, sourceId: string): boolean => {
+    if (!isRecord(value)) return false;
+    const exactFields = [
+      value.sourceRecordId,
+      value.sourceTraditionId,
+      value.sourceTitle,
+      value.sourceDateOrVersion,
+      value.sourceUrlOrArchiveRef,
+      value.entryLocator,
+    ];
+    return (
+      value.sourceRecordId === sourceId &&
+      exactFields.every((item) => typeof item === "string" && item.length > 0 && item.trim() === item) &&
+      (value.sourceHashOrArchiveHash === null ||
+        (typeof value.sourceHashOrArchiveHash === "string" && value.sourceHashOrArchiveHash.length > 0)) &&
+      (value.languageVariety === null ||
+        (typeof value.languageVariety === "string" && value.languageVariety.length > 0)) &&
+      (value.attestedGrammarNote === undefined ||
+        value.attestedGrammarNote === null ||
+        (typeof value.attestedGrammarNote === "string" &&
+          value.attestedGrammarNote.length > 0 &&
+          value.attestedGrammarNote.trim() === value.attestedGrammarNote))
+    );
+  };
   const validSourceRelationAssertion = (
     assertion: unknown,
     senses: unknown,
@@ -2751,6 +2775,8 @@ function parseMotivationDiscoveryV0_1(
       typeof source.sourceStatus !== "string" ||
       typeof source.attestationTruth !== "string" ||
       !isStringArray(source.evidenceRefs) ||
+      (source.sourceProvenance !== undefined &&
+        !sourceProvenanceIsValid(source.sourceProvenance, source.sourceId)) ||
       !isStringArray(structure.protoRoots) ||
       !isStringArray(structure.carrierForms) ||
       !isStringArray(structure.operationIds) ||
