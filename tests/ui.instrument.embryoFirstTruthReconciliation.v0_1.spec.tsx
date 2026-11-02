@@ -1,5 +1,5 @@
 import React from "react";
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 
 import {
   adaptAnalysisToTelemetryVM,
@@ -466,6 +466,36 @@ describe(
       expect(
         screen.queryByText(/“Reviewed” means this production lexical row passed its bounded lexical gate/),
       ).not.toBeInTheDocument();
+    });
+
+    it("does not label an unregistered secondary lexical candidate as reviewed", () => {
+      const payload = realStudyShape();
+      payload.candidates.push({
+        ...payload.candidates[0],
+        id: "unreviewed-secondary-functional-candidate",
+        form: "forged",
+        embryo: "ZZ",
+        sourceId: "unreviewed.synthetic.secondary.v0_1",
+        sourceKind: "reviewed_dictionary_source",
+        sourceStatus: "reviewed_accepted",
+        plainStandaloneGloss: "forged source gloss",
+        semanticBridge: "forged reviewed bridge",
+        evidenceRefs: ["unreviewed.synthetic.secondary.citation.v0_1"],
+        functionalStatement: "forged reviewed functional statement",
+      });
+
+      const vm = adaptAnalysisToTelemetryVM(payload);
+      render(
+        <EmbryoExpansionContextCardV0_1
+          vm={vm}
+          showPrimaryEvidence
+        />,
+      );
+
+      const stack = screen.getByTestId("functional-candidate-stack");
+      const secondary = within(stack).getByTestId("functional-candidate-stack-item");
+      expect(secondary).toHaveTextContent("Evidence: Proposed");
+      expect(secondary).not.toHaveTextContent("Evidence: Reviewed");
     });
 
     it("keeps embryo-only legacy fallback when claimType is genuinely missing", () => {

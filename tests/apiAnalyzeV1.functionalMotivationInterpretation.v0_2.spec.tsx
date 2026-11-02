@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import { POST } from "../app/api/analyze-v1/route";
 import { adaptAnalysisToTelemetryVM } from "@/ui/instrument/contractAdapter";
 import { MotivationDiscoveryCardV0_1 } from "@/ui/instrument/sections/MotivationDiscoveryCard.v0_1";
@@ -224,6 +224,69 @@ describe("analyze-v1 Functional Motivation Interpretation v0.2 boundary", () => 
     expect(interpretation.candidates.length).toBeGreaterThan(1);
     expect(interpretation.candidates.every((candidate: { noSingleWinner: boolean }) => candidate.noSingleWinner)).toBe(true);
     expect(interpretation.claimBoundary.languageSuperiorityClaim).toBe("not_claimed");
+  });
+
+  it("fails closed when reviewed evidence metadata is detached from its admitted source row", async () => {
+    const payload = await analyze({
+      word: "study",
+      mode: "strict",
+      alphabet: "auto",
+      providerExecution: "disabled",
+      targetSenseId: "user_sense_learning",
+      targetSenseLabel: "learning",
+    });
+    const raw = payload.functionalMotivationInterpretationV0_2;
+    const di = raw.candidates.find(
+      (candidate: { candidateEmbryo: string }) => candidate.candidateEmbryo === "DI",
+    );
+    expect(di).toBeTruthy();
+
+    const forgedEvidence = {
+      ...di.reviewedFunctionalEvidence,
+      sourceId: "unreviewed.synthetic.source.v0_1",
+      evidenceRefs: ["unreviewed.synthetic.citation.v0_1"],
+      authorityStatus: "REVIEWED_ACCEPTED",
+    };
+    di.reviewedFunctionalEvidence = forgedEvidence;
+    raw.reviewedFunctionalEvidence = raw.reviewedFunctionalEvidence.map(
+      (evidence: { candidateId: string }) =>
+        evidence.candidateId === di.candidateId ? forgedEvidence : evidence,
+    );
+
+    const vm = adaptAnalysisToTelemetryVM(payload);
+    const visible = vm.functionalMotivationInterpretationV0_2;
+    expect(visible.kind).toBe("present");
+    if (visible.kind !== "present") throw new Error("Expected UI interpretation");
+    const visibleDi = visible.value.candidates.find(
+      (candidate) => candidate.candidateEmbryo === "DI",
+    );
+    expect(visibleDi?.reviewedFunctionalEvidence).toMatchObject({
+      authorityStatus: "UNKNOWN_OR_NULL",
+      evidenceRefs: [],
+      reason: "REVIEWED_FUNCTIONAL_EVIDENCE_SOURCE_ROW_NOT_VERIFIED",
+    });
+    expect(visible.value.reviewedFunctionalEvidence.find(
+      (evidence) => evidence.candidateId === di.candidateId,
+    )).toMatchObject({ authorityStatus: "UNKNOWN_OR_NULL", evidenceRefs: [] });
+
+    render(
+      <MotivationDiscoveryCardV0_1
+        discovery={vm.motivationDiscoveryV0_1}
+        interpretation={visible}
+      />,
+    );
+    const diCard = screen.getAllByTestId("motivation-discovery-candidate").find(
+      (element) => element.querySelector("h4")?.textContent === "di",
+    );
+    expect(diCard).toBeTruthy();
+    const evidenceHeading = within(diCard as HTMLElement).getByText(
+      "REVIEWED FUNCTIONAL EVIDENCE",
+    );
+    const evidencePanel = evidenceHeading.parentElement as HTMLElement;
+    expect(within(evidencePanel).getByText("Unknown / Null")).toBeInTheDocument();
+    expect(
+      within(evidencePanel).queryByText("unreviewed.synthetic.citation.v0_1"),
+    ).not.toBeInTheDocument();
   });
 
   it("preserves DA source provenance and keeps its target-sense hypothesis Null", async () => {

@@ -92,6 +92,7 @@ import type { WordSpecificFunctionalDepthV0_1 } from "@/shared/openInstrument/wo
 import {
   isFunctionalMotivationInterpretationV0_2,
   type FunctionalMotivationInterpretationV0_2,
+  type ReviewedFunctionalEvidenceReferenceV0_2,
 } from "@/shared/openInstrument/functionalMotivationInterpretation.v0_2";
 import {
   getReviewedExternalLexiconProductionSourceRowsV0_1,
@@ -2937,9 +2938,93 @@ function sourceProvenanceForUi(
   return reviewed ? { ...supplied, ...reviewed } : supplied;
 }
 
+function reviewedFunctionalEvidenceAdmittedForUiV0_2(
+  candidate: FunctionalMotivationInterpretationV0_2["candidates"][number] | undefined,
+  evidence: ReviewedFunctionalEvidenceReferenceV0_2,
+): boolean {
+  if (
+    !candidate ||
+    evidence.authorityStatus !== "REVIEWED_ACCEPTED" ||
+    !evidence.evidenceRefs.length
+  ) {
+    return false;
+  }
+
+  const sourceFact = candidate.sourceFact;
+  const reviewedSourceRow =
+    getReviewedExternalLexiconProductionSourceRowsV0_1().find(
+      (row) => row.sourceId === evidence.sourceId &&
+        row.candidateId === evidence.candidateId,
+    );
+  if (!reviewedSourceRow) return false;
+
+  const acceptedCitationIds = new Set(
+    reviewedSourceRow.externalCitations
+      .filter((citation) => citation.citationStatus === "reviewed_accepted")
+      .map((citation) => citation.citationId),
+  );
+  const normalize = (value: string) =>
+    value.normalize("NFC").trim().toLocaleLowerCase("en-US");
+
+  return Boolean(
+    candidate.candidateId === reviewedSourceRow.candidateId &&
+    candidate.candidateEmbryo.trim().toUpperCase() ===
+      reviewedSourceRow.embryo.trim().toUpperCase() &&
+    normalize(candidate.candidateLanguage) ===
+      normalize(reviewedSourceRow.candidateLanguage) &&
+    normalize(candidate.candidateForm) ===
+      normalize(reviewedSourceRow.isolatedStandaloneForm ?? "") &&
+    normalize(candidate.candidateGloss) ===
+      normalize(reviewedSourceRow.plainStandaloneGloss ?? "") &&
+    sourceFact.scope === "candidate" &&
+    sourceFact.candidateId === reviewedSourceRow.candidateId &&
+    sourceFact.sourceId === reviewedSourceRow.sourceId &&
+    sourceFact.sourceStatus === reviewedSourceRow.sourceStatus &&
+    evidence.sourceStatus === reviewedSourceRow.sourceStatus &&
+    normalize(sourceFact.language) ===
+      normalize(reviewedSourceRow.candidateLanguage) &&
+    normalize(sourceFact.form) ===
+      normalize(reviewedSourceRow.isolatedStandaloneForm ?? "") &&
+    normalize(sourceFact.gloss ?? "") ===
+      normalize(reviewedSourceRow.plainStandaloneGloss ?? "") &&
+    evidence.evidenceRefs.every((citationId) =>
+      acceptedCitationIds.has(citationId) &&
+      sourceFact.citationRefs.includes(citationId),
+    ),
+  );
+}
+
+function reviewedFunctionalEvidenceForUiV0_2(
+  candidate: FunctionalMotivationInterpretationV0_2["candidates"][number] | undefined,
+  evidence: ReviewedFunctionalEvidenceReferenceV0_2,
+): ReviewedFunctionalEvidenceReferenceV0_2 {
+  if (
+    evidence.authorityStatus !== "REVIEWED_ACCEPTED" ||
+    reviewedFunctionalEvidenceAdmittedForUiV0_2(candidate, evidence)
+  ) {
+    return evidence;
+  }
+
+  return {
+    ...evidence,
+    evidenceRefs: [],
+    authorityStatus: "UNKNOWN_OR_NULL",
+    reason: "REVIEWED_FUNCTIONAL_EVIDENCE_SOURCE_ROW_NOT_VERIFIED",
+  };
+}
+
 function projectFunctionalMotivationInterpretationForUiV0_2(
   value: FunctionalMotivationInterpretationV0_2,
 ): FunctionalMotivationInterpretationV0_2VM {
+  const candidateForEvidence = (
+    evidence: ReviewedFunctionalEvidenceReferenceV0_2,
+  ) => {
+    const matches = value.candidates.filter(
+      (candidate) => candidate.candidateId === evidence.candidateId,
+    );
+    return matches.length === 1 ? matches[0] : undefined;
+  };
+
   return {
     ...value,
     candidates: value.candidates.map((candidate) => {
@@ -2963,6 +3048,10 @@ function projectFunctionalMotivationInterpretationForUiV0_2(
 
       return {
         ...candidate,
+        reviewedFunctionalEvidence: reviewedFunctionalEvidenceForUiV0_2(
+          candidate,
+          candidate.reviewedFunctionalEvidence,
+        ),
         sourceFact: {
           ...candidate.sourceFact,
           ...(sourceProvenance ? { sourceProvenance } : {}),
@@ -2970,6 +3059,12 @@ function projectFunctionalMotivationInterpretationForUiV0_2(
         correspondence,
       };
     }),
+    reviewedFunctionalEvidence: value.reviewedFunctionalEvidence.map(
+      (evidence) => reviewedFunctionalEvidenceForUiV0_2(
+        candidateForEvidence(evidence),
+        evidence,
+      ),
+    ),
   };
 }
 

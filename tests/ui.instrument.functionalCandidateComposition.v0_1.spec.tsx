@@ -306,5 +306,27 @@ describe(
         ),
       ).toBeInTheDocument();
     });
+
+    it("renders the registered lexical bridge instead of caller-supplied claim text", async () => {
+      const body = await analyzeV1("study");
+      const di = body.candidates.find(
+        (candidate: { sourceId?: string }) =>
+          candidate.sourceId === "reviewed.external.di.knowledge.candidate.v0_1",
+      );
+      expect(di).toBeTruthy();
+      expect(typeof di.semanticBridge).toBe("string");
+
+      const forgedStatement = "This lexical row proves the historical origin of study.";
+      di.functionalStatement = forgedStatement;
+
+      const vm = adaptAnalysisToTelemetryVM(body);
+      render(<EmbryoExpansionContextCardV0_1 vm={vm} />);
+
+      expect(screen.getByText(di.semanticBridge)).toBeInTheDocument();
+      expect(screen.queryByText(forgedStatement)).not.toBeInTheDocument();
+      expect(
+        screen.getByText("Evidence: Reviewed lexical bridge · exploratory"),
+      ).toBeInTheDocument();
+    });
   },
 );

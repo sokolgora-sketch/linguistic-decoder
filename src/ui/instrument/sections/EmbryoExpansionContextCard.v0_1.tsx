@@ -181,9 +181,9 @@ function presentString(
   return text || null;
 }
 
-function isReviewedLexicalBridgeAdmittedV0_1(
+function reviewedLexicalBridgeTextV0_1(
   row: CandidateRowVM,
-): boolean {
+): string | null {
   const sourceId = presentString(row.sourceId);
   const language = presentString(row.language);
   const form = presentString(row.form);
@@ -201,7 +201,7 @@ function isReviewedLexicalBridgeAdmittedV0_1(
     presentString(row.claimType) !== "functionalMotivation" ||
     presentString(row.validationOutcome) !== "validated"
   ) {
-    return false;
+    return null;
   }
 
   const reviewedSourceRow =
@@ -209,7 +209,7 @@ function isReviewedLexicalBridgeAdmittedV0_1(
       (candidate) => candidate.sourceId === sourceId &&
         candidate.candidateId === row.id,
     );
-  if (!reviewedSourceRow) return false;
+  if (!reviewedSourceRow) return null;
 
   const normalize = (value: string) =>
     value.normalize("NFC").trim().toLocaleLowerCase("en-US");
@@ -218,7 +218,7 @@ function isReviewedLexicalBridgeAdmittedV0_1(
       evidenceRefs.includes(citation.citationId),
   );
 
-  return Boolean(
+  const admitted = Boolean(
     reviewedSourceRow.isolatedStandaloneForm &&
     sourceKind === reviewedSourceRow.sourceKind &&
     sourceStatus === reviewedSourceRow.sourceStatus &&
@@ -229,6 +229,14 @@ function isReviewedLexicalBridgeAdmittedV0_1(
     semanticBridge === reviewedSourceRow.semanticBridge &&
     hasReviewedCitation,
   );
+
+  return admitted ? reviewedSourceRow.semanticBridge : null;
+}
+
+function isReviewedLexicalBridgeAdmittedV0_1(
+  row: CandidateRowVM,
+): boolean {
+  return reviewedLexicalBridgeTextV0_1(row) !== null;
 }
 
 function humanLanguage(
@@ -524,6 +532,9 @@ function functionalCandidateDisplayFormV0_1(
 function functionalCandidateMeaningV0_1(
   row: CandidateRowVM,
 ): string | null {
+  const reviewedBridge = reviewedLexicalBridgeTextV0_1(row);
+  if (reviewedBridge) return reviewedBridge;
+
   const statement = presentString(row.functionalStatement);
 
   if (statement) {
@@ -578,11 +589,7 @@ function FunctionalCandidateStackV0_1({
 
       <div className="mt-3 space-y-3">
         {additionalCandidates.map((candidate) => {
-          const validation = presentString(candidate.validationOutcome);
-          const status =
-            validation === "validated"
-              ? "Reviewed"
-              : "Partial";
+          const status = evidenceStateFromCandidateForStackV0_1(candidate);
           const components = presentFunctionalComponents(candidate);
           const meaning = functionalCandidateMeaningV0_1(candidate);
           const uiRow = candidateUiRowsById.get(candidate.id);
@@ -677,6 +684,24 @@ function evidenceStateFromCandidate(
   }
 
   return "Proposed";
+}
+
+function evidenceStateFromCandidateForStackV0_1(
+  row: CandidateRowVM,
+): "Reviewed" | "Partial" | "Proposed" {
+  const sourceKind = presentString(row.sourceKind);
+  if (
+    presentString(row.validationOutcome) === "validated" &&
+    presentString(row.claimType) === "functionalMotivation" &&
+    ["reviewed_dictionary_source", "reviewed_lexical_source"].includes(
+      sourceKind ?? "",
+    ) &&
+    !isReviewedLexicalBridgeAdmittedV0_1(row)
+  ) {
+    return "Proposed";
+  }
+
+  return evidenceStateFromCandidate(row);
 }
 
 function lexicalSourceEvidenceRowsV0_1(
@@ -1176,8 +1201,11 @@ export function EmbryoExpansionContextCardV0_1({
       primaryCandidate.claimType,
     ) === "genericFunctionalHypothesis";
 
+  const reviewedLexicalBridge =
+    reviewedLexicalBridgeTextV0_1(primaryCandidate);
+
   const isReviewedLexicalFunctionalCandidate =
-    isReviewedLexicalBridgeAdmittedV0_1(primaryCandidate) &&
+    reviewedLexicalBridge !== null &&
     primaryValidation === "validated" &&
     presentString(primaryCandidate.claimType) === "functionalMotivation" &&
     presentString(primaryCandidate.sourceStatus) === "reviewed_accepted" &&
@@ -1186,7 +1214,7 @@ export function EmbryoExpansionContextCardV0_1({
     );
 
   const isUnverifiedReviewedLexicalFunctionalCandidate =
-    !isReviewedLexicalBridgeAdmittedV0_1(primaryCandidate) &&
+    reviewedLexicalBridge === null &&
     primaryValidation === "validated" &&
     presentString(primaryCandidate.claimType) === "functionalMotivation" &&
     presentString(primaryCandidate.sourceStatus) === "reviewed_accepted" &&
@@ -1564,6 +1592,7 @@ export function EmbryoExpansionContextCardV0_1({
       );
 
     composedMeaning =
+      reviewedLexicalBridge ??
       (
         isResearchFunctionalCandidate
           ? presentString(
