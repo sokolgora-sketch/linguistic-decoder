@@ -145,7 +145,7 @@ describe("Open Instrument lexical evidence primary surface v0.1", () => {
     expect(screen.queryByTestId("lexical-source-evidence-primary")).not.toBeInTheDocument();
   });
 
-  it("leaves reviewed functional presentation intact and does not relabel it as lexical-only", async () => {
+  it("labels reviewed lexical bridge evidence as exploratory, not as independently proven function", async () => {
     const body = await analyze({
       word: "study",
       mode: "strict",
@@ -155,7 +155,8 @@ describe("Open Instrument lexical evidence primary surface v0.1", () => {
     renderCard(body);
 
     expect(body.analysisStatusV0_1.status).toBe("reviewed_functional_evidence");
-    expect(screen.getByText("Evidence: Reviewed")).toBeInTheDocument();
+    expect(screen.getByText("Evidence: Reviewed lexical bridge · exploratory")).toBeInTheDocument();
+    expect(screen.getByText("Exploratory functional bridge")).toBeInTheDocument();
     expect(screen.queryByTestId("lexical-source-evidence-primary")).not.toBeInTheDocument();
     expect(screen.getByText(/Functional motivation, not historical etymology\./)).toBeInTheDocument();
   });

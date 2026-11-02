@@ -8,6 +8,7 @@ import {
 import { buildMotivationEngineDiscoveryV0_1 } from "@/shared/openInstrument/motivationEngineDiscovery.v0_1";
 import { createAlbanianLexicalSubstrateWitnessAdapterV0_1 } from "@/shared/openInstrument/albanianLexicalSubstrate.v0_1";
 import { createLatinLexicalSubstrateWitnessAdapterV0_1 } from "@/shared/openInstrument/latinLexicalSubstrate.v0_1";
+import { adaptAnalysisToTelemetryVM } from "@/ui/instrument/contractAdapter";
 import {
   adaptEnglishKaikkiJsonlRecordV0_1,
   createEnglishKaikkiGenericWitnessSourceAdapterV0_1,
@@ -339,6 +340,98 @@ describe("Functional Motivation Interpretation v0.2 projector", () => {
     expect(latin?.hypothesis.status).toBe("UNKNOWN_OR_NULL");
     expect(latin?.hypothesis.reason).toBe("NO_AUTHORIZED_STRUCTURAL_RELATION");
     expect(latin?.sourceFact.entryLocator).toContain("amo");
+  });
+
+  it("keeps source-form-derived candidate Voice paths Null in the raw interpretation", async () => {
+    const lexicalAdapter = createAlbanianLexicalSubstrateWitnessAdapterV0_1();
+    const sourceFormExtractingAdapter: GenericFunctionalWitnessSourceAdapterV1 = {
+      ...lexicalAdapter,
+      candidateVoicePathPolicy: "SOURCE_FORM_EXTRACTED",
+    };
+    const { heart, discovery } = await discoveryFor(
+      "study",
+      "en",
+      undefined,
+      [sourceFormExtractingAdapter],
+    );
+
+    const result = buildFunctionalMotivationInterpretationV0_2({
+      discovery,
+      targetSense: null,
+      heart,
+    });
+    const rawDi = result.candidates.find((candidate) => candidate.candidateEmbryo === "DI");
+    expect(heart.spokenPronunciation.status).toBe("defined");
+    expect(result.input.derivedStructure.voicePathSource).toBe("production_spoken");
+    expect(rawDi?.correspondence.inputVoicePath).toEqual(
+      heart.canonicalSpokenVoicePath,
+    );
+    const field = adaptAnalysisToTelemetryVM({
+      functionalMotivationInterpretationV0_2: result,
+    }).functionalMotivationInterpretationV0_2;
+
+    expect(rawDi?.correspondence.candidateVoicePath).toEqual([]);
+    expect(rawDi?.correspondence.candidateVoicePathStatus).toBe("NULL_UNAUTHORIZED");
+    expect(rawDi?.correspondence.candidateRepresentationKind).toBe(
+      "orthographic_profile_derived",
+    );
+    expect(field.kind).toBe("present");
+    if (field.kind !== "present") throw new Error("Expected UI interpretation");
+    const di = field.value.candidates.find((candidate) => candidate.candidateEmbryo === "DI");
+    expect(di?.correspondence.candidateVoicePath).toEqual([]);
+    expect(di?.correspondence.candidateVoicePathStatus).toBe("NULL_UNAUTHORIZED");
+    expect(di?.correspondence.voiceRelationship).toBe(
+      "NOT_COMPARABLE_ACROSS_REPRESENTATIONS",
+    );
+    expect(di?.hypothesis.status).toBe("UNKNOWN_OR_NULL");
+  });
+
+  it("does not authorize a spelling-derived path when its representation is relabeled as spoken", async () => {
+    const lexicalAdapter = createAlbanianLexicalSubstrateWitnessAdapterV0_1();
+    const sourceFormExtractingAdapter: GenericFunctionalWitnessSourceAdapterV1 = {
+      ...lexicalAdapter,
+      candidateVoicePathPolicy: "SOURCE_FORM_EXTRACTED",
+    };
+    const { heart, discovery } = await discoveryFor(
+      "study",
+      "en",
+      undefined,
+      [sourceFormExtractingAdapter],
+    );
+    const relabeledDiscovery = {
+      ...discovery,
+      candidates: discovery.candidates.map((candidate) => ({
+        ...candidate,
+        structuralComparison: {
+          ...candidate.structuralComparison,
+          candidateRepresentationKind: "production_spoken" as const,
+        },
+      })),
+    };
+
+    const result = buildFunctionalMotivationInterpretationV0_2({
+      discovery: relabeledDiscovery,
+      targetSense: null,
+      heart,
+    });
+    const rawDi = result.candidates.find((candidate) => candidate.candidateEmbryo === "DI");
+    const field = adaptAnalysisToTelemetryVM({
+      functionalMotivationInterpretationV0_2: result,
+    }).functionalMotivationInterpretationV0_2;
+
+    expect(rawDi?.correspondence.candidateRepresentationKind).toBe("production_spoken");
+    expect(rawDi?.correspondence.candidateVoicePath).toEqual([]);
+    expect(rawDi?.correspondence.candidateVoicePathStatus).toBe("NULL_UNAUTHORIZED");
+
+    expect(field.kind).toBe("present");
+    if (field.kind !== "present") throw new Error("Expected UI interpretation");
+    const di = field.value.candidates.find((candidate) => candidate.candidateEmbryo === "DI");
+    expect(di?.correspondence.candidateVoicePath).toEqual([]);
+    expect(di?.correspondence.candidateRepresentationKind).toBe(
+      "orthographic_profile_derived",
+    );
+    expect(di?.correspondence.candidateVoicePathStatus).toBe("NULL_UNAUTHORIZED");
+    expect(di?.hypothesis.status).toBe("UNKNOWN_OR_NULL");
   });
 
   it("covers a previously unprepared input selected by a declared inflection rule", async () => {

@@ -132,6 +132,7 @@ describe("M7 novel-input generalization v0.1", () => {
     const selectionSource = readFileSync(join(ROOT, "scripts/openInstrumentM7NovelInputGeneralization.v0_1.ts"), "utf8");
 
     expect(records).toHaveLength(55);
+    // The frozen lexical substrate remains at the base-main fingerprint.
     expect(substrateFingerprint).toBe("3db9f039c12b0b3d51a9d64361909403baf4224c92c3ff237f7e9d49aabedcbb");
     expect(motivationSource).not.toMatch(/(?:word|input\.word)\s*===\s*["']a["']/u);
     expect(motivationSource).not.toMatch(/case\s+["']a["']/u);

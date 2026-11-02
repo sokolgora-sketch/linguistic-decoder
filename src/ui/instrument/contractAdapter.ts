@@ -91,7 +91,18 @@ import {
 import type { WordSpecificFunctionalDepthV0_1 } from "@/shared/openInstrument/wordSpecificFunctionalDepth.v0_1";
 import {
   isFunctionalMotivationInterpretationV0_2,
+  type FunctionalMotivationInterpretationV0_2,
+  type ReviewedFunctionalEvidenceReferenceV0_2,
 } from "@/shared/openInstrument/functionalMotivationInterpretation.v0_2";
+import {
+  getReviewedExternalLexiconProductionSourceRowsV0_1,
+} from "@/shared/reviewedExternalLexiconSourceRowRegistry.v0_1";
+import type {
+  GenericFunctionalWitnessRuntimeProjectionV1,
+} from "@/shared/openInstrument/genericFunctionalWitnessRuntimeProjection.v1";
+import type {
+  GenericFunctionalWitnessSourceProvenanceV1,
+} from "@/shared/openInstrument/genericFunctionalWitnessDiscovery.v1";
 
 type ParseRootMapResult = { ok: true; value: RootMapV1 } | { ok: false; reason: string };
 
@@ -920,6 +931,30 @@ function parseMotivationDiscoveryV0_1(
     : null;
   const isStringArray = (value: unknown): value is string[] =>
     Array.isArray(value) && value.every((item) => typeof item === "string");
+  const sourceProvenanceIsValid = (value: unknown, sourceId: string): boolean => {
+    if (!isRecord(value)) return false;
+    const exactFields = [
+      value.sourceRecordId,
+      value.sourceTraditionId,
+      value.sourceTitle,
+      value.sourceDateOrVersion,
+      value.sourceUrlOrArchiveRef,
+      value.entryLocator,
+    ];
+    return (
+      value.sourceRecordId === sourceId &&
+      exactFields.every((item) => typeof item === "string" && item.length > 0 && item.trim() === item) &&
+      (value.sourceHashOrArchiveHash === null ||
+        (typeof value.sourceHashOrArchiveHash === "string" && value.sourceHashOrArchiveHash.length > 0)) &&
+      (value.languageVariety === null ||
+        (typeof value.languageVariety === "string" && value.languageVariety.length > 0)) &&
+      (value.attestedGrammarNote === undefined ||
+        value.attestedGrammarNote === null ||
+        (typeof value.attestedGrammarNote === "string" &&
+          value.attestedGrammarNote.length > 0 &&
+          value.attestedGrammarNote.trim() === value.attestedGrammarNote))
+    );
+  };
   const validSourceRelationAssertion = (
     assertion: unknown,
     senses: unknown,
@@ -2751,6 +2786,8 @@ function parseMotivationDiscoveryV0_1(
       typeof source.sourceStatus !== "string" ||
       typeof source.attestationTruth !== "string" ||
       !isStringArray(source.evidenceRefs) ||
+      (source.sourceProvenance !== undefined &&
+        !sourceProvenanceIsValid(source.sourceProvenance, source.sourceId)) ||
       !isStringArray(structure.protoRoots) ||
       !isStringArray(structure.carrierForms) ||
       !isStringArray(structure.operationIds) ||
@@ -2819,10 +2856,41 @@ function parseMotivationDiscoveryV0_1(
     ) {
       return missing("malformed", "motivationDiscoveryV0_1 candidate fields invalid");
     }
-    candidates.push(candidate as MotivationDiscoveryCandidateV0_1VM);
+    const typedCandidate = candidate as unknown as MotivationDiscoveryCandidateV0_1VM;
+    const typedSourceFact = typedCandidate.sourceFact;
+    const typedComparison = typedCandidate.structuralComparison;
+    const sourceProvenance = sourceProvenanceForUi(
+      typedSourceFact.sourceId,
+      typedSourceFact.sourceProvenance,
+    );
+    // A caller-supplied representation label is not candidate pronunciation
+    // authority. No reviewed candidate-side pronunciation mapping is carried
+    // by this discovery contract, so keep the UI projection Null.
+    const candidateVoicePath: string[] = [];
+    candidates.push({
+      ...typedCandidate,
+      candidateVoicePath,
+      sourceFact: {
+        ...typedSourceFact,
+        ...(sourceProvenance ? { sourceProvenance } : {}),
+      },
+      structuralComparison: {
+        ...typedComparison,
+        // Discovery candidates are lexical source forms. The payload's
+        // representation label is not evidence of a reviewed pronunciation.
+        candidateRepresentationKind: "orthographic_profile_derived",
+        representationCompatibility:
+          "NOT_COMPARABLE_ACROSS_REPRESENTATIONS",
+        voiceRelationship: "NOT_COMPARABLE_ACROSS_REPRESENTATIONS",
+        candidateVoicePath,
+      },
+    });
   }
 
-  return present(value as unknown as MotivationDiscoveryV0_1VM);
+  return present({
+    ...value,
+    candidates,
+  } as unknown as MotivationDiscoveryV0_1VM);
 }
 
 function parseFunctionalMotivationInterpretationV0_2(
@@ -2835,7 +2903,199 @@ function parseFunctionalMotivationInterpretationV0_2(
   if (!isFunctionalMotivationInterpretationV0_2(value)) {
     return missing("malformed", "functionalMotivationInterpretationV0_2 shape invalid");
   }
-  return present(value);
+  return present(projectFunctionalMotivationInterpretationForUiV0_2(value));
+}
+
+function reviewedSourceProvenanceForUi(
+  sourceId: string,
+): GenericFunctionalWitnessSourceProvenanceV1 | undefined {
+  const row = getReviewedExternalLexiconProductionSourceRowsV0_1().find(
+    (candidate) => candidate.sourceId === sourceId,
+  );
+  const citation = row?.externalCitations[0];
+  if (!row || !citation) return undefined;
+
+  return {
+    sourceRecordId: row.sourceId,
+    sourceTraditionId: "reviewed-external-lexicon-source-row-registry.v0_1",
+    sourceTitle: citation.sourceTitle ?? row.sourceKind,
+    sourceDateOrVersion: citation.sourceDateOrVersion ?? "",
+    sourceUrlOrArchiveRef: citation.sourceUrlOrArchiveRef ?? "",
+    entryLocator: citation.entryLocator ?? "",
+    sourceHashOrArchiveHash: citation.sourceHashOrArchiveHash ?? null,
+    languageVariety: null,
+    ...(citation.attestedGrammarNote
+      ? { attestedGrammarNote: citation.attestedGrammarNote }
+      : {}),
+  };
+}
+
+function sourceProvenanceForUi(
+  sourceId: string,
+  supplied?: GenericFunctionalWitnessSourceProvenanceV1,
+): GenericFunctionalWitnessSourceProvenanceV1 | undefined {
+  const reviewed = reviewedSourceProvenanceForUi(sourceId);
+  return reviewed ? { ...supplied, ...reviewed } : supplied;
+}
+
+function reviewedFunctionalEvidenceAdmittedForUiV0_2(
+  candidate: FunctionalMotivationInterpretationV0_2["candidates"][number] | undefined,
+  evidence: ReviewedFunctionalEvidenceReferenceV0_2,
+): boolean {
+  if (
+    !candidate ||
+    evidence.authorityStatus !== "REVIEWED_ACCEPTED" ||
+    !evidence.evidenceRefs.length
+  ) {
+    return false;
+  }
+
+  const sourceFact = candidate.sourceFact;
+  const reviewedSourceRow =
+    getReviewedExternalLexiconProductionSourceRowsV0_1().find(
+      (row) => row.sourceId === evidence.sourceId &&
+        row.candidateId === evidence.candidateId,
+    );
+  if (!reviewedSourceRow) return false;
+
+  const acceptedCitationIds = new Set(
+    reviewedSourceRow.externalCitations
+      .filter((citation) => citation.citationStatus === "reviewed_accepted")
+      .map((citation) => citation.citationId),
+  );
+  const normalize = (value: string) =>
+    value.normalize("NFC").trim().toLocaleLowerCase("en-US");
+
+  return Boolean(
+    candidate.candidateId === reviewedSourceRow.candidateId &&
+    candidate.candidateEmbryo.trim().toUpperCase() ===
+      reviewedSourceRow.embryo.trim().toUpperCase() &&
+    normalize(candidate.candidateLanguage) ===
+      normalize(reviewedSourceRow.candidateLanguage) &&
+    normalize(candidate.candidateForm) ===
+      normalize(reviewedSourceRow.isolatedStandaloneForm ?? "") &&
+    normalize(candidate.candidateGloss) ===
+      normalize(reviewedSourceRow.plainStandaloneGloss ?? "") &&
+    sourceFact.scope === "candidate" &&
+    sourceFact.candidateId === reviewedSourceRow.candidateId &&
+    sourceFact.sourceId === reviewedSourceRow.sourceId &&
+    sourceFact.sourceStatus === reviewedSourceRow.sourceStatus &&
+    evidence.sourceStatus === reviewedSourceRow.sourceStatus &&
+    normalize(sourceFact.language) ===
+      normalize(reviewedSourceRow.candidateLanguage) &&
+    normalize(sourceFact.form) ===
+      normalize(reviewedSourceRow.isolatedStandaloneForm ?? "") &&
+    normalize(sourceFact.gloss ?? "") ===
+      normalize(reviewedSourceRow.plainStandaloneGloss ?? "") &&
+    evidence.evidenceRefs.every((citationId) =>
+      acceptedCitationIds.has(citationId) &&
+      sourceFact.citationRefs.includes(citationId),
+    ),
+  );
+}
+
+function reviewedFunctionalEvidenceForUiV0_2(
+  candidate: FunctionalMotivationInterpretationV0_2["candidates"][number] | undefined,
+  evidence: ReviewedFunctionalEvidenceReferenceV0_2,
+): ReviewedFunctionalEvidenceReferenceV0_2 {
+  if (
+    evidence.authorityStatus !== "REVIEWED_ACCEPTED" ||
+    reviewedFunctionalEvidenceAdmittedForUiV0_2(candidate, evidence)
+  ) {
+    return evidence;
+  }
+
+  return {
+    ...evidence,
+    evidenceRefs: [],
+    authorityStatus: "UNKNOWN_OR_NULL",
+    reason: "REVIEWED_FUNCTIONAL_EVIDENCE_SOURCE_ROW_NOT_VERIFIED",
+  };
+}
+
+function projectFunctionalMotivationInterpretationForUiV0_2(
+  value: FunctionalMotivationInterpretationV0_2,
+): FunctionalMotivationInterpretationV0_2VM {
+  const candidateForEvidence = (
+    evidence: ReviewedFunctionalEvidenceReferenceV0_2,
+  ) => {
+    const matches = value.candidates.filter(
+      (candidate) => candidate.candidateId === evidence.candidateId,
+    );
+    return matches.length === 1 ? matches[0] : undefined;
+  };
+
+  return {
+    ...value,
+    candidates: value.candidates.map((candidate) => {
+      const sourceProvenance = sourceProvenanceForUi(
+        candidate.sourceFact.sourceId,
+        candidate.sourceFact.sourceProvenance,
+      );
+      // This lexical-source contract carries no independently reviewed
+      // candidate pronunciation mapping. Preserve input-side Voice evidence,
+      // but derive candidate representation and authority fail-closed.
+      const correspondence = {
+        ...candidate.correspondence,
+        candidateRepresentationKind: "orthographic_profile_derived" as const,
+        representationCompatibility:
+          "NOT_COMPARABLE_ACROSS_REPRESENTATIONS" as const,
+        voiceRelationship:
+          "NOT_COMPARABLE_ACROSS_REPRESENTATIONS" as const,
+        candidateVoicePath: [],
+        candidateVoicePathStatus: "NULL_UNAUTHORIZED" as const,
+      };
+
+      return {
+        ...candidate,
+        reviewedFunctionalEvidence: reviewedFunctionalEvidenceForUiV0_2(
+          candidate,
+          candidate.reviewedFunctionalEvidence,
+        ),
+        sourceFact: {
+          ...candidate.sourceFact,
+          ...(sourceProvenance ? { sourceProvenance } : {}),
+        },
+        correspondence,
+      };
+    }),
+    reviewedFunctionalEvidence: value.reviewedFunctionalEvidence.map(
+      (evidence) => reviewedFunctionalEvidenceForUiV0_2(
+        candidateForEvidence(evidence),
+        evidence,
+      ),
+    ),
+  };
+}
+
+function projectGenericFunctionalWitnessRuntimeForUiV1(
+  value: GenericFunctionalWitnessRuntimeProjectionV1,
+): GenericFunctionalWitnessRuntimeProjectionV1 {
+  const matches = value.discovery.matches.map((witness) => {
+    const sourceProvenance = sourceProvenanceForUi(
+      witness.sourceId,
+      witness.sourceProvenance,
+    );
+    return {
+      ...witness,
+      candidateVoicePathPolicy: "NULL_UNAUTHORIZED" as const,
+      ...(sourceProvenance ? { sourceProvenance } : {}),
+    };
+  });
+
+  return {
+    ...value,
+    discovery: {
+      ...value.discovery,
+      matches,
+    },
+    correspondences: value.correspondences.map((correspondence, index) => {
+      const sourceWitness = matches[index];
+      return sourceWitness
+        ? { ...correspondence, sourceWitness }
+        : correspondence;
+    }),
+  };
 }
 
 function pickVoicePaths(payload: unknown): { detected: string | null; surface: string | null; functional: string | null } {
@@ -3750,10 +4010,16 @@ const normalizationSteps =
       const candidateTruthClaim =
         asString(rec["candidateTruthClaim"]);
 
-      const genericFunctionalWitnessRuntimeProjection =
+      const parsedGenericFunctionalWitnessRuntimeProjection =
         parseGenericFunctionalWitnessRuntimeProjectionV1(
           rec["genericFunctionalWitnessRuntimeProjectionV1"],
         );
+      const genericFunctionalWitnessRuntimeProjection =
+        parsedGenericFunctionalWitnessRuntimeProjection
+          ? projectGenericFunctionalWitnessRuntimeForUiV1(
+              parsedGenericFunctionalWitnessRuntimeProjection,
+            )
+          : null;
 
       const segmentation =
         isRecord(rec["segmentation"])

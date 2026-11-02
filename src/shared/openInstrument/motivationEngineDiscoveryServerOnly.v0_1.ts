@@ -611,6 +611,14 @@ function attachSourceFamilyProjectionV0_1(
     const sourceDetails = sourceDetailsBySourceId.get(candidate.sourceFact.sourceId);
     return {
       ...candidate,
+      // This API projection does not carry candidate-side pronunciation
+      // authority. Keep source-form vowel extraction inside the discovery
+      // engine, but do not publish that orthographic path as Voice output.
+      candidateVoicePath: [],
+      structuralComparison: {
+        ...candidate.structuralComparison,
+        candidateVoicePath: [],
+      },
       sourceFact: {
         ...candidate.sourceFact,
         ...(sourceFamilyId ? { sourceFamilyId } : {}),

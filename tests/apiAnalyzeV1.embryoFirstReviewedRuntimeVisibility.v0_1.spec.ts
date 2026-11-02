@@ -80,8 +80,8 @@ describe(
       expect(String(candidate.semanticBridge)).toContain(
         "split or divided",
       );
-      expect(String(candidate.claimBoundary)).toContain(
-        "not historical origin",
+      expect(candidate.claimBoundary).toBe(
+        "functional motivation evidence only; not historical origin",
       );
 
       const da = rootMapKey(body, "DA");
@@ -148,8 +148,8 @@ describe(
       expect(String(candidate.semanticBridge)).toContain(
         "study and learning",
       );
-      expect(String(candidate.claimBoundary)).toContain(
-        "not historical origin",
+      expect(candidate.claimBoundary).toBe(
+        "functional motivation evidence only; not historical origin",
       );
 
       const di = rootMapKey(body, "DI");

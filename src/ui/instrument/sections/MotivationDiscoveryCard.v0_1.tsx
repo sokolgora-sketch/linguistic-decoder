@@ -220,15 +220,15 @@ function exactLexicalSourceStatusLabel(
 function representationBoundary(candidate: MotivationDiscoveryCandidateV0_1VM): string | null {
   const comparison = candidate.structuralComparison;
   if (
+    comparison.candidateRepresentationKind !== "production_spoken" &&
+    comparison.candidateVoicePath.length === 0
+  ) {
+    return "Candidate Voice path: NULL_UNAUTHORIZED. Candidate pronunciation and spoken Voice path are Null; this displayed source form is nonspoken lexical evidence, not pronunciation authority.";
+  }
+  if (
     comparison.representationCompatibility !== "CROSS_REPRESENTATION" &&
     comparison.voiceRelationship !== "NOT_COMPARABLE_ACROSS_REPRESENTATIONS"
   ) {
-    if (
-      comparison.candidateRepresentationKind === "orthographic_profile_derived" &&
-      comparison.candidateVoicePath.length === 0
-    ) {
-      return "Candidate pronunciation and spoken Voice path are Null: this source supplies lexical form/gloss only. The displayed candidate representation is not spoken authority.";
-    }
     return null;
   }
   return `Voice comparison is limited: the input uses ${representationLabel(comparison.inputRepresentationKind)} while this candidate currently uses ${representationLabel(comparison.candidateRepresentationKind)}.`;
@@ -360,12 +360,22 @@ function Candidate({
               Source family: {candidate.sourceFact.sourceFamilyId ?? "unavailable"}
             </div>
             <div className="mt-2 space-y-3">
-              {records.map((record, index) => (
-                <div
-                  key={`${record.sourceFact.sourceId}:${index}`}
-                  data-testid="motivation-evidence-ledger-record"
-                  className="rounded border border-[#303843] bg-[#0d1117] p-2"
-                >
+              {records.map((record, index) => {
+                const interpretedSourceFact =
+                  interpretation?.sourceFact.sourceId === record.sourceFact.sourceId
+                    ? interpretation.sourceFact
+                    : null;
+                const attestedGrammarNote = (
+                  record.sourceFact.sourceProvenance?.attestedGrammarNote ??
+                  interpretedSourceFact?.sourceProvenance?.attestedGrammarNote
+                )?.trim();
+
+                return (
+                  <div
+                    key={`${record.sourceFact.sourceId}:${index}`}
+                    data-testid="motivation-evidence-ledger-record"
+                    className="rounded border border-[#303843] bg-[#0d1117] p-2"
+                  >
                   <div className="font-semibold text-[#d7dde7]">Source record {index + 1}</div>
                   <div className="mt-1 break-words font-mono">{record.sourceFact.sourceId}</div>
                   <div className="break-words text-[#9fb1bf]">
@@ -385,6 +395,11 @@ function Candidate({
                   <div className="break-words text-[#9fb1bf]">
                     Evidence refs: {record.sourceFact.evidenceRefs.join(", ") || "none"}
                   </div>
+                  {attestedGrammarNote ? (
+                    <div className="break-words text-[#9fb1bf]">
+                      Source-authored grammar/dialect/pronunciation note (descriptive only; not a structured dialect profile or Voice mapping): {attestedGrammarNote}
+                    </div>
+                  ) : null}
                   {record.sourceFact.sourceDetails ? (
                     <div className="break-words rounded border border-[#303843] bg-[#121923] p-2 text-[#b9c7d4]">
                       <div className="font-semibold text-[#d7dde7]">Source details</div>
@@ -421,8 +436,9 @@ function Candidate({
                   <div className="break-words text-[#9fb1bf]">
                     Functional authority: {record.functionalInterpretation.status} · {record.functionalInterpretation.reason ?? "none"}
                   </div>
-                </div>
-              ))}
+                  </div>
+                );
+              })}
             </div>
             <div className="mt-1 text-[#9fb1bf]">deterministic embryo/source-row lookup; no target-word mapping</div>
           </div>
@@ -436,6 +452,7 @@ function Candidate({
               <div><dt className="text-[#8ea4ba]">Candidate representation</dt><dd className="break-words font-mono">{comparison.candidateRepresentationKind}</dd></div>
               <div><dt className="text-[#8ea4ba]">Representation compatibility</dt><dd className="break-words font-mono">{comparison.representationCompatibility}</dd></div>
               <div><dt className="text-[#8ea4ba]">Voice relationship</dt><dd className="break-words font-mono">{comparison.voiceRelationship}</dd></div>
+              <div><dt className="text-[#8ea4ba]">Candidate Voice authority</dt><dd className="break-words font-mono">{interpretation?.correspondence.candidateVoicePathStatus ?? "not emitted"}</dd></div>
               <div><dt className="text-[#8ea4ba]">Input Voice / nucleus</dt><dd className="font-mono">{pathText(comparison.inputVoicePath)}</dd></div>
               <div><dt className="text-[#8ea4ba]">Candidate Voice / nucleus</dt><dd className="font-mono">{pathText(comparison.candidateVoicePath)}</dd></div>
               <div><dt className="text-[#8ea4ba]">Carrier relationship</dt><dd className="break-words font-mono">{comparison.consonantalCarrierRelationship}</dd></div>

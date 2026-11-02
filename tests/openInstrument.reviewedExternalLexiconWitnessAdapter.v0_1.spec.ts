@@ -17,10 +17,12 @@ function query(embryo: string) {
 
 describe("reviewed external lexicon generic witness adapter v0.1", () => {
   it("projects the existing reviewed AT row by embryo without a target row", () => {
+    const adapter = createReviewedExternalLexiconWitnessAdapterV0_1();
     const result = queryGenericFunctionalWitnessesV1(query("AT"), [
-      createReviewedExternalLexiconWitnessAdapterV0_1(),
+      adapter,
     ]);
 
+    expect(adapter.candidateVoicePathPolicy).toBeUndefined();
     expect(result.status).toBe("MATCHES_FOUND");
     expect(result.matches).toHaveLength(1);
     expect(result.matches[0]).toMatchObject({
@@ -42,13 +44,22 @@ describe("reviewed external lexicon generic witness adapter v0.1", () => {
       "reviewed.external.albanian-at.father.citation.v0_1",
     ]);
     expect(result.matches[0]?.sourceProvenance).toMatchObject({
-      sourceRecordId:
-        "reviewed.external.albanian-at.father.candidate.v0_1",
+      sourceRecordId: "reviewed.external.albanian-at.father.candidate.v0_1",
       entryLocator: "at [m] (tg) {2} 'father'; Alb. atë [m] (tg) 'father' (AE 83)",
-      sourceUrlOrArchiveRef: "https://ieed.ullet.net/alb.html",
+      languageVariety: null,
     });
+    expect(result.matches[0]?.sourceProvenance?.attestedGrammarNote).toBeUndefined();
     expect(JSON.stringify(result)).not.toContain("targetWord");
     expect(JSON.stringify(result)).not.toContain("semanticBridge");
+  });
+
+  it("keeps source-note enrichment outside the frozen runtime API shape", () => {
+    const adapter = createReviewedExternalLexiconWitnessAdapterV0_1();
+    const da = queryGenericFunctionalWitnessesV1(query("DA"), [adapter]);
+    const di = queryGenericFunctionalWitnessesV1(query("DI"), [adapter]);
+
+    expect(da.matches[0]?.sourceProvenance?.attestedGrammarNote).toBeUndefined();
+    expect(di.matches[0]?.sourceProvenance?.attestedGrammarNote).toBeUndefined();
   });
 
   it("queries all existing reviewed production rows generically and rejects absent embryos", () => {

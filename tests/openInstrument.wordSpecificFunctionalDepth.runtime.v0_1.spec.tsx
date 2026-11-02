@@ -47,7 +47,7 @@ describe("word-specific functional depth runtime v0.1", () => {
     );
 
     expect(screen.getByTestId("word-specific-functional-depth")).toBeVisible();
-    expect(screen.getByText("Reviewed functional motivation")).toBeVisible();
+    expect(screen.getByText("Reviewed lexical bridge evidence")).toBeVisible();
     expect(within(screen.getByTestId("word-specific-functional-depth")).getByText("di")).toBeVisible();
     expect(screen.getByText(/No single candidate is selected\. User decides\./)).toBeVisible();
   });
@@ -76,7 +76,7 @@ describe("word-specific functional depth runtime v0.1", () => {
     );
 
     expect(screen.getByTestId("word-specific-functional-depth")).toBeVisible();
-    expect(screen.getByText("Reviewed functional motivation")).toBeVisible();
+    expect(screen.getByText("Reviewed lexical bridge evidence")).toBeVisible();
     expect(
       within(screen.getByTestId("word-specific-functional-depth")).getByText("at"),
     ).toBeVisible();

@@ -70,7 +70,7 @@ describe(
           within(
             overviewPanel,
           ).getByText(
-            "Evidence: Reviewed",
+            "Evidence: Reviewed lexical bridge · exploratory",
           ),
         ).toBeVisible();
 
@@ -149,7 +149,7 @@ describe(
           within(
             candidatesPanel,
           ).getByText(
-            "Evidence: Reviewed",
+            "Evidence: Reviewed lexical bridge · exploratory",
           ),
         ).toBeVisible();
 
@@ -226,7 +226,7 @@ describe(
           within(
             functionalCard,
           ).getByText(
-            "Evidence: Reviewed",
+            "Evidence: Reviewed lexical bridge · exploratory",
           ),
         ).toBeVisible();
 

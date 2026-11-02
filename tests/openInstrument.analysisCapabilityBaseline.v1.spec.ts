@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
 
 import {
@@ -13,12 +14,24 @@ const MANIFEST_PATH =
   "tests/fixtures/openInstrument/analysis-capability-baseline.v1.manifest.json";
 const BASELINE_PATH =
   "tests/fixtures/openInstrument/analysis-capability-baseline.v1.json";
+const REGRESSION_BASELINE_PATH =
+  "tests/fixtures/openInstrument/analysis-capability-regression-baseline.v0_1.json";
+
+const FROZEN_MANIFEST_SHA256 =
+  "80e161d14538875e3cd9225cd6d43b8db2c40f7f68ca2fef661da216430e7d0a";
+const FROZEN_BASELINE_SHA256 =
+  "1cf20269b3d9516c66b8470b60208699e48e0a3ff78608107054078e91bc6d6d";
 
 const manifest = parseAnalysisCapabilityBaselineManifestV1(
   JSON.parse(readFileSync(MANIFEST_PATH, "utf8")) as unknown,
 );
+const frozenManifestBytes = readFileSync(MANIFEST_PATH);
+const frozenBaselineBytes = readFileSync(BASELINE_PATH);
 const baseline = parseAnalysisCapabilityBaselineV1(
-  readFileSync(BASELINE_PATH, "utf8"),
+  frozenBaselineBytes.toString("utf8"),
+);
+const regressionBaseline = parseAnalysisCapabilityBaselineV1(
+  readFileSync(REGRESSION_BASELINE_PATH, "utf8"),
 );
 
 const EXPECTED_CLAIM_BOUNDARY = {
@@ -132,6 +145,28 @@ function syntheticCase(input: {
 }
 
 describe("Open Instrument analytical capability baseline v1", () => {
+  test("preserves the historical v1 manifest and artifact byte-for-byte", () => {
+    expect(frozenManifestBytes.byteLength).toBe(9_087);
+    expect(createHash("sha256").update(frozenManifestBytes).digest("hex")).toBe(
+      FROZEN_MANIFEST_SHA256,
+    );
+    expect(frozenBaselineBytes.byteLength).toBe(284_890);
+    expect(createHash("sha256").update(frozenBaselineBytes).digest("hex")).toBe(
+      FROZEN_BASELINE_SHA256,
+    );
+  });
+
+  test("current runtime regression successor uses the same unchanged 57-case corpus", () => {
+    expect(regressionBaseline.schemaVersion).toBe(baseline.schemaVersion);
+    expect(regressionBaseline.corpusVersion).toBe(manifest.corpusVersion);
+    expect(regressionBaseline.caseCount).toBe(57);
+    expect(regressionBaseline.valid).toBe(true);
+    expect(regressionBaseline.cases.map((item) => item.caseId)).toEqual(
+      manifest.cases.map((item) => item.caseId),
+    );
+    expect(regressionBaseline.aggregate).toEqual(baseline.aggregate);
+  });
+
   test("manifest is versioned, representative, and has unique stable case IDs", () => {
     expect(manifest.schemaVersion).toBe(
       "open-instrument.analysis-capability-baseline-manifest.v1",

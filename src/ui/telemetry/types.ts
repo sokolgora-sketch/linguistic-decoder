@@ -10,6 +10,9 @@ import type {
   FunctionalMotivationInterpretationV0_2,
 } from "@/shared/openInstrument/functionalMotivationInterpretation.v0_2";
 import type {
+  GenericFunctionalWitnessSourceProvenanceV1,
+} from "@/shared/openInstrument/genericFunctionalWitnessDiscovery.v1";
+import type {
   AlbanianKaikkiExactLexicalSourceFactV0_1,
   AlbanianKaikkiExactLexicalSourceStatusV0_1,
 } from "@/shared/openInstrument/albanianKaikkiServerOnlyExactLexicalSource.v0_1";
@@ -369,6 +372,7 @@ export type MotivationDiscoveryCandidateV0_1VM = Readonly<{
     evidenceRefs: string[];
     sourceUrlOrArchiveRef: string | null;
     entryLocator: string | null;
+    sourceProvenance?: GenericFunctionalWitnessSourceProvenanceV1;
     sourceDetails?: Readonly<{
       synsetId: string;
       sourceIdentity?: string;

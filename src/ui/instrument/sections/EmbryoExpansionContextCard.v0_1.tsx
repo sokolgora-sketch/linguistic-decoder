@@ -9,6 +9,7 @@ import type {
 } from "@/ui/telemetry/types";
 import type { GenericFunctionalWitnessRuntimeProjectionV1 } from "@/shared/openInstrument/genericFunctionalWitnessRuntimeProjection.v1";
 import type { WordSpecificFunctionalDepthV0_1 } from "@/shared/openInstrument/wordSpecificFunctionalDepth.v0_1";
+import { getReviewedExternalLexiconProductionSourceRowsV0_1 } from "@/shared/reviewedExternalLexiconSourceRowRegistry.v0_1";
 
 import { buildCandidateRowsFromVM } from "@/ui/candidates/candidateModel";
 import type { UICandidateRow } from "@/ui/candidates/candidateModel";
@@ -178,6 +179,64 @@ function presentString(
     value.value.trim();
 
   return text || null;
+}
+
+function reviewedLexicalBridgeTextV0_1(
+  row: CandidateRowVM,
+): string | null {
+  const sourceId = presentString(row.sourceId);
+  const language = presentString(row.language);
+  const form = presentString(row.form);
+  const sourceKind = presentString(row.sourceKind);
+  const sourceStatus = presentString(row.sourceStatus);
+  const embryo = presentString(row.embryo);
+  const gloss = presentString(row.plainStandaloneGloss);
+  const semanticBridge = presentString(row.semanticBridge);
+  const evidenceRefs = row.evidenceRefs?.kind === "present"
+    ? row.evidenceRefs.value
+    : [];
+  if (
+    !sourceId || !language || !form || !sourceKind || !sourceStatus ||
+    !embryo || !gloss || !semanticBridge ||
+    presentString(row.claimType) !== "functionalMotivation" ||
+    presentString(row.validationOutcome) !== "validated"
+  ) {
+    return null;
+  }
+
+  const reviewedSourceRow =
+    getReviewedExternalLexiconProductionSourceRowsV0_1().find(
+      (candidate) => candidate.sourceId === sourceId &&
+        candidate.candidateId === row.id,
+    );
+  if (!reviewedSourceRow) return null;
+
+  const normalize = (value: string) =>
+    value.normalize("NFC").trim().toLocaleLowerCase("en-US");
+  const hasReviewedCitation = reviewedSourceRow.externalCitations.some(
+    (citation) => citation.citationStatus === "reviewed_accepted" &&
+      evidenceRefs.includes(citation.citationId),
+  );
+
+  const admitted = Boolean(
+    reviewedSourceRow.isolatedStandaloneForm &&
+    sourceKind === reviewedSourceRow.sourceKind &&
+    sourceStatus === reviewedSourceRow.sourceStatus &&
+    normalize(language) === normalize(reviewedSourceRow.candidateLanguage) &&
+    normalize(form) === normalize(reviewedSourceRow.isolatedStandaloneForm) &&
+    normalize(embryo) === normalize(reviewedSourceRow.embryo) &&
+    normalize(gloss) === normalize(reviewedSourceRow.plainStandaloneGloss ?? "") &&
+    semanticBridge === reviewedSourceRow.semanticBridge &&
+    hasReviewedCitation,
+  );
+
+  return admitted ? reviewedSourceRow.semanticBridge : null;
+}
+
+function isReviewedLexicalBridgeAdmittedV0_1(
+  row: CandidateRowVM,
+): boolean {
+  return reviewedLexicalBridgeTextV0_1(row) !== null;
 }
 
 function humanLanguage(
@@ -473,6 +532,9 @@ function functionalCandidateDisplayFormV0_1(
 function functionalCandidateMeaningV0_1(
   row: CandidateRowVM,
 ): string | null {
+  const reviewedBridge = reviewedLexicalBridgeTextV0_1(row);
+  if (reviewedBridge) return reviewedBridge;
+
   const statement = presentString(row.functionalStatement);
 
   if (statement) {
@@ -527,11 +589,7 @@ function FunctionalCandidateStackV0_1({
 
       <div className="mt-3 space-y-3">
         {additionalCandidates.map((candidate) => {
-          const validation = presentString(candidate.validationOutcome);
-          const status =
-            validation === "validated"
-              ? "Reviewed"
-              : "Partial";
+          const status = evidenceStateFromCandidate(candidate);
           const components = presentFunctionalComponents(candidate);
           const meaning = functionalCandidateMeaningV0_1(candidate);
           const uiRow = candidateUiRowsById.get(candidate.id);
@@ -607,6 +665,15 @@ function evidenceStateFromCandidate(
     );
 
   if (validation === "validated") {
+    const hasFunctionalClaim =
+      presentString(row.claimType) === "functionalMotivation" ||
+      presentString(row.functionalStatement) !== null;
+    if (
+      hasFunctionalClaim &&
+      !isReviewedLexicalBridgeAdmittedV0_1(row)
+    ) {
+      return "Proposed";
+    }
     return "Reviewed";
   }
 
@@ -771,7 +838,7 @@ function WordSpecificFunctionalDepthSummaryV0_1({
 
   const authorityLabel =
     value.authorityClass === "reviewed_functional"
-      ? "Reviewed functional motivation"
+      ? "Reviewed lexical bridge evidence"
       : "Research functional hypothesis";
 
   return (
@@ -899,9 +966,18 @@ function GenericFunctionalWitnesses({
                     {witness.gloss}
                   </div>
 
+                  <div className="mt-2 text-xs font-medium text-slate-600 dark:text-slate-400">
+                    Candidate Voice path: NULL_UNAUTHORIZED (nonspoken lexical form)
+                  </div>
+
                   {provenance ? (
                     <div className="mt-2 text-xs leading-5 text-slate-600 dark:text-slate-400">
                       {`${provenance.sourceTitle} · ${provenance.entryLocator}`}
+                    </div>
+                  ) : null}
+                  {provenance?.attestedGrammarNote ? (
+                    <div className="mt-2 text-xs leading-5 text-slate-600 dark:text-slate-400">
+                      Source-authored grammar/dialect/pronunciation note (descriptive only; not a structured dialect profile or Voice mapping): {provenance.attestedGrammarNote}
                     </div>
                   ) : null}
 
@@ -1104,6 +1180,27 @@ export function EmbryoExpansionContextCardV0_1({
     presentString(
       primaryCandidate.claimType,
     ) === "genericFunctionalHypothesis";
+
+  const reviewedLexicalBridge =
+    reviewedLexicalBridgeTextV0_1(primaryCandidate);
+
+  const isReviewedLexicalFunctionalCandidate =
+    reviewedLexicalBridge !== null &&
+    primaryValidation === "validated" &&
+    presentString(primaryCandidate.claimType) === "functionalMotivation" &&
+    presentString(primaryCandidate.sourceStatus) === "reviewed_accepted" &&
+    ["reviewed_dictionary_source", "reviewed_lexical_source"].includes(
+      presentString(primaryCandidate.sourceKind) ?? "",
+    );
+
+  const isUnverifiedReviewedLexicalFunctionalCandidate =
+    reviewedLexicalBridge === null &&
+    primaryValidation === "validated" &&
+    presentString(primaryCandidate.claimType) === "functionalMotivation" &&
+    presentString(primaryCandidate.sourceStatus) === "reviewed_accepted" &&
+    ["reviewed_dictionary_source", "reviewed_lexical_source"].includes(
+      presentString(primaryCandidate.sourceKind) ?? "",
+    );
 
   const useLegacyRootMapComposition =
     !isCompositionCandidate(
@@ -1475,6 +1572,7 @@ export function EmbryoExpansionContextCardV0_1({
       );
 
     composedMeaning =
+      reviewedLexicalBridge ??
       (
         isResearchFunctionalCandidate
           ? presentString(
@@ -1609,6 +1707,10 @@ export function EmbryoExpansionContextCardV0_1({
                 : "Evidence: None available"
               : isResearchFunctionalCandidate
               ? "Research hypothesis"
+              : isReviewedLexicalFunctionalCandidate
+              ? "Evidence: Reviewed lexical bridge · exploratory"
+              : isUnverifiedReviewedLexicalFunctionalCandidate
+                ? "Evidence: Source row not verified"
               : `Evidence: ${evidenceStatus}`}
           </div>
 
@@ -1677,7 +1779,9 @@ export function EmbryoExpansionContextCardV0_1({
         <div className="text-xs font-semibold uppercase tracking-[0.14em] text-blue-700 dark:text-blue-200">
           {isGenericFunctionalCandidate
             ? "Bounded doctrinal reading"
-            : `How it can motivate "${word || "this word"}"`}
+            : isReviewedLexicalFunctionalCandidate
+              ? "Exploratory functional bridge"
+              : `How it can motivate "${word || "this word"}"`}
         </div>
 
         <div className="mt-2 text-base leading-7 text-slate-900 dark:text-slate-100">
@@ -1686,6 +1790,11 @@ export function EmbryoExpansionContextCardV0_1({
               ? "This reading is generated under the ZË-RO Seven-Voices framework. No external lexical evidence is currently attached."
               : "A functional explanation was not emitted.")}
         </div>
+        {isReviewedLexicalFunctionalCandidate ? (
+          <p className="mt-3 border-t border-blue-300/70 pt-3 text-xs leading-5 text-slate-700 dark:border-blue-400/25 dark:text-slate-300">
+            “Reviewed” means this production lexical row passed its bounded lexical gate and matched reviewed RootMap evidence. It does not establish cross-source identity, target-sense correspondence, or independently demonstrate embryo function.
+          </p>
+        ) : null}
       </div>
 
       {witnessProjection || isGenericFunctionalCandidate ? (

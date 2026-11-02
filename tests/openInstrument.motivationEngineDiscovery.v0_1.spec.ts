@@ -54,6 +54,7 @@ describe("Motivation Engine Discovery first vertical v0.1", () => {
       consonantalCarrierRelationship: "INPUT_CARRIER_CONTEXT_ONLY",
     });
     expect(di?.structuralComparison.inputVoicePath.length).toBeGreaterThan(0);
+    expect(di?.candidateVoicePath).toEqual(["I"]);
     expect(di?.structuralComparison.candidateVoicePath).toEqual(["I"]);
     expect(di?.structuralComparison.candidateConsonantalStructure).toBeNull();
     expect(di?.structuralComparison.authorizedOperationIds).toContain("y_to_i");

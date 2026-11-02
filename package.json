@@ -73,6 +73,7 @@
     "open-instrument:controlled-semantic-provider-runner": "tsx scripts/openInstrumentControlledSemanticProviderExecutionRunner.v0.1.ts",
     "open-instrument:controlled-semantic-contrastive-provider-runner": "tsx scripts/openInstrumentControlledSemanticContrastiveProviderExecutionRunner.v0.2.ts",
     "open-instrument:analysis-capability-baseline": "tsx scripts/openInstrumentAnalysisCapabilityBaseline.v1.ts",
+    "open-instrument:analysis-capability-regression-baseline": "tsx scripts/openInstrumentAnalysisCapabilityBaseline.v1.ts --manifest tests/fixtures/openInstrument/analysis-capability-baseline.v1.manifest.json --out tests/fixtures/openInstrument/analysis-capability-regression-baseline.v0_1.json",
     "open-instrument:strict-blind-runner-readiness": "tsx scripts/openInstrumentStrictBlindReplicationRunnerReadiness.v1.ts",
     "open-instrument:strict-blind-runner-integrity": "tsx scripts/openInstrumentStrictBlindRunnerIntegrityReadiness.v1.ts"
   },

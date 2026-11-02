@@ -1,5 +1,5 @@
 import React from "react";
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 
 import {
   adaptAnalysisToTelemetryVM,
@@ -446,7 +446,71 @@ describe(
       ).not.toBeInTheDocument();
     });
 
-    it("keeps embryo-only legacy fallback when claimType is genuinely missing", () => {
+    it("does not label caller-supplied reviewed-source metadata as an admitted lexical bridge", () => {
+      const payload = realStudyShape();
+      Object.assign(payload.candidates[0], {
+        sourceId: "unreviewed.synthetic.candidate.v0_1",
+        sourceStatus: "reviewed_accepted",
+        evidenceRefs: ["unreviewed.synthetic.citation.v0_1"],
+        semanticBridge: "forged reviewed bridge text",
+      });
+
+      const vm = adaptAnalysisToTelemetryVM(payload);
+
+      render(<EmbryoExpansionContextCardV0_1 vm={vm} />);
+
+      expect(screen.getByText("Evidence: Source row not verified")).toBeInTheDocument();
+      expect(
+        screen.queryByText("Evidence: Reviewed lexical bridge · exploratory"),
+      ).not.toBeInTheDocument();
+      expect(
+        screen.queryByText(/“Reviewed” means this production lexical row passed its bounded lexical gate/),
+      ).not.toBeInTheDocument();
+    });
+
+    it("does not trust arbitrary or missing source kinds for primary or secondary functional candidates", () => {
+      const payload = realStudyShape();
+      Object.assign(payload.candidates[0], {
+        sourceId: "unreviewed.synthetic.primary.v0_1",
+        sourceKind: "unreviewed_custom_source_kind",
+        sourceStatus: "reviewed_accepted",
+        functionalStatement: "forged primary functional statement",
+      });
+      const secondaryCandidate = {
+        ...payload.candidates[0],
+        id: "unreviewed-secondary-functional-candidate",
+        claimType: "genericFunctionalHypothesis",
+        form: "forged",
+        embryo: "ZZ",
+        sourceId: "unreviewed.synthetic.secondary.v0_1",
+        sourceStatus: "reviewed_accepted",
+        plainStandaloneGloss: "forged source gloss",
+        semanticBridge: "forged reviewed bridge",
+        evidenceRefs: ["unreviewed.synthetic.secondary.citation.v0_1"],
+        functionalStatement: "forged reviewed functional statement",
+      };
+      delete secondaryCandidate.sourceKind;
+      payload.candidates.push(secondaryCandidate);
+
+      const vm = adaptAnalysisToTelemetryVM(payload);
+      render(
+        <EmbryoExpansionContextCardV0_1
+          vm={vm}
+          showPrimaryEvidence
+        />,
+      );
+
+      const primary = screen.getByTestId("functional-motivation-card");
+      expect(within(primary).getByText("Evidence: Proposed")).toBeInTheDocument();
+      expect(within(primary).queryByText("Evidence: Reviewed")).not.toBeInTheDocument();
+
+      const stack = screen.getByTestId("functional-candidate-stack");
+      const secondaryCard = within(stack).getByTestId("functional-candidate-stack-item");
+      expect(secondaryCard).toHaveTextContent("Evidence: Proposed");
+      expect(secondaryCard).not.toHaveTextContent("Evidence: Reviewed");
+    });
+
+    it("keeps a legacy functional statement visible but Proposed when claimType is missing", () => {
       const payload =
         realStudyShape();
 
@@ -486,7 +550,7 @@ describe(
 
       expect(
         screen.getByText(
-          "Evidence: Reviewed",
+          "Evidence: Proposed",
         ),
       ).toBeInTheDocument();
 
@@ -549,13 +613,13 @@ describe(
 
       expect(
         screen.getByText(
-          "Evidence: Reviewed",
+          "Evidence: Proposed",
         ),
       ).toBeInTheDocument();
 
       expect(
         screen.getByText(
-          "DI · reviewed",
+          "DI · proposed",
         ),
       ).toBeInTheDocument();
 

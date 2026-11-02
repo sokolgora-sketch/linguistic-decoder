@@ -9,6 +9,9 @@ import { EmbryoExpansionContextCardV0_1 } from "../src/ui/instrument/sections/Em
 import {
   buildGenericFunctionalWitnessRuntimeProjectionV1,
 } from "../src/shared/openInstrument/genericFunctionalWitnessRuntimeProjection.v1";
+import {
+  createReviewedExternalLexiconWitnessAdapterV0_1,
+} from "../src/shared/openInstrument/reviewedExternalLexiconWitnessAdapter.v0_1";
 
 async function analyze(word: string): Promise<any> {
   const response = await GET(
@@ -171,6 +174,47 @@ describe("Lane 4 witness presentation", () => {
       expect(witness).not.toHaveTextContent(/comes from|proves|winner/i);
     },
   );
+
+  it("renders the DA source-authored dialect and pronunciation note descriptively", async () => {
+    const body = await analyze("banana");
+    const generic = body.candidates.find(
+      (candidate: any) => candidate?.claimType === "genericFunctionalHypothesis",
+    );
+    expect(generic).toBeTruthy();
+    generic.genericFunctionalWitnessRuntimeProjectionV1 =
+      buildGenericFunctionalWitnessRuntimeProjectionV1(
+        {
+          targetWord: "banana",
+          structuralHypothesis: {
+            hypothesisId: "logic-structural:banana:DA:reviewed-source-note",
+            embryo: "DA",
+          } as any,
+        },
+        [createReviewedExternalLexiconWitnessAdapterV0_1()],
+      );
+    const vm = adaptAnalysisToTelemetryVM(body);
+
+    render(
+      <EmbryoExpansionContextCardV0_1
+        vm={vm}
+        showPrimaryEvidence
+      />,
+    );
+
+    const witness = screen
+      .getAllByTestId("generic-functional-witness")
+      .find((element) => element.textContent?.includes(
+        "Linguistic variation within the Northwestern Gheg Albanian dialect",
+      ));
+
+    expect(witness).toBeDefined();
+    expect(witness).toHaveTextContent(
+      "Source-authored grammar/dialect/pronunciation note (descriptive only; not a structured dialect profile or Voice mapping)",
+    );
+    expect(witness).toHaveTextContent(
+      "Malsia/Northwestern Gheg Albanian verb form; paper lists Malsia da [dɔː] with Shkodër/Lezhë [dɔː], [ndɔː] in example (4)",
+    );
+  });
 
   it("renders a non-primary witness under its owning structural candidate", async () => {
     const body = await analyze("bamoar");

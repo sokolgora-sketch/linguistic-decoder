@@ -73,11 +73,13 @@ describe("bounded Albanian lexical substrate v0.1", () => {
   });
 
   it("retrieves DI generically without the target-specific reviewed adapter", () => {
+    const adapter = createAlbanianLexicalSubstrateWitnessAdapterV0_1();
     const result = queryGenericFunctionalWitnessesV1(
       query("DI"),
-      [createAlbanianLexicalSubstrateWitnessAdapterV0_1()],
+      [adapter],
     );
 
+    expect(adapter.candidateVoicePathPolicy).toBe("SOURCE_FORM_EXTRACTED");
     expect(result.status).toBe("MATCHES_FOUND");
     expect(result.matches).toHaveLength(1);
     expect(result.matches[0]).toMatchObject({
@@ -88,6 +90,26 @@ describe("bounded Albanian lexical substrate v0.1", () => {
       functionalCorrespondence: "NOT_EVALUATED",
       targetMeaning: "NOT_CLAIMED",
     });
+  });
+
+  it("keeps the frozen source adapter's citation shape unchanged", () => {
+    const result = queryGenericFunctionalWitnessesV1(
+      query("DA", ["A"]),
+      [createAlbanianLexicalSubstrateWitnessAdapterV0_1()],
+    );
+
+    expect(result.matches[0]).toMatchObject({
+      queryForm: "DA",
+      sourceId: "reviewed.external.gheg-da.damage.candidate.v0_1",
+      sourceAttestation: "SOURCE_RECORD_ONLY",
+      historicalRelation: "NOT_CLAIMED",
+    });
+    expect(result.matches[0]?.sourceProvenance).toMatchObject({
+      sourceRecordId: "reviewed.external.gheg-da.damage.candidate.v0_1",
+      entryLocator: "Example (4), page 3; footnote 1",
+      languageVariety: null,
+    });
+    expect(result.matches[0]?.sourceProvenance?.attestedGrammarNote).toBeUndefined();
   });
 
   it("keeps the source-backed ZEMËR lexical fact queryable by its generic key", () => {

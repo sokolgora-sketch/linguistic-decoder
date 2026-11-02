@@ -163,7 +163,7 @@ describe("Open Instrument Seven-Voices doctrine reading UI v0.1", () => {
     expect(within(card).getByText("Completion/Unit")).toBeInTheDocument();
     expect(within(card).getByText("Direction/Focus")).toBeInTheDocument();
     expect(within(card).getByText("This is not a lexical definition, historical origin claim, candidate proof, or winner selection. User decides the final interpretation.")).toBeInTheDocument();
-    expect(screen.getAllByText("Evidence: Reviewed")).toHaveLength(2);
+    expect(screen.getAllByText("Evidence: Reviewed lexical bridge · exploratory")).toHaveLength(2);
   });
 
   it("does not fabricate a doctrine card for the structural Null case 123", async () => {

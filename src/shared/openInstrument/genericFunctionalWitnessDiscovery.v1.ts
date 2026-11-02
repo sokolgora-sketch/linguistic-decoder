@@ -35,6 +35,8 @@ export type GenericFunctionalWitnessSourceProvenanceV1 = Readonly<{
   entryLocator: string;
   sourceHashOrArchiveHash: string | null;
   languageVariety: string | null;
+  /** Descriptive source-authored note; never a structured dialect or Voice mapping. */
+  attestedGrammarNote?: string | null;
 }>;
 
 /**
@@ -83,9 +85,8 @@ export type GenericFunctionalWitnessSourceAdapterResultV1 =
 export type GenericFunctionalWitnessSourceAdapterV1 = Readonly<{
   adapterId: string;
   /**
-   * A source adapter may explicitly keep candidate Voice extraction Null when
-   * its source records contain lexical facts but no authorized pronunciation.
-   * Omission preserves the legacy source-form extraction behavior.
+   * Source-form extraction can expose an orthographic profile only. It never
+   * authorizes spoken Voice; lexical-only adapters should explicitly use Null.
    */
   candidateVoicePathPolicy?: "SOURCE_FORM_EXTRACTED" | "NULL_UNAUTHORIZED";
   query: (
@@ -201,7 +202,10 @@ function sourceProvenanceIsValidV1(
     (provenance.sourceHashOrArchiveHash === null ||
       exactTextV1(provenance.sourceHashOrArchiveHash)) &&
     (provenance.languageVariety === null ||
-      exactTextV1(provenance.languageVariety))
+      exactTextV1(provenance.languageVariety)) &&
+    (provenance.attestedGrammarNote === undefined ||
+      provenance.attestedGrammarNote === null ||
+      exactTextV1(provenance.attestedGrammarNote))
   );
 }
 

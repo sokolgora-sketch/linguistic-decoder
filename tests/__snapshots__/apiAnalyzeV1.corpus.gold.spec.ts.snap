@@ -5690,10 +5690,8 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
           "candidateTruthClaim": "not_claimed",
           "correspondence": {
             "candidateRepresentationKind": "orthographic_profile_derived",
-            "candidateVoicePath": [
-              "A",
-            ],
-            "candidateVoicePathStatus": "AUTHORIZED",
+            "candidateVoicePath": [],
+            "candidateVoicePathStatus": "NULL_UNAUTHORIZED",
             "gamma": null,
             "inputRepresentationKind": "unknown",
             "inputVoicePath": [],
@@ -9685,10 +9683,8 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
           "candidateTruthClaim": "not_claimed",
           "correspondence": {
             "candidateRepresentationKind": "orthographic_profile_derived",
-            "candidateVoicePath": [
-              "A",
-            ],
-            "candidateVoicePathStatus": "AUTHORIZED",
+            "candidateVoicePath": [],
+            "candidateVoicePathStatus": "NULL_UNAUTHORIZED",
             "gamma": [
               "F",
               "DH",
@@ -11671,10 +11667,8 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
           "candidateTruthClaim": "not_claimed",
           "correspondence": {
             "candidateRepresentationKind": "orthographic_profile_derived",
-            "candidateVoicePath": [
-              "A",
-            ],
-            "candidateVoicePathStatus": "AUTHORIZED",
+            "candidateVoicePath": [],
+            "candidateVoicePathStatus": "NULL_UNAUTHORIZED",
             "gamma": null,
             "inputRepresentationKind": "unknown",
             "inputVoicePath": [],
@@ -32622,10 +32616,8 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
           "candidateTruthClaim": "not_claimed",
           "correspondence": {
             "candidateRepresentationKind": "orthographic_profile_derived",
-            "candidateVoicePath": [
-              "A",
-            ],
-            "candidateVoicePathStatus": "AUTHORIZED",
+            "candidateVoicePath": [],
+            "candidateVoicePathStatus": "NULL_UNAUTHORIZED",
             "gamma": [
               "S",
               "T",
@@ -32742,10 +32734,8 @@ exports[`apiAnalyzeV1 — corpus gold (contract projection) strict corpus matche
           "candidateTruthClaim": "not_claimed",
           "correspondence": {
             "candidateRepresentationKind": "orthographic_profile_derived",
-            "candidateVoicePath": [
-              "I",
-            ],
-            "candidateVoicePathStatus": "AUTHORIZED",
+            "candidateVoicePath": [],
+            "candidateVoicePathStatus": "NULL_UNAUTHORIZED",
             "gamma": [
               "S",
               "T",
