@@ -172,7 +172,6 @@ function projectReviewedRowV0_1(
       entryLocator: citation.entryLocator ?? "",
       sourceHashOrArchiveHash: citation.sourceHashOrArchiveHash,
       languageVariety: null,
-      attestedGrammarNote: citation.attestedGrammarNote,
     },
   };
 }
@@ -215,7 +214,7 @@ export function createAlbanianLexicalSubstrateWitnessAdapterV0_1():
 
   return Object.freeze({
     adapterId: ALBANIAN_LEXICAL_SUBSTRATE_ADAPTER_ID_V0_1,
-    candidateVoicePathPolicy: "NULL_UNAUTHORIZED" as const,
+    candidateVoicePathPolicy: "SOURCE_FORM_EXTRACTED" as const,
     query(input: GenericFunctionalWitnessQueryV1):
       GenericFunctionalWitnessSourceAdapterResultV1 {
       return {

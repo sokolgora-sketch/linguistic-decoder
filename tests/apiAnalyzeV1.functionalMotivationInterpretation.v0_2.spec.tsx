@@ -39,9 +39,21 @@ describe("analyze-v1 Functional Motivation Interpretation v0.2 boundary", () => 
       candidateVoicePath: [],
       candidateVoicePathStatus: "NULL_UNAUTHORIZED",
       candidateRepresentationKind: "orthographic_profile_derived",
+    });
+    const visibleInterpretation = adaptAnalysisToTelemetryVM(payload)
+      .functionalMotivationInterpretationV0_2;
+    expect(visibleInterpretation.kind).toBe("present");
+    if (visibleInterpretation.kind !== "present") throw new Error("Expected UI interpretation");
+    const visibleDi = visibleInterpretation.value.candidates.find(
+      (candidate) => candidate.candidateEmbryo === "DI",
+    );
+    expect(visibleDi?.correspondence).toMatchObject({
+      candidateVoicePath: [],
+      candidateVoicePathStatus: "NULL_UNAUTHORIZED",
+      candidateRepresentationKind: "orthographic_profile_derived",
       voiceRelationship: "NOT_COMPARABLE_ACROSS_REPRESENTATIONS",
     });
-    expect(di.sourceFact).toMatchObject({
+    expect(visibleDi?.sourceFact).toMatchObject({
       language: "sq",
       sourceProvenance: {
         languageVariety: null,
@@ -86,10 +98,22 @@ describe("analyze-v1 Functional Motivation Interpretation v0.2 boundary", () => 
     const da = interpretation.candidates.find(
       (candidate: { candidateEmbryo: string }) => candidate.candidateEmbryo === "DA",
     );
+    const visibleInterpretation = adaptAnalysisToTelemetryVM(payload)
+      .functionalMotivationInterpretationV0_2;
+    expect(visibleInterpretation.kind).toBe("present");
+    if (visibleInterpretation.kind !== "present") throw new Error("Expected UI interpretation");
+    const visibleDa = visibleInterpretation.value.candidates.find(
+      (candidate) => candidate.candidateEmbryo === "DA",
+    );
 
     expect(da).toBeTruthy();
+    expect(da?.correspondence).toMatchObject({
+      candidateVoicePath: [],
+      candidateVoicePathStatus: "NULL_UNAUTHORIZED",
+      candidateRepresentationKind: "orthographic_profile_derived",
+    });
     expect(interpretation.input.targetSense).toBeNull();
-    expect(da.sourceFact).toMatchObject({
+    expect(visibleDa?.sourceFact).toMatchObject({
       sourceId: "reviewed.external.gheg-da.damage.candidate.v0_1",
       citationRefs: ["reviewed.external.gheg-da.damage.candidate.citation.v0_1"],
       sourceProvenance: {
@@ -103,11 +127,11 @@ describe("analyze-v1 Functional Motivation Interpretation v0.2 boundary", () => 
           "Malsia/Northwestern Gheg Albanian verb form; paper lists Malsia da [dɔː] with Shkodër/Lezhë [dɔː], [ndɔː] in example (4)",
       },
     });
-    expect(da.correspondence).toMatchObject({
+    expect(visibleDa?.correspondence).toMatchObject({
       candidateVoicePath: [],
       candidateVoicePathStatus: "NULL_UNAUTHORIZED",
       candidateRepresentationKind: "orthographic_profile_derived",
-      voiceRelationship: "UNKNOWN",
+      voiceRelationship: "NOT_COMPARABLE_ACROSS_REPRESENTATIONS",
     });
     expect(da.hypothesis).toMatchObject({
       status: "UNKNOWN_OR_NULL",
@@ -122,8 +146,7 @@ describe("analyze-v1 Functional Motivation Interpretation v0.2 boundary", () => 
       status: "experimental",
       validationOutcome: "validated",
       rankGroup: "validatedFunctionalMotivation",
-      claimBoundary:
-        "reviewed lexical functional evidence only; this does not establish exact target-sense correspondence or an independently demonstrated embryo function, and it makes no historical-origin claim",
+      claimBoundary: "functional motivation evidence only; not historical origin",
     });
   });
 
@@ -137,8 +160,22 @@ describe("analyze-v1 Functional Motivation Interpretation v0.2 boundary", () => 
     const at = payload.functionalMotivationInterpretationV0_2.candidates.find(
       (candidate: { candidateEmbryo: string }) => candidate.candidateEmbryo === "AT",
     );
+    const visibleInterpretation = adaptAnalysisToTelemetryVM(payload)
+      .functionalMotivationInterpretationV0_2;
+    expect(visibleInterpretation.kind).toBe("present");
+    if (visibleInterpretation.kind !== "present") throw new Error("Expected UI interpretation");
+    const visibleAt = visibleInterpretation.value.candidates.find(
+      (candidate) => candidate.candidateEmbryo === "AT",
+    );
+    const vm = adaptAnalysisToTelemetryVM(payload);
 
-    expect(at).toMatchObject({
+    expect(at).toBeTruthy();
+    expect(at?.correspondence).toMatchObject({
+      candidateVoicePath: [],
+      candidateVoicePathStatus: "NULL_UNAUTHORIZED",
+      candidateRepresentationKind: "orthographic_profile_derived",
+    });
+    expect(visibleAt).toMatchObject({
       sourceFact: {
         sourceId: "reviewed.external.albanian-at.father.candidate.v0_1",
         sourceProvenance: {
@@ -154,6 +191,58 @@ describe("analyze-v1 Functional Motivation Interpretation v0.2 boundary", () => 
         candidateVoicePathStatus: "NULL_UNAUTHORIZED",
       },
     });
+
+    render(
+      <MotivationDiscoveryCardV0_1
+        discovery={vm.motivationDiscoveryV0_1}
+        interpretation={vm.functionalMotivationInterpretationV0_2}
+      />,
+    );
+    expect(screen.getAllByText(/Candidate Voice path: NULL_UNAUTHORIZED/).length)
+      .toBeGreaterThan(0);
+  });
+
+  it("keeps STERILE structural hypotheses visible without candidate Voice authorization", async () => {
+    const payload = await analyze({
+      word: "sterile",
+      mode: "strict",
+      alphabet: "auto",
+      providerExecution: "disabled",
+    });
+    const interpretation = payload.functionalMotivationInterpretationV0_2;
+    const hypotheses = interpretation.input.derivedStructure.structuralHypotheses;
+    expect(hypotheses.map((hypothesis: { embryo: string }) => hypothesis.embryo)).toEqual([
+      "ER",
+      "ERILE",
+    ]);
+    expect(interpretation.candidates.every((candidate: {
+      correspondence: {
+        candidateVoicePath: readonly string[];
+        candidateVoicePathStatus: string;
+      };
+    }) => candidate.correspondence.candidateVoicePath.length === 0 &&
+      candidate.correspondence.candidateVoicePathStatus === "NULL_UNAUTHORIZED")).toBe(true);
+
+    const vm = adaptAnalysisToTelemetryVM(payload);
+    const visible = vm.functionalMotivationInterpretationV0_2;
+    expect(visible.kind).toBe("present");
+    if (visible.kind !== "present") throw new Error("Expected UI interpretation");
+    expect(visible.value.candidates.every((candidate) =>
+      candidate.correspondence.candidateVoicePath.length === 0 &&
+      candidate.correspondence.candidateVoicePathStatus === "NULL_UNAUTHORIZED",
+    )).toBe(true);
+
+    render(
+      <MotivationDiscoveryCardV0_1
+        discovery={vm.motivationDiscoveryV0_1}
+        interpretation={vm.functionalMotivationInterpretationV0_2}
+      />,
+    );
+    expect(screen.getByTestId("functional-motivation-interpretation")).toBeInTheDocument();
+    if (visible.value.candidates.length > 0) {
+      expect(screen.getAllByText(/Candidate Voice path: NULL_UNAUTHORIZED/).length)
+        .toBeGreaterThan(0);
+    }
   });
 
   it("renders the interpretation layers through the existing Motivation Discovery card", async () => {
@@ -166,6 +255,14 @@ describe("analyze-v1 Functional Motivation Interpretation v0.2 boundary", () => 
       targetSenseLabel: "learning",
     });
     const vm = adaptAnalysisToTelemetryVM(payload);
+    const discovery = vm.motivationDiscoveryV0_1;
+    expect(discovery?.kind).toBe("present");
+    if (discovery?.kind !== "present") throw new Error("Expected UI discovery");
+    const displayedDi = discovery.value.candidates.find(
+      (candidate) => candidate.candidateEmbryo === "DI",
+    );
+    expect(displayedDi?.candidateVoicePath).toEqual([]);
+    expect(displayedDi?.structuralComparison.candidateVoicePath).toEqual([]);
 
     render(
       <MotivationDiscoveryCardV0_1
@@ -179,6 +276,7 @@ describe("analyze-v1 Functional Motivation Interpretation v0.2 boundary", () => 
     expect(screen.getAllByText("CANDIDATE CORRESPONDENCE").length).toBeGreaterThan(0);
     expect(screen.getAllByText("REVIEWED FUNCTIONAL EVIDENCE").length).toBeGreaterThan(0);
     expect(screen.getAllByText("Candidate Voice authority").length).toBeGreaterThan(0);
+    expect(screen.getAllByText(/Candidate Voice path: NULL_UNAUTHORIZED/).length).toBeGreaterThan(0);
     expect(screen.getAllByText("NULL_UNAUTHORIZED").length).toBeGreaterThan(0);
     expect(screen.getAllByText("ZË-RO FUNCTIONAL HYPOTHESIS").length).toBeGreaterThan(0);
     expect(screen.getAllByText("This candidate and input do not have an authorized structural relation for this comparison.").length).toBeGreaterThan(0);

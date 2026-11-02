@@ -899,6 +899,10 @@ function GenericFunctionalWitnesses({
                     {witness.gloss}
                   </div>
 
+                  <div className="mt-2 text-xs font-medium text-slate-600 dark:text-slate-400">
+                    Candidate Voice path: NULL_UNAUTHORIZED (nonspoken lexical form)
+                  </div>
+
                   {provenance ? (
                     <div className="mt-2 text-xs leading-5 text-slate-600 dark:text-slate-400">
                       {`${provenance.sourceTitle} · ${provenance.entryLocator}`}

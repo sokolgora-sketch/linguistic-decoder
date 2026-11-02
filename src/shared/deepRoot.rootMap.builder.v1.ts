@@ -774,7 +774,7 @@ export function buildReviewedFunctionalCandidateProjectionsFromRootMapV0_1(
         "reviewed production source row matches live RootMap reviewed functional evidence",
 
       claimBoundary:
-        "reviewed lexical functional evidence only; this does not establish exact target-sense correspondence or an independently demonstrated embryo function, and it makes no historical-origin claim",
+        "functional motivation evidence only; not historical origin",
 
       userDecisionPosture: "user_decides",
     }));

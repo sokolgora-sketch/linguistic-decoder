@@ -2,12 +2,6 @@ import type {
   MotivationEngineDiscoveryCandidateV0_1,
   MotivationEngineDiscoveryV0_1,
 } from "@/shared/openInstrument/motivationEngineDiscovery.v0_1";
-import {
-  getReviewedExternalLexiconProductionSourceRowsV0_1,
-} from "@/shared/reviewedExternalLexiconSourceRowRegistry.v0_1";
-import {
-  loadMultiSourceFunctionalResearchEvidenceCatalogV0_1,
-} from "@/shared/multiSourceFunctionalResearchEvidenceCatalog.v0_1";
 import type {
   GenericFunctionalWitnessSourceProvenanceV1,
 } from "@/shared/openInstrument/genericFunctionalWitnessDiscovery.v1";
@@ -239,75 +233,6 @@ function validSourceProvenanceV0_2(value: unknown, sourceId: string): boolean {
   );
 }
 
-function reviewedSourceProvenanceV0_2(
-  sourceId: string,
-): GenericFunctionalWitnessSourceProvenanceV1 | undefined {
-  const row = getReviewedExternalLexiconProductionSourceRowsV0_1().find(
-    (candidate) =>
-      candidate.sourceId === sourceId &&
-      candidate.sourceStatus === "reviewed_accepted",
-  );
-  const citation = row?.externalCitations[0];
-  if (!row || !citation) return undefined;
-
-  const provenance: GenericFunctionalWitnessSourceProvenanceV1 = {
-    sourceRecordId: row.sourceId,
-    sourceTraditionId:
-      "reviewed-external-lexicon-source-row-registry.v0_1",
-    sourceTitle: citation.sourceTitle ?? row.sourceKind,
-    sourceDateOrVersion: citation.sourceDateOrVersion ?? "",
-    sourceUrlOrArchiveRef: citation.sourceUrlOrArchiveRef ?? "",
-    entryLocator: citation.entryLocator ?? "",
-    sourceHashOrArchiveHash: citation.sourceHashOrArchiveHash,
-    languageVariety: null,
-    attestedGrammarNote: citation.attestedGrammarNote,
-  };
-
-  return validSourceProvenanceV0_2(provenance, sourceId)
-    ? provenance
-    : undefined;
-}
-
-function researchCatalogSourceProvenanceV0_2(
-  sourceId: string,
-): GenericFunctionalWitnessSourceProvenanceV1 | undefined {
-  const row = loadMultiSourceFunctionalResearchEvidenceCatalogV0_1().find(
-    (candidate) => candidate.researchEvidenceId === sourceId,
-  );
-  const citation = row?.citations[0];
-  if (!row || !citation) return undefined;
-
-  const provenance: GenericFunctionalWitnessSourceProvenanceV1 = {
-    sourceRecordId: row.researchEvidenceId,
-    sourceTraditionId:
-      "multi-source-functional-research-evidence-catalog.v0_1",
-    sourceTitle: citation.sourceTitle,
-    sourceDateOrVersion: citation.sourceDateOrVersion,
-    sourceUrlOrArchiveRef: citation.sourceUrlOrArchiveRef,
-    entryLocator: citation.entryLocator,
-    sourceHashOrArchiveHash: citation.sourceHashOrArchiveHash,
-    languageVariety: null,
-  };
-
-  return validSourceProvenanceV0_2(provenance, sourceId)
-    ? provenance
-    : undefined;
-}
-
-function candidateSourceProvenanceV0_2(
-  candidate: MotivationEngineDiscoveryCandidateV0_1,
-): GenericFunctionalWitnessSourceProvenanceV1 | undefined {
-  const supplied = (candidate.sourceFact as {
-    sourceProvenance?: unknown;
-  }).sourceProvenance;
-  if (validSourceProvenanceV0_2(supplied, candidate.sourceFact.sourceId)) {
-    const provenance = supplied as GenericFunctionalWitnessSourceProvenanceV1;
-    return { ...provenance };
-  }
-  return reviewedSourceProvenanceV0_2(candidate.sourceFact.sourceId) ??
-    researchCatalogSourceProvenanceV0_2(candidate.sourceFact.sourceId);
-}
-
 function compareTextV0_2(left: string, right: string): number {
   return left < right ? -1 : left > right ? 1 : 0;
 }
@@ -350,7 +275,6 @@ function deepFreezeV0_2<T>(value: T, seen = new WeakSet<object>()): T {
 function sourceFactFromCandidateV0_2(
   candidate: MotivationEngineDiscoveryCandidateV0_1,
 ): FunctionalMotivationSourceFactV0_2 {
-  const sourceProvenance = candidateSourceProvenanceV0_2(candidate);
   return {
     layer: "SOURCE_FACT",
     scope: "candidate",
@@ -364,7 +288,6 @@ function sourceFactFromCandidateV0_2(
     citationRefs: [...candidate.sourceFact.evidenceRefs].sort(compareTextV0_2),
     sourceUrlOrArchiveRef: candidate.sourceFact.sourceUrlOrArchiveRef,
     entryLocator: candidate.sourceFact.entryLocator,
-    ...(sourceProvenance ? { sourceProvenance } : {}),
   };
 }
 
@@ -606,10 +529,12 @@ function candidateInterpretationV0_2(
       candidateRepresentationKind: comparison.candidateRepresentationKind,
       representationCompatibility: comparison.representationCompatibility,
       inputVoicePath: [...comparison.inputVoicePath],
-      candidateVoicePath: [...comparison.candidateVoicePath],
-      // This interpretation seam has no candidate-side reviewed
-      // pronunciation-to-Voice mapping. A representation label and a
-      // nonempty spelling-derived path cannot supply that authority.
+      // This projector receives lexical candidate forms, not an independently
+      // reviewed candidate pronunciation-to-Voice mapping. A nonempty
+      // spelling-derived path or a caller-supplied representation label cannot
+      // authorize candidate Voice output. Heart's input-side authority remains
+      // represented separately in inputVoicePath.
+      candidateVoicePath: [],
       candidateVoicePathStatus: "NULL_UNAUTHORIZED",
       voiceRelationship: comparison.voiceRelationship,
       gamma: comparison.inputConsonantalStructure.gamma
