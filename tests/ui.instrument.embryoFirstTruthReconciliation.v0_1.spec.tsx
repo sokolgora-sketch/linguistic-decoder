@@ -479,6 +479,7 @@ describe(
       const secondaryCandidate = {
         ...payload.candidates[0],
         id: "unreviewed-secondary-functional-candidate",
+        claimType: "genericFunctionalHypothesis",
         form: "forged",
         embryo: "ZZ",
         sourceId: "unreviewed.synthetic.secondary.v0_1",
@@ -509,7 +510,7 @@ describe(
       expect(secondaryCard).not.toHaveTextContent("Evidence: Reviewed");
     });
 
-    it("keeps embryo-only legacy fallback when claimType is genuinely missing", () => {
+    it("keeps a legacy functional statement visible but Proposed when claimType is missing", () => {
       const payload =
         realStudyShape();
 
@@ -549,7 +550,7 @@ describe(
 
       expect(
         screen.getByText(
-          "Evidence: Reviewed",
+          "Evidence: Proposed",
         ),
       ).toBeInTheDocument();
 

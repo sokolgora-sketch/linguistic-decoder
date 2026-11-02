@@ -665,8 +665,11 @@ function evidenceStateFromCandidate(
     );
 
   if (validation === "validated") {
+    const hasFunctionalClaim =
+      presentString(row.claimType) === "functionalMotivation" ||
+      presentString(row.functionalStatement) !== null;
     if (
-      presentString(row.claimType) === "functionalMotivation" &&
+      hasFunctionalClaim &&
       !isReviewedLexicalBridgeAdmittedV0_1(row)
     ) {
       return "Proposed";
