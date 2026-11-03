@@ -144,10 +144,85 @@ jobs:
           if-no-files-found: warn
           retention-days: 14
 
+  m2_solo_ai_restricted_rehearsal:
+    name: m2-solo-ai-restricted-rehearsal
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Verify hosted Docker client and daemon before rehearsal
+        env:
+          ZE14_ISOLATION_EVIDENCE_PATH: ${{ runner.temp }}/ze14-hosted-isolation/evidence.json
+        run: |
+          mkdir -p "$(dirname "$ZE14_ISOLATION_EVIDENCE_PATH")"
+          node <<'NODE'
+          const fs = require("node:fs");
+          const path = require("node:path");
+          const { execFileSync } = require("node:child_process");
+          const destination = process.env.ZE14_ISOLATION_EVIDENCE_PATH;
+          let evidence;
+          try {
+            const versions = execFileSync("docker", ["version", "--format", "{{.Client.Version}}|{{.Server.Version}}"], { encoding: "utf8" }).trim().split("|");
+            const info = execFileSync("docker", ["info", "--format", "{{.OSType}}|{{.Architecture}}|{{.Driver}}"], { encoding: "utf8" }).trim().split("|");
+            if (versions.length !== 2 || !versions[0] || !versions[1] || info[0] !== "linux") {
+              throw new Error("Docker client/server or Linux daemon identity was incomplete");
+            }
+            evidence = {
+              schemaVersion: "ze14.hosted-isolation-evidence.v0.2",
+              status: "PASS",
+              docker: { clientVersion: versions[0], serverVersion: versions[1], osType: info[0], architecture: info[1], storageDriver: info[2] },
+              classification: { PROCESS_ISOLATION: "NOT_RUN", AI_REVIEW_EXECUTED: "NOT_RUN", SYNTHETIC_REVIEW_RESULT: "UNKNOWN", REAL_M2_READINESS: "UNKNOWN" },
+            };
+          } catch (error) {
+            evidence = {
+              schemaVersion: "ze14.hosted-isolation-evidence.v0.2",
+              status: "BLOCKED",
+              docker: null,
+              error: { name: error?.name ?? "Error", message: String(error?.message ?? error).slice(0, 500) },
+              classification: { PROCESS_ISOLATION: "BLOCKED", AI_REVIEW_EXECUTED: "NOT_RUN", SYNTHETIC_REVIEW_RESULT: "UNKNOWN", REAL_M2_READINESS: "UNKNOWN" },
+            };
+          }
+          fs.mkdirSync(path.dirname(destination), { recursive: true });
+          fs.writeFileSync(destination, JSON.stringify(evidence, null, 2) + "\n", { mode: 0o600 });
+          if (evidence.status !== "PASS") process.exitCode = 1;
+          NODE
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      - name: Test hosted reviewer request and Docker configuration contracts
+        run: npx jest -c jest.config.mjs tests/openInstrument.m2SoloAiHostedIsolation.v0_2.spec.ts --runInBand
+
+      - name: Execute Docker-isolated synthetic reviewer handoff
+        env:
+          ZE14_DOCKER_PREFLIGHT_PATH: ${{ runner.temp }}/ze14-hosted-isolation/evidence.json
+          ZE14_ISOLATION_EVIDENCE_PATH: ${{ runner.temp }}/ze14-hosted-isolation/evidence.json
+        run: node scripts/openInstrument/m2SoloAiHostedIsolation.v0_2.mjs
+
+      - name: Upload hosted isolation execution evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ze14-hosted-isolation-${{ github.run_id }}
+          path: ${{ runner.temp }}/ze14-hosted-isolation/evidence.json
+          if-no-files-found: warn
+          retention-days: 14
+
   lint-test-build:
     name: lint-test-build
     if: ${{ always() }}
-    needs: [core_validation, browser_smoke, unit_tests]
+    needs: [core_validation, browser_smoke, unit_tests, m2_solo_ai_restricted_rehearsal]
     runs-on: ubuntu-latest
     timeout-minutes: 5
 
@@ -157,11 +232,15 @@ jobs:
           CORE_RESULT: ${{ needs.core_validation.result }}
           BROWSER_RESULT: ${{ needs.browser_smoke.result }}
           UNIT_RESULT: ${{ needs.unit_tests.result }}
+          ISOLATION_RESULT: ${{ needs.m2_solo_ai_restricted_rehearsal.result }}
         run: |
           set -eu
           test "$CORE_RESULT" = "success"
           test "$BROWSER_RESULT" = "success"
           test "$UNIT_RESULT" = "success"
+          test "$ISOLATION_RESULT" = "success"
           echo "Core validation: $CORE_RESULT"
           echo "Browser smoke: $BROWSER_RESULT"
+          echo "Unit tests: $UNIT_RESULT"
+          echo "Restricted reviewer rehearsal: $ISOLATION_RESULT"
           echo "lint-test-build aggregate: PASS"
