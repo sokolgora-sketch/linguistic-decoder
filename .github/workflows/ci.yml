@@ -129,6 +129,21 @@ jobs:
       - name: Open Instrument browser handoff smoke
         run: npm run open-instrument:browser-smoke
 
+      - name: Open Instrument structural readout browser smoke
+        env:
+          OPEN_INSTRUMENT_PR_HEAD: ${{ github.event.pull_request.head.sha || github.sha }}
+          OPEN_INSTRUMENT_STRUCTURAL_SMOKE_ARTIFACT_DIR: ${{ runner.temp }}/open-instrument-structural-smoke
+        run: npm run open-instrument:structural-browser-smoke
+
+      - name: Upload structural browser smoke evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pr2283-structural-browser-smoke-${{ github.run_id }}
+          path: ${{ runner.temp }}/open-instrument-structural-smoke/
+          if-no-files-found: warn
+          retention-days: 14
+
   lint-test-build:
     name: lint-test-build
     if: ${{ always() }}
