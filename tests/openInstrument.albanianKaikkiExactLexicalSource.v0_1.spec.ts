@@ -236,6 +236,46 @@ function shkenceScientistFixtureFactsV0_1(
   return Object.freeze([primary, related]);
 }
 
+const BLETAR_OCCUPATIONS_CATEGORY_V0_1 = {
+  name: "Occupations",
+  kind: "other",
+  parents: [],
+  source: "w",
+  orig: "sq:Occupations",
+  langcode: "sq",
+  _dis: null,
+} as const;
+
+function bletarSuffixTemplateFixtureFactsV0_1(
+  targetOverrides: Partial<AlbanianKaikkiExactLexicalSourceFactV0_1> = {},
+): readonly AlbanianKaikkiExactLexicalSourceFactV0_1[] {
+  const target = fixtureFact({
+    sourceRecordId: "kaikki-albanian-jsonl:word=bletar:ordinal=0",
+    entryLocator: "jsonl://word/bletar/match/0",
+    physicalRecordOrdinal: 3973,
+    form: "bletar",
+    partOfSpeech: "noun",
+    senses: [{
+      senseId: "en-bletar-sq-noun-KI12VIJ3",
+      glosses: ["beekeeper"],
+      categories: [BLETAR_OCCUPATIONS_CATEGORY_V0_1],
+    }],
+    ipaObservations: [],
+    etymologyText: "From bletë (“bee”) + -ar noun suffix.",
+    etymologyLinks: [
+      { sourceForm: "bletë", reference: "bletë#Albanian" },
+      { sourceForm: "-ar", reference: "-ar#Albanian" },
+    ],
+    etymologyTemplates: [{
+      name: "suffix",
+      args: { "1": "sq", "2": "bletë", "3": "-ar", "4": "", t1: "bee" },
+      expansion: "bletë (“bee”) + -ar",
+    }],
+    ...targetOverrides,
+  });
+  return Object.freeze([target]);
+}
+
 async function analysisFor(word: string) {
   const payload = await runAnalysisDeterministic(word, {
     mode: "strict",
@@ -3841,6 +3881,252 @@ describe("real Albanian exact lexical source integration v0.1", () => {
     cleanup();
   });
 
+  it.each(["ar", "-ar"] as const)(
+    "normalizes the explicitly bounded BLETAR suffix form %s without changing its source sense gate",
+    async (suffixArgument) => {
+      const target = bletarSuffixTemplateFixtureFactsV0_1({
+        etymologyTemplates: [{
+          name: "suffix",
+          args: { "1": "sq", "2": "bletë", "3": suffixArgument, "4": "", t1: "bee" },
+          expansion: "bletë (“bee”) + -ar",
+        }],
+      })[0]!;
+      const discovery = await discoveryForFactsV0_1([target], "bletar");
+      const reading = discovery.albanianLexicalReading;
+
+      expect(reading?.primarySourceFact).toMatchObject({
+        sourceRecordId: "kaikki-albanian-jsonl:word=bletar:ordinal=0",
+        form: "bletar",
+        partOfSpeech: "noun",
+        meaningGlosses: ["beekeeper"],
+        etymologyText: "From bletë (“bee”) + -ar noun suffix.",
+      });
+      expect(reading?.functionalMeaningBridge.sourceFacts?.primary).toMatchObject({
+        sourceRecordId: "kaikki-albanian-jsonl:word=bletar:ordinal=0",
+        form: "bletar",
+        sourceSenses: [expect.objectContaining({
+          senseId: "en-bletar-sq-noun-KI12VIJ3",
+          glosses: ["beekeeper"],
+          categories: expect.arrayContaining([BLETAR_OCCUPATIONS_CATEGORY_V0_1]),
+        })],
+      });
+      expect(reading?.functionalMeaningBridge).toMatchObject({
+        status: "SUPPORTED",
+        truthLayers: ["SOURCE_FACT", "EXPLORATORY_FUNCTIONAL_HYPOTHESIS"],
+        derivedStructure: null,
+        functionalHypothesis: {
+          status: "EXPLORATORY_FUNCTIONAL_HYPOTHESIS",
+          functionalOperation: "AGENT",
+          basis: expect.arrayContaining([
+            "SOURCE_ATTESTED_TARGET_ROLE_CATEGORY",
+            "TARGET_SOURCE_AUTHORED_SUFFIX_TEMPLATE",
+            "SOURCE_STRUCTURED_ALBANIAN_REFERENCES",
+          ]),
+          claimBoundary: expect.stringContaining("No target-to-base sense alignment"),
+        },
+        claimBoundary: expect.stringContaining("IPA and Voice are not used to classify the role"),
+      });
+      expect(reading?.functionalMeaningBridge.functionalHypothesis.statement).toContain(
+        "en-bletar-sq-noun-KI12VIJ3",
+      );
+      expect(reading?.functionalMeaningBridge.functionalHypothesis.alternatives.join(" ")).toContain(
+        "no historical relation, suffix function, suffix law, independent embryo meaning, or Voice semantics",
+      );
+      expect(reading?.interpretation.status).toBe("EXPLORATORY_ZHEJI_READING");
+      expect(reading?.interpretation.basis).toContain("STRUCTURAL_EMBRYO_FUNCTION_REMAINS_UNKNOWN_OR_NULL");
+    },
+  );
+
+  const invalidBletarSuffixCasesV0_1 = [
+    ["unknown argument", {
+      etymologyTemplates: [{
+        name: "suffix",
+        args: { "1": "sq", "2": "bletë", "3": "-ar", "4": "", t1: "bee", extra: "ignored" },
+        expansion: "bletë (“bee”) + -ar",
+      }],
+    }],
+    ["wrong template language", {
+      etymologyTemplates: [{
+        name: "suffix",
+        args: { "1": "en", "2": "bletë", "3": "-ar", "4": "", t1: "bee" },
+        expansion: "bletë (“bee”) + -ar",
+      }],
+    }],
+    ["nonempty argument 4", {
+      etymologyTemplates: [{
+        name: "suffix",
+        args: { "1": "sq", "2": "bletë", "3": "-ar", "4": "extra", t1: "bee" },
+        expansion: "bletë (“bee”) + -ar",
+      }],
+    }],
+    ["mismatching t1 and expansion gloss", {
+      etymologyTemplates: [{
+        name: "suffix",
+        args: { "1": "sq", "2": "bletë", "3": "-ar", "4": "", t1: "bee" },
+        expansion: "bletë (“honey”) + -ar",
+      }],
+    }],
+    ["missing expansion gloss", {
+      etymologyTemplates: [{
+        name: "suffix",
+        args: { "1": "sq", "2": "bletë", "3": "-ar", "4": "", t1: "bee" },
+        expansion: "bletë + -ar",
+      }],
+    }],
+    ["gloss annotation without t1 metadata", {
+      etymologyTemplates: [{
+        name: "suffix",
+        args: { "1": "sq", "2": "bletë", "3": "-ar", "4": "" },
+        expansion: "bletë (“bee”) + -ar",
+      }],
+    }],
+    ["missing explanation gloss", { etymologyText: "From bletë + -ar noun suffix." }],
+    ["mismatching explanation gloss", { etymologyText: "From bletë (“honey”) + -ar noun suffix." }],
+    ["malformed double hyphen", {
+      etymologyText: "From bletë (“bee”) + --ar noun suffix.",
+      etymologyLinks: [
+        { sourceForm: "bletë", reference: "bletë#Albanian" },
+        { sourceForm: "--ar", reference: "--ar#Albanian" },
+      ],
+      etymologyTemplates: [{
+        name: "suffix",
+        args: { "1": "sq", "2": "bletë", "3": "--ar", "4": "", t1: "bee" },
+        expansion: "bletë (“bee”) + --ar",
+      }],
+    }],
+    ["suffix with no letters", {
+      etymologyText: "From bletë (“bee”) + - noun suffix.",
+      etymologyLinks: [
+        { sourceForm: "bletë", reference: "bletë#Albanian" },
+        { sourceForm: "-", reference: "-#Albanian" },
+      ],
+      etymologyTemplates: [{
+        name: "suffix",
+        args: { "1": "sq", "2": "bletë", "3": "-", "4": "", t1: "bee" },
+        expansion: "bletë (“bee”) + -",
+      }],
+    }],
+    ["mismatching source explanation", { etymologyText: "From another root + -ar noun suffix." }],
+    ["hedged source explanation", { etymologyText: "Presumably from bletë (“bee”) + -ar noun suffix." }],
+    ["unrecognized final descriptor", { etymologyText: "From bletë (“bee”) + -ar adjective suffix." }],
+    ["duplicate component reference", {
+      etymologyLinks: [
+        { sourceForm: "bletë", reference: "bletë#Albanian" },
+        { sourceForm: "bletë", reference: "bletë#Albanian" },
+      ],
+    }],
+    ["missing component reference", {
+      etymologyLinks: [{ sourceForm: "bletë", reference: "bletë#Albanian" }],
+    }],
+    ["foreign-language component reference", {
+      etymologyLinks: [
+        { sourceForm: "bletë", reference: "bletë#Albanian" },
+        { sourceForm: "-ar", reference: "-ar#French" },
+      ],
+    }],
+    ["multiple source templates", {
+      etymologyTemplates: [
+        {
+          name: "suffix",
+          args: { "1": "sq", "2": "bletë", "3": "-ar", "4": "", t1: "bee" },
+          expansion: "bletë (“bee”) + -ar",
+        },
+        {
+          name: "suffix",
+          args: { "1": "sq", "2": "bletë", "3": "-ar" },
+          expansion: "bletë + -ar",
+        },
+      ],
+    }],
+    ["missing source relationship text", { etymologyText: null }],
+    ["empty base component", {
+      etymologyText: "From  (“bee”) + -ar noun suffix.",
+      etymologyLinks: [
+        { sourceForm: "", reference: "#Albanian" },
+        { sourceForm: "-ar", reference: "-ar#Albanian" },
+      ],
+      etymologyTemplates: [{
+        name: "suffix",
+        args: { "1": "sq", "2": "", "3": "-ar", "4": "", t1: "bee" },
+        expansion: " (“bee”) + -ar",
+      }],
+    }],
+    ["empty suffix component", {
+      etymologyText: "From bletë (“bee”) +  noun suffix.",
+      etymologyLinks: [{ sourceForm: "bletë", reference: "bletë#Albanian" }],
+      etymologyTemplates: [{
+        name: "suffix",
+        args: { "1": "sq", "2": "bletë", "3": "", "4": "", t1: "bee" },
+        expansion: "bletë (“bee”) + ",
+      }],
+    }],
+  ] as const;
+
+  it.each(invalidBletarSuffixCasesV0_1)(
+    "keeps BLETAR AGENT Null for %s suffix-template metadata",
+    async (_label, targetOverrides) => {
+      const target = bletarSuffixTemplateFixtureFactsV0_1(
+        targetOverrides as Partial<AlbanianKaikkiExactLexicalSourceFactV0_1>,
+      )[0]!;
+      const discovery = await discoveryForFactsV0_1([target], "bletar");
+      expect(discovery.albanianLexicalReading?.primarySourceFact?.form).toBe("bletar");
+      expect(discovery.albanianLexicalReading?.functionalMeaningBridge).toMatchObject({
+        status: "NULL",
+        functionalHypothesis: { status: "UNKNOWN_OR_NULL", functionalOperation: null, statement: null },
+      });
+    },
+  );
+
+  it.each([
+    ["missing occupation category", { senses: [{ senseId: "en-bletar-sq-noun-KI12VIJ3", glosses: ["beekeeper"] }] }],
+    ["invalid occupation category provenance", {
+      senses: [{
+        senseId: "en-bletar-sq-noun-KI12VIJ3",
+        glosses: ["beekeeper"],
+        categories: [{ ...BLETAR_OCCUPATIONS_CATEGORY_V0_1, source: "w+disamb" }],
+      }],
+    }],
+    ["wrong target POS", { partOfSpeech: "adj" }],
+    ["ambiguous qualifying source senses", {
+      senses: [
+        {
+          senseId: "en-bletar-sq-noun-KI12VIJ3",
+          glosses: ["beekeeper"],
+          categories: [BLETAR_OCCUPATIONS_CATEGORY_V0_1],
+        },
+        {
+          senseId: "en-bletar-sq-noun-second",
+          glosses: ["bee keeper, broadly"],
+          categories: [BLETAR_OCCUPATIONS_CATEGORY_V0_1],
+        },
+      ],
+    }],
+  ] as const)("does not authorize BLETAR AGENT with %s", async (_label, overrides) => {
+    const target = bletarSuffixTemplateFixtureFactsV0_1(
+      overrides as Partial<AlbanianKaikkiExactLexicalSourceFactV0_1>,
+    )[0]!;
+    const discovery = await discoveryForFactsV0_1([target], "bletar");
+    expect(discovery.albanianLexicalReading?.functionalMeaningBridge).toMatchObject({
+      status: "NULL",
+      functionalHypothesis: { status: "UNKNOWN_OR_NULL", functionalOperation: null, statement: null },
+    });
+  });
+
+  it("keeps BLETAR AGENT Null when the target record or source sense is ambiguous", async () => {
+    const target = bletarSuffixTemplateFixtureFactsV0_1()[0]!;
+    const duplicateTarget = {
+      ...target,
+      sourceRecordId: "kaikki-albanian-jsonl:word=bletar:ordinal=1",
+      entryLocator: "jsonl://word/bletar/match/1",
+      physicalRecordOrdinal: 3974,
+    };
+    const duplicateRecords = await discoveryForFactsV0_1([target, duplicateTarget], "bletar");
+    expect(duplicateRecords.albanianLexicalReading?.functionalMeaningBridge).toMatchObject({
+      status: "NULL",
+      functionalHypothesis: { status: "UNKNOWN_OR_NULL", functionalOperation: null },
+    });
+  });
+
   it.each([
     ["missing target suffix template", { etymologyTemplates: [] }],
     ["template does not identify the queried base", {
@@ -6359,4 +6645,129 @@ describe("sense-conditioned functional reasoning v0.4", () => {
     expect(legacyBridge.functionalHypothesis.statement).toContain("fish; seller");
     expect(legacyBridge.functionalHypothesis.statement).not.toContain("fish-owner");
   });
+});
+
+describe("pinned BLETAR source-authored suffix template v0.1", () => {
+  pinnedAlbanianSourceTestV0_1(
+    "projects the exact real BLETAR noun sense to the existing exploratory AGENT reading surface",
+    async () => {
+      const provider = await createAlbanianKaikkiServerOnlyExactLexicalSourceProviderV0_1(
+        process.env[ALBANIAN_KAIKKI_LEXICAL_SOURCE_PATH_ENV_V0_1],
+      );
+      const lookup = await provider.query("bletar");
+      expect(lookup.status).toBe("MATCHES_FOUND");
+      if (lookup.status !== "MATCHES_FOUND") return;
+
+      const targetFact = lookup.facts.find((fact) =>
+        fact.senses.some((sense) => sense.senseId === "en-bletar-sq-noun-KI12VIJ3"),
+      );
+      expect(targetFact).toMatchObject({
+        sourceRecordId: "kaikki-albanian-jsonl:word=bletar:ordinal=0",
+        form: "bletar",
+        partOfSpeech: "noun",
+        senses: [expect.objectContaining({
+          senseId: "en-bletar-sq-noun-KI12VIJ3",
+          glosses: ["beekeeper"],
+        })],
+        etymologyText: "From bletë (“bee”) + -ar noun suffix.",
+        etymologyLinks: [
+          { sourceForm: "bletë", reference: "bletë#Albanian" },
+          { sourceForm: "-ar", reference: "-ar#Albanian" },
+        ],
+        etymologyTemplates: [expect.objectContaining({
+          name: "suffix",
+          args: { "1": "sq", "2": "bletë", "3": "-ar", t1: "bee" },
+          expansion: "bletë (“bee”) + -ar",
+        })],
+      });
+      const targetSense = targetFact?.senses.find((sense) => sense.senseId === "en-bletar-sq-noun-KI12VIJ3");
+      expect(targetSense?.categories).toEqual(expect.arrayContaining([expect.objectContaining({
+        name: "Occupations",
+        orig: "sq:Occupations",
+        langcode: "sq",
+        source: "w",
+      })]));
+
+      const discovery = await discoveryForProviderV0_1(provider, "bletar");
+      const reading = discovery.albanianLexicalReading;
+      expect(reading).toMatchObject({
+        status: "SUPPORTED",
+        primarySourceFact: {
+          sourceRecordId: "kaikki-albanian-jsonl:word=bletar:ordinal=0",
+          partOfSpeech: "noun",
+          meaningGlosses: ["beekeeper"],
+        },
+        functionalMeaningBridge: {
+          status: "SUPPORTED",
+          derivedStructure: null,
+          functionalHypothesis: {
+            status: "EXPLORATORY_FUNCTIONAL_HYPOTHESIS",
+            functionalOperation: "AGENT",
+            basis: expect.arrayContaining([
+              "TARGET_SOURCE_AUTHORED_SUFFIX_TEMPLATE",
+              "SOURCE_ATTESTED_FINAL_SENSE_CATEGORY",
+            ]),
+          },
+        },
+        interpretation: {
+          status: "EXPLORATORY_ZHEJI_READING",
+          basis: expect.arrayContaining(["STRUCTURAL_EMBRYO_FUNCTION_REMAINS_UNKNOWN_OR_NULL"]),
+        },
+      });
+      expect(reading?.functionalMeaningBridge.sourceFacts?.primary).toMatchObject({
+        sourceRecordId: "kaikki-albanian-jsonl:word=bletar:ordinal=0",
+        entryLocator: "jsonl://word/bletar/match/0",
+        form: "bletar",
+        sourceSenses: [expect.objectContaining({
+          senseId: "en-bletar-sq-noun-KI12VIJ3",
+          glosses: ["beekeeper"],
+          categories: expect.arrayContaining([expect.objectContaining({
+            name: "Occupations",
+            orig: "sq:Occupations",
+            langcode: "sq",
+            source: "w",
+          })]),
+        })],
+      });
+      expect(reading?.sourceLinkedComponentReading?.relation).toMatchObject({
+        relation: "SOURCE_AUTHORED_SUFFIX_TEMPLATE",
+        primarySourceRecordId: "kaikki-albanian-jsonl:word=bletar:ordinal=0",
+        primaryEntryLocator: "jsonl://word/bletar/match/0",
+        sourceAuthoredExplanation: "From bletë (“bee”) + -ar noun suffix.",
+        references: [
+          { sourceForm: "bletë", reference: "bletë#Albanian" },
+          { sourceForm: "-ar", reference: "-ar#Albanian" },
+        ],
+      });
+      expect(reading?.functionalMeaningBridge.functionalHypothesis.statement).toContain(
+        "en-bletar-sq-noun-KI12VIJ3",
+      );
+      expect(reading?.functionalMeaningBridge.functionalHypothesis.claimBoundary).toContain(
+        "No target-to-base sense alignment",
+      );
+      expect(reading?.functionalMeaningBridge.functionalHypothesis.claimBoundary).toContain(
+        "historical etymology, suffix semantics, embryo function, or pronunciation semantics is asserted",
+      );
+      expect(reading?.functionalMeaningBridge.claimBoundary).toContain(
+        "IPA and Voice are not used to classify the role",
+      );
+
+      const vm = adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: discovery });
+      expect(vm.motivationDiscoveryV0_1).toMatchObject({ kind: "present" });
+      if (vm.motivationDiscoveryV0_1?.kind !== "present") {
+        throw new Error("Expected the existing source-backed BLETAR UI projection");
+      }
+      render(createElement(MotivationDiscoveryCardV0_1, { discovery: vm.motivationDiscoveryV0_1 }));
+      expect(screen.getByTestId("albanian-lexical-reading")).toHaveTextContent("bletar");
+      expect(screen.getByTestId("albanian-reading-meaning")).toHaveTextContent("beekeeper");
+      expect(screen.getByTestId("albanian-reading-functional-bridge")).toHaveTextContent("AGENT");
+      expect(screen.getByTestId("albanian-reading-functional-bridge")).toHaveTextContent("exploratory");
+      const senseEvidence = screen.getAllByTestId("albanian-reading-source-sense-evidence")
+        .map((node) => node.textContent).join(" ");
+      expect(senseEvidence).toContain("en-bletar-sq-noun-KI12VIJ3");
+      expect(senseEvidence).toContain("Occupations (sq:Occupations; sq; w)");
+      expect(senseEvidence).not.toContain("base sense selected");
+      cleanup();
+    },
+  );
 });

@@ -1119,20 +1119,41 @@ function parseMotivationDiscoveryV0_1(
     const template = suffixTemplates[0] as Record<string, unknown>;
     const templateExpansion = template.expansion as string;
     const args = template.args as Record<string, unknown>;
-    const argumentKeys = Object.keys(args).sort();
+    const argumentKeys = Object.keys(args);
+    const allowedArgumentKeys = new Set(["1", "2", "3", "4", "t1"]);
+    const hasArgument4 = Object.prototype.hasOwnProperty.call(args, "4");
+    const hasGlossAnnotation = Object.prototype.hasOwnProperty.call(args, "t1");
     const base = typeof args["2"] === "string" ? args["2"].normalize("NFC").trim() : "";
-    const bareSuffix = typeof args["3"] === "string" ? args["3"].normalize("NFC").trim() : "";
-    if (argumentKeys.join(",") !== "1,2,3" || args["1"] !== "sq" || !base || !bareSuffix ||
-      bareSuffix.startsWith("-")) return false;
-    const componentForms = [base, `-${bareSuffix}`];
+    const rawSuffix = typeof args["3"] === "string" ? args["3"].normalize("NFC").trim() : "";
+    const suffixBody = rawSuffix.startsWith("-") ? rawSuffix.slice(1) : rawSuffix;
+    const canonicalSuffix = `-${suffixBody}`;
+    const glossAnnotation = typeof args.t1 === "string" ? args.t1.normalize("NFC").trim() : "";
+    const normalizedBase = normalizeAlbanianRelationForm(base);
+    const normalizedSuffix = normalizeAlbanianRelationForm(suffixBody);
+    if (!(["1", "2", "3"].every((key) => Object.prototype.hasOwnProperty.call(args, key))) ||
+      argumentKeys.some((key) => !allowedArgumentKeys.has(key)) ||
+      (hasArgument4 && args["4"] !== "") || args["1"] !== "sq" || !base ||
+      !/^[a-zçë]+$/u.test(normalizedBase) || !suffixBody || !/^[a-zçë]+$/u.test(normalizedSuffix) ||
+      (hasGlossAnnotation && (!glossAnnotation || /[\r\n()+“”"]/u.test(glossAnnotation)))) return false;
+
+    const componentForms = [base, canonicalSuffix];
+    const primaryForm = typeof primary.form === "string" ? primary.form : null;
+    if (primaryForm === null) return false;
+    if (componentForms.some((form, index) => componentForms.findIndex((candidate) =>
+      normalizeAlbanianRelationForm(candidate) === normalizeAlbanianRelationForm(form),
+    ) !== index) || componentForms.some((form) =>
+      normalizeAlbanianRelationForm(form) === normalizeAlbanianRelationForm(primaryForm))) return false;
     const normalizeText = (text: string): string =>
       text.normalize("NFC").trim().replace(/\s+/gu, " ").toLocaleLowerCase("sq-AL");
-    const expectedExpansion = `${base} + -${bareSuffix}`;
+    const annotatedBase = hasGlossAnnotation ? `${base} (“${glossAnnotation}”)` : base;
+    const expectedExpansion = `${annotatedBase} + ${canonicalSuffix}`;
     const explanation = typeof primary.etymologyText === "string"
-      ? normalizeText(primary.etymologyText).replace(/[.!?]+$/u, "")
+      ? normalizeText(primary.etymologyText).replace(/\.$/u, "")
       : "";
+    const expectedExplanation = normalizeText(`From ${expectedExpansion}`);
     if (normalizeText(templateExpansion) !== normalizeText(expectedExpansion) ||
-      explanation !== normalizeText(`From ${expectedExpansion}`) || rawLinks.length !== 2 ||
+      (explanation !== expectedExplanation && explanation !== `${expectedExplanation} noun suffix`) ||
+      rawLinks.length !== 2 ||
       projectedLinks.length !== 2) return false;
 
     return componentForms.every((form, index) => {

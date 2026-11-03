@@ -229,7 +229,11 @@ describeWithRealSource("source-authored suffix direct-target AGENT with the froz
     expect(outputs["shkencë"]).toMatchObject({ status: "SUPPORTED", operation: "AGENT", relation: "SOURCE_RELATED_FORM" });
     expect(outputs["orëndreqës"]).toMatchObject({ status: "SUPPORTED", operation: "AGENT", relation: "SOURCE_AUTHORED_AF_TEMPLATE" });
     expect(outputs["pelar"]).toMatchObject({ status: "SUPPORTED", operation: "AGENT" });
-    for (const word of ["zjarrfikës", "bletar", "luleshitës", "fuzhnjar", "thëngjilltar", "gjitar", "kombëtar"]) {
+    expect(outputs["bletar"]).toMatchObject({
+      status: "SUPPORTED",
+      operation: "AGENT",
+    });
+    for (const word of ["zjarrfikës", "luleshitës", "fuzhnjar", "thëngjilltar", "gjitar", "kombëtar"]) {
       expect(outputs[word]).toMatchObject({ status: "NULL", operation: null });
     }
   });
