@@ -152,6 +152,30 @@ describe("safe documentation-only pre-push classifier", () => {
     expect(classify(fixture).tier).toBe("FULL");
   });
 
+  it.each([
+    "docs/open-instrument/albanian-pronunciation-source-contract-v0.1.md",
+    "docs/open-instrument/blind-validation-pilot-preregistration-v1.md",
+    "docs/contracts/README.md",
+    "docs/validation/VALIDATION_REPORT_LATEST_v0.2.md",
+  ])("uses the full lane for scientific or validation document %s", (changedPath) => {
+    const fixture = fresh();
+    const target = path.join(fixture.root, changedPath);
+    fs.mkdirSync(path.dirname(target), { recursive: true });
+    fs.writeFileSync(target, "# Authority-bearing document\n");
+    commit(fixture);
+
+    expect(classify(fixture).tier).toBe("FULL");
+  });
+
+  it("continues to allow the narrow process-document subtree", () => {
+    const fixture = fresh();
+    fs.mkdirSync(path.join(fixture.root, "docs/process"), { recursive: true });
+    fs.writeFileSync(path.join(fixture.root, "docs/process/workflows.md"), "# Workflow\n");
+    commit(fixture);
+
+    expect(classify(fixture).tier).toBe("DOCS_ONLY");
+  });
+
   it("uses the full lane for ambiguous, multiple, or malformed ref data", () => {
     const fixture = fresh();
     fs.writeFileSync(path.join(fixture.root, "docs/dev-workflow.md"), "# Changed\n");
@@ -355,6 +379,23 @@ describe("documentation fast-path content validation", () => {
     });
 
     expect(validation.state).toBe("PASS");
+  });
+
+  it("forces default diff prefixes and validates new links with diff.noprefix enabled", () => {
+    const fixture = makeFixture();
+    fixtures.push(fixture);
+    const baseSha = git(fixture.root, "rev-parse", "main");
+    fs.writeFileSync(
+      path.join(fixture.root, "docs/dev-workflow.md"),
+      "# Workflow\n\n[Missing target](./not-present.md)\n",
+    );
+    const headSha = commit(fixture);
+    git(fixture.root, "config", "diff.noprefix", "true");
+
+    const validation = validateDocsOnlyCommit({ repoRoot: fixture.root, baseSha, headSha });
+
+    expect(validation.state).toBe("FAIL");
+    expect(validation.reason).toContain("local link target does not exist");
   });
 
   it.each([

@@ -9,6 +9,7 @@ const ALLOWED_ROOT_DOCS = new Set([
   "CONTRIBUTING.md",
   "README.md",
 ]);
+const ALLOWED_DOCS_PREFIXES = ["docs/process/"];
 
 function full(reason) {
   return { tier: "FULL", reason };
@@ -62,7 +63,8 @@ function isAllowedDocsPath(filePath) {
   if (/^\.agents\/skills\/[a-z0-9]+(?:-[a-z0-9]+)*\/SKILL\.md$/.test(filePath)) {
     return true;
   }
-  if (!filePath.startsWith("docs/")) return false;
+  if (filePath === "docs/dev-workflow.md") return true;
+  if (!ALLOWED_DOCS_PREFIXES.some((prefix) => filePath.startsWith(prefix))) return false;
   const segments = filePath.slice("docs/".length).split("/");
   return segments.every(
     (segment) =>

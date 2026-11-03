@@ -104,6 +104,8 @@ function localTarget(repoRoot, headSha, sourcePath, destination) {
 function readAddedMarkdownLines(repoRoot, baseSha, headSha, filePaths) {
   const diff = git(repoRoot, [
     "diff",
+    "--src-prefix=a/",
+    "--dst-prefix=b/",
     "--unified=0",
     "--no-renames",
     "--no-ext-diff",
@@ -122,26 +124,50 @@ function readAddedMarkdownLines(repoRoot, baseSha, headSha, filePaths) {
   }
 
   const additions = new Map(filePaths.map((filePath) => [filePath, []]));
+  const seenPaths = new Set();
+  const hunkCounts = new Map(filePaths.map((filePath) => [filePath, 0]));
+  let diffPath = null;
   let currentPath = null;
   let inHunk = false;
   for (const line of text.split("\n")) {
     if (line.startsWith("diff --git ")) {
+      if (diffPath && (!currentPath || hunkCounts.get(diffPath) === 0)) return null;
+      const match = /^diff --git a\/([A-Za-z0-9._/-]+) b\/([A-Za-z0-9._/-]+)$/.exec(line);
+      if (!match || match[1] !== match[2] || !additions.has(match[1]) || seenPaths.has(match[1])) return null;
+      diffPath = match[1];
       currentPath = null;
       inHunk = false;
       continue;
     }
-    if (line.startsWith("+++ b/")) {
-      currentPath = line.slice("+++ b/".length);
+    if (line.startsWith("--- ")) {
+      if (!diffPath || !["/dev/null", `a/${diffPath}`].includes(line.slice("--- ".length))) return null;
+      continue;
+    }
+    if (line.startsWith("+++ ")) {
+      const path = line.slice("+++ ".length);
+      if (!diffPath || path !== `b/${diffPath}`) return null;
+      currentPath = diffPath;
+      seenPaths.add(currentPath);
       continue;
     }
     if (line.startsWith("@@")) {
+      if (!currentPath || !/^@@ -\d+(?:,\d+)? \+\d+(?:,\d+)? @@(?: .*)?$/.test(line)) return null;
       inHunk = true;
+      hunkCounts.set(currentPath, hunkCounts.get(currentPath) + 1);
       continue;
     }
+    if (line.startsWith("\\ No newline at end of file")) continue;
+    if (line.startsWith("diff ") || line.startsWith("+++")) return null;
     if (inHunk && currentPath && line.startsWith("+")) {
       additions.get(currentPath)?.push(line.slice(1));
     }
   }
+  if (
+    !diffPath ||
+    !currentPath ||
+    seenPaths.size !== filePaths.length ||
+    filePaths.some((filePath) => hunkCounts.get(filePath) === 0)
+  ) return null;
   return new Map([...additions].map(([filePath, lines]) => [filePath, lines.join("\n")]));
 }
 
