@@ -129,7 +129,8 @@ branch update, a clean index/worktree, an exact configured push URL, a live
 matching remote branch (or live remote `main` for a new branch), and a complete
 commit diff made only of regular `100644` Markdown files in this allowlist:
 `AGENTS.md`, `CONTRIBUTING.md`, `README.md`,
-`.agents/skills/<skill-name>/SKILL.md`, and `docs/**/*.md`. The classifier
+`.agents/skills/<skill-name>/SKILL.md`, `docs/dev-workflow.md`, and
+`docs/process/**/*.md`. The classifier
 reads committed Git objects; extensions, environment flags, staged paths, and
 caller-supplied file lists cannot establish eligibility. The fast path runs
 `git diff --check`, Markdown encoding/final-newline checks, relevant skill

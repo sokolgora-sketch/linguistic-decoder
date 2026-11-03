@@ -30,7 +30,8 @@ The docs-only path is eligible only from the Git pre-push hook with one identica
 
 - `AGENTS.md`, `CONTRIBUTING.md`, and `README.md`;
 - `.agents/skills/<skill-name>/SKILL.md`;
-- `docs/**/*.md`.
+- `docs/dev-workflow.md`;
+- `docs/process/**/*.md`.
 
 The gate derives paths from Git objects, not staged files, an environment flag, or a caller-supplied file list. It checks `git diff --check`, committed Markdown encoding and final newlines, changed or AGENTS-referenced skill frontmatter, AGENTS skill paths, and relative Markdown links. Multiple refs, tags, deletes, renames, executable or symlink modes, MDX, code/config/dependency/CI/hook/gate changes, unusual paths, dirty state, a stale/missing base, or any Git/remote uncertainty select the existing full lint and serial Jest lane. If a docs content check itself fails, the gate fails; it does not report success or hide the error behind the fast lane.
 
