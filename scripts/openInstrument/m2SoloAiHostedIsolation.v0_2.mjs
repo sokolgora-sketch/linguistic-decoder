@@ -118,7 +118,7 @@ function dockerMount(source, destination, writable) {
 function runRestrictedReviewer({ request, reviewerPath, outputDir, privateFilePath, imageId, imageEnv, runName }) {
   const requestPath = join(dirname(outputDir), `${outputDir.split("/").at(-1)}-request.json`);
   const outputPath = join(outputDir, "response.json");
-  const cidPath = join(dirname(outputDir), "container.cid");
+  const cidPath = join(dirname(outputDir), `${outputDir.split("/").at(-1)}.cid`);
   const uid = typeof process.getuid === "function" ? process.getuid() : null;
   const gid = typeof process.getgid === "function" ? process.getgid() : null;
   if (!Number.isInteger(uid) || !Number.isInteger(gid) || uid === 0) throw new Error("host runner lacks a non-root numeric uid/gid");
@@ -382,6 +382,7 @@ async function main() {
       executions: {
         validReview: {
           dockerRunExitCode: mainResult.dockerRunExitCode,
+          dockerStderr: mainResult.dockerStderr,
           dockerInspectError: mainResult.dockerInspectError,
           isolationInspection: mainResult.inspection,
           responseSha256: mainResult.responseSha256,
@@ -396,6 +397,7 @@ async function main() {
           inputHashMatchesOriginal: tamperedRun.response?.diagnostics?.recomputedProjectionSha256 === packet.reviewRequest.reviewerInputSha256,
           reviewerOutcome: tamperedRun.response?.decision?.outcome ?? "NO_RESPONSE",
           dockerRunExitCode: tamperedRun.dockerRunExitCode,
+          dockerStderr: tamperedRun.dockerStderr,
           isolationInspection: tamperedRun.inspection,
           responseSha256: tamperedRun.responseSha256,
           existingV0_1VerifierStatus: tamperedRunner?.packet.aiReview?.evaluation?.status ?? "UNKNOWN",

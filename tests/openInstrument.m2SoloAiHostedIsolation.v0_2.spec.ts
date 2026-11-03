@@ -152,6 +152,16 @@ describe("ZE-14 hosted restricted reviewer configuration contract", () => {
     expect(result.decision.checks.reviewerContractReadOnly).toBe("FAIL");
   });
 
+  test("accepts denied writes to read-only file mounts across filesystem error codes", () => {
+    const { request, observations } = fixture();
+    observations.unauthorizedWrite.requestMountErrorCode = "EACCES";
+    observations.unauthorizedWrite.reviewerCodeMountErrorCode = "EPERM";
+    expect(reviewer.inspectRequestAndBuildDecision(request, observations).decision.outcome).toBe("PASS");
+
+    observations.unauthorizedWrite.reviewerCodeMountErrorCode = "EIO";
+    expect(reviewer.inspectRequestAndBuildDecision(request, observations).decision.outcome).toBe("FAIL");
+  });
+
   test("fails closed when filesystem or process restrictions are missing", () => {
     const { request, observations } = fixture();
     observations.privateFileRead.observedErrorCode = "EACCES";

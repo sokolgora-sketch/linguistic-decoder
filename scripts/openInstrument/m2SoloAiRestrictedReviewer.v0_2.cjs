@@ -251,8 +251,8 @@ const inspectRequestAndBuildDecision = (request, observations) => {
     privateRead?.observedErrorCode === "ENOENT" &&
     privateRead?.hostFileMounted === false &&
     unauthorizedWrite?.observedErrorCode === "EROFS" &&
-    unauthorizedWrite?.requestMountErrorCode === "EROFS" &&
-    unauthorizedWrite?.reviewerCodeMountErrorCode === "EROFS" &&
+    ["EROFS", "EACCES", "EPERM"].includes(unauthorizedWrite?.requestMountErrorCode) &&
+    ["EROFS", "EACCES", "EPERM"].includes(unauthorizedWrite?.reviewerCodeMountErrorCode) &&
     unauthorizedWrite?.requestBytesUnchanged === true &&
     unauthorizedWrite?.reviewerCodeBytesUnchanged === true &&
     unauthorizedWrite?.outputMountWritable === true &&
