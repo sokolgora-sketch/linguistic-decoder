@@ -981,28 +981,51 @@ function sourceComponentReferencesV0_1(
   if (afTemplates.length === 0 && suffixTemplates.length > 0) {
     const template = suffixTemplates[0];
     if (!template || suffixTemplates.length !== 1 || templates.length !== 1) return null;
-    const argumentKeys = Object.keys(template.args).sort();
+    const args = template.args;
+    const argumentKeys = Object.keys(args);
+    const allowedArgumentKeys = new Set(["1", "2", "3", "4", "t1"]);
+    const hasArgument4 = Object.prototype.hasOwnProperty.call(args, "4");
+    const hasGlossAnnotation = Object.prototype.hasOwnProperty.call(args, "t1");
     const baseForm = template.args["2"]?.normalize("NFC").trim() ?? "";
-    const bareSuffix = template.args["3"]?.normalize("NFC").trim() ?? "";
+    const rawSuffix = template.args["3"]?.normalize("NFC").trim() ?? "";
+    const suffixBody = rawSuffix.startsWith("-") ? rawSuffix.slice(1) : rawSuffix;
+    const canonicalSuffix = `-${suffixBody}`;
+    const normalizedBase = normalizedAlbanianFormV0_1(baseForm);
+    const normalizedSuffix = normalizedAlbanianFormV0_1(suffixBody);
+    const glossAnnotation = args["t1"]?.normalize("NFC").trim() ?? "";
     if (
-      argumentKeys.join(",") !== "1,2,3" ||
+      !["1", "2", "3"].every((key) => Object.prototype.hasOwnProperty.call(args, key)) ||
+      argumentKeys.some((key) => !allowedArgumentKeys.has(key)) ||
+      (hasArgument4 && args["4"] !== "") ||
       template.args["1"] !== "sq" ||
       !baseForm ||
-      !bareSuffix ||
-      bareSuffix.startsWith("-")
+      !/^[a-zçë]+$/u.test(normalizedBase) ||
+      !suffixBody ||
+      !/^[a-zçë]+$/u.test(normalizedSuffix) ||
+      (hasGlossAnnotation && (!glossAnnotation || /[\r\n()+“”"]/u.test(glossAnnotation)))
     ) return null;
 
-    const componentForms = [baseForm, `-${bareSuffix}`];
+    const componentForms = [baseForm, canonicalSuffix];
+    const annotatedBase = hasGlossAnnotation
+      ? `${baseForm} (“${glossAnnotation}”)`
+      : baseForm;
+    const expectedExpansion = `${annotatedBase} + ${canonicalSuffix}`;
     if (
-      componentForms.some((form, index) => componentForms.indexOf(form) !== index) ||
+      componentForms.some((form, index) => componentForms.findIndex((candidate) =>
+        normalizedAlbanianFormV0_1(candidate) === normalizedAlbanianFormV0_1(form),
+      ) !== index) ||
       componentForms.some((form) => normalizedAlbanianFormV0_1(form) === normalizedAlbanianFormV0_1(primary.form)) ||
       normalizedSourceTemplateTextV0_1(template.expansion) !==
-        normalizedSourceTemplateTextV0_1(`${baseForm} + -${bareSuffix}`)
+        normalizedSourceTemplateTextV0_1(expectedExpansion)
     ) return null;
 
     const authoredExplanation = normalizedSourceTemplateTextV0_1(primary.etymologyText ?? "")
-      .replace(/[.!?]+$/u, "");
-    if (authoredExplanation !== normalizedSourceTemplateTextV0_1(`From ${baseForm} + -${bareSuffix}`)) return null;
+      .replace(/\.$/u, "");
+    const expectedRelationship = normalizedSourceTemplateTextV0_1(`From ${expectedExpansion}`);
+    if (
+      authoredExplanation !== expectedRelationship &&
+      authoredExplanation !== `${expectedRelationship} noun suffix`
+    ) return null;
 
     const links = primary.etymologyLinks ?? [];
     if (links.length !== componentForms.length) return null;
