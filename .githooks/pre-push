@@ -1,12 +1,10 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Bypass when you need it:
-#   SKIP_PREPUSH=1 git push
-if [[ "${SKIP_PREPUSH:-0}" == "1" ]]; then
-  echo "pre-push: SKIP_PREPUSH=1 set — skipping gate."
-  exit 0
+if [[ "$#" -eq 2 ]]; then
+  echo "pre-push: running npm run gate:prepush with verified Git ref context"
+  npm run gate:prepush -- --hook "$1" "$2"
+else
+  echo "pre-push: Git ref context is unavailable; running the full pre-push gate"
+  npm run gate:prepush
 fi
-
-echo "pre-push: running npm run gate:prepush (lint + serial CI-mode deterministic tests)"
-npm run gate:prepush

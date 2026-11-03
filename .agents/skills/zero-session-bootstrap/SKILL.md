@@ -7,6 +7,17 @@ description: "Use at the start of any Open Instrument or ZË-RO Codex session, i
 
 This skill is the repository entry point. It checks current authority and state; it does not authorize edits, source acquisition, experiments, PR publication, or merging.
 
+## Classify before expensive commands
+
+After the read-only preflight needed to understand the request, state the validation tier and planned checks before running tests, gates, builds, installations, or other expensive commands:
+
+- **A — READ_ONLY:** inspection, review, research, or planning. Do not run tests, gates, builds, or installations and do not mutate the repository.
+- **B — DOCS_ONLY:** non-executable Markdown documentation or instruction skills. Check the exact changed-file scope, formatting, frontmatter, references, and links. Let `npm run gate:prepush` select its docs-only lane only when its live-Git classifier proves eligibility; otherwise it runs the existing full lint and serial Jest lane.
+- **C — SCOPED_CODE:** code, tests, or ordinary implementation. Run focused regression tests, applicable changed-file lint/typechecks, and the full required push gate.
+- **D — HIGH_IMPACT:** gate/hook, CI, dependency, runtime, security, or scientific-contract changes. Add justified integration/contract coverage and run the full required push gate.
+
+The tier describes the requested change, not an environment setting or a caller-provided file list. A docs-only result must be proven from the actual pushed ref and live remote base. Do not use `SKIP_PREPUSH`, `--no-verify`, or another bypass. Avoid duplicate broad gates, unnecessary installation, and repeated unchanged failing validation.
+
 ## Preflight before execution
 
 1. Restate the requested outcome and its authorized scope. A Linear milestone, prior prompt, green CI, or skill is not permission to expand the task.

@@ -7,12 +7,7 @@ This repo has strict rules so we don’t break the Seven-Voices engine or the Fi
 - **Never** run auto-fix tools that touch many files at once (Gemini, `next lint --fix`, etc.).
 - Treat `tsconfig`, `package.json`, `jest.config`, and Firebase config as **high-risk**.  
   Only change them in very small, deliberate commits.
-- Every change must keep:
-
-  ```bash
-  npm test
-  npm run build
-  ```
+- Every change must preserve correctness and receive validation proportional to its scope. Use `npm test` and `npm run build` when the changed behavior or current policy requires them; they are not a blanket requirement for a Markdown-only edit.
 
 ## 2. Source of truth
 
@@ -109,12 +104,12 @@ Run focused tests first for changed behavior. Use the actual repository commands
 
 Use `npm run gate` or a separately executed `npm run build` when production-build validation is required. Pre-merge proof must show the command that actually provided build coverage.
 
-The repository pre-push hook runs `npm run gate:prepush` for constrained local
-environments. This is not a validation bypass: it runs lint plus Jest in
-`--ci --runInBand` mode with `OPEN_INSTRUMENT_EXTERNAL_SOURCE_ROOT` unset so
-deterministic local results cannot change with an optional external provider.
-It excludes only the known capability-dependent suites that require loopback,
-`tsx` child-process IPC, or the integration build/network path:
+The repository pre-push hook always enters through `npm run gate:prepush`. For
+code or uncertain changes it runs lint plus Jest in `--ci --runInBand` mode
+with `OPEN_INSTRUMENT_EXTERNAL_SOURCE_ROOT` unset so deterministic local
+results cannot change with an optional external provider. It excludes only the
+known capability-dependent suites that require loopback, `tsx` child-process
+IPC, or the integration build/network path:
 
 - `tests/apiAnalyzeV1.evidence.smoke.curl.spec.ts`
 - `tests/apiAnalyzeV1.stability.repeat.smoke.spec.ts`
@@ -128,12 +123,29 @@ Those suites remain mandatory in CI. The CI workflow runs the full unit suite,
 normal capable local environment may still use `npm run gate:quick` or
 `npm run gate` directly.
 
+For a positively proven docs-only push, `gate:prepush` can run a fast path
+instead of lint/Jest. It requires actual Git pre-push ref data, exactly one
+branch update, a clean index/worktree, an exact configured push URL, a live
+matching remote branch (or live remote `main` for a new branch), and a complete
+commit diff made only of regular `100644` Markdown files in this allowlist:
+`AGENTS.md`, `CONTRIBUTING.md`, `README.md`,
+`.agents/skills/<skill-name>/SKILL.md`, and `docs/**/*.md`. The classifier
+reads committed Git objects; extensions, environment flags, staged paths, and
+caller-supplied file lists cannot establish eligibility. The fast path runs
+`git diff --check`, Markdown encoding/final-newline checks, relevant skill
+frontmatter and AGENTS reference checks, and local Markdown-link checks.
+Multiple refs, tags, deletes, renames, mode changes, symlinks, MDX, code,
+tests, CI, hooks, gate/dependency/config changes, unusual paths, stale or
+missing refs, dirty state, and any ambiguous Git/remote result use the existing
+full lint/Jest lane. A failing docs check fails the gate.
+
 Never claim PASS, build success, CI success, or gate success without actual output. Do not encode transient test counts in this durable workflow.
 
-For an ordinary scoped change, default local validation is focused tests,
+For an ordinary scoped code change, default local validation is focused tests,
 changed-file ESLint, and the applicable production or contract typecheck. Keep
 the normal pre-push hook enabled; it must complete `npm run gate:prepush` on
-every push. Run `npm run gate:quick` when broader local integration validation
+every push, selecting only the verified docs path or the existing full lane.
+Run `npm run gate:quick` when broader local integration validation
 is warranted, not as a routine pre-merge step. `gate:quick` and `gate:prepush`
 are not equivalent: `gate:prepush` excludes the defined capability-dependent
 suites and does not run integration tests. Require all hosted CI checks to pass

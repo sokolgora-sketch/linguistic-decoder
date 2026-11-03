@@ -2,6 +2,8 @@
 
 Before any runnable task, read `.agents/skills/zero-session-bootstrap/SKILL.md` and complete its live authorization, repository, concurrent-task, and worktree preflight. Stop on a mismatch, unknown active lane, or unsafe dirty state; never reset, clean, stash, prune, or edit a protected worktree.
 
+Before expensive commands, state the task's validation tier and plan: **A READ_ONLY** (inspect/review/research; no tests or mutation), **B DOCS_ONLY** (allowlisted non-executable Markdown; structural/content checks and the verified docs fast path), **C SCOPED_CODE** (focused tests, applicable lint/typecheck, mandatory pre-push gate), or **D HIGH_IMPACT** (gate, hook, CI, dependency, runtime, security, or scientific-contract changes; justified integration/contract checks and the full mandatory pre-push gate). Read-only preflight needed to classify a task is allowed first. Avoid duplicate broad checks and repeated unchanged failures.
+
 Route by task:
 
 - Authorized code or documentation changes, validation, or PR work: `.agents/skills/zero-change-validation-pr/SKILL.md`.
