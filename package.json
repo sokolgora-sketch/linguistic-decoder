@@ -76,7 +76,8 @@
     "open-instrument:analysis-capability-baseline": "tsx scripts/openInstrumentAnalysisCapabilityBaseline.v1.ts",
     "open-instrument:analysis-capability-regression-baseline": "tsx scripts/openInstrumentAnalysisCapabilityBaseline.v1.ts --manifest tests/fixtures/openInstrument/analysis-capability-baseline.v1.manifest.json --out tests/fixtures/openInstrument/analysis-capability-regression-baseline.v0_1.json",
     "open-instrument:strict-blind-runner-readiness": "tsx scripts/openInstrumentStrictBlindReplicationRunnerReadiness.v1.ts",
-    "open-instrument:strict-blind-runner-integrity": "tsx scripts/openInstrumentStrictBlindRunnerIntegrityReadiness.v1.ts"
+    "open-instrument:strict-blind-runner-integrity": "tsx scripts/openInstrumentStrictBlindRunnerIntegrityReadiness.v1.ts",
+    "open-instrument:m2-solo-ai-review:synthetic": "tsx scripts/openInstrument/m2SoloAiReviewWorkflow.v0_1.ts"
   },
   "dependencies": {
     "@google-cloud/storage": "^7.19.0",
