@@ -65,6 +65,19 @@ describe("M2 solo AI review handoff v0.1", () => {
     expect(result.humanIndependentReviewClaimed).toBe(false);
   });
 
+  test("fails when the reviewer explicitly rejects despite otherwise valid passing fields", () => {
+    const rejected = { ...decision(), outcome: "FAIL" as const };
+    const result = evaluateM2SoloAiReviewDecisionV0_1({
+      reviewerInputSha256: sha("b"),
+      artifactSha256s: [sha("c"), sha("d")],
+      selectionFingerprint: sha("e"),
+      machineChecks: allMachineChecks(),
+    }, rejected);
+
+    expect(result.status).toBe("FAIL");
+    expect(result.reasonCodes).toContain("REVIEWER_REJECTED_REVIEW");
+  });
+
   test("fails a changed selection fingerprint and does not accept reviewer selection overrides", () => {
     const original = decision();
     const before = JSON.stringify(original);

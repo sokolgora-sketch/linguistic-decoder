@@ -66,7 +66,7 @@ import {
 } from "../../src/shared/openInstrument/m2FreshCandidatePoolAuthorityBoundary.v0_1";
 
 const ROOT = process.cwd();
-const DEFAULT_OUTPUT = join("/private/tmp", `open-instrument-m2-solo-ai-review-packet-${Date.now()}-${process.pid}.json`);
+const DEFAULT_OUTPUT = join(tmpdir(), `open-instrument-m2-solo-ai-review-packet-${Date.now()}-${process.pid}.json`);
 const PREREGISTRATION_PATH = "docs/open-instrument/research-artifacts/m2-one-embryo-proof-v1/preregistration.json";
 const EXPECTED_PREREGISTRATION_SHA256 = "28bfab132990c4f67313462d076e44db538927e8a132421b7af71aeccd428f93";
 const SOURCE_BYTES = "synthetic-source-bytes-v0.1";

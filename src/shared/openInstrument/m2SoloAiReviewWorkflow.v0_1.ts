@@ -325,14 +325,14 @@ export function evaluateM2SoloAiReviewDecisionV0_1(
     }
   }
 
-  const failed = reasons.some((reason) =>
+  if (decision.outcome === "FAIL") reasons.push("REVIEWER_REJECTED_REVIEW");
+  const failed = decision.outcome === "FAIL" || reasons.some((reason) =>
     reason.includes("MISMATCH") || reason.includes("CHANGED") || reason.includes("FORBIDDEN") ||
     reason.includes("CONFLICTS_PRESENT") || reason.includes("FAILURES_PRESENT") ||
     reason.includes("CHECK_FAILED") || reason === "REVIEW_DECISION_SCHEMA_INVALID" ||
     reason.includes("CHECK_UPGRADED") || reason.includes("CODE_INVALID") ||
     reason === "REVIEW_CLASSIFICATION_INVALID" || reason === "REVIEW_OUTCOME_INVALID" ||
-    reason === "REVIEWED_ARTIFACT_HASH_SET_MISMATCH" || reason === "REVIEW_CHECK_SET_INVALID" ||
-    decision.outcome === "FAIL",
+    reason === "REVIEWED_ARTIFACT_HASH_SET_MISMATCH" || reason === "REVIEW_CHECK_SET_INVALID",
   );
   const unknown = reasons.length > 0 || !identityValid || decision.outcome === "UNKNOWN" ||
     (isRecordV0_1(checks) && M2_SOLO_AI_REVIEW_CHECKS_V0_1.some((check) => checks[check] === "UNKNOWN"));
