@@ -150,6 +150,10 @@ function assert(condition: unknown, message: string): asserts condition {
   if (!condition) throw new Error(message);
 }
 
+function syntheticFjaloriRequestCount(report: SmokeReport): number {
+  return report.syntheticFjaloriRequests.length;
+}
+
 function errorMessage(error: unknown): string {
   return error instanceof Error ? error.message : String(error);
 }
@@ -472,7 +476,7 @@ async function main(): Promise<void> {
         if (word === "KANDIL") {
           assert(await mechanical.getAttribute("data-status") === "NOT_SUBMITTED", "KANDIL inherited a prior mechanical result.");
           assert(await workbench.getByLabel("Component 1 exact spelling").inputValue() === "", "KANDIL inherited a prior component draft.");
-          assert(report.syntheticFjaloriRequests.length === 0, "A component source lookup ran before the user selected Check source.");
+          assert(syntheticFjaloriRequestCount(report) === 0, "A component source lookup ran before the user selected Check source.");
 
           const entries: Array<[string, string]> = [
             ["Target language", "Albanian"],
@@ -494,7 +498,7 @@ async function main(): Promise<void> {
           const sourceGloss = workbench.getByTestId("fjalori-source-sense-gloss");
           await sourceGloss.waitFor({ state: "visible" });
           assert((await sourceGloss.innerText()).includes("Synthetic browser fixture only"), "Source fixture was not visibly labeled synthetic.");
-          assert(report.syntheticFjaloriRequests.length === 1, "The manual source lookup did not use exactly one bounded fixture request.");
+          assert(syntheticFjaloriRequestCount(report) === 1, "The manual source lookup did not use exactly one bounded fixture request.");
           assert(report.syntheticFjaloriRequests[0] === "https://fjalorishqip.org/api/v1/fjala/kan.json", "Unexpected source fixture request URL.");
           await workbench.getByRole("button", { name: "Select source sense entry 1 sense 1 for inspection", exact: true }).click();
           const assessment = workbench.getByLabel("USER_INTERPRETATION assessment for entry 1 sense 1", { exact: true });
@@ -532,7 +536,7 @@ async function main(): Promise<void> {
           assert(await mechanical.getAttribute("data-status") === "NOT_SUBMITTED", "DRITARE retained the previous word's replay result.");
           assert(await workbench.getByLabel("Component 1 exact spelling").inputValue() === "", "DRITARE retained the previous word's component draft.");
           assert(await workbench.getByTestId("fjalori-selected-sense").count() === 0, "DRITARE retained the previous word's source-sense selection.");
-          assert(report.syntheticFjaloriRequests.length === 1, "A source request was triggered without a manual component action.");
+          assert(syntheticFjaloriRequestCount(report) === 1, "A source request was triggered without a manual component action.");
           const entries: Array<[string, string]> = [
             ["Target language", "Albanian"],
             ["Component 1 exact spelling", "DRIT"],
@@ -563,7 +567,7 @@ async function main(): Promise<void> {
           assert(await mechanical.getAttribute("data-status") === "NOT_SUBMITTED", "BUKË was given an unsubmitted mechanical interpretation.");
           assert(await workbench.getByLabel("Component 1 exact spelling").inputValue() === "", "BUKË inherited an earlier component proposal.");
           assert(await workbench.getByTestId("fjalori-selected-sense").count() === 0, "BUKË inherited an earlier source-sense assessment.");
-          assert(report.syntheticFjaloriRequests.length === 1, "BUKË triggered an unrequested source lookup.");
+          assert(syntheticFjaloriRequestCount(report) === 1, "BUKË triggered an unrequested source lookup.");
           interpretation.proposalStatus = "NOT_SUBMITTED";
           interpretation.strictEmbryoMeaning = "UNKNOWN_OR_NULL";
         } else if (viewport === "mobile") {
