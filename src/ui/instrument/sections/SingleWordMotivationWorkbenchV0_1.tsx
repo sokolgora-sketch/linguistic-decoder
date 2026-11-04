@@ -278,8 +278,12 @@ export function SingleWordMotivationWorkbenchV0_1({
                 </p>
                 <p className="mt-1 text-xs text-[#aeb4ce]">
                   <strong>User-proposed meaning (as entered):</strong>{" "}
-                  {segment.unresolved ? "UNKNOWN_OR_NULL" : segment.proposedMeaning || "UNKNOWN_OR_NULL"}.
+                  {segment.unresolved ? "UNKNOWN_OR_NULL" : segment.proposedMeaning || "UNKNOWN_OR_NULL"}. USER_PROPOSED.
                   This Albanian form lookup does not verify that meaning, the recorded language/dialect, or an exact sense alignment.
+                </p>
+                <p className="mt-1 text-xs text-[#aeb4ce]">
+                  <strong>User-proposed grammatical role:</strong>{" "}
+                  {segment.unresolved ? "UNKNOWN_OR_NULL" : segment.proposedGrammaticalRole || "UNKNOWN_OR_NULL"}. USER_PROPOSED.
                 </p>
                 <p className="mt-1 text-xs text-[#aeb4ce]">
                   <strong>Recorded language/dialect (as entered):</strong>{" "}
@@ -290,6 +294,15 @@ export function SingleWordMotivationWorkbenchV0_1({
                   word={selectedComponentSource.exactSpelling}
                   context="component"
                   proposalMeaning={segment.unresolved ? "" : segment.proposedMeaning}
+                  componentProposal={{
+                    componentId: String(index),
+                    exactSpelling: segment.exactSpelling,
+                    proposedMeaning: segment.proposedMeaning,
+                    proposedGrammaticalRole: segment.proposedGrammaticalRole,
+                    language: segment.language,
+                    dialect: segment.dialect,
+                    unresolved: segment.unresolved,
+                  }}
                 />
               </div>
             ) : null}

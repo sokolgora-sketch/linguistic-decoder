@@ -142,7 +142,23 @@ describe("FjaloriShqip Albanian meaning evidence v0.1", () => {
       }),
     }) as unknown as typeof fetch;
 
-    render(<FjaloriCrossSourceEvidenceV0_1 word="ka" context="component" proposalMeaning="has" />);
+    const componentProposal = {
+      componentId: "0",
+      exactSpelling: "KA",
+      proposedMeaning: "has",
+      proposedGrammaticalRole: "third-person singular verb",
+      language: "Albanian",
+      dialect: "",
+      unresolved: false,
+    };
+    const view = render(
+      <FjaloriCrossSourceEvidenceV0_1
+        word="ka"
+        context="component"
+        proposalMeaning="has"
+        componentProposal={componentProposal}
+      />,
+    );
 
     const entries = await screen.findAllByTestId("fjalori-source-entry");
     expect(entries).toHaveLength(4);
@@ -167,11 +183,56 @@ describe("FjaloriShqip Albanian meaning evidence v0.1", () => {
     fireEvent.click(screen.getByRole("button", { name: "Select source sense entry 1 sense 1 for inspection" }));
     expect(screen.getByTestId("fjalori-selected-sense")).toHaveTextContent("USER_INTERPRETATION");
     expect(screen.getAllByTestId("fjalori-source-sense")).toHaveLength(5);
+    const comparison = screen.getByTestId("fjalori-component-meaning-comparison");
+    expect(comparison).toHaveTextContent("USER_PROPOSED");
+    expect(comparison).toHaveTextContent("Component spelling: KA");
+    expect(comparison).toHaveTextContent("Proposed meaning: has");
+    expect(comparison).toHaveTextContent("Proposed grammatical role: third-person singular verb");
+    expect(comparison).toHaveTextContent("Language / dialect: Albanian · UNKNOWN_OR_NULL");
+    expect(comparison).toHaveTextContent("SOURCE_REPORTED");
+    expect(comparison).toHaveTextContent("Part of speech: verb");
+    expect(comparison).toHaveTextContent("Gloss: has (form of kam); there is");
+    expect(comparison).toHaveTextContent("Gloss language: en");
+    expect(comparison).toHaveTextContent("Source attribution: en-wiktionary");
+    expect(comparison).toHaveTextContent("Entry source identity: en-wiktionary");
+    expect(comparison).toHaveTextContent("Response-position locator: Entry 1 · Sense 1");
+    expect(comparison).toHaveTextContent("cross-source sense alignment");
+    expect(screen.getByRole("option", { name: "POTENTIALLY_SUPPORTS_PROPOSAL" })).toBeInTheDocument();
+    expect(screen.getByRole("option", { name: "DOES_NOT_SUPPORT_PROPOSAL" })).toBeInTheDocument();
+    expect(screen.getByRole("option", { name: "UNDECIDED" })).toBeInTheDocument();
     fireEvent.change(screen.getByLabelText("USER_INTERPRETATION assessment for entry 1 sense 1"), {
       target: { value: "POTENTIALLY_SUPPORTS_PROPOSAL" },
     });
     expect(screen.getByTestId("fjalori-selected-sense")).toHaveTextContent("Current assessment: POTENTIALLY_SUPPORTS_PROPOSAL");
     expect(screen.getByTestId("fjalori-component-senses")).toHaveTextContent("No sense is ranked or matched automatically");
+
+    let currentProposal = componentProposal;
+    const proposalChanges = [
+      { componentId: "1" },
+      { proposedMeaning: "possesses" },
+      { proposedGrammaticalRole: "finite verb" },
+      { language: "Albanian Gheg" },
+      { dialect: "Gheg" },
+    ] as const;
+    for (const change of proposalChanges) {
+      currentProposal = { ...currentProposal, ...change };
+      view.rerender(
+        <FjaloriCrossSourceEvidenceV0_1
+          word="ka"
+          context="component"
+          proposalMeaning={currentProposal.proposedMeaning}
+          componentProposal={currentProposal}
+        />,
+      );
+      expect(screen.queryByTestId("fjalori-selected-sense")).not.toBeInTheDocument();
+      expect(screen.queryByText(/Current assessment:/)).not.toBeInTheDocument();
+      fireEvent.click(screen.getByRole("button", { name: "Select source sense entry 1 sense 1 for inspection" }));
+      expect(screen.getByLabelText("USER_INTERPRETATION assessment for entry 1 sense 1")).toHaveValue("");
+      fireEvent.change(screen.getByLabelText("USER_INTERPRETATION assessment for entry 1 sense 1"), {
+        target: { value: "DOES_NOT_SUPPORT_PROPOSAL" },
+      });
+    }
+    expect(global.fetch).toHaveBeenCalledTimes(1);
   });
 
   it("distinguishes unavailable, invalid, and valid records without usable senses", async () => {
@@ -188,6 +249,7 @@ describe("FjaloriShqip Albanian meaning evidence v0.1", () => {
     }) as unknown as typeof fetch;
     const invalidJson = render(<FjaloriCrossSourceEvidenceV0_1 word="ka" context="component" />);
     expect(await screen.findByTestId("fjalori-evidence-null")).toHaveTextContent("INVALID_SOURCE_RESPONSE · UNKNOWN_OR_NULL");
+    expect(screen.queryByTestId("fjalori-component-meaning-comparison")).not.toBeInTheDocument();
     invalidJson.unmount();
 
     global.fetch = jest.fn().mockResolvedValue({
@@ -203,6 +265,7 @@ describe("FjaloriShqip Albanian meaning evidence v0.1", () => {
     render(<FjaloriCrossSourceEvidenceV0_1 word="ka" context="component" />);
     expect(await screen.findByTestId("fjalori-no-usable-senses")).toHaveTextContent("NO_USABLE_SENSES · UNKNOWN_OR_NULL");
     expect(screen.getByTestId("fjalori-alignment-boundary")).toHaveTextContent("FORM_MATCH_ONLY");
+    expect(screen.queryByTestId("fjalori-component-meaning-comparison")).not.toBeInTheDocument();
   });
 
   it("does not show a dritare source-meaning claim when its description is unavailable", async () => {

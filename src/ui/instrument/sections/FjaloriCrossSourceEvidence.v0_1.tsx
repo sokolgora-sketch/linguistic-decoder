@@ -24,6 +24,15 @@ type FjaloriEntry = Readonly<{
   sources: readonly string[];
   senses: readonly FjaloriSense[];
 }>;
+type ComponentProposalContextV0_1 = Readonly<{
+  componentId: string;
+  exactSpelling: string;
+  proposedMeaning: string;
+  proposedGrammaticalRole: string;
+  language: string;
+  dialect: string;
+  unresolved: boolean;
+}>;
 type UserSenseAssessment = "POTENTIALLY_SUPPORTS_PROPOSAL" | "DOES_NOT_SUPPORT_PROPOSAL" | "UNDECIDED";
 type EvidenceState =
   | Readonly<{ status: "loading" }>
@@ -162,20 +171,41 @@ export function FjaloriCrossSourceEvidenceV0_1({
   word,
   context = "word-reading",
   proposalMeaning,
-}: Readonly<{ word: string; context?: "word-reading" | "component"; proposalMeaning?: string }>) {
+  componentProposal,
+}: Readonly<{
+  word: string;
+  context?: "word-reading" | "component";
+  proposalMeaning?: string;
+  componentProposal?: ComponentProposalContextV0_1;
+}>) {
   const canonicalWord = canonicalAlbanianWord(word);
+  const userProposedMeaning = componentProposal?.unresolved
+    ? ""
+    : proposalMeaning ?? componentProposal?.proposedMeaning ?? "";
+  const comparisonScope = context === "component"
+    ? JSON.stringify({
+        canonicalWord,
+        exactSpelling: componentProposal?.exactSpelling ?? word,
+        componentId: componentProposal?.componentId ?? "",
+        proposedMeaning: userProposedMeaning,
+        proposedGrammaticalRole: componentProposal?.unresolved ? "" : componentProposal?.proposedGrammaticalRole ?? "",
+        language: componentProposal?.language ?? "",
+        dialect: componentProposal?.dialect ?? "",
+        unresolved: componentProposal?.unresolved ?? false,
+      })
+    : proposalMeaning ?? "";
   const [evidence, setEvidence] = useState<EvidenceState>({ status: "loading" });
   const [selectedSense, setSelectedSense] = useState<Readonly<{
     entryIndex: number;
     senseIndex: number;
-    proposalMeaning: string;
+    comparisonScope: string;
   }> | null>(null);
   const [userAssessment, setUserAssessment] = useState<UserSenseAssessment | null>(null);
 
   useEffect(() => {
     setSelectedSense(null);
     setUserAssessment(null);
-  }, [canonicalWord, proposalMeaning]);
+  }, [canonicalWord, comparisonScope]);
 
   useEffect(() => {
     if (!canonicalWord) return;
@@ -313,7 +343,7 @@ export function FjaloriCrossSourceEvidenceV0_1({
                           {entry.senses.map((sense, senseIndex) => {
                             const isSelected = selectedSense?.entryIndex === entryIndex &&
                               selectedSense.senseIndex === senseIndex &&
-                              selectedSense.proposalMeaning === (proposalMeaning ?? "");
+                              selectedSense.comparisonScope === comparisonScope;
                             return (
                               <li key={`sense-${senseIndex}`} className="rounded bg-[#171c28] p-2" data-testid="fjalori-source-sense">
                                 <p className="text-[10px] text-[#aeb4ce]">
@@ -326,7 +356,33 @@ export function FjaloriCrossSourceEvidenceV0_1({
                                 </p>
                                 {isSelected ? (
                                   <div className="mt-2 rounded border border-[#53604a] p-2" data-testid="fjalori-selected-sense">
-                                    <p className="font-semibold">Selected by you for inspection · USER_INTERPRETATION</p>
+                                    <p className="font-semibold">Manually selected source sense · no automatic ranking or alignment</p>
+                                    {context === "component" ? (
+                                      <section className="mt-2 rounded border border-[#46505c] bg-[#0d1117] p-2" data-testid="fjalori-component-meaning-comparison">
+                                        <h5 className="font-semibold text-[#f0f1fa]">Component meaning comparison · USER_INTERPRETATION</h5>
+                                        <div className="mt-2 grid gap-2 sm:grid-cols-2">
+                                          <div className="rounded border border-[#53604a] p-2">
+                                            <h6 className="font-semibold">USER_PROPOSED</h6>
+                                            <p>Component spelling: {componentProposal?.exactSpelling ?? word}</p>
+                                            <p>Proposed meaning: {userProposedMeaning.trim() || "UNKNOWN_OR_NULL"}</p>
+                                            <p>Proposed grammatical role: {componentProposal?.unresolved ? "UNKNOWN_OR_NULL" : componentProposal?.proposedGrammaticalRole.trim() || "UNKNOWN_OR_NULL"}</p>
+                                            <p>Language / dialect: {componentProposal?.language.trim() || "UNKNOWN_OR_NULL"} · {componentProposal?.dialect.trim() || "UNKNOWN_OR_NULL"}</p>
+                                          </div>
+                                          <div className="rounded border border-[#46505c] p-2">
+                                            <h6 className="font-semibold">SOURCE_REPORTED</h6>
+                                            <p>Part of speech: {entry.pos ?? "UNKNOWN_OR_NULL"}</p>
+                                            <p>Gloss: {sense.gloss}</p>
+                                            <p>Gloss language: {sense.lang}</p>
+                                            <p>Source attribution: {sense.source}</p>
+                                            <p>Entry source identity: {entry.sources.join(" · ") || "UNKNOWN_OR_NULL"}</p>
+                                            <p>Response-position locator: Entry {entryIndex + 1} · Sense {senseIndex + 1}</p>
+                                          </div>
+                                        </div>
+                                        <p className="mt-2 text-[10px] text-[#aeb4ce]">
+                                          UNKNOWN_OR_NULL — this exact-form comparison does not establish cross-source sense alignment, a compound analysis, or historical derivation. The locator is a response position, not a source-issued sense ID.
+                                        </p>
+                                      </section>
+                                    ) : null}
                                     <label className="mt-1 block text-[10px] text-[#c5ced8]">
                                       USER_INTERPRETATION assessment
                                       <select
@@ -352,7 +408,7 @@ export function FjaloriCrossSourceEvidenceV0_1({
                                     className="mt-2 rounded border border-[#53604a] px-2 py-1 text-[10px] text-[#dce9ca]"
                                     aria-label={`Select source sense entry ${entryIndex + 1} sense ${senseIndex + 1} for inspection`}
                                     onClick={() => {
-                                      setSelectedSense({ entryIndex, senseIndex, proposalMeaning: proposalMeaning ?? "" });
+                                      setSelectedSense({ entryIndex, senseIndex, comparisonScope });
                                       setUserAssessment(null);
                                     }}
                                   >
