@@ -1,6 +1,12 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import { SingleWordMotivationWorkbenchV0_1 } from "@/ui/instrument/sections/SingleWordMotivationWorkbenchV0_1";
 
+const originalFetch = global.fetch;
+
+afterEach(() => {
+  global.fetch = originalFetch;
+});
+
 describe("Single-word motivation workbench v0.1", () => {
   it("lets a user inspect the KANDIL proposal and keeps mismatch, unverified evidence, and embryo Null visible", () => {
     render(<SingleWordMotivationWorkbenchV0_1 initialTargetWord="KANDIL" />);
@@ -110,4 +116,92 @@ describe("Single-word motivation workbench v0.1", () => {
     fireEvent.click(screen.getByLabelText("Remove transformation 1"));
     expect(addButton).toBeEnabled();
   });
+
+  it("checks only the selected exact component and keeps source evidence separate from the proposal", async () => {
+    const aiAttribution = "Albanian descriptions written with AI help — CC BY-SA 4.0";
+    const fetchMock = jest.fn((input: RequestInfo | URL) => {
+      if (String(input).endsWith("/dill.json")) {
+        return Promise.resolve({ ok: false, json: async () => ({}) });
+      }
+      return Promise.resolve({
+        ok: true,
+        json: async () => ({
+          word: "ka",
+          licence: "CC BY-SA 4.0",
+          attribution: [aiAttribution],
+          sources: ["en-wiktionary", "ai"],
+          description: { text: "Source-described Albanian entry for ka", source: "ai" },
+          entries: [{ pos: "verb", sources: ["en-wiktionary"], senses: [] }],
+        }),
+      });
+    });
+    global.fetch = fetchMock as unknown as typeof fetch;
+
+    render(<SingleWordMotivationWorkbenchV0_1 initialTargetWord="KANDIL" />);
+    fireEvent.change(screen.getByLabelText("Target language"), { target: { value: "Albanian" } });
+    fireEvent.click(screen.getByTestId("single-word-add-component"));
+
+    const values = [
+      ["Component 1 exact spelling", "KA"],
+      ["Component 1 proposed meaning", "has"],
+      ["Component 1 grammatical role", "third-person singular verb"],
+      ["Component 1 language", "Albanian"],
+      ["Component 2 exact spelling", "N"],
+      ["Component 2 language", "Albanian"],
+      ["Component 3 exact spelling", "DILL"],
+      ["Component 3 proposed meaning", "sun"],
+      ["Component 3 grammatical role", "noun"],
+      ["Component 3 language", "Albanian"],
+      ["Component 3 dialect", "Gheg"],
+      ["Proposed functional explanation", "Has sun / carries light"],
+    ] as const;
+    for (const [label, value] of values) {
+      fireEvent.change(screen.getByLabelText(label), { target: { value } });
+    }
+    fireEvent.click(screen.getByLabelText("Component 2 not yet explained"));
+    fireEvent.change(screen.getByLabelText("Transparency description"), { target: { value: "METAPHORICAL" } });
+
+    const proposal = screen.getByTestId("single-word-proposal-result");
+    const proposalBeforeSourceChecks = proposal.textContent;
+    expect(proposal).toHaveTextContent("KA + N + DILL");
+    expect(proposal).toHaveTextContent("KANDILL");
+    expect(proposal).toHaveTextContent("MISMATCH");
+    expect(proposal).toHaveTextContent("Has sun / carries light");
+    expect(proposal).toHaveTextContent("PROPOSED");
+    expect(proposal).toHaveTextContent("A → I");
+    expect(proposal).toHaveTextContent("Strict embryo meaning: Unknown / Null");
+    expect(proposal).toHaveTextContent("N — meaning Unknown / Null");
+    expect(screen.getAllByTestId("single-word-component-source-check")).toHaveLength(3);
+    expect(fetchMock).not.toHaveBeenCalled();
+
+    fireEvent.click(screen.getByRole("button", { name: "Check source for component 1" }));
+    expect(await screen.findByText("Source-described Albanian entry for ka")).toBeInTheDocument();
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(String(fetchMock.mock.calls[0][0])).toBe("https://fjalorishqip.org/api/v1/fjala/ka.json");
+    expect(screen.getByTestId("single-word-component-source-spelling")).toHaveTextContent("KA");
+    expect(screen.getByTestId("single-word-component-source-evidence")).toHaveTextContent("User-proposed meaning (unchanged): has");
+    expect(screen.getByTestId("fjalori-alignment-boundary")).toHaveTextContent("FORM_MATCH_ONLY");
+    expect(screen.getByText(/not independent scientific corroboration/)).toBeInTheDocument();
+    expect(screen.getByRole("link", { name: "Original FjaloriShqip record" })).toHaveAttribute(
+      "href",
+      "https://fjalorishqip.org/fjala/ka/",
+    );
+    expect(screen.getByLabelText("Component 1 evidence status")).toHaveValue("USER_PROPOSED");
+
+    fireEvent.click(screen.getByRole("button", { name: "Check source for component 3" }));
+    expect(await screen.findByTestId("fjalori-evidence-null")).toHaveTextContent("UNKNOWN_OR_NULL");
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+    expect(fetchMock.mock.calls.map(([url]) => String(url))).toEqual([
+      "https://fjalorishqip.org/api/v1/fjala/ka.json",
+      "https://fjalorishqip.org/api/v1/fjala/dill.json",
+    ]);
+    expect(screen.getAllByTestId("single-word-component-source-evidence")).toHaveLength(1);
+    expect(screen.getByTestId("single-word-component-source-spelling")).toHaveTextContent("DILL");
+    expect(screen.getByTestId("single-word-component-source-evidence")).toHaveTextContent("User-proposed meaning (unchanged): sun");
+    expect(screen.getByTestId("single-word-component-source-evidence")).toHaveTextContent("Albanian · Gheg");
+    expect(screen.getByLabelText("Component 3 evidence status")).toHaveValue("USER_PROPOSED");
+    expect(screen.getByLabelText("Component 3 proposed meaning")).toHaveValue("sun");
+    expect(screen.getByTestId("single-word-proposal-result").textContent).toBe(proposalBeforeSourceChecks);
+  });
+
 });

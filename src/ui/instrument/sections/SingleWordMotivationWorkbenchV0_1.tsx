@@ -9,9 +9,11 @@ import {
   type SingleWordSegmentEvidenceStatusV0_1,
   type SingleWordTransparencyV0_1,
 } from "@/shared/openInstrument/singleWordFunctionalMotivation.v0_1";
+import { FjaloriCrossSourceEvidenceV0_1 } from "@/ui/instrument/sections/FjaloriCrossSourceEvidence.v0_1";
 
 type DraftSegment = SingleWordFunctionalMotivationSegmentInputV0_1;
 type DraftTransformation = SingleWordFunctionalMotivationTransformationInputV0_1;
+type SelectedComponentSourceLookupV0_1 = Readonly<{ componentIndex: number; exactSpelling: string }>;
 
 function blankSegment(): DraftSegment {
   return {
@@ -137,6 +139,7 @@ export function SingleWordMotivationWorkbenchV0_1({
   const [targetLanguage, setTargetLanguage] = useState("");
   const [targetDialect, setTargetDialect] = useState("");
   const [segments, setSegments] = useState<DraftSegment[]>([blankSegment(), blankSegment()]);
+  const [selectedComponentSource, setSelectedComponentSource] = useState<SelectedComponentSourceLookupV0_1 | null>(null);
   const [unresolvedConnectingMaterial, setUnresolvedConnectingMaterial] = useState("");
   const [transformations, setTransformations] = useState<DraftTransformation[]>([]);
   const [functionalExplanation, setFunctionalExplanation] = useState("");
@@ -155,7 +158,19 @@ export function SingleWordMotivationWorkbenchV0_1({
   const result = useMemo(() => buildSingleWordFunctionalMotivationProposalV0_1(input), [input]);
 
   function updateSegment(index: number, update: Partial<DraftSegment>) {
+    if (
+      selectedComponentSource?.componentIndex === index &&
+      typeof update.exactSpelling === "string" &&
+      update.exactSpelling !== selectedComponentSource.exactSpelling
+    ) {
+      setSelectedComponentSource(null);
+    }
     setSegments((current) => current.map((segment, at) => at === index ? { ...segment, ...update } : segment));
+  }
+
+  function removeSegment(index: number) {
+    setSelectedComponentSource(null);
+    setSegments((current) => current.filter((_, at) => at !== index));
   }
 
   function updateTransformation(index: number, update: Partial<DraftTransformation>) {
@@ -245,8 +260,39 @@ export function SingleWordMotivationWorkbenchV0_1({
                 Component not yet explained
               </label>
             </div>
+            <button
+              type="button"
+              aria-label={"Check source for component " + (index + 1)}
+              data-testid="single-word-component-source-check"
+              className="mt-2 rounded border border-[#53604a] px-2 py-1 text-xs text-[#dce9ca] disabled:cursor-not-allowed disabled:opacity-50"
+              disabled={!segment.exactSpelling.trim()}
+              onClick={() => setSelectedComponentSource({ componentIndex: index, exactSpelling: segment.exactSpelling })}
+            >
+              Check source
+            </button>
+            {selectedComponentSource?.componentIndex === index ? (
+              <div data-testid="single-word-component-source-evidence" className="mt-3 rounded border border-[#46505c] bg-[#10131d] p-2">
+                <p className="text-xs text-[#d5d9e8]">
+                  <strong>Selected exact component spelling:</strong>{" "}
+                  <span data-testid="single-word-component-source-spelling">{selectedComponentSource.exactSpelling}</span>
+                </p>
+                <p className="mt-1 text-xs text-[#aeb4ce]">
+                  <strong>User-proposed meaning (unchanged):</strong>{" "}
+                  {segment.unresolved ? "UNKNOWN_OR_NULL" : segment.proposedMeaning || "UNKNOWN_OR_NULL"}.
+                  This Albanian form lookup does not verify that meaning, the recorded language/dialect, or an exact sense alignment.
+                </p>
+                <p className="mt-1 text-xs text-[#aeb4ce]">
+                  <strong>Recorded language/dialect (unchanged):</strong>{" "}
+                  {segment.language || "UNKNOWN_OR_NULL"}{segment.dialect ? " · " + segment.dialect : ""}.
+                </p>
+                <FjaloriCrossSourceEvidenceV0_1
+                  key={selectedComponentSource.componentIndex + ":" + selectedComponentSource.exactSpelling}
+                  word={selectedComponentSource.exactSpelling}
+                />
+              </div>
+            ) : null}
             {segments.length > 2 ? (
-              <button type="button" className="mt-2 rounded border border-[#53604a] px-2 py-1 text-xs text-[#dce9ca]" onClick={() => setSegments((current) => current.filter((_, at) => at !== index))}>
+              <button type="button" className="mt-2 rounded border border-[#53604a] px-2 py-1 text-xs text-[#dce9ca]" onClick={() => removeSegment(index)}>
                 Remove component {index + 1}
               </button>
             ) : null}
