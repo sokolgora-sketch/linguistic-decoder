@@ -34,9 +34,13 @@ describe("ui instrument: originClaim gates renders from VM", () => {
 
     render(<InstrumentPanel payload={payload as any} />);
 
-    expect(screen.getByText("OriginClaim Gates")).toBeInTheDocument();
-    expect(screen.getByText(/Status:/)).toHaveTextContent("Status: ON");
-    expect(screen.getByText(/Candidates:/)).toHaveTextContent("Candidates: 3");
+    const originClaimHeading = screen.getByText("OriginClaim Gates");
+    expect(originClaimHeading).toBeInTheDocument();
+    const originClaimCard = originClaimHeading.closest("section");
+    expect(originClaimCard).toBeTruthy();
+    const originClaim = within(originClaimCard as HTMLElement);
+    expect(originClaim.getByText(/Status:/)).toHaveTextContent("Status: ON");
+    expect(originClaim.getByText(/Candidates:/)).toHaveTextContent("Candidates: 3");
 
     // Scope to the section that actually contains the counts <pre>.
     const heading = screen.getByText("Reason code counts");
@@ -62,7 +66,11 @@ describe("ui instrument: originClaim gates renders from VM", () => {
     };
 
     render(<InstrumentPanel payload={payload as any} />);
-    expect(screen.getByText(/Status:/)).toHaveTextContent("Status: OFF");
-    expect(screen.getByText(/Candidates:/)).toHaveTextContent("Candidates: 7");
+    const originClaimHeading = screen.getByText("OriginClaim Gates");
+    const originClaimCard = originClaimHeading.closest("section");
+    expect(originClaimCard).toBeTruthy();
+    const originClaim = within(originClaimCard as HTMLElement);
+    expect(originClaim.getByText(/Status:/)).toHaveTextContent("Status: OFF");
+    expect(originClaim.getByText(/Candidates:/)).toHaveTextContent("Candidates: 7");
   });
 });
