@@ -63,4 +63,23 @@ describe("Single-word motivation workbench v0.1", () => {
     expect(screen.getByTestId("single-word-proposal-result")).toHaveTextContent("RRUGË");
     expect(screen.getByTestId("single-word-proposal-result")).toHaveTextContent("U → Ë");
   });
+
+  it("lets users remove incomplete transformations and enforces the eight-item limit", () => {
+    render(<SingleWordMotivationWorkbenchV0_1 initialTargetWord="KANDIL" />);
+    const addButton = screen.getByTestId("single-word-add-transformation");
+
+    fireEvent.click(addButton);
+    expect(screen.getByLabelText("Transformation 1 from")).toBeInTheDocument();
+    fireEvent.click(screen.getByLabelText("Remove transformation 1"));
+    expect(screen.queryByLabelText("Transformation 1 from")).not.toBeInTheDocument();
+
+    for (let index = 0; index < 8; index += 1) {
+      fireEvent.click(addButton);
+    }
+    expect(addButton).toBeDisabled();
+    expect(screen.getByLabelText("Transformation 8 from")).toBeInTheDocument();
+
+    fireEvent.click(screen.getByLabelText("Remove transformation 1"));
+    expect(addButton).toBeEnabled();
+  });
 });

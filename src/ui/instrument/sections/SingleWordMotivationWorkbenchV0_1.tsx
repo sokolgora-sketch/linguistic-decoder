@@ -205,7 +205,7 @@ export function SingleWordMotivationWorkbenchV0_1({
       <div className="mt-4 rounded-lg border border-[#354234] bg-[#0d1117] p-3">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <div className="text-xs font-semibold uppercase tracking-[0.12em] text-[#dce9ca]">Declared transformations</div>
-          <button type="button" data-testid="single-word-add-transformation" className="rounded border border-[#53604a] px-2 py-1 text-xs text-[#dce9ca]" onClick={() => setTransformations((current) => [...current, blankTransformation()])}>
+          <button type="button" data-testid="single-word-add-transformation" className="rounded border border-[#53604a] px-2 py-1 text-xs text-[#dce9ca] disabled:cursor-not-allowed disabled:opacity-50" disabled={transformations.length >= 8} onClick={() => setTransformations((current) => [...current, blankTransformation()])}>
             Add transformation
           </button>
         </div>
@@ -215,7 +215,10 @@ export function SingleWordMotivationWorkbenchV0_1({
             <label className={labelClass}>To<input aria-label={`Transformation ${index + 1} to`} className={inputClass} value={transformation.to} onChange={(event) => updateTransformation(index, { to: event.target.value })} /></label>
             <label className={labelClass}>Explanation<input aria-label={`Transformation ${index + 1} explanation`} className={inputClass} value={transformation.explanation} onChange={(event) => updateTransformation(index, { explanation: event.target.value })} /></label>
             <label className={labelClass}>Evidence reference (optional)<input aria-label={`Transformation ${index + 1} evidence reference`} className={inputClass} value={transformation.evidenceReference} onChange={(event) => updateTransformation(index, { evidenceReference: event.target.value })} /></label>
-            <div data-testid="single-word-transformation-unverified" className="text-xs text-[#d5c28f] sm:col-span-2">User-declared, unverified; this transformation is recorded and never applied to make the spelling match.</div>
+            <div data-testid="single-word-transformation-unverified" className="flex flex-wrap items-center gap-2 text-xs text-[#d5c28f] sm:col-span-2">
+              <span>User-declared, unverified; this transformation is recorded and never applied to make the spelling match.</span>
+              <button type="button" aria-label={`Remove transformation ${index + 1}`} className="underline" onClick={() => setTransformations((current) => current.filter((_, at) => at !== index))}>Remove</button>
+            </div>
           </div>
         )) : <p className="mt-2 text-xs text-[#9fb1bf]">None declared.</p>}
       </div>
@@ -247,7 +250,6 @@ export function SingleWordMotivationWorkbenchV0_1({
             {result.proposal.declaredTransformations.map((transformation, index) => (
               <div key={index} className="mt-1 text-[#d5c28f]">
                 Declared transform {transformation.from} → {transformation.to}: user-declared and unverified; not applied.
-                <button type="button" aria-label={`Remove transformation ${index + 1}`} className="ml-2 underline" onClick={() => setTransformations((current) => current.filter((_, at) => at !== index))}>Remove</button>
               </div>
             ))}
             <div className="mt-2"><strong>Functional motivation:</strong> {result.proposal.functionalMotivation.explanation} · {transparencyLabel(result.proposal.functionalMotivation.transparency)}</div>
