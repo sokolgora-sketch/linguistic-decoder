@@ -383,7 +383,7 @@ async function main(): Promise<void> {
       timeout: PAGE_TIMEOUT_MS,
     });
     assert(response?.ok(), `Expected /chat?debug=1 to load, got ${response?.status() ?? "no response"}.`);
-    await page.getByRole("textbox", { name: "Word" }).waitFor({ state: "visible" });
+    await page.getByRole("textbox", { name: "Word", exact: true }).waitFor({ state: "visible" });
     await page.getByRole("region", { name: "Open Instrument ready" }).waitFor({ state: "visible" });
 
     let previousDisplayedWord: string | null = null;
@@ -434,7 +434,7 @@ async function main(): Promise<void> {
 
       try {
         assert(page, "Browser page was not initialized.");
-        await page.getByRole("textbox", { name: "Word" }).fill(testCase.word);
+        await page.getByRole("textbox", { name: "Word", exact: true }).fill(testCase.word);
         const apiResponsePromise = page.waitForResponse((candidate) => {
           const candidateUrl = new URL(candidate.url());
           return candidateUrl.origin === localOrigin &&

@@ -43,6 +43,7 @@ import { PrimaryReadingOrientationCardV0_1 } from "./sections/PrimaryReadingOrie
 import { SpokenPronunciationOverviewCardV0_1 } from "./sections/SpokenPronunciationOverviewCard.v0_1";
 import { SpokenResultCompositionSummaryV0_1 } from "./sections/SpokenResultCompositionSummary.v0_1";
 import { MotivationDiscoveryCardV0_1 } from "./sections/MotivationDiscoveryCard.v0_1";
+import { SingleWordMotivationWorkbenchV0_1 } from "./sections/SingleWordMotivationWorkbenchV0_1";
 import { OriginClaimCard } from '@/components/OriginClaimCard';
 import { cn } from "@/lib/utils";
 import { safeText } from "./safeText";
@@ -534,6 +535,11 @@ export function InstrumentPanel(props: Props) {
                 interpretation={vm.functionalMotivationInterpretationV0_2}
                 onAnalyzeAlbanianSourceRecord={props.onAnalyzeAlbanianSourceRecord}
                 sourceRecordSelectionDisabled={props.sourceRecordSelectionDisabled}
+              />
+
+              <SingleWordMotivationWorkbenchV0_1
+                key={vm.readout.word}
+                initialTargetWord={vm.readout.word}
               />
 
               {primaryNullStatus ? (
