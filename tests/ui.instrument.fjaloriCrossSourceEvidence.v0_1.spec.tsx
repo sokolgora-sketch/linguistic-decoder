@@ -1,4 +1,4 @@
-import { act, cleanup, render, screen } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { FjaloriCrossSourceEvidenceV0_1 } from "@/ui/instrument/sections/FjaloriCrossSourceEvidence.v0_1";
 
 const testedWords = ["dritare", "dritë", "bletar", "pelar", "qymyrtar", "gjitar", "thëngjilltar"] as const;
@@ -101,6 +101,108 @@ describe("FjaloriShqip Albanian meaning evidence v0.1", () => {
     expect(await screen.findByTestId("fjalori-source-description")).toBeInTheDocument();
     expect(screen.getByTestId("fjalori-alignment-boundary")).toHaveTextContent("FORM_MATCH_ONLY");
     expect(screen.queryByTestId("fjalori-dritare-separation")).not.toBeInTheDocument();
+  });
+
+  it("preserves source POS entries, individual senses, source order, and local-only sense assessment", async () => {
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        word: "ka",
+        licence: "CC BY-SA 4.0",
+        attribution: [aiAttribution],
+        sources: ["en-wiktionary", "ai"],
+        description: { text: "Author description fixture", source: "ai" },
+        entries: [
+          {
+            pos: "verb",
+            sources: ["en-wiktionary"],
+            senses: [
+              { gloss: "has (form of kam); there is", lang: "en", source: "en-wiktionary", tags: ["fixture-tag"] },
+            ],
+          },
+          {
+            pos: "prep",
+            sources: ["sq-wiktionary"],
+            senses: [
+              { gloss: "preposition sense fixture", lang: "en", source: "sq-wiktionary" },
+              { gloss: "second preposition sense fixture", lang: "sq", source: "sq-wiktionary" },
+            ],
+          },
+          {
+            pos: "noun",
+            sources: ["en-wiktionary"],
+            senses: [{ gloss: "ox / steer", lang: "en", source: "en-wiktionary" }],
+          },
+          {
+            pos: "verb",
+            sources: ["sq-wiktionary"],
+            senses: [{ gloss: "duplicate entry fixture", lang: "sq", source: "sq-wiktionary" }],
+          },
+        ],
+      }),
+    }) as unknown as typeof fetch;
+
+    render(<FjaloriCrossSourceEvidenceV0_1 word="ka" context="component" proposalMeaning="has" />);
+
+    const entries = await screen.findAllByTestId("fjalori-source-entry");
+    expect(entries).toHaveLength(4);
+    expect(entries.map((entry) => entry.textContent?.match(/Source-reported part of speech: (.*?) · Entry/)?.[1])).toEqual([
+      "verb", "prep", "noun", "verb",
+    ]);
+    expect(screen.getAllByTestId("fjalori-source-sense")).toHaveLength(5);
+    expect(screen.getAllByTestId("fjalori-source-sense-gloss").map((node) => node.textContent)).toEqual([
+      "has (form of kam); there is",
+      "preposition sense fixture",
+      "second preposition sense fixture",
+      "ox / steer",
+      "duplicate entry fixture",
+    ]);
+    expect(screen.getAllByText(/gloss language en/).length).toBeGreaterThan(0);
+    expect(screen.getByText(/Sense source attribution: en-wiktionary · source tags: fixture-tag/)).toBeInTheDocument();
+    expect(screen.getAllByTestId("fjalori-source-sense")[0]).toHaveTextContent("Response locator: Entry 1 · Sense 1 · gloss language en");
+    expect(screen.getByText(/not source-issued IDs/)).toBeInTheDocument();
+    expect(screen.getByTestId("fjalori-lineage-boundary")).toHaveTextContent("not independent corroboration");
+    expect(screen.queryByTestId("fjalori-selected-sense")).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: "Select source sense entry 1 sense 1 for inspection" }));
+    expect(screen.getByTestId("fjalori-selected-sense")).toHaveTextContent("USER_INTERPRETATION");
+    expect(screen.getAllByTestId("fjalori-source-sense")).toHaveLength(5);
+    fireEvent.change(screen.getByLabelText("USER_INTERPRETATION assessment for entry 1 sense 1"), {
+      target: { value: "POTENTIALLY_SUPPORTS_PROPOSAL" },
+    });
+    expect(screen.getByTestId("fjalori-selected-sense")).toHaveTextContent("Current assessment: POTENTIALLY_SUPPORTS_PROPOSAL");
+    expect(screen.getByTestId("fjalori-component-senses")).toHaveTextContent("No sense is ranked or matched automatically");
+  });
+
+  it("distinguishes unavailable, invalid, and valid records without usable senses", async () => {
+    const unavailableFetch = jest.fn().mockResolvedValue({ ok: false, json: async () => ({}) });
+    global.fetch = unavailableFetch as unknown as typeof fetch;
+    const unavailable = render(<FjaloriCrossSourceEvidenceV0_1 word="dill" context="component" />);
+    expect(await screen.findByTestId("fjalori-evidence-null")).toHaveTextContent("SOURCE_UNAVAILABLE · UNKNOWN_OR_NULL");
+    expect(screen.getByTestId("fjalori-evidence-null")).toHaveTextContent("does not establish that the word is absent");
+    unavailable.unmount();
+
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      json: async () => { throw new SyntaxError("invalid JSON fixture"); },
+    }) as unknown as typeof fetch;
+    const invalidJson = render(<FjaloriCrossSourceEvidenceV0_1 word="ka" context="component" />);
+    expect(await screen.findByTestId("fjalori-evidence-null")).toHaveTextContent("INVALID_SOURCE_RESPONSE · UNKNOWN_OR_NULL");
+    invalidJson.unmount();
+
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        word: "ka",
+        licence: "CC BY-SA 4.0",
+        attribution: [],
+        sources: [],
+        entries: [{ pos: "verb", sources: [], senses: [] }],
+      }),
+    }) as unknown as typeof fetch;
+    render(<FjaloriCrossSourceEvidenceV0_1 word="ka" context="component" />);
+    expect(await screen.findByTestId("fjalori-no-usable-senses")).toHaveTextContent("NO_USABLE_SENSES · UNKNOWN_OR_NULL");
+    expect(screen.getByTestId("fjalori-alignment-boundary")).toHaveTextContent("FORM_MATCH_ONLY");
   });
 
   it("does not show a dritare source-meaning claim when its description is unavailable", async () => {

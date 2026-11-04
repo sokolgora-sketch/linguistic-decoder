@@ -289,6 +289,7 @@ export function SingleWordMotivationWorkbenchV0_1({
                   key={selectedComponentSource.componentIndex + ":" + selectedComponentSource.exactSpelling}
                   word={selectedComponentSource.exactSpelling}
                   context="component"
+                  proposalMeaning={segment.unresolved ? "" : segment.proposedMeaning}
                 />
               </div>
             ) : null}
