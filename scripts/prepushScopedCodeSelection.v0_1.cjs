@@ -7,6 +7,12 @@ const path = require("node:path");
 const UI_SOURCE = /^src\/ui\/instrument\/InstrumentPanel\.tsx$|^src\/ui\/instrument\/sections\/(?:[A-Za-z0-9][A-Za-z0-9._-]*\/)*[A-Za-z0-9][A-Za-z0-9._-]*\.tsx$/;
 const UI_TEST = /^tests\/(?:ui\.instrument|instrumentPanel)\.[A-Za-z0-9._-]+\.spec\.tsx?$/;
 const UI_GUARD_TEST = /^tests\/(?:ui\.instrument\.[^/]+|instrumentPanel\.[^/]+)\.spec\.tsx?$/;
+const FILESYSTEM_SCAN_GUARD_TESTS = [
+  "tests/ui.devOnly.contractAdapter.import.guard.spec.ts",
+  "tests/doctrine/doctrineDrift.guard.v0.1.2.spec.ts",
+  "tests/vowels/orthographySsot.guard.v0.1.spec.ts",
+  "tests/vowels/phoneticIpaSsot.guard.v0.1.spec.ts",
+];
 const MAX_CHANGED_PATHS = 20;
 const MAX_CHANGED_SOURCES = 5;
 const MAX_CHANGED_TESTS = 15;
@@ -172,6 +178,13 @@ function selectScopedCodeTests({ repoRoot, changedPaths, runner = runJest }) {
   }
   for (const testPath of uiGuards) selected.add(testPath);
 
+  for (const testPath of FILESYSTEM_SCAN_GUARD_TESTS) {
+    if (!allTestSet.has(testPath)) {
+      return full(`required filesystem-scanning guard is not registered with Jest: ${testPath}`);
+    }
+    selected.add(testPath);
+  }
+
   const explicitConsumers = explicitSourceConsumers(repoRoot, allTests, sourcePaths);
   if (explicitConsumers.error) return full(explicitConsumers.error);
   for (const testPath of explicitConsumers.paths) selected.add(testPath);
@@ -191,6 +204,7 @@ function selectScopedCodeTests({ repoRoot, changedPaths, runner = runJest }) {
     directChangedTests,
     relatedTestCount: relatedCount,
     uiGuardCount: uiGuards.length,
+    filesystemScanGuardCount: FILESYSTEM_SCAN_GUARD_TESTS.length,
     explicitConsumerCount: explicitConsumers.paths.length,
     totalSuiteCount: allTests.length,
   };

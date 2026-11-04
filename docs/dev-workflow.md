@@ -149,9 +149,13 @@ limited to `src/ui/instrument/InstrumentPanel.tsx`,
 `tests/ui.instrument.*.spec.ts(x)` or
 `tests/instrumentPanel.*.spec.ts(x)`, the classifier may select `SCOPED_CODE`.
 It derives related tests from each changed UI source using Jest, keeps every
-directly changed test, adds all registered Instrument UI guard suites, and
-scans registered test files for explicit references to changed source paths or
-component names. It then runs ESLint on the changed files,
+directly changed test, adds all registered Instrument UI guard suites and four
+required filesystem-scanning guards (`tests/ui.devOnly.contractAdapter.import.guard.spec.ts`,
+`tests/doctrine/doctrineDrift.guard.v0.1.2.spec.ts`,
+`tests/vowels/orthographySsot.guard.v0.1.spec.ts`, and
+`tests/vowels/phoneticIpaSsot.guard.v0.1.spec.ts`), and scans registered test
+files for explicit references to changed source paths or component names.
+Missing required guard registration falls back to FULL. It then runs ESLint on the changed files,
 `npm run typecheck:prod`, and the selected tests serially with `--runInBand`.
 The selection must be nonempty, each source must have related tests, each
 direct test must be registered, the cross-cutting guard inventory must be

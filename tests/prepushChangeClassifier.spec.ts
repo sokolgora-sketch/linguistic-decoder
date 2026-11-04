@@ -396,6 +396,17 @@ describe("pre-push fast-path classifier", () => {
         "describe('guard', () => {});\n",
       );
     }
+    const filesystemScanGuards = [
+      "ui.devOnly.contractAdapter.import.guard.spec.ts",
+      "doctrine/doctrineDrift.guard.v0.1.2.spec.ts",
+      "vowels/orthographySsot.guard.v0.1.spec.ts",
+      "vowels/phoneticIpaSsot.guard.v0.1.spec.ts",
+    ];
+    for (const guardPath of filesystemScanGuards) {
+      const absolutePath = path.join(testsRoot, guardPath);
+      fs.mkdirSync(path.dirname(absolutePath), { recursive: true });
+      fs.writeFileSync(absolutePath, "describe('filesystem guard', () => {});\n");
+    }
     fs.writeFileSync(path.join(testsRoot, "ui.instrument.related.spec.tsx"), "describe('related', () => {});\n");
     fs.writeFileSync(path.join(testsRoot, "ui.instrument.direct.spec.tsx"), "describe('direct before', () => {});\n");
     for (let index = 0; index < 368; index += 1) {
@@ -430,9 +441,12 @@ describe("pre-push fast-path classifier", () => {
       const fs = require('node:fs');
       const path = require('node:path');
       const root = process.cwd();
-      const inventory = fs.readdirSync(path.join(root, 'tests'))
-        .filter(name => name.endsWith('.spec.tsx'))
-        .map(name => path.join(root, 'tests', name));
+      const walk = dir => fs.readdirSync(dir, { withFileTypes: true }).flatMap(entry => {
+        const absolute = path.join(dir, entry.name);
+        if (entry.isDirectory()) return walk(absolute);
+        return /\\.spec\\.tsx?$/.test(entry.name) ? [absolute] : [];
+      });
+      const inventory = walk(path.join(root, 'tests'));
       const related = ${JSON.stringify(related)}.map(name => path.join(root, 'tests', name));
       process.stdout.write(JSON.stringify(process.argv.includes('--findRelatedTests') ? related : inventory));
     `;
@@ -452,7 +466,11 @@ describe("pre-push fast-path classifier", () => {
     const scoped = runHook();
     expect(scoped.status).toBe(0);
     expect(scoped.stdout).toContain("verified scoped Instrument UI change");
-    expect(scoped.stdout).toContain("82/450 serial Jest suites");
+    expect(scoped.stdout).toContain("86/454 serial Jest suites");
+    for (const guardPath of filesystemScanGuards) {
+      expect(scoped.stdout).toContain(guardPath);
+    }
+    expect(scoped.stdout).toContain("4 filesystem-scanning guards");
     expect(scoped.stdout).toContain("SCOPED_LINT");
     expect(scoped.stdout).toContain("SCOPED_TYPECHECK");
     expect(scoped.stdout).toContain("SCOPED_TEST");

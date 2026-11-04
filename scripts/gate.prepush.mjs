@@ -89,7 +89,8 @@ if (classification.tier === "DOCS_ONLY") {
     console.log(
       `pre-push: verified scoped Instrument UI change (${selection.reason}); ` +
         `${selection.testPaths.length}/${selection.totalSuiteCount} serial Jest suites, ` +
-        `${selection.uiGuardCount} UI guards, ${selection.explicitConsumerCount} source-referencing consumers`,
+        `${selection.uiGuardCount} UI guards, ${selection.filesystemScanGuardCount} filesystem-scanning guards, ` +
+        `${selection.explicitConsumerCount} source-referencing consumers`,
     );
     run("node_modules/.bin/eslint", ["-c", "eslint.config.mjs", ...classification.changedPaths], "changed-file ESLint");
     run("npm", ["run", "typecheck:prod"], "production typecheck");

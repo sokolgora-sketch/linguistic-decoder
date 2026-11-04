@@ -16,6 +16,7 @@ const { selectScopedCodeTests } = require("../scripts/prepushScopedCodeSelection
     testPaths?: string[];
     relatedTestPaths?: string[];
     uiGuardCount?: number;
+    filesystemScanGuardCount?: number;
     explicitConsumerCount?: number;
   };
 };
@@ -35,6 +36,11 @@ describe("fail-closed scoped-code Jest selector", () => {
     expect(result.testPaths).toContain(changedDirectTest);
     expect(result.relatedTestPaths).not.toContain(changedDirectTest);
     expect(result.testPaths).toContain("tests/ui.instrument.singleWordMotivationWorkbench.v0_1.spec.tsx");
+    expect(result.testPaths).toContain("tests/ui.devOnly.contractAdapter.import.guard.spec.ts");
+    expect(result.testPaths).toContain("tests/doctrine/doctrineDrift.guard.v0.1.2.spec.ts");
+    expect(result.testPaths).toContain("tests/vowels/orthographySsot.guard.v0.1.spec.ts");
+    expect(result.testPaths).toContain("tests/vowels/phoneticIpaSsot.guard.v0.1.spec.ts");
+    expect(result.filesystemScanGuardCount).toBe(4);
     expect(result.uiGuardCount).toBeGreaterThanOrEqual(90);
     expect(result.testPaths!.length).toBeLessThanOrEqual(150);
 
