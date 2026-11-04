@@ -77,10 +77,11 @@ describe("mandatory pre-push hook bootstrap", () => {
     rmSync(linked, { recursive: true, force: true });
     roots.push(linked);
     expect(git(root, ["worktree", "add", "-q", "--detach", linked]).status).toBe(0);
-    expect(() => ensurePrepushHook({ repoRoot: linked })).toThrow(/Linked worktree/);
+    expect(() => ensurePrepushHook({ repoRoot: linked })).toThrow(/linked worktrees.*safe per-worktree/);
+    expect(() => ensurePrepushHook({ repoRoot: root })).toThrow(/linked worktrees.*safe per-worktree/);
     expect(git(root, ["config", "--get", "core.hooksPath"]).status).toBe(1);
   });
-  it("uses per-worktree hooksPath when linked-worktree config is enabled", () => {
+  it("uses per-worktree hooksPath in the primary without changing a sibling worktree", () => {
     const { root } = fixture();
     writeFileSync(path.join(root, "readme.txt"), "fixture\n");
     git(root, ["add", "."]);
@@ -90,6 +91,13 @@ describe("mandatory pre-push hook bootstrap", () => {
     rmSync(linked, { recursive: true, force: true });
     roots.push(linked);
     expect(git(root, ["worktree", "add", "-q", "--detach", linked]).status).toBe(0);
+    const siblingHooksBefore = git(linked, ["config", "--get", "core.hooksPath"]);
+    expect(siblingHooksBefore.status).toBe(1);
+    expect(ensurePrepushHook({ repoRoot: root }).status).toBe("INSTALLED");
+    expect(git(root, ["config", "--worktree", "--get", "core.hooksPath"]).stdout).toBe(".githooks");
+    expect(git(root, ["config", "--local", "--get", "core.hooksPath"]).status).toBe(1);
+    const siblingHooksAfterPrimarySetup = git(linked, ["config", "--get", "core.hooksPath"]);
+    expect(siblingHooksAfterPrimarySetup).toEqual(siblingHooksBefore);
     expect(ensurePrepushHook({ repoRoot: linked }).status).toBe("INSTALLED");
     expect(git(linked, ["config", "--worktree", "--get", "core.hooksPath"]).stdout).toBe(".githooks");
     expect(git(root, ["config", "--local", "--get", "core.hooksPath"]).status).toBe(1);

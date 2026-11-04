@@ -43,39 +43,79 @@ function ensurePrepushHook({ repoRoot, mode = "install" }) {
   if (effective.status === 0 && effective.stdout !== ".githooks") {
     throw new Error("A different core.hooksPath is configured; do not overwrite existing hooks");
   }
-  if (effective.status === 0) return { status: "READY", hooksPath: ".githooks" };
-  if (mode === "check") {
-    throw new Error("Pre-push hook is not active; run npm run hooks:setup before implementation or pushing");
-  }
-
-  const defaultHookPath = requiredGit(root, ["rev-parse", "--git-path", "hooks/pre-push"], "find the default pre-push hook");
-  let defaultHookExists = false;
-  try {
-    lstatSync(path.resolve(root, defaultHookPath));
-    defaultHookExists = true;
-  } catch (error) {
-    if (typeof error !== "object" || error === null || error.code !== "ENOENT") throw error;
-  }
-  if (defaultHookExists) throw new Error("An existing default pre-push hook would be bypassed; preserve or resolve it before activating .githooks");
 
   const gitDir = requiredGit(root, ["rev-parse", "--git-dir"], "find the Git directory");
   const commonDir = requiredGit(root, ["rev-parse", "--git-common-dir"], "find the shared Git directory");
   const linkedWorktree = path.resolve(root, gitDir) !== path.resolve(root, commonDir);
-  if (linkedWorktree) {
-    const worktreeConfig = git(root, ["config", "--bool", "--get", "extensions.worktreeConfig"]);
-    if (worktreeConfig.status !== 0 || worktreeConfig.stdout !== "true") {
-      throw new Error("Linked worktree has no safe per-worktree Git config; use an isolated clone, not shared core.hooksPath changes");
+  const worktreeConfig = git(root, ["config", "--bool", "--get", "extensions.worktreeConfig"]);
+  if (
+    worktreeConfig.error ||
+    ![0, 1].includes(worktreeConfig.status) ||
+    (worktreeConfig.status === 0 && !["true", "false"].includes(worktreeConfig.stdout))
+  ) {
+    throw new Error("Cannot inspect extensions.worktreeConfig safely");
+  }
+  const perWorktreeConfigEnabled = worktreeConfig.status === 0 && worktreeConfig.stdout === "true";
+  const worktreeList = git(root, ["worktree", "list", "--porcelain"]);
+  if (worktreeList.error || worktreeList.status !== 0 || !worktreeList.stdout) {
+    throw new Error("Cannot inspect registered Git worktrees safely");
+  }
+  const worktreeCount = worktreeList.stdout.split(/\r?\n/).filter((line) => line.startsWith("worktree ")).length;
+  if (worktreeCount === 0) throw new Error("Git returned no registered worktrees");
+  const hasSiblingWorktrees = linkedWorktree || worktreeCount > 1;
+  if (hasSiblingWorktrees && !perWorktreeConfigEnabled) {
+    throw new Error("Repository has linked worktrees but safe per-worktree Git config is unavailable; refusing shared core.hooksPath changes");
+  }
+
+  let configurePerWorktree = perWorktreeConfigEnabled;
+  if (configurePerWorktree) {
+    const worktreeHooksPath = git(root, ["config", "--worktree", "--get", "core.hooksPath"]);
+    if (worktreeHooksPath.error || ![0, 1].includes(worktreeHooksPath.status)) {
+      throw new Error("Cannot inspect the per-worktree hooksPath safely");
     }
-    if (git(root, ["config", "--worktree", "core.hooksPath", ".githooks"]).status !== 0) {
-      throw new Error("Could not activate the per-worktree pre-push hook");
+    if (worktreeHooksPath.status === 0 && worktreeHooksPath.stdout !== ".githooks") {
+      throw new Error("A different per-worktree core.hooksPath is configured; do not overwrite existing hooks");
     }
-  } else if (git(root, ["config", "--local", "core.hooksPath", ".githooks"]).status !== 0) {
-    throw new Error("Could not activate the local pre-push hook");
+    if (mode === "check") {
+      if (worktreeHooksPath.status === 0) return { status: "READY", hooksPath: ".githooks" };
+      throw new Error("Pre-push hook is not active in this worktree; run npm run hooks:setup before implementation or pushing");
+    }
+    if (worktreeHooksPath.status === 0) return { status: "READY", hooksPath: ".githooks" };
+  } else {
+    if (effective.status === 0) return { status: "READY", hooksPath: ".githooks" };
+    if (mode === "check") {
+      throw new Error("Pre-push hook is not active; run npm run hooks:setup before implementation or pushing");
+    }
+  }
+
+  if (effective.status !== 0) {
+    const defaultHookPath = requiredGit(root, ["rev-parse", "--git-path", "hooks/pre-push"], "find the default pre-push hook");
+    let defaultHookExists = false;
+    try {
+      lstatSync(path.resolve(root, defaultHookPath));
+      defaultHookExists = true;
+    } catch (error) {
+      if (typeof error !== "object" || error === null || error.code !== "ENOENT") throw error;
+    }
+    if (defaultHookExists) throw new Error("An existing default pre-push hook would be bypassed; preserve or resolve it before activating .githooks");
+  }
+
+  const configArgs = configurePerWorktree
+    ? ["config", "--worktree", "core.hooksPath", ".githooks"]
+    : ["config", "--local", "core.hooksPath", ".githooks"];
+  if (git(root, configArgs).status !== 0) {
+    throw new Error(configurePerWorktree ? "Could not activate the per-worktree pre-push hook" : "Could not activate the local pre-push hook");
   }
 
   const verified = git(root, ["config", "--get", "core.hooksPath"]);
   if (verified.status !== 0 || verified.stdout !== ".githooks") {
     throw new Error("Pre-push hook activation could not be verified");
+  }
+  if (configurePerWorktree) {
+    const verifiedWorktree = git(root, ["config", "--worktree", "--get", "core.hooksPath"]);
+    if (verifiedWorktree.status !== 0 || verifiedWorktree.stdout !== ".githooks") {
+      throw new Error("Per-worktree pre-push hook activation could not be verified");
+    }
   }
   return { status: "INSTALLED", hooksPath: ".githooks" };
 }
