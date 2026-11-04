@@ -27,6 +27,10 @@ The tier describes the requested change, not an environment setting or a caller-
 5. List every registered worktree and inspect its branch, HEAD, and tracked/untracked status. Preserve protected or dirty paths. Never reset, clean, stash, prune, switch, or write to them.
 6. Check that the requested lane does not overlap an active task or protected work. Stop on repository mismatch, unexplained drift, unsafe state, or unresolved concurrency.
 
+## Mandatory hook bootstrap before implementation
+
+After safe live repository/worktree preflight and BEFORE editing or publishing a branch, run `npm run hooks:setup && npm run hooks:check` in the actual checkout. This activates `.githooks/pre-push` locally in a standalone clone and verifies the executable hook. `npm ci`/`npm install` also run the repository `prepare` bootstrap, but cached dependencies or skipped lifecycle scripts are insufficient proof. A conflicting hooksPath or linked worktree without safe existing per-worktree configuration is a STOP, not permission to alter sibling worktrees. Never replace missing-hook setup with an explicit no-context FULL `npm run gate:prepush`, a skipped hook, or fabricated push ref data.
+
 ## Route to a specialist
 
 - Changes, validation, or PR publication: `zero-change-validation-pr`.

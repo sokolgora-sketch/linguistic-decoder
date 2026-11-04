@@ -96,6 +96,11 @@ Stop on a repository or lane mismatch. Do not guess repository state.
 
 ## 7. Test and gate discipline
 
+### Checkout hook bootstrap (mandatory for implementation)
+
+After safe preflight and before edits, run `npm run hooks:setup && npm run hooks:check` in the actual feature checkout. The repository `prepare` lifecycle also activates/verifies hooks during ordinary `npm ci`/`npm install` in a Git clone. It checks that `.githooks/pre-push` is a regular executable file; refuses conflicting effective `core.hooksPath` values; and avoids changing shared Git config from a linked worktree without preexisting per-worktree config. Non-Git npm installs may safely skip `prepare` hook setup. A missing or unsafe hook is a STOP, not permission to run a no-context FULL gate in place of the correct pre-push hook. Normal push must invoke the hook with genuine Git-supplied context. Hook/bootstrap/dependency changes are HIGH_IMPACT and require FULL validation.
+
+
 Run focused tests first for changed behavior. Use the actual repository commands for repository-wide validation:
 
 - `npm run gate:quick` runs lint, unit tests, and integration tests but does not run the production build.
