@@ -2,6 +2,8 @@
 
 Before any runnable task, read `.agents/skills/zero-session-bootstrap/SKILL.md` and complete its live authorization, repository, concurrent-task, and worktree preflight. Stop on a mismatch, unknown active lane, or unsafe dirty state; never reset, clean, stash, prune, or edit a protected worktree.
 
+For authorized implementation and PR work, after safe checkout preflight and BEFORE edits, run `npm run hooks:setup && npm run hooks:check` in the actual clone/worktree. Ordinary `npm ci` also runs a repository `prepare` bootstrap, but a cached install or skipped lifecycle scripts is not evidence that the hook is active. This bootstrap refuses conflicting hooks and unsafe shared worktree config. If it fails, STOP; do not waste time on a no-context FULL gate as a substitute. Normal Git push must invoke the tracked executable `.githooks/pre-push` and its verified mandatory gate.
+
 Before expensive commands, state the task's validation tier and plan: **A READ_ONLY** (inspect/review/research; no tests or mutation), **B DOCS_ONLY** (allowlisted non-executable Markdown; structural/content checks and the verified docs fast path), **C SCOPED_CODE** (focused tests, applicable lint/typecheck, mandatory pre-push gate), or **D HIGH_IMPACT** (gate, hook, CI, dependency, runtime, security, or scientific-contract changes; justified integration/contract checks and the full mandatory pre-push gate). Read-only preflight needed to classify a task is allowed first. Avoid duplicate broad checks and repeated unchanged failures.
 
 Route by task:

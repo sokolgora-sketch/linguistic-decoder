@@ -10,14 +10,14 @@ This repo is run as a deterministic instrument. Preserve correctness, scientific
 
 ## Default workflow for an ordinary scoped PR
 
-1. Sync from the current `main` and create a feature branch.
+1. Sync from the current `main` and create a feature branch. After safe checkout preflight and before editing, run `npm run hooks:setup && npm run hooks:check` in that checkout.
 2. Make the smallest scoped change.
 3. During implementation, run the focused tests relevant to the changed behavior, ESLint on changed files, and the applicable production or contract typecheck. Add other focused checks when the change warrants them.
 4. Avoid repeating broad validation after edits that do not invalidate its result. Do not automatically run both broad local gates for every ordinary PR.
 5. Before pushing, verify the repository's normal pre-push hook is active and leave it enabled. The hook runs `npm run gate:prepush` on every push, including later pushes to the same PR. That entry point selects only a verified docs-only or bounded Instrument UI validation path; every other or uncertain change uses the existing full pre-push validation.
 6. Open or update the PR and wait for all required GitHub checks to pass before merge. Obtain any separately required owner approval; do not merge automatically.
 
-The default workflow does **not** require a separate `npm run gate:quick` immediately before the push hook. If the hook is inactive, do not bypass it: run `npm run gate:prepush` explicitly before pushing, and report that the hook itself did not run.
+The default workflow does **not** require a separate `npm run gate:quick` immediately before the push hook. Hook activation belongs to initial checkout setup, not to a late gate fallback: `npm run hooks:setup` safely sets `core.hooksPath=.githooks` in a standalone clone; `npm run hooks:check` verifies it. `npm ci` also runs `prepare`, but preexisting dependencies or disabled lifecycle scripts do not prove activation. Conflicting custom hooks and linked worktrees without safe per-worktree config STOP instead of being silently overwritten. If setup fails, STOP and diagnose; do not run a no-context FULL gate merely because the hook is missing. Normal Git push executes the hook with real ref context. Never use `--no-verify` or forged hook arguments.
 
 ## Gate coverage and broader local validation
 
