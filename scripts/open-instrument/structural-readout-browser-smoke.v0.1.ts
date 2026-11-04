@@ -453,6 +453,13 @@ async function main(): Promise<void> {
       try {
         assert(page, "Browser page was not initialized for the interpretation workbench.");
         const interpretationTab = page.getByRole("tab", { name: "My Interpretation", exact: true });
+        await interpretationTab.evaluate((element) => element.scrollIntoView({ block: "center", inline: "nearest" }));
+        const tabCenterIsUnobscured = await interpretationTab.evaluate((element) => {
+          const rect = element.getBoundingClientRect();
+          const hit = document.elementFromPoint(rect.left + rect.width / 2, rect.top + rect.height / 2);
+          return hit === element || (hit !== null && element.contains(hit));
+        });
+        assert(tabCenterIsUnobscured, "My Interpretation tab is obscured at its centered mobile/desktop position.");
         await interpretationTab.click();
         assert(await interpretationTab.getAttribute("aria-selected") === "true", "My Interpretation tab did not become selected.");
         const workbench = page.getByTestId("single-word-motivation-workbench");
