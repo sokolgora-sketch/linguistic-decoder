@@ -48,6 +48,15 @@ describe("mandatory pre-push hook bootstrap", () => {
     expect(() => ensurePrepushHook({ repoRoot: root })).toThrow(/different core.hooksPath/);
     expect(git(root, ["config", "--get", "core.hooksPath"]).stdout).toBe(".custom");
   });
+  it("refuses to bypass an existing default Git pre-push hook", () => {
+    const { root } = fixture();
+    const defaultHook = path.resolve(root, git(root, ["rev-parse", "--git-path", "hooks/pre-push"]).stdout);
+    mkdirSync(path.dirname(defaultHook), { recursive: true });
+    writeFileSync(defaultHook, "#!/bin/sh\nexit 0\n");
+    chmodSync(defaultHook, 0o755);
+    expect(() => ensurePrepushHook({ repoRoot: root })).toThrow(/existing default pre-push hook would be bypassed/);
+    expect(git(root, ["config", "--get", "core.hooksPath"]).status).toBe(1);
+  });
   it("rejects a nonexecutable tracked hook", () => {
     const { root, hook } = fixture();
     chmodSync(hook, 0o644);
@@ -70,5 +79,19 @@ describe("mandatory pre-push hook bootstrap", () => {
     expect(git(root, ["worktree", "add", "-q", "--detach", linked]).status).toBe(0);
     expect(() => ensurePrepushHook({ repoRoot: linked })).toThrow(/Linked worktree/);
     expect(git(root, ["config", "--get", "core.hooksPath"]).status).toBe(1);
+  });
+  it("uses per-worktree hooksPath when linked-worktree config is enabled", () => {
+    const { root } = fixture();
+    writeFileSync(path.join(root, "readme.txt"), "fixture\n");
+    git(root, ["add", "."]);
+    expect(git(root, ["commit", "-qm", "fixture"]).status).toBe(0);
+    git(root, ["config", "extensions.worktreeConfig", "true"]);
+    const linked = mkdtempSync(path.join(os.tmpdir(), "zero-hook-linked-safe-"));
+    rmSync(linked, { recursive: true, force: true });
+    roots.push(linked);
+    expect(git(root, ["worktree", "add", "-q", "--detach", linked]).status).toBe(0);
+    expect(ensurePrepushHook({ repoRoot: linked }).status).toBe("INSTALLED");
+    expect(git(linked, ["config", "--worktree", "--get", "core.hooksPath"]).stdout).toBe(".githooks");
+    expect(git(root, ["config", "--local", "--get", "core.hooksPath"]).status).toBe(1);
   });
 });

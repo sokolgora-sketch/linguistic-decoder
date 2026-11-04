@@ -48,6 +48,16 @@ function ensurePrepushHook({ repoRoot, mode = "install" }) {
     throw new Error("Pre-push hook is not active; run npm run hooks:setup before implementation or pushing");
   }
 
+  const defaultHookPath = requiredGit(root, ["rev-parse", "--git-path", "hooks/pre-push"], "find the default pre-push hook");
+  let defaultHookExists = false;
+  try {
+    lstatSync(path.resolve(root, defaultHookPath));
+    defaultHookExists = true;
+  } catch (error) {
+    if (typeof error !== "object" || error === null || error.code !== "ENOENT") throw error;
+  }
+  if (defaultHookExists) throw new Error("An existing default pre-push hook would be bypassed; preserve or resolve it before activating .githooks");
+
   const gitDir = requiredGit(root, ["rev-parse", "--git-dir"], "find the Git directory");
   const commonDir = requiredGit(root, ["rev-parse", "--git-common-dir"], "find the shared Git directory");
   const linkedWorktree = path.resolve(root, gitDir) !== path.resolve(root, commonDir);
