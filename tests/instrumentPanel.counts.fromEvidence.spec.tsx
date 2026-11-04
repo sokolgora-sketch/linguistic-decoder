@@ -32,6 +32,9 @@ test("InstrumentPanel derives ops/notes/signals counts from emitted evidence arr
 
   render(<InstrumentPanel payload={payload} />);
 
+  expect(screen.getByTestId("single-word-motivation-workbench")).toBeInTheDocument();
+  expect(screen.getByLabelText("Exact target word")).toHaveValue("study");
+
   const btn = screen.getByRole("button", { name: /copy summary/i });
   fireEvent.click(btn);
 
