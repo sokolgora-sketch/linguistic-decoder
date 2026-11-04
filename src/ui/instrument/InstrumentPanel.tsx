@@ -81,13 +81,14 @@ function fmt<T>(x: { kind: 'present'; value: T } | { kind: 'missing'; missing: s
   return x.kind === 'present' ? String(x.value) : 'not_emitted';
 }
 
-type InstrumentSectionKey = "overview" | "evidence" | "candidates" | "roots" | "advanced";
+type InstrumentSectionKey = "overview" | "my-interpretation" | "evidence" | "candidates" | "roots" | "advanced";
 
 const INSTRUMENT_SECTIONS: Array<{
   id: InstrumentSectionKey;
   label: string;
 }> = [
   { id: "overview", label: "Overview" },
+  { id: "my-interpretation", label: "My Interpretation" },
   { id: "evidence", label: "Evidence" },
   { id: "candidates", label: "Candidates" },
   { id: "roots", label: "Roots / Meaning" },
@@ -537,11 +538,6 @@ export function InstrumentPanel(props: Props) {
                 sourceRecordSelectionDisabled={props.sourceRecordSelectionDisabled}
               />
 
-              <SingleWordMotivationWorkbenchV0_1
-                key={vm.readout.word}
-                initialTargetWord={vm.readout.word}
-              />
-
               {primaryNullStatus ? (
                 <AnalysisStatusCardV0_1
                   status={primaryNullStatus}
@@ -602,6 +598,15 @@ export function InstrumentPanel(props: Props) {
                   />
                 </div>
               </details>
+            </div>
+          </TabPanel>
+
+          <TabPanel id="my-interpretation" active={activeSection}>
+            <div className="space-y-4">
+              <SingleWordMotivationWorkbenchV0_1
+                key={vm.readout.word}
+                initialTargetWord={vm.readout.word}
+              />
             </div>
           </TabPanel>
 

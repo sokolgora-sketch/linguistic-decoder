@@ -366,5 +366,25 @@ describe(
         ).not.toBeInTheDocument();
       },
     );
+
+    it(
+      "places the single-word workbench in the accessible My Interpretation tab, outside Overview",
+      async () => {
+        const body = await analyze("KANDIL");
+        render(<InstrumentPanel payload={body} />);
+
+        const overview = screen.getByRole("tabpanel");
+        expect(within(overview).queryByTestId("single-word-motivation-workbench")).not.toBeInTheDocument();
+        const interpretationTab = screen.getByRole("tab", { name: "My Interpretation" });
+        expect(interpretationTab).toHaveAttribute("aria-selected", "false");
+
+        fireEvent.click(interpretationTab);
+        expect(interpretationTab).toHaveAttribute("aria-selected", "true");
+        const interpretationPanel = screen.getByRole("tabpanel");
+        expect(interpretationPanel).toBeVisible();
+        expect(within(interpretationPanel).getByTestId("single-word-motivation-workbench")).toBeVisible();
+        expect(within(interpretationPanel).getByTestId("single-word-mechanical-result")).toHaveAttribute("data-status", "NOT_SUBMITTED");
+      },
+    );
   },
 );

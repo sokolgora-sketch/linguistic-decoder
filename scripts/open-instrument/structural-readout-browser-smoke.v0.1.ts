@@ -86,8 +86,23 @@ type CaseResult = {
   failure: string | null;
 };
 
+type InterpretationCaseResult = {
+  word: string;
+  viewport: "desktop" | "mobile";
+  status: "PASS" | "FAIL";
+  rawConcatenation: string | null;
+  finalMechanicalSpelling: string | null;
+  exactComparison: string | null;
+  warningCodes: string[];
+  sourceLookup: "NOT_REQUESTED" | "SYNTHETIC_FIXTURE_SELECTED_MANUALLY";
+  proposalStatus: string | null;
+  strictEmbryoMeaning: string | null;
+  screenshot: string | null;
+  failure: string | null;
+};
+
 type SmokeReport = {
-  schemaVersion: "pr2283.hosted-structural-browser-smoke.v0.1";
+  schemaVersion: "open-instrument.structural-and-interpretation-browser-smoke.v0.2";
   currentHead: string | null;
   expectedMain: string;
   page: string;
@@ -100,6 +115,8 @@ type SmokeReport = {
   pageErrors: string[];
   hydrationErrors: string[];
   cases: CaseResult[];
+  interpretationCases: InterpretationCaseResult[];
+  syntheticFjaloriRequests: string[];
   fatalError: string | null;
   outcome: "RUNNING" | "PASS" | "FAIL" | "BLOCKED";
 };
@@ -112,7 +129,9 @@ const CASES: SmokeCase[] = [
   { word: "JET", expectedVoices: ["E"], hasPinnedReference: false },
   { word: "JETË", expectedVoices: ["E", "Ë"], hasPinnedReference: false },
   { word: "BLETAR", expectedVoices: ["E", "A"], hasPinnedReference: false, screenshot: true },
+  { word: "KANDIL", expectedVoices: ["A", "I"], hasPinnedReference: false },
   { word: "DRITARE", expectedVoices: ["I", "A", "E"], hasPinnedReference: false },
+  { word: "BUKË", expectedVoices: ["U", "Ë"], hasPinnedReference: false },
   { word: "ËNDËRR", expectedVoices: ["Ë", "Ë"], hasPinnedReference: false, screenshot: true },
   { word: "RRUGË", expectedVoices: ["U", "Ë"], hasPinnedReference: false },
   { word: "GJUHË", expectedVoices: ["U", "Ë"], hasPinnedReference: false },
@@ -250,9 +269,9 @@ async function main(): Promise<void> {
   await mkdir(screenshotDirectory, { recursive: true });
 
   const report: SmokeReport = {
-    schemaVersion: "pr2283.hosted-structural-browser-smoke.v0.1",
+    schemaVersion: "open-instrument.structural-and-interpretation-browser-smoke.v0.2",
     currentHead: process.env.OPEN_INSTRUMENT_PR_HEAD ?? null,
-    expectedMain: "ca821ffc55b4a4c00947010fcaf6a7444926e3fb",
+    expectedMain: "8a172fe697fbcd2c1a93f3b0baaa96ca6f3b52f4",
     page: "/chat?debug=1",
     browser: null,
     analyzeInteractions: 0,
@@ -263,6 +282,8 @@ async function main(): Promise<void> {
     pageErrors: [],
     hydrationErrors: [],
     cases: [],
+    interpretationCases: [],
+    syntheticFjaloriRequests: [],
     fatalError: null,
     outcome: "RUNNING",
   };
@@ -290,10 +311,34 @@ async function main(): Promise<void> {
     browser = await chromium.launch({ headless: true });
     report.browser = { name: "chromium", version: browser.version() };
     const context = await browser.newContext({ viewport: { width: 1280, height: 900 } });
+    const syntheticFjaloriUrl = "https://fjalorishqip.org/api/v1/fjala/kan.json";
+    const syntheticFjaloriPayload = {
+      word: "kan",
+      licence: "CC BY-SA 4.0",
+      sources: ["synthetic-browser-fixture"],
+      entries: [{
+        pos: "verb",
+        sources: ["synthetic-browser-fixture"],
+        senses: [{
+          gloss: "Synthetic browser fixture only; not lexical evidence.",
+          lang: "en",
+          source: "synthetic-browser-fixture",
+        }],
+      }],
+    };
     await context.route("**/*", async (route) => {
-      const requestUrl = new URL(route.request().url());
+      const request = route.request();
+      const requestUrl = new URL(request.url());
       if (requestUrl.origin === localOrigin) {
         await route.continue();
+      } else if (request.method() === "GET" && request.url() === syntheticFjaloriUrl) {
+        report.syntheticFjaloriRequests.push(request.url());
+        await route.fulfill({
+          status: 200,
+          contentType: "application/json",
+          headers: { "access-control-allow-origin": "*" },
+          body: JSON.stringify(syntheticFjaloriPayload),
+        });
       } else {
         blockedExternalHosts.add(requestUrl.hostname);
         await route.abort();
@@ -387,6 +432,153 @@ async function main(): Promise<void> {
     await page.getByRole("region", { name: "Open Instrument ready" }).waitFor({ state: "visible" });
 
     let previousDisplayedWord: string | null = null;
+    const runInterpretationCase = async (
+      word: string,
+      viewport: "desktop" | "mobile",
+    ): Promise<InterpretationCaseResult> => {
+      const interpretation: InterpretationCaseResult = {
+        word,
+        viewport,
+        status: "FAIL",
+        rawConcatenation: null,
+        finalMechanicalSpelling: null,
+        exactComparison: null,
+        warningCodes: [],
+        sourceLookup: "NOT_REQUESTED",
+        proposalStatus: null,
+        strictEmbryoMeaning: null,
+        screenshot: null,
+        failure: null,
+      };
+      try {
+        assert(page, "Browser page was not initialized for the interpretation workbench.");
+        const interpretationTab = page.getByRole("tab", { name: "My Interpretation", exact: true });
+        await interpretationTab.click();
+        assert(await interpretationTab.getAttribute("aria-selected") === "true", "My Interpretation tab did not become selected.");
+        const workbench = page.getByTestId("single-word-motivation-workbench");
+        await workbench.waitFor({ state: "visible" });
+        const targetInput = workbench.getByRole("textbox", { name: "Exact target word", exact: true });
+        assert(await targetInput.inputValue() === word, `Workbench target did not reset to ${word}.`);
+        const mechanical = workbench.getByTestId("single-word-mechanical-result");
+
+        if (word === "KANDIL") {
+          assert(await mechanical.getAttribute("data-status") === "NOT_SUBMITTED", "KANDIL inherited a prior mechanical result.");
+          assert(await workbench.getByLabel("Component 1 exact spelling").inputValue() === "", "KANDIL inherited a prior component draft.");
+          assert(report.syntheticFjaloriRequests.length === 0, "A component source lookup ran before the user selected Check source.");
+
+          const entries: Array<[string, string]> = [
+            ["Target language", "Albanian"],
+            ["Component 1 exact spelling", "KAN"],
+            ["Component 1 proposed meaning", "have"],
+            ["Component 1 grammatical role", "verb · user proposal"],
+            ["Component 1 language", "Albanian"],
+            ["Component 1 dialect", "Gheg"],
+            ["Component 2 exact spelling", "DILL"],
+            ["Component 2 proposed meaning", "sun"],
+            ["Component 2 grammatical role", "noun · user proposal"],
+            ["Component 2 language", "Albanian"],
+            ["Component 2 dialect", "Gheg"],
+            ["Proposed functional explanation", "Have sun / have light · user hypothesis"],
+          ];
+          for (const [label, value] of entries) await workbench.getByLabel(label, { exact: true }).fill(value);
+          await workbench.getByLabel("Component 1 evidence status", { exact: true }).selectOption("USER_PROPOSED");
+          await workbench.getByRole("button", { name: "Check source for component 1", exact: true }).click();
+          const sourceGloss = workbench.getByTestId("fjalori-source-sense-gloss");
+          await sourceGloss.waitFor({ state: "visible" });
+          assert((await sourceGloss.innerText()).includes("Synthetic browser fixture only"), "Source fixture was not visibly labeled synthetic.");
+          assert(report.syntheticFjaloriRequests.length === 1, "The manual source lookup did not use exactly one bounded fixture request.");
+          assert(report.syntheticFjaloriRequests[0] === "https://fjalorishqip.org/api/v1/fjala/kan.json", "Unexpected source fixture request URL.");
+          await workbench.getByRole("button", { name: "Select source sense entry 1 sense 1 for inspection", exact: true }).click();
+          const assessment = workbench.getByLabel("USER_INTERPRETATION assessment for entry 1 sense 1", { exact: true });
+          assert(await assessment.inputValue() === "", "A USER_INTERPRETATION assessment was auto-selected.");
+          await assessment.selectOption("UNDECIDED");
+          interpretation.sourceLookup = "SYNTHETIC_FIXTURE_SELECTED_MANUALLY";
+
+          const proposal = workbench.getByTestId("single-word-proposal-result");
+          interpretation.proposalStatus = "PROPOSED";
+          interpretation.strictEmbryoMeaning = "UNKNOWN_OR_NULL";
+          assert((await proposal.innerText()).includes("PROPOSED"), "Functional proposal was not kept as PROPOSED.");
+          assert((await proposal.innerText()).includes("Strict embryo meaning: Unknown / Null"), "Strict embryo meaning was promoted.");
+          assert((await proposal.innerText()).includes("A → I"), "The complete written Voice path changed after mechanical replay.");
+          assert((await proposal.innerText()).includes("historical origin: not claimed"), "Mechanical replay promoted historical origin.");
+          assert(await workbench.getByLabel("Component 1 evidence status", { exact: true }).inputValue() === "USER_PROPOSED", "Manual source inspection promoted component evidence status.");
+          assert((await proposal.innerText()).includes("have"), "The user's proposed meaning was not retained.");
+
+          await workbench.getByTestId("single-word-add-mechanical-operation").click();
+          await workbench.getByLabel("Mechanical operation 1 type", { exact: true }).selectOption("SUBSTITUTE");
+          await workbench.getByLabel("Mechanical operation 1 position", { exact: true }).fill("5");
+          await workbench.getByLabel("Mechanical operation 1 expected text", { exact: true }).fill("LL");
+          await workbench.getByLabel("Mechanical operation 1 replacement text", { exact: true }).fill("L");
+          await workbench.getByTestId("single-word-examine-interpretation").click();
+          assert(await mechanical.getAttribute("data-status") === "EXAMINED", "KANDIL mechanical replay was not examined.");
+          const mechanicalText = await mechanical.innerText();
+          assert(mechanicalText.includes("Raw component concatenation: KANDILL"), "KANDIL raw concatenation was incorrect.");
+          assert(mechanicalText.includes("Final mechanical spelling: KANDIL"), "KANDIL replay result was incorrect.");
+          assert(mechanicalText.includes("Exact comparison: MATCH"), "KANDIL exact comparison was incorrect.");
+          assert(mechanicalText.includes("DIGRAPH_REMOVED"), "KANDIL LL digraph impact was not reported.");
+          interpretation.rawConcatenation = "KANDILL";
+          interpretation.finalMechanicalSpelling = "KANDIL";
+          interpretation.exactComparison = "MATCH";
+          interpretation.warningCodes = ["DIGRAPH_REMOVED"];
+        } else if (word === "DRITARE") {
+          assert(await mechanical.getAttribute("data-status") === "NOT_SUBMITTED", "DRITARE retained the previous word's replay result.");
+          assert(await workbench.getByLabel("Component 1 exact spelling").inputValue() === "", "DRITARE retained the previous word's component draft.");
+          assert(await workbench.getByTestId("fjalori-selected-sense").count() === 0, "DRITARE retained the previous word's source-sense selection.");
+          assert(report.syntheticFjaloriRequests.length === 1, "A source request was triggered without a manual component action.");
+          const entries: Array<[string, string]> = [
+            ["Target language", "Albanian"],
+            ["Component 1 exact spelling", "DRIT"],
+            ["Component 1 language", "Albanian"],
+            ["Component 2 exact spelling", "HARE"],
+            ["Component 2 language", "Albanian"],
+            ["Proposed functional explanation", "Owner-proposed segmentation only"],
+          ];
+          for (const [label, value] of entries) await workbench.getByLabel(label, { exact: true }).fill(value);
+          await workbench.getByLabel("Component 1 not yet explained", { exact: true }).check();
+          await workbench.getByLabel("Component 2 not yet explained", { exact: true }).check();
+          await workbench.getByTestId("single-word-add-mechanical-operation").click();
+          await workbench.getByLabel("Mechanical operation 1 type", { exact: true }).selectOption("OMIT");
+          await workbench.getByLabel("Mechanical operation 1 position", { exact: true }).fill("4");
+          await workbench.getByLabel("Mechanical operation 1 expected text", { exact: true }).fill("H");
+          await workbench.getByTestId("single-word-examine-interpretation").click();
+          const mechanicalText = await mechanical.innerText();
+          assert(await mechanical.getAttribute("data-status") === "EXAMINED", "DRITARE mechanical replay was not examined.");
+          assert(mechanicalText.includes("Raw component concatenation: DRITHARE"), "DRITARE raw concatenation was incorrect.");
+          assert(mechanicalText.includes("Final mechanical spelling: DRITARE"), "DRITARE replay result was incorrect.");
+          assert(mechanicalText.includes("DIGRAPH_CROSSES_COMPONENT_BOUNDARY") && mechanicalText.includes("DIGRAPH_REMOVED"), "DRITARE TH boundary impact was not reported.");
+          assert(await workbench.getByLabel("Component 2 exact spelling", { exact: true }).inputValue() === "HARE", "The user spelling HARE was silently changed.");
+          interpretation.rawConcatenation = "DRITHARE";
+          interpretation.finalMechanicalSpelling = "DRITARE";
+          interpretation.exactComparison = "MATCH";
+          interpretation.warningCodes = ["DIGRAPH_CROSSES_COMPONENT_BOUNDARY", "DIGRAPH_REMOVED"];
+        } else if (word === "BUKË") {
+          assert(await mechanical.getAttribute("data-status") === "NOT_SUBMITTED", "BUKË was given an unsubmitted mechanical interpretation.");
+          assert(await workbench.getByLabel("Component 1 exact spelling").inputValue() === "", "BUKË inherited an earlier component proposal.");
+          assert(await workbench.getByTestId("fjalori-selected-sense").count() === 0, "BUKË inherited an earlier source-sense assessment.");
+          assert(report.syntheticFjaloriRequests.length === 1, "BUKË triggered an unrequested source lookup.");
+          interpretation.proposalStatus = "NOT_SUBMITTED";
+          interpretation.strictEmbryoMeaning = "UNKNOWN_OR_NULL";
+        } else if (viewport === "mobile") {
+          assert(await mechanical.getAttribute("data-status") === "NOT_SUBMITTED", "Mobile target inherited a mechanical result.");
+          assert(await workbench.getByLabel("Component 1 exact spelling").inputValue() === "", "Mobile target inherited a component draft.");
+          interpretation.proposalStatus = "NOT_SUBMITTED";
+          interpretation.strictEmbryoMeaning = "UNKNOWN_OR_NULL";
+        } else {
+          throw new Error(`No interpretation smoke case is defined for ${word}.`);
+        }
+
+        const overflow = await page.evaluate(() => Math.max(0, document.documentElement.scrollWidth - window.innerWidth));
+        assert(overflow <= 1, `${viewport} interpretation tab has horizontal overflow (${overflow}px).`);
+        const screenshotPath = join(screenshotDirectory, `${safeSlug(word)}.my-interpretation.${viewport}.png`);
+        await page.screenshot({ path: screenshotPath, fullPage: true, animations: "disabled" });
+        interpretation.screenshot = relative(artifactDirectory, screenshotPath);
+        interpretation.status = "PASS";
+      } catch (error) {
+        interpretation.failure = errorMessage(error).slice(0, 1000);
+      }
+      return interpretation;
+    };
+
     const runCase = async (testCase: SmokeCase, viewport: "desktop" | "mobile"): Promise<void> => {
       const expectedBasis = normalizedWord(testCase.word);
       const expectedVoicePath = testCase.unsupportedStructuralInput
@@ -554,6 +746,15 @@ async function main(): Promise<void> {
           }
         }
 
+        const shouldRunInterpretation =
+          (viewport === "desktop" && ["KANDIL", "DRITARE", "BUKË"].includes(testCase.word)) ||
+          (viewport === "mobile" && testCase.word === "ËNDËRR");
+        if (shouldRunInterpretation) {
+          const interpretation = await runInterpretationCase(testCase.word, viewport);
+          report.interpretationCases.push(interpretation);
+          assert(interpretation.status === "PASS", `My Interpretation smoke failed for ${testCase.word}: ${interpretation.failure ?? "unknown failure"}`);
+        }
+
         result.horizontalOverflowPx = await page.evaluate(() => Math.max(0, document.documentElement.scrollWidth - window.innerWidth));
         assert(result.horizontalOverflowPx !== null && result.horizontalOverflowPx <= 1, `Horizontal overflow (${result.horizontalOverflowPx}px) at ${viewport} viewport for ${testCase.word}.`);
         result.browserErrors = [...consoleErrors.slice(consoleOffset), ...pageErrors.slice(pageErrorOffset)];
@@ -659,8 +860,8 @@ async function main(): Promise<void> {
       const details = unexpectedConsoleDiagnostics.map((item) => `${item.message} at ${item.location.url}:${item.location.lineNumber}:${item.location.columnNumber}`);
       report.fatalError = [report.fatalError, ...pageErrors, ...hydrationErrors, ...details].filter(Boolean).join("; ");
     }
-    if (report.analyzeInteractions !== 15) {
-      report.fatalError = [report.fatalError, `Expected 15 Analyze interactions, observed ${report.analyzeInteractions}.`].filter(Boolean).join("; ");
+    if (report.analyzeInteractions !== 17) {
+      report.fatalError = [report.fatalError, `Expected 17 Analyze interactions, observed ${report.analyzeInteractions}.`].filter(Boolean).join("; ");
     }
     report.outcome = report.fatalError || report.cases.some((result) => result.outcome === "FAIL")
       ? "FAIL"
@@ -693,7 +894,7 @@ async function main(): Promise<void> {
   console.log(`HTTP_ERROR_DIAGNOSTICS=${JSON.stringify(report.httpErrors)}`);
   console.log(`CONSOLE_ERROR_DIAGNOSTICS=${JSON.stringify(report.consoleDiagnostics)}`);
   assert(report.outcome === "PASS", `Hosted structural browser smoke ${report.outcome}: ${report.fatalError ?? "one or more cases failed"}`);
-  assert(report.analyzeInteractions === 15, `Expected 15 Analyze interactions, observed ${report.analyzeInteractions}.`);
+  assert(report.analyzeInteractions === 17, `Expected 17 Analyze interactions, observed ${report.analyzeInteractions}.`);
   console.log(`STRUCTURAL_BROWSER_SMOKE=${report.outcome}`);
   console.log(`ANALYZE_INTERACTIONS=${report.analyzeInteractions}`);
   console.log(`RESULT_MATRIX=${join(artifactDirectory, "result-matrix.json")}`);

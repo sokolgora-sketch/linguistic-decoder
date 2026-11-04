@@ -9,11 +9,23 @@ import {
   type SingleWordSegmentEvidenceStatusV0_1,
   type SingleWordTransparencyV0_1,
 } from "@/shared/openInstrument/singleWordFunctionalMotivation.v0_1";
+import {
+  examineSingleWordMechanicalInterpretationV0_1,
+  notSubmittedMechanicalInterpretationV0_1,
+  type MechanicalEditInputV0_1,
+  type MechanicalEditKindV0_1,
+  type SingleWordMechanicalExaminerResultV0_1,
+} from "@/shared/openInstrument/singleWordMechanicalExaminer.v0_1";
 import { FjaloriCrossSourceEvidenceV0_1 } from "@/ui/instrument/sections/FjaloriCrossSourceEvidence.v0_1";
 
 type DraftSegment = SingleWordFunctionalMotivationSegmentInputV0_1;
 type DraftTransformation = SingleWordFunctionalMotivationTransformationInputV0_1;
+type DraftMechanicalOperation = Omit<MechanicalEditInputV0_1, "position"> & { position: number | "" };
 type SelectedComponentSourceLookupV0_1 = Readonly<{ componentIndex: number; exactSpelling: string }>;
+type ExaminedMechanicalDraft = Readonly<{
+  snapshot: string;
+  result: SingleWordMechanicalExaminerResultV0_1;
+}>;
 
 function blankSegment(): DraftSegment {
   return {
@@ -30,6 +42,10 @@ function blankSegment(): DraftSegment {
 
 function blankTransformation(): DraftTransformation {
   return { from: "", to: "", explanation: "", evidenceReference: "" };
+}
+
+function blankMechanicalOperation(): DraftMechanicalOperation {
+  return { kind: "SUBSTITUTE", position: 0, expectedText: "", replacementText: "" };
 }
 
 const inputClass = "mt-1 w-full rounded border border-[#46505c] bg-[#0d1117] px-2 py-1.5 text-sm text-[#f5f7fb] placeholder:text-[#7f8b99] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#d8bb7a]";
@@ -142,6 +158,8 @@ export function SingleWordMotivationWorkbenchV0_1({
   const [selectedComponentSource, setSelectedComponentSource] = useState<SelectedComponentSourceLookupV0_1 | null>(null);
   const [unresolvedConnectingMaterial, setUnresolvedConnectingMaterial] = useState("");
   const [transformations, setTransformations] = useState<DraftTransformation[]>([]);
+  const [mechanicalOperations, setMechanicalOperations] = useState<DraftMechanicalOperation[]>([]);
+  const [examinedMechanicalDraft, setExaminedMechanicalDraft] = useState<ExaminedMechanicalDraft | null>(null);
   const [functionalExplanation, setFunctionalExplanation] = useState("");
   const [transparency, setTransparency] = useState<SingleWordTransparencyV0_1>("UNKNOWN_OR_NULL");
 
@@ -156,6 +174,15 @@ export function SingleWordMotivationWorkbenchV0_1({
     transparency,
   }), [targetWord, targetLanguage, targetDialect, segments, unresolvedConnectingMaterial, transformations, functionalExplanation, transparency]);
   const result = useMemo(() => buildSingleWordFunctionalMotivationProposalV0_1(input), [input]);
+  const mechanicalDraftSnapshot = useMemo(() => JSON.stringify({ input, mechanicalOperations }), [input, mechanicalOperations]);
+  const currentMechanicalResult = examinedMechanicalDraft?.snapshot === mechanicalDraftSnapshot
+    ? examinedMechanicalDraft.result
+    : null;
+  const mechanicalResultIsStale = examinedMechanicalDraft !== null && currentMechanicalResult === null;
+  const notSubmittedResult = useMemo(() => notSubmittedMechanicalInterpretationV0_1(
+    targetWord,
+    segments.map((segment) => segment.exactSpelling),
+  ), [targetWord, segments]);
 
   function updateSegment(index: number, update: Partial<DraftSegment>) {
     if (
@@ -175,6 +202,47 @@ export function SingleWordMotivationWorkbenchV0_1({
 
   function updateTransformation(index: number, update: Partial<DraftTransformation>) {
     setTransformations((current) => current.map((item, at) => at === index ? { ...item, ...update } : item));
+  }
+
+  function updateMechanicalOperation(index: number, update: Partial<DraftMechanicalOperation>) {
+    setMechanicalOperations((current) => current.map((item, at) => at === index ? { ...item, ...update } : item));
+  }
+
+  function moveMechanicalOperation(index: number, offset: -1 | 1) {
+    setMechanicalOperations((current) => {
+      const nextIndex = index + offset;
+      if (nextIndex < 0 || nextIndex >= current.length) return current;
+      const next = [...current];
+      [next[index], next[nextIndex]] = [next[nextIndex]!, next[index]!];
+      return next;
+    });
+  }
+
+  function examineMechanicalDraft() {
+    const examined = examineSingleWordMechanicalInterpretationV0_1({
+      submitted: true,
+      targetWord,
+      componentSpellings: segments.map((segment) => segment.exactSpelling),
+      operations: mechanicalOperations.map((operation) => ({
+        ...operation,
+        position: operation.position === "" ? Number.NaN : operation.position,
+      })),
+    });
+    setExaminedMechanicalDraft({ snapshot: mechanicalDraftSnapshot, result: examined });
+  }
+
+  function clearInterpretation() {
+    setTargetWord(initialTargetWord);
+    setTargetLanguage("");
+    setTargetDialect("");
+    setSegments([blankSegment(), blankSegment()]);
+    setSelectedComponentSource(null);
+    setUnresolvedConnectingMaterial("");
+    setTransformations([]);
+    setMechanicalOperations([]);
+    setExaminedMechanicalDraft(null);
+    setFunctionalExplanation("");
+    setTransparency("UNKNOWN_OR_NULL");
   }
 
   return (
@@ -359,6 +427,181 @@ export function SingleWordMotivationWorkbenchV0_1({
           </div>
         )) : <p className="mt-2 text-xs text-[#9fb1bf]">None declared.</p>}
       </div>
+
+      <section
+        aria-label="Mechanical replay"
+        data-testid="single-word-mechanical-replay"
+        className="mt-4 rounded-lg border border-[#53604a] bg-[#0d1117] p-3"
+      >
+        <div className="flex flex-wrap items-start justify-between gap-2">
+          <div>
+            <h3 className="text-sm font-semibold text-[#dce9ca]">Mechanical replay</h3>
+            <p className="mt-1 max-w-3xl text-xs leading-5 text-[#aeb7c5]">
+              This separately replays only the exact edits you declare at zero-based Unicode code-point positions. It does not verify meaning, morphology, etymology, pronunciation, or a source relationship.
+            </p>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <button
+              type="button"
+              data-testid="single-word-examine-interpretation"
+              className="rounded border border-[#82985d] bg-[#26311d] px-3 py-1.5 text-xs font-semibold text-[#f0f5e7]"
+              onClick={examineMechanicalDraft}
+            >
+              Examine Interpretation
+            </button>
+            <button
+              type="button"
+              data-testid="single-word-clear-interpretation"
+              className="rounded border border-[#53604a] px-3 py-1.5 text-xs text-[#dce9ca]"
+              onClick={clearInterpretation}
+            >
+              Clear / reset interpretation
+            </button>
+          </div>
+        </div>
+
+        <div className="mt-3 rounded border border-[#303843] bg-[#10131d] p-2">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <div className="text-xs font-semibold text-[#dce9ca]">Explicit ordered mechanical operations</div>
+            <button
+              type="button"
+              data-testid="single-word-add-mechanical-operation"
+              className="rounded border border-[#53604a] px-2 py-1 text-xs text-[#dce9ca] disabled:cursor-not-allowed disabled:opacity-50"
+              disabled={mechanicalOperations.length >= 8}
+              onClick={() => setMechanicalOperations((current) => [...current, blankMechanicalOperation()])}
+            >
+              Add mechanical operation
+            </button>
+          </div>
+          <p className="mt-1 text-[11px] leading-4 text-[#9fb1bf]">
+            Position is measured in Unicode code points of the current intermediate spelling. Expected text must match exactly; a rejected edit stops the remaining sequence.
+          </p>
+          {mechanicalOperations.length ? mechanicalOperations.map((operation, index) => (
+            <fieldset key={index} data-testid="single-word-mechanical-operation" className="mt-2 rounded border border-[#354234] p-2">
+              <legend className="px-1 text-[11px] font-semibold text-[#dce9ca]">Operation {index + 1}</legend>
+              <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+                <label className={labelClass}>
+                  Operation type
+                  <select
+                    aria-label={`Mechanical operation ${index + 1} type`}
+                    className={inputClass}
+                    value={operation.kind}
+                    onChange={(event) => {
+                      const kind = event.target.value as MechanicalEditKindV0_1;
+                      updateMechanicalOperation(index, {
+                        kind,
+                        expectedText: kind === "INSERT" ? "" : operation.expectedText,
+                        replacementText: kind === "OMIT" ? "" : operation.replacementText,
+                      });
+                    }}
+                  >
+                    <option value="INSERT">Insert</option>
+                    <option value="OMIT">Omit</option>
+                    <option value="SUBSTITUTE">Substitute</option>
+                  </select>
+                </label>
+                <label className={labelClass}>
+                  Zero-based position
+                  <input
+                    aria-label={`Mechanical operation ${index + 1} position`}
+                    type="number"
+                    min={0}
+                    step={1}
+                    inputMode="numeric"
+                    className={inputClass}
+                    value={operation.position}
+                    onChange={(event) => updateMechanicalOperation(index, {
+                      position: event.target.value === "" ? "" : Number(event.target.value),
+                    })}
+                  />
+                </label>
+                {operation.kind !== "INSERT" ? (
+                  <label className={labelClass}>
+                    Exact expected text
+                    <input
+                      aria-label={`Mechanical operation ${index + 1} expected text`}
+                      maxLength={80}
+                      className={inputClass}
+                      value={operation.expectedText}
+                      onChange={(event) => updateMechanicalOperation(index, { expectedText: event.target.value })}
+                    />
+                  </label>
+                ) : null}
+                {operation.kind !== "OMIT" ? (
+                  <label className={labelClass}>
+                    Replacement text
+                    <input
+                      aria-label={`Mechanical operation ${index + 1} replacement text`}
+                      maxLength={80}
+                      className={inputClass}
+                      value={operation.replacementText}
+                      onChange={(event) => updateMechanicalOperation(index, { replacementText: event.target.value })}
+                    />
+                  </label>
+                ) : null}
+              </div>
+              <div className="mt-2 flex flex-wrap items-center gap-3 text-xs">
+                <button type="button" aria-label={`Move mechanical operation ${index + 1} up`} disabled={index === 0} className="underline disabled:opacity-40" onClick={() => moveMechanicalOperation(index, -1)}>Move up</button>
+                <button type="button" aria-label={`Move mechanical operation ${index + 1} down`} disabled={index === mechanicalOperations.length - 1} className="underline disabled:opacity-40" onClick={() => moveMechanicalOperation(index, 1)}>Move down</button>
+                <button type="button" aria-label={`Remove mechanical operation ${index + 1}`} className="underline text-[#f0c5b8]" onClick={() => setMechanicalOperations((current) => current.filter((_, at) => at !== index))}>Remove</button>
+                <span className="text-[#d5c28f]">USER_DECLARED_UNVERIFIED · never treated as linguistic evidence</span>
+              </div>
+            </fieldset>
+          )) : <p className="mt-2 text-xs text-[#9fb1bf]">No mechanical edits declared; Examine will compare the exact component concatenation as entered.</p>}
+        </div>
+
+        <div aria-live="polite" className="mt-3 rounded border border-[#303843] bg-[#10131d] p-3 text-xs leading-5 text-[#d7dde7]">
+          {mechanicalResultIsStale ? (
+            <p data-testid="single-word-mechanical-result-stale" className="mb-2 rounded border border-[#746541] bg-[#18140e] p-2 text-[#f0ddb0]">
+              STALE — interpretation inputs changed after the last examination. The previous replay is hidden; examine the current draft to see a new result.
+            </p>
+          ) : null}
+          {currentMechanicalResult ? (
+            <div data-testid="single-word-mechanical-result" data-status={currentMechanicalResult.status}>
+              <div><strong>Status:</strong> {currentMechanicalResult.status}</div>
+              <div><strong>Exact target, unchanged:</strong> <span className="font-mono">{currentMechanicalResult.targetWord}</span></div>
+              <div><strong>Raw component concatenation:</strong> <span className="font-mono">{currentMechanicalResult.rawConcatenation || "∅"}</span></div>
+              <div><strong>Last valid intermediate:</strong> <span className="font-mono">{currentMechanicalResult.lastValidIntermediate || "∅"}</span></div>
+              {currentMechanicalResult.status === "EXAMINED" ? (
+                <>
+                  <div><strong>Final mechanical spelling:</strong> <span className="font-mono">{currentMechanicalResult.finalMechanicalSpelling}</span></div>
+                  <div><strong>Exact comparison:</strong> {currentMechanicalResult.exactComparison}</div>
+                  <div><strong>NFC equivalence (separate from exact spelling):</strong> {currentMechanicalResult.nfcEquivalent === null ? "NOT_COMPUTED" : currentMechanicalResult.nfcEquivalent ? "YES" : "NO"}</div>
+                </>
+              ) : (
+                <div className="text-[#f0ddb0]">No final mechanical spelling was produced. Review rejected operations before examining again.</div>
+              )}
+              {currentMechanicalResult.operationResults.length ? (
+                <ol data-testid="single-word-mechanical-operation-ledger" className="mt-2 list-inside list-decimal space-y-1">
+                  {currentMechanicalResult.operationResults.map((operation, index) => (
+                    <li key={index}>
+                      <span className="font-semibold">{operation.kind} @ {operation.position ?? "invalid"}: {operation.status}</span>
+                      {operation.intermediateBefore !== null ? <span className="font-mono"> · {operation.intermediateBefore} → {operation.intermediateAfter ?? "not applied"}</span> : null}
+                      {operation.reasonCodes.length ? <span> · {operation.reasonCodes.join(", ")}</span> : null}
+                    </li>
+                  ))}
+                </ol>
+              ) : null}
+              {currentMechanicalResult.reasonCodes.length ? <div className="mt-2 text-[#f0ddb0]">Reason codes: {currentMechanicalResult.reasonCodes.join(", ")}</div> : null}
+              {currentMechanicalResult.warnings.length ? (
+                <ul data-testid="single-word-mechanical-warnings" className="mt-2 list-inside list-disc text-[#f0ddb0]">
+                  {currentMechanicalResult.warnings.map((item, index) => <li key={`${item.code}:${index}`}>{item.code}: {item.message}</li>)}
+                </ul>
+              ) : <p className="mt-2 text-[#9fb1bf]">No digraph or Unicode warnings reported.</p>}
+              <p className="mt-2 border-t border-[#303843] pt-2 text-[#d5c28f]">
+                Mechanical spelling replay only · {currentMechanicalResult.authority} · linguistic validity {currentMechanicalResult.linguisticValidity}. This result does not establish a source fact, component meaning, derivation, historical origin, spoken Voice path, or functional operation.
+              </p>
+            </div>
+          ) : (
+            <div data-testid="single-word-mechanical-result" data-status="NOT_SUBMITTED">
+              <div><strong>Status:</strong> {notSubmittedResult.status}</div>
+              <div><strong>Exact target:</strong> <span className="font-mono">{notSubmittedResult.targetWord}</span></div>
+              <div><strong>Current raw component concatenation:</strong> <span className="font-mono">{notSubmittedResult.rawConcatenation || "∅"}</span></div>
+              <p className="mt-1 text-[#9fb1bf]">No mechanical interpretation has been submitted for examination. This is not a linguistic conclusion.</p>
+            </div>
+          )}
+        </div>
+      </section>
 
       <div className="mt-4" aria-live="polite">
         {result.status === "INVALID" ? (
