@@ -57,6 +57,77 @@ function transparencyLabel(value: SingleWordTransparencyV0_1): string {
   }
 }
 
+function validationMessageForReasonCode(reasonCode: string): string {
+  const segmentMatch = /^SEGMENT_(\d+)_(.+)$/u.exec(reasonCode);
+  if (segmentMatch) {
+    const [, number, reason] = segmentMatch;
+    switch (reason) {
+      case "EXACT_SPELLING_REQUIRED":
+        return `Component ${number} spelling: enter one component of up to 80 characters.`;
+      case "MEANING_MALFORMED":
+        return `Component ${number} meaning: use 300 characters or fewer.`;
+      case "GRAMMATICAL_ROLE_MALFORMED":
+        return `Component ${number} grammatical role: use 200 characters or fewer.`;
+      case "MEANING_AND_ROLE_REQUIRED_OR_MARK_UNRESOLVED":
+        return `Component ${number}: enter both a meaning and role, or mark it not yet explained.`;
+      case "LANGUAGE_REQUIRED":
+        return `Component ${number} language: enter a language matching the target language.`;
+      case "LANGUAGE_MUST_MATCH_TARGET":
+        return `Component ${number} language must match the target language.`;
+      case "DIALECT_MALFORMED":
+        return `Component ${number} dialect: use 80 characters or fewer.`;
+      case "EVIDENCE_STATUS_UNSUPPORTED":
+        return `Component ${number} evidence status: select one of the listed statuses.`;
+      case "EVIDENCE_REFERENCE_MALFORMED":
+        return `Component ${number} evidence reference: use 500 characters or fewer.`;
+      case "CITATION_REFERENCE_REQUIRED":
+        return `Component ${number} evidence reference: add a citation locator (up to 500 characters) or change the evidence status.`;
+      case "UNRESOLVED_FLAG_REQUIRED":
+        return `Component ${number}: set whether it is not yet explained.`;
+      case "MALFORMED":
+        return `Component ${number}: check the spelling, meaning, role, language, dialect, and evidence fields.`;
+      default:
+        return `Component ${number}: review the field values and limits shown above.`;
+    }
+  }
+
+  const transformationMatch = /^TRANSFORMATION_(\d+)_(.+)$/u.exec(reasonCode);
+  if (transformationMatch) {
+    const [, number, reason] = transformationMatch;
+    if (reason === "SOURCE_AND_TARGET_REQUIRED") {
+      return `Transformation ${number}: enter both From and To values.`;
+    }
+    if (reason === "MALFORMED") {
+      return `Transformation ${number}: From/To allow 80 characters each, explanation 300, and evidence reference 500.`;
+    }
+  }
+
+  switch (reasonCode) {
+    case "MALFORMED_PROPOSAL":
+      return "Proposal: check that all fields have valid values.";
+    case "TARGET_WORD_REQUIRED_AS_ONE_SUPPORTED_TOKEN":
+      return "Exact target word: enter one supported word of up to 80 Unicode code points.";
+    case "TARGET_LANGUAGE_REQUIRED":
+      return "Target language: enter a language of up to 80 characters.";
+    case "TARGET_DIALECT_MALFORMED":
+      return "Target dialect: use 80 characters or fewer.";
+    case "TWO_TO_TWELVE_ORDERED_SEGMENTS_REQUIRED":
+      return "Components: add between 2 and 12 ordered components.";
+    case "UNRESOLVED_CONNECTING_MATERIAL_MALFORMED":
+      return "Connecting material: use 500 characters or fewer.";
+    case "ZERO_TO_EIGHT_TRANSFORMATIONS_REQUIRED":
+      return "Transformations: keep the list between 0 and 8 items.";
+    case "FUNCTIONAL_EXPLANATION_REQUIRED":
+      return "Proposed functional explanation: enter 1–1,000 characters.";
+    case "TRANSPARENCY_LEVEL_UNSUPPORTED":
+      return "Transparency: select one of the listed descriptions.";
+    case "ORTHOGRAPHIC_STRUCTURE_ANALYSIS_FAILED":
+      return "Written Voice analysis is unavailable for this target word.";
+    default:
+      return "This field needs correction. Check its label and the limits shown above.";
+  }
+}
+
 export function SingleWordMotivationWorkbenchV0_1({
   initialTargetWord,
 }: {
@@ -107,19 +178,22 @@ export function SingleWordMotivationWorkbenchV0_1({
       <p className="mt-1 max-w-3xl text-xs leading-5 text-[#aeb7c5]">
         Keep component languages aligned with the target language; record dialect differences separately.
       </p>
+      <p data-testid="single-word-motivation-field-limits" className="mt-1 max-w-4xl text-xs leading-5 text-[#aeb7c5]">
+        Limits: target word 80 Unicode code points; target/component language and dialect 80 characters; component spelling 80, meaning 300, role 200; evidence references and connecting material 500; transformation endpoints 80, explanation 300, reference 500; functional explanation 1,000 characters. Use 2–12 components and at most 8 transformations.
+      </p>
 
       <div className="mt-3 grid gap-3 sm:grid-cols-2">
         <label className={labelClass}>
           Exact target word
-          <input aria-label="Exact target word" className={inputClass} value={targetWord} onChange={(event) => setTargetWord(event.target.value)} />
+          <input aria-label="Exact target word" maxLength={80} className={inputClass} value={targetWord} onChange={(event) => setTargetWord(event.target.value)} />
         </label>
         <label className={labelClass}>
           Target language
-          <input aria-label="Target language" className={inputClass} value={targetLanguage} onChange={(event) => setTargetLanguage(event.target.value)} placeholder="Language or code" />
+          <input aria-label="Target language" maxLength={80} className={inputClass} value={targetLanguage} onChange={(event) => setTargetLanguage(event.target.value)} placeholder="Language or code" />
         </label>
         <label className={labelClass}>
           Target dialect (optional)
-          <input aria-label="Target dialect" className={inputClass} value={targetDialect} onChange={(event) => setTargetDialect(event.target.value)} placeholder="Unknown / not specified" />
+          <input aria-label="Target dialect" maxLength={80} className={inputClass} value={targetDialect} onChange={(event) => setTargetDialect(event.target.value)} placeholder="Unknown / not specified" />
         </label>
       </div>
 
@@ -130,23 +204,23 @@ export function SingleWordMotivationWorkbenchV0_1({
             <div className="grid gap-3 sm:grid-cols-2">
               <label className={labelClass}>
                 Exact component spelling
-                <input aria-label={`Component ${index + 1} exact spelling`} className={inputClass} value={segment.exactSpelling} onChange={(event) => updateSegment(index, { exactSpelling: event.target.value })} />
+                <input aria-label={`Component ${index + 1} exact spelling`} maxLength={80} className={inputClass} value={segment.exactSpelling} onChange={(event) => updateSegment(index, { exactSpelling: event.target.value })} />
               </label>
               <label className={labelClass}>
                 Proposed meaning
-                <input aria-label={`Component ${index + 1} proposed meaning`} className={inputClass} value={segment.proposedMeaning} onChange={(event) => updateSegment(index, { proposedMeaning: event.target.value })} disabled={segment.unresolved} />
+                <input aria-label={`Component ${index + 1} proposed meaning`} maxLength={300} className={inputClass} value={segment.proposedMeaning} onChange={(event) => updateSegment(index, { proposedMeaning: event.target.value })} disabled={segment.unresolved} />
               </label>
               <label className={labelClass}>
                 Proposed grammatical role
-                <input aria-label={`Component ${index + 1} grammatical role`} className={inputClass} value={segment.proposedGrammaticalRole} onChange={(event) => updateSegment(index, { proposedGrammaticalRole: event.target.value })} disabled={segment.unresolved} />
+                <input aria-label={`Component ${index + 1} grammatical role`} maxLength={200} className={inputClass} value={segment.proposedGrammaticalRole} onChange={(event) => updateSegment(index, { proposedGrammaticalRole: event.target.value })} disabled={segment.unresolved} />
               </label>
               <label className={labelClass}>
                 Language
-                <input aria-label={`Component ${index + 1} language`} className={inputClass} value={segment.language} onChange={(event) => updateSegment(index, { language: event.target.value })} />
+                <input aria-label={`Component ${index + 1} language`} maxLength={80} className={inputClass} value={segment.language} onChange={(event) => updateSegment(index, { language: event.target.value })} />
               </label>
               <label className={labelClass}>
                 Dialect (optional)
-                <input aria-label={`Component ${index + 1} dialect`} className={inputClass} value={segment.dialect} onChange={(event) => updateSegment(index, { dialect: event.target.value })} />
+                <input aria-label={`Component ${index + 1} dialect`} maxLength={80} className={inputClass} value={segment.dialect} onChange={(event) => updateSegment(index, { dialect: event.target.value })} />
               </label>
               <label className={labelClass}>
                 Segment evidence status
@@ -163,7 +237,8 @@ export function SingleWordMotivationWorkbenchV0_1({
               </label>
               <label className={`${labelClass} sm:col-span-2`}>
                 Evidence source / citation locator
-                <input aria-label={`Component ${index + 1} evidence reference`} className={inputClass} value={segment.evidenceReference} onChange={(event) => updateSegment(index, { evidenceReference: event.target.value })} placeholder="URL, work and entry/sense locator, or leave blank" />
+                <input aria-label={`Component ${index + 1} evidence reference`} maxLength={500} className={inputClass} value={segment.evidenceReference} onChange={(event) => updateSegment(index, { evidenceReference: event.target.value })} placeholder="URL, work and entry/sense locator, or leave blank" />
+                <span className="mt-1 block text-[11px] leading-4 text-[#9fb1bf]">Up to 500 characters; required when evidence status is “Citation entered; unverified.”</span>
               </label>
               <label className="flex items-center gap-2 text-xs text-[#c5ced8] sm:col-span-2">
                 <input aria-label={`Component ${index + 1} not yet explained`} type="checkbox" checked={segment.unresolved} onChange={(event) => updateSegment(index, { unresolved: event.target.checked })} />
@@ -185,11 +260,12 @@ export function SingleWordMotivationWorkbenchV0_1({
       <div className="mt-4 grid gap-3 sm:grid-cols-2">
         <label className={labelClass}>
           Unexplained connecting material or role
-          <textarea aria-label="Unexplained connecting material" className={inputClass} rows={2} value={unresolvedConnectingMaterial} onChange={(event) => setUnresolvedConnectingMaterial(event.target.value)} placeholder="Keep unexplained material explicit; do not repair it silently." />
+          <textarea aria-label="Unexplained connecting material" maxLength={500} className={inputClass} rows={2} value={unresolvedConnectingMaterial} onChange={(event) => setUnresolvedConnectingMaterial(event.target.value)} placeholder="Keep unexplained material explicit; do not repair it silently." />
         </label>
         <label className={labelClass}>
           Proposed functional explanation
-          <textarea aria-label="Proposed functional explanation" className={inputClass} rows={2} value={functionalExplanation} onChange={(event) => setFunctionalExplanation(event.target.value)} placeholder="How might the proposed component meanings motivate the word's function?" />
+          <textarea aria-label="Proposed functional explanation" maxLength={1000} className={inputClass} rows={2} value={functionalExplanation} onChange={(event) => setFunctionalExplanation(event.target.value)} placeholder="How might the proposed component meanings motivate the word's function?" />
+          <span data-testid="single-word-functional-explanation-count" className="mt-1 block text-[11px] leading-4 text-[#9fb1bf]">{functionalExplanation.length}/1,000 characters · enter at least one character.</span>
         </label>
         <label className={labelClass}>
           Transparency description
@@ -211,10 +287,10 @@ export function SingleWordMotivationWorkbenchV0_1({
         </div>
         {transformations.length ? transformations.map((transformation, index) => (
           <div key={index} className="mt-2 grid gap-2 sm:grid-cols-2">
-            <label className={labelClass}>From<input aria-label={`Transformation ${index + 1} from`} className={inputClass} value={transformation.from} onChange={(event) => updateTransformation(index, { from: event.target.value })} /></label>
-            <label className={labelClass}>To<input aria-label={`Transformation ${index + 1} to`} className={inputClass} value={transformation.to} onChange={(event) => updateTransformation(index, { to: event.target.value })} /></label>
-            <label className={labelClass}>Explanation<input aria-label={`Transformation ${index + 1} explanation`} className={inputClass} value={transformation.explanation} onChange={(event) => updateTransformation(index, { explanation: event.target.value })} /></label>
-            <label className={labelClass}>Evidence reference (optional)<input aria-label={`Transformation ${index + 1} evidence reference`} className={inputClass} value={transformation.evidenceReference} onChange={(event) => updateTransformation(index, { evidenceReference: event.target.value })} /></label>
+            <label className={labelClass}>From<input aria-label={`Transformation ${index + 1} from`} maxLength={80} className={inputClass} value={transformation.from} onChange={(event) => updateTransformation(index, { from: event.target.value })} /></label>
+            <label className={labelClass}>To<input aria-label={`Transformation ${index + 1} to`} maxLength={80} className={inputClass} value={transformation.to} onChange={(event) => updateTransformation(index, { to: event.target.value })} /></label>
+            <label className={labelClass}>Explanation<input aria-label={`Transformation ${index + 1} explanation`} maxLength={300} className={inputClass} value={transformation.explanation} onChange={(event) => updateTransformation(index, { explanation: event.target.value })} /></label>
+            <label className={labelClass}>Evidence reference (optional)<input aria-label={`Transformation ${index + 1} evidence reference`} maxLength={500} className={inputClass} value={transformation.evidenceReference} onChange={(event) => updateTransformation(index, { evidenceReference: event.target.value })} /></label>
             <div data-testid="single-word-transformation-unverified" className="flex flex-wrap items-center gap-2 text-xs text-[#d5c28f] sm:col-span-2">
               <span>User-declared, unverified; this transformation is recorded and never applied to make the spelling match.</span>
               <button type="button" aria-label={`Remove transformation ${index + 1}`} className="underline" onClick={() => setTransformations((current) => current.filter((_, at) => at !== index))}>Remove</button>
@@ -226,7 +302,12 @@ export function SingleWordMotivationWorkbenchV0_1({
       <div className="mt-4" aria-live="polite">
         {result.status === "INVALID" ? (
           <div data-testid="single-word-proposal-incomplete" className="rounded border border-[#584c34] bg-[#18140e] p-3 text-xs leading-5 text-[#f0ddb0]">
-          Complete a single target word and language, at least two ordered components, meanings and roles for interpreted components, and a proposed functional explanation. Orthographic Voice analysis supports words up to 80 Unicode code points.
+            <p className="font-semibold">Correct these fields to see the proposal:</p>
+            <ul data-testid="single-word-validation-messages" className="mt-1 list-inside list-disc">
+              {result.reasonCodes.map((reasonCode) => (
+                <li key={reasonCode}>{validationMessageForReasonCode(reasonCode)}</li>
+              ))}
+            </ul>
           </div>
         ) : (
           <article data-testid="single-word-proposal-result" className="rounded-lg border border-[#53604a] bg-[#111710] p-3 text-sm leading-6 text-[#d7dde7]">

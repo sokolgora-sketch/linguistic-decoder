@@ -64,6 +64,34 @@ describe("Single-word motivation workbench v0.1", () => {
     expect(screen.getByTestId("single-word-proposal-result")).toHaveTextContent("U → Ë");
   });
 
+  it("shows field-specific citation and explanation errors with their supported limits", () => {
+    render(<SingleWordMotivationWorkbenchV0_1 initialTargetWord="KANDIL" />);
+    expect(screen.getByTestId("single-word-motivation-field-limits")).toHaveTextContent("evidence references and connecting material 500");
+    expect(screen.getByTestId("single-word-functional-explanation-count")).toHaveTextContent("0/1,000 characters");
+
+    fireEvent.change(screen.getByLabelText("Target language"), { target: { value: "Albanian" } });
+    fireEvent.change(screen.getByLabelText("Component 1 evidence status"), { target: { value: "CITATION_ENTERED_UNVERIFIED" } });
+    const evidenceReference = screen.getByLabelText("Component 1 evidence reference");
+    expect(evidenceReference).toHaveAttribute("maxLength", "500");
+    expect(screen.getByTestId("single-word-validation-messages")).toHaveTextContent(
+      "Component 1 evidence reference: add a citation locator (up to 500 characters) or change the evidence status.",
+    );
+
+    fireEvent.change(evidenceReference, { target: { value: "x".repeat(501) } });
+    expect(screen.getByTestId("single-word-validation-messages")).toHaveTextContent(
+      "Component 1 evidence reference: use 500 characters or fewer.",
+    );
+
+    const explanation = screen.getByLabelText("Proposed functional explanation");
+    expect(explanation).toHaveAttribute("maxLength", "1000");
+    fireEvent.change(explanation, { target: { value: "x".repeat(1001) } });
+    expect(screen.getByTestId("single-word-functional-explanation-count")).toHaveTextContent("1001/1,000 characters");
+    expect(screen.getByTestId("single-word-validation-messages")).toHaveTextContent(
+      "Proposed functional explanation: enter 1–1,000 characters.",
+    );
+    expect(screen.queryByTestId("single-word-proposal-result")).not.toBeInTheDocument();
+  });
+
   it("lets users remove incomplete transformations and enforces the eight-item limit", () => {
     render(<SingleWordMotivationWorkbenchV0_1 initialTargetWord="KANDIL" />);
     const addButton = screen.getByTestId("single-word-add-transformation");
