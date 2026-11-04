@@ -453,7 +453,8 @@ async function main(): Promise<void> {
       try {
         assert(page, "Browser page was not initialized for the interpretation workbench.");
         const interpretationTab = page.getByRole("tab", { name: "My Interpretation", exact: true });
-        await interpretationTab.evaluate((element) => element.scrollIntoView({ block: "center", inline: "nearest" }));
+        await interpretationTab.evaluate((element) => element.scrollIntoView({ block: "start", inline: "nearest" }));
+        await page.evaluate(() => window.scrollBy({ top: -96, behavior: "instant" }));
         const tabCenterIsUnobscured = await interpretationTab.evaluate((element) => {
           const rect = element.getBoundingClientRect();
           const hit = document.elementFromPoint(rect.left + rect.width / 2, rect.top + rect.height / 2);
