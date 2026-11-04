@@ -204,4 +204,131 @@ describe("Single-word motivation workbench v0.1", () => {
     expect(screen.getByTestId("single-word-proposal-result").textContent).toBe(proposalBeforeSourceChecks);
   });
 
+  it("lets the user inspect a KA source sense without automatic ranking or proposal promotion", async () => {
+    const aiAttribution = "Albanian descriptions written with AI help — CC BY-SA 4.0";
+    const payload = {
+      word: "ka",
+      licence: "CC BY-SA 4.0",
+      attribution: [aiAttribution],
+      sources: ["en-wiktionary", "ai"],
+      description: { text: "Source description fixture", source: "ai" },
+      entries: [
+        {
+          pos: "verb",
+          sources: ["en-wiktionary"],
+          senses: [{ gloss: "has (form of kam); there is", lang: "en", source: "en-wiktionary" }],
+        },
+        {
+          pos: "prep",
+          sources: ["sq-wiktionary"],
+          senses: [{ gloss: "preposition sense fixture", lang: "en", source: "sq-wiktionary" }],
+        },
+        {
+          pos: "noun",
+          sources: ["en-wiktionary"],
+          senses: [{ gloss: "ox / steer", lang: "en", source: "en-wiktionary" }],
+        },
+      ],
+    };
+    const fetchMock = jest.fn().mockResolvedValue({ ok: true, json: async () => payload });
+    global.fetch = fetchMock as unknown as typeof fetch;
+
+    render(<SingleWordMotivationWorkbenchV0_1 initialTargetWord="KANDIL" />);
+    fireEvent.change(screen.getByLabelText("Target language"), { target: { value: "Albanian" } });
+    fireEvent.click(screen.getByTestId("single-word-add-component"));
+    const values = [
+      ["Component 1 exact spelling", "KA"],
+      ["Component 1 proposed meaning", "has"],
+      ["Component 1 grammatical role", "third-person singular verb"],
+      ["Component 1 language", "Albanian"],
+      ["Component 2 exact spelling", "N"],
+      ["Component 2 language", "Albanian"],
+      ["Component 3 exact spelling", "DILL"],
+      ["Component 3 proposed meaning", "sun"],
+      ["Component 3 grammatical role", "noun"],
+      ["Component 3 language", "Albanian"],
+      ["Component 3 dialect", "Gheg"],
+      ["Proposed functional explanation", "Has sun / carries light"],
+    ] as const;
+    for (const [label, value] of values) {
+      fireEvent.change(screen.getByLabelText(label), { target: { value } });
+    }
+    fireEvent.click(screen.getByLabelText("Component 2 not yet explained"));
+    fireEvent.change(screen.getByLabelText("Transparency description"), { target: { value: "METAPHORICAL" } });
+
+    expect(fetchMock).not.toHaveBeenCalled();
+    const proposal = screen.getByTestId("single-word-proposal-result");
+    expect(proposal).toHaveTextContent("KANDILL");
+    expect(proposal).toHaveTextContent("MISMATCH");
+    expect(proposal).toHaveTextContent("Has sun / carries light");
+    expect(proposal).toHaveTextContent("PROPOSED");
+    expect(proposal).toHaveTextContent("A → I");
+    expect(proposal).toHaveTextContent("Strict embryo meaning: Unknown / Null");
+
+    fireEvent.click(screen.getByRole("button", { name: "Check source for component 1" }));
+    const glosses = await screen.findAllByTestId("fjalori-source-sense-gloss");
+    expect(glosses.map((node) => node.textContent)).toEqual([
+      "has (form of kam); there is",
+      "preposition sense fixture",
+      "ox / steer",
+    ]);
+    expect(screen.queryByTestId("fjalori-selected-sense")).not.toBeInTheDocument();
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(String(fetchMock.mock.calls[0][0])).toBe("https://fjalorishqip.org/api/v1/fjala/ka.json");
+
+    const beforeAssessment = proposal.textContent;
+    fireEvent.click(screen.getByRole("button", { name: "Select source sense entry 1 sense 1 for inspection" }));
+    fireEvent.change(screen.getByLabelText("USER_INTERPRETATION assessment for entry 1 sense 1"), {
+      target: { value: "POTENTIALLY_SUPPORTS_PROPOSAL" },
+    });
+    expect(screen.getByTestId("fjalori-selected-sense")).toHaveTextContent("USER_INTERPRETATION");
+    expect(screen.getByTestId("fjalori-selected-sense")).toHaveTextContent("POTENTIALLY_SUPPORTS_PROPOSAL");
+    expect(screen.getAllByTestId("fjalori-source-sense-gloss")).toHaveLength(3);
+    expect(proposal.textContent).toBe(beforeAssessment);
+    expect(screen.getByLabelText("Component 1 evidence status")).toHaveValue("USER_PROPOSED");
+
+    fireEvent.change(screen.getByLabelText("Component 1 proposed meaning"), { target: { value: "possesses" } });
+    expect(screen.queryByTestId("fjalori-selected-sense")).not.toBeInTheDocument();
+    expect(screen.queryByText(/Current assessment:/)).not.toBeInTheDocument();
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(screen.getByLabelText("Component 1 proposed meaning")).toHaveValue("possesses");
+    expect(screen.getByLabelText("Component 1 evidence status")).toHaveValue("USER_PROPOSED");
+    expect(screen.getByTestId("single-word-proposal-result")).toHaveTextContent("Has sun / carries light");
+    expect(screen.getByTestId("single-word-proposal-result")).toHaveTextContent("Strict embryo meaning: Unknown / Null");
+  });
+
+  it("clears source-sense inspection when the component spelling changes or is removed", async () => {
+    const aiAttribution = "Albanian descriptions written with AI help — CC BY-SA 4.0";
+    const fetchMock = jest.fn((input: RequestInfo | URL) => Promise.resolve({
+      ok: true,
+      json: async () => ({
+        word: String(input).split("/").at(-1)?.replace(/\.json$/u, "") ?? "",
+        licence: "CC BY-SA 4.0",
+        attribution: [aiAttribution],
+        sources: ["en-wiktionary", "ai"],
+        description: { text: "source description fixture", source: "ai" },
+        entries: [{ pos: "noun", sources: ["en-wiktionary"], senses: [{ gloss: "sense fixture", lang: "en", source: "en-wiktionary" }] }],
+      }),
+    }));
+    global.fetch = fetchMock as unknown as typeof fetch;
+
+    render(<SingleWordMotivationWorkbenchV0_1 initialTargetWord="KANDIL" />);
+    fireEvent.click(screen.getByTestId("single-word-add-component"));
+    fireEvent.change(screen.getByLabelText("Component 1 exact spelling"), { target: { value: "KA" } });
+    fireEvent.click(screen.getByRole("button", { name: "Check source for component 1" }));
+    expect(await screen.findByTestId("fjalori-source-sense-gloss")).toHaveTextContent("sense fixture");
+    fireEvent.click(screen.getByRole("button", { name: "Select source sense entry 1 sense 1 for inspection" }));
+    expect(screen.getByTestId("fjalori-selected-sense")).toBeInTheDocument();
+    fireEvent.change(screen.getByLabelText("Component 1 exact spelling"), { target: { value: "DILL" } });
+    expect(screen.queryByTestId("single-word-component-source-evidence")).not.toBeInTheDocument();
+
+    fireEvent.change(screen.getByLabelText("Component 3 exact spelling"), { target: { value: "N" } });
+    fireEvent.click(screen.getByRole("button", { name: "Check source for component 3" }));
+    expect(await screen.findByTestId("fjalori-source-sense-gloss")).toHaveTextContent("sense fixture");
+    fireEvent.click(screen.getByRole("button", { name: "Select source sense entry 1 sense 1 for inspection" }));
+    fireEvent.click(screen.getByRole("button", { name: "Remove component 3" }));
+    expect(screen.queryByTestId("single-word-component-source-evidence")).not.toBeInTheDocument();
+    expect(screen.getAllByTestId("single-word-component-source-check")).toHaveLength(2);
+  });
+
 });

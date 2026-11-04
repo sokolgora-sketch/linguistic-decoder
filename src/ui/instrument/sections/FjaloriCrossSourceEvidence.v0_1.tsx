@@ -6,16 +6,33 @@ const FJALORI_API_ROOT = "https://fjalorishqip.org/api/v1/fjala";
 const FETCH_TIMEOUT_MS = 8_000;
 const MAX_WORD_CODEPOINTS = 64;
 const MAX_RECORD_ENTRIES = 20;
+const MAX_RECORD_SENSES = 200;
 const MAX_DESCRIPTION_CODEPOINTS = 2_000;
+const MAX_SENSE_GLOSS_CODEPOINTS = 2_000;
 const MAX_SOURCE_IDS = 24;
+const MAX_SENSE_TAGS = 24;
 
 type FjaloriDescription = Readonly<{ text: string; source: "ai"; attribution: string }>;
+type FjaloriSense = Readonly<{
+  gloss: string;
+  lang: "en" | "sq";
+  source: string;
+  tags: readonly string[];
+}>;
+type FjaloriEntry = Readonly<{
+  pos: string | null;
+  sources: readonly string[];
+  senses: readonly FjaloriSense[];
+}>;
+type UserSenseAssessment = "POTENTIALLY_SUPPORTS_PROPOSAL" | "DOES_NOT_SUPPORT_PROPOSAL" | "UNDECIDED";
 type EvidenceState =
   | Readonly<{ status: "loading" }>
   | Readonly<{ status: "unavailable" }>
+  | Readonly<{ status: "invalid" }>
   | Readonly<{
       status: "available";
       description: FjaloriDescription | null;
+      entries: readonly FjaloriEntry[];
       entrySources: readonly (readonly string[])[];
       recordSources: readonly string[];
       hasWiktionaryDerivedSenses: boolean;
@@ -49,7 +66,7 @@ function isGplOnlyOrUnverified(record: Record<string, unknown>): boolean {
     rawSources.length > MAX_SOURCE_IDS || rawSources.includes("hunspell-sq");
 }
 
-function readFjaloriEvidence(payload: unknown, canonicalWord: string): EvidenceState | null {
+function readFjaloriEvidence(payload: unknown, canonicalWord: string): Extract<EvidenceState, { status: "available" }> | null {
   if (!isRecord(payload) || typeof payload.word !== "string" ||
       payload.word.normalize("NFC").trim().toLocaleLowerCase("sq-AL") !== canonicalWord ||
       payload.licence !== "CC BY-SA 4.0" || isGplOnlyOrUnverified(payload) ||
@@ -59,24 +76,57 @@ function readFjaloriEvidence(payload: unknown, canonicalWord: string): EvidenceS
 
   const recordSources = stringIds(payload.sources);
   const entrySources: (readonly string[])[] = [];
+  const entries: FjaloriEntry[] = [];
   let hasWiktionaryDerivedSenses = false;
   let hasPartOfSpeech = false;
+  let totalSenseCount = 0;
 
   for (const entry of payload.entries) {
     if (!isRecord(entry) || isGplOnlyOrUnverified(entry)) return null;
     const sources = stringIds(entry.sources);
     entrySources.push(sources);
 
-    if (typeof entry.pos === "string" && entry.pos.trim().length > 0) {
+    const pos = typeof entry.pos === "string" && entry.pos.trim().length > 0 && entry.pos.length <= 80
+      ? entry.pos
+      : null;
+    if (pos) {
       hasPartOfSpeech = true;
     }
-    if (Array.isArray(entry.senses)) {
-      for (const sense of entry.senses) {
-        if (isRecord(sense) && sense.lang === "en" && sense.source === "en-wiktionary") {
-          hasWiktionaryDerivedSenses = true;
-        }
+    if (!Array.isArray(entry.senses)) return null;
+
+    const senses: FjaloriSense[] = [];
+    for (const sense of entry.senses) {
+      if (!isRecord(sense) ||
+          typeof sense.gloss !== "string" ||
+          sense.gloss.trim().length === 0 ||
+          [...sense.gloss].length > MAX_SENSE_GLOSS_CODEPOINTS ||
+          (sense.lang !== "en" && sense.lang !== "sq") ||
+          typeof sense.source !== "string" ||
+          sense.source.trim().length === 0 ||
+          sense.source.length > 100) {
+        return null;
+      }
+      const tags = sense.tags === undefined
+        ? []
+        : Array.isArray(sense.tags) && sense.tags.length <= MAX_SENSE_TAGS &&
+          sense.tags.every((tag) => typeof tag === "string" && tag.length > 0 && tag.length <= 100)
+          ? sense.tags as string[]
+          : null;
+      if (tags === null) return null;
+
+      senses.push(Object.freeze({
+        gloss: sense.gloss,
+        lang: sense.lang,
+        source: sense.source,
+        tags: Object.freeze([...tags]),
+      }));
+      totalSenseCount++;
+      if (totalSenseCount > MAX_RECORD_SENSES) return null;
+      if (sense.lang === "en" && sense.source === "en-wiktionary") {
+        hasWiktionaryDerivedSenses = true;
       }
     }
+    entries.push(Object.freeze({ pos, sources, senses: Object.freeze(senses) }));
   }
 
   let description: FjaloriDescription | null = null;
@@ -100,6 +150,7 @@ function readFjaloriEvidence(payload: unknown, canonicalWord: string): EvidenceS
   return Object.freeze({
     status: "available",
     description,
+    entries: Object.freeze(entries),
     entrySources: Object.freeze(entrySources),
     recordSources,
     hasWiktionaryDerivedSenses,
@@ -110,9 +161,21 @@ function readFjaloriEvidence(payload: unknown, canonicalWord: string): EvidenceS
 export function FjaloriCrossSourceEvidenceV0_1({
   word,
   context = "word-reading",
-}: Readonly<{ word: string; context?: "word-reading" | "component" }>) {
+  proposalMeaning,
+}: Readonly<{ word: string; context?: "word-reading" | "component"; proposalMeaning?: string }>) {
   const canonicalWord = canonicalAlbanianWord(word);
   const [evidence, setEvidence] = useState<EvidenceState>({ status: "loading" });
+  const [selectedSense, setSelectedSense] = useState<Readonly<{
+    entryIndex: number;
+    senseIndex: number;
+    proposalMeaning: string;
+  }> | null>(null);
+  const [userAssessment, setUserAssessment] = useState<UserSenseAssessment | null>(null);
+
+  useEffect(() => {
+    setSelectedSense(null);
+    setUserAssessment(null);
+  }, [canonicalWord, proposalMeaning]);
 
   useEffect(() => {
     if (!canonicalWord) return;
@@ -131,12 +194,20 @@ export function FjaloriCrossSourceEvidenceV0_1({
       { cache: "force-cache", signal: controller.signal },
     )
       .then(async (response) => {
-        if (!response.ok) throw new Error("Fjalori API response unavailable");
-        return readFjaloriEvidence(await response.json() as unknown, canonicalWord);
+        if (!response.ok) return { kind: "unavailable" } as const;
+        let payload: unknown;
+        try {
+          payload = await response.json() as unknown;
+        } catch {
+          return { kind: "invalid" } as const;
+        }
+        const parsed = readFjaloriEvidence(payload, canonicalWord);
+        return parsed ? { kind: "available", evidence: parsed } as const : { kind: "invalid" } as const;
       })
       .then((result) => {
         if (!disposed && !timedOut) {
-          setEvidence(result ?? { status: "unavailable" });
+          if (result.kind === "available") setEvidence(result.evidence);
+          else setEvidence({ status: result.kind });
         }
       })
       .catch(() => {
@@ -168,7 +239,11 @@ export function FjaloriCrossSourceEvidenceV0_1({
         <p className="mt-1">Loading this bounded FjaloriShqip word record…</p>
       ) : evidence.status === "unavailable" ? (
         <p className="mt-1" data-testid="fjalori-evidence-null">
-          UNKNOWN_OR_NULL — the exact FjaloriShqip record or attributable description could not be verified in this response.
+          SOURCE_UNAVAILABLE · UNKNOWN_OR_NULL — this FjaloriShqip request did not return a usable response. That does not establish that the word is absent from Albanian or other sources.
+        </p>
+      ) : evidence.status === "invalid" ? (
+        <p className="mt-1" data-testid="fjalori-evidence-null">
+          INVALID_SOURCE_RESPONSE · UNKNOWN_OR_NULL — the response was not valid JSON or did not match the bounded FjaloriShqip record shape. This does not establish that the word is absent.
         </p>
       ) : (
         <>
@@ -194,9 +269,13 @@ export function FjaloriCrossSourceEvidenceV0_1({
                 ))}
               </div>
               <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-[10px]">
-                <a href={wordPageUrl} target="_blank" rel="noreferrer" className="underline">Original FjaloriShqip record</a>
-                <a href={apiUrl} target="_blank" rel="noreferrer" className="underline">FjaloriShqip API record</a>
-                <a href="https://github.com/EndritRushiti/FjaloriShqip/blob/main/DATA-LICENSE.md" target="_blank" rel="noreferrer" className="underline">Data sources and license</a>
+                {context === "word-reading" ? (
+                  <>
+                    <a href={wordPageUrl} target="_blank" rel="noreferrer" className="underline">Original FjaloriShqip record</a>
+                    <a href={apiUrl} target="_blank" rel="noreferrer" className="underline">FjaloriShqip API record</a>
+                    <a href="https://github.com/EndritRushiti/FjaloriShqip/blob/main/DATA-LICENSE.md" target="_blank" rel="noreferrer" className="underline">Data sources and license</a>
+                  </>
+                ) : null}
                 <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noreferrer" className="underline">CC BY-SA 4.0 terms</a>
               </div>
               <p className="mt-1 text-[10px] text-[#aeb4ce]">
@@ -212,6 +291,95 @@ export function FjaloriCrossSourceEvidenceV0_1({
             <p className="mt-2 text-[#b7bfd9]" data-testid="fjalori-lineage-boundary">
               English entry senses identify en-wiktionary/Kaikki lineage; they are not independent corroboration of the Kaikki lexical fact.
             </p>
+          ) : null}
+          {context === "component" ? (
+            <section className="mt-3 rounded border border-[#3d465c] bg-[#10131d] p-2" data-testid="fjalori-component-senses">
+              <h3 className="font-semibold text-[#f0f1fa]">Individual source senses · response order</h3>
+              <p className="mt-1 text-[10px] text-[#aeb4ce]">
+                No sense is ranked or matched automatically against the proposed meaning. Entry and sense numbers are positions in this response, not source-issued IDs; no stable source sense ID is supplied here.
+              </p>
+              {evidence.entries.some((entry) => entry.senses.length > 0) ? (
+                <div className="mt-2 space-y-2">
+                  {evidence.entries.map((entry, entryIndex) => (
+                    <section key={`entry-${entryIndex}`} className="rounded border border-[#343a50] p-2" data-testid="fjalori-source-entry">
+                      <h4 className="font-semibold">
+                        Source-reported part of speech: {entry.pos ?? "UNKNOWN_OR_NULL"} · Entry {entryIndex + 1}
+                      </h4>
+                      <p className="text-[10px] text-[#aeb4ce]">
+                        Entry sources: {entry.sources.join(" · ") || "UNKNOWN_OR_NULL"}
+                      </p>
+                      {entry.senses.length ? (
+                        <ol className="mt-1 space-y-2">
+                          {entry.senses.map((sense, senseIndex) => {
+                            const isSelected = selectedSense?.entryIndex === entryIndex &&
+                              selectedSense.senseIndex === senseIndex &&
+                              selectedSense.proposalMeaning === (proposalMeaning ?? "");
+                            return (
+                              <li key={`sense-${senseIndex}`} className="rounded bg-[#171c28] p-2" data-testid="fjalori-source-sense">
+                                <p className="text-[10px] text-[#aeb4ce]">
+                                  Response locator: Entry {entryIndex + 1} · Sense {senseIndex + 1} · gloss language {sense.lang}
+                                </p>
+                                <p className="mt-1" data-testid="fjalori-source-sense-gloss">{sense.gloss}</p>
+                                <p className="mt-1 text-[10px] text-[#aeb4ce]">
+                                  Sense source attribution: {sense.source}
+                                  {sense.tags.length ? ` · source tags: ${sense.tags.join(" · ")}` : ""}
+                                </p>
+                                {isSelected ? (
+                                  <div className="mt-2 rounded border border-[#53604a] p-2" data-testid="fjalori-selected-sense">
+                                    <p className="font-semibold">Selected by you for inspection · USER_INTERPRETATION</p>
+                                    <label className="mt-1 block text-[10px] text-[#c5ced8]">
+                                      USER_INTERPRETATION assessment
+                                      <select
+                                        aria-label={`USER_INTERPRETATION assessment for entry ${entryIndex + 1} sense ${senseIndex + 1}`}
+                                        className="mt-1 w-full rounded border border-[#46505c] bg-[#0d1117] px-2 py-1 text-xs text-[#f5f7fb]"
+                                        value={userAssessment ?? ""}
+                                        onChange={(event) => setUserAssessment(event.target.value ? event.target.value as UserSenseAssessment : null)}
+                                      >
+                                        <option value="">Not assessed</option>
+                                        <option value="POTENTIALLY_SUPPORTS_PROPOSAL">POTENTIALLY_SUPPORTS_PROPOSAL</option>
+                                        <option value="DOES_NOT_SUPPORT_PROPOSAL">DOES_NOT_SUPPORT_PROPOSAL</option>
+                                        <option value="UNDECIDED">UNDECIDED</option>
+                                      </select>
+                                    </label>
+                                    <p className="mt-1 text-[10px] text-[#aeb4ce]">
+                                      This local assessment does not change the proposal, evidence ledger, source sense, or engine result.
+                                      {userAssessment ? ` Current assessment: ${userAssessment}.` : " No assessment entered."}
+                                    </p>
+                                  </div>
+                                ) : (
+                                  <button
+                                    type="button"
+                                    className="mt-2 rounded border border-[#53604a] px-2 py-1 text-[10px] text-[#dce9ca]"
+                                    aria-label={`Select source sense entry ${entryIndex + 1} sense ${senseIndex + 1} for inspection`}
+                                    onClick={() => {
+                                      setSelectedSense({ entryIndex, senseIndex, proposalMeaning: proposalMeaning ?? "" });
+                                      setUserAssessment(null);
+                                    }}
+                                  >
+                                    Select sense for inspection
+                                  </button>
+                                )}
+                              </li>
+                            );
+                          })}
+                        </ol>
+                      ) : (
+                        <p className="mt-1 text-[10px] text-[#aeb4ce]">This source entry has no usable senses in the response.</p>
+                      )}
+                    </section>
+                  ))}
+                </div>
+              ) : (
+                <p className="mt-2" data-testid="fjalori-no-usable-senses">
+                  NO_USABLE_SENSES · UNKNOWN_OR_NULL — the validated record contains no individual senses with usable gloss text.
+                </p>
+              )}
+              <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-[10px]">
+                <a href={wordPageUrl} target="_blank" rel="noreferrer" className="underline">Original FjaloriShqip record</a>
+                <a href={apiUrl} target="_blank" rel="noreferrer" className="underline">FjaloriShqip API record</a>
+                <a href="https://github.com/EndritRushiti/FjaloriShqip/blob/main/DATA-LICENSE.md" target="_blank" rel="noreferrer" className="underline">Data sources and license</a>
+              </div>
+            </section>
           ) : null}
           <p className="mt-2 text-[#d3c99c]" data-testid="fjalori-alignment-boundary">
             FORM_MATCH_ONLY — this record exposes no shared source sense ID; exact cross-source sense alignment is UNKNOWN_OR_NULL.
