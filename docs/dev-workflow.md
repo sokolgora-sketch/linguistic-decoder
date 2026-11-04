@@ -105,7 +105,8 @@ Run focused tests first for changed behavior. Use the actual repository commands
 Use `npm run gate` or a separately executed `npm run build` when production-build validation is required. Pre-merge proof must show the command that actually provided build coverage.
 
 The repository pre-push hook always enters through `npm run gate:prepush`. For
-code or uncertain changes it runs lint plus Jest in `--ci --runInBand` mode
+changes outside the two verified fast paths below, or whenever their evidence
+is uncertain, it runs repository lint plus Jest in `--ci --runInBand` mode
 with `OPEN_INSTRUMENT_EXTERNAL_SOURCE_ROOT` unset so deterministic local
 results cannot change with an optional external provider. It excludes only the
 known capability-dependent suites that require loopback, `tsx` child-process
@@ -137,15 +138,42 @@ caller-supplied file lists cannot establish eligibility. The fast path runs
 frontmatter and AGENTS reference checks, and local Markdown-link checks.
 Multiple refs, tags, deletes, renames, mode changes, symlinks, MDX, code,
 tests, CI, hooks, gate/dependency/config changes, unusual paths, stale or
-missing refs, dirty state, and any ambiguous Git/remote result use the existing
-full lint/Jest lane. A failing docs check fails the gate.
+missing refs, dirty state, and any ambiguous Git/remote result do not qualify
+for DOCS_ONLY. The classifier may then consider the separate SCOPED_CODE
+allowlist below; all other changes use FULL. A failing docs check fails the
+gate.
+
+For a clean, single-ref push whose complete regular `100644` code/test diff is
+limited to `src/ui/instrument/InstrumentPanel.tsx`,
+`src/ui/instrument/sections/**/*.tsx`, and/or direct tests matching
+`tests/ui.instrument.*.spec.ts(x)` or
+`tests/instrumentPanel.*.spec.ts(x)`, the classifier may select `SCOPED_CODE`.
+It derives related tests from each changed UI source using Jest, keeps every
+directly changed test, adds all registered Instrument UI guard suites and four
+required filesystem-scanning guards (`tests/ui.devOnly.contractAdapter.import.guard.spec.ts`,
+`tests/doctrine/doctrineDrift.guard.v0.1.2.spec.ts`,
+`tests/vowels/orthographySsot.guard.v0.1.spec.ts`, and
+`tests/vowels/phoneticIpaSsot.guard.v0.1.spec.ts`), and scans registered test
+files for explicit references to changed source paths or component names.
+Missing required guard registration falls back to FULL. It then runs ESLint on the changed files,
+`npm run typecheck:prod`, and the selected tests serially with `--runInBand`.
+The selection must be nonempty, each source must have related tests, each
+direct test must be registered, the cross-cutting guard inventory must be
+present, and the union must be no larger than 150 suites or 20% of the
+registered Jest inventory, whichever limit is smaller. Any failed, empty,
+malformed, oversized, or otherwise uncertain selection falls back to FULL.
+Shared engines/contracts, APIs, security, generated artifacts/baselines,
+dependencies, configuration, CI, hooks, gate scripts, deletions, renames,
+symlinks, and unrecognized paths are never eligible. Selected Jest execution
+remains serial; this path does not replace full hosted CI.
 
 Never claim PASS, build success, CI success, or gate success without actual output. Do not encode transient test counts in this durable workflow.
 
 For an ordinary scoped code change, default local validation is focused tests,
 changed-file ESLint, and the applicable production or contract typecheck. Keep
 the normal pre-push hook enabled; it must complete `npm run gate:prepush` on
-every push, selecting only the verified docs path or the existing full lane.
+every push, selecting only a verified docs path, a verified bounded Instrument
+UI path, or the existing full lane.
 Run `npm run gate:quick` when broader local integration validation
 is warranted, not as a routine pre-merge step. `gate:quick` and `gate:prepush`
 are not equivalent: `gate:prepush` excludes the defined capability-dependent

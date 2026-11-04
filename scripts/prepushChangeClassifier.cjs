@@ -10,6 +10,7 @@ const ALLOWED_ROOT_DOCS = new Set([
   "README.md",
 ]);
 const ALLOWED_DOCS_PREFIXES = ["docs/process/"];
+const SAFE_REPO_PATH = /^[A-Za-z0-9._/-]+$/;
 
 function full(reason) {
   return { tier: "FULL", reason };
@@ -49,16 +50,7 @@ function outputText(result) {
 }
 
 function isAllowedDocsPath(filePath) {
-  if (typeof filePath !== "string" || !/^[A-Za-z0-9._/-]+$/.test(filePath)) {
-    return false;
-  }
-  if (
-    filePath.startsWith("/") ||
-    filePath.includes("//") ||
-    filePath.split("/").some((part) => part === "" || part === "." || part === "..")
-  ) {
-    return false;
-  }
+  if (!isSafeRepoPath(filePath)) return false;
   if (ALLOWED_ROOT_DOCS.has(filePath)) return true;
   if (/^\.agents\/skills\/[a-z0-9]+(?:-[a-z0-9]+)*\/SKILL\.md$/.test(filePath)) {
     return true;
@@ -72,6 +64,25 @@ function isAllowedDocsPath(filePath) {
       !segment.includes("..") &&
       !segment.endsWith("."),
   ) && segments[segments.length - 1]?.endsWith(".md");
+}
+
+function isSafeRepoPath(filePath) {
+  return (
+    typeof filePath === "string" &&
+    SAFE_REPO_PATH.test(filePath) &&
+    !filePath.startsWith("/") &&
+    !filePath.includes("//") &&
+    filePath.split("/").every((part) => part !== "" && part !== "." && part !== "..")
+  );
+}
+
+function isAllowedScopedCodePath(filePath) {
+  if (!isSafeRepoPath(filePath)) return false;
+  if (filePath === "src/ui/instrument/InstrumentPanel.tsx") return true;
+  if (/^src\/ui\/instrument\/sections\/(?:[A-Za-z0-9][A-Za-z0-9._-]*\/)*[A-Za-z0-9][A-Za-z0-9._-]*\.tsx$/.test(filePath)) {
+    return true;
+  }
+  return /^tests\/(?:ui\.instrument|instrumentPanel)\.[A-Za-z0-9._-]+\.spec\.tsx?$/.test(filePath);
 }
 
 function parseSingleUpdate(input, hashLength) {
@@ -145,10 +156,9 @@ function readRawChanges(repoRoot, baseSha, headSha) {
     if (
       !["A", "M"].includes(status) ||
       !["000000", "100644"].includes(oldMode) ||
-      newMode !== "100644" ||
-      !isAllowedDocsPath(filePath)
+      newMode !== "100644"
     ) {
-      return { error: "the pushed diff contains a non-allowlisted or non-regular documentation change" };
+      return { error: "the pushed diff contains a delete, rename, or non-regular file change" };
     }
     if ((status === "A" && oldMode !== "000000") || (status === "M" && oldMode !== "100644")) {
       return { error: "the pushed diff has inconsistent file status and mode" };
@@ -264,17 +274,31 @@ function classifyPrePush({ repoRoot, remoteName, remoteUrl, stdin }) {
 
   const diff = readRawChanges(topLevel, baseSha, headSha);
   if (diff.error) return full(diff.error);
-  return {
-    tier: "DOCS_ONLY",
-    reason: "single clean branch update verified against its live remote base",
-    baseSha,
-    headSha,
-    changedPaths: diff.changes.map((change) => change.path),
-  };
+  const changedPaths = diff.changes.map((change) => change.path);
+  if (changedPaths.every(isAllowedDocsPath)) {
+    return {
+      tier: "DOCS_ONLY",
+      reason: "single clean branch update verified against its live remote base",
+      baseSha,
+      headSha,
+      changedPaths,
+    };
+  }
+  if (changedPaths.every(isAllowedScopedCodePath)) {
+    return {
+      tier: "SCOPED_CODE",
+      reason: "single clean branch update contains only bounded Instrument UI sources and focused UI tests",
+      baseSha,
+      headSha,
+      changedPaths,
+    };
+  }
+  return full("the complete pushed diff is not wholly within a verified fast-path allowlist");
 }
 
 module.exports = {
   classifyPrePush,
   isAllowedDocsPath,
+  isAllowedScopedCodePath,
   readRawChanges,
 };

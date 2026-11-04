@@ -11,9 +11,11 @@ import { spawnSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 import classifier from "./prepushChangeClassifier.cjs";
 import docsValidation from "./prepushDocsValidation.cjs";
+import scopedCodeSelection from "./prepushScopedCodeSelection.v0_1.cjs";
 
 const { classifyPrePush } = classifier;
 const { validateDocsOnlyCommit } = docsValidation;
+const { selectScopedCodeTests } = scopedCodeSelection;
 
 const capabilityDependentTestPatterns = [
   "tests/apiAnalyzeV1\\.evidence\\.smoke\\.curl\\.spec\\.ts$",
@@ -29,7 +31,8 @@ const gateEnvironment = { ...process.env };
 // restore a truthy local external-root configuration from .env.test.local.
 gateEnvironment.OPEN_INSTRUMENT_EXTERNAL_SOURCE_ROOT = "";
 
-function run(command, args) {
+function run(command, args, label = command) {
+  const startedAt = process.hrtime.bigint();
   const result = spawnSync(command, args, {
     env: gateEnvironment,
     shell: false,
@@ -41,6 +44,8 @@ function run(command, args) {
     process.exit(1);
   }
 
+  const elapsedSeconds = Number(process.hrtime.bigint() - startedAt) / 1_000_000_000;
+  console.log(`[gate:prepush] ${label} elapsed ${elapsedSeconds.toFixed(2)}s`);
   if (result.status !== 0) process.exit(result.status ?? 1);
 }
 
@@ -75,6 +80,36 @@ if (classification.tier === "DOCS_ONLY") {
     process.exit(1);
   }
   console.log(`pre-push: documentation fast path became uncertain (${validation.reason}); using full gate`);
+} else if (classification.tier === "SCOPED_CODE") {
+  const selection = selectScopedCodeTests({
+    repoRoot: process.cwd(),
+    changedPaths: classification.changedPaths,
+  });
+  if (selection.state === "SELECTED") {
+    console.log(
+      `pre-push: verified scoped Instrument UI change (${selection.reason}); ` +
+        `${selection.testPaths.length}/${selection.totalSuiteCount} serial Jest suites, ` +
+        `${selection.uiGuardCount} UI guards, ${selection.filesystemScanGuardCount} filesystem-scanning guards, ` +
+        `${selection.explicitConsumerCount} source-referencing consumers`,
+    );
+    run("node_modules/.bin/eslint", ["-c", "eslint.config.mjs", ...classification.changedPaths], "changed-file ESLint");
+    run("npm", ["run", "typecheck:prod"], "production typecheck");
+    run(
+      "npm",
+      [
+        "test",
+        "--",
+        "--ci",
+        "--runInBand",
+        "--runTestsByPath",
+        ...selection.testPaths.map((testPath) => `${process.cwd()}/${testPath}`),
+      ],
+      `selected serial Jest (${selection.testPaths.length} suites)`,
+    );
+    console.log("\n✅ gate:prepush passed (verified scoped Instrument UI validation)\n");
+    process.exit(0);
+  }
+  console.log(`pre-push: scoped-code selection became uncertain (${selection.reason}); using full gate`);
 } else {
   console.log(`pre-push: using full validation (${classification.reason})`);
 }
