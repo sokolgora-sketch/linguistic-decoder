@@ -93,6 +93,16 @@ describe("FjaloriShqip Albanian meaning evidence v0.1", () => {
     expect(screen.getByTestId("fjalori-dritare-separation")).not.toHaveTextContent("lets light and air enter");
   });
 
+  it("omits the word-reading-specific dritare note in component lookup context", async () => {
+    global.fetch = jest.fn().mockResolvedValue(responseFor("dritare")) as unknown as typeof fetch;
+
+    render(<FjaloriCrossSourceEvidenceV0_1 word="dritare" context="component" />);
+
+    expect(await screen.findByTestId("fjalori-source-description")).toBeInTheDocument();
+    expect(screen.getByTestId("fjalori-alignment-boundary")).toHaveTextContent("FORM_MATCH_ONLY");
+    expect(screen.queryByTestId("fjalori-dritare-separation")).not.toBeInTheDocument();
+  });
+
   it("does not show a dritare source-meaning claim when its description is unavailable", async () => {
     global.fetch = jest.fn().mockResolvedValue(responseFor("dritare", { description: null })) as unknown as typeof fetch;
 

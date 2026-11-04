@@ -179,7 +179,7 @@ describe("Single-word motivation workbench v0.1", () => {
     expect(fetchMock).toHaveBeenCalledTimes(1);
     expect(String(fetchMock.mock.calls[0][0])).toBe("https://fjalorishqip.org/api/v1/fjala/ka.json");
     expect(screen.getByTestId("single-word-component-source-spelling")).toHaveTextContent("KA");
-    expect(screen.getByTestId("single-word-component-source-evidence")).toHaveTextContent("User-proposed meaning (unchanged): has");
+    expect(screen.getByTestId("single-word-component-source-evidence")).toHaveTextContent("User-proposed meaning (as entered): has");
     expect(screen.getByTestId("fjalori-alignment-boundary")).toHaveTextContent("FORM_MATCH_ONLY");
     expect(screen.getByText(/not independent scientific corroboration/)).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Original FjaloriShqip record" })).toHaveAttribute(
@@ -197,7 +197,7 @@ describe("Single-word motivation workbench v0.1", () => {
     ]);
     expect(screen.getAllByTestId("single-word-component-source-evidence")).toHaveLength(1);
     expect(screen.getByTestId("single-word-component-source-spelling")).toHaveTextContent("DILL");
-    expect(screen.getByTestId("single-word-component-source-evidence")).toHaveTextContent("User-proposed meaning (unchanged): sun");
+    expect(screen.getByTestId("single-word-component-source-evidence")).toHaveTextContent("User-proposed meaning (as entered): sun");
     expect(screen.getByTestId("single-word-component-source-evidence")).toHaveTextContent("Albanian · Gheg");
     expect(screen.getByLabelText("Component 3 evidence status")).toHaveValue("USER_PROPOSED");
     expect(screen.getByLabelText("Component 3 proposed meaning")).toHaveValue("sun");

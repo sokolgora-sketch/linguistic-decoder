@@ -277,17 +277,18 @@ export function SingleWordMotivationWorkbenchV0_1({
                   <span data-testid="single-word-component-source-spelling">{selectedComponentSource.exactSpelling}</span>
                 </p>
                 <p className="mt-1 text-xs text-[#aeb4ce]">
-                  <strong>User-proposed meaning (unchanged):</strong>{" "}
+                  <strong>User-proposed meaning (as entered):</strong>{" "}
                   {segment.unresolved ? "UNKNOWN_OR_NULL" : segment.proposedMeaning || "UNKNOWN_OR_NULL"}.
                   This Albanian form lookup does not verify that meaning, the recorded language/dialect, or an exact sense alignment.
                 </p>
                 <p className="mt-1 text-xs text-[#aeb4ce]">
-                  <strong>Recorded language/dialect (unchanged):</strong>{" "}
+                  <strong>Recorded language/dialect (as entered):</strong>{" "}
                   {segment.language || "UNKNOWN_OR_NULL"}{segment.dialect ? " · " + segment.dialect : ""}.
                 </p>
                 <FjaloriCrossSourceEvidenceV0_1
                   key={selectedComponentSource.componentIndex + ":" + selectedComponentSource.exactSpelling}
                   word={selectedComponentSource.exactSpelling}
+                  context="component"
                 />
               </div>
             ) : null}
