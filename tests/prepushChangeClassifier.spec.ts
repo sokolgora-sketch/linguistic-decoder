@@ -95,7 +95,7 @@ function classify(fixture: Fixture, oldRemoteSha = fixture.zeroSha) {
   });
 }
 
-describe("safe documentation-only pre-push classifier", () => {
+describe("pre-push fast-path classifier", () => {
   let fixtures: Fixture[] = [];
   afterEach(() => {
     for (const fixture of fixtures) fixture.cleanup();
@@ -130,6 +130,72 @@ describe("safe documentation-only pre-push classifier", () => {
     commit(fixture, "second docs commit");
 
     expect(classify(fixture, oldRemoteSha).tier).toBe("DOCS_ONLY");
+  });
+
+  it("selects SCOPED_CODE for one bounded Instrument section change", () => {
+    const fixture = fresh();
+    const source = path.join(fixture.root, "src/ui/instrument/sections/ExampleCard.tsx");
+    fs.mkdirSync(path.dirname(source), { recursive: true });
+    fs.writeFileSync(source, "export const ExampleCard = () => null;\n");
+    commit(fixture, "bounded UI change");
+
+    const result = classify(fixture);
+
+    expect(result.tier).toBe("SCOPED_CODE");
+    expect(result.changedPaths).toEqual(["src/ui/instrument/sections/ExampleCard.tsx"]);
+  });
+
+  it("keeps a directly changed focused UI test in the SCOPED_CODE diff", () => {
+    const fixture = fresh();
+    const source = path.join(fixture.root, "src/ui/instrument/InstrumentPanel.tsx");
+    const test = path.join(fixture.root, "tests/ui.instrument.scopedGate.spec.tsx");
+    fs.mkdirSync(path.dirname(source), { recursive: true });
+    fs.mkdirSync(path.dirname(test), { recursive: true });
+    fs.writeFileSync(source, "export const InstrumentPanel = () => null;\n");
+    fs.writeFileSync(test, "describe('scoped', () => {});\n");
+    commit(fixture, "UI and focused test");
+
+    const result = classify(fixture);
+
+    expect(result.tier).toBe("SCOPED_CODE");
+    expect(result.changedPaths).toEqual([
+      "src/ui/instrument/InstrumentPanel.tsx",
+      "tests/ui.instrument.scopedGate.spec.tsx",
+    ]);
+  });
+
+  it.each([
+    ["shared functional engine", "src/shared/openInstrument/motivationEngineDiscoveryServerOnly.v0_1.ts"],
+    ["API route", "app/api/analyze-v1/route.ts"],
+    ["security policy", "src/shared/security/example.ts"],
+    ["CI workflow", ".github/workflows/ci.yml"],
+    ["source generator", "scripts/generateAlbanianOccupationalRoleCandidateBatch.v0_1.mts"],
+    ["baseline-mutating test", "tests/validation/canonC2.runner.v0.4.spec.ts"],
+    ["Jest configuration", "jest.config.mjs"],
+    ["generated baseline", "src/data/validation/example-baseline.json"],
+    ["unrecognized direct test", "tests/openInstrument.authority.spec.ts"],
+  ])("uses FULL when %s is in the pushed diff", (_label, changedPath) => {
+    const fixture = fresh();
+    const source = path.join(fixture.root, "src/ui/instrument/sections/ExampleCard.tsx");
+    const extra = path.join(fixture.root, changedPath);
+    fs.mkdirSync(path.dirname(source), { recursive: true });
+    fs.mkdirSync(path.dirname(extra), { recursive: true });
+    fs.writeFileSync(source, "export const ExampleCard = () => null;\n");
+    fs.writeFileSync(extra, "changed\n");
+    commit(fixture, "unsafe mixed change");
+
+    expect(classify(fixture).tier).toBe("FULL");
+  });
+
+  it("uses FULL for a mixed documentation and scoped-code diff", () => {
+    const fixture = fresh();
+    fs.writeFileSync(path.join(fixture.root, "docs/dev-workflow.md"), "# Changed\n");
+    const source = path.join(fixture.root, "src/ui/instrument/sections/ExampleCard.tsx");
+    fs.mkdirSync(path.dirname(source), { recursive: true });
+    fs.writeFileSync(source, "export const ExampleCard = () => null;\n");
+    commit(fixture, "mixed docs and UI");
+
+    expect(classify(fixture).tier).toBe("FULL");
   });
 
   it.each([
@@ -310,6 +376,95 @@ describe("safe documentation-only pre-push classifier", () => {
     expect(fallback.stdout).toContain("using full validation");
     expect(fallback.stdout).toContain("FULL_LINT");
     expect(fallback.stdout).toContain("FULL_TEST");
+  });
+
+  it("runs scoped UI validation through the hook and falls back to FULL on an empty selection", () => {
+    const fixture = fresh();
+    const packagePath = path.join(fixture.root, "package.json");
+    const packageJson = JSON.parse(fs.readFileSync(packagePath, "utf8")) as {
+      scripts: Record<string, string>;
+    };
+    packageJson.scripts.test = "echo SCOPED_TEST";
+    packageJson.scripts["typecheck:prod"] = "echo SCOPED_TYPECHECK";
+    fs.writeFileSync(packagePath, JSON.stringify(packageJson));
+
+    const testsRoot = path.join(fixture.root, "tests");
+    fs.mkdirSync(testsRoot, { recursive: true });
+    for (let index = 0; index < 80; index += 1) {
+      fs.writeFileSync(
+        path.join(testsRoot, `ui.instrument.guard-${index}.spec.tsx`),
+        "describe('guard', () => {});\n",
+      );
+    }
+    fs.writeFileSync(path.join(testsRoot, "ui.instrument.related.spec.tsx"), "describe('related', () => {});\n");
+    fs.writeFileSync(path.join(testsRoot, "ui.instrument.direct.spec.tsx"), "describe('direct before', () => {});\n");
+    for (let index = 0; index < 368; index += 1) {
+      fs.writeFileSync(path.join(testsRoot, `unrelated-${index}.spec.tsx`), "describe('other', () => {});\n");
+    }
+    const sourceRoot = path.join(fixture.root, "src/ui/instrument/sections");
+    fs.mkdirSync(sourceRoot, { recursive: true });
+    const sourcePath = path.join(sourceRoot, "ExampleCard.tsx");
+    fs.writeFileSync(sourcePath, "export const ExampleCard = () => null;\n");
+    git(fixture.root, "add", "--all");
+    git(fixture.root, "commit", "-m", "add local scoped-gate harness");
+    git(fixture.root, "push", "origin", "topic/docs");
+    const oldRemoteSha = git(fixture.root, "rev-parse", "HEAD");
+
+    fs.writeFileSync(sourcePath, "export const ExampleCard = () => <div />;\n");
+    fs.writeFileSync(path.join(testsRoot, "ui.instrument.direct.spec.tsx"), "describe('direct after', () => {});\n");
+    const headSha = commit(fixture, "scoped UI push");
+
+    const nodeModules = path.join(fixture.root, "node_modules");
+    const jestBin = path.join(nodeModules, "jest/bin");
+    const executableBin = path.join(nodeModules, ".bin");
+    fs.mkdirSync(jestBin, { recursive: true });
+    fs.mkdirSync(executableBin, { recursive: true });
+    fs.appendFileSync(path.join(fixture.root, ".git/info/exclude"), "\n/node_modules/\n");
+    fs.writeFileSync(
+      path.join(executableBin, "eslint"),
+      "#!/bin/sh\necho SCOPED_LINT\n",
+      { mode: 0o755 },
+    );
+
+    const fakeJest = (related: string[]) => `
+      const fs = require('node:fs');
+      const path = require('node:path');
+      const root = process.cwd();
+      const inventory = fs.readdirSync(path.join(root, 'tests'))
+        .filter(name => name.endsWith('.spec.tsx'))
+        .map(name => path.join(root, 'tests', name));
+      const related = ${JSON.stringify(related)}.map(name => path.join(root, 'tests', name));
+      process.stdout.write(JSON.stringify(process.argv.includes('--findRelatedTests') ? related : inventory));
+    `;
+    fs.writeFileSync(path.join(jestBin, "jest.js"), fakeJest(["ui.instrument.related.spec.tsx"]));
+
+    const hookScript = path.resolve(__dirname, "../.githooks/pre-push");
+    const update = `${fixture.topicRef} ${headSha} ${fixture.topicRef} ${oldRemoteSha}\n`;
+    const runHook = () => spawnSync("bash", [hookScript, "origin", fixture.remote], {
+      cwd: fixture.root,
+      env: { ...process.env },
+      encoding: "utf8",
+      input: update,
+      shell: false,
+      timeout: 30_000,
+    });
+
+    const scoped = runHook();
+    expect(scoped.status).toBe(0);
+    expect(scoped.stdout).toContain("verified scoped Instrument UI change");
+    expect(scoped.stdout).toContain("82/450 serial Jest suites");
+    expect(scoped.stdout).toContain("SCOPED_LINT");
+    expect(scoped.stdout).toContain("SCOPED_TYPECHECK");
+    expect(scoped.stdout).toContain("SCOPED_TEST");
+    expect(scoped.stdout).not.toContain("FULL_LINT");
+
+    fs.writeFileSync(path.join(jestBin, "jest.js"), fakeJest([]));
+    const uncertain = runHook();
+    expect(uncertain.status).toBe(0);
+    expect(uncertain.stdout).toContain("selection became uncertain");
+    expect(uncertain.stdout).toContain("using full gate");
+    expect(uncertain.stdout).toContain("FULL_LINT");
+    expect(uncertain.stdout).toContain("SCOPED_TEST");
   });
 });
 
