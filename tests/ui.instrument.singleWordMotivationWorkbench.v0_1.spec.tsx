@@ -123,6 +123,9 @@ describe("Single-word motivation workbench v0.1", () => {
       if (String(input).endsWith("/dill.json")) {
         return Promise.resolve({ ok: false, json: async () => ({}) });
       }
+      if (String(input).endsWith("/n.json")) {
+        return Promise.resolve({ ok: false, json: async () => ({}) });
+      }
       return Promise.resolve({
         ok: true,
         json: async () => ({
@@ -174,10 +177,16 @@ describe("Single-word motivation workbench v0.1", () => {
     expect(screen.getAllByTestId("single-word-component-source-check")).toHaveLength(3);
     expect(fetchMock).not.toHaveBeenCalled();
 
+    fireEvent.click(screen.getByRole("button", { name: "Check source for component 2" }));
+    expect(await screen.findByTestId("fjalori-evidence-null")).toHaveTextContent("SOURCE_UNAVAILABLE · UNKNOWN_OR_NULL");
+    expect(screen.getByTestId("single-word-component-source-evidence")).toHaveTextContent("User-proposed meaning (as entered): UNKNOWN_OR_NULL");
+    expect(screen.queryByTestId("fjalori-component-meaning-comparison")).not.toBeInTheDocument();
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+
     fireEvent.click(screen.getByRole("button", { name: "Check source for component 1" }));
     expect(await screen.findByText("Source-described Albanian entry for ka")).toBeInTheDocument();
-    expect(fetchMock).toHaveBeenCalledTimes(1);
-    expect(String(fetchMock.mock.calls[0][0])).toBe("https://fjalorishqip.org/api/v1/fjala/ka.json");
+    expect(fetchMock).toHaveBeenCalledTimes(2);
+    expect(String(fetchMock.mock.calls[1][0])).toBe("https://fjalorishqip.org/api/v1/fjala/ka.json");
     expect(screen.getByTestId("single-word-component-source-spelling")).toHaveTextContent("KA");
     expect(screen.getByTestId("single-word-component-source-evidence")).toHaveTextContent("User-proposed meaning (as entered): has");
     expect(screen.getByTestId("fjalori-alignment-boundary")).toHaveTextContent("FORM_MATCH_ONLY");
@@ -190,8 +199,9 @@ describe("Single-word motivation workbench v0.1", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "Check source for component 3" }));
     expect(await screen.findByTestId("fjalori-evidence-null")).toHaveTextContent("UNKNOWN_OR_NULL");
-    expect(fetchMock).toHaveBeenCalledTimes(2);
+    expect(fetchMock).toHaveBeenCalledTimes(3);
     expect(fetchMock.mock.calls.map(([url]) => String(url))).toEqual([
+      "https://fjalorishqip.org/api/v1/fjala/n.json",
       "https://fjalorishqip.org/api/v1/fjala/ka.json",
       "https://fjalorishqip.org/api/v1/fjala/dill.json",
     ]);
@@ -199,6 +209,8 @@ describe("Single-word motivation workbench v0.1", () => {
     expect(screen.getByTestId("single-word-component-source-spelling")).toHaveTextContent("DILL");
     expect(screen.getByTestId("single-word-component-source-evidence")).toHaveTextContent("User-proposed meaning (as entered): sun");
     expect(screen.getByTestId("single-word-component-source-evidence")).toHaveTextContent("Albanian · Gheg");
+    expect(screen.getByTestId("single-word-component-source-evidence")).toHaveTextContent("does not establish that the word is absent");
+    expect(screen.queryByTestId("fjalori-component-meaning-comparison")).not.toBeInTheDocument();
     expect(screen.getByLabelText("Component 3 evidence status")).toHaveValue("USER_PROPOSED");
     expect(screen.getByLabelText("Component 3 proposed meaning")).toHaveValue("sun");
     expect(screen.getByTestId("single-word-proposal-result").textContent).toBe(proposalBeforeSourceChecks);
@@ -283,6 +295,17 @@ describe("Single-word motivation workbench v0.1", () => {
     });
     expect(screen.getByTestId("fjalori-selected-sense")).toHaveTextContent("USER_INTERPRETATION");
     expect(screen.getByTestId("fjalori-selected-sense")).toHaveTextContent("POTENTIALLY_SUPPORTS_PROPOSAL");
+    const comparison = screen.getByTestId("fjalori-component-meaning-comparison");
+    expect(comparison).toHaveTextContent("USER_PROPOSED");
+    expect(comparison).toHaveTextContent("Component spelling: KA");
+    expect(comparison).toHaveTextContent("Proposed meaning: has");
+    expect(comparison).toHaveTextContent("Proposed grammatical role: third-person singular verb");
+    expect(comparison).toHaveTextContent("SOURCE_REPORTED");
+    expect(comparison).toHaveTextContent("Part of speech: verb");
+    expect(comparison).toHaveTextContent("Gloss: has (form of kam); there is");
+    expect(comparison).toHaveTextContent("Gloss language: en");
+    expect(comparison).toHaveTextContent("Source attribution: en-wiktionary");
+    expect(comparison).toHaveTextContent("Response-position locator: Entry 1 · Sense 1");
     expect(screen.getAllByTestId("fjalori-source-sense-gloss")).toHaveLength(3);
     expect(proposal.textContent).toBe(beforeAssessment);
     expect(screen.getByLabelText("Component 1 evidence status")).toHaveValue("USER_PROPOSED");
