@@ -7,6 +7,7 @@ import {
   STRICT_BLIND_FROZEN_SOURCE_TRADITIONS_V1,
   STRICT_BLIND_PERSEUS_SOURCE_DEFINITIONS_V1,
   STRICT_BLIND_PERSEUS_SOURCE_PACKET_SCHEMA_V1,
+  STRICT_BLIND_PERSEUS_DEFAULT_TEI_LIMITS_V1,
   validateStrictBlindPerseusFrozenCoverageV1,
   validateStrictBlindPerseusSourcePacketV1,
   verifyStrictBlindPerseusSourceBytesV1,
@@ -140,6 +141,28 @@ describe("strict-blind Perseus source packets v1", () => {
     expect(result.entry.entryLocator).toContain("entryFree[ordinal=0;id=n7;key=abactor]");
   });
 
+  it("rejects duplicate ID or key selector matches instead of replacing the earlier entry", () => {
+    const duplicateEntries = tei(
+      `<entry id="n0" key="a"><orth>first</orth><sense>first meaning</sense></entry><entry id="n0" key="b"><orth>second</orth><sense>second meaning</sense></entry>`,
+    );
+    expect(
+      extractStrictBlindPerseusTeiEntryFromBytesV1({
+        sourceTraditionId: "scaife.middle-liddell.v0_1",
+        bytes: duplicateEntries,
+        selector: { entryId: "n0" },
+      }),
+    ).toEqual({ ok: false, reasonCode: "ENTRY_SELECTOR_AMBIGUOUS" });
+    expect(
+      extractStrictBlindPerseusTeiEntryFromBytesV1({
+        sourceTraditionId: "scaife.middle-liddell.v0_1",
+        bytes: tei(
+          `<entry id="n0" key="shared"><orth>first</orth><sense>first meaning</sense></entry><entry id="n1" key="shared"><orth>second</orth><sense>second meaning</sense></entry>`,
+        ),
+        selector: { entryKey: "shared" },
+      }),
+    ).toEqual({ ok: false, reasonCode: "ENTRY_SELECTOR_AMBIGUOUS" });
+  });
+
   it.each([
     ["malformed XML", "<entry", "MALFORMED_XML"],
     ["unsupported schema", "<Dictionary><entry id=\"n0\"><orth>x</orth></entry></Dictionary>", "UNSUPPORTED_TEI_SCHEMA"],
@@ -180,7 +203,27 @@ describe("strict-blind Perseus source packets v1", () => {
     ).toEqual({ ok: false, reasonCode: "ENTRY_NOT_FOUND" });
   });
 
-  it("requires a verified snapshot and completed coverage for NOT_FOUND", () => {
+  it.each([
+    ["Infinity", { maxDepth: Infinity }],
+    ["NaN", { maxDepth: Number.NaN }],
+    ["negative", { maxDepth: -1 }],
+    ["zero", { maxDepth: 0 }],
+    ["fractional", { maxDepth: 1.5 }],
+    ["above the configured ceiling", {
+      maxDepth: STRICT_BLIND_PERSEUS_DEFAULT_TEI_LIMITS_V1.maxDepth + 1,
+    }],
+  ])("rejects %s caller-supplied TEI limit before parsing", (_label, limits) => {
+    expect(
+      extractStrictBlindPerseusTeiEntryFromBytesV1({
+        sourceTraditionId: "scaife.middle-liddell.v0_1",
+        bytes: tei(`<entry id="n0"><orth>alpha</orth><sense>meaning</sense></entry>`),
+        selector: { entryId: "n0" },
+        limits,
+      }),
+    ).toEqual({ ok: false, reasonCode: "RESOURCE_LIMITS_INVALID" });
+  });
+
+  it("fails closed for NOT_FOUND without verifiable completed-lookup evidence", () => {
     const source = makeSnapshot("scaife.middle-liddell.v0_1");
     expect(
       buildStrictBlindPerseusNotFoundPacketV1({
@@ -198,16 +241,31 @@ describe("strict-blind Perseus source packets v1", () => {
         completeVerifiedSnapshot: false,
       }),
     ).toEqual({ ok: false, packet: null, reasonCodes: ["NOT_FOUND_SNAPSHOT_UNVERIFIED"] });
-    const result = buildStrictBlindPerseusNotFoundPacketV1({
+    expect(
+      buildStrictBlindPerseusNotFoundPacketV1({
+        sourceTraditionId: "scaife.middle-liddell.v0_1",
+        source,
+        authorizedLookupCompleted: true,
+        completeVerifiedSnapshot: true,
+      }),
+    ).toEqual({ ok: false, packet: null, reasonCodes: ["NOT_FOUND_EVIDENCE_UNVERIFIED"] });
+    const manuallyConstructed = {
+      schemaVersion: STRICT_BLIND_PERSEUS_SOURCE_PACKET_SCHEMA_V1,
       sourceTraditionId: "scaife.middle-liddell.v0_1",
+      outcome: "NOT_FOUND",
       source,
-      authorizedLookupCompleted: true,
-      completeVerifiedSnapshot: true,
+      entry: null,
+      lookup: {
+        status: "COMPLETED_OVER_VERIFIED_SNAPSHOT",
+        coverage: "COMPLETE_VERIFIED_SNAPSHOT",
+      },
+      unavailable: null,
+    };
+    expect(validateStrictBlindPerseusSourcePacketV1(manuallyConstructed)).toEqual({
+      ok: false,
+      packet: null,
+      reasonCodes: ["NOT_FOUND_EVIDENCE_UNVERIFIED"],
     });
-    expect(result.ok).toBe(true);
-    if (!result.ok) throw new Error(result.reasonCodes.join(","));
-    expect(result.packet.outcome).toBe("NOT_FOUND");
-    expect(result.packet.entry).toBeNull();
   });
 
   it("keeps FOUND extraction review-required and rejects target leakage", () => {
@@ -249,6 +307,34 @@ describe("strict-blind Perseus source packets v1", () => {
     expect(validateStrictBlindPerseusSourcePacketV1(packet).ok).toBe(true);
     expect(packet).not.toHaveProperty("sourceContent");
     expect(packet).not.toHaveProperty("substitution");
+    for (const key of ["sourceContent", "targetData", "arbitraryPayload"]) {
+      expect(
+        validateStrictBlindPerseusSourcePacketV1({
+          ...packet,
+          unavailable: { ...packet.unavailable, [key]: { leaked: true } },
+        }),
+      ).toEqual({
+        ok: false,
+        packet: null,
+        reasonCodes: ["FJALE_SOURCE_ACCESS_FORBIDDEN"],
+      });
+    }
+  });
+
+  it("rejects unexpected lookup metadata instead of accepting arbitrary payloads", () => {
+    const packet = buildStrictBlindPerseusFoundPacketV1({
+      sourceTraditionId: "scaife.middle-liddell.v0_1",
+      source: makeSnapshot("scaife.middle-liddell.v0_1"),
+      entry: makeEntry(),
+    });
+    expect(packet.ok).toBe(true);
+    if (!packet.ok) throw new Error(packet.reasonCodes.join(","));
+    expect(
+      validateStrictBlindPerseusSourcePacketV1({
+        ...packet.packet,
+        lookup: { ...packet.packet.lookup, arbitraryPayload: "forbidden" },
+      }),
+    ).toEqual({ ok: false, packet: null, reasonCodes: ["PACKET_INVALID"] });
   });
 
   it("preserves the frozen three-tradition, five-stage ordered coverage matrix", () => {

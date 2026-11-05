@@ -218,15 +218,18 @@ export type StrictBlindPerseusPacketReasonCodeV1 =
   | "MALFORMED_XML"
   | "UNSUPPORTED_TEI_SCHEMA"
   | "ENTRY_SELECTOR_INVALID"
+  | "ENTRY_SELECTOR_AMBIGUOUS"
   | "ENTRY_NOT_FOUND"
   | "ENTRY_SPELLING_MISSING"
   | "EXTRACTED_TEXT_MISSING"
+  | "RESOURCE_LIMITS_INVALID"
   | "ELEMENT_LIMIT_EXCEEDED"
   | "DEPTH_LIMIT_EXCEEDED"
   | "ATTRIBUTE_LIMIT_EXCEEDED"
   | "TEXT_LIMIT_EXCEEDED"
   | "INPUT_BYTE_LIMIT_EXCEEDED"
-  | "ENTRY_LIMIT_EXCEEDED";
+  | "ENTRY_LIMIT_EXCEEDED"
+  | "NOT_FOUND_EVIDENCE_UNVERIFIED";
 
 export type StrictBlindPerseusPacketValidationResultV1 = Readonly<
   | { ok: true; packet: StrictBlindPerseusPacketV1 }
@@ -277,6 +280,15 @@ export const STRICT_BLIND_PERSEUS_DEFAULT_TEI_LIMITS_V1: StrictBlindPerseusTeiLi
     maxTextCharacters: 2_000_000,
     maxEntriesExamined: 1_000_000,
   });
+
+const STRICT_BLIND_PERSEUS_TEI_LIMIT_KEYS_V1 = [
+  "maxInputBytes",
+  "maxDepth",
+  "maxElements",
+  "maxAttributesPerElement",
+  "maxTextCharacters",
+  "maxEntriesExamined",
+] as const satisfies readonly (keyof StrictBlindPerseusTeiLimitsV1)[];
 
 type TeiChunkV1 = string | Uint8Array;
 type EntryFrameV1 = {
@@ -333,6 +345,30 @@ function hasExactKeysV1(
   expected: readonly string[],
 ): boolean {
   return JSON.stringify(Object.keys(value).sort()) === JSON.stringify([...expected].sort());
+}
+
+function validTeiLimitsV1(value: unknown): value is Partial<StrictBlindPerseusTeiLimitsV1> {
+  if (value === undefined) return true;
+  if (!isRecordV1(value)) return false;
+  for (const [key, candidate] of Object.entries(value)) {
+    if (!(STRICT_BLIND_PERSEUS_TEI_LIMIT_KEYS_V1 as readonly string[]).includes(key)) {
+      return false;
+    }
+    const ceiling =
+      STRICT_BLIND_PERSEUS_DEFAULT_TEI_LIMITS_V1[
+        key as keyof StrictBlindPerseusTeiLimitsV1
+      ];
+    if (
+      typeof candidate !== "number" ||
+      !Number.isFinite(candidate) ||
+      !Number.isSafeInteger(candidate) ||
+      candidate <= 0 ||
+      candidate > ceiling
+    ) {
+      return false;
+    }
+  }
+  return true;
 }
 
 function sortReasonCodesV1(
@@ -524,6 +560,9 @@ export function extractStrictBlindPerseusTeiEntryV1(input: Readonly<{
   if (!selectorIsValidV1(input.selector)) {
     return { ok: false, reasonCode: "ENTRY_SELECTOR_INVALID" };
   }
+  if (!validTeiLimitsV1(input.limits)) {
+    return { ok: false, reasonCode: "RESOURCE_LIMITS_INVALID" };
+  }
 
   const limits: StrictBlindPerseusTeiLimitsV1 = {
     ...STRICT_BLIND_PERSEUS_DEFAULT_TEI_LIMITS_V1,
@@ -542,6 +581,7 @@ export function extractStrictBlindPerseusTeiEntryV1(input: Readonly<{
   let entryCount = 0;
   let byteCount = 0;
   let matchedEntry: EntryFrameV1 | null = null;
+  let matchedEntryCount = 0;
   let result: StrictBlindPerseusTeiExtractionResultV1 | null = null;
   let failure: StrictBlindPerseusPacketReasonCodeV1 | null = null;
   let rollingMarkup = "";
@@ -593,7 +633,11 @@ export function extractStrictBlindPerseusTeiEntryV1(input: Readonly<{
         spellingDepth: null,
         senses: [],
       };
-      if (selectorMatchesV1(input.selector, candidate)) matchedEntry = candidate;
+      if (selectorMatchesV1(input.selector, candidate)) {
+        matchedEntryCount += 1;
+        if (matchedEntryCount > 1) return fail("ENTRY_SELECTOR_AMBIGUOUS");
+        matchedEntry = candidate;
+      }
     }
     if (!matchedEntry) return;
     if (localName === "orth" && matchedEntry.spellingDepth === null) {
@@ -713,18 +757,7 @@ export function buildStrictBlindPerseusNotFoundPacketV1(input: Readonly<{
   if (!input.completeVerifiedSnapshot) {
     return { ok: false, packet: null, reasonCodes: ["NOT_FOUND_SNAPSHOT_UNVERIFIED"] };
   }
-  return validateStrictBlindPerseusSourcePacketV1({
-    schemaVersion: STRICT_BLIND_PERSEUS_SOURCE_PACKET_SCHEMA_V1,
-    sourceTraditionId: input.sourceTraditionId,
-    outcome: "NOT_FOUND",
-    source: input.source,
-    entry: null,
-    lookup: {
-      status: "COMPLETED_OVER_VERIFIED_SNAPSHOT",
-      coverage: "COMPLETE_VERIFIED_SNAPSHOT",
-    },
-    unavailable: null,
-  });
+  return { ok: false, packet: null, reasonCodes: ["NOT_FOUND_EVIDENCE_UNVERIFIED"] };
 }
 
 export function buildStrictBlindPerseusSourceUnavailablePacketV1(): StrictBlindPerseusUnavailablePacketV1 {
@@ -793,6 +826,7 @@ export function validateStrictBlindPerseusSourcePacketV1(
       value.entry === null &&
       value.lookup === null &&
       isRecordV1(value.unavailable) &&
+      hasExactKeysV1(value.unavailable, ["accessPerformed", "detail", "reasonCode"]) &&
       value.unavailable.reasonCode === "REUSE_AUTHORITY_UNVERIFIED" &&
       value.unavailable.detail === "SOURCE_UNAVAILABLE" &&
       value.unavailable.accessPerformed === false;
@@ -841,7 +875,11 @@ export function validateStrictBlindPerseusSourcePacketV1(
   ) {
     return { ok: false, packet: null, reasonCodes: ["PACKET_INVALID"] };
   }
-  if (value.unavailable !== null || !isRecordV1(value.lookup)) {
+  if (
+    value.unavailable !== null ||
+    !isRecordV1(value.lookup) ||
+    !hasExactKeysV1(value.lookup, ["coverage", "status"])
+  ) {
     return { ok: false, packet: null, reasonCodes: ["PACKET_INVALID"] };
   }
   if (value.outcome === "NOT_FOUND") {
@@ -854,7 +892,7 @@ export function validateStrictBlindPerseusSourcePacketV1(
     ) {
       return { ok: false, packet: null, reasonCodes: ["NOT_FOUND_LOOKUP_INCOMPLETE"] };
     }
-    return { ok: true, packet: value as StrictBlindPerseusSourcePacketV1 };
+    return { ok: false, packet: null, reasonCodes: ["NOT_FOUND_EVIDENCE_UNVERIFIED"] };
   }
   if (!isRecordV1(value.entry)) {
     return { ok: false, packet: null, reasonCodes: ["ENTRY_REQUIRED_FOR_FOUND"] };
