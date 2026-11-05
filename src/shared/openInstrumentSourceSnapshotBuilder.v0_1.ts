@@ -43,6 +43,7 @@ export type OpenInstrumentSourceSnapshotBuilderResultV0_1 =
 const TRADITION_ID_PREFIXES_V0_1: Readonly<Record<string, string>> = {
   "fjale.fjalor-shqip.v0_1": "fjale",
   "scaife.lewis-short.v0_1": "scaife",
+  "scaife.middle-liddell.v0_1": "liddell",
 };
 
 function isRecordV0_1(value: unknown): value is Record<string, unknown> {

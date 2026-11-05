@@ -63,6 +63,7 @@ export type OpenInstrumentSourceFactExtractionResultV0_1 =
 const SUPPORTED_SOURCE_TRADITIONS_V0_1 = new Set([
   "fjale.fjalor-shqip.v0_1",
   "scaife.lewis-short.v0_1",
+  "scaife.middle-liddell.v0_1",
 ]);
 
 const FORBIDDEN_SOURCE_FACT_FIELDS_V0_1 = [
