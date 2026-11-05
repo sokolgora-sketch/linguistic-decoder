@@ -499,15 +499,12 @@ async function main(): Promise<void> {
         assert(page, "Browser page was not initialized for the interpretation workbench.");
         const measureControlViewport = async (control: Locator): Promise<MobileScrollMeasurement> =>
           control.evaluate((element) => {
-            const rectFor = (node: Element | null): ViewportRect => {
-              if (!node) return null;
-              const rect = node.getBoundingClientRect();
-              return { x: rect.x, y: rect.y, width: rect.width, height: rect.height };
-            };
             const header = document.querySelector("header");
             const footer = document.querySelector("footer");
             const headerRect = header?.getBoundingClientRect() ?? null;
             const footerRect = footer?.getBoundingClientRect() ?? null;
+            const composerWordInput = document.querySelector('footer input[aria-label="Word"]');
+            const composerWordInputRect = composerWordInput?.getBoundingClientRect() ?? null;
             const safeTop = Math.max(0, Math.ceil(headerRect?.bottom ?? 0) + 8);
             const safeBottom = Math.min(window.innerHeight, Math.floor(footerRect?.top ?? window.innerHeight) - 8);
             const controlRect = element.getBoundingClientRect();
@@ -523,10 +520,30 @@ async function main(): Promise<void> {
               maxScrollY: Math.max(0, document.documentElement.scrollHeight - window.innerHeight),
               availableUnobscuredHeight: Math.max(0, safeBottom - safeTop),
               safeViewport: { top: safeTop, bottom: safeBottom },
-              controlRect: rectFor(element),
-              stickyHeaderRect: rectFor(header),
-              stickyFooterRect: rectFor(footer),
-              composerWordInputRect: rectFor(document.querySelector('footer input[aria-label="Word"]')),
+              controlRect: {
+                x: controlRect.x,
+                y: controlRect.y,
+                width: controlRect.width,
+                height: controlRect.height,
+              },
+              stickyHeaderRect: headerRect ? {
+                x: headerRect.x,
+                y: headerRect.y,
+                width: headerRect.width,
+                height: headerRect.height,
+              } : null,
+              stickyFooterRect: footerRect ? {
+                x: footerRect.x,
+                y: footerRect.y,
+                width: footerRect.width,
+                height: footerRect.height,
+              } : null,
+              composerWordInputRect: composerWordInputRect ? {
+                x: composerWordInputRect.x,
+                y: composerWordInputRect.y,
+                width: composerWordInputRect.width,
+                height: composerWordInputRect.height,
+              } : null,
               centerHit: centerHit ? {
                 tag: centerHit.tagName,
                 ariaLabel: centerHit.getAttribute("aria-label"),
