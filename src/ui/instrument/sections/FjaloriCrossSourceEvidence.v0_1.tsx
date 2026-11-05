@@ -36,7 +36,11 @@ type ComponentProposalContextV0_1 = Readonly<{
 type UserSenseAssessment = "POTENTIALLY_SUPPORTS_PROPOSAL" | "DOES_NOT_SUPPORT_PROPOSAL" | "UNDECIDED";
 type EvidenceState =
   | Readonly<{ status: "loading" }>
-  | Readonly<{ status: "unavailable" }>
+  | Readonly<{ status: "network-failure" }>
+  | Readonly<{ status: "timeout" }>
+  | Readonly<{ status: "unavailable"; reason: "HTTP_STATUS_UNKNOWN" }>
+  | Readonly<{ status: "http-not-found"; httpStatus: 404 }>
+  | Readonly<{ status: "http-error"; httpStatus: number }>
   | Readonly<{ status: "invalid" }>
   | Readonly<{
       status: "available";
@@ -47,6 +51,8 @@ type EvidenceState =
       hasWiktionaryDerivedSenses: boolean;
       hasPartOfSpeech: boolean;
     }>;
+
+type KeyedEvidenceState = Readonly<{ requestKey: string; evidence: EvidenceState }>;
 
 function canonicalAlbanianWord(value: string): string | null {
   if (value.length > MAX_WORD_CODEPOINTS * 2 + 16) return null;
@@ -194,7 +200,14 @@ export function FjaloriCrossSourceEvidenceV0_1({
         unresolved: componentProposal?.unresolved ?? false,
       })
     : proposalMeaning ?? "";
-  const [evidence, setEvidence] = useState<EvidenceState>({ status: "loading" });
+  const requestKey = `${word}\u0000${canonicalWord ?? ""}`;
+  const [storedEvidence, setStoredEvidence] = useState<KeyedEvidenceState>({
+    requestKey,
+    evidence: { status: "loading" },
+  });
+  const evidence = storedEvidence.requestKey === requestKey
+    ? storedEvidence.evidence
+    : { status: "loading" as const };
   const [selectedSense, setSelectedSense] = useState<Readonly<{
     entryIndex: number;
     senseIndex: number;
@@ -208,14 +221,16 @@ export function FjaloriCrossSourceEvidenceV0_1({
   }, [canonicalWord, comparisonScope]);
 
   useEffect(() => {
+    setStoredEvidence({ requestKey, evidence: { status: "loading" } });
     if (!canonicalWord) return;
 
     const controller = new AbortController();
     let disposed = false;
     let timedOut = false;
-    setEvidence({ status: "loading" });
     const timeout = window.setTimeout(() => {
+      if (disposed) return;
       timedOut = true;
+      setStoredEvidence({ requestKey, evidence: { status: "timeout" } });
       controller.abort();
     }, FETCH_TIMEOUT_MS);
 
@@ -224,7 +239,13 @@ export function FjaloriCrossSourceEvidenceV0_1({
       { cache: "force-cache", signal: controller.signal },
     )
       .then(async (response) => {
-        if (!response.ok) return { kind: "unavailable" } as const;
+        if (response.status === 404) return { kind: "http-not-found", httpStatus: 404 } as const;
+        if (!response.ok) {
+          const hasHttpStatus = Number.isInteger(response.status) && response.status >= 100 && response.status <= 599;
+          return hasHttpStatus
+            ? { kind: "http-error", httpStatus: response.status } as const
+            : { kind: "http-status-unknown" } as const;
+        }
         let payload: unknown;
         try {
           payload = await response.json() as unknown;
@@ -236,12 +257,23 @@ export function FjaloriCrossSourceEvidenceV0_1({
       })
       .then((result) => {
         if (!disposed && !timedOut) {
-          if (result.kind === "available") setEvidence(result.evidence);
-          else setEvidence({ status: result.kind });
+          if (result.kind === "available") {
+            setStoredEvidence({ requestKey, evidence: result.evidence });
+          } else if (result.kind === "invalid") {
+            setStoredEvidence({ requestKey, evidence: { status: "invalid" } });
+          } else if (result.kind === "http-not-found") {
+            setStoredEvidence({ requestKey, evidence: { status: "http-not-found", httpStatus: result.httpStatus } });
+          } else if (result.kind === "http-status-unknown") {
+            setStoredEvidence({ requestKey, evidence: { status: "unavailable", reason: "HTTP_STATUS_UNKNOWN" } });
+          } else {
+            setStoredEvidence({ requestKey, evidence: { status: "http-error", httpStatus: result.httpStatus } });
+          }
         }
       })
       .catch(() => {
-        if (!disposed) setEvidence({ status: "unavailable" });
+        if (!disposed && !timedOut) {
+          setStoredEvidence({ requestKey, evidence: { status: "network-failure" } });
+        }
       })
       .finally(() => window.clearTimeout(timeout));
 
@@ -250,7 +282,7 @@ export function FjaloriCrossSourceEvidenceV0_1({
       window.clearTimeout(timeout);
       controller.abort();
     };
-  }, [canonicalWord]);
+  }, [canonicalWord, requestKey]);
 
   if (!canonicalWord) return null;
 
@@ -267,9 +299,25 @@ export function FjaloriCrossSourceEvidenceV0_1({
       </div>
       {evidence.status === "loading" ? (
         <p className="mt-1">Loading this bounded FjaloriShqip word record…</p>
+      ) : evidence.status === "network-failure" ? (
+        <p className="mt-1" data-testid="fjalori-evidence-null">
+          SOURCE_UNAVAILABLE · NETWORK_FAILURE · UNKNOWN_OR_NULL — the FjaloriShqip endpoint could not be reached. This does not establish that the word is absent from Albanian or other sources.
+        </p>
+      ) : evidence.status === "timeout" ? (
+        <p className="mt-1" data-testid="fjalori-evidence-null">
+          SOURCE_UNAVAILABLE · TIMEOUT · UNKNOWN_OR_NULL — the FjaloriShqip request exceeded the 8-second limit. This does not establish that the word is absent from Albanian or other sources.
+        </p>
       ) : evidence.status === "unavailable" ? (
         <p className="mt-1" data-testid="fjalori-evidence-null">
-          SOURCE_UNAVAILABLE · UNKNOWN_OR_NULL — this FjaloriShqip request did not return a usable response. That does not establish that the word is absent from Albanian or other sources.
+          SOURCE_UNAVAILABLE · UNKNOWN_OR_NULL — the response did not expose a usable HTTP status. This does not establish that the word is absent from Albanian or other sources.
+        </p>
+      ) : evidence.status === "http-not-found" ? (
+        <p className="mt-1" data-testid="fjalori-evidence-null">
+          SOURCE_HTTP_NOT_FOUND · HTTP 404 · UNKNOWN_OR_NULL — the exact FjaloriShqip endpoint request returned HTTP 404. This is transport evidence only and does not establish that the word is absent from Albanian or other sources.
+        </p>
+      ) : evidence.status === "http-error" ? (
+        <p className="mt-1" data-testid="fjalori-evidence-null">
+          SOURCE_HTTP_ERROR · HTTP {evidence.httpStatus} · UNKNOWN_OR_NULL — the FjaloriShqip endpoint returned a non-success HTTP response. This does not establish that the word is absent from Albanian or other sources.
         </p>
       ) : evidence.status === "invalid" ? (
         <p className="mt-1" data-testid="fjalori-evidence-null">
