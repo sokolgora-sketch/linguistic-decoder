@@ -3,7 +3,7 @@
 import { mkdir, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, relative } from "node:path";
-import { chromium, type Browser, type Page, type Request } from "playwright";
+import { chromium, type Browser, type Locator, type Page, type Request } from "playwright";
 import { startNextServer } from "../../tests/helpers/ownedNextServer";
 
 type SmokeCase = {
@@ -56,10 +56,25 @@ type ConsoleDiagnostic = {
   timing: InteractionTiming;
 };
 
+type ViewportRect = { x: number; y: number; width: number; height: number } | null;
+type MobileScrollMeasurement = {
+  viewport: { width: number; height: number };
+  scrollY: number;
+  maxScrollY: number;
+  availableUnobscuredHeight: number;
+  safeViewport: { top: number; bottom: number };
+  controlRect: ViewportRect;
+  stickyHeaderRect: ViewportRect;
+  stickyFooterRect: ViewportRect;
+  composerWordInputRect: ViewportRect;
+  centerHit: { tag: string; ariaLabel: string | null; placeholder: string | null } | null;
+};
+
 type CaseResult = {
   analyzeInteractionIndex: number;
   word: string;
   viewport: "desktop" | "mobile";
+  submissionMethod: "ANALYZE_BUTTON" | "ENTER_KEY";
   expectedVoices: string;
   observedVoices: string | null;
   expectedGraphemes: string[];
@@ -94,7 +109,19 @@ type InterpretationCaseResult = {
   finalMechanicalSpelling: string | null;
   exactComparison: string | null;
   warningCodes: string[];
+  authorityStatus: string | null;
+  linguisticValidity: string | null;
   sourceLookup: "NOT_REQUESTED" | "SYNTHETIC_FIXTURE_SELECTED_MANUALLY";
+  sourceAssessmentStatus: string | null;
+  componentDraftReset: boolean | null;
+  sourceSenseSelectionReset: boolean | null;
+  sourceAssessmentReset: boolean | null;
+  controlsChecked: string[];
+  controlsObscured: string[];
+  mobileScrollMeasurements: { before: MobileScrollMeasurement; after: MobileScrollMeasurement } | null;
+  horizontalOverflowPx: number | null;
+  browserErrors: string[];
+  hydrationErrors: string[];
   proposalStatus: string | null;
   strictEmbryoMeaning: string | null;
   screenshot: string | null;
@@ -102,7 +129,7 @@ type InterpretationCaseResult = {
 };
 
 type SmokeReport = {
-  schemaVersion: "open-instrument.structural-and-interpretation-browser-smoke.v0.2";
+  schemaVersion: "open-instrument.structural-and-interpretation-browser-smoke.v0.3";
   currentHead: string | null;
   expectedMain: string;
   page: string;
@@ -273,7 +300,7 @@ async function main(): Promise<void> {
   await mkdir(screenshotDirectory, { recursive: true });
 
   const report: SmokeReport = {
-    schemaVersion: "open-instrument.structural-and-interpretation-browser-smoke.v0.2",
+    schemaVersion: "open-instrument.structural-and-interpretation-browser-smoke.v0.3",
     currentHead: process.env.OPEN_INSTRUMENT_PR_HEAD ?? null,
     expectedMain: "8a172fe697fbcd2c1a93f3b0baaa96ca6f3b52f4",
     page: "/chat?debug=1",
@@ -448,35 +475,150 @@ async function main(): Promise<void> {
         finalMechanicalSpelling: null,
         exactComparison: null,
         warningCodes: [],
+        authorityStatus: null,
+        linguisticValidity: null,
         sourceLookup: "NOT_REQUESTED",
+        sourceAssessmentStatus: null,
+        componentDraftReset: null,
+        sourceSenseSelectionReset: null,
+        sourceAssessmentReset: null,
+        controlsChecked: [],
+        controlsObscured: [],
+        mobileScrollMeasurements: null,
+        horizontalOverflowPx: null,
+        browserErrors: [],
+        hydrationErrors: [],
         proposalStatus: null,
         strictEmbryoMeaning: null,
         screenshot: null,
         failure: null,
       };
+      const pageErrorStart = pageErrors.length;
+      const hydrationErrorStart = hydrationErrors.length;
       try {
         assert(page, "Browser page was not initialized for the interpretation workbench.");
+        const measureControlViewport = async (control: Locator): Promise<MobileScrollMeasurement> =>
+          control.evaluate((element) => {
+            const rectFor = (node: Element | null): ViewportRect => {
+              if (!node) return null;
+              const rect = node.getBoundingClientRect();
+              return { x: rect.x, y: rect.y, width: rect.width, height: rect.height };
+            };
+            const header = document.querySelector("header");
+            const footer = document.querySelector("footer");
+            const headerRect = header?.getBoundingClientRect() ?? null;
+            const footerRect = footer?.getBoundingClientRect() ?? null;
+            const safeTop = Math.max(0, Math.ceil(headerRect?.bottom ?? 0) + 8);
+            const safeBottom = Math.min(window.innerHeight, Math.floor(footerRect?.top ?? window.innerHeight) - 8);
+            const controlRect = element.getBoundingClientRect();
+            const centerHit = controlRect.width > 0 && controlRect.height > 0
+              ? document.elementFromPoint(
+                controlRect.left + controlRect.width / 2,
+                controlRect.top + controlRect.height / 2,
+              )
+              : null;
+            return {
+              viewport: { width: window.innerWidth, height: window.innerHeight },
+              scrollY: window.scrollY,
+              maxScrollY: Math.max(0, document.documentElement.scrollHeight - window.innerHeight),
+              availableUnobscuredHeight: Math.max(0, safeBottom - safeTop),
+              safeViewport: { top: safeTop, bottom: safeBottom },
+              controlRect: rectFor(element),
+              stickyHeaderRect: rectFor(header),
+              stickyFooterRect: rectFor(footer),
+              composerWordInputRect: rectFor(document.querySelector('footer input[aria-label="Word"]')),
+              centerHit: centerHit ? {
+                tag: centerHit.tagName,
+                ariaLabel: centerHit.getAttribute("aria-label"),
+                placeholder: centerHit.getAttribute("placeholder"),
+              } : null,
+            };
+          });
+        const ensureControlUnobscured = async (control: Locator, name: string): Promise<void> => {
+          if (viewport === "mobile") {
+            const before = await measureControlViewport(control);
+            await control.evaluate((element) => {
+              element.scrollIntoView({ block: "start", inline: "nearest", behavior: "instant" });
+              const headerBottom = document.querySelector("header")?.getBoundingClientRect().bottom ?? 0;
+              const footerTop = document.querySelector("footer")?.getBoundingClientRect().top ?? window.innerHeight;
+              const safeTop = Math.max(0, Math.ceil(headerBottom) + 8);
+              const safeBottom = Math.min(window.innerHeight, Math.floor(footerTop) - 8);
+              const safeHeight = safeBottom - safeTop;
+              if (safeHeight <= 0) return;
+              const rect = element.getBoundingClientRect();
+              const targetCenter = safeTop + safeHeight / 2;
+              window.scrollBy({ top: rect.top + rect.height / 2 - targetCenter, behavior: "instant" });
+            });
+            const after = await measureControlViewport(control);
+            if (name === "My Interpretation tab") {
+              interpretation.mobileScrollMeasurements = { before, after };
+            }
+          } else {
+            await control.evaluate((element) => element.scrollIntoView({ block: "center", inline: "nearest" }));
+          }
+          const hitTest = await control.evaluate((element) => {
+            const rect = element.getBoundingClientRect();
+            const point = { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
+            const hit = rect.width > 0 && rect.height > 0
+              ? document.elementFromPoint(point.x, point.y)
+              : null;
+            return {
+              unobscured: hit === element || (hit !== null && element.contains(hit)),
+              rect: { x: rect.x, y: rect.y, width: rect.width, height: rect.height },
+              point,
+              viewport: { width: window.innerWidth, height: window.innerHeight },
+              hit: hit ? {
+                tag: hit.tagName,
+                id: hit.id,
+                className: String(hit.className),
+                role: hit.getAttribute("role"),
+                text: hit.textContent?.trim().slice(0, 80) ?? "",
+              } : null,
+            };
+          });
+          interpretation.controlsChecked.push(name);
+          if (!hitTest.unobscured) interpretation.controlsObscured.push(name);
+          assert(hitTest.unobscured, `${viewport} control is obscured: ${name}: ${JSON.stringify(hitTest)}.`);
+        };
         const interpretationTab = page.getByRole("tab", { name: "My Interpretation", exact: true });
-        await interpretationTab.evaluate((element) => element.scrollIntoView({ block: "start", inline: "nearest" }));
-        await page.evaluate(() => window.scrollBy({ top: -96, behavior: "instant" }));
-        const tabCenterIsUnobscured = await interpretationTab.evaluate((element) => {
-          const rect = element.getBoundingClientRect();
-          const hit = document.elementFromPoint(rect.left + rect.width / 2, rect.top + rect.height / 2);
-          return hit === element || (hit !== null && element.contains(hit));
-        });
-        assert(tabCenterIsUnobscured, "My Interpretation tab is obscured at its centered mobile/desktop position.");
+        await ensureControlUnobscured(interpretationTab, "My Interpretation tab");
         await interpretationTab.click();
         assert(await interpretationTab.getAttribute("aria-selected") === "true", "My Interpretation tab did not become selected.");
         const workbench = page.getByTestId("single-word-motivation-workbench");
         await workbench.waitFor({ state: "visible" });
+        const fillControl = async (label: string, value: string): Promise<void> => {
+          const control = workbench.getByLabel(label, { exact: true });
+          await ensureControlUnobscured(control, label);
+          await control.fill(value);
+        };
+        const selectControl = async (label: string, value: string): Promise<void> => {
+          const control = workbench.getByLabel(label, { exact: true });
+          await ensureControlUnobscured(control, label);
+          await control.selectOption(value);
+        };
+        const clickControl = async (control: Locator, name: string): Promise<void> => {
+          await ensureControlUnobscured(control, name);
+          await control.click();
+        };
+        const checkControl = async (label: string): Promise<void> => {
+          const control = workbench.getByLabel(label, { exact: true });
+          await ensureControlUnobscured(control, label);
+          await control.check();
+        };
         const targetInput = workbench.getByRole("textbox", { name: "Exact target word", exact: true });
+        await ensureControlUnobscured(targetInput, "Exact target word");
         assert(await targetInput.inputValue() === word, `Workbench target did not reset to ${word}.`);
         const mechanical = workbench.getByTestId("single-word-mechanical-result");
 
         if (word === "KANDIL") {
           assert(await mechanical.getAttribute("data-status") === "NOT_SUBMITTED", "KANDIL inherited a prior mechanical result.");
-          assert(await workbench.getByLabel("Component 1 exact spelling").inputValue() === "", "KANDIL inherited a prior component draft.");
-          assert(syntheticFjaloriRequestCount(report) === 0, "A component source lookup ran before the user selected Check source.");
+          interpretation.componentDraftReset = await workbench.getByLabel("Component 1 exact spelling").inputValue() === "";
+          interpretation.sourceSenseSelectionReset = await workbench.getByTestId("fjalori-selected-sense").count() === 0;
+          interpretation.sourceAssessmentReset = await workbench.getByLabel(/USER_INTERPRETATION assessment/u).count() === 0;
+          assert(interpretation.componentDraftReset, "KANDIL inherited a prior component draft.");
+          assert(interpretation.sourceSenseSelectionReset, "KANDIL inherited a prior source-sense selection.");
+          assert(interpretation.sourceAssessmentReset, "KANDIL inherited a prior source assessment.");
+          const sourceRequestCountBefore = syntheticFjaloriRequestCount(report);
 
           const entries: Array<[string, string]> = [
             ["Target language", "Albanian"],
@@ -492,18 +634,23 @@ async function main(): Promise<void> {
             ["Component 2 dialect", "Gheg"],
             ["Proposed functional explanation", "Have sun / have light · user hypothesis"],
           ];
-          for (const [label, value] of entries) await workbench.getByLabel(label, { exact: true }).fill(value);
-          await workbench.getByLabel("Component 1 evidence status", { exact: true }).selectOption("USER_PROPOSED");
-          await workbench.getByRole("button", { name: "Check source for component 1", exact: true }).click();
+          for (const [label, value] of entries) await fillControl(label, value);
+          await selectControl("Component 1 evidence status", "USER_PROPOSED");
+          const checkSourceButton = workbench.getByRole("button", { name: "Check source for component 1", exact: true });
+          await clickControl(checkSourceButton, "Check source for component 1");
           const sourceGloss = workbench.getByTestId("fjalori-source-sense-gloss");
           await sourceGloss.waitFor({ state: "visible" });
           assert((await sourceGloss.innerText()).includes("Synthetic browser fixture only"), "Source fixture was not visibly labeled synthetic.");
-          assert(syntheticFjaloriRequestCount(report) === 1, "The manual source lookup did not use exactly one bounded fixture request.");
-          assert(report.syntheticFjaloriRequests[0] === "https://fjalorishqip.org/api/v1/fjala/kan.json", "Unexpected source fixture request URL.");
-          await workbench.getByRole("button", { name: "Select source sense entry 1 sense 1 for inspection", exact: true }).click();
-          const assessment = workbench.getByLabel("USER_INTERPRETATION assessment for entry 1 sense 1", { exact: true });
+          assert(syntheticFjaloriRequestCount(report) === sourceRequestCountBefore + 1, "The manual source lookup did not use exactly one bounded fixture request.");
+          assert(report.syntheticFjaloriRequests[sourceRequestCountBefore] === "https://fjalorishqip.org/api/v1/fjala/kan.json", "Unexpected source fixture request URL.");
+          const selectSenseButton = workbench.getByRole("button", { name: "Select source sense entry 1 sense 1 for inspection", exact: true });
+          await clickControl(selectSenseButton, "Select source sense entry 1 sense 1");
+          const assessmentLabel = "USER_INTERPRETATION assessment for entry 1 sense 1";
+          const assessment = workbench.getByLabel(assessmentLabel, { exact: true });
+          await ensureControlUnobscured(assessment, assessmentLabel);
           assert(await assessment.inputValue() === "", "A USER_INTERPRETATION assessment was auto-selected.");
           await assessment.selectOption("UNDECIDED");
+          interpretation.sourceAssessmentStatus = "UNDECIDED";
           interpretation.sourceLookup = "SYNTHETIC_FIXTURE_SELECTED_MANUALLY";
 
           const proposal = workbench.getByTestId("single-word-proposal-result");
@@ -516,27 +663,36 @@ async function main(): Promise<void> {
           assert(await workbench.getByLabel("Component 1 evidence status", { exact: true }).inputValue() === "USER_PROPOSED", "Manual source inspection promoted component evidence status.");
           assert((await proposal.innerText()).includes("have"), "The user's proposed meaning was not retained.");
 
-          await workbench.getByTestId("single-word-add-mechanical-operation").click();
-          await workbench.getByLabel("Mechanical operation 1 type", { exact: true }).selectOption("SUBSTITUTE");
-          await workbench.getByLabel("Mechanical operation 1 position", { exact: true }).fill("5");
-          await workbench.getByLabel("Mechanical operation 1 expected text", { exact: true }).fill("LL");
-          await workbench.getByLabel("Mechanical operation 1 replacement text", { exact: true }).fill("L");
-          await workbench.getByTestId("single-word-examine-interpretation").click();
+          const addOperationButton = workbench.getByTestId("single-word-add-mechanical-operation");
+          await clickControl(addOperationButton, "Add mechanical operation");
+          await selectControl("Mechanical operation 1 type", "SUBSTITUTE");
+          await fillControl("Mechanical operation 1 position", "5");
+          await fillControl("Mechanical operation 1 expected text", "LL");
+          await fillControl("Mechanical operation 1 replacement text", "L");
+          await clickControl(workbench.getByTestId("single-word-examine-interpretation"), "Examine mechanical interpretation");
           assert(await mechanical.getAttribute("data-status") === "EXAMINED", "KANDIL mechanical replay was not examined.");
           const mechanicalText = await mechanical.innerText();
           assert(mechanicalText.includes("Raw component concatenation: KANDILL"), "KANDIL raw concatenation was incorrect.");
           assert(mechanicalText.includes("Final mechanical spelling: KANDIL"), "KANDIL replay result was incorrect.");
           assert(mechanicalText.includes("Exact comparison: MATCH"), "KANDIL exact comparison was incorrect.");
           assert(mechanicalText.includes("DIGRAPH_REMOVED"), "KANDIL LL digraph impact was not reported.");
+          assert(mechanicalText.includes("USER_DECLARED_UNVERIFIED"), "KANDIL mechanical authority was not explicitly unverified.");
+          assert(mechanicalText.includes("linguistic validity NOT_ASSESSED"), "KANDIL replay was promoted to a linguistic-validity assessment.");
           interpretation.rawConcatenation = "KANDILL";
           interpretation.finalMechanicalSpelling = "KANDIL";
           interpretation.exactComparison = "MATCH";
           interpretation.warningCodes = ["DIGRAPH_REMOVED"];
+          interpretation.authorityStatus = "USER_DECLARED_UNVERIFIED";
+          interpretation.linguisticValidity = "NOT_ASSESSED";
         } else if (word === "DRITARE") {
           assert(await mechanical.getAttribute("data-status") === "NOT_SUBMITTED", "DRITARE retained the previous word's replay result.");
-          assert(await workbench.getByLabel("Component 1 exact spelling").inputValue() === "", "DRITARE retained the previous word's component draft.");
-          assert(await workbench.getByTestId("fjalori-selected-sense").count() === 0, "DRITARE retained the previous word's source-sense selection.");
-          assert(syntheticFjaloriRequestCount(report) === 1, "A source request was triggered without a manual component action.");
+          interpretation.componentDraftReset = await workbench.getByLabel("Component 1 exact spelling").inputValue() === "";
+          interpretation.sourceSenseSelectionReset = await workbench.getByTestId("fjalori-selected-sense").count() === 0;
+          interpretation.sourceAssessmentReset = await workbench.getByLabel(/USER_INTERPRETATION assessment/u).count() === 0;
+          assert(interpretation.componentDraftReset, "DRITARE retained the previous word's component draft.");
+          assert(interpretation.sourceSenseSelectionReset, "DRITARE retained the previous word's source-sense selection.");
+          assert(interpretation.sourceAssessmentReset, "DRITARE retained the previous word's source assessment.");
+          const sourceRequestCountBefore = syntheticFjaloriRequestCount(report);
           const entries: Array<[string, string]> = [
             ["Target language", "Albanian"],
             ["Component 1 exact spelling", "DRIT"],
@@ -545,48 +701,74 @@ async function main(): Promise<void> {
             ["Component 2 language", "Albanian"],
             ["Proposed functional explanation", "Owner-proposed segmentation only"],
           ];
-          for (const [label, value] of entries) await workbench.getByLabel(label, { exact: true }).fill(value);
-          await workbench.getByLabel("Component 1 not yet explained", { exact: true }).check();
-          await workbench.getByLabel("Component 2 not yet explained", { exact: true }).check();
-          await workbench.getByTestId("single-word-add-mechanical-operation").click();
-          await workbench.getByLabel("Mechanical operation 1 type", { exact: true }).selectOption("OMIT");
-          await workbench.getByLabel("Mechanical operation 1 position", { exact: true }).fill("4");
-          await workbench.getByLabel("Mechanical operation 1 expected text", { exact: true }).fill("H");
-          await workbench.getByTestId("single-word-examine-interpretation").click();
+          for (const [label, value] of entries) await fillControl(label, value);
+          await checkControl("Component 1 not yet explained");
+          await checkControl("Component 2 not yet explained");
+          await clickControl(workbench.getByTestId("single-word-add-mechanical-operation"), "Add mechanical operation");
+          await selectControl("Mechanical operation 1 type", "OMIT");
+          await fillControl("Mechanical operation 1 position", "4");
+          await fillControl("Mechanical operation 1 expected text", "H");
+          await clickControl(workbench.getByTestId("single-word-examine-interpretation"), "Examine mechanical interpretation");
+          assert(syntheticFjaloriRequestCount(report) === sourceRequestCountBefore, "DRITARE unexpectedly triggered a source lookup.");
           const mechanicalText = await mechanical.innerText();
           assert(await mechanical.getAttribute("data-status") === "EXAMINED", "DRITARE mechanical replay was not examined.");
           assert(mechanicalText.includes("Raw component concatenation: DRITHARE"), "DRITARE raw concatenation was incorrect.");
           assert(mechanicalText.includes("Final mechanical spelling: DRITARE"), "DRITARE replay result was incorrect.");
           assert(mechanicalText.includes("DIGRAPH_CROSSES_COMPONENT_BOUNDARY") && mechanicalText.includes("DIGRAPH_REMOVED"), "DRITARE TH boundary impact was not reported.");
+          assert(mechanicalText.includes("USER_DECLARED_UNVERIFIED"), "DRITARE mechanical authority was not explicitly unverified.");
+          assert(mechanicalText.includes("linguistic validity NOT_ASSESSED"), "DRITARE replay was promoted to a linguistic-validity assessment.");
           assert(await workbench.getByLabel("Component 2 exact spelling", { exact: true }).inputValue() === "HARE", "The user spelling HARE was silently changed.");
           interpretation.rawConcatenation = "DRITHARE";
           interpretation.finalMechanicalSpelling = "DRITARE";
           interpretation.exactComparison = "MATCH";
           interpretation.warningCodes = ["DIGRAPH_CROSSES_COMPONENT_BOUNDARY", "DIGRAPH_REMOVED"];
+          interpretation.authorityStatus = "USER_DECLARED_UNVERIFIED";
+          interpretation.linguisticValidity = "NOT_ASSESSED";
         } else if (word === "BUKË") {
           assert(await mechanical.getAttribute("data-status") === "NOT_SUBMITTED", "BUKË was given an unsubmitted mechanical interpretation.");
-          assert(await workbench.getByLabel("Component 1 exact spelling").inputValue() === "", "BUKË inherited an earlier component proposal.");
-          assert(await workbench.getByTestId("fjalori-selected-sense").count() === 0, "BUKË inherited an earlier source-sense assessment.");
-          assert(syntheticFjaloriRequestCount(report) === 1, "BUKË triggered an unrequested source lookup.");
+          interpretation.componentDraftReset = await workbench.getByLabel("Component 1 exact spelling").inputValue() === "";
+          interpretation.sourceSenseSelectionReset = await workbench.getByTestId("fjalori-selected-sense").count() === 0;
+          interpretation.sourceAssessmentReset = await workbench.getByLabel(/USER_INTERPRETATION assessment/u).count() === 0;
+          assert(interpretation.componentDraftReset, "BUKË inherited an earlier component proposal.");
+          assert(interpretation.sourceSenseSelectionReset, "BUKË inherited an earlier source-sense selection.");
+          assert(interpretation.sourceAssessmentReset, "BUKË inherited an earlier source assessment.");
           interpretation.proposalStatus = "NOT_SUBMITTED";
           interpretation.strictEmbryoMeaning = "UNKNOWN_OR_NULL";
-        } else if (viewport === "mobile") {
+        } else if (viewport === "mobile" && word === "ËNDËRR") {
           assert(await mechanical.getAttribute("data-status") === "NOT_SUBMITTED", "Mobile target inherited a mechanical result.");
-          assert(await workbench.getByLabel("Component 1 exact spelling").inputValue() === "", "Mobile target inherited a component draft.");
+          interpretation.componentDraftReset = await workbench.getByLabel("Component 1 exact spelling").inputValue() === "";
+          interpretation.sourceSenseSelectionReset = await workbench.getByTestId("fjalori-selected-sense").count() === 0;
+          interpretation.sourceAssessmentReset = await workbench.getByLabel(/USER_INTERPRETATION assessment/u).count() === 0;
+          assert(interpretation.componentDraftReset, "Mobile target inherited a component draft.");
+          assert(interpretation.sourceSenseSelectionReset, "Mobile target inherited a source-sense selection.");
+          assert(interpretation.sourceAssessmentReset, "Mobile target inherited a source assessment.");
           interpretation.proposalStatus = "NOT_SUBMITTED";
           interpretation.strictEmbryoMeaning = "UNKNOWN_OR_NULL";
         } else {
           throw new Error(`No interpretation smoke case is defined for ${word}.`);
         }
 
-        const overflow = await page.evaluate(() => Math.max(0, document.documentElement.scrollWidth - window.innerWidth));
-        assert(overflow <= 1, `${viewport} interpretation tab has horizontal overflow (${overflow}px).`);
+        interpretation.horizontalOverflowPx = await page.evaluate(() => Math.max(0, document.documentElement.scrollWidth - window.innerWidth));
+        assert(interpretation.horizontalOverflowPx <= 1, `${viewport} interpretation tab has horizontal overflow (${interpretation.horizontalOverflowPx}px).`);
+        interpretation.browserErrors = pageErrors.slice(pageErrorStart);
+        interpretation.hydrationErrors = hydrationErrors.slice(hydrationErrorStart);
+        assert(interpretation.browserErrors.length === 0, `${viewport} browser error: ${interpretation.browserErrors.join("; ")}`);
+        assert(interpretation.hydrationErrors.length === 0, `${viewport} hydration error: ${interpretation.hydrationErrors.join("; ")}`);
         const screenshotPath = join(screenshotDirectory, `${safeSlug(word)}.my-interpretation.${viewport}.png`);
         await page.screenshot({ path: screenshotPath, fullPage: true, animations: "disabled" });
         interpretation.screenshot = relative(artifactDirectory, screenshotPath);
         interpretation.status = "PASS";
       } catch (error) {
         interpretation.failure = errorMessage(error).slice(0, 1000);
+        interpretation.browserErrors = pageErrors.slice(pageErrorStart);
+        interpretation.hydrationErrors = hydrationErrors.slice(hydrationErrorStart);
+        if (page) {
+          try {
+            interpretation.horizontalOverflowPx = await page.evaluate(() => Math.max(0, document.documentElement.scrollWidth - window.innerWidth));
+          } catch {
+            interpretation.horizontalOverflowPx = null;
+          }
+        }
       }
       return interpretation;
     };
@@ -603,6 +785,7 @@ async function main(): Promise<void> {
         analyzeInteractionIndex: report.analyzeInteractions + 1,
         word: testCase.word,
         viewport,
+        submissionMethod: "ANALYZE_BUTTON",
         expectedVoices: expectedVoicePath,
         observedVoices: null,
         expectedGraphemes: expectedGraphemeList,
@@ -638,7 +821,8 @@ async function main(): Promise<void> {
 
       try {
         assert(page, "Browser page was not initialized.");
-        await page.getByRole("textbox", { name: "Word", exact: true }).fill(testCase.word);
+        const wordInput = page.getByRole("textbox", { name: "Word", exact: true });
+        await wordInput.fill(testCase.word);
         const apiResponsePromise = page.waitForResponse((candidate) => {
           const candidateUrl = new URL(candidate.url());
           return candidateUrl.origin === localOrigin &&
@@ -651,7 +835,12 @@ async function main(): Promise<void> {
           startedAt: Date.now(),
           completedAt: null,
         };
-        await page.getByRole("button", { name: "Analyze" }).click();
+        if (viewport === "mobile" && testCase.word === "ËNDËRR") {
+          result.submissionMethod = "ENTER_KEY";
+          await wordInput.press("Enter");
+        } else {
+          await page.getByRole("button", { name: "Analyze" }).click();
+        }
         const apiResponse = await apiResponsePromise;
         result.apiStatus = apiResponse.status();
         assert(apiResponse.ok(), `Analyze API returned HTTP ${apiResponse.status()} for ${testCase.word}.`);
@@ -760,7 +949,7 @@ async function main(): Promise<void> {
 
         const shouldRunInterpretation =
           (viewport === "desktop" && ["KANDIL", "DRITARE", "BUKË"].includes(testCase.word)) ||
-          (viewport === "mobile" && testCase.word === "ËNDËRR");
+          (viewport === "mobile" && ["KANDIL", "DRITARE", "BUKË", "ËNDËRR"].includes(testCase.word));
         if (shouldRunInterpretation) {
           const interpretation = await runInterpretationCase(testCase.word, viewport);
           report.interpretationCases.push(interpretation);
@@ -804,9 +993,11 @@ async function main(): Promise<void> {
     for (const testCase of CASES) await runCase(testCase, "desktop");
     assert(page, "Browser page was not initialized before the mobile case.");
     await page.setViewportSize({ width: 390, height: 844 });
-    const mobileCase = CASES.find((testCase) => testCase.word === "ËNDËRR");
-    assert(mobileCase, "The unfamiliar-word mobile case is missing.");
-    await runCase(mobileCase, "mobile");
+    for (const mobileWord of ["KANDIL", "DRITARE", "BUKË", "ËNDËRR"]) {
+      const mobileCase = CASES.find((testCase) => testCase.word === mobileWord);
+      assert(mobileCase, `The ${mobileWord} mobile case is missing.`);
+      await runCase(mobileCase, "mobile");
+    }
     await page.waitForTimeout(150);
     await Promise.all(httpResponseInspections);
 
@@ -872,8 +1063,8 @@ async function main(): Promise<void> {
       const details = unexpectedConsoleDiagnostics.map((item) => `${item.message} at ${item.location.url}:${item.location.lineNumber}:${item.location.columnNumber}`);
       report.fatalError = [report.fatalError, ...pageErrors, ...hydrationErrors, ...details].filter(Boolean).join("; ");
     }
-    if (report.analyzeInteractions !== 17) {
-      report.fatalError = [report.fatalError, `Expected 17 Analyze interactions, observed ${report.analyzeInteractions}.`].filter(Boolean).join("; ");
+    if (report.analyzeInteractions !== 20) {
+      report.fatalError = [report.fatalError, `Expected 20 Analyze interactions, observed ${report.analyzeInteractions}.`].filter(Boolean).join("; ");
     }
     report.outcome = report.fatalError || report.cases.some((result) => result.outcome === "FAIL")
       ? "FAIL"
@@ -906,7 +1097,7 @@ async function main(): Promise<void> {
   console.log(`HTTP_ERROR_DIAGNOSTICS=${JSON.stringify(report.httpErrors)}`);
   console.log(`CONSOLE_ERROR_DIAGNOSTICS=${JSON.stringify(report.consoleDiagnostics)}`);
   assert(report.outcome === "PASS", `Hosted structural browser smoke ${report.outcome}: ${report.fatalError ?? "one or more cases failed"}`);
-  assert(report.analyzeInteractions === 17, `Expected 17 Analyze interactions, observed ${report.analyzeInteractions}.`);
+  assert(report.analyzeInteractions === 20, `Expected 20 Analyze interactions, observed ${report.analyzeInteractions}.`);
   console.log(`STRUCTURAL_BROWSER_SMOKE=${report.outcome}`);
   console.log(`ANALYZE_INTERACTIONS=${report.analyzeInteractions}`);
   console.log(`RESULT_MATRIX=${join(artifactDirectory, "result-matrix.json")}`);

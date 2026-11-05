@@ -101,18 +101,68 @@ describe("Single-word mechanical examiner v0.1", () => {
     expect(noAccentRepair.finalMechanicalSpelling).toBe("ET");
   });
 
-  it.each(["DH", "GJ", "LL", "NJ", "RR", "SH", "TH", "XH", "ZH"])(
-    "reports the Albanian %s digraph across an explicit component seam",
-    (digraph) => {
-      const result = examine(digraph, [digraph[0]!, digraph[1]!]);
-      expect(result.status).toBe("EXAMINED");
-      expect(result.finalMechanicalSpelling).toBe(digraph);
-      expect(result.warnings).toContainEqual(expect.objectContaining({
-        code: "DIGRAPH_CROSSES_COMPONENT_BOUNDARY",
-        digraph,
-      }));
-    },
-  );
+  const albanianDigraphs = ["DH", "GJ", "LL", "NJ", "RR", "SH", "TH", "XH", "ZH"] as const;
+
+  it.each(albanianDigraphs)("applies an explicit whole-%s replacement with a warning", (digraph) => {
+    const raw = `${digraph}A`;
+    const result = examine("QA", [digraph, "A"], [{
+      kind: "SUBSTITUTE", position: 0, expectedText: digraph, replacementText: "Q",
+    }]);
+
+    expect(result.status).toBe("EXAMINED");
+    expect(result.rawConcatenation).toBe(raw);
+    expect(result.operationResults[0]).toMatchObject({
+      status: "APPLIED", position: 0, intermediateBefore: raw, intermediateAfter: "QA", reasonCodes: [],
+    });
+    expect(result.finalMechanicalSpelling).toBe("QA");
+    expect(result.exactComparison).toBe("MATCH");
+    expect(result.warnings).toContainEqual(expect.objectContaining({ code: "DIGRAPH_REMOVED", digraph }));
+    expect(result.authority).toBe("USER_DECLARED_UNVERIFIED");
+    expect(result.linguisticValidity).toBe("NOT_ASSESSED");
+  });
+
+  it.each(albanianDigraphs)("applies an explicit partial-%s replacement", (digraph) => {
+    const raw = `${digraph}A`;
+    const [first, second] = Array.from(digraph);
+    const expected = `${first}AA`;
+    const result = examine(expected, [digraph, "A"], [{
+      kind: "SUBSTITUTE", position: 1, expectedText: second!, replacementText: "A",
+    }]);
+
+    expect(result.status).toBe("EXAMINED");
+    expect(result.rawConcatenation).toBe(raw);
+    expect(result.operationResults[0]).toMatchObject({ status: "APPLIED", reasonCodes: [] });
+    expect(result.finalMechanicalSpelling).toBe(expected);
+    expect(result.exactComparison).toBe("MATCH");
+    expect(result.warnings).toContainEqual(expect.objectContaining({ code: "DIGRAPH_REMOVED", digraph }));
+    expect(result.authority).toBe("USER_DECLARED_UNVERIFIED");
+    expect(result.linguisticValidity).toBe("NOT_ASSESSED");
+  });
+
+  it.each(albanianDigraphs)("applies an edit at the component seam for %s and reports the boundary", (digraph) => {
+    const [first, second] = Array.from(digraph);
+    const components = [first!, `${second}A`];
+    const raw = components.join("");
+    const expected = `${first}AA`;
+    const result = examine(expected, components, [{
+      kind: "SUBSTITUTE", position: 1, expectedText: second!, replacementText: "A",
+    }]);
+
+    expect(result.status).toBe("EXAMINED");
+    expect(result.rawConcatenation).toBe(raw);
+    expect(result.operationResults[0]).toMatchObject({ status: "APPLIED", reasonCodes: [] });
+    expect(result.finalMechanicalSpelling).toBe(expected);
+    expect(result.exactComparison).toBe("MATCH");
+    expect(result.warnings).toContainEqual(expect.objectContaining({
+      code: "DIGRAPH_CROSSES_COMPONENT_BOUNDARY", digraph, position: 1,
+    }));
+    expect(result.warnings).toContainEqual(expect.objectContaining({
+      code: "COMPONENT_BOUNDARY_AFFECTED", position: 1, operationIndex: 0,
+    }));
+    expect(result.warnings).toContainEqual(expect.objectContaining({ code: "DIGRAPH_REMOVED", digraph }));
+    expect(result.authority).toBe("USER_DECLARED_UNVERIFIED");
+    expect(result.linguisticValidity).toBe("NOT_ASSESSED");
+  });
 
   it("does not apply later edits after a rejected edit", () => {
     const result = examine("ABZ", ["AB", "C"], [
