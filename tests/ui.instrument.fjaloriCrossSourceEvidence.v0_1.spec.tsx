@@ -335,6 +335,41 @@ describe("FjaloriShqip Albanian meaning evidence v0.1", () => {
     expect(screen.queryByTestId("fjalori-component-meaning-comparison")).not.toBeInTheDocument();
   });
 
+  it("treats status zero as unavailable status information, not an HTTP error", async () => {
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: false,
+      status: 0,
+      json: async () => ({ message: "opaque response fixture" }),
+    }) as unknown as typeof fetch;
+
+    render(<FjaloriCrossSourceEvidenceV0_1 word="ka" context="component" />);
+
+    const result = await screen.findByTestId("fjalori-evidence-null");
+    expect(result).toHaveTextContent("SOURCE_UNAVAILABLE · UNKNOWN_OR_NULL");
+    expect(result).toHaveTextContent("does not establish that the word is absent");
+    expect(result).not.toHaveTextContent("HTTP 0");
+    expect(result).not.toHaveTextContent("SOURCE_HTTP_ERROR");
+    expect(screen.queryByTestId("fjalori-source-description")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("fjalori-source-sense")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("fjalori-component-meaning-comparison")).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /Select source sense/ })).not.toBeInTheDocument();
+  });
+
+  it.each([Number.NaN, 99, 600])("rejects invalid HTTP status value %s", async (status) => {
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: false,
+      status,
+      json: async () => ({ message: "invalid status fixture" }),
+    }) as unknown as typeof fetch;
+
+    render(<FjaloriCrossSourceEvidenceV0_1 word="ka" context="component" />);
+
+    const result = await screen.findByTestId("fjalori-evidence-null");
+    expect(result).toHaveTextContent("SOURCE_UNAVAILABLE · UNKNOWN_OR_NULL");
+    expect(result).not.toHaveTextContent("SOURCE_HTTP_ERROR");
+    expect(screen.queryByTestId("fjalori-source-description")).not.toBeInTheDocument();
+  });
+
   it("classifies a rejected fetch as a network failure without source meaning", async () => {
     global.fetch = jest.fn().mockRejectedValue(new TypeError("Failed to fetch")) as unknown as typeof fetch;
 

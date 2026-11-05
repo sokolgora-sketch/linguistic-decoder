@@ -241,7 +241,8 @@ export function FjaloriCrossSourceEvidenceV0_1({
       .then(async (response) => {
         if (response.status === 404) return { kind: "http-not-found", httpStatus: 404 } as const;
         if (!response.ok) {
-          return Number.isFinite(response.status)
+          const hasHttpStatus = Number.isInteger(response.status) && response.status >= 100 && response.status <= 599;
+          return hasHttpStatus
             ? { kind: "http-error", httpStatus: response.status } as const
             : { kind: "http-status-unknown" } as const;
         }
