@@ -3,7 +3,7 @@
 import { mkdir, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, relative } from "node:path";
-import { chromium, type Browser, type Page, type Request } from "playwright";
+import { chromium, type Browser, type Locator, type Page, type Request } from "playwright";
 import { startNextServer } from "../../tests/helpers/ownedNextServer";
 
 type SmokeCase = {
@@ -56,10 +56,25 @@ type ConsoleDiagnostic = {
   timing: InteractionTiming;
 };
 
+type ViewportRect = { x: number; y: number; width: number; height: number } | null;
+type MobileScrollMeasurement = {
+  viewport: { width: number; height: number };
+  scrollY: number;
+  maxScrollY: number;
+  availableUnobscuredHeight: number;
+  safeViewport: { top: number; bottom: number };
+  controlRect: ViewportRect;
+  stickyHeaderRect: ViewportRect;
+  stickyFooterRect: ViewportRect;
+  composerWordInputRect: ViewportRect;
+  centerHit: { tag: string; ariaLabel: string | null; placeholder: string | null } | null;
+};
+
 type CaseResult = {
   analyzeInteractionIndex: number;
   word: string;
   viewport: "desktop" | "mobile";
+  submissionMethod: "ANALYZE_BUTTON" | "ENTER_KEY";
   expectedVoices: string;
   observedVoices: string | null;
   expectedGraphemes: string[];
@@ -86,8 +101,35 @@ type CaseResult = {
   failure: string | null;
 };
 
+type InterpretationCaseResult = {
+  word: string;
+  viewport: "desktop" | "mobile";
+  status: "PASS" | "FAIL";
+  rawConcatenation: string | null;
+  finalMechanicalSpelling: string | null;
+  exactComparison: string | null;
+  warningCodes: string[];
+  authorityStatus: string | null;
+  linguisticValidity: string | null;
+  sourceLookup: "NOT_REQUESTED" | "SYNTHETIC_FIXTURE_SELECTED_MANUALLY";
+  sourceAssessmentStatus: string | null;
+  componentDraftReset: boolean | null;
+  sourceSenseSelectionReset: boolean | null;
+  sourceAssessmentReset: boolean | null;
+  controlsChecked: string[];
+  controlsObscured: string[];
+  mobileScrollMeasurements: { before: MobileScrollMeasurement; after: MobileScrollMeasurement } | null;
+  horizontalOverflowPx: number | null;
+  browserErrors: string[];
+  hydrationErrors: string[];
+  proposalStatus: string | null;
+  strictEmbryoMeaning: string | null;
+  screenshot: string | null;
+  failure: string | null;
+};
+
 type SmokeReport = {
-  schemaVersion: "pr2283.hosted-structural-browser-smoke.v0.1";
+  schemaVersion: "open-instrument.structural-and-interpretation-browser-smoke.v0.3";
   currentHead: string | null;
   expectedMain: string;
   page: string;
@@ -100,6 +142,8 @@ type SmokeReport = {
   pageErrors: string[];
   hydrationErrors: string[];
   cases: CaseResult[];
+  interpretationCases: InterpretationCaseResult[];
+  syntheticFjaloriRequests: string[];
   fatalError: string | null;
   outcome: "RUNNING" | "PASS" | "FAIL" | "BLOCKED";
 };
@@ -112,7 +156,9 @@ const CASES: SmokeCase[] = [
   { word: "JET", expectedVoices: ["E"], hasPinnedReference: false },
   { word: "JETË", expectedVoices: ["E", "Ë"], hasPinnedReference: false },
   { word: "BLETAR", expectedVoices: ["E", "A"], hasPinnedReference: false, screenshot: true },
+  { word: "KANDIL", expectedVoices: ["A", "I"], hasPinnedReference: false },
   { word: "DRITARE", expectedVoices: ["I", "A", "E"], hasPinnedReference: false },
+  { word: "BUKË", expectedVoices: ["U", "Ë"], hasPinnedReference: false },
   { word: "ËNDËRR", expectedVoices: ["Ë", "Ë"], hasPinnedReference: false, screenshot: true },
   { word: "RRUGË", expectedVoices: ["U", "Ë"], hasPinnedReference: false },
   { word: "GJUHË", expectedVoices: ["U", "Ë"], hasPinnedReference: false },
@@ -129,6 +175,10 @@ const STRUCTURAL_SMOKE_WORDS = new Set(CASES.map((testCase) => exactWord(testCas
 
 function assert(condition: unknown, message: string): asserts condition {
   if (!condition) throw new Error(message);
+}
+
+function syntheticFjaloriRequestCount(report: SmokeReport): number {
+  return report.syntheticFjaloriRequests.length;
 }
 
 function errorMessage(error: unknown): string {
@@ -250,9 +300,9 @@ async function main(): Promise<void> {
   await mkdir(screenshotDirectory, { recursive: true });
 
   const report: SmokeReport = {
-    schemaVersion: "pr2283.hosted-structural-browser-smoke.v0.1",
+    schemaVersion: "open-instrument.structural-and-interpretation-browser-smoke.v0.3",
     currentHead: process.env.OPEN_INSTRUMENT_PR_HEAD ?? null,
-    expectedMain: "ca821ffc55b4a4c00947010fcaf6a7444926e3fb",
+    expectedMain: "8a172fe697fbcd2c1a93f3b0baaa96ca6f3b52f4",
     page: "/chat?debug=1",
     browser: null,
     analyzeInteractions: 0,
@@ -263,6 +313,8 @@ async function main(): Promise<void> {
     pageErrors: [],
     hydrationErrors: [],
     cases: [],
+    interpretationCases: [],
+    syntheticFjaloriRequests: [],
     fatalError: null,
     outcome: "RUNNING",
   };
@@ -290,10 +342,34 @@ async function main(): Promise<void> {
     browser = await chromium.launch({ headless: true });
     report.browser = { name: "chromium", version: browser.version() };
     const context = await browser.newContext({ viewport: { width: 1280, height: 900 } });
+    const syntheticFjaloriUrl = "https://fjalorishqip.org/api/v1/fjala/kan.json";
+    const syntheticFjaloriPayload = {
+      word: "kan",
+      licence: "CC BY-SA 4.0",
+      sources: ["synthetic-browser-fixture"],
+      entries: [{
+        pos: "verb",
+        sources: ["synthetic-browser-fixture"],
+        senses: [{
+          gloss: "Synthetic browser fixture only; not lexical evidence.",
+          lang: "en",
+          source: "synthetic-browser-fixture",
+        }],
+      }],
+    };
     await context.route("**/*", async (route) => {
-      const requestUrl = new URL(route.request().url());
+      const request = route.request();
+      const requestUrl = new URL(request.url());
       if (requestUrl.origin === localOrigin) {
         await route.continue();
+      } else if (request.method() === "GET" && request.url() === syntheticFjaloriUrl) {
+        report.syntheticFjaloriRequests.push(request.url());
+        await route.fulfill({
+          status: 200,
+          contentType: "application/json",
+          headers: { "access-control-allow-origin": "*" },
+          body: JSON.stringify(syntheticFjaloriPayload),
+        });
       } else {
         blockedExternalHosts.add(requestUrl.hostname);
         await route.abort();
@@ -387,6 +463,333 @@ async function main(): Promise<void> {
     await page.getByRole("region", { name: "Open Instrument ready" }).waitFor({ state: "visible" });
 
     let previousDisplayedWord: string | null = null;
+    const runInterpretationCase = async (
+      word: string,
+      viewport: "desktop" | "mobile",
+    ): Promise<InterpretationCaseResult> => {
+      const interpretation: InterpretationCaseResult = {
+        word,
+        viewport,
+        status: "FAIL",
+        rawConcatenation: null,
+        finalMechanicalSpelling: null,
+        exactComparison: null,
+        warningCodes: [],
+        authorityStatus: null,
+        linguisticValidity: null,
+        sourceLookup: "NOT_REQUESTED",
+        sourceAssessmentStatus: null,
+        componentDraftReset: null,
+        sourceSenseSelectionReset: null,
+        sourceAssessmentReset: null,
+        controlsChecked: [],
+        controlsObscured: [],
+        mobileScrollMeasurements: null,
+        horizontalOverflowPx: null,
+        browserErrors: [],
+        hydrationErrors: [],
+        proposalStatus: null,
+        strictEmbryoMeaning: null,
+        screenshot: null,
+        failure: null,
+      };
+      const pageErrorStart = pageErrors.length;
+      const hydrationErrorStart = hydrationErrors.length;
+      try {
+        assert(page, "Browser page was not initialized for the interpretation workbench.");
+        const measureControlViewport = async (control: Locator): Promise<MobileScrollMeasurement> =>
+          control.evaluate((element) => {
+            const header = document.querySelector("header");
+            const footer = document.querySelector("footer");
+            const headerRect = header?.getBoundingClientRect() ?? null;
+            const footerRect = footer?.getBoundingClientRect() ?? null;
+            const composerWordInput = document.querySelector('footer input[aria-label="Word"]');
+            const composerWordInputRect = composerWordInput?.getBoundingClientRect() ?? null;
+            const safeTop = Math.max(0, Math.ceil(headerRect?.bottom ?? 0) + 8);
+            const safeBottom = Math.min(window.innerHeight, Math.floor(footerRect?.top ?? window.innerHeight) - 8);
+            const controlRect = element.getBoundingClientRect();
+            const centerHit = controlRect.width > 0 && controlRect.height > 0
+              ? document.elementFromPoint(
+                controlRect.left + controlRect.width / 2,
+                controlRect.top + controlRect.height / 2,
+              )
+              : null;
+            return {
+              viewport: { width: window.innerWidth, height: window.innerHeight },
+              scrollY: window.scrollY,
+              maxScrollY: Math.max(0, document.documentElement.scrollHeight - window.innerHeight),
+              availableUnobscuredHeight: Math.max(0, safeBottom - safeTop),
+              safeViewport: { top: safeTop, bottom: safeBottom },
+              controlRect: {
+                x: controlRect.x,
+                y: controlRect.y,
+                width: controlRect.width,
+                height: controlRect.height,
+              },
+              stickyHeaderRect: headerRect ? {
+                x: headerRect.x,
+                y: headerRect.y,
+                width: headerRect.width,
+                height: headerRect.height,
+              } : null,
+              stickyFooterRect: footerRect ? {
+                x: footerRect.x,
+                y: footerRect.y,
+                width: footerRect.width,
+                height: footerRect.height,
+              } : null,
+              composerWordInputRect: composerWordInputRect ? {
+                x: composerWordInputRect.x,
+                y: composerWordInputRect.y,
+                width: composerWordInputRect.width,
+                height: composerWordInputRect.height,
+              } : null,
+              centerHit: centerHit ? {
+                tag: centerHit.tagName,
+                ariaLabel: centerHit.getAttribute("aria-label"),
+                placeholder: centerHit.getAttribute("placeholder"),
+              } : null,
+            };
+          });
+        const ensureControlUnobscured = async (control: Locator, name: string): Promise<void> => {
+          if (viewport === "mobile") {
+            const before = await measureControlViewport(control);
+            await control.evaluate((element) => {
+              element.scrollIntoView({ block: "start", inline: "nearest", behavior: "instant" });
+              const headerBottom = document.querySelector("header")?.getBoundingClientRect().bottom ?? 0;
+              const footerTop = document.querySelector("footer")?.getBoundingClientRect().top ?? window.innerHeight;
+              const safeTop = Math.max(0, Math.ceil(headerBottom) + 8);
+              const safeBottom = Math.min(window.innerHeight, Math.floor(footerTop) - 8);
+              const safeHeight = safeBottom - safeTop;
+              if (safeHeight <= 0) return;
+              const rect = element.getBoundingClientRect();
+              const targetCenter = safeTop + safeHeight / 2;
+              window.scrollBy({ top: rect.top + rect.height / 2 - targetCenter, behavior: "instant" });
+            });
+            const after = await measureControlViewport(control);
+            if (name === "My Interpretation tab") {
+              interpretation.mobileScrollMeasurements = { before, after };
+            }
+          } else {
+            await control.evaluate((element) => element.scrollIntoView({ block: "center", inline: "nearest" }));
+          }
+          const hitTest = await control.evaluate((element) => {
+            const rect = element.getBoundingClientRect();
+            const point = { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
+            const hit = rect.width > 0 && rect.height > 0
+              ? document.elementFromPoint(point.x, point.y)
+              : null;
+            return {
+              unobscured: hit === element || (hit !== null && element.contains(hit)),
+              rect: { x: rect.x, y: rect.y, width: rect.width, height: rect.height },
+              point,
+              viewport: { width: window.innerWidth, height: window.innerHeight },
+              hit: hit ? {
+                tag: hit.tagName,
+                id: hit.id,
+                className: String(hit.className),
+                role: hit.getAttribute("role"),
+                text: hit.textContent?.trim().slice(0, 80) ?? "",
+              } : null,
+            };
+          });
+          interpretation.controlsChecked.push(name);
+          if (!hitTest.unobscured) interpretation.controlsObscured.push(name);
+          assert(hitTest.unobscured, `${viewport} control is obscured: ${name}: ${JSON.stringify(hitTest)}.`);
+        };
+        const interpretationTab = page.getByRole("tab", { name: "My Interpretation", exact: true });
+        await ensureControlUnobscured(interpretationTab, "My Interpretation tab");
+        await interpretationTab.click();
+        assert(await interpretationTab.getAttribute("aria-selected") === "true", "My Interpretation tab did not become selected.");
+        const workbench = page.getByTestId("single-word-motivation-workbench");
+        await workbench.waitFor({ state: "visible" });
+        const fillControl = async (label: string, value: string): Promise<void> => {
+          const control = workbench.getByLabel(label, { exact: true });
+          await ensureControlUnobscured(control, label);
+          await control.fill(value);
+        };
+        const selectControl = async (label: string, value: string): Promise<void> => {
+          const control = workbench.getByLabel(label, { exact: true });
+          await ensureControlUnobscured(control, label);
+          await control.selectOption(value);
+        };
+        const clickControl = async (control: Locator, name: string): Promise<void> => {
+          await ensureControlUnobscured(control, name);
+          await control.click();
+        };
+        const checkControl = async (label: string): Promise<void> => {
+          const control = workbench.getByLabel(label, { exact: true });
+          await ensureControlUnobscured(control, label);
+          await control.check();
+        };
+        const targetInput = workbench.getByRole("textbox", { name: "Exact target word", exact: true });
+        await ensureControlUnobscured(targetInput, "Exact target word");
+        assert(await targetInput.inputValue() === word, `Workbench target did not reset to ${word}.`);
+        const mechanical = workbench.getByTestId("single-word-mechanical-result");
+
+        if (word === "KANDIL") {
+          assert(await mechanical.getAttribute("data-status") === "NOT_SUBMITTED", "KANDIL inherited a prior mechanical result.");
+          interpretation.componentDraftReset = await workbench.getByLabel("Component 1 exact spelling").inputValue() === "";
+          interpretation.sourceSenseSelectionReset = await workbench.getByTestId("fjalori-selected-sense").count() === 0;
+          interpretation.sourceAssessmentReset = await workbench.getByLabel(/USER_INTERPRETATION assessment/u).count() === 0;
+          assert(interpretation.componentDraftReset, "KANDIL inherited a prior component draft.");
+          assert(interpretation.sourceSenseSelectionReset, "KANDIL inherited a prior source-sense selection.");
+          assert(interpretation.sourceAssessmentReset, "KANDIL inherited a prior source assessment.");
+          const sourceRequestCountBefore = syntheticFjaloriRequestCount(report);
+
+          const entries: Array<[string, string]> = [
+            ["Target language", "Albanian"],
+            ["Component 1 exact spelling", "KAN"],
+            ["Component 1 proposed meaning", "have"],
+            ["Component 1 grammatical role", "verb · user proposal"],
+            ["Component 1 language", "Albanian"],
+            ["Component 1 dialect", "Gheg"],
+            ["Component 2 exact spelling", "DILL"],
+            ["Component 2 proposed meaning", "sun"],
+            ["Component 2 grammatical role", "noun · user proposal"],
+            ["Component 2 language", "Albanian"],
+            ["Component 2 dialect", "Gheg"],
+            ["Proposed functional explanation", "Have sun / have light · user hypothesis"],
+          ];
+          for (const [label, value] of entries) await fillControl(label, value);
+          await selectControl("Component 1 evidence status", "USER_PROPOSED");
+          const checkSourceButton = workbench.getByRole("button", { name: "Check source for component 1", exact: true });
+          await clickControl(checkSourceButton, "Check source for component 1");
+          const sourceGloss = workbench.getByTestId("fjalori-source-sense-gloss");
+          await sourceGloss.waitFor({ state: "visible" });
+          assert((await sourceGloss.innerText()).includes("Synthetic browser fixture only"), "Source fixture was not visibly labeled synthetic.");
+          assert(syntheticFjaloriRequestCount(report) === sourceRequestCountBefore + 1, "The manual source lookup did not use exactly one bounded fixture request.");
+          assert(report.syntheticFjaloriRequests[sourceRequestCountBefore] === "https://fjalorishqip.org/api/v1/fjala/kan.json", "Unexpected source fixture request URL.");
+          const selectSenseButton = workbench.getByRole("button", { name: "Select source sense entry 1 sense 1 for inspection", exact: true });
+          await clickControl(selectSenseButton, "Select source sense entry 1 sense 1");
+          const assessmentLabel = "USER_INTERPRETATION assessment for entry 1 sense 1";
+          const assessment = workbench.getByLabel(assessmentLabel, { exact: true });
+          await ensureControlUnobscured(assessment, assessmentLabel);
+          assert(await assessment.inputValue() === "", "A USER_INTERPRETATION assessment was auto-selected.");
+          await assessment.selectOption("UNDECIDED");
+          interpretation.sourceAssessmentStatus = "UNDECIDED";
+          interpretation.sourceLookup = "SYNTHETIC_FIXTURE_SELECTED_MANUALLY";
+
+          const proposal = workbench.getByTestId("single-word-proposal-result");
+          interpretation.proposalStatus = "PROPOSED";
+          interpretation.strictEmbryoMeaning = "UNKNOWN_OR_NULL";
+          assert((await proposal.innerText()).includes("PROPOSED"), "Functional proposal was not kept as PROPOSED.");
+          assert((await proposal.innerText()).includes("Strict embryo meaning: Unknown / Null"), "Strict embryo meaning was promoted.");
+          assert((await proposal.innerText()).includes("A → I"), "The complete written Voice path changed after mechanical replay.");
+          assert((await proposal.innerText()).includes("historical origin: not claimed"), "Mechanical replay promoted historical origin.");
+          assert(await workbench.getByLabel("Component 1 evidence status", { exact: true }).inputValue() === "USER_PROPOSED", "Manual source inspection promoted component evidence status.");
+          assert((await proposal.innerText()).includes("have"), "The user's proposed meaning was not retained.");
+
+          const addOperationButton = workbench.getByTestId("single-word-add-mechanical-operation");
+          await clickControl(addOperationButton, "Add mechanical operation");
+          await selectControl("Mechanical operation 1 type", "SUBSTITUTE");
+          await fillControl("Mechanical operation 1 position", "5");
+          await fillControl("Mechanical operation 1 expected text", "LL");
+          await fillControl("Mechanical operation 1 replacement text", "L");
+          await clickControl(workbench.getByTestId("single-word-examine-interpretation"), "Examine mechanical interpretation");
+          assert(await mechanical.getAttribute("data-status") === "EXAMINED", "KANDIL mechanical replay was not examined.");
+          const mechanicalText = await mechanical.innerText();
+          assert(mechanicalText.includes("Raw component concatenation: KANDILL"), "KANDIL raw concatenation was incorrect.");
+          assert(mechanicalText.includes("Final mechanical spelling: KANDIL"), "KANDIL replay result was incorrect.");
+          assert(mechanicalText.includes("Exact comparison: MATCH"), "KANDIL exact comparison was incorrect.");
+          assert(mechanicalText.includes("DIGRAPH_REMOVED"), "KANDIL LL digraph impact was not reported.");
+          assert(mechanicalText.includes("USER_DECLARED_UNVERIFIED"), "KANDIL mechanical authority was not explicitly unverified.");
+          assert(mechanicalText.includes("linguistic validity NOT_ASSESSED"), "KANDIL replay was promoted to a linguistic-validity assessment.");
+          interpretation.rawConcatenation = "KANDILL";
+          interpretation.finalMechanicalSpelling = "KANDIL";
+          interpretation.exactComparison = "MATCH";
+          interpretation.warningCodes = ["DIGRAPH_REMOVED"];
+          interpretation.authorityStatus = "USER_DECLARED_UNVERIFIED";
+          interpretation.linguisticValidity = "NOT_ASSESSED";
+        } else if (word === "DRITARE") {
+          assert(await mechanical.getAttribute("data-status") === "NOT_SUBMITTED", "DRITARE retained the previous word's replay result.");
+          interpretation.componentDraftReset = await workbench.getByLabel("Component 1 exact spelling").inputValue() === "";
+          interpretation.sourceSenseSelectionReset = await workbench.getByTestId("fjalori-selected-sense").count() === 0;
+          interpretation.sourceAssessmentReset = await workbench.getByLabel(/USER_INTERPRETATION assessment/u).count() === 0;
+          assert(interpretation.componentDraftReset, "DRITARE retained the previous word's component draft.");
+          assert(interpretation.sourceSenseSelectionReset, "DRITARE retained the previous word's source-sense selection.");
+          assert(interpretation.sourceAssessmentReset, "DRITARE retained the previous word's source assessment.");
+          const sourceRequestCountBefore = syntheticFjaloriRequestCount(report);
+          const entries: Array<[string, string]> = [
+            ["Target language", "Albanian"],
+            ["Component 1 exact spelling", "DRIT"],
+            ["Component 1 language", "Albanian"],
+            ["Component 2 exact spelling", "HARE"],
+            ["Component 2 language", "Albanian"],
+            ["Proposed functional explanation", "Owner-proposed segmentation only"],
+          ];
+          for (const [label, value] of entries) await fillControl(label, value);
+          await checkControl("Component 1 not yet explained");
+          await checkControl("Component 2 not yet explained");
+          await clickControl(workbench.getByTestId("single-word-add-mechanical-operation"), "Add mechanical operation");
+          await selectControl("Mechanical operation 1 type", "OMIT");
+          await fillControl("Mechanical operation 1 position", "4");
+          await fillControl("Mechanical operation 1 expected text", "H");
+          await clickControl(workbench.getByTestId("single-word-examine-interpretation"), "Examine mechanical interpretation");
+          assert(syntheticFjaloriRequestCount(report) === sourceRequestCountBefore, "DRITARE unexpectedly triggered a source lookup.");
+          const mechanicalText = await mechanical.innerText();
+          assert(await mechanical.getAttribute("data-status") === "EXAMINED", "DRITARE mechanical replay was not examined.");
+          assert(mechanicalText.includes("Raw component concatenation: DRITHARE"), "DRITARE raw concatenation was incorrect.");
+          assert(mechanicalText.includes("Final mechanical spelling: DRITARE"), "DRITARE replay result was incorrect.");
+          assert(mechanicalText.includes("DIGRAPH_CROSSES_COMPONENT_BOUNDARY") && mechanicalText.includes("DIGRAPH_REMOVED"), "DRITARE TH boundary impact was not reported.");
+          assert(mechanicalText.includes("USER_DECLARED_UNVERIFIED"), "DRITARE mechanical authority was not explicitly unverified.");
+          assert(mechanicalText.includes("linguistic validity NOT_ASSESSED"), "DRITARE replay was promoted to a linguistic-validity assessment.");
+          assert(await workbench.getByLabel("Component 2 exact spelling", { exact: true }).inputValue() === "HARE", "The user spelling HARE was silently changed.");
+          interpretation.rawConcatenation = "DRITHARE";
+          interpretation.finalMechanicalSpelling = "DRITARE";
+          interpretation.exactComparison = "MATCH";
+          interpretation.warningCodes = ["DIGRAPH_CROSSES_COMPONENT_BOUNDARY", "DIGRAPH_REMOVED"];
+          interpretation.authorityStatus = "USER_DECLARED_UNVERIFIED";
+          interpretation.linguisticValidity = "NOT_ASSESSED";
+        } else if (word === "BUKË") {
+          assert(await mechanical.getAttribute("data-status") === "NOT_SUBMITTED", "BUKË was given an unsubmitted mechanical interpretation.");
+          interpretation.componentDraftReset = await workbench.getByLabel("Component 1 exact spelling").inputValue() === "";
+          interpretation.sourceSenseSelectionReset = await workbench.getByTestId("fjalori-selected-sense").count() === 0;
+          interpretation.sourceAssessmentReset = await workbench.getByLabel(/USER_INTERPRETATION assessment/u).count() === 0;
+          assert(interpretation.componentDraftReset, "BUKË inherited an earlier component proposal.");
+          assert(interpretation.sourceSenseSelectionReset, "BUKË inherited an earlier source-sense selection.");
+          assert(interpretation.sourceAssessmentReset, "BUKË inherited an earlier source assessment.");
+          interpretation.proposalStatus = "NOT_SUBMITTED";
+          interpretation.strictEmbryoMeaning = "UNKNOWN_OR_NULL";
+        } else if (viewport === "mobile" && word === "ËNDËRR") {
+          assert(await mechanical.getAttribute("data-status") === "NOT_SUBMITTED", "Mobile target inherited a mechanical result.");
+          interpretation.componentDraftReset = await workbench.getByLabel("Component 1 exact spelling").inputValue() === "";
+          interpretation.sourceSenseSelectionReset = await workbench.getByTestId("fjalori-selected-sense").count() === 0;
+          interpretation.sourceAssessmentReset = await workbench.getByLabel(/USER_INTERPRETATION assessment/u).count() === 0;
+          assert(interpretation.componentDraftReset, "Mobile target inherited a component draft.");
+          assert(interpretation.sourceSenseSelectionReset, "Mobile target inherited a source-sense selection.");
+          assert(interpretation.sourceAssessmentReset, "Mobile target inherited a source assessment.");
+          interpretation.proposalStatus = "NOT_SUBMITTED";
+          interpretation.strictEmbryoMeaning = "UNKNOWN_OR_NULL";
+        } else {
+          throw new Error(`No interpretation smoke case is defined for ${word}.`);
+        }
+
+        interpretation.horizontalOverflowPx = await page.evaluate(() => Math.max(0, document.documentElement.scrollWidth - window.innerWidth));
+        assert(interpretation.horizontalOverflowPx <= 1, `${viewport} interpretation tab has horizontal overflow (${interpretation.horizontalOverflowPx}px).`);
+        interpretation.browserErrors = pageErrors.slice(pageErrorStart);
+        interpretation.hydrationErrors = hydrationErrors.slice(hydrationErrorStart);
+        assert(interpretation.browserErrors.length === 0, `${viewport} browser error: ${interpretation.browserErrors.join("; ")}`);
+        assert(interpretation.hydrationErrors.length === 0, `${viewport} hydration error: ${interpretation.hydrationErrors.join("; ")}`);
+        const screenshotPath = join(screenshotDirectory, `${safeSlug(word)}.my-interpretation.${viewport}.png`);
+        await page.screenshot({ path: screenshotPath, fullPage: true, animations: "disabled" });
+        interpretation.screenshot = relative(artifactDirectory, screenshotPath);
+        interpretation.status = "PASS";
+      } catch (error) {
+        interpretation.failure = errorMessage(error).slice(0, 1000);
+        interpretation.browserErrors = pageErrors.slice(pageErrorStart);
+        interpretation.hydrationErrors = hydrationErrors.slice(hydrationErrorStart);
+        if (page) {
+          try {
+            interpretation.horizontalOverflowPx = await page.evaluate(() => Math.max(0, document.documentElement.scrollWidth - window.innerWidth));
+          } catch {
+            interpretation.horizontalOverflowPx = null;
+          }
+        }
+      }
+      return interpretation;
+    };
+
     const runCase = async (testCase: SmokeCase, viewport: "desktop" | "mobile"): Promise<void> => {
       const expectedBasis = normalizedWord(testCase.word);
       const expectedVoicePath = testCase.unsupportedStructuralInput
@@ -399,6 +802,7 @@ async function main(): Promise<void> {
         analyzeInteractionIndex: report.analyzeInteractions + 1,
         word: testCase.word,
         viewport,
+        submissionMethod: "ANALYZE_BUTTON",
         expectedVoices: expectedVoicePath,
         observedVoices: null,
         expectedGraphemes: expectedGraphemeList,
@@ -434,7 +838,8 @@ async function main(): Promise<void> {
 
       try {
         assert(page, "Browser page was not initialized.");
-        await page.getByRole("textbox", { name: "Word", exact: true }).fill(testCase.word);
+        const wordInput = page.getByRole("textbox", { name: "Word", exact: true });
+        await wordInput.fill(testCase.word);
         const apiResponsePromise = page.waitForResponse((candidate) => {
           const candidateUrl = new URL(candidate.url());
           return candidateUrl.origin === localOrigin &&
@@ -447,7 +852,12 @@ async function main(): Promise<void> {
           startedAt: Date.now(),
           completedAt: null,
         };
-        await page.getByRole("button", { name: "Analyze" }).click();
+        if (viewport === "mobile" && testCase.word === "ËNDËRR") {
+          result.submissionMethod = "ENTER_KEY";
+          await wordInput.press("Enter");
+        } else {
+          await page.getByRole("button", { name: "Analyze" }).click();
+        }
         const apiResponse = await apiResponsePromise;
         result.apiStatus = apiResponse.status();
         assert(apiResponse.ok(), `Analyze API returned HTTP ${apiResponse.status()} for ${testCase.word}.`);
@@ -554,6 +964,15 @@ async function main(): Promise<void> {
           }
         }
 
+        const shouldRunInterpretation =
+          (viewport === "desktop" && ["KANDIL", "DRITARE", "BUKË"].includes(testCase.word)) ||
+          (viewport === "mobile" && ["KANDIL", "DRITARE", "BUKË", "ËNDËRR"].includes(testCase.word));
+        if (shouldRunInterpretation) {
+          const interpretation = await runInterpretationCase(testCase.word, viewport);
+          report.interpretationCases.push(interpretation);
+          assert(interpretation.status === "PASS", `My Interpretation smoke failed for ${testCase.word}: ${interpretation.failure ?? "unknown failure"}`);
+        }
+
         result.horizontalOverflowPx = await page.evaluate(() => Math.max(0, document.documentElement.scrollWidth - window.innerWidth));
         assert(result.horizontalOverflowPx !== null && result.horizontalOverflowPx <= 1, `Horizontal overflow (${result.horizontalOverflowPx}px) at ${viewport} viewport for ${testCase.word}.`);
         result.browserErrors = [...consoleErrors.slice(consoleOffset), ...pageErrors.slice(pageErrorOffset)];
@@ -591,9 +1010,11 @@ async function main(): Promise<void> {
     for (const testCase of CASES) await runCase(testCase, "desktop");
     assert(page, "Browser page was not initialized before the mobile case.");
     await page.setViewportSize({ width: 390, height: 844 });
-    const mobileCase = CASES.find((testCase) => testCase.word === "ËNDËRR");
-    assert(mobileCase, "The unfamiliar-word mobile case is missing.");
-    await runCase(mobileCase, "mobile");
+    for (const mobileWord of ["KANDIL", "DRITARE", "BUKË", "ËNDËRR"]) {
+      const mobileCase = CASES.find((testCase) => testCase.word === mobileWord);
+      assert(mobileCase, `The ${mobileWord} mobile case is missing.`);
+      await runCase(mobileCase, "mobile");
+    }
     await page.waitForTimeout(150);
     await Promise.all(httpResponseInspections);
 
@@ -659,8 +1080,8 @@ async function main(): Promise<void> {
       const details = unexpectedConsoleDiagnostics.map((item) => `${item.message} at ${item.location.url}:${item.location.lineNumber}:${item.location.columnNumber}`);
       report.fatalError = [report.fatalError, ...pageErrors, ...hydrationErrors, ...details].filter(Boolean).join("; ");
     }
-    if (report.analyzeInteractions !== 15) {
-      report.fatalError = [report.fatalError, `Expected 15 Analyze interactions, observed ${report.analyzeInteractions}.`].filter(Boolean).join("; ");
+    if (report.analyzeInteractions !== 20) {
+      report.fatalError = [report.fatalError, `Expected 20 Analyze interactions, observed ${report.analyzeInteractions}.`].filter(Boolean).join("; ");
     }
     report.outcome = report.fatalError || report.cases.some((result) => result.outcome === "FAIL")
       ? "FAIL"
@@ -693,7 +1114,7 @@ async function main(): Promise<void> {
   console.log(`HTTP_ERROR_DIAGNOSTICS=${JSON.stringify(report.httpErrors)}`);
   console.log(`CONSOLE_ERROR_DIAGNOSTICS=${JSON.stringify(report.consoleDiagnostics)}`);
   assert(report.outcome === "PASS", `Hosted structural browser smoke ${report.outcome}: ${report.fatalError ?? "one or more cases failed"}`);
-  assert(report.analyzeInteractions === 15, `Expected 15 Analyze interactions, observed ${report.analyzeInteractions}.`);
+  assert(report.analyzeInteractions === 20, `Expected 20 Analyze interactions, observed ${report.analyzeInteractions}.`);
   console.log(`STRUCTURAL_BROWSER_SMOKE=${report.outcome}`);
   console.log(`ANALYZE_INTERACTIONS=${report.analyzeInteractions}`);
   console.log(`RESULT_MATRIX=${join(artifactDirectory, "result-matrix.json")}`);

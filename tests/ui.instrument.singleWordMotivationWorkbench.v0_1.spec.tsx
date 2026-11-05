@@ -8,6 +8,87 @@ afterEach(() => {
 });
 
 describe("Single-word motivation workbench v0.1", () => {
+  it("keeps the KANDIL source-sense proposal separate from explicit mechanical replay", () => {
+    render(<SingleWordMotivationWorkbenchV0_1 initialTargetWord="KANDIL" />);
+    fireEvent.change(screen.getByLabelText("Target language"), { target: { value: "Albanian" } });
+    const values = [
+      ["Component 1 exact spelling", "KAN"],
+      ["Component 1 proposed meaning", "have"],
+      ["Component 1 grammatical role", "verb"],
+      ["Component 1 language", "Albanian"],
+      ["Component 1 dialect", "Gheg"],
+      ["Component 2 exact spelling", "DILL"],
+      ["Component 2 proposed meaning", "sun"],
+      ["Component 2 grammatical role", "noun"],
+      ["Component 2 language", "Albanian"],
+      ["Component 2 dialect", "Gheg"],
+      ["Proposed functional explanation", "Have sun / have light"],
+    ] as const;
+    for (const [label, value] of values) fireEvent.change(screen.getByLabelText(label), { target: { value } });
+
+    fireEvent.click(screen.getByTestId("single-word-add-mechanical-operation"));
+    fireEvent.change(screen.getByLabelText("Mechanical operation 1 position"), { target: { value: "5" } });
+    fireEvent.change(screen.getByLabelText("Mechanical operation 1 expected text"), { target: { value: "LL" } });
+    fireEvent.change(screen.getByLabelText("Mechanical operation 1 replacement text"), { target: { value: "L" } });
+    fireEvent.click(screen.getByTestId("single-word-examine-interpretation"));
+
+    const mechanical = screen.getByTestId("single-word-mechanical-result");
+    expect(mechanical).toHaveAttribute("data-status", "EXAMINED");
+    expect(mechanical).toHaveTextContent("Raw component concatenation: KANDILL");
+    expect(mechanical).toHaveTextContent("Final mechanical spelling: KANDIL");
+    expect(mechanical).toHaveTextContent("Exact comparison: MATCH");
+    expect(mechanical).toHaveTextContent("USER_DECLARED_UNVERIFIED");
+    expect(mechanical).toHaveTextContent("linguistic validity NOT_ASSESSED");
+    expect(mechanical).toHaveTextContent("DIGRAPH_REMOVED");
+
+    const proposal = screen.getByTestId("single-word-proposal-result");
+    expect(proposal).toHaveTextContent("PROPOSED");
+    expect(proposal).toHaveTextContent("Have sun / have light");
+    expect(proposal).toHaveTextContent("Strict embryo meaning: Unknown / Null");
+    expect(proposal).toHaveTextContent("A → I");
+    expect(proposal).toHaveTextContent("historical origin: not claimed");
+  });
+
+  it("replays the DRITARE H omission and keeps the HARE spelling unchanged", () => {
+    render(<SingleWordMotivationWorkbenchV0_1 initialTargetWord="DRITARE" />);
+    fireEvent.change(screen.getByLabelText("Component 1 exact spelling"), { target: { value: "DRIT" } });
+    fireEvent.change(screen.getByLabelText("Component 2 exact spelling"), { target: { value: "HARE" } });
+    fireEvent.click(screen.getByTestId("single-word-add-mechanical-operation"));
+    fireEvent.change(screen.getByLabelText("Mechanical operation 1 type"), { target: { value: "OMIT" } });
+    fireEvent.change(screen.getByLabelText("Mechanical operation 1 position"), { target: { value: "4" } });
+    fireEvent.change(screen.getByLabelText("Mechanical operation 1 expected text"), { target: { value: "H" } });
+    fireEvent.click(screen.getByTestId("single-word-examine-interpretation"));
+
+    const mechanical = screen.getByTestId("single-word-mechanical-result");
+    expect(mechanical).toHaveTextContent("Raw component concatenation: DRITHARE");
+    expect(mechanical).toHaveTextContent("Final mechanical spelling: DRITARE");
+    expect(mechanical).toHaveTextContent("DIGRAPH_CROSSES_COMPONENT_BOUNDARY");
+    expect(mechanical).toHaveTextContent("DIGRAPH_REMOVED: Operation 1 changes or removes Albanian digraph TH");
+    expect(screen.getByLabelText("Component 2 exact spelling")).toHaveValue("HARE");
+  });
+
+  it("marks replay stale after proposal changes and clears all local proposal and source state", () => {
+    render(<SingleWordMotivationWorkbenchV0_1 initialTargetWord="KANDIL" />);
+    fireEvent.change(screen.getByLabelText("Component 1 exact spelling"), { target: { value: "KAN" } });
+    fireEvent.change(screen.getByLabelText("Component 2 exact spelling"), { target: { value: "DIL" } });
+    fireEvent.click(screen.getByTestId("single-word-examine-interpretation"));
+    expect(screen.getByTestId("single-word-mechanical-result")).toHaveAttribute("data-status", "EXAMINED");
+
+    fireEvent.change(screen.getByLabelText("Component 2 exact spelling"), { target: { value: "DILL" } });
+    expect(screen.getByTestId("single-word-mechanical-result-stale")).toHaveTextContent("STALE");
+    expect(screen.getByTestId("single-word-mechanical-result")).toHaveAttribute("data-status", "NOT_SUBMITTED");
+    expect(screen.queryByText(/Final mechanical spelling:/)).not.toBeInTheDocument();
+
+    fireEvent.change(screen.getByLabelText("Proposed functional explanation"), { target: { value: "local-only proposal" } });
+    fireEvent.click(screen.getByTestId("single-word-clear-interpretation"));
+    expect(screen.getByLabelText("Exact target word")).toHaveValue("KANDIL");
+    expect(screen.getByLabelText("Component 1 exact spelling")).toHaveValue("");
+    expect(screen.getByTestId("single-word-mechanical-result")).toHaveAttribute("data-status", "NOT_SUBMITTED");
+    expect(screen.queryByTestId("single-word-mechanical-result-stale")).not.toBeInTheDocument();
+    expect(screen.queryByText("local-only proposal")).not.toBeInTheDocument();
+    expect(screen.getByTestId("single-word-proposal-incomplete")).toBeInTheDocument();
+  });
+
   it("lets a user inspect the KANDIL proposal and keeps mismatch, unverified evidence, and embryo Null visible", () => {
     render(<SingleWordMotivationWorkbenchV0_1 initialTargetWord="KANDIL" />);
     fireEvent.change(screen.getByLabelText("Target language"), { target: { value: "Albanian" } });
