@@ -22,11 +22,13 @@ source header.
 ## Extraction boundary
 
 The implementation uses the namespace-aware `saxes` parser and accepts the
-TEI/TEI.2 roots and the `entry`/`entryFree` shapes needed by the pinned files.
-It preserves source spelling, sense order, identifiers, and an explicit
-review-required status. It rejects DTDs, external entities, malformed or
-unsupported XML, ambiguous selectors, and inputs exceeding bounded resource
-limits.
+canonical TEI namespace (`http://www.tei-c.org/ns/1.0`) for `TEI` documents and
+the unnamespaced legacy `TEI.2` profile used by both pinned files. Relevant
+elements must remain in the document's accepted namespace; foreign-namespace
+roots and lexical elements are rejected. It preserves source spelling, sense
+order, identifiers, and an explicit review-required status. It rejects DTDs,
+external entities, malformed or unsupported XML, ambiguous selectors, and
+inputs exceeding bounded resource limits.
 
 `FOUND` packets contain only verified source metadata and review-required source
 extraction. `NOT_FOUND` requires an authorized completed lookup over a complete
@@ -37,6 +39,11 @@ FJALË remains fail-closed in this lane: no FJALË source was accessed, copied,
 substituted, or treated as reusable authority. Its packet is explicitly
 `SOURCE_UNAVAILABLE` with `REUSE_AUTHORITY_UNVERIFIED` and
 `accessPerformed: false`.
+
+A structurally valid packet is not, by itself, cryptographic proof that its
+entry text came from the pinned source bytes. Byte-level source verification and
+the packet's structural validation are separate boundaries; this lane does not
+claim independent cryptographic provenance for extracted entry text.
 
 The frozen three-tradition/five-stage research coverage matrix and both real
 execution locks are unchanged. This implementation performs no target lookup,

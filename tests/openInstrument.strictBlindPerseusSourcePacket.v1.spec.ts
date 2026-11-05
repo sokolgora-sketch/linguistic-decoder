@@ -8,6 +8,7 @@ import {
   STRICT_BLIND_PERSEUS_SOURCE_DEFINITIONS_V1,
   STRICT_BLIND_PERSEUS_SOURCE_PACKET_SCHEMA_V1,
   STRICT_BLIND_PERSEUS_DEFAULT_TEI_LIMITS_V1,
+  STRICT_BLIND_PERSEUS_TEI_NAMESPACE_URI_V1,
   validateStrictBlindPerseusFrozenCoverageV1,
   validateStrictBlindPerseusSourcePacketV1,
   verifyStrictBlindPerseusSourceBytesV1,
@@ -68,7 +69,13 @@ function makeEntry(): StrictBlindPerseusExtractedEntryV1 {
 
 function tei(body: string): Uint8Array {
   return new TextEncoder().encode(
-    `<?xml version="1.0"?><TEI xmlns="http://www.tei-c.org/ns/1.0"><teiHeader/><text><body>${body}</body></text></TEI>`,
+    `<?xml version="1.0"?><TEI xmlns="${STRICT_BLIND_PERSEUS_TEI_NAMESPACE_URI_V1}"><teiHeader/><text><body>${body}</body></text></TEI>`,
+  );
+}
+
+function legacyTei2(body: string): Uint8Array {
+  return new TextEncoder().encode(
+    `<?xml version="1.0"?><TEI.2><teiHeader/><text><body>${body}</body></text></TEI.2>`,
   );
 }
 
@@ -139,6 +146,40 @@ describe("strict-blind Perseus source packets v1", () => {
     if (!result.ok) throw new Error(result.reasonCode);
     expect(result.entry.attestedSpelling).toBe("ăbactor");
     expect(result.entry.entryLocator).toContain("entryFree[ordinal=0;id=n7;key=abactor]");
+  });
+
+  it("accepts the legacy unnamespaced TEI.2 profile used by the pinned sources", () => {
+    const result = extractStrictBlindPerseusTeiEntryFromBytesV1({
+      sourceTraditionId: "scaife.lewis-short.v0_1",
+      bytes: legacyTei2(
+        `<entryFree id="n7" key="abactor"><orth>ăbactor</orth><sense>one who drives off</sense></entryFree>`,
+      ),
+      selector: { entryId: "n7" },
+    });
+    expect(result.ok).toBe(true);
+  });
+
+  it.each([
+    [
+      "foreign TEI root namespace",
+      `<?xml version="1.0"?><TEI xmlns="urn:example:fake-tei"><text><body><entry id="n0"><orth>alpha</orth><sense>meaning</sense></entry></body></text></TEI>`,
+    ],
+    [
+      "foreign lexical element namespace",
+      tei(`<entry id="n0" xmlns="urn:example:foreign"><orth>alpha</orth><sense>meaning</sense></entry>`),
+    ],
+    [
+      "foreign lexical element namespace in legacy TEI.2",
+      legacyTei2(`<entryFree id="n0" xmlns="urn:example:foreign"><orth>alpha</orth><sense>meaning</sense></entryFree>`),
+    ],
+  ])("rejects %s", (_label, bytes) => {
+    expect(
+      extractStrictBlindPerseusTeiEntryFromBytesV1({
+        sourceTraditionId: "scaife.middle-liddell.v0_1",
+        bytes: typeof bytes === "string" ? new TextEncoder().encode(bytes) : bytes,
+        selector: { entryId: "n0" },
+      }),
+    ).toEqual({ ok: false, reasonCode: "UNSUPPORTED_TEI_NAMESPACE" });
   });
 
   it("rejects duplicate ID or key selector matches instead of replacing the earlier entry", () => {

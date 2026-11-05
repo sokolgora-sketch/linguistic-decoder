@@ -32,6 +32,9 @@ export const STRICT_BLIND_PERSEUS_LICENSE_V1 = "CC-BY-SA-4.0" as const;
 export const STRICT_BLIND_PERSEUS_LICENSE_REFERENCE_V1 =
   "https://creativecommons.org/licenses/by-sa/4.0/" as const;
 
+export const STRICT_BLIND_PERSEUS_TEI_NAMESPACE_URI_V1 =
+  "http://www.tei-c.org/ns/1.0" as const;
+
 type PerseusSourceTraditionIdV1 =
   (typeof STRICT_BLIND_PERSEUS_SOURCE_TRADITIONS_V1)[number];
 
@@ -217,6 +220,7 @@ export type StrictBlindPerseusPacketReasonCodeV1 =
   | "EXTERNAL_ENTITY_FORBIDDEN"
   | "MALFORMED_XML"
   | "UNSUPPORTED_TEI_SCHEMA"
+  | "UNSUPPORTED_TEI_NAMESPACE"
   | "ENTRY_SELECTOR_INVALID"
   | "ENTRY_SELECTOR_AMBIGUOUS"
   | "ENTRY_NOT_FOUND"
@@ -291,6 +295,7 @@ const STRICT_BLIND_PERSEUS_TEI_LIMIT_KEYS_V1 = [
 ] as const satisfies readonly (keyof StrictBlindPerseusTeiLimitsV1)[];
 
 type TeiChunkV1 = string | Uint8Array;
+type TeiNamespaceV1 = "" | typeof STRICT_BLIND_PERSEUS_TEI_NAMESPACE_URI_V1;
 type EntryFrameV1 = {
   depth: number;
   ordinal: number;
@@ -473,6 +478,10 @@ function localNameV1(tag: SaxesTagNS): string {
   return tag.local ?? tag.name.split(":").at(-1) ?? tag.name;
 }
 
+function namespaceUriV1(tag: SaxesTagNS): string {
+  return tag.uri;
+}
+
 function selectorIsValidV1(selector: StrictBlindPerseusTeiEntrySelectorV1): boolean {
   const fields = [selector.entryId, selector.entryKey, selector.entryOrdinal].filter(
     (value) => value !== undefined,
@@ -574,9 +583,10 @@ export function extractStrictBlindPerseusTeiEntryV1(input: Readonly<{
     fragment: false,
     fileName: definition.sourcePath,
   });
-  const stack: Array<{ depth: number; localName: string }> = [];
+  const stack: Array<{ depth: number; localName: string; namespaceUri: string }> = [];
   let rootSeen = false;
   let rootClosed = false;
+  let documentNamespace: TeiNamespaceV1 | null = null;
   let elementCount = 0;
   let entryCount = 0;
   let byteCount = 0;
@@ -608,15 +618,30 @@ export function extractStrictBlindPerseusTeiEntryV1(input: Readonly<{
     }
 
     const localName = localNameV1(tag);
-    stack.push({ depth, localName });
+    const namespaceUri = namespaceUriV1(tag);
     if (!rootSeen) {
       rootSeen = true;
-      if (localName !== "TEI.2" && localName !== "TEI") {
+      if (localName === "TEI.2" && namespaceUri === "") {
+        documentNamespace = "";
+      } else if (
+        localName === "TEI" &&
+        namespaceUri === STRICT_BLIND_PERSEUS_TEI_NAMESPACE_URI_V1
+      ) {
+        documentNamespace = STRICT_BLIND_PERSEUS_TEI_NAMESPACE_URI_V1;
+      } else if (localName === "TEI.2" || localName === "TEI") {
+        fail("UNSUPPORTED_TEI_NAMESPACE");
+      } else {
         fail("UNSUPPORTED_TEI_SCHEMA");
       }
+      stack.push({ depth, localName, namespaceUri });
       return;
     }
+    if (namespaceUri !== documentNamespace) {
+      stack.push({ depth, localName, namespaceUri });
+      return fail("UNSUPPORTED_TEI_NAMESPACE");
+    }
     if (depth === 1) rootClosed = false;
+    stack.push({ depth, localName, namespaceUri });
 
     if (localName === "entryFree" || localName === "entry") {
       entryCount += 1;
