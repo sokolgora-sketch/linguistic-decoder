@@ -16,6 +16,7 @@ function responseFor(
   const entrySources = options.entrySources ?? [["en-wiktionary", "wikidata"]];
   return {
     ok: true,
+    status: 200,
     json: async () => ({
       word,
       licence: "CC BY-SA 4.0",
@@ -77,6 +78,38 @@ describe("FjaloriShqip Albanian meaning evidence v0.1", () => {
     );
   });
 
+  it("preserves the KAN proposal spelling while requesting the established canonical form", async () => {
+    const fetchMock = jest.fn().mockResolvedValue(responseFor("kan"));
+    global.fetch = fetchMock as unknown as typeof fetch;
+    const componentProposal = {
+      componentId: "0",
+      exactSpelling: "KAN",
+      proposedMeaning: "user proposed meaning",
+      proposedGrammaticalRole: "UNKNOWN_OR_NULL",
+      language: "Albanian",
+      dialect: "",
+      unresolved: false,
+    };
+
+    render(
+      <FjaloriCrossSourceEvidenceV0_1
+        word="KAN"
+        context="component"
+        componentProposal={componentProposal}
+      />,
+    );
+
+    expect(await screen.findByText("Përshkrim prove për kan")).toBeInTheDocument();
+    expect(fetchMock).toHaveBeenCalledWith(
+      "https://fjalorishqip.org/api/v1/fjala/kan.json",
+      expect.objectContaining({ cache: "force-cache" }),
+    );
+    expect(screen.queryByTestId("fjalori-selected-sense")).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Select source sense entry 1 sense 1 for inspection" }));
+    expect(screen.getByTestId("fjalori-component-meaning-comparison")).toHaveTextContent("Component spelling: KAN");
+    expect(screen.getByTestId("fjalori-component-meaning-comparison")).toHaveTextContent("Proposed meaning: user proposed meaning");
+  });
+
   it("keeps dritare source description, existing instrument reading, and unverified structure/history distinct", async () => {
     global.fetch = jest.fn().mockResolvedValue(responseFor("dritare", {
       description: "Përshkrim i burimit për dritare",
@@ -104,8 +137,9 @@ describe("FjaloriShqip Albanian meaning evidence v0.1", () => {
   });
 
   it("preserves source POS entries, individual senses, source order, and local-only sense assessment", async () => {
-    global.fetch = jest.fn().mockResolvedValue({
+    const fetchMock = jest.fn().mockResolvedValue({
       ok: true,
+      status: 200,
       json: async () => ({
         word: "ka",
         licence: "CC BY-SA 4.0",
@@ -140,7 +174,8 @@ describe("FjaloriShqip Albanian meaning evidence v0.1", () => {
           },
         ],
       }),
-    }) as unknown as typeof fetch;
+    });
+    global.fetch = fetchMock as unknown as typeof fetch;
 
     const componentProposal = {
       componentId: "0",
@@ -158,6 +193,11 @@ describe("FjaloriShqip Albanian meaning evidence v0.1", () => {
         proposalMeaning="has"
         componentProposal={componentProposal}
       />,
+    );
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      "https://fjalorishqip.org/api/v1/fjala/ka.json",
+      expect.objectContaining({ cache: "force-cache" }),
     );
 
     const entries = await screen.findAllByTestId("fjalori-source-entry");
@@ -235,16 +275,83 @@ describe("FjaloriShqip Albanian meaning evidence v0.1", () => {
     expect(global.fetch).toHaveBeenCalledTimes(1);
   });
 
-  it("distinguishes unavailable, invalid, and valid records without usable senses", async () => {
-    const unavailableFetch = jest.fn().mockResolvedValue({ ok: false, json: async () => ({}) });
-    global.fetch = unavailableFetch as unknown as typeof fetch;
-    const unavailable = render(<FjaloriCrossSourceEvidenceV0_1 word="dill" context="component" />);
-    expect(await screen.findByTestId("fjalori-evidence-null")).toHaveTextContent("SOURCE_UNAVAILABLE · UNKNOWN_OR_NULL");
-    expect(screen.getByTestId("fjalori-evidence-null")).toHaveTextContent("does not establish that the word is absent");
-    unavailable.unmount();
+  it("reports an HTML 404 as endpoint evidence without parsing it as JSON", async () => {
+    const json = jest.fn();
+    const fetchMock = jest.fn().mockResolvedValue({
+      ok: false,
+      status: 404,
+      headers: { get: () => "text/html; charset=utf-8" },
+      text: async () => "<html>Not Found</html>",
+      json,
+    });
+    global.fetch = fetchMock as unknown as typeof fetch;
 
+    render(<FjaloriCrossSourceEvidenceV0_1 word="KAN" context="component" />);
+
+    const result = await screen.findByTestId("fjalori-evidence-null");
+    expect(result).toHaveTextContent("SOURCE_HTTP_NOT_FOUND · HTTP 404 · UNKNOWN_OR_NULL");
+    expect(result).toHaveTextContent("exact FjaloriShqip endpoint request returned HTTP 404");
+    expect(result).toHaveTextContent("does not establish that the word is absent");
+    expect(result).not.toHaveTextContent("SOURCE_REPORTED");
+    expect(json).not.toHaveBeenCalled();
+    expect(screen.queryByTestId("fjalori-source-description")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("fjalori-component-meaning-comparison")).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /Select source sense/ })).not.toBeInTheDocument();
+    expect(fetchMock).toHaveBeenCalledWith(
+      "https://fjalorishqip.org/api/v1/fjala/kan.json",
+      expect.objectContaining({ cache: "force-cache" }),
+    );
+  });
+
+  it.each([403, 429, 500, 503])("reports HTTP %i distinctly from source unavailability", async (status) => {
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: false,
+      status,
+      json: async () => ({ message: "HTTP error fixture" }),
+    }) as unknown as typeof fetch;
+
+    render(<FjaloriCrossSourceEvidenceV0_1 word="ka" context="component" />);
+
+    const result = await screen.findByTestId("fjalori-evidence-null");
+    expect(result).toHaveTextContent(`SOURCE_HTTP_ERROR · HTTP ${status} · UNKNOWN_OR_NULL`);
+    expect(result).toHaveTextContent("does not establish that the word is absent");
+    expect(screen.queryByTestId("fjalori-source-description")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("fjalori-component-meaning-comparison")).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /Select source sense/ })).not.toBeInTheDocument();
+  });
+
+  it("keeps a non-success response with no numeric status in UNKNOWN_OR_NULL", async () => {
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: false,
+      json: async () => ({ message: "incomplete response fixture" }),
+    }) as unknown as typeof fetch;
+
+    render(<FjaloriCrossSourceEvidenceV0_1 word="ka" context="component" />);
+
+    const result = await screen.findByTestId("fjalori-evidence-null");
+    expect(result).toHaveTextContent("SOURCE_UNAVAILABLE · UNKNOWN_OR_NULL");
+    expect(result).toHaveTextContent("did not expose a usable HTTP status");
+    expect(result).not.toHaveTextContent("SOURCE_HTTP_ERROR · HTTP undefined");
+    expect(screen.queryByTestId("fjalori-component-meaning-comparison")).not.toBeInTheDocument();
+  });
+
+  it("classifies a rejected fetch as a network failure without source meaning", async () => {
+    global.fetch = jest.fn().mockRejectedValue(new TypeError("Failed to fetch")) as unknown as typeof fetch;
+
+    render(<FjaloriCrossSourceEvidenceV0_1 word="ka" context="component" />);
+
+    const result = await screen.findByTestId("fjalori-evidence-null");
+    expect(result).toHaveTextContent("SOURCE_UNAVAILABLE · NETWORK_FAILURE · UNKNOWN_OR_NULL");
+    expect(result).toHaveTextContent("does not establish that the word is absent");
+    expect(screen.queryByTestId("fjalori-source-description")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("fjalori-component-meaning-comparison")).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /Select source sense/ })).not.toBeInTheDocument();
+  });
+
+  it("distinguishes invalid JSON and contract responses from valid records without usable senses", async () => {
     global.fetch = jest.fn().mockResolvedValue({
       ok: true,
+      status: 200,
       json: async () => { throw new SyntaxError("invalid JSON fixture"); },
     }) as unknown as typeof fetch;
     const invalidJson = render(<FjaloriCrossSourceEvidenceV0_1 word="ka" context="component" />);
@@ -254,6 +361,7 @@ describe("FjaloriShqip Albanian meaning evidence v0.1", () => {
 
     global.fetch = jest.fn().mockResolvedValue({
       ok: true,
+      status: 200,
       json: async () => ({
         word: "ka",
         licence: "CC BY-SA 4.0",
@@ -292,12 +400,12 @@ describe("FjaloriShqip Albanian meaning evidence v0.1", () => {
     expect(screen.getByTestId("fjalori-entry-lineages").children).toHaveLength(2);
   });
 
-  it("fails closed when the returned record is for a different spelling", async () => {
+  it("classifies a mismatched successful record as invalid source response", async () => {
     global.fetch = jest.fn().mockResolvedValue(responseFor("pelar")) as unknown as typeof fetch;
 
     render(<FjaloriCrossSourceEvidenceV0_1 word="qymyrtar" />);
 
-    expect(await screen.findByTestId("fjalori-evidence-null")).toHaveTextContent("UNKNOWN_OR_NULL");
+    expect(await screen.findByTestId("fjalori-evidence-null")).toHaveTextContent("INVALID_SOURCE_RESPONSE · UNKNOWN_OR_NULL");
     expect(screen.queryByTestId("fjalori-source-description")).not.toBeInTheDocument();
   });
 
@@ -313,6 +421,7 @@ describe("FjaloriShqip Albanian meaning evidence v0.1", () => {
   it("suppresses GPL-only unverified Hunspell records", async () => {
     global.fetch = jest.fn().mockResolvedValue({
       ok: true,
+      status: 200,
       json: async () => ({
         word: "fuzhnjar",
         unverified: true,
@@ -343,12 +452,13 @@ describe("FjaloriShqip Albanian meaning evidence v0.1", () => {
     expect(fetchMock).not.toHaveBeenCalled();
   });
 
-  it("returns graceful Null when the bounded request times out", async () => {
+  it("settles the timeout when abort does not settle the fetch", async () => {
     jest.useFakeTimers();
-    global.fetch = jest.fn((_input, init) => new Promise((_resolve, reject) => {
-      const signal = (init as RequestInit).signal as AbortSignal;
-      signal.addEventListener("abort", () => reject(new Error("request aborted")), { once: true });
-    })) as unknown as typeof fetch;
+    let signal: AbortSignal | undefined;
+    global.fetch = jest.fn((_input, init) => {
+      signal = (init as RequestInit).signal as AbortSignal;
+      return new Promise(() => undefined);
+    }) as unknown as typeof fetch;
 
     render(<FjaloriCrossSourceEvidenceV0_1 word="fuzhnjar" />);
 
@@ -356,6 +466,142 @@ describe("FjaloriShqip Albanian meaning evidence v0.1", () => {
       jest.advanceTimersByTime(8_000);
     });
 
-    expect(screen.getByTestId("fjalori-evidence-null")).toHaveTextContent("UNKNOWN_OR_NULL");
+    expect(signal?.aborted).toBe(true);
+    expect(screen.getByTestId("fjalori-evidence-null")).toHaveTextContent("SOURCE_UNAVAILABLE · TIMEOUT · UNKNOWN_OR_NULL");
+    await act(async () => {
+      jest.advanceTimersByTime(16_000);
+    });
+    expect(screen.getByTestId("fjalori-evidence-null")).toHaveTextContent("SOURCE_UNAVAILABLE · TIMEOUT · UNKNOWN_OR_NULL");
+  });
+
+  it("does not let a response arriving after timeout replace the terminal timeout state", async () => {
+    jest.useFakeTimers();
+    let resolveFetch!: (response: ReturnType<typeof responseFor>) => void;
+    const pending = new Promise<ReturnType<typeof responseFor>>((resolve) => {
+      resolveFetch = resolve;
+    });
+    global.fetch = jest.fn(() => pending) as unknown as typeof fetch;
+
+    render(<FjaloriCrossSourceEvidenceV0_1 word="ka" />);
+    await act(async () => {
+      jest.advanceTimersByTime(8_000);
+    });
+    expect(screen.getByTestId("fjalori-evidence-null")).toHaveTextContent("SOURCE_UNAVAILABLE · TIMEOUT · UNKNOWN_OR_NULL");
+
+    await act(async () => {
+      resolveFetch(responseFor("ka"));
+      await Promise.resolve();
+      await Promise.resolve();
+      await Promise.resolve();
+    });
+
+    expect(screen.getByTestId("fjalori-evidence-null")).toHaveTextContent("SOURCE_UNAVAILABLE · TIMEOUT · UNKNOWN_OR_NULL");
+    expect(screen.queryByTestId("fjalori-source-description")).not.toBeInTheDocument();
+  });
+
+  it("clears a successful request timeout instead of showing stale timeout state", async () => {
+    jest.useFakeTimers();
+    global.fetch = jest.fn().mockResolvedValue(responseFor("ka")) as unknown as typeof fetch;
+
+    render(<FjaloriCrossSourceEvidenceV0_1 word="ka" />);
+    await act(async () => {
+      await Promise.resolve();
+      await Promise.resolve();
+      await Promise.resolve();
+    });
+    expect(screen.getByTestId("fjalori-source-description")).toHaveTextContent("Përshkrim prove për ka");
+
+    await act(async () => {
+      jest.advanceTimersByTime(8_000);
+    });
+    expect(screen.getByTestId("fjalori-source-description")).toHaveTextContent("Përshkrim prove për ka");
+    expect(screen.queryByText(/SOURCE_UNAVAILABLE · TIMEOUT/)).not.toBeInTheDocument();
+  });
+
+  it("ignores an old word response after switching to another exact spelling", async () => {
+    let resolveKan!: (response: ReturnType<typeof responseFor>) => void;
+    const pendingKan = new Promise<ReturnType<typeof responseFor>>((resolve) => {
+      resolveKan = resolve;
+    });
+    const fetchMock = jest.fn((input: RequestInfo | URL) => {
+      return String(input).endsWith("/kan.json") ? pendingKan : Promise.resolve(responseFor("ka"));
+    });
+    global.fetch = fetchMock as unknown as typeof fetch;
+    const kanProposal = {
+      componentId: "0", exactSpelling: "KAN", proposedMeaning: "KAN draft",
+      proposedGrammaticalRole: "", language: "Albanian", dialect: "", unresolved: false,
+    };
+    const kaProposal = { ...kanProposal, exactSpelling: "KA", proposedMeaning: "KA draft" };
+    const view = render(
+      <FjaloriCrossSourceEvidenceV0_1 word="KAN" context="component" componentProposal={kanProposal} />,
+    );
+
+    view.rerender(
+      <FjaloriCrossSourceEvidenceV0_1 word="KA" context="component" componentProposal={kaProposal} />,
+    );
+    expect(await screen.findByText("Përshkrim prove për ka")).toBeInTheDocument();
+    await act(async () => {
+      resolveKan(responseFor("kan"));
+      await Promise.resolve();
+      await Promise.resolve();
+      await Promise.resolve();
+    });
+
+    expect(screen.getByTestId("fjalori-source-description")).toHaveTextContent("Përshkrim prove për ka");
+    expect(screen.queryByText("Përshkrim prove për kan")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("fjalori-selected-sense")).not.toBeInTheDocument();
+  });
+
+  it("resets a manually selected sense assessment when the analyzed word changes", async () => {
+    const fetchMock = jest.fn()
+      .mockResolvedValueOnce(responseFor("kan"))
+      .mockResolvedValueOnce(responseFor("ka"));
+    global.fetch = fetchMock as unknown as typeof fetch;
+    const kanProposal = {
+      componentId: "0", exactSpelling: "KAN", proposedMeaning: "KAN draft",
+      proposedGrammaticalRole: "", language: "Albanian", dialect: "", unresolved: false,
+    };
+    const kaProposal = { ...kanProposal, exactSpelling: "KA", proposedMeaning: "KA draft" };
+    const view = render(
+      <FjaloriCrossSourceEvidenceV0_1 word="KAN" context="component" componentProposal={kanProposal} />,
+    );
+    expect(await screen.findByText("Përshkrim prove për kan")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Select source sense entry 1 sense 1 for inspection" }));
+    fireEvent.change(screen.getByLabelText("USER_INTERPRETATION assessment for entry 1 sense 1"), {
+      target: { value: "POTENTIALLY_SUPPORTS_PROPOSAL" },
+    });
+
+    view.rerender(
+      <FjaloriCrossSourceEvidenceV0_1 word="KA" context="component" componentProposal={kaProposal} />,
+    );
+    expect(await screen.findByText("Përshkrim prove për ka")).toBeInTheDocument();
+    expect(screen.queryByTestId("fjalori-selected-sense")).not.toBeInTheDocument();
+    expect(screen.queryByText(/Current assessment:/)).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Select source sense entry 1 sense 1 for inspection" }));
+    expect(screen.getByTestId("fjalori-component-meaning-comparison")).toHaveTextContent("Component spelling: KA");
+    expect(screen.getByTestId("fjalori-component-meaning-comparison")).toHaveTextContent("Proposed meaning: KA draft");
+    expect(screen.getByLabelText("USER_INTERPRETATION assessment for entry 1 sense 1")).toHaveValue("");
+  });
+
+  it("aborts and ignores a pending source response after unmount", async () => {
+    let resolveFetch!: (response: ReturnType<typeof responseFor>) => void;
+    let signal: AbortSignal | undefined;
+    const pending = new Promise<ReturnType<typeof responseFor>>((resolve) => {
+      resolveFetch = resolve;
+    });
+    global.fetch = jest.fn((_input, init) => {
+      signal = (init as RequestInit).signal as AbortSignal;
+      return pending;
+    }) as unknown as typeof fetch;
+    const view = render(<FjaloriCrossSourceEvidenceV0_1 word="ka" />);
+
+    view.unmount();
+    expect(signal?.aborted).toBe(true);
+    await act(async () => {
+      resolveFetch(responseFor("ka"));
+      await Promise.resolve();
+      await Promise.resolve();
+      await Promise.resolve();
+    });
   });
 });
