@@ -60,12 +60,12 @@ export default function ChatShell({
         </div>
       </header>
 
-      <main className={composer ? "flex-1 pb-[calc(34rem+env(safe-area-inset-bottom))] md:pb-[calc(22rem+env(safe-area-inset-bottom))] xl:pb-[calc(7.5rem+env(safe-area-inset-bottom))]" : "flex-1"}>
+      <main className={composer ? "flex-1 pb-4 sm:pb-[calc(22rem+env(safe-area-inset-bottom))] xl:pb-[calc(7.5rem+env(safe-area-inset-bottom))]" : "flex-1"}>
         <div className={`${wrap} py-4`}>{children}</div>
       </main>
 
       {composer ? (
-        <footer className="sticky bottom-0 z-20 border-t border-[#333333] bg-[#111111]/95 backdrop-blur supports-[backdrop-filter]:bg-[#111111]/88">
+        <footer className="static border-t border-[#333333] bg-[#111111]/95 backdrop-blur supports-[backdrop-filter]:bg-[#111111]/88 sm:sticky sm:bottom-0 sm:z-20">
           <div className={`${wrap} pb-[calc(0.75rem+env(safe-area-inset-bottom))] pt-3 sm:py-4`}>{composer}</div>
         </footer>
       ) : null}

@@ -166,7 +166,7 @@ describe(
         ),
       ).toBeInTheDocument();
       expect(
-        screen.queryByText("No supported functional candidate yet."),
+        screen.queryByText("No canonical candidate is established."),
       ).not.toBeInTheDocument();
     });
 
@@ -187,7 +187,7 @@ describe(
         screen.queryByText(/Functional path:/),
       ).not.toBeInTheDocument();
       expect(
-        screen.queryByText("No supported functional candidate yet."),
+        screen.queryByText("No canonical candidate is established."),
       ).not.toBeInTheDocument();
     });
 
@@ -238,7 +238,7 @@ describe(
       render(<EmbryoExpansionContextCardV0_1 vm={vm} />);
 
       expect(
-        screen.getByText("No supported functional candidate yet."),
+        screen.getByText("No canonical candidate is established."),
       ).toBeInTheDocument();
       expect(
         screen.queryByText("Seven-Voices doctrinal reading"),

@@ -214,7 +214,7 @@ describe("Open Instrument target-sense result context v0.1", () => {
     expect(
       await screen.findByRole("heading", { name: "Null — no supported candidate" }),
     ).toBeInTheDocument();
-    expect(screen.getAllByText("No supported functional candidate yet.").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("No canonical candidate is established.").length).toBeGreaterThan(0);
     expect(screen.queryByText("View candidate record")).not.toBeInTheDocument();
   });
 });

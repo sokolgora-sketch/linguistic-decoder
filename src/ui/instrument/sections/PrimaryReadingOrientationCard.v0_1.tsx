@@ -56,8 +56,8 @@ function statusEvidenceSummary(
         return "No structural Voice path was detected, so no structural reading is established.";
       }
       return hasLexicalEvidence
-        ? "No supported functional candidate is established. Lexical source evidence remains available separately."
-        : "No supported functional candidate is established; structural and evidence states remain separate.";
+        ? "No canonical candidate or reviewed functional evidence is established; lexical source evidence remains separate."
+        : "No canonical candidate or reviewed functional evidence is established; structural hypotheses remain separate.";
     default:
       return hasPath
         ? "The current analysis has no stronger emitted evidence state."
@@ -146,7 +146,7 @@ export function PrimaryReadingOrientationCardV0_1({
           <dd>{orientation.doctrine}</dd>
         </div>
         <div data-testid="orientation-evidence">
-          <dt className="font-semibold text-[#8ea4ba]">Functional / source state</dt>
+          <dt className="font-semibold text-[#8ea4ba]">Canonical candidate / reviewed evidence status</dt>
           <dd>{orientation.evidence}</dd>
         </div>
       </dl>

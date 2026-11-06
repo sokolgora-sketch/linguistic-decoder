@@ -197,7 +197,7 @@ describe(
       renderPayload(body, true);
 
       expect(
-        screen.getByText("No supported functional candidate yet."),
+        screen.getByText("No canonical candidate is established."),
       ).toBeInTheDocument();
       expect(
         screen.queryByTestId("functional-candidate-stack"),
@@ -210,7 +210,7 @@ describe(
       renderPayload(body, true);
 
       expect(
-        screen.getByText("No supported functional candidate yet."),
+        screen.getByText("No canonical candidate is established."),
       ).toBeInTheDocument();
       expect(
         screen.queryByTestId("functional-candidate-stack"),
@@ -457,7 +457,7 @@ describe(
 
       expect(
         screen.getByText(
-          "No supported functional candidate yet.",
+          "No canonical candidate is established.",
         ),
       ).toBeInTheDocument();
 

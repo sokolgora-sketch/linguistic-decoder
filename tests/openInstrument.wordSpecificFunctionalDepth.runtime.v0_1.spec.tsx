@@ -104,7 +104,7 @@ describe("word-specific functional depth runtime v0.1", () => {
 
     expect(screen.getByTestId("word-specific-functional-depth")).toBeVisible();
     expect(screen.getByText("No supported word-specific functional motivation yet.")).toBeVisible();
-    expect(screen.getByText("No supported functional candidate yet.")).toBeVisible();
+    expect(screen.getByText("No canonical candidate is established.")).toBeVisible();
   });
 
   it("keeps same-path controls and long paths structural when no word-specific depth is authorized", async () => {

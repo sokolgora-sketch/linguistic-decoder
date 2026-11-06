@@ -555,17 +555,6 @@ export default function ZroChatPage() {
       maxWidthClass="max-w-screen-2xl"
     >
       <div className="space-y-4">
-        <ReproducibleRunBundleControls
-          payload={latestInstrumentPayload}
-          completedInput={{
-            ipa: lastRun?.ipa,
-            targetSenseLabel: lastRun?.targetSenseLabel,
-          }}
-          source={displayedAnalysisSource}
-          disabled={busy}
-          onImport={handleImportedBundle}
-        />
-
         {latestInstrumentPayload ? (
           <UiErrorBoundary label="InstrumentPanel">
             <InstrumentPanel
@@ -591,6 +580,17 @@ export default function ZroChatPage() {
         ) : (
           <OpenInstrumentEmptyState />
         )}
+
+        <ReproducibleRunBundleControls
+          payload={latestInstrumentPayload}
+          completedInput={{
+            ipa: lastRun?.ipa,
+            targetSenseLabel: lastRun?.targetSenseLabel,
+          }}
+          source={displayedAnalysisSource}
+          disabled={busy}
+          onImport={handleImportedBundle}
+        />
 
         <WordToWordStructuralAuthorityComparisonCard
           current={latestInstrumentVm}

@@ -367,7 +367,7 @@ describe(
 
         expect(
           screen.queryByText(
-            "No supported functional candidate yet.",
+            "No canonical candidate is established.",
           ),
         ).not.toBeInTheDocument();
 
