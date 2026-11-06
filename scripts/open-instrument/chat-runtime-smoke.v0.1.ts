@@ -19,6 +19,18 @@ function assert(condition: unknown, message: string): asserts condition {
   if (!condition) throw new Error(message);
 }
 
+async function selectAutoAlphabetProfile(page: import("playwright").Page): Promise<void> {
+  const profile = page.getByRole("combobox", { name: "Alphabet profile", exact: true });
+  await page.waitForFunction(
+    () => document.querySelector<HTMLElement>('[aria-label="Alphabet profile"]')?.textContent?.trim() === "Albanian",
+    null,
+    { timeout: PAGE_TIMEOUT_MS },
+  );
+  await profile.click();
+  await page.getByRole("option", { name: "Auto", exact: true }).click();
+  assert((await profile.innerText()).trim() === "Auto", "Expected the explicit Auto alphabet profile.");
+}
+
 async function isPortClosed(url: string): Promise<boolean> {
   const port = Number(new URL(url).port);
   return await new Promise((resolve) => {
@@ -74,6 +86,7 @@ async function main(): Promise<void> {
     assert(response?.ok(), `Expected /chat to load, received HTTP ${response?.status() ?? "no response"}.`);
     await page.getByRole("textbox", { name: "Word" }).waitFor({ state: "visible" });
     await page.getByRole("region", { name: "Open Instrument ready" }).waitFor({ state: "visible" });
+    await selectAutoAlphabetProfile(page);
     console.log("CHAT_PAGE_BROWSER_LOAD=PASS");
     console.log("CHAT_HYDRATION=PASS");
 
@@ -183,7 +196,9 @@ async function main(): Promise<void> {
     console.log("DOWNLOADED_BYTES_READ=PASS");
 
     const parsed = await parseReproducibleRunBundleV0_1(downloadedBytes.toString("utf8"));
-    assert(parsed.ok, `Downloaded bundle failed production parsing: ${parsed.reason}`);
+    if (!parsed.ok) {
+      throw new Error(`Downloaded bundle failed production parsing: ${parsed.reason}`);
+    }
     assert(parsed.value.schemaVersion === "open-instrument.reproducible-run-bundle.v0.1", "Downloaded bundle schema was unexpected.");
     assert(parsed.value.fingerprint.algorithm === "sha256", "Downloaded bundle fingerprint algorithm was unexpected.");
     assert(parsed.value.fingerprint.value.length > 0, "Downloaded bundle fingerprint was empty.");
@@ -219,8 +234,9 @@ async function main(): Promise<void> {
         timeout: PAGE_TIMEOUT_MS,
       });
       await page.getByRole("textbox", { name: "Word" }).waitFor({ state: "visible" });
+      await selectAutoAlphabetProfile(page);
       await page.getByRole("textbox", { name: "Word" }).fill(truthCase.word);
-      const expectedRequestCount = analyzeRequests + 1;
+      const expectedRequestCount: number = analyzeRequests + 1;
       await page.getByRole("button", { name: "Analyze" }).click();
       await page.getByTestId("open-instrument-shell").waitFor({ state: "visible" });
       await page.getByText("Current analysis", { exact: true }).waitFor({ state: "visible" });

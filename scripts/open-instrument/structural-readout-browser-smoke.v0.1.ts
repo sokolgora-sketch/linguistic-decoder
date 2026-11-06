@@ -462,6 +462,16 @@ async function main(): Promise<void> {
     await page.getByRole("textbox", { name: "Word", exact: true }).waitFor({ state: "visible" });
     await page.getByRole("region", { name: "Open Instrument ready" }).waitFor({ state: "visible" });
 
+    const alphabetProfile = page.getByRole("combobox", { name: "Alphabet profile", exact: true });
+    await page.waitForFunction(
+      () => document.querySelector<HTMLElement>('[aria-label="Alphabet profile"]')?.textContent?.trim() === "Albanian",
+      null,
+      { timeout: PAGE_TIMEOUT_MS },
+    );
+    await alphabetProfile.click();
+    await page.getByRole("option", { name: "Auto", exact: true }).click();
+    assert((await alphabetProfile.innerText()).trim() === "Auto", "Structural smoke requires explicit Auto profile selection.");
+
     let previousDisplayedWord: string | null = null;
     const runInterpretationCase = async (
       word: string,

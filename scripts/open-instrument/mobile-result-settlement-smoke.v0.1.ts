@@ -73,6 +73,7 @@ async function waitForSettledWord(
   page: import("playwright").Page,
   expectedWord: string,
   requireMobileComposerJump = false,
+  requireAlbanianReading = true,
 ): Promise<void> {
   await page.waitForFunction(
     (word) =>
@@ -81,7 +82,9 @@ async function waitForSettledWord(
     expectedWord,
     { timeout: TIMEOUT_MS },
   );
-  await page.getByTestId("primary-albanian-reading").waitFor({ state: "visible" });
+  if (requireAlbanianReading) {
+    await page.getByTestId("primary-albanian-reading").waitFor({ state: "visible" });
+  }
   if (requireMobileComposerJump) {
     await page.getByTestId("mobile-composer-jump").waitFor({ state: "visible" });
   }
@@ -93,6 +96,7 @@ async function main(): Promise<void> {
   const browserErrors: string[] = [];
   const consoleErrors: string[] = [];
   const httpErrors: Array<{ status: number; url: string }> = [];
+  const analyzeRequestProfiles: Array<{ word: string | null; alphabet: string | null }> = [];
   const replayDirectory = process.env.OPEN_INSTRUMENT_AUTHENTIC_REPLAY_DIR;
   const replayPayloads = new Map<string, string>();
   let analyzeRequests = 0;
@@ -159,10 +163,14 @@ async function main(): Promise<void> {
     page.on("response", (resource) => {
       if (resource.status() >= 400) httpErrors.push({ status: resource.status(), url: resource.url() });
     });
-    page.on("request", (request) => {
+    context.on("request", (request) => {
       const url = new URL(request.url());
       if (url.origin === server?.base && url.pathname === "/api/analyze-v1") {
         analyzeRequests += 1;
+        analyzeRequestProfiles.push({
+          word: url.searchParams.get("word"),
+          alphabet: url.searchParams.get("alphabet"),
+        });
       }
     });
 
@@ -172,9 +180,16 @@ async function main(): Promise<void> {
     });
     assert(response?.ok(), `Expected /chat to load, received HTTP ${response?.status() ?? "none"}.`);
 
+    await page.getByRole("textbox", { name: "Word" }).waitFor({ state: "visible" });
+    await page.getByRole("region", { name: "Open Instrument ready" }).waitFor({ state: "visible" });
+    await page.waitForFunction(
+      () => document.querySelector<HTMLElement>('[aria-label="Alphabet profile"]')?.textContent?.trim() === "Albanian",
+      null,
+      { timeout: TIMEOUT_MS },
+    );
     const alphabetProfile = page.getByRole("combobox", { name: "Alphabet profile" });
-    await alphabetProfile.click();
-    await page.getByRole("option", { name: "Albanian", exact: true }).click();
+    const initialMobileAlphabet = (await alphabetProfile.innerText()).trim();
+    assert(initialMobileAlphabet === "Albanian", `Fresh mobile /chat did not default to Albanian; observed "${initialMobileAlphabet}".`);
 
     const wordInput = page.getByRole("textbox", { name: "Word" });
     const analyzeButton = page.getByRole("button", { name: "Analyze", exact: true });
@@ -182,6 +197,10 @@ async function main(): Promise<void> {
     await wordInput.fill("administronjës");
     await analyzeButton.click();
     await waitForSettledWord(page, "administronjës", true);
+    assert(
+      analyzeRequestProfiles[0]?.word === "administronjës" && analyzeRequestProfiles[0]?.alphabet === "albanian",
+      `First mobile request did not explicitly use Albanian: ${JSON.stringify(analyzeRequestProfiles[0])}.`,
+    );
     const firstMobile = await measure(page);
     assert(firstMobile.width === 390 && firstMobile.height === 844, "Mobile viewport was not 390×844.");
     assert(firstMobile.cardIntersectsContentViewport, "First primary Albanian reading did not intersect the mobile viewport.");
@@ -253,6 +272,10 @@ async function main(): Promise<void> {
     await analyzeButton.click();
     await waitForSettledWord(page, "shkencëtar", true);
     assert(analyzeRequests === secondRequestCount, `Expected one second analysis request, saw ${analyzeRequests}.`);
+    assert(
+      analyzeRequestProfiles[1]?.word === "shkencëtar" && analyzeRequestProfiles[1]?.alphabet === "albanian",
+      `Second mobile request did not preserve the Albanian profile: ${JSON.stringify(analyzeRequestProfiles[1])}.`,
+    );
     const secondMobile = await measure(page);
     assert(secondMobile.cardIntersectsContentViewport, "Second primary Albanian reading did not intersect the mobile viewport.");
     assert(
@@ -286,7 +309,79 @@ async function main(): Promise<void> {
     await page.screenshot({ path: desktopScreenshot });
     console.log(`DESKTOP_SCREENSHOT=${desktopScreenshot}`);
 
-    assert(analyzeRequests === 2, `Expected exactly two mobile analyses, saw ${analyzeRequests}.`);
+    const desktopPage = await context.newPage();
+    desktopPage.setDefaultTimeout(TIMEOUT_MS);
+    await desktopPage.setViewportSize({ width: 1440, height: 900 });
+    desktopPage.on("pageerror", (error) => browserErrors.push(`JavaScript exception: ${error.message}`));
+    desktopPage.on("console", (message) => {
+      if (message.type() === "error") {
+        const location = message.location().url;
+        consoleErrors.push(`${message.text()}${location ? ` (${location})` : ""}`);
+      }
+    });
+    desktopPage.on("response", (resource) => {
+      if (resource.status() >= 400) httpErrors.push({ status: resource.status(), url: resource.url() });
+    });
+    const desktopInitialResponse = await desktopPage.goto(`${server.base}/chat`, {
+      waitUntil: "domcontentloaded",
+      timeout: TIMEOUT_MS,
+    });
+    assert(desktopInitialResponse?.ok(), `Expected fresh desktop /chat to load, received HTTP ${desktopInitialResponse?.status() ?? "none"}.`);
+    await desktopPage.getByRole("textbox", { name: "Word" }).waitFor({ state: "visible" });
+    await desktopPage.waitForFunction(
+      () => document.querySelector<HTMLElement>('[aria-label="Alphabet profile"]')?.textContent?.trim() === "Albanian",
+      null,
+      { timeout: TIMEOUT_MS },
+    );
+    const desktopAlphabetProfile = desktopPage.getByRole("combobox", { name: "Alphabet profile" });
+    const initialDesktopAlphabet = (await desktopAlphabetProfile.innerText()).trim();
+    assert(initialDesktopAlphabet === "Albanian", `Fresh desktop /chat did not default to Albanian; observed "${initialDesktopAlphabet}".`);
+    const desktopWordInput = desktopPage.getByRole("textbox", { name: "Word" });
+    await desktopWordInput.fill("administronjës");
+    const desktopAnalyzeButton = desktopPage.getByRole("button", { name: "Analyze", exact: true });
+    await desktopAnalyzeButton.click();
+    await waitForSettledWord(desktopPage, "administronjës");
+    assert(
+      analyzeRequestProfiles[2]?.word === "administronjës" && analyzeRequestProfiles[2]?.alphabet === "albanian",
+      `First desktop request did not explicitly use Albanian: ${JSON.stringify(analyzeRequestProfiles[2])}.`,
+    );
+    const desktopDefaultResult = await measure(desktopPage);
+    assert(desktopDefaultResult.width === 1440 && desktopDefaultResult.height === 900, "Fresh desktop viewport was not 1440×900.");
+    assert(desktopDefaultResult.cardIntersectsContentViewport, "Desktop Albanian result did not intersect the viewport.");
+    assert(desktopDefaultResult.documentWidth <= desktopDefaultResult.width, "Desktop Albanian result introduced horizontal overflow.");
+    console.log(`DESKTOP_DEFAULT_ALBANIAN=${JSON.stringify(desktopDefaultResult)}`);
+
+    await desktopAlphabetProfile.click();
+    await desktopPage.getByRole("option", { name: "Auto", exact: true }).click();
+    assert((await desktopAlphabetProfile.innerText()).trim() === "Auto", "Desktop user could not select Auto.");
+    await desktopWordInput.fill("study");
+    const autoRequestPromise = desktopPage.waitForRequest((request) => {
+      const requestUrl = new URL(request.url());
+      return requestUrl.origin === server?.base &&
+        requestUrl.pathname === "/api/analyze-v1" &&
+        requestUrl.searchParams.get("word") === "study";
+    });
+    await desktopAnalyzeButton.click();
+    const autoRequest = await autoRequestPromise;
+    await waitForSettledWord(desktopPage, "study", false, false);
+    const autoRequestUrl = new URL(autoRequest.url());
+    assert(!autoRequestUrl.searchParams.has("alphabet"), `Explicit Auto request unexpectedly specified alphabet=${autoRequestUrl.searchParams.get("alphabet")}.`);
+    assert(
+      analyzeRequestProfiles[3]?.word === "study" && analyzeRequestProfiles[3]?.alphabet === null,
+      `Explicit Auto request did not preserve omitted-alphabet semantics: ${JSON.stringify(analyzeRequestProfiles[3])}.`,
+    );
+    console.log(`EXPLICIT_AUTO_REQUEST=${autoRequestUrl.pathname}${autoRequestUrl.search}`);
+
+    assert(analyzeRequests === 4, `Expected four focused mobile/desktop analyses, saw ${analyzeRequests}.`);
+    assert(
+      analyzeRequestProfiles.length === 4 &&
+        analyzeRequestProfiles[0]?.alphabet === "albanian" &&
+        analyzeRequestProfiles[1]?.alphabet === "albanian" &&
+        analyzeRequestProfiles[2]?.alphabet === "albanian" &&
+        analyzeRequestProfiles[3]?.alphabet === null,
+      `Unexpected profile request sequence: ${JSON.stringify(analyzeRequestProfiles)}.`,
+    );
+    console.log(`ANALYZE_REQUEST_PROFILES=${JSON.stringify(analyzeRequestProfiles)}`);
     assert(browserErrors.length === 0, `Browser errors observed: ${browserErrors.join(" | ")}`);
     console.log("MOBILE_RESULT_SETTLEMENT=PASS");
     console.log("MOBILE_COMPOSER_ACCESS=PASS");
