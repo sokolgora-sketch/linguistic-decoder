@@ -90,6 +90,30 @@ function syntheticSuffixTarget(overrides: Partial<AlbanianKaikkiExactLexicalSour
   } as AlbanianKaikkiExactLexicalSourceFactV0_1;
 }
 
+function syntheticDirectOccupationRoleTarget(overrides: Partial<AlbanianKaikkiExactLexicalSourceFactV0_1> = {}) {
+  return syntheticSuffixTarget({
+    sourceRecordId: "kaikki-albanian-jsonl:word=administronj%C3%ABs:ordinal=0",
+    entryLocator: "jsonl://word/administronj%C3%ABs/match/0",
+    physicalRecordOrdinal: 545,
+    form: "administronjës",
+    senses: [{
+      senseId: "en-administronjës-sq-noun-aYSRYity",
+      glosses: ["manager, administrator"],
+      categories: [occupations()],
+    }],
+    etymologyText: "Compare administroj.",
+    etymologyLinks: [{ sourceForm: "administroj", reference: "administroj#Albanian" }],
+    etymologyTemplates: [],
+    sourceSnapshot: {
+      sourceFamilyId: "kaikki-albanian-jsonl-v0.1",
+      sourceUrl: "https://kaikki.org/dictionary/Albanian/kaikki.org-dictionary-Albanian.jsonl",
+      sha256: "7a84eca776ebfac752e7251bb0822edc9cd1701d1d58060d4f8ef4b76a208fcc",
+      bytes: 67438537,
+    },
+    ...overrides,
+  });
+}
+
 async function syntheticDiscovery(facts: readonly AlbanianKaikkiExactLexicalSourceFactV0_1[], word = "testlexeme") {
   const payload = await runAnalysisDeterministic(word, { mode: "strict", alphabet: "albanian" });
   const result = await buildMotivationEngineDiscoveryServerOnlyV0_1({
@@ -240,6 +264,58 @@ describeWithRealSource("source-authored suffix direct-target AGENT with the froz
 });
 
 describe("source-authored suffix direct-target AGENT synthetic controls", () => {
+  it("supports an exact occupation sense when the source has no validated morphology template", async () => {
+    const discovery = await syntheticDiscovery([syntheticDirectOccupationRoleTarget()], "administronjës");
+    const reading = realReading(discovery);
+    const bridge = functionalBridge(reading);
+    expect(reading.primarySourceFact).toMatchObject({
+      sourceRecordId: "kaikki-albanian-jsonl:word=administronj%C3%ABs:ordinal=0",
+      form: "administronjës",
+      meaningGlosses: ["manager, administrator"],
+    });
+    expect(bridge).toMatchObject({
+      status: "SUPPORTED",
+      relatedForm: null,
+      functionalHypothesis: {
+        status: "EXPLORATORY_FUNCTIONAL_HYPOTHESIS",
+        functionalOperation: "AGENT",
+        basis: expect.arrayContaining([
+          "SOURCE_ATTESTED_TARGET_ROLE_CATEGORY",
+          "SOURCE_ATTESTED_FINAL_SENSE_CATEGORY",
+          "TARGET_SOURCE_ROLE_HAS_NO_VALIDATED_COMPONENT_TEMPLATE",
+        ]),
+      },
+    });
+    const hypothesis = bridge.functionalHypothesis as Record<string, unknown>;
+    expect(hypothesis.statement).toEqual(expect.stringContaining("manager, administrator"));
+    expect(hypothesis.statement).toEqual(expect.stringContaining("does not assert morphology"));
+    expect(hypothesis.claimBoundary).toEqual(expect.stringContaining("No source component template or base relation is present"));
+
+    const vm = adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: discovery });
+    expect(vm.motivationDiscoveryV0_1).toMatchObject({ kind: "present" });
+    if (vm.motivationDiscoveryV0_1?.kind === "present") {
+      render(createElement(MotivationDiscoveryCardV0_1, { discovery: vm.motivationDiscoveryV0_1 }));
+      expect(screen.getByTestId("albanian-reading-meaning")).toHaveTextContent("manager, administrator");
+      expect(screen.getByTestId("albanian-reading-functional-bridge-operation")).toHaveTextContent("Functional operation: AGENT");
+      expect(screen.getByTestId("albanian-reading-functional-bridge")).toHaveTextContent("administronjës");
+      expect(screen.getByTestId("albanian-reading-functional-bridge")).toHaveTextContent("does not assert morphology");
+    }
+  });
+
+  it("keeps duplicate template-free occupation records ambiguous", async () => {
+    const first = syntheticDirectOccupationRoleTarget();
+    const second = syntheticDirectOccupationRoleTarget({
+      sourceRecordId: "kaikki-albanian-jsonl:word=administronj%C3%ABs:ordinal=1",
+      entryLocator: "jsonl://word/administronj%C3%ABs/match/1",
+      physicalRecordOrdinal: 546,
+    });
+    const reading = realReading(await syntheticDiscovery([first, second], "administronjës"));
+    const bridge = functionalBridge(reading);
+    expect(bridge.status).toBe("NULL");
+    expect(bridge.reasonCodes).toContain("SOURCE_TARGET_RECORD_IDENTITY_AMBIGUOUS");
+    expect((bridge.functionalHypothesis as Record<string, unknown>).functionalOperation).toBeNull();
+  });
+
   it.each([
     ["foreign references", { etymologyLinks: [
       { sourceForm: "testbase", reference: "testbase#French" },
