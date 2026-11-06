@@ -55,6 +55,7 @@ export type OpenInstrumentRawSourceEntryCaptureResultV0_1 =
 const SUPPORTED_SOURCE_TRADITIONS_V0_1 = new Set([
   "fjale.fjalor-shqip.v0_1",
   "scaife.lewis-short.v0_1",
+  "scaife.middle-liddell.v0_1",
 ]);
 
 function isRecordV0_1(value: unknown): value is Record<string, unknown> {
