@@ -62,6 +62,7 @@ type Props =
         targetSenseLabel?: string | null;
       onAnalyzeAlbanianSourceRecord?: (sourceRecordId: string) => void;
       sourceRecordSelectionDisabled?: boolean;
+      onMobileComposerJump?: () => void;
       debug?: boolean;
       onCopyFullJson?: () => void;
     }
@@ -74,6 +75,7 @@ type Props =
         targetSenseLabel?: string | null;
       onAnalyzeAlbanianSourceRecord?: (sourceRecordId: string) => void;
       sourceRecordSelectionDisabled?: boolean;
+      onMobileComposerJump?: () => void;
       debug?: boolean;
       onCopyFullJson?: () => void;
     };
@@ -528,10 +530,25 @@ export function InstrumentPanel(props: Props) {
         <div className="space-y-4">
           <TabPanel id="overview" active={activeSection}>
             <div className="space-y-4">
-              <PrimaryAlbanianReadingCardV0_1
-                discovery={vm.motivationDiscoveryV0_1}
-                analysisStatus={vm.analysisStatusV0_1}
-              />
+              <div
+                data-testid="primary-reading-scroll-target"
+                className="scroll-mt-24 sm:scroll-mt-0"
+              >
+                {props.onMobileComposerJump ? (
+                  <button
+                    type="button"
+                    data-testid="mobile-composer-jump"
+                    onClick={props.onMobileComposerJump}
+                    className="mb-3 inline-flex min-h-10 w-full items-center justify-center rounded-lg border border-[#355a7a] bg-[#111a24] px-3 text-sm font-semibold text-[#cfe6ff] sm:hidden"
+                  >
+                    Analyze another word
+                  </button>
+                ) : null}
+                <PrimaryAlbanianReadingCardV0_1
+                  discovery={vm.motivationDiscoveryV0_1}
+                  analysisStatus={vm.analysisStatusV0_1}
+                />
+              </div>
 
               <SpokenPronunciationOverviewCardV0_1 readout={vm.readout} />
 

@@ -15,6 +15,22 @@ describe("Open Instrument responsive shell guard", () => {
     expect(source).toContain("xl:pb-[calc(7.5rem+env(safe-area-inset-bottom))]");
   });
 
+  it("settles each mobile result on its analysis and exposes a direct composer jump", () => {
+    const source = read("src/components/ZroChatPage.tsx");
+
+    expect(source).toContain("window.matchMedia('(max-width: 639px)').matches");
+    expect(source).toContain("settledResultMessageIdRef.current !== settledResultMessageId");
+    expect(source).toContain("behavior: 'instant'");
+    expect(source).toContain('data-testid="settled-analysis-result"');
+    expect(source).toContain("primaryReading ?? result");
+    expect(source).toContain("inputElement.focus({ preventScroll: true })");
+
+    const panel = read("src/ui/instrument/InstrumentPanel.tsx");
+    expect(panel).toContain('data-testid="primary-reading-scroll-target"');
+    expect(panel).toContain('data-testid="mobile-composer-jump"');
+    expect(panel).toContain("scroll-mt-24 sm:scroll-mt-0");
+  });
+
   it("keeps the /chat composer compact and full-width across breakpoints", () => {
     const source = read("src/components/ZroChatPage.tsx");
 
