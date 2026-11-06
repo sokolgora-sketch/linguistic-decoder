@@ -1,8 +1,11 @@
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import {
   buildStrictBlindPerseusFoundPacketV1,
   buildStrictBlindPerseusNotFoundPacketV1,
   buildStrictBlindPerseusSourceUnavailablePacketV1,
   extractStrictBlindPerseusTeiEntryFromBytesV1,
+  extractStrictBlindPerseusVerifiedPinnedTeiEntryV1,
   STRICT_BLIND_FROZEN_SEARCH_STAGES_V1,
   STRICT_BLIND_FROZEN_SOURCE_TRADITIONS_V1,
   STRICT_BLIND_PERSEUS_SOURCE_DEFINITIONS_V1,
@@ -11,6 +14,7 @@ import {
   STRICT_BLIND_PERSEUS_TEI_NAMESPACE_URI_V1,
   validateStrictBlindPerseusFrozenCoverageV1,
   validateStrictBlindPerseusSourcePacketV1,
+  verifyStrictBlindPerseusSourceEntryBindingV1,
   verifyStrictBlindPerseusSourceBytesV1,
   type StrictBlindPerseusExtractedEntryV1,
   type StrictBlindPerseusSourceSnapshotV1,
@@ -77,6 +81,29 @@ function legacyTei2(body: string): Uint8Array {
   return new TextEncoder().encode(
     `<?xml version="1.0"?><TEI.2><teiHeader/><text><body>${body}</body></text></TEI.2>`,
   );
+}
+
+const pinnedRawRoot = process.env.OPEN_INSTRUMENT_PERSEUS_RAW_ROOT;
+const PINNED_RAW_SOURCE_CASES = [
+  [
+    "scaife.lewis-short.v0_1",
+    "CTS_XML_TEI/perseus/pdllex/lat/ls/lat.ls.perseus-eng2.xml",
+  ],
+  [
+    "scaife.middle-liddell.v0_1",
+    "data/viaf66541464/001/viaf66541464.001.perseus-eng1.xml",
+  ],
+] as const;
+
+function pinnedRawPathV1(
+  sourceTraditionId: (typeof PINNED_RAW_SOURCE_CASES)[number][0],
+  sourcePath: string,
+): string {
+  const sourceClone =
+    sourceTraditionId === "scaife.lewis-short.v0_1"
+      ? "perseus-lexica-source-v0-1"
+      : "perseus-canonical-pdlrefwk-source-v0-1";
+  return join(pinnedRawRoot as string, sourceClone, sourcePath);
 }
 
 describe("strict-blind Perseus source packets v1", () => {
@@ -376,6 +403,159 @@ describe("strict-blind Perseus source packets v1", () => {
         lookup: { ...packet.packet.lookup, arbitraryPayload: "forbidden" },
       }),
     ).toEqual({ ok: false, packet: null, reasonCodes: ["PACKET_INVALID"] });
+  });
+
+  const pinnedSourceTest = pinnedRawRoot ? it : it.skip;
+
+  pinnedSourceTest.each(PINNED_RAW_SOURCE_CASES)(
+    "binds predetermined structural entry ordinal 0 for %s",
+    (sourceTraditionId, sourcePath) => {
+      const bytes = new Uint8Array(
+        readFileSync(pinnedRawPathV1(sourceTraditionId, sourcePath)),
+      );
+      const extracted = extractStrictBlindPerseusVerifiedPinnedTeiEntryV1({
+        sourceTraditionId,
+        bytes,
+        selector: { entryOrdinal: 0 },
+      });
+      if (!extracted.ok) throw new Error(extracted.reasonCode);
+      expect(extracted.ok).toBe(true);
+
+      const packet = buildStrictBlindPerseusFoundPacketV1({
+        sourceTraditionId,
+        source: extracted.snapshot,
+        entry: extracted.entry,
+      });
+      expect(packet.ok).toBe(true);
+      if (!packet.ok) throw new Error(packet.reasonCodes.join(","));
+
+      const binding = verifyStrictBlindPerseusSourceEntryBindingV1({
+        sourceTraditionId,
+        packet: packet.packet,
+        bytes,
+      });
+      expect(binding).toMatchObject({ ok: true });
+      if (!binding.ok) throw new Error(binding.reasonCode);
+      expect(binding.extractedEntry).toEqual(extracted.entry);
+    },
+  );
+
+  pinnedSourceTest("fails closed for binding mismatches over verified Middle Liddell bytes", () => {
+    const sourceTraditionId = "scaife.middle-liddell.v0_1" as const;
+    const sourcePath = STRICT_BLIND_PERSEUS_SOURCE_DEFINITIONS_V1[sourceTraditionId].sourcePath;
+    const bytes = new Uint8Array(
+      readFileSync(pinnedRawPathV1(sourceTraditionId, sourcePath)),
+    );
+    const definition = STRICT_BLIND_PERSEUS_SOURCE_DEFINITIONS_V1[sourceTraditionId];
+    const extracted = extractStrictBlindPerseusVerifiedPinnedTeiEntryV1({
+      sourceTraditionId,
+      bytes,
+      selector: { entryOrdinal: 0 },
+    });
+    if (!extracted.ok) throw new Error(extracted.reasonCode);
+    expect(extracted.ok).toBe(true);
+    const packet = buildStrictBlindPerseusFoundPacketV1({
+      sourceTraditionId,
+      source: extracted.snapshot,
+      entry: extracted.entry,
+    });
+    expect(packet.ok).toBe(true);
+    if (!packet.ok) throw new Error(packet.reasonCodes.join(","));
+
+    const modifiedBytes = bytes.slice();
+    modifiedBytes[0] ^= 1;
+    expect(
+      verifyStrictBlindPerseusSourceEntryBindingV1({
+        sourceTraditionId,
+        packet: packet.packet,
+        bytes: modifiedBytes,
+      }),
+    ).toEqual({ ok: false, reasonCode: "SOURCE_SHA256_MISMATCH" });
+
+    const wrongSourcePacket = {
+      ...packet.packet,
+      sourceTraditionId: "scaife.lewis-short.v0_1" as const,
+      source: makeSnapshot("scaife.lewis-short.v0_1"),
+    };
+    expect(
+      verifyStrictBlindPerseusSourceEntryBindingV1({
+        sourceTraditionId,
+        packet: wrongSourcePacket,
+        bytes,
+      }),
+    ).toEqual({
+      ok: false,
+      reasonCode: "SOURCE_ENTRY_BINDING_SOURCE_ID_MISMATCH",
+    });
+
+    expect(
+      verifyStrictBlindPerseusSourceEntryBindingV1({
+        sourceTraditionId,
+        packet: {
+          ...packet.packet,
+          entry: {
+            ...packet.packet.entry,
+            attestedSpelling: `${packet.packet.entry?.attestedSpelling} forged`,
+          },
+        },
+        bytes,
+      }),
+    ).toEqual({ ok: false, reasonCode: "ENTRY_SPELLING_MISMATCH" });
+
+    const alteredSenses = packet.packet.entry?.senses.map((sense, index) => ({
+      ...sense,
+      text: index === 0 ? `${sense.text} forged` : sense.text,
+    }));
+    expect(
+      verifyStrictBlindPerseusSourceEntryBindingV1({
+        sourceTraditionId,
+        packet: {
+          ...packet.packet,
+          entry: { ...packet.packet.entry, senses: alteredSenses },
+        },
+        bytes,
+      }),
+    ).toEqual({ ok: false, reasonCode: "ENTRY_SENSES_MISMATCH" });
+
+    const reorderedOrAlteredSenses =
+      packet.packet.entry && packet.packet.entry.senses.length > 1
+        ? [...packet.packet.entry.senses].reverse()
+        : [{ senseId: "forged", text: "reordered" }];
+    expect(
+      verifyStrictBlindPerseusSourceEntryBindingV1({
+        sourceTraditionId,
+        packet: {
+          ...packet.packet,
+          entry: { ...packet.packet.entry, senses: reorderedOrAlteredSenses },
+        },
+        bytes,
+      }),
+    ).toEqual({ ok: false, reasonCode: "ENTRY_SENSES_MISMATCH" });
+
+    expect(
+      verifyStrictBlindPerseusSourceEntryBindingV1({
+        sourceTraditionId,
+        packet: {
+          ...packet.packet,
+          entry: {
+            ...packet.packet.entry,
+            entryLocator: packet.packet.entry?.entryLocator.replace(
+              definition.sourcePath,
+              "wrong-source.xml",
+            ),
+          },
+        },
+        bytes,
+      }),
+    ).toEqual({ ok: false, reasonCode: "ENTRY_LOCATOR_INVALID" });
+
+    expect(
+      verifyStrictBlindPerseusSourceEntryBindingV1({
+        sourceTraditionId,
+        packet: packet.packet,
+        bytes: undefined,
+      }),
+    ).toEqual({ ok: false, reasonCode: "SOURCE_BYTES_MISSING" });
   });
 
   it("preserves the frozen three-tradition, five-stage ordered coverage matrix", () => {

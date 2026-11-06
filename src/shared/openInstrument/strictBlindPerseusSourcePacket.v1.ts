@@ -233,7 +233,17 @@ export type StrictBlindPerseusPacketReasonCodeV1 =
   | "TEXT_LIMIT_EXCEEDED"
   | "INPUT_BYTE_LIMIT_EXCEEDED"
   | "ENTRY_LIMIT_EXCEEDED"
-  | "NOT_FOUND_EVIDENCE_UNVERIFIED";
+  | "NOT_FOUND_EVIDENCE_UNVERIFIED"
+  | "SOURCE_ENTRY_BINDING_UNSUPPORTED_OUTCOME"
+  | "SOURCE_ENTRY_BINDING_SOURCE_ID_MISMATCH"
+  | "ENTRY_LOCATOR_INVALID"
+  | "ENTRY_LOCATOR_MISMATCH"
+  | "ENTRY_ID_MISMATCH"
+  | "ENTRY_KEY_MISMATCH"
+  | "ENTRY_ORDINAL_MISMATCH"
+  | "ENTRY_SPELLING_MISMATCH"
+  | "EXTRACTED_TEXT_MISMATCH"
+  | "ENTRY_SENSES_MISMATCH";
 
 export type StrictBlindPerseusPacketValidationResultV1 = Readonly<
   | { ok: true; packet: StrictBlindPerseusPacketV1 }
@@ -246,6 +256,31 @@ export type StrictBlindPerseusPacketValidationResultV1 = Readonly<
 
 export type StrictBlindPerseusSourceSnapshotVerificationResultV1 = Readonly<
   | { ok: true; snapshot: StrictBlindPerseusSourceSnapshotV1 }
+  | {
+      ok: false;
+      reasonCode: StrictBlindPerseusPacketReasonCodeV1;
+    }
+>;
+
+export type StrictBlindPerseusSourceEntryBindingResultV1 = Readonly<
+  | {
+      ok: true;
+      packet: StrictBlindPerseusSourcePacketV1;
+      verifiedSource: StrictBlindPerseusSourceSnapshotV1;
+      extractedEntry: StrictBlindPerseusExtractedEntryV1;
+    }
+  | {
+      ok: false;
+      reasonCode: StrictBlindPerseusPacketReasonCodeV1;
+    }
+>;
+
+export type StrictBlindPerseusVerifiedPinnedTeiExtractionResultV1 = Readonly<
+  | {
+      ok: true;
+      snapshot: StrictBlindPerseusSourceSnapshotV1;
+      entry: StrictBlindPerseusExtractedEntryV1;
+    }
   | {
       ok: false;
       reasonCode: StrictBlindPerseusPacketReasonCodeV1;
@@ -296,6 +331,12 @@ const STRICT_BLIND_PERSEUS_TEI_LIMIT_KEYS_V1 = [
 
 type TeiChunkV1 = string | Uint8Array;
 type TeiNamespaceV1 = "" | typeof STRICT_BLIND_PERSEUS_TEI_NAMESPACE_URI_V1;
+type StrictBlindPerseusTeiExtractionInputV1 = Readonly<{
+  sourceTraditionId: unknown;
+  chunks: Iterable<TeiChunkV1>;
+  selector: StrictBlindPerseusTeiEntrySelectorV1;
+  limits?: Partial<StrictBlindPerseusTeiLimitsV1>;
+}>;
 type EntryFrameV1 = {
   depth: number;
   ordinal: number;
@@ -306,6 +347,30 @@ type EntryFrameV1 = {
   spellingDepth: number | null;
   senses: Array<{ depth: number; id: string | null; parts: string[] }>;
 };
+
+const STRICT_BLIND_PERSEUS_PINNED_LEGACY_ENTITIES_V1: Readonly<
+  Record<string, string>
+> = Object.freeze({
+  agrave: "à",
+  ast: "*",
+  breve: "˘",
+  colon: ":",
+  dagger: "†",
+  eacute: "é",
+  equals: "=",
+  lpar: "(",
+  macr: "¯",
+  mdash: "—",
+  plus: "+",
+  quest: "?",
+  rpar: ")",
+});
+
+function isPinnedPerseusLegacyDoctypeV1(doctype: string): boolean {
+  return /^\s+TEI\.2\s+PUBLIC\s+"-\/\/TEI P4\/\/DTD Main DTD Driver File\/\/EN"\s+"http:\/\/www\.tei-c\.org\/Vault\/P4\/xml\/schema\/dtd\/tei2\.dtd"\s*\[\s*<!ENTITY\s+%\s+TEI\.XML\s+"INCLUDE"\s*>\s*<!ENTITY\s+%\s+PersDict\s+PUBLIC\s+"-\/\/Perseus P4\/\/DTD Perseus Dictionaries\/\/EN"\s+"http:\/\/www\.perseus\.tufts\.edu\/DTD\/1\.0\/PersDict\.dtd"\s*>\s*%PersDict;\s*\]\s*$/u.test(
+    doctype,
+  );
+}
 
 function isRecordV1(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
@@ -510,6 +575,61 @@ function entryLocatorV1(entry: EntryFrameV1, sourcePath: string): string {
   )};key=${encodeURIComponent(entry.key ?? "NULL")}]`;
 }
 
+type ParsedEntryLocatorV1 = Readonly<{
+  sourcePath: string;
+  localName: "entry" | "entryFree";
+  entryOrdinal: number;
+  entryId: string | null;
+  entryKey: string | null;
+}>;
+
+function decodeEntryLocatorValueV1(value: string): string | null | undefined {
+  if (value === "NULL") return null;
+  try {
+    return decodeURIComponent(value);
+  } catch {
+    return undefined;
+  }
+}
+
+function parseEntryLocatorV1(
+  value: unknown,
+  sourcePath: string,
+): ParsedEntryLocatorV1 | null {
+  if (typeof value !== "string") return null;
+  const separator = value.indexOf("#");
+  if (separator <= 0 || value.slice(0, separator) !== sourcePath) return null;
+  const match = /^\s*(entry|entryFree)\[ordinal=(\d+);id=([^;]*);key=([^;]*)\]$/u.exec(
+    value.slice(separator + 1),
+  );
+  if (!match) return null;
+  const entryOrdinal = Number(match[2]);
+  if (!Number.isSafeInteger(entryOrdinal)) return null;
+  const entryId = decodeEntryLocatorValueV1(match[3]);
+  const entryKey = decodeEntryLocatorValueV1(match[4]);
+  if (entryId === undefined || entryKey === undefined) return null;
+  return {
+    sourcePath,
+    localName: match[1] as "entry" | "entryFree",
+    entryOrdinal,
+    entryId,
+    entryKey,
+  };
+}
+
+function sensesMatchV1(
+  left: readonly StrictBlindPerseusEntrySenseV1[],
+  right: readonly StrictBlindPerseusEntrySenseV1[],
+): boolean {
+  return (
+    left.length === right.length &&
+    left.every(
+      (sense, index) =>
+        sense.senseId === right[index]?.senseId && sense.text === right[index]?.text,
+    )
+  );
+}
+
 function appendTextV1(
   entry: EntryFrameV1,
   stack: readonly { depth: number; localName: string }[],
@@ -558,12 +678,10 @@ function finishEntryV1(
   };
 }
 
-export function extractStrictBlindPerseusTeiEntryV1(input: Readonly<{
-  sourceTraditionId: unknown;
-  chunks: Iterable<TeiChunkV1>;
-  selector: StrictBlindPerseusTeiEntrySelectorV1;
-  limits?: Partial<StrictBlindPerseusTeiLimitsV1>;
-}>): StrictBlindPerseusTeiExtractionResultV1 {
+function extractStrictBlindPerseusTeiEntryInternalV1(
+  input: StrictBlindPerseusTeiExtractionInputV1,
+  allowPinnedPerseusLegacyDoctype: boolean,
+): StrictBlindPerseusTeiExtractionResultV1 {
   const definition = sourceDefinitionV1(input.sourceTraditionId);
   if (!definition) return { ok: false, reasonCode: "UNSUPPORTED_SOURCE_TRADITION" };
   if (!selectorIsValidV1(input.selector)) {
@@ -583,6 +701,9 @@ export function extractStrictBlindPerseusTeiEntryV1(input: Readonly<{
     fragment: false,
     fileName: definition.sourcePath,
   });
+  if (allowPinnedPerseusLegacyDoctype) {
+    Object.assign(parser.ENTITIES, STRICT_BLIND_PERSEUS_PINNED_LEGACY_ENTITIES_V1);
+  }
   const stack: Array<{ depth: number; localName: string; namespaceUri: string }> = [];
   let rootSeen = false;
   let rootClosed = false;
@@ -603,7 +724,14 @@ export function extractStrictBlindPerseusTeiEntryV1(input: Readonly<{
     parser.fail(reasonCode);
   };
 
-  parser.on("doctype", () => fail("DTD_FORBIDDEN"));
+  parser.on("doctype", (doctype) => {
+    if (
+      !allowPinnedPerseusLegacyDoctype ||
+      !isPinnedPerseusLegacyDoctypeV1(doctype)
+    ) {
+      fail("DTD_FORBIDDEN");
+    }
+  });
   parser.on("error", () => {
     if (!failure) failure = "MALFORMED_XML";
   });
@@ -719,7 +847,10 @@ export function extractStrictBlindPerseusTeiEntryV1(input: Readonly<{
           ? chunk
           : decoder.decode(chunk, { stream: true });
       rollingMarkup = `${rollingMarkup}${text}`.slice(-256);
-      if (/<\s*!\s*(?:DOCTYPE|ENTITY|\[)/iu.test(rollingMarkup)) {
+      if (
+        !allowPinnedPerseusLegacyDoctype &&
+        /<\s*!\s*(?:DOCTYPE|ENTITY|\[)/iu.test(rollingMarkup)
+      ) {
         fail(rollingMarkup.includes("ENTITY") ? "EXTERNAL_ENTITY_FORBIDDEN" : "DTD_FORBIDDEN");
         break;
       }
@@ -741,6 +872,12 @@ export function extractStrictBlindPerseusTeiEntryV1(input: Readonly<{
   return result ?? { ok: false, reasonCode: "ENTRY_NOT_FOUND" };
 }
 
+export function extractStrictBlindPerseusTeiEntryV1(
+  input: StrictBlindPerseusTeiExtractionInputV1,
+): StrictBlindPerseusTeiExtractionResultV1 {
+  return extractStrictBlindPerseusTeiEntryInternalV1(input, false);
+}
+
 export function extractStrictBlindPerseusTeiEntryFromBytesV1(input: Readonly<{
   sourceTraditionId: unknown;
   bytes: Uint8Array;
@@ -751,6 +888,134 @@ export function extractStrictBlindPerseusTeiEntryFromBytesV1(input: Readonly<{
     ...input,
     chunks: [input.bytes],
   });
+}
+
+export function extractStrictBlindPerseusVerifiedPinnedTeiEntryV1(input: Readonly<{
+  sourceTraditionId: unknown;
+  bytes: Uint8Array | null | undefined;
+  selector: StrictBlindPerseusTeiEntrySelectorV1;
+  limits?: Partial<StrictBlindPerseusTeiLimitsV1>;
+}>): StrictBlindPerseusVerifiedPinnedTeiExtractionResultV1 {
+  const verifiedSource = sourceSnapshotFromBytesV1(input.sourceTraditionId, input.bytes);
+  if (!verifiedSource.ok) return verifiedSource;
+  const extraction = extractStrictBlindPerseusTeiEntryInternalV1(
+    {
+      sourceTraditionId: input.sourceTraditionId,
+      chunks: [input.bytes as Uint8Array],
+      selector: input.selector,
+      limits: input.limits,
+    },
+    true,
+  );
+  if (!extraction.ok) return extraction;
+  return {
+    ok: true,
+    snapshot: verifiedSource.snapshot,
+    entry: extraction.entry,
+  };
+}
+
+/**
+ * Verifies an untrusted FOUND packet against independently supplied bytes.
+ * Structural packet validity and source-entry binding are intentionally separate
+ * checks: the latter requires re-extraction from bytes that match the trusted pin.
+ */
+export function verifyStrictBlindPerseusSourceEntryBindingV1(input: Readonly<{
+  sourceTraditionId: unknown;
+  packet: unknown;
+  bytes: Uint8Array | null | undefined;
+}>): StrictBlindPerseusSourceEntryBindingResultV1 {
+  const verifiedSource = sourceSnapshotFromBytesV1(input.sourceTraditionId, input.bytes);
+  if (!verifiedSource.ok) return verifiedSource;
+
+  const packetValidation = validateStrictBlindPerseusSourcePacketV1(input.packet);
+  if (!packetValidation.ok) {
+    return {
+      ok: false,
+      reasonCode: packetValidation.reasonCodes[0] ?? "PACKET_INVALID",
+    };
+  }
+  const packet = packetValidation.packet;
+  if (
+    packet.outcome !== "FOUND" ||
+    packet.entry === null ||
+    packet.source === null
+  ) {
+    return { ok: false, reasonCode: "SOURCE_ENTRY_BINDING_UNSUPPORTED_OUTCOME" };
+  }
+  if (
+    packet.sourceTraditionId !== input.sourceTraditionId ||
+    packet.source.sourceTraditionId !== input.sourceTraditionId
+  ) {
+    return { ok: false, reasonCode: "SOURCE_ENTRY_BINDING_SOURCE_ID_MISMATCH" };
+  }
+
+  const definition = sourceDefinitionV1(input.sourceTraditionId);
+  const expectedLocator = parseEntryLocatorV1(
+    packet.entry.entryLocator,
+    definition?.sourcePath ?? "",
+  );
+  if (!definition || !expectedLocator) {
+    return { ok: false, reasonCode: "ENTRY_LOCATOR_INVALID" };
+  }
+
+  const extraction = extractStrictBlindPerseusTeiEntryInternalV1(
+    {
+      sourceTraditionId: input.sourceTraditionId,
+      chunks: [input.bytes as Uint8Array],
+      selector: { entryOrdinal: expectedLocator.entryOrdinal },
+    },
+    true,
+  );
+  if (!extraction.ok) return extraction;
+
+  const actualLocator = parseEntryLocatorV1(
+    extraction.entry.entryLocator,
+    definition.sourcePath,
+  );
+  if (!actualLocator) {
+    return { ok: false, reasonCode: "ENTRY_LOCATOR_MISMATCH" };
+  }
+  if (
+    actualLocator.sourcePath !== expectedLocator.sourcePath ||
+    actualLocator.localName !== expectedLocator.localName
+  ) {
+    return { ok: false, reasonCode: "ENTRY_LOCATOR_MISMATCH" };
+  }
+  if (actualLocator.entryOrdinal !== expectedLocator.entryOrdinal) {
+    return { ok: false, reasonCode: "ENTRY_ORDINAL_MISMATCH" };
+  }
+  if (actualLocator.entryId !== expectedLocator.entryId) {
+    return { ok: false, reasonCode: "ENTRY_ID_MISMATCH" };
+  }
+  if (actualLocator.entryKey !== expectedLocator.entryKey) {
+    return { ok: false, reasonCode: "ENTRY_KEY_MISMATCH" };
+  }
+  if (extraction.entry.entryLocator !== packet.entry.entryLocator) {
+    return { ok: false, reasonCode: "ENTRY_LOCATOR_MISMATCH" };
+  }
+  if (extraction.entry.entryId !== packet.entry.entryId) {
+    return { ok: false, reasonCode: "ENTRY_ID_MISMATCH" };
+  }
+  if (extraction.entry.entryKey !== packet.entry.entryKey) {
+    return { ok: false, reasonCode: "ENTRY_KEY_MISMATCH" };
+  }
+  if (extraction.entry.attestedSpelling !== packet.entry.attestedSpelling) {
+    return { ok: false, reasonCode: "ENTRY_SPELLING_MISMATCH" };
+  }
+  if (extraction.entry.extractedText !== packet.entry.extractedText) {
+    return { ok: false, reasonCode: "EXTRACTED_TEXT_MISMATCH" };
+  }
+  if (!sensesMatchV1(extraction.entry.senses, packet.entry.senses)) {
+    return { ok: false, reasonCode: "ENTRY_SENSES_MISMATCH" };
+  }
+
+  return {
+    ok: true,
+    packet,
+    verifiedSource: verifiedSource.snapshot,
+    extractedEntry: extraction.entry,
+  };
 }
 
 export function buildStrictBlindPerseusFoundPacketV1(input: Readonly<{
