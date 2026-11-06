@@ -2369,6 +2369,23 @@ function qualifyingSourceSenseAgentEvidenceV0_1(
   return qualifyingSenses.length === 1 ? qualifyingSenses[0] ?? null : null;
 }
 
+function hasValidTargetRoleSourceTemplateV0_1(
+  fact: AlbanianKaikkiExactLexicalSourceFactV0_1,
+): boolean {
+  const sourceAuthoredRoleTemplates = (fact.etymologyTemplates ?? []).filter((template) =>
+    template.name === "af" || template.name === "suffix",
+  );
+  if (sourceAuthoredRoleTemplates.length === 0) return true;
+  const evidence = sourceComponentReferencesV0_1(fact);
+  return Boolean(
+    evidence &&
+      (evidence.relation === "SOURCE_AUTHORED_AF_TEMPLATE" ||
+        evidence.relation === "SOURCE_AUTHORED_SUFFIX_TEMPLATE") &&
+      evidence.reasonCodes.length === 0 &&
+      evidence.references.length === 2,
+  );
+}
+
 function buildTargetRoleAgentFunctionalBridgeV0_1(input: Readonly<{
   targetFact: AlbanianKaikkiExactLexicalSourceFactV0_1;
   targetRecord: AlbanianSourceLinkedRecordV0_1;
@@ -2394,15 +2411,16 @@ function buildTargetRoleAgentFunctionalBridgeV0_1(input: Readonly<{
   }
 
   const templateEvidence = sourceComponentReferencesV0_1(input.targetFact);
-  if (
-    !templateEvidence ||
-    (templateEvidence.relation !== "SOURCE_AUTHORED_AF_TEMPLATE" &&
-      templateEvidence.relation !== "SOURCE_AUTHORED_SUFFIX_TEMPLATE") ||
-    templateEvidence.reasonCodes.length > 0 ||
-    templateEvidence.references.length !== 2
-  ) {
+  if (!hasValidTargetRoleSourceTemplateV0_1(input.targetFact)) {
     return null;
   }
+  const hasValidatedTemplateEvidence = Boolean(
+    templateEvidence &&
+      (templateEvidence.relation === "SOURCE_AUTHORED_AF_TEMPLATE" ||
+        templateEvidence.relation === "SOURCE_AUTHORED_SUFFIX_TEMPLATE") &&
+      templateEvidence.reasonCodes.length === 0 &&
+      templateEvidence.references.length === 2,
+  );
 
   const roleEvidence = qualifyingSourceSenseAgentEvidenceV0_1(input.targetRecord);
   if (!roleEvidence || !roleEvidence.sense.senseId || !hasMeaningEvidenceV0_1(roleEvidence.sense.glosses)) {
@@ -2414,13 +2432,17 @@ function buildTargetRoleAgentFunctionalBridgeV0_1(input: Readonly<{
   if (targetSenseRows.length !== 1) return null;
 
   const senseMeaning = roleEvidence.sense.glosses.join("; ");
-  const sourceReferences = templateEvidence.references
-    .map(({ sourceForm, reference }) => `${sourceForm} → ${reference ?? "Null"}`)
-    .join(" · ");
-  const isSuffixTemplate = templateEvidence.relation === "SOURCE_AUTHORED_SUFFIX_TEMPLATE";
+  const sourceReferences = hasValidatedTemplateEvidence
+    ? templateEvidence!.references
+      .map(({ sourceForm, reference }) => `${sourceForm} → ${reference ?? "Null"}`)
+      .join(" · ")
+    : null;
+  const isSuffixTemplate = templateEvidence?.relation === "SOURCE_AUTHORED_SUFFIX_TEMPLATE";
   const templateName = isSuffixTemplate ? "suffix" : "af";
-  const template = input.targetFact.etymologyTemplates?.find((candidate) => candidate.name === templateName);
-  if (!template) return null;
+  const template = hasValidatedTemplateEvidence
+    ? input.targetFact.etymologyTemplates?.find((candidate) => candidate.name === templateName)
+    : null;
+  if (hasValidatedTemplateEvidence && !template) return null;
   const componentAlternatives = (input.componentReading?.componentResolutions ?? []).map((resolution) => {
     if (resolution.status === "AMBIGUOUS") {
       return `${resolution.sourceForm} has ${resolution.sourceRecordIds.length} source records; all returned records and senses are retained without selecting or aligning one.`;
@@ -2444,19 +2466,29 @@ function buildTargetRoleAgentFunctionalBridgeV0_1(input: Readonly<{
     functionalHypothesis: Object.freeze({
       status: "EXPLORATORY_FUNCTIONAL_HYPOTHESIS" as const,
       functionalOperation: "AGENT" as const,
-      statement: `Source-bounded target-role interpretation (exploratory): the directly queried Albanian noun ${input.targetFact.form} has source sense ${roleEvidence.sense.senseId} (“${senseMeaning}”) with the exact source-authored sq:Occupations category (category source: w). This category supports an exploratory AGENT reading for this identified target sense. The same target record attributes the ${templateName} template “${template.expansion}” and the Albanian references ${sourceReferences}; those references do not create a base-side SOURCE_DERIVED_FORM assertion or select a component sense.`,
+      statement: hasValidatedTemplateEvidence
+        ? `Source-bounded target-role interpretation (exploratory): the directly queried Albanian noun ${input.targetFact.form} has source sense ${roleEvidence.sense.senseId} (“${senseMeaning}”) with the exact source-authored sq:Occupations category (category source: w). This category supports an exploratory AGENT reading for this identified target sense. The same target record attributes the ${templateName} template “${template!.expansion}” and the Albanian references ${sourceReferences}; those references do not create a base-side SOURCE_DERIVED_FORM assertion or select a component sense.`
+        : `Source-bounded target-role interpretation (exploratory): the directly queried Albanian noun ${input.targetFact.form} has source sense ${roleEvidence.sense.senseId} (“${senseMeaning}”) with the exact source-authored sq:Occupations category (category source: w). This category supports an exploratory AGENT reading for this identified target sense. The source record has no validated role-form template or structured component relation, so this reading does not assert morphology, etymology, a base-side SOURCE_DERIVED_FORM relation, or an embryo meaning.`,
       alternatives: Object.freeze([
         "The source category applies only to the identified target sense; other target senses remain alternatives and are not selected.",
         ...componentAlternatives,
-        "The target-authored template and references remain attributed source evidence; no historical relation, suffix function, suffix law, independent embryo meaning, or Voice semantics is claimed.",
+        ...(hasValidatedTemplateEvidence
+          ? ["The target-authored template and references remain attributed source evidence; no historical relation, suffix function, suffix law, independent embryo meaning, or Voice semantics is claimed."]
+          : ["The absence of a validated component template leaves morphology, etymology, historical relation, suffix function, independent embryo meaning, and Voice semantics unclaimed."]),
       ]),
       basis: Object.freeze([
         "SOURCE_ATTESTED_TARGET_ROLE_CATEGORY",
         "SOURCE_ATTESTED_FINAL_SENSE_CATEGORY",
-        isSuffixTemplate ? "TARGET_SOURCE_AUTHORED_SUFFIX_TEMPLATE" : "TARGET_SOURCE_AUTHORED_AF_TEMPLATE",
-        "SOURCE_STRUCTURED_ALBANIAN_REFERENCES",
+        ...(hasValidatedTemplateEvidence
+          ? [
+              isSuffixTemplate ? "TARGET_SOURCE_AUTHORED_SUFFIX_TEMPLATE" : "TARGET_SOURCE_AUTHORED_AF_TEMPLATE",
+              "SOURCE_STRUCTURED_ALBANIAN_REFERENCES",
+            ]
+          : ["TARGET_SOURCE_ROLE_HAS_NO_VALIDATED_COMPONENT_TEMPLATE"]),
       ]),
-      claimBoundary: "Exploratory AGENT role for one exact source-identified target sense only. No target-to-base sense alignment, base-side derived-form relation, composition, historical etymology, suffix semantics, embryo function, or pronunciation semantics is asserted.",
+      claimBoundary: hasValidatedTemplateEvidence
+        ? "Exploratory AGENT role for one exact source-identified target sense only. No target-to-base sense alignment, base-side derived-form relation, composition, historical etymology, suffix semantics, embryo function, or pronunciation semantics is asserted."
+        : "Exploratory AGENT role for one exact source-identified target sense only. No source component template or base relation is present; no morphology, etymology, composition, historical relation, suffix semantics, embryo function, or pronunciation semantics is asserted.",
     }),
     reasonCodes: Object.freeze([]),
     claimBoundary: "The direct role reading is authorized by the exact source sense category and target identity. Target-authored component references remain separate attributed evidence; IPA and Voice are not used to classify the role.",
@@ -3643,14 +3675,11 @@ async function buildAlbanianLexicalReadingV0_1(input: Readonly<{
       normalizedAlbanianFormV0_1(fact.form) === normalizedAlbanianFormV0_1(input.word) &&
       fact.partOfSpeech !== "name",
     );
-    const targetRoleCandidates = targetRecords.filter((fact) => {
-      const componentReferences = sourceComponentReferencesV0_1(fact);
-      return fact.partOfSpeech === "noun" &&
-        (componentReferences?.relation === "SOURCE_AUTHORED_AF_TEMPLATE" ||
-          componentReferences?.relation === "SOURCE_AUTHORED_SUFFIX_TEMPLATE") &&
-        componentReferences.reasonCodes.length === 0 &&
-        qualifyingSourceSenseAgentEvidenceV0_1(sourceRecordProjectionV0_1(fact, [])) !== null;
-    });
+    const targetRoleCandidates = targetRecords.filter((fact) =>
+      fact.partOfSpeech === "noun" &&
+      hasValidTargetRoleSourceTemplateV0_1(fact) &&
+      qualifyingSourceSenseAgentEvidenceV0_1(sourceRecordProjectionV0_1(fact, [])) !== null,
+    );
     if (targetRoleCandidates.length > 0 && targetRecords.length > 1) {
       return "SOURCE_TARGET_RECORD_IDENTITY_AMBIGUOUS";
     }

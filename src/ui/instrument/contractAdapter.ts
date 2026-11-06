@@ -2099,10 +2099,15 @@ function parseMotivationDiscoveryV0_1(
       const hypothesis = bridge.functionalHypothesis;
       const basis = hypothesis.basis;
       if (!isStringArray(basis)) return true;
-      const componentReading = reading.sourceLinkedComponentReading;
-      const componentRelationType = isRecord(componentReading) && isRecord(componentReading.relation)
-        ? componentReading.relation.relation
+      const componentReadingValue = reading.sourceLinkedComponentReading;
+      const componentReading = isRecord(componentReadingValue) ? componentReadingValue : null;
+      const componentRelation = componentReading && isRecord(componentReading.relation)
+        ? componentReading.relation
         : null;
+      const componentPrimary = componentReading && isRecord(componentReading.primary)
+        ? componentReading.primary
+        : null;
+      const componentRelationType = componentRelation?.relation;
       const claimsDirectTargetAgent = bridge.status === "SUPPORTED" && bridge.relatedForm === null &&
         bridge.derivedStructure === null && hypothesis.status === "EXPLORATORY_FUNCTIONAL_HYPOTHESIS" &&
         hypothesis.functionalOperation === "AGENT";
@@ -2127,16 +2132,18 @@ function parseMotivationDiscoveryV0_1(
         target.form !== sourceFacts.primary.form ||
         target.sourceRecordId !== sourceFacts.primary.sourceRecordId ||
         target.entryLocator !== sourceFacts.primary.entryLocator ||
-        !isRecord(componentReading) || !isRecord(componentReading.relation) ||
-        (componentRelationType !== "SOURCE_AUTHORED_AF_TEMPLATE" &&
-          componentRelationType !== "SOURCE_AUTHORED_SUFFIX_TEMPLATE") ||
-        componentReading.relation.primarySourceRecordId !== target.sourceRecordId ||
-        componentReading.relation.primaryEntryLocator !== target.entryLocator ||
-        !Array.isArray(componentReading.relation.references) || componentReading.relation.references.length !== 2 ||
-        !isRecord(componentReading.primary) || componentReading.primary.sourceRecordId !== target.sourceRecordId ||
-        componentReading.primary.entryLocator !== target.entryLocator ||
         !Array.isArray(exactSourceFacts)
       ) return false;
+      if (hasTargetAuthoredTemplateRelation) {
+        if (!componentReading || !componentRelation ||
+          componentRelation.primarySourceRecordId !== target.sourceRecordId ||
+          componentRelation.primaryEntryLocator !== target.entryLocator ||
+          !Array.isArray(componentRelation.references) || componentRelation.references.length !== 2 ||
+          !componentPrimary || componentPrimary.sourceRecordId !== target.sourceRecordId ||
+          componentPrimary.entryLocator !== target.entryLocator) return false;
+      } else if (componentReadingValue !== null && componentReadingValue !== undefined) {
+        return false;
+      }
 
       const targetForm = typeof target.form === "string" ? target.form : null;
       if (targetForm === null) return false;
@@ -2157,17 +2164,18 @@ function parseMotivationDiscoveryV0_1(
       ) return false;
 
       const rawTarget = targetRecords[0];
-      const componentPrimary = isRecord(componentReading) ? componentReading.primary : null;
-      if (!isRecord(rawTarget) || !Array.isArray(rawTarget.senses) || !isRecord(componentPrimary) ||
+      if (!isRecord(rawTarget) || !Array.isArray(rawTarget.senses) ||
         rawTarget.sourceRecordId !== target.sourceRecordId || rawTarget.entryLocator !== target.entryLocator ||
         rawTarget.form !== target.form || rawTarget.partOfSpeech !== target.partOfSpeech ||
-        rawTarget.partOfSpeech !== "noun" || rawTarget.etymologyText !== target.etymologyText ||
-        componentPrimary.sourceRecordId !== target.sourceRecordId ||
-        componentPrimary.entryLocator !== target.entryLocator || componentPrimary.form !== target.form ||
-        componentPrimary.partOfSpeech !== rawTarget.partOfSpeech ||
-        componentPrimary.physicalRecordOrdinal !== rawTarget.physicalRecordOrdinal) return false;
+        rawTarget.partOfSpeech !== "noun" || rawTarget.etymologyText !== target.etymologyText) return false;
+      if (hasTargetAuthoredTemplateRelation &&
+        (!componentPrimary ||
+          componentPrimary.sourceRecordId !== target.sourceRecordId ||
+          componentPrimary.entryLocator !== target.entryLocator || componentPrimary.form !== target.form ||
+          componentPrimary.partOfSpeech !== rawTarget.partOfSpeech ||
+          componentPrimary.physicalRecordOrdinal !== rawTarget.physicalRecordOrdinal)) return false;
 
-      const rawSenses = rawTarget.senses as unknown[];
+      const rawSenses: unknown[] = rawTarget.senses;
       if (!rawSenses.every((sense) => isRecord(sense) &&
         (sense.senseId === null || typeof sense.senseId === "string") && isStringArray(sense.glosses))) return false;
       const sameStringArray = (left: unknown, right: unknown): boolean =>
@@ -2185,10 +2193,10 @@ function parseMotivationDiscoveryV0_1(
         isRecord(sense) && isStringArray(sense.glosses) ? sense.glosses : [],
       ))];
       if (!matchesRawSenseProjection(sourceFacts.primary.sourceSenses) ||
-        !matchesRawSenseProjection(componentPrimary.sourceSenses) ||
+        (hasTargetAuthoredTemplateRelation && (!isRecord(componentPrimary) || !matchesRawSenseProjection(componentPrimary.sourceSenses))) ||
         !sameStringArray(sourceFacts.primary.meaningGlosses, expectedMeaningGlosses) ||
         !sameStringArray(target.meaningGlosses, expectedMeaningGlosses) ||
-        !sameStringArray(componentPrimary.meaningGlosses, expectedMeaningGlosses)) return false;
+        (hasTargetAuthoredTemplateRelation && (!isRecord(componentPrimary) || !sameStringArray(componentPrimary.meaningGlosses, expectedMeaningGlosses)))) return false;
 
       const sourceSenses = sourceFacts.primary.sourceSenses;
       if (!Array.isArray(sourceSenses)) return false;
@@ -2220,30 +2228,51 @@ function parseMotivationDiscoveryV0_1(
       const projectedRoleCategories = projectedRoleSense.categories.filter(isExactSourceOccupationCategory);
       if (rawRoleCategories.length !== 1 || projectedRoleCategories.length !== 1) return false;
 
-      const expectedTemplateBasis = componentRelationType === "SOURCE_AUTHORED_SUFFIX_TEMPLATE"
-        ? "TARGET_SOURCE_AUTHORED_SUFFIX_TEMPLATE"
-        : "TARGET_SOURCE_AUTHORED_AF_TEMPLATE";
-      if (!sameStringArray(basis, [
-        "SOURCE_ATTESTED_TARGET_ROLE_CATEGORY",
-        "SOURCE_ATTESTED_FINAL_SENSE_CATEGORY",
-        expectedTemplateBasis,
-        "SOURCE_STRUCTURED_ALBANIAN_REFERENCES",
-      ])) return false;
+      const expectedBasis = hasTargetAuthoredTemplateRelation
+        ? [
+            "SOURCE_ATTESTED_TARGET_ROLE_CATEGORY",
+            "SOURCE_ATTESTED_FINAL_SENSE_CATEGORY",
+            componentRelationType === "SOURCE_AUTHORED_SUFFIX_TEMPLATE"
+              ? "TARGET_SOURCE_AUTHORED_SUFFIX_TEMPLATE"
+              : "TARGET_SOURCE_AUTHORED_AF_TEMPLATE",
+            "SOURCE_STRUCTURED_ALBANIAN_REFERENCES",
+          ]
+        : [
+            "SOURCE_ATTESTED_TARGET_ROLE_CATEGORY",
+            "SOURCE_ATTESTED_FINAL_SENSE_CATEGORY",
+            "TARGET_SOURCE_ROLE_HAS_NO_VALIDATED_COMPONENT_TEMPLATE",
+          ];
+      if (!sameStringArray(basis, expectedBasis)) return false;
 
+      const rawTargetTemplates: unknown[] | null = Array.isArray(rawTarget.etymologyTemplates)
+        ? rawTarget.etymologyTemplates
+        : null;
       let validTemplateEvidence = false;
-      if (componentRelationType === "SOURCE_AUTHORED_SUFFIX_TEMPLATE") {
+      if (!hasTargetAuthoredTemplateRelation) {
+        if (rawTargetTemplates === null) return false;
+        validTemplateEvidence = rawTargetTemplates.every((template: unknown) =>
+          !isRecord(template) || (template.name !== "af" && template.name !== "suffix"),
+        );
+      } else if (componentRelationType === "SOURCE_AUTHORED_SUFFIX_TEMPLATE") {
         validTemplateEvidence = validSourceAuthoredSuffixTemplateReading(componentReading, target);
       } else {
-        const references = componentReading.relation.references as unknown[];
-        const projectedTemplateArray = Array.isArray(componentPrimary.etymologyTemplates)
-          ? componentPrimary.etymologyTemplates
+        const references: unknown[] = componentRelation && Array.isArray(componentRelation.references)
+          ? componentRelation.references
           : [];
-        const rawTemplates = Array.isArray(rawTarget.etymologyTemplates) ? rawTarget.etymologyTemplates : [];
-        const projectedLinks = Array.isArray(componentPrimary.etymologyLinks) ? componentPrimary.etymologyLinks : [];
-        const rawLinks = Array.isArray(rawTarget.etymologyLinks) ? rawTarget.etymologyLinks : [];
-        if (!Array.isArray(componentPrimary.etymologyTemplates) || !Array.isArray(rawTarget.etymologyTemplates) ||
-          rawTemplates.length !== projectedTemplateArray.length ||
-          rawLinks.length !== projectedLinks.length || rawLinks.length !== 2) return false;
+        const projectedTemplateArray: unknown[] | null = componentPrimary && Array.isArray(componentPrimary.etymologyTemplates)
+          ? componentPrimary.etymologyTemplates
+          : null;
+        const projectedLinks: unknown[] | null = componentPrimary && Array.isArray(componentPrimary.etymologyLinks)
+          ? componentPrimary.etymologyLinks
+          : null;
+        const rawLinks: unknown[] | null = Array.isArray(rawTarget.etymologyLinks)
+          ? rawTarget.etymologyLinks
+          : null;
+        if (!componentPrimary || rawTargetTemplates === null || projectedTemplateArray === null ||
+          rawLinks === null || projectedLinks === null || references.length !== 2 ||
+          rawTargetTemplates.length !== projectedTemplateArray.length ||
+          rawLinks.length !== projectedLinks.length || rawLinks.length !== 2 ||
+          typeof componentPrimary.etymologyText !== "string") return false;
         const sameTemplate = (left: unknown, right: unknown): boolean => {
           if (!isRecord(left) || !isRecord(right) || !isRecord(left.args) || !isRecord(right.args)) return false;
           const leftArgs = left.args as Record<string, unknown>;
@@ -2252,10 +2281,10 @@ function parseMotivationDiscoveryV0_1(
             Object.keys(leftArgs).sort().join("\u0000") === Object.keys(rightArgs).sort().join("\u0000") &&
             Object.entries(leftArgs).every(([key, value]) => rightArgs[key] === value);
         };
-        if (!rawTemplates.every((template, index) => sameTemplate(template, projectedTemplateArray[index])) ||
+        if (!rawTargetTemplates.every((template: unknown, index: number) => sameTemplate(template, projectedTemplateArray[index])) ||
           !rawLinks.every((link, index) => isRecord(link) && isRecord(projectedLinks[index]) &&
             link.sourceForm === projectedLinks[index].sourceForm && link.reference === projectedLinks[index].reference)) return false;
-        const projectedTemplates = projectedTemplateArray.filter((template) => isRecord(template) && template.name === "af");
+        const projectedTemplates = projectedTemplateArray.filter((template: unknown) => isRecord(template) && template.name === "af");
         if (projectedTemplates.length !== 1) return false;
         const template = projectedTemplates[0];
         if (!isRecord(template) || !isRecord(template.args)) return false;
@@ -2268,7 +2297,7 @@ function parseMotivationDiscoveryV0_1(
           Object.keys(templateArguments).filter((argument) => argument === "t1" || argument === "t2")
             .some((argument) => typeof templateArguments[argument] !== "string") ||
           typeof templateBaseForm !== "string" || typeof templateComponentForm !== "string" ||
-          typeof template.expansion !== "string" || typeof componentPrimary.etymologyText !== "string") return false;
+          typeof template.expansion !== "string") return false;
         const normalizeText = (text: string): string => text.normalize("NFC").trim().replace(/\s+/gu, " ").toLocaleLowerCase("sq-AL");
         const expansionParts = template.expansion.split(/\s+\+\s+/u);
         const matchesExpansionRoot = (part: string | undefined, form: string): boolean => {
@@ -2293,21 +2322,30 @@ function parseMotivationDiscoveryV0_1(
       }
       if (!validTemplateEvidence) return false;
 
-      const templateName = componentRelationType === "SOURCE_AUTHORED_SUFFIX_TEMPLATE" ? "suffix" : "af";
-      const rawTemplates = Array.isArray(rawTarget.etymologyTemplates) ? rawTarget.etymologyTemplates : [];
-      const matchingTemplates = rawTemplates.filter((template) => isRecord(template) && template.name === templateName);
-      if (matchingTemplates.length !== 1 || !isRecord(matchingTemplates[0]) ||
-        typeof matchingTemplates[0].expansion !== "string") return false;
-      const references = componentReading.relation.references as unknown[];
-      const sourceReferences = references.map((reference) => {
-        if (!isRecord(reference) || typeof reference.sourceForm !== "string" || typeof reference.reference !== "string") {
-          return null;
-        }
-        return `${reference.sourceForm} → ${reference.reference}`;
-      });
-      if (sourceReferences.some((reference) => reference === null)) return false;
       const roleGlosses = rawRoleSense.glosses as string[];
-      const expectedStatement = `Source-bounded target-role interpretation (exploratory): the directly queried Albanian noun ${target.form} has source sense ${roleSenseId} (“${roleGlosses.join("; ")}”) with the exact source-authored sq:Occupations category (category source: w). This category supports an exploratory AGENT reading for this identified target sense. The same target record attributes the ${templateName} template “${matchingTemplates[0].expansion}” and the Albanian references ${sourceReferences.join(" · ")}; those references do not create a base-side SOURCE_DERIVED_FORM assertion or select a component sense.`;
+      let expectedStatement: string;
+      if (!hasTargetAuthoredTemplateRelation) {
+        expectedStatement = `Source-bounded target-role interpretation (exploratory): the directly queried Albanian noun ${target.form} has source sense ${roleSenseId} (“${roleGlosses.join("; ")}”) with the exact source-authored sq:Occupations category (category source: w). This category supports an exploratory AGENT reading for this identified target sense. The source record has no validated role-form template or structured component relation, so this reading does not assert morphology, etymology, a base-side SOURCE_DERIVED_FORM relation, or an embryo meaning.`;
+      } else {
+        const templateName = componentRelationType === "SOURCE_AUTHORED_SUFFIX_TEMPLATE" ? "suffix" : "af";
+        const matchingTemplates = rawTargetTemplates === null
+          ? []
+          : rawTargetTemplates.filter((template: unknown) => isRecord(template) && template.name === templateName);
+        if (matchingTemplates.length !== 1 || !isRecord(matchingTemplates[0]) ||
+          typeof matchingTemplates[0].expansion !== "string") return false;
+        const references: unknown[] = componentRelation && Array.isArray(componentRelation.references)
+          ? componentRelation.references
+          : [];
+        if (references.length !== 2) return false;
+        const sourceReferences = references.map((reference) => {
+          if (!isRecord(reference) || typeof reference.sourceForm !== "string" || typeof reference.reference !== "string") {
+            return null;
+          }
+          return `${reference.sourceForm} → ${reference.reference}`;
+        });
+        if (sourceReferences.some((reference) => reference === null)) return false;
+        expectedStatement = `Source-bounded target-role interpretation (exploratory): the directly queried Albanian noun ${target.form} has source sense ${roleSenseId} (“${roleGlosses.join("; ")}”) with the exact source-authored sq:Occupations category (category source: w). This category supports an exploratory AGENT reading for this identified target sense. The same target record attributes the ${templateName} template “${matchingTemplates[0].expansion}” and the Albanian references ${sourceReferences.join(" · ")}; those references do not create a base-side SOURCE_DERIVED_FORM assertion or select a component sense.`;
+      }
       return hypothesis.statement === expectedStatement;
     };
     const validFunctionalMeaningBridge = validFunctionalMeaningBridgeValue(reading.functionalMeaningBridge) &&
