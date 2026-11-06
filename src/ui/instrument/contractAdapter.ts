@@ -2325,7 +2325,7 @@ function parseMotivationDiscoveryV0_1(
           return `${reference.sourceForm} → ${reference.reference}`;
         });
         if (sourceReferences.some((reference) => reference === null)) return false;
-        expectedStatement = `Source-bounded target-role interpretation (exploratory): the directly queried Albanian noun ${target.form} has source sense ${roleSenseId} (“${roleGlosses.join("; ")}") with the exact source-authored sq:Occupations category (category source: w). This category supports an exploratory AGENT reading for this identified target sense. The same target record attributes the ${templateName} template “${matchingTemplates[0].expansion}” and the Albanian references ${sourceReferences.join(" · ")}; those references do not create a base-side SOURCE_DERIVED_FORM assertion or select a component sense.`;
+        expectedStatement = `Source-bounded target-role interpretation (exploratory): the directly queried Albanian noun ${target.form} has source sense ${roleSenseId} (“${roleGlosses.join("; ")}”) with the exact source-authored sq:Occupations category (category source: w). This category supports an exploratory AGENT reading for this identified target sense. The same target record attributes the ${templateName} template “${matchingTemplates[0].expansion}” and the Albanian references ${sourceReferences.join(" · ")}; those references do not create a base-side SOURCE_DERIVED_FORM assertion or select a component sense.`;
       }
       return hypothesis.statement === expectedStatement;
     };
