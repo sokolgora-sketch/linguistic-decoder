@@ -19,6 +19,8 @@ describe("Open Instrument responsive shell guard", () => {
     const source = read("src/components/ZroChatPage.tsx");
 
     expect(source).toContain("window.matchMedia('(max-width: 639px)').matches");
+    expect(source).toContain("typeof window.matchMedia === 'function'");
+    expect(source).toContain('window.innerWidth <= 639');
     expect(source).toContain("settledResultMessageIdRef.current !== settledResultMessageId");
     expect(source).toContain("behavior: 'instant'");
     expect(source).toContain('data-testid="settled-analysis-result"');

@@ -75,6 +75,13 @@ function uid() {
   return Math.random().toString(16).slice(2) + Date.now().toString(16);
 }
 
+function isMobileViewport(): boolean {
+  if (typeof window.matchMedia === 'function') {
+    return window.matchMedia('(max-width: 639px)').matches;
+  }
+  return window.innerWidth <= 639;
+}
+
 function safeString(e: unknown): string {
   if (e instanceof Error) return e.message;
   try {
@@ -223,7 +230,7 @@ export default function ZroChatPage() {
   const bottomRef = React.useRef<HTMLDivElement | null>(null);
 
   React.useEffect(() => {
-    if (window.matchMedia('(max-width: 639px)').matches) return;
+    if (isMobileViewport()) return;
     const el = bottomRef.current;
     const fn = (el as any)?.scrollIntoView;
     if (typeof fn === 'function') fn.call(el, { behavior: 'smooth', block: 'end' });
@@ -523,7 +530,7 @@ export default function ZroChatPage() {
       : null;
   settledResultMessageIdRef.current = settledResultMessageId;
   React.useEffect(() => {
-    if (!settledResultMessageId || window.matchMedia('(min-width: 640px)').matches) return;
+    if (!settledResultMessageId || !isMobileViewport()) return;
 
     const frame = window.requestAnimationFrame(() => {
       if (settledResultMessageIdRef.current !== settledResultMessageId) return;
