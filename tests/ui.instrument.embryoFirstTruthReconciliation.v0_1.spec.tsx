@@ -423,13 +423,13 @@ describe(
 
       expect(
         screen.getByText(
-          "WORD-SPECIFIC READING",
+          "CANONICAL CANDIDATE / REVIEWED EVIDENCE STATUS",
         ),
       ).toBeInTheDocument();
 
       expect(
         screen.getByText(
-          "No supported functional candidate yet.",
+          "No canonical candidate is established.",
         ),
       ).toBeInTheDocument();
 
@@ -655,13 +655,13 @@ describe(
 
       expect(
         screen.getByText(
-          "WORD-SPECIFIC READING",
+          "CANONICAL CANDIDATE / REVIEWED EVIDENCE STATUS",
         ),
       ).toBeInTheDocument();
 
       expect(
         screen.getByText(
-          "No supported functional candidate yet.",
+          "No canonical candidate is established.",
         ),
       ).toBeInTheDocument();
     });

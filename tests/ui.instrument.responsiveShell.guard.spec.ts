@@ -5,14 +5,32 @@ function read(path: string): string {
 }
 
 describe("Open Instrument responsive shell guard", () => {
-  it("keeps the sticky composer from covering the final result content", () => {
+  it("keeps the mobile composer in flow and the desktop sticky composer below safe-area content", () => {
     const source = read("src/components/ChatShell.tsx");
 
-    expect(source).toContain("sticky bottom-0");
+    expect(source).toContain("static border-t border-[#333333]");
+    expect(source).toContain("sm:sticky sm:bottom-0");
     expect(source).toContain("env(safe-area-inset-bottom)");
-    expect(source).toContain("pb-[calc(34rem+env(safe-area-inset-bottom))]");
-    expect(source).toContain("md:pb-[calc(22rem+env(safe-area-inset-bottom))]");
+    expect(source).toContain("pb-4 sm:pb-[calc(22rem+env(safe-area-inset-bottom))]");
     expect(source).toContain("xl:pb-[calc(7.5rem+env(safe-area-inset-bottom))]");
+  });
+
+  it("settles each mobile result on its analysis and exposes a direct composer jump", () => {
+    const source = read("src/components/ZroChatPage.tsx");
+
+    expect(source).toContain("window.matchMedia('(max-width: 639px)').matches");
+    expect(source).toContain("typeof window.matchMedia === 'function'");
+    expect(source).toContain('window.innerWidth <= 639');
+    expect(source).toContain("settledResultMessageIdRef.current !== settledResultMessageId");
+    expect(source).toContain("behavior: 'instant'");
+    expect(source).toContain('data-testid="settled-analysis-result"');
+    expect(source).toContain("primaryReading ?? result");
+    expect(source).toContain("inputElement.focus({ preventScroll: true })");
+
+    const panel = read("src/ui/instrument/InstrumentPanel.tsx");
+    expect(panel).toContain('data-testid="primary-reading-scroll-target"');
+    expect(panel).toContain('data-testid="mobile-composer-jump"');
+    expect(panel).toContain("scroll-mt-24 sm:scroll-mt-0");
   });
 
   it("keeps the /chat composer compact and full-width across breakpoints", () => {
@@ -28,10 +46,15 @@ describe("Open Instrument responsive shell guard", () => {
     const panel = read("src/ui/instrument/InstrumentPanel.tsx");
     const candidates = read("src/ui/candidates/CandidatesAccordion.tsx");
     const rawJson = read("src/ui/instrument/sections/RawJsonCard.tsx");
+    const tabsStart = panel.indexOf("function SectionTabs");
+    const tabsEnd = panel.indexOf("function TabPanel", tabsStart);
+    const tabs = panel.slice(tabsStart, tabsEnd);
 
     expect(panel).toContain("max-w-full overflow-hidden");
-    expect(panel).toContain("overscroll-x-contain");
-    expect(panel).toContain("whitespace-nowrap");
+    expect(tabs).toContain("flex max-w-full flex-wrap gap-1.5");
+    expect(tabs).toContain("min-h-10 max-w-full rounded-[8px]");
+    expect(tabs).not.toContain("overflow-x-auto");
+    expect(tabs).not.toContain("whitespace-nowrap");
     expect(candidates).toContain("whitespace-pre-wrap break-words");
     expect(rawJson).toContain("whitespace-pre-wrap break-words");
   });

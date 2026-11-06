@@ -2244,9 +2244,62 @@ function parseMotivationDiscoveryV0_1(
           ];
       if (!sameStringArray(basis, expectedBasis)) return false;
 
-      const rawTargetTemplates: unknown[] | null = Array.isArray(rawTarget.etymologyTemplates)
-        ? rawTarget.etymologyTemplates
-        : null;
+      const sameTemplateList = (left: unknown[], right: unknown[]): boolean =>
+        left.length === right.length && left.every((template, index) => {
+          const other = right[index];
+          if (!isRecord(template) || !isRecord(other) ||
+            template.name !== other.name || template.expansion !== other.expansion ||
+            !isRecord(template.args) || !isRecord(other.args)) return false;
+          const templateArgs = template.args as Record<string, unknown>;
+          const otherArgs = other.args as Record<string, unknown>;
+          return Object.keys(templateArgs).sort().join("\u0000") === Object.keys(otherArgs).sort().join("\u0000") &&
+            Object.entries(templateArgs).every(([key, value]) => otherArgs[key] === value);
+        });
+      const rawTargetTemplates: unknown[] | null = (() => {
+        if (Array.isArray(rawTarget.etymologyTemplates)) return rawTarget.etymologyTemplates;
+        if (rawTarget.etymologyTemplates !== undefined) return null;
+
+        // The exact-source projection permits an omitted template field. Recover that
+        // optional field only from the pinned occupational candidate projection when
+        // it is bound back to this exact record and its source links.
+        const batch = reading.occupationalRoleResearchCandidates;
+        if (!isRecord(batch) || batch.sourceProfileId !== "open-instrument.albanian-kaikki.frozen.20261022T035432Z" ||
+          batch.sourceArtifactSha256 !== ALBANIAN_KAIKKI_LEXICAL_SOURCE_SHA256_V0_1 ||
+          batch.sourceArtifactBytes !== ALBANIAN_KAIKKI_LEXICAL_SOURCE_BYTES_V0_1 ||
+          !Array.isArray(batch.candidates) || !Array.isArray(rawTarget.etymologyLinks)) return null;
+        const linkedCandidates = batch.candidates.filter((candidate) =>
+          isRecord(candidate) && candidate.sourceRecordId === target.sourceRecordId,
+        );
+        if (linkedCandidates.length === 0) return null;
+        const candidateRecords: Record<string, unknown>[] = [];
+        for (const candidate of linkedCandidates) {
+          if (!isRecord(candidate) || !isRecord(candidate.sourceRecord)) return null;
+          const record = candidate.sourceRecord;
+          const sourceSense = Array.isArray(rawTarget.senses) && Number.isInteger(record.senseOrdinal)
+            ? rawTarget.senses[record.senseOrdinal as number]
+            : null;
+          const recordLinks = record.etymologyLinks;
+          if (record.physicalRecordOrdinal !== rawTarget.physicalRecordOrdinal ||
+            record.entryLocator !== target.entryLocator || record.lemma !== target.form ||
+            record.partOfSpeech !== rawTarget.partOfSpeech || record.etymologyText !== rawTarget.etymologyText ||
+            !Array.isArray(record.etymologyTemplates) || !Array.isArray(recordLinks) ||
+            recordLinks.length !== rawTarget.etymologyLinks.length ||
+            !isRecord(sourceSense) || sourceSense.senseId !== candidate.senseId ||
+            !isStringArray(sourceSense.glosses) || !sameStringArray(record.glosses, sourceSense.glosses) ||
+            !rawTarget.etymologyLinks.every((link, index) => {
+              const projectedLink = recordLinks[index];
+              return isRecord(link) && isRecord(projectedLink) &&
+                (projectedLink.form === link.sourceForm || projectedLink.sourceForm === link.sourceForm) &&
+                projectedLink.reference === link.reference;
+            })) return null;
+          candidateRecords.push(record);
+        }
+        const firstTemplates = candidateRecords[0]?.etymologyTemplates;
+        if (!Array.isArray(firstTemplates) || !candidateRecords.every((record) =>
+          Array.isArray(record.etymologyTemplates) && sameTemplateList(firstTemplates, record.etymologyTemplates),
+        )) return null;
+        return firstTemplates;
+      })();
       let validTemplateEvidence = false;
       if (!hasTargetAuthoredTemplateRelation) {
         if (rawTargetTemplates === null) return false;

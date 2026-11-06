@@ -112,7 +112,7 @@ describe("Open Instrument lexical evidence primary surface v0.1", () => {
     expect(lexical).toHaveTextContent("Source form: det");
     expect(lexical).toHaveTextContent("Source form: mare");
     expect(screen.queryByText("Research functional hypothesis")).not.toBeInTheDocument();
-    expect(screen.getByText("No supported functional candidate yet.")).toBeInTheDocument();
+    expect(screen.getByText("No canonical candidate is established.")).toBeInTheDocument();
   });
 
   it("surfaces target-bound lexical evidence for candle while preserving the structural result", async () => {

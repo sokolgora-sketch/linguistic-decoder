@@ -856,7 +856,10 @@ async function main(): Promise<void> {
           result.submissionMethod = "ENTER_KEY";
           await wordInput.press("Enter");
         } else {
-          await page.getByRole("button", { name: "Analyze" }).click();
+          await page.getByRole("button", {
+            name: "Analyze",
+            exact: true,
+          }).click();
         }
         const apiResponse = await apiResponsePromise;
         result.apiStatus = apiResponse.status();

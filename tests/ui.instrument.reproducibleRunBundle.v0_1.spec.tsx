@@ -446,7 +446,7 @@ describe("reproducible run bundle UI handoff v0.1", () => {
     expect(screen.getByLabelText("Word")).toHaveValue("saved");
     expect(screen.getByLabelText("IPA")).toHaveValue("/ˈseɪvd/");
     expect(screen.getByLabelText("Intended sense")).toHaveValue("archived learning action");
-    expect(screen.getAllByText("No supported functional candidate yet.").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("No canonical candidate is established.").length).toBeGreaterThan(0);
     expect(screen.getByText("Imported local snapshot")).toBeInTheDocument();
     expect(screen.getByText(bundle.fingerprint.value)).toBeInTheDocument();
     expect(global.fetch).not.toHaveBeenCalled();

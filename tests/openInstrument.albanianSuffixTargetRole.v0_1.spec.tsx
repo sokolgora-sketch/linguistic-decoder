@@ -11,6 +11,7 @@ import {
   type AlbanianKaikkiExactLexicalSourceFactV0_1,
 } from "@/shared/openInstrument/albanianKaikkiServerOnlyExactLexicalSource.v0_1";
 import { adaptAnalysisToTelemetryVM } from "@/ui/instrument/contractAdapter";
+import { InstrumentPanel } from "@/ui/instrument/InstrumentPanel";
 import { MotivationDiscoveryCardV0_1 } from "@/ui/instrument/sections/MotivationDiscoveryCard.v0_1";
 import { buildHeartInstrumentV1 } from "@/v1/heartInstrument.v1";
 import { createElement } from "react";
@@ -264,6 +265,89 @@ describeWithRealSource("source-authored suffix direct-target AGENT with the froz
 });
 
 describe("source-authored suffix direct-target AGENT synthetic controls", () => {
+  it("keeps the source-bounded AGENT reading visible in the default Overview when the exact source omits its optional template field", async () => {
+    const target = syntheticDirectOccupationRoleTarget({
+      senses: [
+        {
+          senseId: "en-administronjës-sq-noun-aYSRYity",
+          glosses: ["manager, administrator"],
+          categories: [occupations()],
+        },
+        {
+          senseId: "administronjës-alternative-sense",
+          glosses: ["an additional source sense"],
+          categories: [],
+        },
+      ],
+    });
+    delete target.etymologyTemplates;
+    const discovery = await syntheticDiscovery([target], "administronjës");
+    const exactFacts = discovery.exactLexicalSourceFacts as Record<string, unknown>[];
+    expect(exactFacts[0]).not.toHaveProperty("etymologyTemplates");
+    const reading = discovery.albanianLexicalReading as Record<string, unknown>;
+    const roleBatch = reading.occupationalRoleResearchCandidates as Record<string, unknown>;
+    const roleCandidates = roleBatch.candidates as Record<string, unknown>[];
+    expect((roleCandidates[0]?.sourceRecord as Record<string, unknown>).etymologyTemplates).toEqual([]);
+
+    const sourceSense = exactFacts[0]?.senses as Record<string, unknown>[];
+    expect(sourceSense).toHaveLength(2);
+    const baseResponse = await GET(new Request(
+      "http://localhost/api/analyze-v1?word=administronj%C3%ABs&mode=strict&alphabet=albanian&language=sq&providerExecution=disabled",
+    ));
+    expect(baseResponse.status).toBe(200);
+    const body = await baseResponse.json() as ApiBody;
+    body.motivationDiscoveryV0_1 = discovery;
+
+    const vm = adaptAnalysisToTelemetryVM(body);
+    expect(vm.motivationDiscoveryV0_1?.kind).toBe("present");
+    render(<InstrumentPanel payload={body} />);
+
+    const primary = screen.getByTestId("primary-albanian-reading");
+    expect(primary).toHaveTextContent("Albanian word reading");
+    expect(primary).toHaveTextContent("Kaikki Albanian · administronjës · noun");
+    expect(primary).toHaveTextContent("en-administronjës-sq-noun-aYSRYity");
+    expect(primary).toHaveTextContent("Source meaning: manager, administrator");
+    expect(primary).toHaveTextContent("sq:Occupations · source w");
+    expect(primary).toHaveTextContent("Functional role: AGENT · exploratory");
+    expect(primary).toHaveTextContent(
+      "A source-attested occupational category supports this exploratory classification for the exact sense above.",
+    );
+    expect(primary).toHaveTextContent("Independent embryo meaning or function: UNKNOWN_OR_NULL");
+    expect(primary).toHaveTextContent("Historical derivation: not established by these source facts.");
+    expect(primary).not.toHaveTextContent("Compare administroj.");
+    expect(primary).toHaveTextContent("an additional source sense");
+    expect(screen.getByTestId("motivation-discovery-card")).toHaveTextContent(
+      "Source-authored etymology (attributed): Compare administroj.",
+    );
+
+    const candidateStatus = screen.getByLabelText("Canonical candidate / reviewed evidence status");
+    expect(candidateStatus).toHaveTextContent("null_no_supported_candidate");
+    expect(candidateStatus).not.toHaveTextContent("Functional / candidate status");
+    expect(screen.getAllByText("No canonical candidate is established.").length).toBeGreaterThan(0);
+    expect(screen.queryByText("No supported functional candidate yet.")).not.toBeInTheDocument();
+    const spoken = screen.getByTestId("spoken-pronunciation-overview");
+    expect(primary.compareDocumentPosition(spoken) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    const discoveryCard = screen.getByTestId("motivation-discovery-card");
+    expect(primary.compareDocumentPosition(discoveryCard) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
+
+  it("rejects an omitted template field when the pinned candidate projection does not match the exact source record", async () => {
+    const target = syntheticDirectOccupationRoleTarget();
+    delete target.etymologyTemplates;
+    const discovery = JSON.parse(JSON.stringify(
+      await syntheticDiscovery([target], "administronjës"),
+    )) as Discovery;
+    const reading = discovery.albanianLexicalReading as Record<string, unknown>;
+    const roleBatch = reading.occupationalRoleResearchCandidates as Record<string, unknown>;
+    const roleCandidates = roleBatch.candidates as Record<string, unknown>[];
+    const sourceRecord = roleCandidates[0]?.sourceRecord as Record<string, unknown>;
+    const links = sourceRecord.etymologyLinks as Record<string, unknown>[];
+    links[0]!.reference = "unrelated#Albanian";
+
+    expect(adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: discovery }).motivationDiscoveryV0_1)
+      .toMatchObject({ kind: "missing", missing: "malformed" });
+  });
+
   it("supports an exact occupation sense when the source has no validated morphology template", async () => {
     const discovery = await syntheticDiscovery([syntheticDirectOccupationRoleTarget()], "administronjës");
     const reading = realReading(discovery);

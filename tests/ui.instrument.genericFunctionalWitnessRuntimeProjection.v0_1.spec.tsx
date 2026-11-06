@@ -43,7 +43,7 @@ describe("Lane 4 witness presentation", () => {
         "No external evidence was found for this embryo. The doctrinal reading remains separate from this Evidence Null.",
       ),
     ).toBeInTheDocument();
-    expect(screen.queryByText("No supported functional candidate yet.")).not.toBeInTheDocument();
+    expect(screen.queryByText("No canonical candidate is established.")).not.toBeInTheDocument();
   });
 
   it("renders a source witness and UNKNOWN correspondence without upgrading it", async () => {
@@ -262,7 +262,7 @@ describe("Lane 4 witness presentation", () => {
       />,
     );
 
-    expect(screen.getByText("No supported functional candidate yet.")).toBeInTheDocument();
+    expect(screen.getByText("No canonical candidate is established.")).toBeInTheDocument();
     expect(screen.queryByText("Functional witnesses")).not.toBeInTheDocument();
   });
 

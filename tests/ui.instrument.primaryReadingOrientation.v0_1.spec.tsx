@@ -51,7 +51,7 @@ describe("Open Instrument primary reading orientation card v0.1", () => {
       "rain",
       "E → I",
       "Doctrinal inference: expanding growth with clear understanding",
-      "Lexical source evidence remains available separately",
+      "No canonical candidate or reviewed functional evidence is established; lexical source evidence remains separate.",
     ],
     [
       "ea",

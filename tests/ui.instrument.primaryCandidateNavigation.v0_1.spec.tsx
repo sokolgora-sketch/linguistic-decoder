@@ -193,7 +193,7 @@ describe("Open Instrument primary candidate navigation affordance v0.1", () => {
 
     render(<InstrumentPanel payload={payload} />);
 
-    expect(screen.getAllByText("No supported functional candidate yet.").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("No canonical candidate is established.").length).toBeGreaterThan(0);
     expect(screen.queryByRole("button", { name: "View candidate record" })).not.toBeInTheDocument();
   });
 

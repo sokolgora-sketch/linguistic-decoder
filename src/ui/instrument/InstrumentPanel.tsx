@@ -42,6 +42,7 @@ import { DoctrineReadingCard } from "./sections/DoctrineReadingCard.v0.1";
 import { PrimaryReadingOrientationCardV0_1 } from "./sections/PrimaryReadingOrientationCard.v0_1";
 import { SpokenPronunciationOverviewCardV0_1 } from "./sections/SpokenPronunciationOverviewCard.v0_1";
 import { SpokenResultCompositionSummaryV0_1 } from "./sections/SpokenResultCompositionSummary.v0_1";
+import { PrimaryAlbanianReadingCardV0_1 } from "./sections/PrimaryAlbanianReadingCard.v0_1";
 import { MotivationDiscoveryCardV0_1 } from "./sections/MotivationDiscoveryCard.v0_1";
 import { SingleWordMotivationWorkbenchV0_1 } from "./sections/SingleWordMotivationWorkbenchV0_1";
 import { OriginClaimCard } from '@/components/OriginClaimCard';
@@ -61,6 +62,7 @@ type Props =
         targetSenseLabel?: string | null;
       onAnalyzeAlbanianSourceRecord?: (sourceRecordId: string) => void;
       sourceRecordSelectionDisabled?: boolean;
+      onMobileComposerJump?: () => void;
       debug?: boolean;
       onCopyFullJson?: () => void;
     }
@@ -73,6 +75,7 @@ type Props =
         targetSenseLabel?: string | null;
       onAnalyzeAlbanianSourceRecord?: (sourceRecordId: string) => void;
       sourceRecordSelectionDisabled?: boolean;
+      onMobileComposerJump?: () => void;
       debug?: boolean;
       onCopyFullJson?: () => void;
     };
@@ -137,7 +140,7 @@ function SectionTabs({
 }) {
   return (
     <div className="max-w-full overflow-hidden rounded-[12px] border border-[#2f3742] bg-[#10161e] p-1.5 dark:border-[#2f3742] dark:bg-[#10161e]">
-      <div className="flex max-w-full gap-1.5 overflow-x-auto overscroll-x-contain [-webkit-overflow-scrolling:touch]" role="tablist" aria-label="Instrument sections">
+      <div className="flex max-w-full flex-wrap gap-1.5" role="tablist" aria-label="Instrument sections">
         {INSTRUMENT_SECTIONS.map((section) => (
           <button
             key={section.id}
@@ -145,7 +148,7 @@ function SectionTabs({
             role="tab"
             aria-selected={active === section.id}
             className={cn(
-              `${MT.actionSm} min-h-10 shrink-0 whitespace-nowrap rounded-[8px] border px-3 transition-colors`,
+              `${MT.actionSm} min-h-10 max-w-full rounded-[8px] border px-3 transition-colors`,
               active === section.id
                 ? "border-[#355a7a] bg-[#111a24] text-[#cfe6ff] shadow-[inset_0_0_0_1px_rgba(142,164,186,0.16)] dark:border-[#355a7a] dark:bg-[#111a24] dark:text-[#cfe6ff]"
                 : "border-transparent bg-transparent text-[#aeb7c5] hover:border-[#303a45] hover:bg-[#151515] hover:text-white dark:text-[#aeb7c5] dark:hover:border-[#303a45] dark:hover:bg-[#151515] dark:hover:text-white"
@@ -527,6 +530,26 @@ export function InstrumentPanel(props: Props) {
         <div className="space-y-4">
           <TabPanel id="overview" active={activeSection}>
             <div className="space-y-4">
+              <div
+                data-testid="primary-reading-scroll-target"
+                className="scroll-mt-24 sm:scroll-mt-0"
+              >
+                {props.onMobileComposerJump ? (
+                  <button
+                    type="button"
+                    data-testid="mobile-composer-jump"
+                    onClick={props.onMobileComposerJump}
+                    className="mb-3 inline-flex min-h-10 w-full items-center justify-center rounded-lg border border-[#355a7a] bg-[#111a24] px-3 text-sm font-semibold text-[#cfe6ff] sm:hidden"
+                  >
+                    Analyze another word
+                  </button>
+                ) : null}
+                <PrimaryAlbanianReadingCardV0_1
+                  discovery={vm.motivationDiscoveryV0_1}
+                  analysisStatus={vm.analysisStatusV0_1}
+                />
+              </div>
+
               <SpokenPronunciationOverviewCardV0_1 readout={vm.readout} />
 
               <SpokenResultCompositionSummaryV0_1 readout={vm.readout} />
@@ -541,13 +564,13 @@ export function InstrumentPanel(props: Props) {
               {primaryNullStatus ? (
                 <AnalysisStatusCardV0_1
                   status={primaryNullStatus}
-                  scopeLabel="Functional / candidate status"
+                  scopeLabel="Canonical candidate / reviewed evidence status"
                 />
               ) : primaryAnalysisStatus ? (
                 <AnalysisStatusCardV0_1
                   status={primaryAnalysisStatus}
                   variant="primary"
-                  scopeLabel="Functional / candidate status"
+                  scopeLabel="Canonical candidate / reviewed evidence status"
                 />
               ) : null}
 

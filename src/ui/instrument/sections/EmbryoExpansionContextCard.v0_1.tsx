@@ -786,25 +786,25 @@ function NoSupportedFunctionalCandidate({
       className="rounded-xl border border-slate-300 bg-slate-50 p-5 dark:border-slate-700 dark:bg-slate-900/40"
     >
       <div className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-600 dark:text-slate-300">
-        WORD-SPECIFIC READING
+        CANONICAL CANDIDATE / REVIEWED EVIDENCE STATUS
       </div>
 
       <div className="mt-3 text-xl font-semibold text-slate-900 dark:text-white">
-        No supported functional candidate yet.
+        No canonical candidate is established.
       </div>
 
       {word ? (
         <div className="mt-2 text-sm text-slate-600 dark:text-slate-400">
-          {`No supported functional-motivation result is currently available for "${word}".`}
+          {`No canonical candidate or reviewed functional-motivation result is currently available for "${word}".`}
         </div>
       ) : null}
 
       <p data-testid="word-specific-reading-role" className="mt-4 text-sm leading-6 text-slate-700 dark:text-slate-300">
-        This word-specific reading organizes the current word analysis; it is not a selected choice among multilingual source candidates and does not override source Discovery.
+        This status covers canonical candidates and reviewed evidence. It does not override a separate source-bounded exploratory reading shown above.
       </p>
 
       <div className="mt-4 text-xs text-slate-500 dark:text-slate-400">
-        Functional motivation, not historical etymology.
+        Candidate and reviewed-evidence status, not historical etymology.
       </div>
     </section>
   );

@@ -75,6 +75,13 @@ function uid() {
   return Math.random().toString(16).slice(2) + Date.now().toString(16);
 }
 
+function isMobileViewport(): boolean {
+  if (typeof window.matchMedia === 'function') {
+    return window.matchMedia('(max-width: 639px)').matches;
+  }
+  return window.innerWidth <= 639;
+}
+
 function safeString(e: unknown): string {
   if (e instanceof Error) return e.message;
   try {
@@ -207,6 +214,9 @@ export default function ZroChatPage() {
   const [messages, setMessages] = React.useState<Msg[]>([
       { id: 'init', role: 'assistant', text: 'Type a word and press Enter.' },
     ]);
+  const wordInputRef = React.useRef<HTMLInputElement | null>(null);
+  const settledResultRef = React.useRef<HTMLDivElement | null>(null);
+  const settledResultMessageIdRef = React.useRef<string | null>(null);
 
   const [debugEnabled, setDebugEnabled] = React.useState(false);
   React.useEffect(() => {
@@ -220,10 +230,18 @@ export default function ZroChatPage() {
   const bottomRef = React.useRef<HTMLDivElement | null>(null);
 
   React.useEffect(() => {
+    if (isMobileViewport()) return;
     const el = bottomRef.current;
     const fn = (el as any)?.scrollIntoView;
     if (typeof fn === 'function') fn.call(el, { behavior: 'smooth', block: 'end' });
   }, [messages.length]);
+
+  function focusWordInput() {
+    const inputElement = wordInputRef.current;
+    if (!inputElement) return;
+    inputElement.scrollIntoView({ behavior: 'instant', block: 'center' });
+    inputElement.focus({ preventScroll: true });
+  }
 
   async function runAnalysis(
     word: string,
@@ -398,6 +416,7 @@ export default function ZroChatPage() {
             Word
           </span>
           <Input
+            ref={wordInputRef}
             value={input}
             onChange={e => setInput(e.target.value)}
             onKeyDown={onKeyDown}
@@ -505,6 +524,28 @@ export default function ZroChatPage() {
     .slice()
     .reverse()
     .find((m): m is Extract<Msg, { role: 'assistant' }> => m.role === 'assistant');
+  const settledResultMessageId =
+    latestAssistantMessage && latestAssistantMessage.instrumentPayload != null
+      ? latestAssistantMessage.id
+      : null;
+  settledResultMessageIdRef.current = settledResultMessageId;
+  React.useEffect(() => {
+    if (!settledResultMessageId || !isMobileViewport()) return;
+
+    const frame = window.requestAnimationFrame(() => {
+      if (settledResultMessageIdRef.current !== settledResultMessageId) return;
+      const result = settledResultRef.current;
+      const primaryReading = result?.querySelector<HTMLElement>(
+        '[data-testid="primary-reading-scroll-target"]',
+      );
+      (primaryReading ?? result)?.scrollIntoView({
+        behavior: 'instant',
+        block: 'start',
+      });
+    });
+
+    return () => window.cancelAnimationFrame(frame);
+  }, [settledResultMessageId]);
   const latestInstrumentPayload =
     importedBundle?.result ??
     (latestAssistantMessage && 'instrumentPayload' in latestAssistantMessage
@@ -555,6 +596,39 @@ export default function ZroChatPage() {
       maxWidthClass="max-w-screen-2xl"
     >
       <div className="space-y-4">
+        {latestInstrumentPayload ? (
+          <div
+            ref={settledResultRef}
+            data-testid="settled-analysis-result"
+            className="scroll-mt-24 sm:scroll-mt-0"
+          >
+            <UiErrorBoundary label="InstrumentPanel">
+              <InstrumentPanel
+                payload={latestInstrumentPayload}
+                onMobileComposerJump={focusWordInput}
+                debug={debugEnabled}
+                wordForMask={lastRun?.word}
+                carrierIpa={lastRun?.ipa}
+                targetSenseLabel={lastRun?.targetSenseLabel}
+                sourceRecordSelectionDisabled={busy}
+                onAnalyzeAlbanianSourceRecord={(sourceRecordId) => {
+                  if (busy || !lastRun) return;
+                  void runAnalysis(
+                    lastRun.word,
+                    lastRun.ipa,
+                    lastRun.targetSenseLabel,
+                    lastRun.mode ?? analysisMode,
+                    lastRun.alphabet ?? analysisAlphabet,
+                    sourceRecordId,
+                  );
+                }}
+              />
+            </UiErrorBoundary>
+          </div>
+        ) : (
+          <OpenInstrumentEmptyState />
+        )}
+
         <ReproducibleRunBundleControls
           payload={latestInstrumentPayload}
           completedInput={{
@@ -565,32 +639,6 @@ export default function ZroChatPage() {
           disabled={busy}
           onImport={handleImportedBundle}
         />
-
-        {latestInstrumentPayload ? (
-          <UiErrorBoundary label="InstrumentPanel">
-            <InstrumentPanel
-              payload={latestInstrumentPayload}
-              debug={debugEnabled}
-              wordForMask={lastRun?.word}
-              carrierIpa={lastRun?.ipa}
-              targetSenseLabel={lastRun?.targetSenseLabel}
-              sourceRecordSelectionDisabled={busy}
-              onAnalyzeAlbanianSourceRecord={(sourceRecordId) => {
-                if (busy || !lastRun) return;
-                void runAnalysis(
-                  lastRun.word,
-                  lastRun.ipa,
-                  lastRun.targetSenseLabel,
-                  lastRun.mode ?? analysisMode,
-                  lastRun.alphabet ?? analysisAlphabet,
-                  sourceRecordId,
-                );
-              }}
-            />
-          </UiErrorBoundary>
-        ) : (
-          <OpenInstrumentEmptyState />
-        )}
 
         <WordToWordStructuralAuthorityComparisonCard
           current={latestInstrumentVm}
