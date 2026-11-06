@@ -45,6 +45,25 @@ entry text came from the pinned source bytes. Byte-level source verification and
 the packet's structural validation are separate boundaries; this lane does not
 claim independent cryptographic provenance for extracted entry text.
 
+## Source-entry binding v0.1
+
+`verifyStrictBlindPerseusSourceEntryBindingV1` is the independent verification
+boundary for an untrusted `FOUND` packet. It first checks the independently
+supplied bytes against the immutable tradition definition, then re-extracts the
+entry selected by the packet locator with the bounded TEI parser. It accepts
+only when source identity, locator, entry ordinal, ID/key, attested spelling,
+extracted text and ordered senses all match the re-extraction. Missing bytes,
+modified bytes, foreign source identity, altered packet fields and malformed
+locators fail closed with explicit reason codes.
+
+The verifier does not accept a caller-supplied hash, boolean assertion or
+manually constructed packet as provenance evidence. Structural packet validity
+remains useful input validation, but it is not cryptographic proof that entry
+text came from the pinned source bytes. The committed tests use deterministic
+synthetic TEI fixtures for parser/contract adversaries; optional local
+integration tests use only the independently verified pinned files at structural
+entry ordinal `0`, without semantic target lookup or interpretation.
+
 The frozen three-tradition/five-stage research coverage matrix and both real
 execution locks are unchanged. This implementation performs no target lookup,
 embryo lookup, reveal, model/provider execution, or research run.
