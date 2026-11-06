@@ -63,7 +63,11 @@ describe("spoken result composition summary v0.1", () => {
     expect(within(compact).queryByText("S → T → N")).not.toBeInTheDocument();
     expect(within(compact).queryByText("forward force")).not.toBeInTheDocument();
     expect(within(compact).queryByText("semantic meaning")).not.toBeInTheDocument();
-    expect(screen.getByText("Functional / candidate status")).toBeVisible();
+    expect(
+      screen.getByRole("region", {
+        name: "Canonical candidate / reviewed evidence status",
+      }),
+    ).toBeVisible();
     expect(screen.getByRole("heading", { name: "Null — no supported candidate" })).toBeVisible();
   });
 
@@ -153,7 +157,11 @@ describe("spoken result composition summary v0.1", () => {
     expect(within(compact).queryByText("Repeated exact source consonant identity.")).not.toBeInTheDocument();
     expect(within(compact).queryByText("P = prefix consonant load · I = ordered inter-nucleus consonant loads · S = suffix consonant load.")).not.toBeInTheDocument();
     expect(within(compact).queryByText("ZC summarizes structure; the source consonant sequence preserves exact identity and order.")).not.toBeInTheDocument();
-    expect(screen.getByText("Functional / candidate status")).toBeVisible();
+    expect(
+      screen.getByRole("region", {
+        name: "Canonical candidate / reviewed evidence status",
+      }),
+    ).toBeVisible();
     expect(compact).toHaveTextContent(
       "reason: PRONUNCIATION_NOT_FOUND",
     );
