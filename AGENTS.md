@@ -14,13 +14,3 @@ Route by task:
 - An explicitly authorized merge decision, post-merge closure, or handoff: `.agents/skills/zero-merge-continuity/SKILL.md`.
 
 Skills guide work; they do not grant permission. Follow current ZE-21 and repository policy. Preserve user spellings exactly and distinguish Fact, Inference, Hypothesis, and Unknown/Null. A new ZË-RO milestone requires evidence-backed confidence above 80% and explicit owner approval. `npm run gate:prepush` is the required push gate. Never merge without explicit authorization for the exact PR and head.
-
-<!-- BEGIN:nextjs-agent-rules -->
-
-## This is NOT the Next.js you know
-
-This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
-
-This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
-
-<!-- END:nextjs-agent-rules -->
