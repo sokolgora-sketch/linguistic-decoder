@@ -194,7 +194,7 @@ export default function ZroChatPage() {
   const [targetSense, setTargetSense] = React.useState('');
   const [analysisMode, setAnalysisMode] = React.useState<Mode>("strict");
   const [analysisAlphabet, setAnalysisAlphabet] =
-    React.useState<AlphabetId>("auto");
+    React.useState<AlphabetId>("albanian");
   const [lastRun, setLastRun] = React.useState<{
     word: string;
     ipa?: string;

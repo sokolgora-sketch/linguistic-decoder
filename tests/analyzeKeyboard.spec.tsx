@@ -62,13 +62,26 @@ describe('Analyze keyboard interactions', () => {
     expect(screen.getByRole('button', { name: 'Analyze' })).toBeInTheDocument();
   });
 
-  it('exposes strict and auto selector defaults while preserving the default request', async () => {
+  it('defaults to Strict Albanian and sends an explicit Albanian request without profile changes', async () => {
+    const albanianResult = {
+      ...SELECTOR_RESULT,
+      word: 'administronjës',
+      mode: 'strict',
+      alphabet: 'albanian',
+    };
+    (global.fetch as jest.Mock).mockResolvedValueOnce({
+      ok: true,
+      status: 200,
+      statusText: 'OK',
+      json: async () => albanianResult,
+    } as any);
+
     render(<ZroChatPage />);
 
     expect(screen.getByRole('combobox', { name: 'Analysis mode' })).toHaveTextContent('Strict');
-    expect(screen.getByRole('combobox', { name: 'Alphabet profile' })).toHaveTextContent('Auto');
+    expect(screen.getByRole('combobox', { name: 'Alphabet profile' })).toHaveTextContent('Albanian');
 
-    fireEvent.change(screen.getByLabelText('Word'), { target: { value: 'study' } });
+    fireEvent.change(screen.getByLabelText('Word'), { target: { value: 'administronjës' } });
     fireEvent.click(screen.getByRole('button', { name: 'Analyze' }));
 
     await waitFor(() => {
@@ -80,10 +93,45 @@ describe('Analyze keyboard interactions', () => {
     ) ?? [];
     const requestUrl = new URL(String(request), 'http://localhost');
     expect(requestUrl.searchParams.get('mode')).toBe('strict');
-    expect(requestUrl.searchParams.has('alphabet')).toBe(false);
+    expect(requestUrl.searchParams.get('word')).toBe('administronjës');
+    expect(requestUrl.searchParams.get('alphabet')).toBe('albanian');
+    expect(await screen.findByTestId('instrument-word')).toHaveTextContent('administronjës');
+    expect(screen.getByRole('combobox', { name: 'Alphabet profile' })).toHaveTextContent('Albanian');
     await waitFor(() => {
       expect(screen.getByRole('button', { name: 'Analyze' })).not.toBeDisabled();
     });
+  });
+
+  it('keeps explicit Auto available and omits the alphabet query on repeated submissions', async () => {
+    render(<ZroChatPage />);
+
+    const alphabetProfile = screen.getByRole('combobox', { name: 'Alphabet profile' });
+    expect(alphabetProfile).toHaveTextContent('Albanian');
+    fireEvent.keyDown(alphabetProfile, { key: 'ArrowDown' });
+    fireEvent.click(await screen.findByRole('option', { name: 'Auto', exact: true }));
+    expect(alphabetProfile).toHaveTextContent('Auto');
+
+    const wordInput = screen.getByLabelText('Word');
+    fireEvent.change(wordInput, { target: { value: 'study' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Analyze' }));
+    await waitFor(() => expect(countAnalyzeV1Fetches()).toBe(1));
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: 'Analyze' })).not.toBeDisabled();
+    });
+
+    fireEvent.change(wordInput, { target: { value: 'damage' } });
+    fireEvent.click(await screen.findByRole('button', { name: 'Analyze' }));
+    await waitFor(() => expect(countAnalyzeV1Fetches()).toBe(2));
+
+    const analyzeRequests = (global.fetch as jest.Mock).mock.calls.filter(([input]) =>
+      String(input).includes('/api/analyze-v1?'),
+    );
+    for (const [request] of analyzeRequests) {
+      const requestUrl = new URL(String(request), 'http://localhost');
+      expect(requestUrl.searchParams.has('alphabet')).toBe(false);
+    }
+    expect(alphabetProfile).toHaveTextContent('Auto');
+    expect(screen.queryByText(/en-administronjës-sq-noun-/u)).not.toBeInTheDocument();
   });
 
   it('forwards a padded provider-free query value to Analyze V1', async () => {
@@ -141,6 +189,14 @@ describe('Analyze keyboard interactions', () => {
     await waitFor(() => {
       expect(screen.getByRole('button', { name: 'Analyze' })).not.toBeDisabled();
     });
+
+    fireEvent.change(screen.getByLabelText('Word'), { target: { value: 'second' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Analyze' }));
+    await waitFor(() => expect(countAnalyzeV1Fetches()).toBe(2));
+    const secondRequest = (global.fetch as jest.Mock).mock.calls.filter(([input]) =>
+      String(input).includes('/api/analyze-v1?'),
+    )[1]?.[0];
+    expect(new URL(String(secondRequest), 'http://localhost').searchParams.get('alphabet')).toBe('latin');
   });
 
   it('locks selector controls while an analysis request is pending', async () => {
