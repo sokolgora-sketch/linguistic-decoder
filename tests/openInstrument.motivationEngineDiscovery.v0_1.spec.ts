@@ -4,6 +4,7 @@ import { enginePayloadToAnalysisResult } from "@/shared/analysisAdapter";
 import {
   buildMotivationEngineDiscoveryV0_1,
 } from "@/shared/openInstrument/motivationEngineDiscovery.v0_1";
+import { analyzeStructuralInputV0_2 } from "@/shared/structuralHypothesisDiscovery.v0_2";
 import {
   createAlbanianLexicalSubstrateWitnessAdapterV0_1,
 } from "@/shared/openInstrument/albanianLexicalSubstrate.v0_1";
@@ -20,6 +21,35 @@ async function analysisFor(word: string, alphabet = "auto") {
 }
 
 describe("Motivation Engine Discovery first vertical v0.1", () => {
+  it("keeps the legacy selected path and adds the full Albanian written path", async () => {
+    const word = "pyet";
+    const heart = buildHeartInstrumentV1(word);
+    const result = buildMotivationEngineDiscoveryV0_1({
+      word,
+      inputLanguage: "sq",
+      inputProfile: "albanian",
+      analysis: await analysisFor(word, "albanian"),
+      heart,
+    });
+    const structural = analyzeStructuralInputV0_2(word);
+    const provenance = result.derivedStructure.voicePathProvenance;
+
+    expect(provenance.writtenInput.voicePath).toEqual(["Y", "E"]);
+    expect(provenance.writtenInput.events).toEqual(structural.inputVoiceEvents);
+    expect(result.derivedStructure.voicePath).toEqual(
+      provenance.selectedPath.voicePath,
+    );
+    expect(provenance.selectedPath).toMatchObject({
+      legacySource: result.derivedStructure.voicePathSource,
+      selectionKind: "profile_solver_selected",
+    });
+    expect(provenance.selectedPath.relationshipToWritten).toBe(
+      JSON.stringify(result.derivedStructure.voicePath) === JSON.stringify(["Y", "E"])
+        ? "same_sequence"
+        : "differs_from_written_sequence",
+    );
+  });
+
   it("retrieves Albanian DI generically from study structure without a word shortcut", async () => {
     const word = "study";
     const heart = buildHeartInstrumentV1(word);

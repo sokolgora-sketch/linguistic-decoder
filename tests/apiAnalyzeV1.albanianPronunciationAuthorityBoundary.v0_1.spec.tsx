@@ -83,6 +83,62 @@ describe("Albanian pronunciation authority boundary v0.1", () => {
     expect(zemer.motivationDiscoveryV0_1.derivedStructure.voicePathSource).toBe("albanian_profile");
   });
 
+  it.each([
+    { word: "ecje", voices: ["E", "E"], positions: [0, 3] },
+    { word: "pyet", voices: ["Y", "E"], positions: [1, 2] },
+    { word: "mësoj", voices: ["Ë", "O"], positions: [1, 3] },
+    { word: "minutë", voices: ["I", "U", "Ë"], positions: [1, 3, 5] },
+    { word: "KANDIL", voices: ["A", "I"], positions: [1, 4] },
+    { word: "AEIOUYË", voices: ["A", "E", "I", "O", "U", "Y", "Ë"], positions: [0, 1, 2, 3, 4, 5, 6] },
+  ])("exposes all original written Voice events separately from the selected path for $word", async ({
+    word,
+    voices,
+    positions,
+  }) => {
+    const body = await analyze(word, "albanian");
+    const derived = body.motivationDiscoveryV0_1.derivedStructure;
+    const provenance = derived.voicePathProvenance;
+
+    expect(derived.voicePathSource).toBe("albanian_profile");
+    expect(provenance.writtenInput).toMatchObject({
+      inputForm: word.normalize("NFC"),
+      analysisStatus: "analyzed",
+      inputVoiceSequenceStatus: "complete",
+      inputVoiceEventCount: voices.length,
+      voicePath: voices,
+      representationAuthority: "orthographic",
+      pronunciationAuthority: "not_established",
+    });
+    expect(provenance.writtenInput.events.map((event: { voice: string }) => event.voice)).toEqual(voices);
+    expect(provenance.writtenInput.events.map((event: { sourcePosition: number }) => event.sourcePosition)).toEqual(positions);
+    expect(provenance.writtenInput.events.every((event: { pronunciationAuthority: string }) =>
+      event.pronunciationAuthority === "not_established",
+    )).toBe(true);
+    expect(provenance.selectedPath).toMatchObject({
+      voicePath: derived.voicePath,
+      selectionKind: "profile_solver_selected",
+      legacySource: "albanian_profile",
+    });
+    expect(provenance.selectedPath.relationshipToWritten).toBe(
+      JSON.stringify(derived.voicePath) === JSON.stringify(voices)
+        ? "same_sequence"
+        : "differs_from_written_sequence",
+    );
+    expect(body.heartInstrumentV1.spokenPronunciation).toMatchObject({
+      status: "null",
+      reasonCode: expect.any(String),
+      canonicalSpokenVoicePath: null,
+    });
+  });
+
+  it("retains written events when the API structural hypothesis list is empty", async () => {
+    const body = await analyze("AEIOUYË", "albanian");
+
+    expect(body.motivationDiscoveryV0_1.derivedStructure.structuralHypotheses).toEqual([]);
+    expect(body.motivationDiscoveryV0_1.derivedStructure.voicePathProvenance.writtenInput.voicePath)
+      .toEqual(["A", "E", "I", "O", "U", "Y", "Ë"]);
+  });
+
   it("preserves CMUdict spoken behavior for the existing non-Albanian mode", async () => {
     const body = await analyze("mal", "auto");
 
@@ -94,6 +150,7 @@ describe("Albanian pronunciation authority boundary v0.1", () => {
     expect(body.heartInstrumentV1.spokenPronunciation.variants[0].variant.sourcePronunciation)
       .toBe("M AE1 L");
     expect(body.primaryPath.voicePath).toEqual(["A"]);
+    expect(body.motivationDiscoveryV0_1.derivedStructure.voicePathProvenance).toBeUndefined();
   });
 
   it("keeps the API Null visible through the telemetry adapter and UI", async () => {
@@ -125,7 +182,15 @@ describe("Albanian pronunciation authority boundary v0.1", () => {
     });
     render(<MotivationDiscoveryCardV0_1 discovery={vm.motivationDiscoveryV0_1} />);
     const discoveryCard = screen.getByTestId("motivation-discovery-card");
-    expect(within(discoveryCard).getByText("A")).toBeInTheDocument();
-    expect(within(discoveryCard).getByText(/source: albanian_profile/)).toBeInTheDocument();
+    expect(within(discoveryCard).getByTestId("motivation-written-voice-path")).toHaveTextContent("A");
+    expect(within(discoveryCard).getByTestId("motivation-written-voice-path")).toHaveTextContent(
+      "pronunciation not established",
+    );
+    expect(within(discoveryCard).getByTestId("motivation-selected-voice-path")).toHaveTextContent(
+      "SOLVER-SELECTED PATH (PROFILE DERIVED)",
+    );
+    expect(within(discoveryCard).getByTestId("motivation-selected-voice-path")).toHaveTextContent(
+      "source: albanian_profile",
+    );
   });
 });

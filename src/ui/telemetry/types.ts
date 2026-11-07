@@ -18,6 +18,7 @@ import type {
 } from "@/shared/openInstrument/albanianKaikkiServerOnlyExactLexicalSource.v0_1";
 import type { AlbanianLexicalReadingV0_1 } from "@/shared/openInstrument/motivationEngineDiscoveryServerOnly.v0_1";
 import type { AlbanianKaikkiSourceIpaSevenVoiceAnalysisV0_1 } from "@/shared/openInstrument/albanianKaikkiSourceIpaSevenVoiceProductInterpretation.v0_1";
+import type { MotivationVoicePathProvenanceV0_1 } from "@/shared/openInstrument/motivationEngineDiscovery.v0_1";
 
 /**
  * UI contract for vowel chips. Keep this as the only allowed vowel set.
@@ -453,6 +454,7 @@ export type MotivationDiscoveryV0_1VM = Readonly<{
     layer: "DERIVED_STRUCTURE";
     voicePath: string[];
     voicePathSource: "production_spoken" | "albanian_profile" | "unknown";
+    voicePathProvenance?: MotivationVoicePathProvenanceV0_1;
     math7: Readonly<{
       basis: string | null;
       totalMod7: number | null;

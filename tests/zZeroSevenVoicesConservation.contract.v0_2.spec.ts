@@ -16,6 +16,51 @@ function componentById(
 
 describe("lossless Seven-Voices structural decomposition v0.2", () => {
   it.each([
+    { word: "ecje", voices: ["E", "E"], characters: ["e", "e"], positions: [0, 3] },
+    { word: "pyet", voices: ["Y", "E"], characters: ["y", "e"], positions: [1, 2] },
+    { word: "mësoj", voices: ["Ë", "O"], characters: ["ë", "o"], positions: [1, 3] },
+    { word: "minutë", voices: ["I", "U", "Ë"], characters: ["i", "u", "ë"], positions: [1, 3, 5] },
+    { word: "KANDIL", voices: ["A", "I"], characters: ["A", "I"], positions: [1, 4] },
+    {
+      word: "AEIOUYË",
+      voices: ["A", "E", "I", "O", "U", "Y", "Ë"],
+      characters: ["A", "E", "I", "O", "U", "Y", "Ë"],
+      positions: [0, 1, 2, 3, 4, 5, 6],
+    },
+  ])("preserves every original written Voice event for $word", ({
+    word,
+    voices,
+    characters,
+    positions,
+  }) => {
+    const analysis = analyzeStructuralInputV0_2(word);
+
+    expect(analysis.analysisStatus).toBe("analyzed");
+    expect(analysis.inputVoiceSequenceStatus).toBe("complete");
+    expect(analysis.inputVoiceEvents.map((event) => event.voice)).toEqual(voices);
+    expect(analysis.inputVoiceEvents.map((event) => event.sourceCharacter)).toEqual(characters);
+    expect(analysis.inputVoiceEvents.map((event) => event.sourcePosition)).toEqual(positions);
+    expect(analysis.inputVoiceEvents.map((event) => event.representationAuthority)).toEqual(
+      Array(voices.length).fill("orthographic"),
+    );
+    expect(analysis.inputVoiceEvents.map((event) => event.pronunciationAuthority)).toEqual(
+      Array(voices.length).fill("not_established"),
+    );
+  });
+
+  it("emits the complete written path even when no structural hypotheses exist", () => {
+    for (const [word, voices] of [
+      ["ANET", ["A", "E"]],
+      ["AEIOUYË", ["A", "E", "I", "O", "U", "Y", "Ë"]],
+    ] as const) {
+      const analysis = analyzeStructuralInputV0_2(word);
+      expect(analysis.hypotheses).toEqual([]);
+      expect(analysis.inputVoiceSequenceStatus).toBe("complete");
+      expect(analysis.inputVoiceEvents.map((event) => event.voice)).toEqual(voices);
+    }
+  });
+
+  it.each([
     { word: "PLANET", voices: ["A", "E"], positions: [2, 4], hypotheses: ["AN", "ANET"] },
     { word: "PLAN", voices: ["A"], positions: [2], hypotheses: ["AN"] },
     { word: "ET", voices: ["E"], positions: [0], hypotheses: [] },
