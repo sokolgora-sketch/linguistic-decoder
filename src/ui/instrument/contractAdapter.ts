@@ -2302,10 +2302,22 @@ function parseMotivationDiscoveryV0_1(
       })();
       let validTemplateEvidence = false;
       if (!hasTargetAuthoredTemplateRelation) {
-        if (rawTargetTemplates === null) return false;
-        validTemplateEvidence = rawTargetTemplates.every((template: unknown) =>
-          !isRecord(template) || (template.name !== "af" && template.name !== "suffix"),
-        );
+        if (rawTargetTemplates === null) {
+          const hasUnresolvedSourceEtymology =
+            (rawTarget.etymologyText !== undefined && rawTarget.etymologyText !== null) ||
+            (Array.isArray(rawTarget.etymologyLinks) && rawTarget.etymologyLinks.length > 0);
+          // A direct sense-role reading does not require component evidence. If
+          // the exact source projection emits no etymology material, keep the
+          // template claim unvalidated instead of hiding the separate role fact.
+          // When etymology material is present, the pinned candidate projection
+          // must still resolve it before this no-template branch can be shown.
+          if (rawTarget.etymologyTemplates !== undefined || hasUnresolvedSourceEtymology) return false;
+          validTemplateEvidence = true;
+        } else {
+          validTemplateEvidence = rawTargetTemplates.every((template: unknown) =>
+            !isRecord(template) || (template.name !== "af" && template.name !== "suffix"),
+          );
+        }
       } else if (componentRelationType === "SOURCE_AUTHORED_SUFFIX_TEMPLATE") {
         validTemplateEvidence = validSourceAuthoredSuffixTemplateReading(componentReading, target);
       } else {

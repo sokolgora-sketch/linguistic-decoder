@@ -135,7 +135,7 @@ export function PrimaryAlbanianReadingCardV0_1({
               </p>
               <p className="mt-2 break-words">
                 {hypothesis.functionalOperation === "AGENT"
-                  ? "A source-attested occupational category supports this exploratory classification for the exact sense above. It does not establish morphology, historical derivation, or embryo meaning."
+                  ? "Source evidence for this exact reading supports this exploratory classification. It does not establish morphology, historical derivation, or embryo meaning."
                   : "This exploratory interpretation is bounded to the exact source evidence and sense above. It does not establish morphology, historical derivation, or embryo meaning."}
               </p>
             </>
