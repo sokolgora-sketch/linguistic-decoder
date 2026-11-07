@@ -1551,11 +1551,14 @@ async function runAnalyzeV1Orchestration(
           }
         : await buildMotivationEngineDiscoveryServerOnlyV0_1(discoveryInput);
       if (discoveryResult.englishProvider.status === "UNAVAILABLE") {
-        logInternalFailure({
-          kind: "orchestration",
-          message: "optional English Kaikki Discovery source unavailable; existing Discovery preserved",
-          issues: discoveryResult.englishProvider,
-        });
+        try {
+          console.warn(
+            "[analyze-v1] optional English Kaikki Discovery source unavailable",
+            discoveryResult.englishProvider,
+          );
+        } catch {
+          // Optional-source diagnostics must not change the API response.
+        }
       }
       (final as any).motivationDiscoveryV0_1 = discoveryResult.discovery;
       (final as any).functionalMotivationInterpretationV0_2 =
