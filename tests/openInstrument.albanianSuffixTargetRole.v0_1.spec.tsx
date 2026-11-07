@@ -310,8 +310,9 @@ describe("source-authored suffix direct-target AGENT synthetic controls", () => 
     expect(primary).toHaveTextContent("sq:Occupations · source w");
     expect(primary).toHaveTextContent("Functional role: AGENT · exploratory");
     expect(primary).toHaveTextContent(
-      "A source-attested occupational category supports this exploratory classification for the exact sense above.",
+      "Source evidence for this exact reading supports this exploratory classification.",
     );
+    expect(primary).not.toHaveTextContent("occupational category supports this exploratory classification");
     expect(primary).toHaveTextContent("Independent embryo meaning or function: UNKNOWN_OR_NULL");
     expect(primary).toHaveTextContent("Historical derivation: not established by these source facts.");
     expect(primary).not.toHaveTextContent("Compare administroj.");
@@ -383,6 +384,117 @@ describe("source-authored suffix direct-target AGENT synthetic controls", () => 
       expect(screen.getByTestId("albanian-reading-functional-bridge-operation")).toHaveTextContent("Functional operation: AGENT");
       expect(screen.getByTestId("albanian-reading-functional-bridge")).toHaveTextContent("administronjës");
       expect(screen.getByTestId("albanian-reading-functional-bridge")).toHaveTextContent("does not assert morphology");
+    }
+  });
+
+  it.each(["absent", "explicitly empty"] as const)(
+    "renders a direct occupation reading when exact-source etymology links are %s and no batch fallback exists",
+    async (linkState) => {
+      const target = syntheticDirectOccupationRoleTarget({
+        sourceRecordId: "kaikki-albanian-jsonl:word=nd%C3%ABrtues:ordinal=0",
+        entryLocator: "jsonl://word/nd%C3%ABrtues/match/0",
+        physicalRecordOrdinal: 17896,
+        form: "ndërtues",
+        senses: [{
+          senseId: "en-ndërtues-sq-noun-32sHF2qb",
+          glosses: ["builder"],
+          categories: [occupations()],
+        }],
+        etymologyText: null,
+        etymologyLinks: linkState === "explicitly empty" ? [] : undefined,
+        etymologyTemplates: undefined,
+      });
+      if (linkState === "absent") delete target.etymologyLinks;
+      delete target.etymologyTemplates;
+
+      const discovery = await syntheticDiscovery([target], "ndërtues");
+      expect(discovery.status).toBe("NO_MATCHES");
+      expect(discovery.exactLexicalSourceStatus).toMatchObject({ status: "MATCHES_FOUND" });
+      expect(discovery.exactLexicalSourceFacts).toEqual([
+        expect.objectContaining({
+          sourceRecordId: "kaikki-albanian-jsonl:word=nd%C3%ABrtues:ordinal=0",
+          form: "ndërtues",
+          partOfSpeech: "noun",
+          etymologyText: null,
+          senses: [expect.objectContaining({
+            senseId: "en-ndërtues-sq-noun-32sHF2qb",
+            glosses: ["builder"],
+            categories: [expect.objectContaining({
+              name: "Occupations",
+              orig: "sq:Occupations",
+              source: "w",
+            })],
+          })],
+        }),
+      ]);
+      expect(functionalBridge(realReading(discovery))).toMatchObject({
+        status: "SUPPORTED",
+        functionalHypothesis: {
+          status: "EXPLORATORY_FUNCTIONAL_HYPOTHESIS",
+          functionalOperation: "AGENT",
+        },
+      });
+
+      const response = await GET(new Request(
+        "http://localhost/api/analyze-v1?word=nd%C3%ABrtues&mode=strict&alphabet=albanian&language=sq&providerExecution=disabled",
+      ));
+      expect(response.status).toBe(200);
+      const body = await response.json() as ApiBody;
+      body.motivationDiscoveryV0_1 = discovery;
+
+      const vm = adaptAnalysisToTelemetryVM(body);
+      expect(vm.motivationDiscoveryV0_1).toMatchObject({ kind: "present" });
+      render(<InstrumentPanel payload={body} />);
+
+      const primary = screen.getByTestId("primary-albanian-reading");
+      expect(primary).toHaveTextContent("Kaikki Albanian · ndërtues · noun");
+      expect(primary).toHaveTextContent("en-ndërtues-sq-noun-32sHF2qb");
+      expect(primary).toHaveTextContent("Source meaning: builder");
+      expect(primary).toHaveTextContent("sq:Occupations · source w");
+      expect(primary).toHaveTextContent("Functional role: AGENT · exploratory");
+      expect(primary).toHaveTextContent(
+        "Source evidence for this exact reading supports this exploratory classification.",
+      );
+      expect(screen.getByTestId("primary-albanian-unknown-null"))
+        .toHaveTextContent("Independent embryo meaning or function: UNKNOWN_OR_NULL.");
+      expect(screen.getByTestId("primary-albanian-structural-status"))
+        .toHaveTextContent("candidate_only");
+      expect(screen.getByTestId("primary-albanian-structural-status"))
+        .toHaveTextContent("Generic Voice-profile hypothesis available for ndërtues.");
+    },
+  );
+
+  it("rejects malformed non-array etymology links instead of treating them as absent", async () => {
+    const target = syntheticDirectOccupationRoleTarget({
+      sourceRecordId: "kaikki-albanian-jsonl:word=nd%C3%ABrtues:ordinal=0",
+      entryLocator: "jsonl://word/nd%C3%ABrtues/match/0",
+      physicalRecordOrdinal: 17896,
+      form: "ndërtues",
+      senses: [{
+        senseId: "en-ndërtues-sq-noun-32sHF2qb",
+        glosses: ["builder"],
+        categories: [occupations()],
+      }],
+      etymologyText: null,
+      etymologyLinks: [],
+      etymologyTemplates: undefined,
+    });
+    delete target.etymologyTemplates;
+
+    const discovery = await syntheticDiscovery([target], "ndërtues");
+    expect(functionalBridge(realReading(discovery))).toMatchObject({
+      status: "SUPPORTED",
+      functionalHypothesis: {
+        status: "EXPLORATORY_FUNCTIONAL_HYPOTHESIS",
+        functionalOperation: "AGENT",
+      },
+    });
+
+    const exactFacts = discovery.exactLexicalSourceFacts as Record<string, unknown>[];
+    for (const malformedLinks of [undefined, { malformed: true }]) {
+      exactFacts[0]!.etymologyLinks = malformedLinks;
+      const vm = adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: discovery } as ApiBody);
+      expect(vm.motivationDiscoveryV0_1).toMatchObject({ kind: "missing", missing: "malformed" });
     }
   });
 

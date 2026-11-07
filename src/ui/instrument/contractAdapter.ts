@@ -2302,10 +2302,29 @@ function parseMotivationDiscoveryV0_1(
       })();
       let validTemplateEvidence = false;
       if (!hasTargetAuthoredTemplateRelation) {
-        if (rawTargetTemplates === null) return false;
-        validTemplateEvidence = rawTargetTemplates.every((template: unknown) =>
-          !isRecord(template) || (template.name !== "af" && template.name !== "suffix"),
-        );
+        if (rawTargetTemplates === null) {
+          const rawTargetHasEtymologyLinks = "etymologyLinks" in rawTarget;
+          const rawTargetLinksAreAbsentOrExplicitlyEmpty =
+            !rawTargetHasEtymologyLinks || (
+              Object.prototype.hasOwnProperty.call(rawTarget, "etymologyLinks") &&
+              Array.isArray(rawTarget.etymologyLinks) &&
+              rawTarget.etymologyLinks.length === 0
+            );
+          const hasUnresolvedSourceEtymology =
+            (rawTarget.etymologyText !== undefined && rawTarget.etymologyText !== null) ||
+            !rawTargetLinksAreAbsentOrExplicitlyEmpty;
+          // A direct sense-role reading does not require component evidence. If
+          // the exact source projection emits no etymology material, keep the
+          // template claim unvalidated instead of hiding the separate role fact.
+          // Only an absent link field or an explicitly empty array is absence;
+          // malformed or non-empty link metadata must fail closed.
+          if (rawTarget.etymologyTemplates !== undefined || hasUnresolvedSourceEtymology) return false;
+          validTemplateEvidence = true;
+        } else {
+          validTemplateEvidence = rawTargetTemplates.every((template: unknown) =>
+            !isRecord(template) || (template.name !== "af" && template.name !== "suffix"),
+          );
+        }
       } else if (componentRelationType === "SOURCE_AUTHORED_SUFFIX_TEMPLATE") {
         validTemplateEvidence = validSourceAuthoredSuffixTemplateReading(componentReading, target);
       } else {
