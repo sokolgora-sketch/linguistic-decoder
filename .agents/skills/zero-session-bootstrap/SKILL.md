@@ -12,7 +12,7 @@ This skill is the repository entry point. It checks current authority and state;
 After the read-only preflight needed to understand the request, state the validation tier and planned checks before running tests, gates, builds, installations, or other expensive commands:
 
 - **A — READ_ONLY:** inspection, review, research, or planning. Do not run tests, gates, builds, or installations and do not mutate the repository.
-- **B — DOCS_ONLY:** non-executable Markdown documentation or instruction skills. Check the exact changed-file scope, formatting, frontmatter, references, and links. Let `npm run gate:prepush` select its docs-only lane only when its live-Git classifier proves eligibility; otherwise it runs the existing full lint and serial Jest lane.
+- **B — DOCS_ONLY:** non-executable Markdown documentation or instruction skills. Check the exact changed-file scope, formatting, frontmatter, references, and links. Let `npm run gate:prepush` select its docs-only lane only when its live-Git classifier proves eligibility; on verified Git context, uncertain fast-path selection uses the existing full lint and serial Jest lane.
 - **C — SCOPED_CODE:** code, tests, or ordinary implementation. Run focused regression tests, applicable changed-file lint/typechecks, and the required push gate. The hook may select the bounded Instrument UI path documented in `CONTRIBUTING.md` only after live diff classification and complete test selection succeed; otherwise it runs FULL.
 - **D — HIGH_IMPACT:** gate/hook, CI, dependency, runtime, security, or scientific-contract changes. Add justified integration/contract coverage and run the full required push gate.
 
@@ -26,6 +26,10 @@ The tier describes the requested change, not an environment setting or a caller-
 4. Verify the canonical repository path and identity; live GitHub `main`; relevant open PRs, exact heads, merge/CI status, and parked dispositions; local branch, HEAD, `origin/main`, divergence, and `git status --porcelain=v1 -uall`.
 5. List every registered worktree and inspect its branch, HEAD, and tracked/untracked status. Preserve protected or dirty paths. Never reset, clean, stash, prune, switch, or write to them.
 6. Check that the requested lane does not overlap an active task or protected work. Stop on repository mismatch, unexplained drift, unsafe state, or unresolved concurrency.
+
+Once the intended repository-relative changed paths are identified, before editing any path that may be checksum-frozen, run `node scripts/frozenContractPreflight.v0_1.cjs --planned <repo-relative-paths>` with the planned paths. This is read-only planning output; it does not authorize a checksum change or replace the mandatory pre-push hook.
+
+The hook's frozen-identity outcomes are distinct: missing or invalid Git ref/changeset context stops immediately with `FROZEN_CHANGESET_UNVERIFIED`; a verified frozen-identity mismatch stops before lint or Jest; verified clean identities proceed to normal classification; and uncertain fast-path selection on a verified changeset runs FULL validation.
 
 ## Mandatory hook bootstrap before implementation
 
