@@ -3,11 +3,6 @@ import { buildMinRootHypotheses } from "@/shared/deepRoot.minRoots.v1";
 import { extractSevenVowelsFromString } from "@/shared/math7.core";
 import { discoverStructuralHypothesesV0_1 } from "@/shared/structuralHypothesisDiscovery.v0_1";
 import {
-  analyzeStructuralInputV0_2,
-  type StructuralInputAnalysisV0_2,
-  type StructuralVoiceEventV0_2,
-} from "@/shared/structuralHypothesisDiscovery.v0_2";
-import {
   GENERIC_FUNCTIONAL_WITNESS_DISCOVERY_SCHEMA_V1,
   queryGenericFunctionalWitnessesV1,
   type GenericFunctionalWitnessV1,
@@ -54,29 +49,6 @@ export type MotivationFunctionalInterpretationEvidenceKindV0_1 =
   | "reviewed_functional_evidence"
   | "lexical_gloss_plus_structural_match"
   | "none";
-
-export type MotivationVoicePathProvenanceV0_1 = Readonly<{
-  writtenInput: Readonly<{
-    inputForm: string;
-    analysisStatus: StructuralInputAnalysisV0_2["analysisStatus"];
-    inputVoiceSequenceStatus: StructuralInputAnalysisV0_2["inputVoiceSequenceStatus"];
-    inputVoiceEventCount: number | null;
-    voicePath: readonly StructuralVoiceEventV0_2["voice"][];
-    events: readonly StructuralVoiceEventV0_2[];
-    representationAuthority: "orthographic";
-    pronunciationAuthority: "not_established";
-  }>;
-  selectedPath: Readonly<{
-    voicePath: readonly string[];
-    selectionKind: "profile_solver_selected" | "production_spoken" | "unknown";
-    legacySource: "production_spoken" | "albanian_profile" | "unknown";
-    relationshipToWritten:
-      | "same_sequence"
-      | "differs_from_written_sequence"
-      | "not_comparable"
-      | "written_sequence_unavailable";
-  }>;
-}>;
 
 export type MotivationStructuralComparisonV0_1 = Readonly<{
   matchClassification:
@@ -174,7 +146,6 @@ export type MotivationEngineDiscoveryV0_1 = Readonly<{
     layer: "DERIVED_STRUCTURE";
     voicePath: readonly string[];
     voicePathSource: "production_spoken" | "albanian_profile" | "unknown";
-    voicePathProvenance?: MotivationVoicePathProvenanceV0_1;
     math7: Readonly<{
       basis: string | null;
       totalMod7: number | null;
@@ -667,34 +638,6 @@ export function buildMotivationEngineDiscoveryV0_1(input: {
     : isAlbanianProfile
       ? "albanian_profile" as const
       : "unknown" as const;
-  const writtenInputAnalysis = isAlbanianProfile
-    ? analyzeStructuralInputV0_2(word)
-    : null;
-  const writtenVoicePath = writtenInputAnalysis?.inputVoiceEvents.map((event) => event.voice) ?? [];
-  const voicePathProvenance: MotivationVoicePathProvenanceV0_1 | undefined = writtenInputAnalysis
-    ? {
-        writtenInput: {
-          inputForm: writtenInputAnalysis.inputForm,
-          analysisStatus: writtenInputAnalysis.analysisStatus,
-          inputVoiceSequenceStatus: writtenInputAnalysis.inputVoiceSequenceStatus,
-          inputVoiceEventCount: writtenInputAnalysis.inputVoiceEventCount,
-          voicePath: writtenVoicePath,
-          events: writtenInputAnalysis.inputVoiceEvents,
-          representationAuthority: "orthographic",
-          pronunciationAuthority: "not_established",
-        },
-        selectedPath: {
-          voicePath: [...voicePath],
-          selectionKind: "profile_solver_selected",
-          legacySource: voicePathSource,
-          relationshipToWritten: writtenInputAnalysis.inputVoiceSequenceStatus !== "complete"
-            ? "written_sequence_unavailable"
-            : JSON.stringify(voicePath) === JSON.stringify(writtenVoicePath)
-              ? "same_sequence"
-              : "differs_from_written_sequence",
-        },
-      }
-    : undefined;
   const inputRepresentationKind: MotivationRepresentationKindV0_1 =
     spokenPath?.length
       ? "production_spoken"
@@ -784,7 +727,6 @@ export function buildMotivationEngineDiscoveryV0_1(input: {
       layer: "DERIVED_STRUCTURE",
       voicePath,
       voicePathSource,
-      ...(voicePathProvenance ? { voicePathProvenance } : {}),
       math7: math7Summary(input.analysis, input.heart),
       gamma: spokenPath?.length
         ? spokenGamma(input.heart)

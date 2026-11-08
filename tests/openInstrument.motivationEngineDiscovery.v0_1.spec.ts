@@ -4,6 +4,9 @@ import { enginePayloadToAnalysisResult } from "@/shared/analysisAdapter";
 import {
   buildMotivationEngineDiscoveryV0_1,
 } from "@/shared/openInstrument/motivationEngineDiscovery.v0_1";
+import {
+  attachMotivationVoicePathProvenanceV0_1,
+} from "@/shared/openInstrument/motivationEngineDiscoveryServerOnly.v0_1";
 import { analyzeStructuralInputV0_2 } from "@/shared/structuralHypothesisDiscovery.v0_2";
 import {
   createAlbanianLexicalSubstrateWitnessAdapterV0_1,
@@ -24,16 +27,18 @@ describe("Motivation Engine Discovery first vertical v0.1", () => {
   it("keeps the legacy selected path and adds the full Albanian written path", async () => {
     const word = "pyet";
     const heart = buildHeartInstrumentV1(word);
-    const result = buildMotivationEngineDiscoveryV0_1({
+    const baseResult = buildMotivationEngineDiscoveryV0_1({
       word,
       inputLanguage: "sq",
       inputProfile: "albanian",
       analysis: await analysisFor(word, "albanian"),
       heart,
     });
+    const result = attachMotivationVoicePathProvenanceV0_1(baseResult);
     const structural = analyzeStructuralInputV0_2(word);
     const provenance = result.derivedStructure.voicePathProvenance;
 
+    expect(baseResult.derivedStructure.voicePathProvenance).toBeUndefined();
     expect(provenance.writtenInput.voicePath).toEqual(["Y", "E"]);
     expect(provenance.writtenInput.events).toEqual(structural.inputVoiceEvents);
     expect(result.derivedStructure.voicePath).toEqual(

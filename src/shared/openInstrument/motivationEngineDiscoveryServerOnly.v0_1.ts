@@ -71,6 +71,11 @@ import {
   type MotivationEngineDiscoveryV0_1,
 } from "@/shared/openInstrument/motivationEngineDiscovery.v0_1";
 import {
+  analyzeStructuralInputV0_2,
+  type StructuralInputAnalysisV0_2,
+  type StructuralVoiceEventV0_2,
+} from "@/shared/structuralHypothesisDiscovery.v0_2";
+import {
   createMultilingualDiscoverySubstrateS1LatinWitnessAdapterV0_2,
   getMultilingualDiscoverySubstrateS1LatinSubstrateRecordsV0_2,
 } from "@/shared/openInstrument/multilingualDiscoverySubstrateS1.v0_2";
@@ -90,6 +95,94 @@ export type EnglishKaikkiProviderOperationalStatusV0_1 = Readonly<{
   matchQueries: number;
   failureReasonCodes: readonly string[];
 }>;
+
+export type MotivationVoicePathProvenanceV0_1 = Readonly<{
+  writtenInput: Readonly<{
+    inputForm: string;
+    analysisStatus: StructuralInputAnalysisV0_2["analysisStatus"];
+    inputVoiceSequenceStatus: StructuralInputAnalysisV0_2["inputVoiceSequenceStatus"];
+    inputVoiceEventCount: number | null;
+    voicePath: readonly StructuralVoiceEventV0_2["voice"][];
+    events: readonly StructuralVoiceEventV0_2[];
+    representationAuthority: "orthographic";
+    pronunciationAuthority: "not_established";
+  }>;
+  selectedPath: Readonly<{
+    voicePath: readonly string[];
+    selectionKind: "profile_solver_selected" | "production_spoken" | "unknown";
+    legacySource: "production_spoken" | "albanian_profile" | "unknown";
+    relationshipToWritten:
+      | "same_sequence"
+      | "differs_from_written_sequence"
+      | "not_comparable"
+      | "written_sequence_unavailable";
+  }>;
+}>;
+
+export type MotivationEngineDiscoveryWithVoicePathProvenanceV0_1 = Omit<
+  MotivationEngineDiscoveryV0_1,
+  "derivedStructure"
+> & {
+  derivedStructure: MotivationEngineDiscoveryV0_1["derivedStructure"] & {
+    voicePathProvenance?: MotivationVoicePathProvenanceV0_1;
+  };
+};
+
+/**
+ * Add orthographic conservation evidence only at the unfrozen server/API
+ * composition boundary. The shared Discovery builder remains S2 hash-pinned.
+ */
+export function attachMotivationVoicePathProvenanceV0_1(
+  discovery: MotivationEngineDiscoveryV0_1,
+): MotivationEngineDiscoveryWithVoicePathProvenanceV0_1 {
+  const language = discovery.inputLanguage.normalize("NFC").trim().toLocaleLowerCase("en-US");
+  const profile = discovery.inputProfile.normalize("NFC").trim().toLocaleLowerCase("en-US");
+  if (!["sq", "albanian"].includes(language) && !["sq", "albanian"].includes(profile)) {
+    return discovery;
+  }
+
+  const writtenAnalysis = analyzeStructuralInputV0_2(discovery.inputWord);
+  const writtenVoicePath = writtenAnalysis.inputVoiceEvents.map((event) => event.voice);
+  const selectedVoicePath = discovery.derivedStructure.voicePath;
+  const legacySource = discovery.derivedStructure.voicePathSource;
+  const selectionKind = legacySource === "albanian_profile"
+    ? "profile_solver_selected" as const
+    : legacySource === "production_spoken"
+      ? "production_spoken" as const
+      : "unknown" as const;
+  const relationshipToWritten = legacySource !== "albanian_profile"
+    ? "not_comparable" as const
+    : writtenAnalysis.inputVoiceSequenceStatus !== "complete"
+      ? "written_sequence_unavailable" as const
+      : JSON.stringify(selectedVoicePath) === JSON.stringify(writtenVoicePath)
+        ? "same_sequence" as const
+        : "differs_from_written_sequence" as const;
+
+  return {
+    ...discovery,
+    derivedStructure: {
+      ...discovery.derivedStructure,
+      voicePathProvenance: {
+        writtenInput: {
+          inputForm: writtenAnalysis.inputForm,
+          analysisStatus: writtenAnalysis.analysisStatus,
+          inputVoiceSequenceStatus: writtenAnalysis.inputVoiceSequenceStatus,
+          inputVoiceEventCount: writtenAnalysis.inputVoiceEventCount,
+          voicePath: writtenVoicePath,
+          events: writtenAnalysis.inputVoiceEvents,
+          representationAuthority: "orthographic",
+          pronunciationAuthority: "not_established",
+        },
+        selectedPath: {
+          voicePath: [...selectedVoicePath],
+          selectionKind,
+          legacySource,
+          relationshipToWritten,
+        },
+      },
+    },
+  };
+}
 
 export const ALBANIAN_FIVE_WINDOWS_FORMS_V0_1 = Object.freeze([
   "dritare",
@@ -527,7 +620,7 @@ export type AlbanianLexicalCompositionV0_1 = Readonly<{
 }>;
 
 export type MotivationEngineDiscoveryWithAlbanianLexicalFactsV0_1 = Readonly<
-  MotivationEngineDiscoveryV0_1 & {
+  MotivationEngineDiscoveryWithVoicePathProvenanceV0_1 & {
     /** Additive exact-input source facts; never structural candidates or Voice authority. */
     exactLexicalSourceStatus: AlbanianKaikkiExactLexicalSourceStatusV0_1;
     exactLexicalSourceFacts: readonly AlbanianKaikkiExactLexicalSourceFactV0_1[];
@@ -3844,14 +3937,14 @@ export async function buildMotivationEngineDiscoveryServerOnlyV0_1(input: {
     sourceFamilyRecordingAdapterV0_1(adapter, sourceFamilyBySourceId, sourceDetailsBySourceId),
   );
 
-  const discovery = attachSourceFamilyProjectionV0_1(buildMotivationEngineDiscoveryV0_1({
+  const discovery = attachMotivationVoicePathProvenanceV0_1(attachSourceFamilyProjectionV0_1(buildMotivationEngineDiscoveryV0_1({
     word: input.word,
     inputLanguage: input.inputLanguage,
     inputProfile: input.inputProfile,
     analysis: discoveryAnalysis,
     heart: input.heart,
     sourceAdapters: recordingSourceAdapters,
-  }), sourceFamilyBySourceId, sourceDetailsBySourceId);
+  }), sourceFamilyBySourceId, sourceDetailsBySourceId));
   const exactLexicalSourceFacts = albanianLexicalSourceResult?.status === "MATCHES_FOUND"
     ? albanianLexicalSourceResult.facts
     : Object.freeze([]) as readonly AlbanianKaikkiExactLexicalSourceFactV0_1[];
