@@ -1,4 +1,5 @@
 import { spawnSync } from "node:child_process";
+import { createHash } from "node:crypto";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
@@ -35,7 +36,7 @@ function git(cwd: string, ...args: string[]) {
   return result.stdout.trim();
 }
 
-function makeFixture(pushMain = true): Fixture {
+function makeFixture(pushMain = true, seed?: (root: string) => void): Fixture {
   const temp = fs.mkdtempSync(path.join(os.tmpdir(), "prepush-classifier-"));
   const root = path.join(temp, "repo");
   const remote = path.join(temp, "remote.git");
@@ -63,6 +64,7 @@ function makeFixture(pushMain = true): Fixture {
       },
     }),
   );
+  seed?.(root);
   git(root, "add", "--all");
   git(root, "commit", "-m", "base docs");
   if (pushMain) git(root, "push", "origin", "main");
@@ -185,6 +187,21 @@ describe("pre-push fast-path classifier", () => {
     commit(fixture, "unsafe mixed change");
 
     expect(classify(fixture).tier).toBe("FULL");
+  });
+
+  it("retains verified changed paths for the full-validation tier", () => {
+    const fixture = fresh();
+    fs.mkdirSync(path.join(fixture.root, "src/shared"), { recursive: true });
+    fs.writeFileSync(path.join(fixture.root, "src/shared/example.ts"), "export const example = true;\n");
+    const headSha = commit(fixture, "shared source change");
+    const result = classify(fixture);
+
+    expect(result).toMatchObject({
+      tier: "FULL",
+      baseSha: git(fixture.root, "rev-parse", "main"),
+      headSha,
+      changedPaths: ["src/shared/example.ts"],
+    });
   });
 
   it("uses FULL for a mixed documentation and scoped-code diff", () => {
@@ -345,7 +362,7 @@ describe("pre-push fast-path classifier", () => {
     }
   });
 
-  it("routes the actual gate to the docs checks only with verified hook context", () => {
+  it("runs the frozen preflight before a verified documentation fast path", () => {
     const fixture = fresh();
     fs.writeFileSync(path.join(fixture.root, "docs/dev-workflow.md"), "# Updated docs\n");
     const headSha = commit(fixture);
@@ -362,6 +379,8 @@ describe("pre-push fast-path classifier", () => {
       timeout: 30_000,
     });
     expect(fast.status).toBe(0);
+    expect(fast.stdout).toContain("frozen-contract preflight passed");
+    expect(fast.stdout.indexOf("frozen-contract preflight passed")).toBeLessThan(fast.stdout.indexOf("verified documentation-only"));
     expect(fast.stdout).toContain("verified documentation-only");
     expect(fast.stdout).toContain("documentation-only:");
 
@@ -372,10 +391,71 @@ describe("pre-push fast-path classifier", () => {
       shell: false,
       timeout: 30_000,
     });
-    expect(fallback.status).toBe(0);
-    expect(fallback.stdout).toContain("using full validation");
-    expect(fallback.stdout).toContain("FULL_LINT");
-    expect(fallback.stdout).toContain("FULL_TEST");
+    expect(fallback.status).toBe(1);
+    expect(fallback.stderr).toContain("FROZEN_CHANGESET_UNVERIFIED");
+    expect(fallback.stdout).not.toContain("FULL_LINT");
+    expect(fallback.stdout).not.toContain("FULL_TEST");
+  });
+
+  it("continues into full validation after a verified ordinary code change passes preflight", () => {
+    const fixture = fresh();
+    fs.mkdirSync(path.join(fixture.root, "src"), { recursive: true });
+    fs.writeFileSync(path.join(fixture.root, "src/example.ts"), "export const example = true;\n");
+    const headSha = commit(fixture, "ordinary source change");
+    const update = `${fixture.topicRef} ${headSha} ${fixture.topicRef} ${fixture.zeroSha}\n`;
+    const hookScript = path.resolve(__dirname, "../.githooks/pre-push");
+    const result = spawnSync("bash", [hookScript, "origin", fixture.remote], {
+      cwd: fixture.root,
+      env: { ...process.env },
+      encoding: "utf8",
+      input: update,
+      shell: false,
+      timeout: 30_000,
+    });
+
+    expect(result.status).toBe(0);
+    expect(result.stdout).toContain("frozen-contract preflight passed (0 changed identities checked)");
+    expect(result.stdout).toContain("FULL_LINT");
+    expect(result.stdout).toContain("FULL_TEST");
+    expect(result.stdout.indexOf("frozen-contract preflight passed")).toBeLessThan(result.stdout.indexOf("FULL_LINT"));
+  });
+
+  it("rejects a changed frozen source before full lint and Jest start", () => {
+    const protectedPath = "src/shared/openInstrument/motivationEngineDiscovery.v0_1.ts";
+    const manifestPath = "docs/open-instrument/research-artifacts/test-s2/hash-manifest.json";
+    const baseline = "export const frozen = 'baseline';\n";
+    const fixture = makeFixture(true, (root) => {
+      fs.mkdirSync(path.join(root, path.dirname(protectedPath)), { recursive: true });
+      fs.mkdirSync(path.join(root, path.dirname(manifestPath)), { recursive: true });
+      fs.writeFileSync(path.join(root, protectedPath), baseline);
+      fs.writeFileSync(path.join(root, manifestPath), JSON.stringify({
+        schemaVersion: "test.s2.hash-manifest.v0.1",
+        procedureId: "test.s2.authority-truth.v0.1",
+        inputs: [{ path: protectedPath, sha256: createHash("sha256").update(baseline).digest("hex") }],
+      }, null, 2));
+    });
+    fixtures.push(fixture);
+    fs.writeFileSync(path.join(fixture.root, protectedPath), "export const frozen = 'modified';\n");
+    const headSha = commit(fixture, "modify frozen implementation");
+    const update = `${fixture.topicRef} ${headSha} ${fixture.topicRef} ${fixture.zeroSha}\n`;
+    const hookScript = path.resolve(__dirname, "../.githooks/pre-push");
+    const result = spawnSync("bash", [hookScript, "origin", fixture.remote], {
+      cwd: fixture.root,
+      env: { ...process.env },
+      encoding: "utf8",
+      input: update,
+      shell: false,
+      timeout: 30_000,
+    });
+
+    expect(result.status).toBe(1);
+    expect(result.stdout).toContain("frozen-contract preflight elapsed");
+    expect(result.stderr).toContain("FROZEN_IDENTITY_MISMATCH");
+    expect(result.stderr).toContain(protectedPath);
+    expect(result.stderr).toContain(createHash("sha256").update(baseline).digest("hex"));
+    expect(result.stderr).toContain(createHash("sha256").update("export const frozen = 'modified';\n").digest("hex"));
+    expect(result.stdout).not.toContain("FULL_LINT");
+    expect(result.stdout).not.toContain("FULL_TEST");
   });
 
   it("runs scoped UI validation through the hook and falls back to FULL on an empty selection", () => {
