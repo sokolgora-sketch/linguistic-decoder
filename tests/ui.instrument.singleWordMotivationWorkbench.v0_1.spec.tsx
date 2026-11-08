@@ -1,5 +1,137 @@
 import { fireEvent, render, screen } from "@testing-library/react";
-import { SingleWordMotivationWorkbenchV0_1 } from "@/ui/instrument/sections/SingleWordMotivationWorkbenchV0_1";
+import {
+  SingleWordMotivationWorkbenchV0_1,
+  type SingleWordCurrentWordEvidenceContextV0_1,
+} from "@/ui/instrument/sections/SingleWordMotivationWorkbenchV0_1";
+import type { MotivationDiscoveryV0_1VM } from "@/ui/telemetry/types";
+
+function makeCurrentWordEvidence(
+  word: string,
+  options: {
+    status?: "MATCHES_FOUND" | "SOURCE_NOT_FOUND" | "UNAVAILABLE" | "NOT_QUERIED";
+    voices?: string[];
+    positions?: number[];
+    solverVoices?: string[];
+    facts?: unknown[];
+    structuralHypotheses?: unknown[];
+    language?: string;
+    profile?: string;
+  } = {},
+): SingleWordCurrentWordEvidenceContextV0_1 {
+  const status = options.status ?? "SOURCE_NOT_FOUND";
+  const voices = options.voices ?? ["A", "I"];
+  const positions = options.positions ?? [1, 4];
+  const sourceCharacters = Array.from(word.normalize("NFC"));
+  const events = voices.map((voice, index) => {
+    const sourcePosition = positions[index] ?? index;
+    return {
+      eventId: `fixture-event-${index}`,
+      order: index,
+      voice,
+      basisPosition: index,
+      sourceCharacter: sourceCharacters[sourcePosition] ?? voice,
+      sourcePosition,
+      sourcePositionUnit: "unicode_code_point_in_nfc_input",
+      sourceSpan: { start: sourcePosition, end: sourcePosition + 1 },
+      provenance: "caller_supplied_orthography",
+      mappingSource: "math7.core.extractSevenVowelsFromString",
+      representationAuthority: "orthographic",
+      pronunciationAuthority: "not_established",
+    };
+  });
+  const fixtureFacts = options.facts ?? (status === "MATCHES_FOUND"
+    ? [{
+        sourceRecordId: "fixture:source-record-1",
+        entryLocator: "fixture-entry-1",
+        physicalRecordOrdinal: 0,
+        language: "Albanian",
+        languageCode: "sq",
+        form: word,
+        partOfSpeech: "noun",
+        senses: [
+          { senseId: "fixture-sense-1", glosses: ["fixture gloss one"] },
+          { senseId: "fixture-sense-2", glosses: ["fixture gloss two"] },
+        ],
+        ipaObservations: [{ soundIndex: 0, ipa: null, tags: [] }],
+        sourceStatus: "observed_external_snapshot",
+        attestationTruth: "fact",
+        pronunciationAuthority: "fixture_source_record_not_frozen_authority",
+        sourceSnapshot: {
+          sourceFamilyId: "fixture-source-family",
+          sourceUrl: "https://example.invalid/fixture.jsonl",
+          sha256: "a".repeat(64),
+          bytes: 1,
+        },
+      }]
+    : []);
+  const discovery = {
+    schemaVersion: "open-instrument.motivation-engine-discovery.v0_1",
+    status: "NO_MATCHES",
+    inputWord: word,
+    inputLanguage: options.language ?? "sq",
+    inputProfile: options.profile ?? "albanian",
+    sourceFact: {
+      layer: "SOURCE_FACT",
+      language: options.language === "English" ? "English" : "Albanian",
+      profile: options.profile ?? "albanian",
+      representation: options.language === "English" ? "unknown" : "albanian_profile",
+      sourceStatus: "fixture analysis status",
+      authorityBoundary: "fixture only",
+    },
+    exactLexicalSourceStatus: {
+      status,
+      queryForm: status === "NOT_QUERIED" ? null : word,
+      reasonCode: status === "SOURCE_NOT_FOUND"
+        ? "ALBANIAN_EXACT_FORM_NOT_FOUND"
+        : status === "UNAVAILABLE"
+          ? "ALBANIAN_SOURCE_PATH_NOT_CONFIGURED"
+          : null,
+    },
+    exactLexicalSourceFacts: fixtureFacts,
+    sourceIpaSevenVoiceAnalyses: [],
+    derivedStructure: {
+      layer: "DERIVED_STRUCTURE",
+      voicePath: options.solverVoices ?? ["I", "A"],
+      voicePathSource: "albanian_profile",
+      voicePathProvenance: {
+        writtenInput: {
+          inputForm: word,
+          analysisStatus: "SUPPORTED",
+          inputVoiceSequenceStatus: "complete",
+          inputVoiceEventCount: voices.length,
+          voicePath: voices,
+          events,
+          representationAuthority: "orthographic",
+          pronunciationAuthority: "not_established",
+        },
+        selectedPath: {
+          voicePath: options.solverVoices ?? ["I", "A"],
+          selectionKind: "profile_solver_selected",
+          legacySource: "albanian_profile",
+          relationshipToWritten: "differs_from_written_sequence",
+        },
+      },
+      math7: { basis: null, totalMod7: null, principlesPath: [] },
+      gamma: { status: "NULL", orderedUnits: [], reason: "fixture Null" },
+      zeroConsonantalStructuralComposition: { status: "NULL", variants: [], reason: "fixture Null" },
+      structuralHypotheses: options.structuralHypotheses ?? [],
+    },
+    candidates: [],
+    interpretation: {
+      layer: "ZË-RO_INTERPRETATION_OR_HYPOTHESIS",
+      status: "UNKNOWN_OR_NULL",
+      note: "fixture Null",
+    },
+    unknownOrNull: { layer: "UNKNOWN_OR_NULL", reason: "fixture Null" },
+    userDecisionPosture: "user_decides",
+    noSingleWinner: true,
+  } as unknown as MotivationDiscoveryV0_1VM;
+
+  return {
+    analyzedWord: word,
+    discovery: { kind: "present", value: discovery },
+  };
+}
 
 const originalFetch = global.fetch;
 
@@ -8,6 +140,158 @@ afterEach(() => {
 });
 
 describe("Single-word motivation workbench v0.1", () => {
+  it("shows source facts as read-only context without selecting a sense or filling the proposal", () => {
+    const context = makeCurrentWordEvidence("KANDIL", { status: "MATCHES_FOUND" });
+    render(
+      <SingleWordMotivationWorkbenchV0_1
+        initialTargetWord="KANDIL"
+        currentWordEvidence={context}
+      />,
+    );
+
+    const evidence = screen.getByTestId("single-word-current-evidence");
+    expect(evidence).toHaveTextContent("KANDIL");
+    expect(evidence).toHaveTextContent("MATCHES_FOUND");
+    expect(evidence).toHaveTextContent("fixture:source-record-1");
+    expect(evidence).toHaveTextContent("fixture-sense-1: fixture gloss one");
+    expect(evidence).toHaveTextContent("fixture-sense-2: fixture gloss two");
+    expect(evidence).toHaveTextContent("fixture-source-family");
+    expect(evidence).toHaveTextContent("https://example.invalid/fixture.jsonl");
+    expect(evidence).toHaveTextContent("none is selected for a component proposal");
+    expect(evidence).toHaveTextContent("Written Seven-Voices path");
+    expect(evidence).toHaveTextContent("A → I");
+    expect(evidence).toHaveTextContent("Solver-selected path");
+    expect(evidence).toHaveTextContent("pronunciation: not_established");
+    expect(screen.getByLabelText("Target language")).toHaveValue("");
+    expect(screen.getByLabelText("Component 1 proposed meaning")).toHaveValue("");
+    expect(screen.getByTestId("single-word-proposal-incomplete")).toBeInTheDocument();
+    expect(screen.queryByTestId("single-word-component-source-evidence")).not.toBeInTheDocument();
+  });
+
+  it("keeps exact-form NOT_FOUND, structural Null, and the KANDIL written path distinct", () => {
+    render(
+      <SingleWordMotivationWorkbenchV0_1
+        initialTargetWord="KANDIL"
+        currentWordEvidence={makeCurrentWordEvidence("KANDIL")}
+      />,
+    );
+
+    const evidence = screen.getByTestId("single-word-current-evidence");
+    expect(evidence).toHaveTextContent("SOURCE_NOT_FOUND");
+    expect(evidence).toHaveTextContent("ALBANIAN_EXACT_FORM_NOT_FOUND");
+    expect(evidence).toHaveTextContent("does not establish lexical absence");
+    expect(evidence).toHaveTextContent("A at source position 1 (A)");
+    expect(evidence).toHaveTextContent("I at source position 4 (I)");
+    expect(evidence).toHaveTextContent("No structural hypotheses emitted");
+    expect(evidence).toHaveTextContent("UNKNOWN_OR_NULL");
+    expect(evidence).not.toHaveTextContent("fixture gloss");
+    expect(screen.getByLabelText("Component 1 exact spelling")).toHaveValue("");
+  });
+
+  it.each([
+    ["UNAVAILABLE", "no lexical conclusion follows"],
+    ["NOT_QUERIED", "no lexical conclusion follows"],
+  ] as const)("does not turn %s into a lexical conclusion", (status, explanation) => {
+    render(
+      <SingleWordMotivationWorkbenchV0_1
+        initialTargetWord="KANDIL"
+        currentWordEvidence={makeCurrentWordEvidence("KANDIL", { status })}
+      />,
+    );
+
+    const evidence = screen.getByTestId("single-word-current-source-evidence");
+    expect(evidence).toHaveTextContent(status);
+    expect(evidence).toHaveTextContent(explanation);
+    expect(evidence).not.toHaveTextContent("fixture gloss");
+  });
+
+  it("conserves all written Voices, repeated events, and positions when candidates are empty", () => {
+    const word = "AEIOUYËA";
+    const voices = ["A", "E", "I", "O", "U", "Y", "Ë", "A"];
+    render(
+      <SingleWordMotivationWorkbenchV0_1
+        initialTargetWord={word}
+        currentWordEvidence={makeCurrentWordEvidence(word, {
+          status: "NOT_QUERIED",
+          voices,
+          positions: [0, 1, 2, 3, 4, 5, 6, 7],
+          solverVoices: ["Ë", "Y", "U", "O", "I", "E", "A"],
+        })}
+      />,
+    );
+
+    const written = screen.getByTestId("single-word-current-voice-evidence");
+    expect(written).toHaveTextContent("A → E → I → O → U → Y → Ë → A");
+    expect(written).toHaveTextContent("A at source position 7 (A)");
+    expect(written).toHaveTextContent("Solver-selected path");
+    expect(written).toHaveTextContent("Ë → Y → U → O → I → E → A");
+    expect(screen.getByTestId("single-word-current-structural-evidence")).toHaveTextContent(
+      "No structural hypotheses emitted",
+    );
+    expect(screen.getByTestId("single-word-current-structural-evidence")).toHaveTextContent(
+      "UNKNOWN_OR_NULL",
+    );
+  });
+
+  it("withholds Albanian source facts from a non-Albanian analysis context", () => {
+    render(
+      <SingleWordMotivationWorkbenchV0_1
+        initialTargetWord="KANDIL"
+        currentWordEvidence={makeCurrentWordEvidence("KANDIL", {
+          status: "MATCHES_FOUND",
+          language: "English",
+          profile: "English",
+        })}
+      />,
+    );
+
+    const source = screen.getByTestId("single-word-current-source-evidence");
+    expect(source).toHaveTextContent("NOT_APPLICABLE_FOR_LANGUAGE");
+    expect(source).toHaveTextContent("no Albanian lexical conclusion is displayed");
+    expect(source).not.toHaveTextContent("MATCHES_FOUND");
+    expect(source).not.toHaveTextContent("fixture:source-record-1");
+    expect(source).not.toHaveTextContent("fixture gloss one");
+  });
+
+  it("shows emitted structural candidates only as candidates with their existing reasons", () => {
+    render(
+      <SingleWordMotivationWorkbenchV0_1
+        initialTargetWord="KANDIL"
+        currentWordEvidence={makeCurrentWordEvidence("KANDIL", {
+          structuralHypotheses: [{
+            hypothesisId: "fixture-hypothesis-1",
+            embryo: "AN",
+            expansionChain: ["AN", "AND", "KANDIL"],
+            reasonCodes: ["CONSONANTAL_REDUCTION_SUPPORTED"],
+          }],
+        })}
+      />,
+    );
+
+    const structure = screen.getByTestId("single-word-current-structural-evidence");
+    expect(structure).toHaveTextContent("fixture-hypothesis-1 · embryo AN");
+    expect(structure).toHaveTextContent("AN → AND → KANDIL");
+    expect(structure).toHaveTextContent("CONSONANTAL_REDUCTION_SUPPORTED");
+    expect(structure).toHaveTextContent("does not assign component meaning");
+    expect(screen.getByLabelText("Component 1 exact spelling")).toHaveValue("");
+    expect(screen.getByLabelText("Component 1 proposed meaning")).toHaveValue("");
+  });
+
+  it("withholds a discovery payload whose word differs from the current analysis", () => {
+    const wrongDiscovery = makeCurrentWordEvidence("KANDIL", { status: "MATCHES_FOUND" }).discovery;
+    render(
+      <SingleWordMotivationWorkbenchV0_1
+        initialTargetWord="DRITARE"
+        currentWordEvidence={{ analyzedWord: "DRITARE", discovery: wrongDiscovery }}
+      />,
+    );
+
+    const evidence = screen.getByTestId("single-word-current-evidence");
+    expect(screen.getByTestId("single-word-discovery-word-mismatch")).toBeInTheDocument();
+    expect(evidence).not.toHaveTextContent("fixture:source-record-1");
+    expect(evidence).not.toHaveTextContent("fixture gloss one");
+  });
+
   it("keeps the KANDIL source-sense proposal separate from explicit mechanical replay", () => {
     render(<SingleWordMotivationWorkbenchV0_1 initialTargetWord="KANDIL" />);
     fireEvent.change(screen.getByLabelText("Target language"), { target: { value: "Albanian" } });
