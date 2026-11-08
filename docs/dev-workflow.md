@@ -83,6 +83,8 @@ Before modifying files, verify:
 
 Stop on a repository or lane mismatch. Do not guess repository state.
 
+After identifying the intended repository-relative changed paths, run `node scripts/frozenContractPreflight.v0_1.cjs --planned <repo-relative-paths>` before editing paths that may be checksum-frozen. Include the planned paths. This command is read-only and reports registered checksum owners and expected identities; it is a planning aid, not a replacement for mandatory hooked validation.
+
 ## 6. Change discipline
 
 - Make the smallest correct change.
@@ -110,8 +112,8 @@ Run focused tests first for changed behavior. Use the actual repository commands
 Use `npm run gate` or a separately executed `npm run build` when production-build validation is required. Pre-merge proof must show the command that actually provided build coverage.
 
 The repository pre-push hook always enters through `npm run gate:prepush`. For
-changes outside the two verified fast paths below, or whenever their evidence
-is uncertain, it runs repository lint plus Jest in `--ci --runInBand` mode
+a verified changeset outside the two verified fast paths below, or when
+fast-path selection remains uncertain, it runs repository lint plus Jest in `--ci --runInBand` mode
 with `OPEN_INSTRUMENT_EXTERNAL_SOURCE_ROOT` unset so deterministic local
 results cannot change with an optional external provider. It excludes only the
 known capability-dependent suites that require loopback, `tsx` child-process
@@ -145,8 +147,10 @@ Multiple refs, tags, deletes, renames, mode changes, symlinks, MDX, code,
 tests, CI, hooks, gate/dependency/config changes, unusual paths, stale or
 missing refs, dirty state, and any ambiguous Git/remote result do not qualify
 for DOCS_ONLY. The classifier may then consider the separate SCOPED_CODE
-allowlist below; all other changes use FULL. A failing docs check fails the
-gate.
+allowlist below. If the changeset is verified but fast-path selection remains
+uncertain, the gate uses FULL. If the Git ref or changed-path context cannot be
+verified, the gate stops with `FROZEN_CHANGESET_UNVERIFIED` before validation.
+A failing docs check fails the gate.
 
 For a clean, single-ref push whose complete regular `100644` code/test diff is
 limited to `src/ui/instrument/InstrumentPanel.tsx`,
@@ -179,6 +183,13 @@ changed-file ESLint, and the applicable production or contract typecheck. Keep
 the normal pre-push hook enabled; it must complete `npm run gate:prepush` on
 every push, selecting only a verified docs path, a verified bounded Instrument
 UI path, or the existing full lane.
+
+Before lint/Jest, the gate also requires verified Git ref and changeset context.
+Missing or invalid context fails immediately with
+`FROZEN_CHANGESET_UNVERIFIED`. A verified frozen-identity mismatch fails before
+lint or Jest. Verified clean identities continue to normal classification;
+uncertainty in selecting a fast path runs the existing FULL validation. The
+read-only planning command above does not replace the hook.
 Run `npm run gate:quick` when broader local integration validation
 is warranted, not as a routine pre-merge step. `gate:quick` and `gate:prepush`
 are not equivalent: `gate:prepush` excludes the defined capability-dependent

@@ -11,10 +11,12 @@ import { spawnSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 import classifier from "./prepushChangeClassifier.cjs";
 import docsValidation from "./prepushDocsValidation.cjs";
+import frozenContractPreflight from "./frozenContractPreflight.v0_1.cjs";
 import scopedCodeSelection from "./prepushScopedCodeSelection.v0_1.cjs";
 
 const { classifyPrePush } = classifier;
 const { validateDocsOnlyCommit } = docsValidation;
+const { verifyChangedFiles } = frozenContractPreflight;
 const { selectScopedCodeTests } = scopedCodeSelection;
 
 const capabilityDependentTestPatterns = [
@@ -63,6 +65,41 @@ if (hookArgs.length === 3 && hookArgs[0] === "--hook") {
     classification = { tier: "FULL", reason: "pre-push context could not be read safely" };
   }
 }
+
+if (
+  typeof classification.baseSha !== "string" ||
+  typeof classification.headSha !== "string" ||
+  !Array.isArray(classification.changedPaths) ||
+  classification.changedPaths.length === 0
+) {
+  console.error(JSON.stringify({
+    reasonCode: "FROZEN_CHANGESET_UNVERIFIED",
+    path: null,
+    manifestPath: null,
+    ownerContract: null,
+    expectedSha256: null,
+    actualSha256: null,
+    authorityProcedure: "A verified Git pre-push base, head, and changed-path set are required before expensive validation",
+    detail: classification.reason,
+  }));
+  process.exit(1);
+}
+
+const frozenPreflight = await verifyChangedFiles({
+  repoRoot: process.cwd(),
+  baseSha: classification.baseSha,
+  headSha: classification.headSha,
+  changedPaths: classification.changedPaths,
+});
+console.log(`[gate:prepush] frozen-contract preflight elapsed ${(frozenPreflight.elapsedMs / 1000).toFixed(3)}s`);
+for (const diagnostic of frozenPreflight.diagnostics) {
+  console.error(`[frozen-contract-preflight] ${JSON.stringify(diagnostic)}`);
+}
+if (!frozenPreflight.ok) {
+  console.error("pre-push: frozen-contract preflight failed; expensive validation was not started");
+  process.exit(1);
+}
+console.log(`pre-push: frozen-contract preflight passed (${frozenPreflight.checkedIdentityCount} changed identities checked)`);
 
 if (classification.tier === "DOCS_ONLY") {
   console.log(`pre-push: verified documentation-only change (${classification.reason})`);

@@ -293,7 +293,12 @@ function classifyPrePush({ repoRoot, remoteName, remoteUrl, stdin }) {
       changedPaths,
     };
   }
-  return full("the complete pushed diff is not wholly within a verified fast-path allowlist");
+  return {
+    ...full("the complete pushed diff is not wholly within a verified fast-path allowlist"),
+    baseSha,
+    headSha,
+    changedPaths,
+  };
 }
 
 module.exports = {
