@@ -16,6 +16,7 @@ import {
   type MechanicalEditKindV0_1,
   type SingleWordMechanicalExaminerResultV0_1,
 } from "@/shared/openInstrument/singleWordMechanicalExaminer.v0_1";
+import { analyzeStructuralInputV0_2 } from "@/shared/structuralHypothesisDiscovery.v0_2";
 import type { MotivationDiscoveryV0_1VM, PresentOrMissing } from "@/ui/telemetry/types";
 import { FjaloriCrossSourceEvidenceV0_1 } from "@/ui/instrument/sections/FjaloriCrossSourceEvidence.v0_1";
 
@@ -134,6 +135,46 @@ function CurrentWordEvidenceSectionV0_1({
   const writtenInput = writtenInputMatches ? voiceProvenance?.writtenInput : undefined;
   const selectedPath = voiceProvenance?.selectedPath;
   const structuralHypotheses = visibleDiscovery?.derivedStructure.structuralHypotheses ?? [];
+  const structuralAnalysis = useMemo(
+    () => visibleDiscovery && sourceContextIsAlbanian
+      ? analyzeStructuralInputV0_2(visibleDiscovery.inputWord)
+      : null,
+    [visibleDiscovery, sourceContextIsAlbanian],
+  );
+  const lexicalReading = sourceContextIsAlbanian ? visibleDiscovery?.albanianLexicalReading : undefined;
+  const sourceComponentReading = lexicalReading?.sourceLinkedComponentReading ?? null;
+  const componentReferencesAreUnique = Boolean(
+    sourceComponentReading?.status === "SUPPORTED" &&
+    sourceComponentReading.components.length > 0 &&
+    sourceComponentReading.components.length === sourceComponentReading.componentResolutions.length &&
+    sourceComponentReading.components.length === sourceComponentReading.relation.references.length &&
+    sourceComponentReading.componentResolutions.every((resolution, index) =>
+      resolution.status === "RESOLVED" &&
+      resolution.sourceRecordIds.length === 1 &&
+      sourceComponentReading.components[index]?.sourceRecordId === resolution.sourceRecordIds[0] &&
+      sourceComponentReading.components[index]?.form === resolution.sourceForm &&
+      sourceComponentReading.relation.references[index]?.sourceForm === resolution.sourceForm,
+    ),
+  );
+  const componentSurfaceJoin = componentReferencesAreUnique && sourceComponentReading
+    ? sourceComponentReading.components.map((component, index) => {
+        const isSuffixNotation = sourceComponentReading.relation.relation === "SOURCE_AUTHORED_SUFFIX_TEMPLATE" &&
+          index > 0 && component.form.startsWith("-") && !component.form.startsWith("--");
+        return isSuffixNotation ? component.form.slice(1) : component.form;
+      }).join("")
+    : null;
+  const componentTargetRecordBinding = sourceComponentReading
+    ? !sameAlbanianSourceForm(sourceComponentReading.primary.form, visibleDiscovery?.inputWord ?? "")
+      ? "MISMATCH"
+      : sourceFacts.length === 0
+        ? "UNKNOWN_OR_NULL"
+        : sourceFacts.some((fact) => fact.sourceRecordId === sourceComponentReading.primary.sourceRecordId)
+          ? "MATCH"
+          : "MISMATCH"
+    : "UNKNOWN_OR_NULL";
+  const surfaceJoinMatchesTarget = componentSurfaceJoin !== null && sourceComponentReading !== null && componentTargetRecordBinding === "MATCH"
+    ? sameAlbanianSourceForm(componentSurfaceJoin, visibleDiscovery?.inputWord ?? "")
+    : null;
 
   return (
     <section
@@ -196,9 +237,14 @@ function CurrentWordEvidenceSectionV0_1({
       ) : null}
 
       {visibleDiscovery ? (
-        <div className="mt-3 space-y-2">
+        <section aria-label="Progressive evidence trace" data-testid="single-word-progressive-evidence-trace" className="mt-3 rounded border border-[#34495a] bg-[#10161c] p-2">
+          <h4 className="font-semibold text-[#f5f7fb]">Progressive evidence trace</h4>
+          <p className="mt-1 text-[#9fb1bf]">The steps keep source facts, structural candidates, source relations, and whole-word interpretations distinct. No step supplies an embryo meaning or selects a winning sense.</p>
+          <ol className="mt-2 space-y-2">
+            <li>
           <section data-testid="single-word-current-source-evidence" className="rounded border border-[#303843] bg-[#10161c] p-2">
-            <h4 className="font-semibold text-[#dce9ca]">Albanian Kaikki whole-word source</h4>
+            <h4 className="font-semibold text-[#dce9ca]">1 · Albanian Kaikki whole-word source</h4>
+            <div className="mt-1 break-words">Analyzed form: {visibleDiscovery.inputWord} · language {visibleDiscovery.inputLanguage} · profile {visibleDiscovery.inputProfile}</div>
             {sourceContextIsAlbanian ? (
               <div className="mt-1">
                 Exact-form lookup: {sourceStatus?.status ?? "NOT_EMITTED"}
@@ -258,9 +304,10 @@ function CurrentWordEvidenceSectionV0_1({
               </>
             ) : null}
           </section>
-
+            </li>
+            <li>
           <section data-testid="single-word-current-voice-evidence" className="rounded border border-[#315147] bg-[#101714] p-2">
-            <h4 className="font-semibold text-[#a9d2bf]">Written Seven-Voices path</h4>
+            <h4 className="font-semibold text-[#a9d2bf]">2 · Written Seven-Voices path (complete orthographic events)</h4>
             {writtenInput ? (
               <>
                 <div className="mt-1 font-mono text-base text-[#f5f7fb]">{displayVoicePath(writtenInput.voicePath)}</div>
@@ -278,6 +325,37 @@ function CurrentWordEvidenceSectionV0_1({
               </>
             ) : (
               <p className="mt-1">Written path provenance: NOT_EMITTED or input-form mismatch. A selected derived path is not substituted for spelling.</p>
+            )}
+            {structuralAnalysis ? (
+              <div className="mt-2 rounded border border-[#263a33] p-2" data-testid="single-word-progressive-written-analysis">
+                <div>v0.2 orthographic recheck: {structuralAnalysis.analysisStatus} · sequence {structuralAnalysis.inputVoiceSequenceStatus}</div>
+                <div className="font-mono">Complete input events: {displayVoicePath(structuralAnalysis.inputVoiceEvents.map((event) => event.voice))}</div>
+                <div className="break-words">
+                  {structuralAnalysis.inputVoiceEvents.length
+                    ? structuralAnalysis.inputVoiceEvents.map((event) => `${event.voice} at source position ${event.sourcePosition} (${event.sourceCharacter})`).join(" · ")
+                    : "No complete input Voice events emitted; status remains Unknown / Null."}
+                </div>
+                <div className="break-words text-[#9fb1bf]">
+                  Albanian graphemes: {structuralAnalysis.inputGraphemes.length
+                    ? structuralAnalysis.inputGraphemes.map((grapheme) => {
+                        const exactSourceGrapheme = Array.from(visibleDiscovery.inputWord.normalize("NFC"))
+                          .slice(grapheme.sourceSpan.start, grapheme.sourceSpan.end)
+                          .join("");
+                        return `${exactSourceGrapheme || grapheme.grapheme} [${grapheme.sourceSpan.start}, ${grapheme.sourceSpan.end}) ${grapheme.graphemeKind}`;
+                      }).join(" · ")
+                    : "Unknown / Null"}
+                </div>
+                <div className="text-[#9fb1bf]">
+                  API/event sequence comparison: {writtenInput
+                    ? JSON.stringify(structuralAnalysis.inputVoiceEvents.map((event) => event.voice)) === JSON.stringify(writtenInput.voicePath)
+                      ? "MATCH"
+                      : "MISMATCH · both outputs are retained"
+                    : "UNKNOWN_OR_NULL · API written provenance not emitted"}
+                </div>
+                <div className="text-[#9fb1bf]">Representation is orthographic; pronunciation authority is not established.</div>
+              </div>
+            ) : (
+              <p className="mt-2 text-[#9fb1bf]">v0.2 Albanian grapheme analysis: UNKNOWN_OR_NULL because this discovery does not identify an Albanian language/profile context.</p>
             )}
             {selectedPath ? (
               <div className="mt-2 rounded border border-[#263a33] p-2">
@@ -300,11 +378,52 @@ function CurrentWordEvidenceSectionV0_1({
               </div>
             )}
           </section>
-
+            </li>
+            <li>
           <section data-testid="single-word-current-structural-evidence" className="rounded border border-[#3f3a2b] bg-[#15130f] p-2">
-            <h4 className="font-semibold text-[#f0ddb0]">Structural candidates</h4>
+            <h4 className="font-semibold text-[#f0ddb0]">3 · Structural candidates and component tree</h4>
+            {structuralAnalysis ? (
+              <div className="mt-2" data-testid="single-word-progressive-v02-structure">
+                <div className="font-semibold">Lossless v0.2 analysis · {structuralAnalysis.analysisStatus}</div>
+                {structuralAnalysis.hypotheses.length ? (
+                  <ol className="mt-1 space-y-2">
+                    {structuralAnalysis.hypotheses.map((hypothesis) => (
+                      <li key={hypothesis.hypothesisId} className="min-w-0 rounded border border-[#303843] p-2">
+                        <div className="break-words font-mono">{hypothesis.hypothesisId} · structural candidate {hypothesis.embryo}</div>
+                        <div className="break-words">Expansion: {hypothesis.expansionChain.join(" → ") || "not emitted"}</div>
+                        <div className="break-words text-[#c5b995]">Reason codes: {hypothesis.reasonCodes.join(", ") || "none emitted"}</div>
+                        <div className="mt-1">Components (source order; lexical meaning not evaluated):</div>
+                        <ul className="mt-1 space-y-1">
+                          {hypothesis.losslessDecomposition.components.map((component) => (
+                            <li key={component.componentId} className="break-words">
+                              <span className="font-mono">{component.form}</span> · {component.componentKind} · source span [{component.sourceSpan.start}, {component.sourceSpan.end}) · graphemes {component.graphemeIds.join(", ") || "none"} · Voices {displayVoicePath(component.voiceEvents.map((event) => event.voice))} · meaning UNKNOWN_OR_NULL
+                            </li>
+                          ))}
+                        </ul>
+                        <div className="mt-1 break-words text-[#9fb1bf]">
+                          Conservation: {hypothesis.losslessDecomposition.conservation.status} · event order preserved {String(hypothesis.losslessDecomposition.conservation.eventOrderPreserved)} · grapheme order preserved {String(hypothesis.losslessDecomposition.conservation.graphemeOrderPreserved)} · no digraph split {String(hypothesis.losslessDecomposition.conservation.noDigraphSplit)} · reconstructed {hypothesis.losslessDecomposition.reconstructedBasis}
+                        </div>
+                      </li>
+                    ))}
+                  </ol>
+                ) : (
+                  <p className="mt-1">No v0.2 reduction candidate emitted. The complete written events above remain available; candidate meaning is UNKNOWN_OR_NULL.</p>
+                )}
+                {structuralAnalysis.excludedHypotheses.length ? (
+                  <ul className="mt-1 text-[#c5b995]">
+                    {structuralAnalysis.excludedHypotheses.map((excluded) => (
+                      <li key={excluded.hypothesisId}>
+                        {excluded.hypothesisId} excluded: Albanian digraph {excluded.digraph} would be split at source position {excluded.splitSourcePosition}.
+                      </li>
+                    ))}
+                  </ul>
+                ) : null}
+                <div className="mt-1 text-[#9fb1bf]">Candidate order is deterministic output order; none is promoted as the best root or assigned a lexical meaning.</div>
+              </div>
+            ) : null}
             {structuralHypotheses.length ? (
-              <ul className="mt-1 space-y-2">
+              <ul className="mt-2 space-y-2" data-testid="single-word-progressive-legacy-structure">
+                <li className="text-[#9fb1bf]">Legacy discovery hypotheses (v0.1), kept separate from v0.2 decompositions:</li>
                 {structuralHypotheses.map((hypothesis) => (
                   <li key={hypothesis.hypothesisId} className="min-w-0 break-words">
                     <div className="font-mono">{hypothesis.hypothesisId} · embryo {hypothesis.embryo}</div>
@@ -313,12 +432,199 @@ function CurrentWordEvidenceSectionV0_1({
                   </li>
                 ))}
               </ul>
+            ) : !structuralAnalysis ? (
+              <p className="mt-1">Structural analysis not emitted for this Albanian context; this level remains UNKNOWN_OR_NULL.</p>
             ) : (
-              <p className="mt-1">No structural hypotheses emitted; this level remains UNKNOWN_OR_NULL.</p>
+              <p className="mt-1">No structural hypotheses emitted by the legacy v0.1 field; v0.2 output remains shown separately above.</p>
             )}
             <p className="mt-1 text-[#c5b995]">Structure supplies candidate form only. It does not assign component meaning, morphology, historical derivation, or embryo function.</p>
           </section>
-        </div>
+            </li>
+            <li>
+              <section data-testid="single-word-progressive-source-relationships" className="rounded border border-[#303843] bg-[#10161c] p-2">
+                <h4 className="font-semibold text-[#dce9ca]">4 · Source-authored relationships and sense alternatives</h4>
+                {sourceContextIsAlbanian ? (
+                  <div>Exact-form source status: {sourceStatus?.status ?? "NOT_EMITTED"} · source relation evidence is shown only if emitted by the current Discovery.</div>
+                ) : (
+                  <div>Albanian source relations: UNKNOWN_OR_NULL · no Albanian context is established.</div>
+                )}
+                {sourceComponentReading ? (
+                  <div className="mt-2 rounded border border-[#26323d] p-2">
+                    <div>Source-linked component reading: {sourceComponentReading.status} · {sourceComponentReading.relation.relation}</div>
+                    <div className="break-words">Target record: {sourceComponentReading.primary.sourceRecordId} · {sourceComponentReading.primary.entryLocator} · {sourceComponentReading.primary.form} · {sourceComponentReading.primary.partOfSpeech ?? "POS UNKNOWN_OR_NULL"}</div>
+                    <div>Target record/query binding: {componentTargetRecordBinding}</div>
+                    <div className="break-words">Source-authored explanation: {sourceComponentReading.relation.sourceAuthoredExplanation ?? "UNKNOWN_OR_NULL"}</div>
+                    <div className="break-words">Raw source component forms (ordered): {sourceComponentReading.components.length ? sourceComponentReading.components.map((component) => component.form).join(" + ") : "UNKNOWN_OR_NULL"}</div>
+                    {componentSurfaceJoin !== null ? (
+                      <div className="break-words" data-testid="single-word-source-surface-join">
+                        Surface join (template hyphen is notation only; raw forms above are preserved): {surfaceJoinMatchesTarget === null
+                          ? `${componentSurfaceJoin.toLocaleUpperCase("sq-AL")} · comparison UNKNOWN_OR_NULL because target-record/query binding is ${componentTargetRecordBinding}`
+                          : `${componentSurfaceJoin.toLocaleUpperCase("sq-AL")} ${surfaceJoinMatchesTarget ? "=" : "≠"} ${visibleDiscovery.inputWord.toLocaleUpperCase("sq-AL")} · ${surfaceJoinMatchesTarget ? "EXACT_SURFACE_JOIN" : "SURFACE_MISMATCH"}`}
+                      </div>
+                    ) : (
+                      <div>Surface join: UNKNOWN_OR_NULL · the component partition is not supported for exact reconstruction.</div>
+                    )}
+                    <div className="mt-1">Component reference resolution (source order):</div>
+                    <ol className="mt-1 space-y-1">
+                      {sourceComponentReading.componentResolutions.map((resolution, index) => (
+                        <li key={`${resolution.sourceForm}:${index}`} className="break-words">
+                          {index + 1}. {resolution.sourceForm} · {resolution.status} · reference {resolution.reference ?? "UNKNOWN_OR_NULL"} · source records {resolution.sourceRecordIds.join(", ") || "UNKNOWN_OR_NULL"} · reasons {resolution.reasonCodes.join(", ") || "none emitted"}
+                        </li>
+                      ))}
+                    </ol>
+                    <div className="mt-1">Component source records and senses (source order; alternatives retained):</div>
+                    <ol className="mt-1 space-y-1">
+                      {sourceComponentReading.components.map((component) => (
+                        <li key={component.sourceRecordId} className="break-words">
+                          {component.form} · {component.partOfSpeech ?? "POS UNKNOWN_OR_NULL"} · {component.sourceRecordId} · {component.entryLocator}
+                          {component.sourceSenses?.length ? (
+                            <ul className="ml-3 list-disc">
+                              {component.sourceSenses.map((sense, senseIndex) => (
+                                <li key={`${component.sourceRecordId}:${sense.senseId ?? senseIndex}`}>
+                                  Sense {sense.sourceSenseOrdinal}: {sense.senseId ?? "UNKNOWN_OR_NULL"} · {sense.glosses.join("; ") || "UNKNOWN_OR_NULL"}
+                                </li>
+                              ))}
+                            </ul>
+                          ) : <span> · source senses UNKNOWN_OR_NULL</span>}
+                        </li>
+                      ))}
+                    </ol>
+                    <div className="mt-1 break-words">Relationship interpretation: {sourceComponentReading.exploratoryRelationship.status} · {sourceComponentReading.exploratoryRelationship.statement ?? "UNKNOWN_OR_NULL"}</div>
+                    {sourceComponentReading.exploratoryRelationship.alternatives.length ? (
+                      <ul className="ml-3 list-disc">
+                        {sourceComponentReading.exploratoryRelationship.alternatives.map((alternative, index) => <li key={`${index}:${alternative}`}>{alternative}</li>)}
+                      </ul>
+                    ) : null}
+                    <div className="break-words">Relationship claim boundary: {sourceComponentReading.claimBoundary}</div>
+                    <div className="break-words">Target/component exact-sense crosswalk: UNKNOWN_OR_NULL · no canonical sense alignment is emitted by this record-level relationship.</div>
+                  </div>
+                ) : null}
+                {lexicalReading?.relatedForms.length ? (
+                  <div className="mt-2 rounded border border-[#26323d] p-2">
+                    <div>Source-reported related forms (original order):</div>
+                    <ol className="mt-1 space-y-1">
+                      {lexicalReading.relatedForms.map((related, index) => (
+                        <li key={`${related.entryLocator}:${index}`} className="break-words">
+                          {related.form} · {related.relation} · {related.sourceRecordId ?? "source record UNKNOWN_OR_NULL"} · {related.entryLocator} · {related.partOfSpeech ?? "POS UNKNOWN_OR_NULL"} · {related.meaningGlosses.join("; ") || "UNKNOWN_OR_NULL"}
+                          {related.etymologyText ? <span> · source text: {related.etymologyText}</span> : null}
+                        </li>
+                      ))}
+                    </ol>
+                  </div>
+                ) : null}
+                {lexicalReading?.sourceLinkedComparison ? (
+                  <div className="mt-2 rounded border border-[#26323d] p-2" data-testid="single-word-progressive-source-comparison">
+                    <div>Source-linked comparison: {lexicalReading.sourceLinkedComparison.status} · {lexicalReading.sourceLinkedComparison.relation.relation} · {lexicalReading.sourceLinkedComparison.summary.text}</div>
+                    <div className="break-words">Primary record: {lexicalReading.sourceLinkedComparison.primary.sourceRecordId} · {lexicalReading.sourceLinkedComparison.primary.entryLocator} · related form {lexicalReading.sourceLinkedComparison.relation.relatedForm} · related record {lexicalReading.sourceLinkedComparison.relation.relatedSourceRecordId ?? "UNKNOWN_OR_NULL"} · {lexicalReading.sourceLinkedComparison.relation.relatedEntryLocator}</div>
+                    {[lexicalReading.sourceLinkedComparison.primary, ...(lexicalReading.sourceLinkedComparison.related ? [lexicalReading.sourceLinkedComparison.related] : [])].map((record) => (
+                      <div key={record.sourceRecordId} className="mt-1 break-words">
+                        {record.form} source senses (original order): {record.sourceSenses?.length
+                          ? record.sourceSenses.map((sense) => `${sense.sourceSenseOrdinal}:${sense.senseId ?? "UNKNOWN_OR_NULL"}=${sense.glosses.join("; ") || "UNKNOWN_OR_NULL"}`).join(" · ")
+                          : "UNKNOWN_OR_NULL"}
+                      </div>
+                    ))}
+                    <div className="break-words">Comparison claim boundary: {lexicalReading.sourceLinkedComparison.claimBoundary}</div>
+                    <div>Cross-source exact-sense identity: UNKNOWN_OR_NULL unless separately emitted by a sense-alignment contract.</div>
+                  </div>
+                ) : null}
+                {lexicalReading?.senseAlignedLexicalRole ? (
+                  <div className="mt-2 rounded border border-[#26323d] p-2" data-testid="single-word-progressive-sense-alignment">
+                    <div>Separate sense-aligned lexical-role contract: {lexicalReading.senseAlignedLexicalRole.status} · lineage independence {lexicalReading.senseAlignedLexicalRole.lineageIndependence} · functional operation Null.</div>
+                    {lexicalReading.senseAlignedLexicalRole.candidates.length ? (
+                      <ol className="mt-1 space-y-1">
+                        {lexicalReading.senseAlignedLexicalRole.candidates.map((candidate, index) => (
+                          <li key={`${candidate.sourceFact.sourceRecordId}:${candidate.sourceFact.sourceSenseId ?? index}:${index}`} className="break-words">
+                            Kaikki {candidate.sourceFact.sourceRecordId} · sense {candidate.sourceFact.sourceSenseOrdinal} / {candidate.sourceFact.sourceSenseId ?? "UNKNOWN_OR_NULL"} · {candidate.sourceFact.form} · synonym {candidate.sourceFact.synonym ?? "UNKNOWN_OR_NULL"} · glosses {candidate.sourceFact.glosses.join("; ") || "UNKNOWN_OR_NULL"} · AlbaNet {candidate.crossSourceFact?.sourceRecordId ?? "UNKNOWN_OR_NULL"} · synset {candidate.crossSourceFact?.synsetId ?? "UNKNOWN_OR_NULL"} · inference {candidate.inference.status} / {candidate.inference.roleLabel ?? "UNKNOWN_OR_NULL"} · {candidate.reasonCodes.join(", ") || "no reason codes"}
+                          </li>
+                        ))}
+                      </ol>
+                    ) : (
+                      <div className="mt-1">UNKNOWN_OR_NULL · {lexicalReading.senseAlignedLexicalRole.reasonCodes.join(", ") || "no candidate evidence"}</div>
+                    )}
+                    <div className="mt-1 break-words">{lexicalReading.senseAlignedLexicalRole.claimBoundary} No single winner; user decides. This contract does not establish an embryo function or a component-sense crosswalk.</div>
+                  </div>
+                ) : (
+                  <div className="mt-1">Separate exact sense-alignment artifact: UNKNOWN_OR_NULL · not emitted in this Discovery.</div>
+                )}
+                {!sourceComponentReading && !lexicalReading?.relatedForms.length && !lexicalReading?.sourceLinkedComparison ? (
+                  <p className="mt-1">No source-authored component relation is available in this Discovery payload: UNKNOWN_OR_NULL. A spelling resemblance or user proposal is not a source relation.</p>
+                ) : null}
+                {sourceComponentReading?.functionalHypothesis.status === "EXPLORATORY_FUNCTIONAL_HYPOTHESIS" ? (
+                  <div className="mt-2 break-words" data-testid="single-word-source-component-hypothesis">
+                    Source-component role hypothesis: EXPLORATORY · {sourceComponentReading.functionalHypothesis.statement ?? "UNKNOWN_OR_NULL"} · functional operation {sourceComponentReading.functionalHypothesis.functionalOperation ?? "Null"}.
+                    <div>Evidence references: {sourceComponentReading.functionalHypothesis.evidenceRefs.map((reference) => `${reference.sourceRecordId} (${reference.entryLocator}; senses ${reference.senseIds.join(", ") || "UNKNOWN_OR_NULL"})`).join(" · ") || "UNKNOWN_OR_NULL"}</div>
+                    <div>Claim boundary: {sourceComponentReading.functionalHypothesis.claimBoundary}</div>
+                  </div>
+                ) : null}
+              </section>
+            </li>
+            <li>
+              <section data-testid="single-word-progressive-functional-reading" className="rounded border border-[#34495a] bg-[#10161c] p-2">
+                <h4 className="font-semibold text-[#dce9ca]">5 · Existing whole-word functional reading or Null</h4>
+                {lexicalReading?.functionalFamilyReading ? (
+                  <div className="mb-2 rounded border border-[#26323d] p-2" data-testid="single-word-progressive-functional-family">
+                    <div>Source-family reading: EXPLORATORY_FUNCTIONAL_FAMILY · operation {lexicalReading.functionalFamilyReading.functionalOperation}</div>
+                    <div className="break-words">{lexicalReading.functionalFamilyReading.statement}</div>
+                    <ol className="mt-1 space-y-1">
+                      <li className="break-words">Primary: {lexicalReading.functionalFamilyReading.primary.form} · {lexicalReading.functionalFamilyReading.primary.sourceRecordId} · {lexicalReading.functionalFamilyReading.primary.senseId} · {lexicalReading.functionalFamilyReading.primary.meaningGlosses.join("; ")}</li>
+                      {lexicalReading.functionalFamilyReading.members.map((member, index) => (
+                        <li key={`${member.sourceRecordId}:${member.senseId}:${index}`} className="break-words">
+                          {member.form} · {member.sourceRecordId} · {member.senseId} · {member.meaningGlosses.join("; ")} · {member.sourceRelation} · evidence {member.evidenceBasis.join(", ")}
+                        </li>
+                      ))}
+                    </ol>
+                    <div className="break-words">{lexicalReading.functionalFamilyReading.claimBoundary} {lexicalReading.functionalFamilyReading.alternatives.join(" ")}</div>
+                    <div className="text-[#9fb1bf]">Same-source family evidence does not establish independent corroboration or embryo meaning.</div>
+                  </div>
+                ) : null}
+                {lexicalReading?.functionalMeaningBridge?.status === "SUPPORTED" ? (
+                  <>
+                    <div>Whole-word bridge: SUPPORTED · operation {lexicalReading.functionalMeaningBridge.functionalHypothesis.functionalOperation ?? "Null"} · {lexicalReading.functionalMeaningBridge.functionalHypothesis.status}</div>
+                    <div className="break-words">{lexicalReading.functionalMeaningBridge.functionalHypothesis.statement ?? "UNKNOWN_OR_NULL"}</div>
+                    {lexicalReading.functionalMeaningBridge.functionalHypothesis.alternatives.length ? (
+                      <ul className="ml-3 list-disc">
+                        {lexicalReading.functionalMeaningBridge.functionalHypothesis.alternatives.map((alternative, index) => <li key={`${index}:${alternative}`}>{alternative}</li>)}
+                      </ul>
+                    ) : null}
+                    <div className="break-words">Bridge claim boundary: {lexicalReading.functionalMeaningBridge.claimBoundary}</div>
+                  </>
+                ) : (
+                  <div>Whole-word functional bridge: UNKNOWN_OR_NULL{lexicalReading?.functionalMeaningBridge?.reasonCodes.length ? ` · ${lexicalReading.functionalMeaningBridge.reasonCodes.join(", ")}` : " · no supported bridge emitted"}</div>
+                )}
+                {lexicalReading?.interpretation.status === "EXPLORATORY_ZHEJI_READING" ? (
+                  <div className="mt-1 break-words">Existing product interpretation: EXPLORATORY · {lexicalReading.interpretation.statement ?? "UNKNOWN_OR_NULL"}</div>
+                ) : null}
+                {lexicalReading?.interpretation.alternatives.length ? (
+                  <ul className="ml-3 list-disc">
+                    {lexicalReading.interpretation.alternatives.map((alternative, index) => <li key={`${index}:${alternative}`}>{alternative}</li>)}
+                  </ul>
+                ) : null}
+                <div className="mt-1 font-semibold">Structural embryo meaning/function: UNKNOWN_OR_NULL. Structural candidates do not establish a lexical meaning or functional operation.</div>
+                <div>No single winner: {visibleDiscovery.noSingleWinner ? "true" : "UNKNOWN_OR_NULL"} · user decision posture: {visibleDiscovery.userDecisionPosture}.</div>
+              </section>
+            </li>
+          </ol>
+        </section>
+      ) : null}
+
+      {contextMatchesTarget && !visibleDiscovery ? (
+        <section aria-label="Progressive evidence trace" data-testid="single-word-progressive-evidence-trace" className="mt-3 rounded border border-[#34495a] bg-[#10161c] p-2">
+          <h4 className="font-semibold text-[#f5f7fb]">Progressive evidence trace</h4>
+          <div className="mt-1">Analyzed form: {context?.analyzedWord ?? analyzedWord}</div>
+          <div className="break-words">Discovery status: {!discoveryState
+            ? "NOT_EMITTED"
+            : discoveryState.kind === "missing"
+              ? `MISSING · ${discoveryState.missing}${discoveryState.note ? ` · ${discoveryState.note}` : ""}`
+              : `WITHHELD_INPUT_MISMATCH · Discovery input ${discovery?.inputWord ?? "UNKNOWN_OR_NULL"} does not match this analyzed form`}</div>
+          <ol className="mt-2 space-y-1">
+            <li>1 · Whole-word source facts and target senses: UNKNOWN_OR_NULL.</li>
+            <li>2 · Written Voice events and graphemes: UNKNOWN_OR_NULL; no matching Discovery payload is available.</li>
+            <li>3 · Structural candidates and decomposition: UNKNOWN_OR_NULL.</li>
+            <li>4 · Source-authored relationships and sense alignment: UNKNOWN_OR_NULL.</li>
+            <li>5 · Whole-word function: UNKNOWN_OR_NULL · embryo meaning/function: UNKNOWN_OR_NULL.</li>
+          </ol>
+          <p className="mt-1 text-[#9fb1bf]">Withheld or missing evidence is not a negative lexical finding. No proposal fields are populated from this state.</p>
+        </section>
       ) : null}
 
       {contextMatchesTarget && draftTargetWord !== analyzedWord ? (
