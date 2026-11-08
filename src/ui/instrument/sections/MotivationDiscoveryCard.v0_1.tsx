@@ -599,12 +599,84 @@ export function MotivationDiscoveryCardV0_1({
           </div>
           <div className="mt-1 text-[#9fb1bf]">{value.sourceFact.sourceStatus}</div>
         </div>
-        <div className="rounded-lg border border-[#303843] bg-[#10161c] p-3 text-xs leading-5 text-[#c5ced8] sm:min-w-[12rem]">
-          <div className="font-semibold uppercase tracking-[0.12em] text-[#8ea4ba]">VOICE PATH</div>
-          <div className="mt-1 font-mono text-base text-[#f5f7fb]">{pathText(value.derivedStructure.voicePath)}</div>
+      </div>
+
+      <div className="mt-2 grid gap-2 sm:grid-cols-2">
+        <div
+          data-testid="motivation-written-voice-path"
+          className="rounded-lg border border-[#315147] bg-[#101714] p-3 text-xs leading-5 text-[#d2e2dc]"
+        >
+          <div className="font-semibold uppercase tracking-[0.12em] text-[#a9d2bf]">
+            WRITTEN VOICE PATH (ORTHOGRAPHIC)
+          </div>
+          {value.derivedStructure.voicePathProvenance ? (
+            <>
+              <div className="mt-1 font-mono text-base text-[#f5f7fb]">
+                {value.derivedStructure.voicePathProvenance.writtenInput.voicePath.length
+                  ? pathText(value.derivedStructure.voicePathProvenance.writtenInput.voicePath)
+                  : "No written Voice events"}
+              </div>
+              <div className="mt-1 text-[10px] text-[#a9d2bf]">
+                Original written letters in order · pronunciation not established
+              </div>
+              <ol className="mt-2 space-y-0.5 break-words text-[10px] text-[#9fbdb5]">
+                {value.derivedStructure.voicePathProvenance.writtenInput.events.map((event) => (
+                  <li key={event.eventId}>
+                    {event.order}. {event.voice} from “{event.sourceCharacter}” at Unicode code-point source position {event.sourcePosition}
+                  </li>
+                ))}
+              </ol>
+              {value.derivedStructure.voicePathProvenance.writtenInput.inputVoiceSequenceStatus !== "complete" ? (
+                <div className="mt-1 text-[10px] text-[#d5c28f]">
+                  Written sequence status: {value.derivedStructure.voicePathProvenance.writtenInput.inputVoiceSequenceStatus}
+                </div>
+              ) : null}
+            </>
+          ) : (
+            <div className="mt-1 text-sm text-[#f5f7fb]">
+              Written sequence unavailable in this payload.
+            </div>
+          )}
+        </div>
+
+        <div
+          data-testid="motivation-selected-voice-path"
+          className="rounded-lg border border-[#303843] bg-[#10161c] p-3 text-xs leading-5 text-[#c5ced8]"
+        >
+          <div className="font-semibold uppercase tracking-[0.12em] text-[#8ea4ba]">
+            {value.derivedStructure.voicePathProvenance?.selectedPath.selectionKind === "profile_solver_selected"
+              ? "SOLVER-SELECTED PATH (PROFILE DERIVED)"
+              : value.derivedStructure.voicePathProvenance?.selectedPath.selectionKind === "production_spoken"
+                ? "PRODUCTION SPOKEN PATH"
+                : value.derivedStructure.voicePathProvenance
+                  ? "SELECTED PATH (SOURCE UNKNOWN)"
+                  : value.derivedStructure.voicePathSource === "production_spoken"
+                    ? "PRODUCTION SPOKEN PATH"
+                    : value.derivedStructure.voicePathSource === "albanian_profile"
+                      ? "ALBANIAN PROFILE PATH (WRITTEN PROVENANCE UNAVAILABLE)"
+                      : "SELECTED PATH (SOURCE UNKNOWN)"}
+          </div>
+          <div className="mt-1 font-mono text-base text-[#f5f7fb]">
+            {pathText(value.derivedStructure.voicePathProvenance?.selectedPath.voicePath ?? value.derivedStructure.voicePath)}
+          </div>
           <div className="mt-1 break-words text-[10px] text-[#7f8b99]">
             source: {value.derivedStructure.voicePathSource} · profile: {value.inputProfile}
           </div>
+          {value.derivedStructure.voicePathProvenance ? (
+            <div className="mt-1 break-words text-[10px] text-[#aeb7c5]">
+              {value.derivedStructure.voicePathProvenance.selectedPath.relationshipToWritten === "same_sequence"
+                ? "Selected sequence matches the written Voice sequence."
+                : value.derivedStructure.voicePathProvenance.selectedPath.relationshipToWritten === "differs_from_written_sequence"
+                  ? "Transformed solver output differs from the original written sequence; it is not a literal spelling inventory."
+                  : value.derivedStructure.voicePathProvenance.selectedPath.relationshipToWritten === "written_sequence_unavailable"
+                    ? "The written Voice sequence was unavailable to compare."
+                    : "This selected path is not comparable with written orthography."}
+            </div>
+          ) : (
+            <div className="mt-1 break-words text-[10px] text-[#aeb7c5]">
+              Written-path provenance is unavailable in this payload.
+            </div>
+          )}
         </div>
       </div>
 

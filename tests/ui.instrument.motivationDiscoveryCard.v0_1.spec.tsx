@@ -6,9 +6,11 @@ import {
   aggregateMotivationDiscoveryCandidatesV0_1,
   measureMotivationDiscoveryAggregationV0_1,
 } from "@/ui/instrument/motivationDiscoveryPresentationAggregation.v0_1";
+import { analyzeStructuralInputV0_2 } from "@/shared/structuralHypothesisDiscovery.v0_2";
 import type { MotivationDiscoveryV0_1VM } from "@/ui/telemetry/types";
 
 function model(overrides: Partial<MotivationDiscoveryV0_1VM> = {}): MotivationDiscoveryV0_1VM {
+  const writtenAnalysis = analyzeStructuralInputV0_2("study");
   return {
     schemaVersion: "open-instrument.motivation-engine-discovery.v0_1",
     status: "MATCHES_FOUND",
@@ -27,6 +29,24 @@ function model(overrides: Partial<MotivationDiscoveryV0_1VM> = {}): MotivationDi
       layer: "DERIVED_STRUCTURE",
       voicePath: ["Ë", "I"],
       voicePathSource: "production_spoken",
+      voicePathProvenance: {
+        writtenInput: {
+          inputForm: writtenAnalysis.inputForm,
+          analysisStatus: writtenAnalysis.analysisStatus,
+          inputVoiceSequenceStatus: writtenAnalysis.inputVoiceSequenceStatus,
+          inputVoiceEventCount: writtenAnalysis.inputVoiceEventCount,
+          voicePath: writtenAnalysis.inputVoiceEvents.map((event) => event.voice),
+          events: writtenAnalysis.inputVoiceEvents,
+          representationAuthority: "orthographic",
+          pronunciationAuthority: "not_established",
+        },
+        selectedPath: {
+          voicePath: ["Ë", "I"],
+          selectionKind: "production_spoken",
+          legacySource: "production_spoken",
+          relationshipToWritten: "not_comparable",
+        },
+      },
       math7: { basis: "ËI", totalMod7: 3, principlesPath: ["EVOLUTION", "INSIGHT"] },
       gamma: { status: "source_pronunciation", orderedUnits: ["S", "T", "D"], reason: null },
       zeroConsonantalStructuralComposition: {
@@ -283,7 +303,22 @@ describe("Motivation Discovery Lab presentation v0.1", () => {
 
     expect(screen.getByTestId("motivation-discovery-card")).toBeInTheDocument();
     expect(screen.getByText("SOURCE FACT")).toBeInTheDocument();
-    expect(screen.getByText(/source: production_spoken · profile: open-instrument\.cmudict-arpabet-en-us\.v0_1/)).toBeInTheDocument();
+    expect(screen.getByTestId("motivation-written-voice-path")).toHaveTextContent(
+      "WRITTEN VOICE PATH (ORTHOGRAPHIC)",
+    );
+    expect(screen.getByTestId("motivation-written-voice-path")).toHaveTextContent("U → Y");
+    expect(screen.getByTestId("motivation-written-voice-path")).toHaveTextContent(
+      "pronunciation not established",
+    );
+    expect(screen.getByTestId("motivation-selected-voice-path")).toHaveTextContent(
+      "PRODUCTION SPOKEN PATH",
+    );
+    expect(screen.getByTestId("motivation-selected-voice-path")).toHaveTextContent(
+      "This selected path is not comparable with written orthography.",
+    );
+    expect(screen.getByTestId("motivation-selected-voice-path")).toHaveTextContent(
+      "source: production_spoken · profile: open-instrument.cmudict-arpabet-en-us.v0_1",
+    );
     expect(screen.getByText(/orthographic\/profile-derived Discovery representation/)).toBeInTheDocument();
     expect(screen.getByText(/lexical source: https:\/\/example\.invalid\/di/)).toBeInTheDocument();
     expect(screen.getByText("Source fact")).toBeInTheDocument();
@@ -533,6 +568,37 @@ describe("Motivation Discovery Lab presentation v0.1", () => {
       kind: "missing",
       missing: "malformed",
     });
+  });
+
+  it("fails closed when written Voice provenance does not match conserved input events", () => {
+    const malformed = JSON.parse(JSON.stringify(model())) as Record<string, unknown>;
+    const derived = malformed.derivedStructure as Record<string, unknown>;
+    const provenance = derived.voicePathProvenance as Record<string, unknown>;
+    const written = provenance.writtenInput as Record<string, unknown>;
+    const events = written.events as Array<Record<string, unknown>>;
+    events[0]!.sourcePosition = 99;
+
+    const vm = adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: malformed });
+    expect(vm.motivationDiscoveryV0_1).toMatchObject({
+      kind: "missing",
+      missing: "malformed",
+    });
+  });
+
+  it("keeps legacy payloads readable without treating the selected path as written orthography", () => {
+    const legacy = JSON.parse(JSON.stringify(model())) as Record<string, unknown>;
+    const derived = legacy.derivedStructure as Record<string, unknown>;
+    delete derived.voicePathProvenance;
+    const vm = adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: legacy });
+
+    expect(vm.motivationDiscoveryV0_1.kind).toBe("present");
+    render(<MotivationDiscoveryCardV0_1 discovery={vm.motivationDiscoveryV0_1} />);
+    expect(screen.getByTestId("motivation-written-voice-path")).toHaveTextContent(
+      "Written sequence unavailable in this payload.",
+    );
+    expect(screen.getByTestId("motivation-selected-voice-path")).toHaveTextContent(
+      "Written-path provenance is unavailable in this payload.",
+    );
   });
 
   it("aggregates same-witness records while retaining every source record", () => {

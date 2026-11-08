@@ -80,6 +80,7 @@ import { isDoctrineLevel3ProofPairReadingV0_1 } from
 import type { RootMapV1 } from "@/shared/deepRoot.rootMap.v1";
 import { computeDeepRootHeartGateV01 } from "@/shared/deepRootHeartGate.v0.1.compute";
 import { isSevenVoiceKey } from "@/shared/sevenVoiceOrderedViews.v0.1";
+import { analyzeStructuralInputV0_2 } from "@/shared/structuralHypothesisDiscovery.v0_2";
 import { SEVEN_PRINCIPLES, vowelToIndex1, vowelToRingIndex, vowelToColor, vowelToNote } from "@/shared/sevenPrinciples.v1";
 import type { AnalysisStatusV0_1VM } from "../telemetry/types";
 import {
@@ -890,6 +891,82 @@ function normalizeVowelPathString(v: unknown): Vowel[] | null {
     out.push(vv);
   }
   return out.length ? out : null;
+}
+
+function validMotivationVoicePathProvenanceV0_1(
+  provenanceValue: unknown,
+  inputWord: string,
+  legacyVoicePath: readonly string[],
+  legacyVoicePathSource: "production_spoken" | "albanian_profile" | "unknown",
+): boolean {
+  if (!isRecord(provenanceValue)) return false;
+  const written = provenanceValue.writtenInput;
+  const selected = provenanceValue.selectedPath;
+  if (!isRecord(written) || !isRecord(selected)) return false;
+
+  const writtenInputForm = written.inputForm;
+  if (typeof writtenInputForm !== "string" || writtenInputForm !== inputWord) return false;
+  const expected = analyzeStructuralInputV0_2(writtenInputForm);
+  if (
+    expected.inputForm !== writtenInputForm ||
+    written.analysisStatus !== expected.analysisStatus ||
+    written.inputVoiceSequenceStatus !== expected.inputVoiceSequenceStatus ||
+    written.inputVoiceEventCount !== expected.inputVoiceEventCount ||
+    written.representationAuthority !== "orthographic" ||
+    written.pronunciationAuthority !== "not_established" ||
+    !Array.isArray(written.voicePath) ||
+    !Array.isArray(written.events) ||
+    written.events.length !== expected.inputVoiceEvents.length ||
+    written.voicePath.length !== expected.inputVoiceEvents.length
+  ) return false;
+
+  for (const [index, expectedEvent] of expected.inputVoiceEvents.entries()) {
+    const event = written.events[index];
+    if (!isRecord(event) || !isRecord(event.sourceSpan)) return false;
+    if (
+      event.eventId !== expectedEvent.eventId ||
+      event.order !== expectedEvent.order ||
+      event.voice !== expectedEvent.voice ||
+      written.voicePath[index] !== expectedEvent.voice ||
+      event.basisPosition !== expectedEvent.basisPosition ||
+      event.sourceCharacter !== expectedEvent.sourceCharacter ||
+      event.sourcePosition !== expectedEvent.sourcePosition ||
+      event.sourcePositionUnit !== expectedEvent.sourcePositionUnit ||
+      event.sourceSpan.start !== expectedEvent.sourceSpan.start ||
+      event.sourceSpan.end !== expectedEvent.sourceSpan.end ||
+      event.provenance !== expectedEvent.provenance ||
+      event.mappingSource !== expectedEvent.mappingSource ||
+      event.representationAuthority !== expectedEvent.representationAuthority ||
+      event.pronunciationAuthority !== expectedEvent.pronunciationAuthority
+    ) return false;
+  }
+
+  if (
+    !Array.isArray(selected.voicePath) ||
+    selected.voicePath.some((part) =>
+      typeof part !== "string" || normalizeVowelChar(part) !== part,
+    ) ||
+    selected.voicePath.length !== legacyVoicePath.length ||
+    selected.voicePath.some((part, index) => part !== legacyVoicePath[index]) ||
+    selected.legacySource !== legacyVoicePathSource
+  ) return false;
+
+  const expectedSelectionKind = legacyVoicePathSource === "albanian_profile"
+    ? "profile_solver_selected"
+    : legacyVoicePathSource === "production_spoken"
+      ? "production_spoken"
+      : "unknown";
+  const expectedRelationship = legacyVoicePathSource !== "albanian_profile"
+    ? "not_comparable"
+    : expected.inputVoiceSequenceStatus !== "complete"
+      ? "written_sequence_unavailable"
+      : JSON.stringify(legacyVoicePath) ===
+          JSON.stringify(expected.inputVoiceEvents.map((event) => event.voice))
+        ? "same_sequence"
+        : "differs_from_written_sequence";
+
+  return selected.selectionKind === expectedSelectionKind &&
+    selected.relationshipToWritten === expectedRelationship;
 }
 
 // ----------------------- voice path selection -----------------------
@@ -2845,6 +2922,13 @@ function parseMotivationDiscoveryV0_1(
     (derived.voicePathSource !== "production_spoken" &&
       derived.voicePathSource !== "albanian_profile" &&
       derived.voicePathSource !== "unknown") ||
+    (derived.voicePathProvenance !== undefined &&
+      !validMotivationVoicePathProvenanceV0_1(
+        derived.voicePathProvenance,
+        value.inputWord,
+        derived.voicePath,
+        derived.voicePathSource,
+      )) ||
     !math7 ||
     !gamma ||
     !zc ||
