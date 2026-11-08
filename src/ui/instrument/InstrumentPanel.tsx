@@ -629,6 +629,12 @@ export function InstrumentPanel(props: Props) {
               <SingleWordMotivationWorkbenchV0_1
                 key={vm.readout.word}
                 initialTargetWord={vm.readout.word}
+                currentWordEvidence={isValidVm
+                  ? {
+                      analyzedWord: vm.readout.word,
+                      discovery: vm.motivationDiscoveryV0_1,
+                    }
+                  : undefined}
               />
             </div>
           </TabPanel>

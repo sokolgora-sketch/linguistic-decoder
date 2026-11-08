@@ -16,6 +16,7 @@ import {
   type MechanicalEditKindV0_1,
   type SingleWordMechanicalExaminerResultV0_1,
 } from "@/shared/openInstrument/singleWordMechanicalExaminer.v0_1";
+import type { MotivationDiscoveryV0_1VM, PresentOrMissing } from "@/ui/telemetry/types";
 import { FjaloriCrossSourceEvidenceV0_1 } from "@/ui/instrument/sections/FjaloriCrossSourceEvidence.v0_1";
 
 type DraftSegment = SingleWordFunctionalMotivationSegmentInputV0_1;
@@ -25,6 +26,11 @@ type SelectedComponentSourceLookupV0_1 = Readonly<{ componentIndex: number; exac
 type ExaminedMechanicalDraft = Readonly<{
   snapshot: string;
   result: SingleWordMechanicalExaminerResultV0_1;
+}>;
+
+export type SingleWordCurrentWordEvidenceContextV0_1 = Readonly<{
+  analyzedWord: string;
+  discovery?: PresentOrMissing<MotivationDiscoveryV0_1VM>;
 }>;
 
 function blankSegment(): DraftSegment {
@@ -73,6 +79,255 @@ function transparencyLabel(value: SingleWordTransparencyV0_1): string {
     case "UNKNOWN_OR_NULL":
       return "Unknown / Null";
   }
+}
+
+function displayVoicePath(path: readonly string[]): string {
+  return path.length ? path.join(" → ") : "∅";
+}
+
+function sameAlbanianSourceForm(left: string, right: string): boolean {
+  return left.normalize("NFC").trim().toLocaleLowerCase("sq-AL") ===
+    right.normalize("NFC").trim().toLocaleLowerCase("sq-AL");
+}
+
+function isAlbanianSourceContextV0_1(discovery: MotivationDiscoveryV0_1VM): boolean {
+  const languageValues = [discovery.inputLanguage, discovery.sourceFact.language]
+    .map((value) => value.normalize("NFC").trim().toLocaleLowerCase("en-US"))
+    .filter((value) => value.length > 0 && value !== "unknown");
+  const profile = discovery.inputProfile.normalize("NFC").trim().toLocaleLowerCase("en-US");
+  const identifiesAlbanian = (value: string) =>
+    value === "sq" || value.startsWith("sq-") || value.includes("albanian");
+  const hasAlbanianIdentity = [...languageValues, profile].some(identifiesAlbanian);
+  const hasConflictingLanguage = languageValues.some((value) => !identifiesAlbanian(value));
+  const hasConflictingProfile = /\b(english|latin|greek|turkish|arabic)\b/u.test(profile);
+  return hasAlbanianIdentity && !hasConflictingLanguage && !hasConflictingProfile;
+}
+
+function CurrentWordEvidenceSectionV0_1({
+  analyzedWord,
+  draftTargetWord,
+  context,
+}: {
+  analyzedWord: string;
+  draftTargetWord: string;
+  context?: SingleWordCurrentWordEvidenceContextV0_1;
+}) {
+  const contextMatchesTarget = context?.analyzedWord === analyzedWord;
+  const discoveryState = context?.discovery;
+  const discovery = discoveryState?.kind === "present" ? discoveryState.value : null;
+  const discoveryMatchesContext = discovery?.inputWord === context?.analyzedWord;
+  const visibleDiscovery = contextMatchesTarget && discoveryMatchesContext ? discovery : null;
+  const sourceContextIsAlbanian = visibleDiscovery
+    ? isAlbanianSourceContextV0_1(visibleDiscovery)
+    : false;
+  const sourceStatus = sourceContextIsAlbanian
+    ? visibleDiscovery?.exactLexicalSourceStatus
+    : undefined;
+  const sourceInputWord = visibleDiscovery?.inputWord;
+  const sourceFacts = sourceStatus?.status === "MATCHES_FOUND" && sourceContextIsAlbanian
+    ? (visibleDiscovery?.exactLexicalSourceFacts ?? []).filter((fact) =>
+        fact.languageCode === "sq" && sourceInputWord !== undefined && sameAlbanianSourceForm(fact.form, sourceInputWord),
+      )
+    : [];
+  const voiceProvenance = visibleDiscovery?.derivedStructure.voicePathProvenance;
+  const writtenInputMatches = voiceProvenance?.writtenInput.inputForm === visibleDiscovery?.inputWord;
+  const writtenInput = writtenInputMatches ? voiceProvenance?.writtenInput : undefined;
+  const selectedPath = voiceProvenance?.selectedPath;
+  const structuralHypotheses = visibleDiscovery?.derivedStructure.structuralHypotheses ?? [];
+
+  return (
+    <section
+      aria-label="Current Word Evidence"
+      data-testid="single-word-current-evidence"
+      className="mt-4 rounded-lg border border-[#34495a] bg-[#0d141b] p-3 text-xs leading-5 text-[#d7dde7]"
+    >
+      <h3 className="text-sm font-semibold text-[#f5f7fb]">Current Word Evidence</h3>
+      <p className="mt-1 text-[#aeb7c5]">
+        Read-only context from this analysis. It does not fill proposal fields, select a source sense, or validate a user-entered citation.
+      </p>
+
+      <div className="mt-2 grid gap-2 sm:grid-cols-2">
+        <div className="min-w-0 rounded border border-[#303843] bg-[#10161c] p-2">
+          <div className="font-semibold uppercase tracking-[0.1em] text-[#8ea4ba]">ANALYZED WORD</div>
+          <div className="mt-1 break-words font-mono text-sm text-[#f5f7fb]">
+            {context?.analyzedWord ?? "not supplied"}
+          </div>
+        </div>
+        <div className="min-w-0 rounded border border-[#303843] bg-[#10161c] p-2">
+          <div className="font-semibold uppercase tracking-[0.1em] text-[#8ea4ba]">ANALYSIS LANGUAGE / PROFILE</div>
+          <div className="mt-1 break-words">
+            {visibleDiscovery
+              ? `${visibleDiscovery.inputLanguage} · ${visibleDiscovery.inputProfile}`
+              : "not emitted"}
+          </div>
+          {visibleDiscovery ? (
+            <div className="break-words text-[#9fb1bf]">
+              Analysis source status: {visibleDiscovery.sourceFact.sourceStatus}
+            </div>
+          ) : null}
+        </div>
+      </div>
+
+      {!context ? (
+        <p className="mt-2" data-testid="single-word-evidence-context-unavailable">
+          Analysis context was not supplied. Source and structural evidence are not inferred here.
+        </p>
+      ) : null}
+      {context && !contextMatchesTarget ? (
+        <p className="mt-2 rounded border border-[#674b3a] bg-[#1a1411] p-2 text-[#efccaa]" data-testid="single-word-evidence-word-mismatch">
+          Evidence context is for {context.analyzedWord}, while this workbench belongs to {analyzedWord}. Source and structural details are withheld to prevent cross-word mixing.
+        </p>
+      ) : null}
+      {contextMatchesTarget && !discoveryState ? (
+        <p className="mt-2" data-testid="single-word-discovery-not-emitted">
+          Discovery evidence: NOT_EMITTED. Exact source, Voice-path provenance, and structural candidates are unavailable in this analysis payload.
+        </p>
+      ) : null}
+      {contextMatchesTarget && discoveryState?.kind === "missing" ? (
+        <p className="mt-2" data-testid="single-word-discovery-missing">
+          Discovery evidence: MISSING · {discoveryState.missing}
+          {discoveryState.note ? ` · ${discoveryState.note}` : ""}. No source meaning or structural claim is inferred from the missing payload.
+        </p>
+      ) : null}
+      {contextMatchesTarget && discovery && !discoveryMatchesContext ? (
+        <p className="mt-2 rounded border border-[#674b3a] bg-[#1a1411] p-2 text-[#efccaa]" data-testid="single-word-discovery-word-mismatch">
+          Discovery input {discovery.inputWord} does not match analyzed word {context?.analyzedWord}; its evidence is withheld.
+        </p>
+      ) : null}
+
+      {visibleDiscovery ? (
+        <div className="mt-3 space-y-2">
+          <section data-testid="single-word-current-source-evidence" className="rounded border border-[#303843] bg-[#10161c] p-2">
+            <h4 className="font-semibold text-[#dce9ca]">Albanian Kaikki whole-word source</h4>
+            {sourceContextIsAlbanian ? (
+              <div className="mt-1">
+                Exact-form lookup: {sourceStatus?.status ?? "NOT_EMITTED"}
+                {sourceStatus?.queryForm ? ` · query ${sourceStatus.queryForm}` : ""}
+                {sourceStatus?.reasonCode ? ` · ${sourceStatus.reasonCode}` : ""}
+              </div>
+            ) : (
+              <p className="mt-1 text-[#aeb7c5]">NOT_APPLICABLE_FOR_LANGUAGE · The Albanian source result is withheld outside an identified Albanian analysis context; no Albanian lexical conclusion is displayed.</p>
+            )}
+            {sourceStatus?.status === "SOURCE_NOT_FOUND" ? (
+              <p className="mt-1 text-[#aeb7c5]">The exact-form lookup returned no source record; this does not establish lexical absence.</p>
+            ) : null}
+            {sourceStatus?.status === "UNAVAILABLE" ? (
+              <p className="mt-1 text-[#aeb7c5]">The source was unavailable; no lexical conclusion follows.</p>
+            ) : null}
+            {sourceStatus?.status === "NOT_QUERIED" ? (
+              <p className="mt-1 text-[#aeb7c5]">The source was not queried; no lexical conclusion follows.</p>
+            ) : null}
+            {sourceContextIsAlbanian && sourceStatus?.status === "MATCHES_FOUND" && sourceFacts.length === 0 ? (
+              <p className="mt-1 text-[#aeb7bf]">
+                MATCHES_FOUND was emitted without a displayable exact-form source fact in this payload.
+              </p>
+            ) : null}
+            {sourceFacts.length > 0 ? (
+              <>
+                <p className="mt-1 text-[#9fb1bf]">Source senses are shown read-only; none is selected for a component proposal.</p>
+                <ol className="mt-2 space-y-2">
+                  {sourceFacts.map((fact) => (
+                    <li key={fact.sourceRecordId} className="min-w-0 rounded border border-[#26323d] p-2">
+                      <div className="break-words font-mono">{fact.sourceRecordId}</div>
+                      <div className="break-words text-[#aeb7c5]">
+                        Entry {fact.entryLocator} · {fact.form} · {fact.partOfSpeech ?? "part of speech Unknown / Null"}
+                      </div>
+                      <div className="break-words text-[#9fb1bf]">
+                        {fact.language} · {fact.sourceStatus} · {fact.attestationTruth.toUpperCase()} · {fact.sourceSnapshot.sourceFamilyId} · SHA-256 {fact.sourceSnapshot.sha256}
+                      </div>
+                      <div className="break-all text-[#9fb1bf]">Source snapshot: {fact.sourceSnapshot.sourceUrl}</div>
+                      {fact.senses.length > 0 ? (
+                        <ul className="mt-1 space-y-1">
+                          {fact.senses.map((sense, senseIndex) => (
+                            <li key={`${fact.sourceRecordId}:${sense.senseId ?? senseIndex}`} className="break-words">
+                              Sense {sense.senseId ?? "UNKNOWN_OR_NULL"}: {sense.glosses.length ? sense.glosses.join("; ") : "Unknown / Null"}
+                            </li>
+                          ))}
+                        </ul>
+                      ) : (
+                        <div className="mt-1">Source senses: not emitted.</div>
+                      )}
+                      {fact.ipaObservations.length > 0 ? (
+                        <div className="mt-1 text-[#9fb1bf]">
+                          Source-reported IPA observations: {fact.ipaObservations.map((observation) => observation.ipa ?? "Unknown / Null").join("; ")}
+                        </div>
+                      ) : null}
+                    </li>
+                  ))}
+                </ol>
+              </>
+            ) : null}
+          </section>
+
+          <section data-testid="single-word-current-voice-evidence" className="rounded border border-[#315147] bg-[#101714] p-2">
+            <h4 className="font-semibold text-[#a9d2bf]">Written Seven-Voices path</h4>
+            {writtenInput ? (
+              <>
+                <div className="mt-1 font-mono text-base text-[#f5f7fb]">{displayVoicePath(writtenInput.voicePath)}</div>
+                <div className="break-words">
+                  Authority: {writtenInput.representationAuthority} · pronunciation: {writtenInput.pronunciationAuthority}
+                </div>
+                <div className="break-words text-[#a9d2bf]">
+                  {writtenInput.events.length
+                    ? writtenInput.events.map((event) => `${event.voice} at source position ${event.sourcePosition} (${event.sourceCharacter})`).join(" · ")
+                    : "No written Voice events"}
+                </div>
+                <div className="break-words text-[#9fb1bf]">
+                  Positions are zero-based Unicode code points in the NFC written input; sequence status: {writtenInput.inputVoiceSequenceStatus}.
+                </div>
+              </>
+            ) : (
+              <p className="mt-1">Written path provenance: NOT_EMITTED or input-form mismatch. A selected derived path is not substituted for spelling.</p>
+            )}
+            {selectedPath ? (
+              <div className="mt-2 rounded border border-[#263a33] p-2">
+                <div className="font-semibold">
+                  {selectedPath.selectionKind === "profile_solver_selected" ? "Solver-selected path" : "Selected derived path"}
+                </div>
+                <div className="font-mono text-sm">{displayVoicePath(selectedPath.voicePath)}</div>
+                <div className="break-words text-[#a9d2bf]">
+                  Selection: {selectedPath.selectionKind} · legacy source: {selectedPath.legacySource} · relation to written path: {selectedPath.relationshipToWritten}
+                </div>
+                <div className="text-[#9fb1bf]">This derived sequence is displayed separately; it is not a literal spelling inventory or an independent pronunciation claim.</div>
+              </div>
+            ) : (
+              <div className="mt-2 rounded border border-[#263a33] p-2">
+                <div className="font-semibold">Legacy derived path (separate from spelling)</div>
+                <div className="font-mono text-sm">{displayVoicePath(visibleDiscovery.derivedStructure.voicePath)}</div>
+                <div className="text-[#9fb1bf]">
+                  Source: {visibleDiscovery.derivedStructure.voicePathSource}. Written provenance is not available; pronunciation authority is not inferred.
+                </div>
+              </div>
+            )}
+          </section>
+
+          <section data-testid="single-word-current-structural-evidence" className="rounded border border-[#3f3a2b] bg-[#15130f] p-2">
+            <h4 className="font-semibold text-[#f0ddb0]">Structural candidates</h4>
+            {structuralHypotheses.length ? (
+              <ul className="mt-1 space-y-2">
+                {structuralHypotheses.map((hypothesis) => (
+                  <li key={hypothesis.hypothesisId} className="min-w-0 break-words">
+                    <div className="font-mono">{hypothesis.hypothesisId} · embryo {hypothesis.embryo}</div>
+                    <div>Expansion: {hypothesis.expansionChain.join(" → ") || "not emitted"}</div>
+                    <div className="text-[#c5b995]">Reason codes: {hypothesis.reasonCodes.join(", ") || "none emitted"}</div>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="mt-1">No structural hypotheses emitted; this level remains UNKNOWN_OR_NULL.</p>
+            )}
+            <p className="mt-1 text-[#c5b995]">Structure supplies candidate form only. It does not assign component meaning, morphology, historical derivation, or embryo function.</p>
+          </section>
+        </div>
+      ) : null}
+
+      {contextMatchesTarget && draftTargetWord !== analyzedWord ? (
+        <p className="mt-2 rounded border border-[#674b3a] bg-[#1a1411] p-2 text-[#efccaa]" data-testid="single-word-proposal-evidence-target-mismatch">
+          The editable proposal target is {draftTargetWord}; evidence above remains tied to analyzed word {analyzedWord} and is not transferred.
+        </p>
+      ) : null}
+    </section>
+  );
 }
 
 function validationMessageForReasonCode(reasonCode: string): string {
@@ -148,8 +403,10 @@ function validationMessageForReasonCode(reasonCode: string): string {
 
 export function SingleWordMotivationWorkbenchV0_1({
   initialTargetWord,
+  currentWordEvidence,
 }: {
   initialTargetWord: string;
+  currentWordEvidence?: SingleWordCurrentWordEvidenceContextV0_1;
 }) {
   const [targetWord, setTargetWord] = useState(initialTargetWord);
   const [targetLanguage, setTargetLanguage] = useState("");
@@ -264,6 +521,12 @@ export function SingleWordMotivationWorkbenchV0_1({
       <p data-testid="single-word-motivation-field-limits" className="mt-1 max-w-4xl text-xs leading-5 text-[#aeb7c5]">
         Limits: target word 80 Unicode code points; target/component language and dialect 80 characters; component spelling 80, meaning 300, role 200; evidence references and connecting material 500; transformation endpoints 80, explanation 300, reference 500; functional explanation 1,000 characters. Use 2–12 components and at most 8 transformations.
       </p>
+
+      <CurrentWordEvidenceSectionV0_1
+        analyzedWord={initialTargetWord}
+        draftTargetWord={targetWord}
+        context={currentWordEvidence}
+      />
 
       <div className="mt-3 grid gap-3 sm:grid-cols-2">
         <label className={labelClass}>
