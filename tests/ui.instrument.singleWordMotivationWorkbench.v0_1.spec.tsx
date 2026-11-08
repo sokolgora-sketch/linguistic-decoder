@@ -13,6 +13,7 @@ function makeCurrentWordEvidence(
     positions?: number[];
     solverVoices?: string[];
     facts?: unknown[];
+    factForm?: string;
     structuralHypotheses?: unknown[];
     language?: string;
     profile?: string;
@@ -46,7 +47,7 @@ function makeCurrentWordEvidence(
         physicalRecordOrdinal: 0,
         language: "Albanian",
         languageCode: "sq",
-        form: word,
+        form: options.factForm ?? word,
         partOfSpeech: "noun",
         senses: [
           { senseId: "fixture-sense-1", glosses: ["fixture gloss one"] },
@@ -166,6 +167,33 @@ describe("Single-word motivation workbench v0.1", () => {
     expect(screen.getByLabelText("Component 1 proposed meaning")).toHaveValue("");
     expect(screen.getByTestId("single-word-proposal-incomplete")).toBeInTheDocument();
     expect(screen.queryByTestId("single-word-component-source-evidence")).not.toBeInTheDocument();
+  });
+
+  it("withholds a valid Albanian source record when its form differs from the analyzed word", () => {
+    render(
+      <SingleWordMotivationWorkbenchV0_1
+        initialTargetWord="KANDIL"
+        currentWordEvidence={makeCurrentWordEvidence("KANDIL", {
+          status: "MATCHES_FOUND",
+          factForm: "KA",
+        })}
+      />,
+    );
+
+    const source = screen.getByTestId("single-word-current-source-evidence");
+    expect(source).toHaveTextContent("MATCHES_FOUND");
+    expect(source).toHaveTextContent(
+      "MATCHES_FOUND was emitted without a displayable exact-form source fact in this payload.",
+    );
+    expect(source).not.toHaveTextContent("fixture:source-record-1");
+    expect(source).not.toHaveTextContent("fixture-sense-1");
+    expect(source).not.toHaveTextContent("fixture gloss");
+    expect(screen.getByTestId("single-word-current-structural-evidence")).toHaveTextContent(
+      "UNKNOWN_OR_NULL",
+    );
+    expect(screen.getByTestId("single-word-current-voice-evidence")).toHaveTextContent(
+      "Written Seven-Voices path",
+    );
   });
 
   it("keeps exact-form NOT_FOUND, structural Null, and the KANDIL written path distinct", () => {

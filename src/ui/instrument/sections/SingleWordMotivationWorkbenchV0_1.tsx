@@ -85,6 +85,11 @@ function displayVoicePath(path: readonly string[]): string {
   return path.length ? path.join(" → ") : "∅";
 }
 
+function sameAlbanianSourceForm(left: string, right: string): boolean {
+  return left.normalize("NFC").trim().toLocaleLowerCase("sq-AL") ===
+    right.normalize("NFC").trim().toLocaleLowerCase("sq-AL");
+}
+
 function isAlbanianSourceContextV0_1(discovery: MotivationDiscoveryV0_1VM): boolean {
   const languageValues = [discovery.inputLanguage, discovery.sourceFact.language]
     .map((value) => value.normalize("NFC").trim().toLocaleLowerCase("en-US"))
@@ -118,8 +123,11 @@ function CurrentWordEvidenceSectionV0_1({
   const sourceStatus = sourceContextIsAlbanian
     ? visibleDiscovery?.exactLexicalSourceStatus
     : undefined;
+  const sourceInputWord = visibleDiscovery?.inputWord;
   const sourceFacts = sourceStatus?.status === "MATCHES_FOUND" && sourceContextIsAlbanian
-    ? visibleDiscovery?.exactLexicalSourceFacts ?? []
+    ? (visibleDiscovery?.exactLexicalSourceFacts ?? []).filter((fact) =>
+        fact.languageCode === "sq" && sourceInputWord !== undefined && sameAlbanianSourceForm(fact.form, sourceInputWord),
+      )
     : [];
   const voiceProvenance = visibleDiscovery?.derivedStructure.voicePathProvenance;
   const writtenInputMatches = voiceProvenance?.writtenInput.inputForm === visibleDiscovery?.inputWord;
@@ -211,7 +219,7 @@ function CurrentWordEvidenceSectionV0_1({
             ) : null}
             {sourceContextIsAlbanian && sourceStatus?.status === "MATCHES_FOUND" && sourceFacts.length === 0 ? (
               <p className="mt-1 text-[#aeb7bf]">
-                MATCHES_FOUND was emitted without a source fact in this payload.
+                MATCHES_FOUND was emitted without a displayable exact-form source fact in this payload.
               </p>
             ) : null}
             {sourceFacts.length > 0 ? (
