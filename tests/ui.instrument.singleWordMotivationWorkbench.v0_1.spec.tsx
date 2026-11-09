@@ -173,6 +173,7 @@ function makeProgressiveLexicalReading(input: {
   baseSenses: readonly { senseId: string; gloss: string }[];
   suffixSenses: readonly { senseId: string; gloss: string }[];
   functionalOperation?: "AGENT" | "ENABLE_PASSAGE";
+  sourceAuthoredSuffixTemplate?: Readonly<{ baseGlossAnnotation?: string }>;
 }) {
   const targetSourceRecordId = `fixture:kaikki:${input.targetForm}:target`;
   const baseSourceRecordId = `fixture:kaikki:${input.baseForm}:base`;
@@ -201,10 +202,36 @@ function makeProgressiveLexicalReading(input: {
     etymologyTemplates: [],
     pronunciationVariants: [],
   });
-  const primary = record(input.targetForm, targetSourceRecordId, "noun", input.targetSenses, 0);
+  const baseGlossAnnotation = input.sourceAuthoredSuffixTemplate?.baseGlossAnnotation;
+  const sourceSuffixForm = input.suffixForm.startsWith("-") ? input.suffixForm : `-${input.suffixForm}`;
+  const annotatedBaseForm = baseGlossAnnotation
+    ? `${input.baseForm} (“${baseGlossAnnotation}”)`
+    : input.baseForm;
+  const sourceTemplateExpansion = `${annotatedBaseForm} + ${sourceSuffixForm}`;
+  const sourceTemplateText = `From ${sourceTemplateExpansion} noun suffix.`;
+  const primaryRecord = record(input.targetForm, targetSourceRecordId, "noun", input.targetSenses, 0);
+  const primary = input.sourceAuthoredSuffixTemplate
+    ? {
+        ...primaryRecord,
+        etymologyText: sourceTemplateText,
+        etymologyTemplates: [{
+          name: "suffix",
+          args: {
+            "1": "sq",
+            "2": input.baseForm,
+            "3": sourceSuffixForm,
+            "4": "",
+            ...(baseGlossAnnotation ? { t1: baseGlossAnnotation } : {}),
+          },
+          expansion: sourceTemplateExpansion,
+        }],
+      }
+    : primaryRecord;
   const base = record(input.baseForm, baseSourceRecordId, "noun", input.baseSenses, 0);
   const suffix = record(input.suffixForm, suffixSourceRecordId, "suffix", input.suffixSenses, 0);
-  const relationText = `From ${input.baseForm} + ${input.suffixForm}; fixture source-authored relation text.`;
+  const relationText = input.sourceAuthoredSuffixTemplate
+    ? sourceTemplateText
+    : `From ${input.baseForm} + ${input.suffixForm}; fixture source-authored relation text.`;
   const componentReading = {
     status: "SUPPORTED",
     reasonCodes: [],
@@ -470,6 +497,7 @@ describe("Single-word motivation workbench v0.1", () => {
     expect(screen.getByLabelText("Component 1 proposed meaning")).toHaveValue("");
     expect(screen.getByTestId("single-word-proposal-incomplete")).toBeInTheDocument();
     expect(screen.queryByTestId("single-word-component-source-evidence")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("single-word-progressive-source-motivated-explanation")).not.toBeInTheDocument();
   });
 
   it("withholds a valid Albanian source record when its form differs from the analyzed word", () => {
@@ -516,6 +544,7 @@ describe("Single-word motivation workbench v0.1", () => {
     expect(evidence).toHaveTextContent("No structural hypotheses emitted");
     expect(evidence).toHaveTextContent("UNKNOWN_OR_NULL");
     expect(evidence).not.toHaveTextContent("fixture gloss");
+    expect(screen.queryByTestId("single-word-progressive-source-motivated-explanation")).not.toBeInTheDocument();
     expect(screen.getByLabelText("Component 1 exact spelling")).toHaveValue("");
   });
 
@@ -588,6 +617,7 @@ describe("Single-word motivation workbench v0.1", () => {
     expect(source).not.toHaveTextContent("MATCHES_FOUND");
     expect(source).not.toHaveTextContent("fixture:source-record-1");
     expect(source).not.toHaveTextContent("fixture gloss one");
+    expect(screen.queryByTestId("single-word-progressive-source-motivated-explanation")).not.toBeInTheDocument();
   });
 
   it("shows emitted structural candidates only as candidates with their existing reasons", () => {
@@ -663,6 +693,7 @@ describe("Single-word motivation workbench v0.1", () => {
     expect(relations).toHaveTextContent("Cross-source exact-sense identity: UNKNOWN_OR_NULL");
     expect(relations).not.toHaveTextContent("are-suffix-1");
     expect(relations).not.toHaveTextContent("are-suffix-2");
+    expect(screen.queryByTestId("single-word-progressive-source-motivated-explanation")).not.toBeInTheDocument();
 
     const functional = screen.getByTestId("single-word-progressive-functional-reading");
     expect(functional).toHaveTextContent("operation ENABLE_PASSAGE");
@@ -709,11 +740,13 @@ describe("Single-word motivation workbench v0.1", () => {
       baseForm: "shkencë",
       suffixForm: "-tar",
       targetSenses,
-      baseSenses: [{ senseId: "shkence-knowledge", gloss: "science, knowledge" }],
+      baseSenses: [{ senseId: "shkence-science", gloss: "science" }],
       suffixSenses: [
         { senseId: "tar-agent", gloss: "used to form agent nouns" },
-        { senseId: "tar-alternative", gloss: "a retained alternative suffix sense" },
+        { senseId: "tar-relational", gloss: "relational adjective sense (synthetic fixture)" },
       ],
+      functionalOperation: "AGENT",
+      sourceAuthoredSuffixTemplate: {},
     });
 
     render(
@@ -731,26 +764,92 @@ describe("Single-word motivation workbench v0.1", () => {
 
     const trace = screen.getByTestId("single-word-progressive-evidence-trace");
     expect(trace).toHaveTextContent("SH [0, 2) digraph");
+    expect(trace).toHaveTextContent("Complete input events: E → Ë → A");
     expect(trace).toHaveTextContent("SOURCE_AUTHORED_SUFFIX_TEMPLATE");
     expect(trace).toHaveTextContent("Validated source-attributed component forms (ordered; separate from lexical records): shkencë + -tar");
     expect(screen.getByTestId("single-word-source-surface-join")).toHaveTextContent("SHKENCËTAR = SHKENCËTAR · EXACT_SURFACE_JOIN");
     const relations = screen.getByTestId("single-word-progressive-source-relationships");
     expect(relations).toHaveTextContent("tar-agent");
-    expect(relations).toHaveTextContent("tar-alternative");
+    expect(relations).toHaveTextContent("tar-relational");
     expect(relations).toHaveTextContent("no canonical target/component sense crosswalk");
-    expect(screen.getByTestId("single-word-progressive-functional-reading")).toHaveTextContent("Whole-word functional bridge: UNKNOWN_OR_NULL");
-    expect(screen.getByTestId("single-word-progressive-functional-reading")).toHaveTextContent("Structural embryo meaning/function: UNKNOWN_OR_NULL");
+    const functional = screen.getByTestId("single-word-progressive-functional-reading");
+    expect(functional).toHaveTextContent("Whole-word bridge: SUPPORTED · operation AGENT");
+    expect(functional).toHaveTextContent("Structural embryo meaning/function: UNKNOWN_OR_NULL");
+    const explanation = screen.getByTestId("single-word-progressive-source-motivated-explanation");
+    expect(explanation).toHaveTextContent("Possible source-motivated explanation · CONDITIONAL_INFERENCE");
+    expect(explanation).toHaveTextContent("science");
+    expect(explanation).toHaveTextContent("used to form agent nouns");
+    expect(explanation).toHaveTextContent("relational adjective sense (synthetic fixture)");
+    expect(explanation).toHaveTextContent("scientist");
+    expect(screen.getByTestId("single-word-progressive-source-motivated-candidate-qualification")).toHaveTextContent(
+      "One source-reported noun candidate is available without a template gloss annotation; exact sense crosswalk remains UNKNOWN_OR_NULL.",
+    );
+    expect(screen.getByTestId("single-word-progressive-source-motivated-pairing")).toHaveTextContent(
+      "If a source-reported noun sense of shkencë (candidate glosses: “science”) and an explicitly agent-noun-forming sense of -tar (candidate glosses: “used to form agent nouns”) apply to this exact source-attributed suffix formation, a person associated with the source-reported base meaning “science” is consistent with the existing whole-word AGENT hypothesis and the target source-meaning alternatives “scientist”.",
+    );
+    expect(explanation).toHaveTextContent("Exact target form: SHKENCËTAR");
+    expect(explanation).toHaveTextContent("Source-attributed relationship: From shkencë + -tar noun suffix.");
+    expect(explanation).toHaveTextContent("none selected");
+    expect(explanation).toHaveTextContent("UNKNOWN_OR_NULL");
+    expect(screen.getByLabelText("Component 1 exact spelling")).toHaveValue("");
+    expect(screen.getByLabelText("Component 1 proposed meaning")).toHaveValue("");
+    expect(screen.getByLabelText("Component 2 proposed meaning")).toHaveValue("");
   });
 
-  it("keeps an existing whole-word AGENT family reading separate from embryo meaning", () => {
-    const reading = makeProgressiveLexicalReading({
+  it("synthetically explains the conditional source-noun plus agent-suffix pairing without selecting a sense or assigning embryo meaning", () => {
+    const baseReading = makeProgressiveLexicalReading({
       targetForm: "bletar",
       baseForm: "bletë",
       suffixForm: "-ar",
       targetSenses: [{ senseId: "beekeeper", gloss: "beekeeper" }],
-      baseSenses: [{ senseId: "bee", gloss: "bee" }],
-      suffixSenses: [{ senseId: "agent-suffix", gloss: "agent suffix" }],
+      baseSenses: [
+        { senseId: "bee-insect", gloss: "bee (insect)" },
+        { senseId: "bee-swarm", gloss: "swarm (of bees)" },
+        { senseId: "bee-hive", gloss: "hive" },
+        { senseId: "bee-quick", gloss: "quick, fast at work" },
+      ],
+      suffixSenses: [{ senseId: "agent-suffix", gloss: "a suffix appended to words to create an agent noun, much like English -er/-or" }],
+      functionalOperation: "AGENT",
+      sourceAuthoredSuffixTemplate: { baseGlossAnnotation: "bee" },
     });
+    const componentReading = baseReading.sourceLinkedComponentReading;
+    const baseRecord = componentReading.components[0]!;
+    const alternateBaseRecord = {
+      ...baseRecord,
+      sourceRecordId: `${baseRecord.sourceRecordId}:verb-form`,
+      entryLocator: "fixture-entry:bletë:verb-form",
+      physicalRecordOrdinal: 1,
+      partOfSpeech: "verb",
+      meaningGlosses: ["inflection of blej"],
+      sourceSenses: [{
+        sourceSenseOrdinal: 0,
+        senseId: "blej-form",
+        glosses: ["inflection of blej"],
+        categories: [],
+      }],
+    };
+    const reading = {
+      ...baseReading,
+      sourceLinkedComponentReading: {
+        ...componentReading,
+        status: "NULL",
+        reasonCodes: ["SOURCE_COMPONENT_RECORD_AMBIGUOUS"],
+        relation: {
+          ...componentReading.relation,
+          sourceAuthoredExplanation: "From bletë (“bee”) + -ar noun suffix.",
+        },
+        components: [baseRecord, alternateBaseRecord, ...componentReading.components.slice(1)],
+        componentResolutions: [
+          {
+            ...componentReading.componentResolutions[0]!,
+            status: "AMBIGUOUS",
+            sourceRecordIds: [baseRecord.sourceRecordId, alternateBaseRecord.sourceRecordId],
+            reasonCodes: ["SOURCE_COMPONENT_RECORD_AMBIGUOUS"],
+          },
+          componentReading.componentResolutions[1]!,
+        ],
+      },
+    };
     const familyReading = {
       status: "EXPLORATORY_FUNCTIONAL_FAMILY",
       functionalOperation: "AGENT",
@@ -774,8 +873,8 @@ describe("Single-word motivation workbench v0.1", () => {
         initialTargetWord="bletar"
         currentWordEvidence={makeCurrentWordEvidence("bletar", {
           status: "MATCHES_FOUND",
-          voices: ["A", "E", "A"],
-          positions: [2, 4, 5],
+          voices: ["E", "A"],
+          positions: [2, 4],
           facts: [makeProgressiveExactFact("bletar", "fixture:kaikki:bletar:target", [{ senseId: "beekeeper", gloss: "beekeeper" }])],
           albanianLexicalReading: { ...reading, functionalFamilyReading: familyReading },
         })}
@@ -786,6 +885,181 @@ describe("Single-word motivation workbench v0.1", () => {
     expect(screen.getByTestId("single-word-progressive-functional-family")).toHaveTextContent("operation AGENT");
     expect(functional).toHaveTextContent("Source-backed whole-word role only.");
     expect(functional).toHaveTextContent("Structural embryo meaning/function: UNKNOWN_OR_NULL");
+    const trace = screen.getByTestId("single-word-progressive-evidence-trace");
+    expect(screen.getByTestId("single-word-current-voice-evidence")).toHaveTextContent("E → A");
+    expect(screen.getByTestId("single-word-current-voice-evidence")).toHaveTextContent("E at source position 2 (e) · A at source position 4 (a)");
+    const writtenAnalysis = screen.getByTestId("single-word-progressive-written-analysis");
+    expect(writtenAnalysis).toHaveTextContent("Complete input events: E → A");
+    expect(writtenAnalysis).toHaveTextContent("E at source position 2 (e) · A at source position 4 (a)");
+    expect(writtenAnalysis).toHaveTextContent("API/event sequence comparison: MATCH");
+    expect(screen.getByTestId("single-word-progressive-v02-structure")).toBeInTheDocument();
+    expect(trace).toHaveTextContent("Structural embryo meaning/function: UNKNOWN_OR_NULL");
+    const explanation = screen.getByTestId("single-word-progressive-source-motivated-explanation");
+    const conditionalPairing = screen.getByTestId("single-word-progressive-source-motivated-pairing");
+    expect(explanation).toHaveTextContent("Possible source-motivated explanation · CONDITIONAL_INFERENCE");
+    expect(explanation).toHaveTextContent("Exact target form: bletar");
+    expect(explanation).toHaveTextContent("Source-attributed relationship: From bletë (“bee”) + -ar noun suffix.");
+    expect(explanation).toHaveTextContent("BLETËAR ≠ BLETAR · SURFACE_MISMATCH");
+    expect(explanation).toHaveTextContent("bee (insect)");
+    expect(explanation).toHaveTextContent("swarm (of bees)");
+    expect(explanation).toHaveTextContent("quick, fast at work");
+    expect(explanation).toHaveTextContent("inflection of blej");
+    expect(conditionalPairing).not.toHaveTextContent("inflection of blej");
+    expect(explanation).toHaveTextContent("create an agent noun");
+    expect(explanation).toHaveTextContent("beekeeper");
+    expect(screen.getByTestId("single-word-progressive-source-motivated-pairing")).toHaveTextContent(
+      "If a source-reported noun sense of bletë (candidate glosses: “bee (insect)”) and an explicitly agent-noun-forming sense of -ar (candidate glosses: “a suffix appended to words to create an agent noun, much like English -er/-or”) apply to this exact source-attributed suffix formation, a person associated with the source-reported base meaning “bee (insect)” is consistent with the existing whole-word AGENT hypothesis and the target source-meaning alternatives “beekeeper”.",
+    );
+    expect(explanation).not.toHaveTextContent("may help explain");
+    expect(explanation).toHaveTextContent("EXPLORATORY_FUNCTIONAL_HYPOTHESIS · AGENT");
+    expect(explanation).toHaveTextContent("Component-sense alignment and independent embryo function remain UNKNOWN_OR_NULL");
+    expect(screen.getByTestId("single-word-progressive-source-motivated-candidate-qualification")).toHaveTextContent(
+      "The source-template gloss annotation “bee” matches these candidate glosses by complete-token inclusion; this is a candidate filter, not an exact sense crosswalk.",
+    );
+    expect(trace).toHaveTextContent("No single winner: true · user decision posture: user_decides");
+    const sourceAlternatives = screen.getByTestId("single-word-progressive-source-relationships");
+    for (const alternativeSense of ["bee-insect", "bee-swarm", "bee-hive", "bee-quick", "blej-form"]) {
+      expect(sourceAlternatives).toHaveTextContent(alternativeSense);
+    }
+    expect(sourceAlternatives).toHaveTextContent("Source-linked component reading: NULL");
+    expect(sourceAlternatives).toHaveTextContent("AMBIGUOUS");
+    expect(screen.getByLabelText("Component 1 proposed meaning")).toHaveValue("");
+    expect(screen.getByLabelText("Component 2 proposed meaning")).toHaveValue("");
+  });
+
+  it("withholds pairing when an ambiguous noun record has no source-authored gloss annotation", () => {
+    const reading = makeProgressiveLexicalReading({
+      targetForm: "bletar",
+      baseForm: "bletë",
+      suffixForm: "-ar",
+      targetSenses: [{ senseId: "beekeeper", gloss: "beekeeper" }],
+      baseSenses: [
+        { senseId: "bee-insect", gloss: "bee (insect)" },
+        { senseId: "bee-swarm", gloss: "swarm (of bees)" },
+      ],
+      suffixSenses: [{ senseId: "agent-suffix", gloss: "used to form agent nouns" }],
+      functionalOperation: "AGENT",
+      sourceAuthoredSuffixTemplate: {},
+    });
+
+    render(
+      <SingleWordMotivationWorkbenchV0_1
+        initialTargetWord="BLETAR"
+        currentWordEvidence={makeCurrentWordEvidence("BLETAR", {
+          status: "MATCHES_FOUND",
+          facts: [makeProgressiveExactFact("bletar", "fixture:kaikki:bletar:target", [{ senseId: "beekeeper", gloss: "beekeeper" }])],
+          albanianLexicalReading: reading,
+        })}
+      />,
+    );
+
+    expect(screen.getByTestId("single-word-progressive-source-relationships")).toHaveTextContent("bee-insect");
+    expect(screen.getByTestId("single-word-progressive-source-relationships")).toHaveTextContent("bee-swarm");
+    expect(screen.queryByTestId("single-word-progressive-source-motivated-explanation")).not.toBeInTheDocument();
+  });
+
+  it("withholds pairing when source template gloss annotation does not match a noun sense", () => {
+    const reading = makeProgressiveLexicalReading({
+      targetForm: "bletar",
+      baseForm: "bletë",
+      suffixForm: "-ar",
+      targetSenses: [{ senseId: "beekeeper", gloss: "beekeeper" }],
+      baseSenses: [{ senseId: "bee-insect", gloss: "bee (insect)" }],
+      suffixSenses: [{ senseId: "agent-suffix", gloss: "used to form agent nouns" }],
+      functionalOperation: "AGENT",
+      sourceAuthoredSuffixTemplate: { baseGlossAnnotation: "science" },
+    });
+
+    render(
+      <SingleWordMotivationWorkbenchV0_1
+        initialTargetWord="BLETAR"
+        currentWordEvidence={makeCurrentWordEvidence("BLETAR", {
+          status: "MATCHES_FOUND",
+          facts: [makeProgressiveExactFact("bletar", "fixture:kaikki:bletar:target", [{ senseId: "beekeeper", gloss: "beekeeper" }])],
+          albanianLexicalReading: reading,
+        })}
+      />,
+    );
+
+    expect(screen.getByTestId("single-word-progressive-source-relationships")).toHaveTextContent("science");
+    expect(screen.queryByTestId("single-word-progressive-source-motivated-explanation")).not.toBeInTheDocument();
+  });
+
+  it("withholds a source-motivated explanation when a suffix gloss says only 'agent suffix'", () => {
+    const reading = makeProgressiveLexicalReading({
+      targetForm: "bletar",
+      baseForm: "bletë",
+      suffixForm: "-ar",
+      targetSenses: [{ senseId: "beekeeper", gloss: "beekeeper" }],
+      baseSenses: [{ senseId: "bee", gloss: "bee" }],
+      suffixSenses: [{ senseId: "suffix-agent-vague", gloss: "agent suffix" }],
+      functionalOperation: "AGENT",
+    });
+
+    render(
+      <SingleWordMotivationWorkbenchV0_1
+        initialTargetWord="BLETAR"
+        currentWordEvidence={makeCurrentWordEvidence("BLETAR", {
+          status: "MATCHES_FOUND",
+          voices: ["E", "A"],
+          positions: [2, 4],
+          facts: [makeProgressiveExactFact("bletar", "fixture:kaikki:bletar:target", [{ senseId: "beekeeper", gloss: "beekeeper" }])],
+          albanianLexicalReading: reading,
+        })}
+      />,
+    );
+
+    expect(screen.getByTestId("single-word-progressive-functional-reading")).toHaveTextContent("operation AGENT");
+    expect(screen.getByTestId("single-word-progressive-source-relationships")).toHaveTextContent("suffix-agent-vague · agent suffix");
+    expect(screen.queryByTestId("single-word-progressive-source-motivated-explanation")).not.toBeInTheDocument();
+  });
+
+  it("requires a source-reported noun record for the conditional base meaning", () => {
+    const reading = makeProgressiveLexicalReading({
+      targetForm: "bletar",
+      baseForm: "bletë",
+      suffixForm: "-ar",
+      targetSenses: [{ senseId: "beekeeper", gloss: "beekeeper" }],
+      baseSenses: [{ senseId: "bee", gloss: "bee" }],
+      suffixSenses: [{ senseId: "agent-suffix", gloss: "used to form agent nouns" }],
+      functionalOperation: "AGENT",
+    });
+    const componentReading = reading.sourceLinkedComponentReading;
+    const baseRecord = componentReading.components[0]!;
+    const verbBaseRecord = {
+      ...baseRecord,
+      partOfSpeech: "verb",
+      meaningGlosses: ["to catch"],
+      sourceSenses: [{
+        sourceSenseOrdinal: 0,
+        senseId: "verb-base-sense",
+        glosses: ["to catch"],
+        categories: [],
+      }],
+    };
+    const nonNounReading = {
+      ...reading,
+      sourceLinkedComponentReading: {
+        ...componentReading,
+        components: [verbBaseRecord, ...componentReading.components.slice(1)],
+      },
+    };
+
+    render(
+      <SingleWordMotivationWorkbenchV0_1
+        initialTargetWord="BLETAR"
+        currentWordEvidence={makeCurrentWordEvidence("BLETAR", {
+          status: "MATCHES_FOUND",
+          voices: ["E", "A"],
+          positions: [2, 4],
+          facts: [makeProgressiveExactFact("bletar", "fixture:kaikki:bletar:target", [{ senseId: "beekeeper", gloss: "beekeeper" }])],
+          albanianLexicalReading: nonNounReading,
+        })}
+      />,
+    );
+
+    expect(screen.getByTestId("single-word-progressive-source-relationships")).toHaveTextContent("verb");
+    expect(screen.queryByTestId("single-word-progressive-source-motivated-explanation")).not.toBeInTheDocument();
   });
 
   it("does not surface-join source components when the exact target record does not bind to current source facts", () => {
@@ -816,6 +1090,35 @@ describe("Single-word motivation workbench v0.1", () => {
     expect(screen.getByTestId("single-word-progressive-functional-bridge-withheld")).toHaveTextContent("exact target record/query binding MISMATCH");
     expect(screen.queryByTestId("single-word-source-surface-join")).not.toBeInTheDocument();
     expect(screen.getByTestId("single-word-progressive-functional-reading")).not.toHaveTextContent("operation ENABLE_PASSAGE");
+    expect(screen.queryByTestId("single-word-progressive-source-motivated-explanation")).not.toBeInTheDocument();
+  });
+
+  it("requires source-component and bridge target senses to agree with the exact queried source record", () => {
+    const reading = makeProgressiveLexicalReading({
+      targetForm: "bletar",
+      baseForm: "bletë",
+      suffixForm: "-ar",
+      targetSenses: [{ senseId: "beekeeper", gloss: "a person tending apiaries" }],
+      baseSenses: [{ senseId: "bee", gloss: "bee" }],
+      suffixSenses: [{ senseId: "agent-suffix", gloss: "used to form agent nouns" }],
+      functionalOperation: "AGENT",
+    });
+
+    render(
+      <SingleWordMotivationWorkbenchV0_1
+        initialTargetWord="BLETAR"
+        currentWordEvidence={makeCurrentWordEvidence("BLETAR", {
+          status: "MATCHES_FOUND",
+          voices: ["E", "A"],
+          positions: [2, 4],
+          facts: [makeProgressiveExactFact("bletar", "fixture:kaikki:bletar:target", [{ senseId: "beekeeper", gloss: "beekeeper" }])],
+          albanianLexicalReading: reading,
+        })}
+      />,
+    );
+
+    expect(screen.getByTestId("single-word-current-source-evidence")).toHaveTextContent("Sense beekeeper: beekeeper");
+    expect(screen.queryByTestId("single-word-progressive-source-motivated-explanation")).not.toBeInTheDocument();
   });
 
   it("synthetically separates validated source forms from an unresolved component-record lookup", () => {
@@ -865,6 +1168,91 @@ describe("Single-word motivation workbench v0.1", () => {
     expect(relationships).toHaveTextContent("-are · UNRESOLVED");
     expect(relationships).not.toHaveTextContent("suffix-sense");
     expect(screen.getByTestId("single-word-progressive-functional-reading")).toHaveTextContent("Structural embryo meaning/function: UNKNOWN_OR_NULL");
+    expect(screen.queryByTestId("single-word-progressive-source-motivated-explanation")).not.toBeInTheDocument();
+  });
+
+  it("withholds the conditional explanation when ordered source references are malformed", () => {
+    const reading = makeProgressiveLexicalReading({
+      targetForm: "bletar",
+      baseForm: "bletë",
+      suffixForm: "-ar",
+      targetSenses: [{ senseId: "beekeeper", gloss: "beekeeper" }],
+      baseSenses: [{ senseId: "bee", gloss: "bee" }],
+      suffixSenses: [{ senseId: "agent-suffix", gloss: "used to form agent nouns" }],
+      functionalOperation: "AGENT",
+    });
+    const componentReading = reading.sourceLinkedComponentReading;
+    const malformedReading = {
+      ...reading,
+      sourceLinkedComponentReading: {
+        ...componentReading,
+        relation: {
+          ...componentReading.relation,
+          references: [
+            { ...componentReading.relation.references[0]!, reference: "foreign#Albanian" },
+            componentReading.relation.references[1]!,
+          ],
+        },
+      },
+    };
+
+    render(
+      <SingleWordMotivationWorkbenchV0_1
+        initialTargetWord="BLETAR"
+        currentWordEvidence={makeCurrentWordEvidence("BLETAR", {
+          status: "MATCHES_FOUND",
+          voices: ["E", "A"],
+          positions: [2, 4],
+          facts: [makeProgressiveExactFact("bletar", "fixture:kaikki:bletar:target", [{ senseId: "beekeeper", gloss: "beekeeper" }])],
+          albanianLexicalReading: malformedReading,
+        })}
+      />,
+    );
+
+    expect(screen.getByTestId("single-word-progressive-functional-reading")).toHaveTextContent("operation AGENT");
+    expect(screen.queryByTestId("single-word-progressive-source-motivated-explanation")).not.toBeInTheDocument();
+  });
+
+  it("withholds source-motivated output when a valid-looking relation has no exact source match or is outside Albanian context", () => {
+    const reading = makeProgressiveLexicalReading({
+      targetForm: "bletar",
+      baseForm: "bletë",
+      suffixForm: "-ar",
+      targetSenses: [{ senseId: "beekeeper", gloss: "beekeeper" }],
+      baseSenses: [{ senseId: "bee", gloss: "bee" }],
+      suffixSenses: [{ senseId: "agent-suffix", gloss: "agent suffix" }],
+      functionalOperation: "AGENT",
+    });
+    const exactFact = makeProgressiveExactFact(
+      "bletar",
+      "fixture:kaikki:bletar:target",
+      [{ senseId: "beekeeper", gloss: "beekeeper" }],
+    );
+
+    const { rerender } = render(
+      <SingleWordMotivationWorkbenchV0_1
+        initialTargetWord="BLETAR"
+        currentWordEvidence={makeCurrentWordEvidence("BLETAR", {
+          status: "UNAVAILABLE",
+          albanianLexicalReading: reading,
+        })}
+      />,
+    );
+    expect(screen.queryByTestId("single-word-progressive-source-motivated-explanation")).not.toBeInTheDocument();
+
+    rerender(
+      <SingleWordMotivationWorkbenchV0_1
+        initialTargetWord="BLETAR"
+        currentWordEvidence={makeCurrentWordEvidence("BLETAR", {
+          status: "MATCHES_FOUND",
+          language: "English",
+          profile: "English",
+          facts: [exactFact],
+          albanianLexicalReading: reading,
+        })}
+      />,
+    );
+    expect(screen.queryByTestId("single-word-progressive-source-motivated-explanation")).not.toBeInTheDocument();
   });
 
   it("keeps ordered source forms reconstructable when independent component records are ambiguous", () => {

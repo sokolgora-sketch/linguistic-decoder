@@ -98,6 +98,117 @@ function isExactAlbanianEtymologyLinkV0_1(link: { sourceForm: string; reference:
     link.reference.normalize("NFC").trim() === sourceForm + "#Albanian";
 }
 
+function isSourceReportedNounMeaningV0_1(gloss: string): boolean {
+  const normalized = gloss.normalize("NFC").trim();
+  return normalized.length > 0 &&
+    !/^(?:to\s+|inflection of\b|form of\b|alternative form of\b|plural of\b|past (?:form|tense|participle) of\b)/iu.test(normalized);
+}
+
+function isExplicitAgentNounFormationGlossV0_1(gloss: string): boolean {
+  const normalized = gloss.normalize("NFC").replace(/\s+/gu, " ").trim();
+  if (!normalized || /\b(?:maybe|perhaps|possibly|presumably|probably|likely)\b/iu.test(normalized)) return false;
+  return /\b(?:form|forms|create|creates)\s+(?:(?:a|an)\s+)?agent nouns?\b/iu.test(normalized);
+}
+
+type SourceMotivationSenseCandidateV0_1 = Readonly<{
+  sourceForm: string;
+  sourceRecordId: string;
+  entryLocator: string;
+  sourceSenseOrdinal: number;
+  senseId: string;
+  glosses: readonly string[];
+}>;
+
+type ValidatedSuffixTemplateForMotivationV0_1 = Readonly<{
+  baseForm: string;
+  suffixForm: string;
+  baseGlossAnnotation: string | null;
+}>;
+
+function validatedSuffixTemplateForMotivationV0_1(input: Readonly<{
+  relation: Readonly<{
+    relation: string;
+    sourceAuthoredExplanation: string | null;
+    references: readonly Readonly<{ sourceForm: string; reference: string | null }>[];
+  }>;
+  primary: Readonly<{
+    etymologyText: string | null;
+    etymologyTemplates?: readonly Readonly<{
+      name: string;
+      args: Readonly<Record<string, string>>;
+      expansion: string;
+    }>[];
+  }>;
+}>): ValidatedSuffixTemplateForMotivationV0_1 | null {
+  const references = input.relation.references;
+  const templates = input.primary.etymologyTemplates ?? [];
+  const template = templates[0];
+  if (
+    input.relation.relation !== "SOURCE_AUTHORED_SUFFIX_TEMPLATE" ||
+    references.length !== 2 || templates.length !== 1 || template?.name !== "suffix"
+  ) return null;
+
+  const [baseReference, suffixReference] = references;
+  const args = template.args;
+  const hasAnnotationArgument = Object.prototype.hasOwnProperty.call(args, "t1");
+  const allowedArgumentKeys = new Set(["1", "2", "3", "4", "t1"]);
+  const annotation = args["t1"]?.normalize("NFC").trim() ?? "";
+  const rawSuffix = args["3"]?.normalize("NFC").trim() ?? "";
+  const suffixBody = rawSuffix.startsWith("-") && !rawSuffix.startsWith("--")
+    ? rawSuffix.slice(1)
+    : rawSuffix;
+  const referencedSuffixBody = suffixReference?.sourceForm.startsWith("-") &&
+    !suffixReference.sourceForm.startsWith("--")
+    ? suffixReference.sourceForm.slice(1)
+    : "";
+  const baseForm = baseReference?.sourceForm.normalize("NFC").trim() ?? "";
+  const expectedExpansion = annotation
+    ? `${baseForm} (“${annotation}”) + -${suffixBody}`
+    : `${baseForm} + -${suffixBody}`;
+  const normalizeTemplateText = (value: string) =>
+    value.normalize("NFC").trim().replace(/\s+/gu, " ").replace(/\.$/u, "").toLocaleLowerCase("sq-AL");
+  const explanation = normalizeTemplateText(input.primary.etymologyText ?? "");
+  const expectedExplanation = normalizeTemplateText(`From ${expectedExpansion}`);
+  const argumentKeys = Object.keys(args);
+
+  if (
+    args["1"] !== "sq" ||
+    !baseForm ||
+    args["2"]?.normalize("NFC").trim() !== baseForm ||
+    !suffixBody ||
+    suffixBody !== referencedSuffixBody ||
+    (args["4"] !== undefined && args["4"] !== "") ||
+    argumentKeys.some((key) => !allowedArgumentKeys.has(key)) ||
+    (hasAnnotationArgument && !annotation) ||
+    (annotation !== "" && /[\r\n()+“”"]/u.test(annotation)) ||
+    template.expansion.normalize("NFC").trim() !== expectedExpansion ||
+    (explanation !== expectedExplanation && explanation !== `${expectedExplanation} noun suffix`) ||
+    normalizeTemplateText(input.relation.sourceAuthoredExplanation ?? "") !== explanation
+  ) return null;
+
+  const referenceBase = baseReference?.reference;
+  const referenceSuffix = suffixReference?.reference;
+  if (
+    !baseReference || !suffixReference || !referenceBase || !referenceSuffix ||
+    !isExactAlbanianEtymologyLinkV0_1({ sourceForm: baseForm, reference: referenceBase }) ||
+    !isExactAlbanianEtymologyLinkV0_1({ sourceForm: suffixReference.sourceForm, reference: referenceSuffix }) ||
+    referenceBase !== `${baseForm}#Albanian` ||
+    referenceSuffix !== `${suffixReference.sourceForm}#Albanian`
+  ) return null;
+
+  return {
+    baseForm,
+    suffixForm: `-${suffixBody}`,
+    baseGlossAnnotation: annotation || null,
+  };
+}
+
+function glossContainsSourceAnnotationV0_1(annotation: string, gloss: string): boolean {
+  const annotationTokens = annotation.normalize("NFC").toLocaleLowerCase("sq-AL").match(/[\p{L}\p{M}\p{N}]+/gu) ?? [];
+  const glossTokens = new Set(gloss.normalize("NFC").toLocaleLowerCase("sq-AL").match(/[\p{L}\p{M}\p{N}]+/gu) ?? []);
+  return annotationTokens.length > 0 && annotationTokens.every((token) => glossTokens.has(token));
+}
+
 function isAlbanianSourceContextV0_1(discovery: MotivationDiscoveryV0_1VM): boolean {
   const languageValues = [discovery.inputLanguage, discovery.sourceFact.language]
     .map((value) => value.normalize("NFC").trim().toLocaleLowerCase("en-US"))
@@ -294,6 +405,176 @@ function CurrentWordEvidenceSectionV0_1({
         : sourceFacts.some((fact) => fact.sourceRecordId === functionalBridgeRecords[0]?.sourceRecordId)
           ? "MATCH"
           : "MISMATCH";
+  const sourceComponentMeaningGroups = sourceComponentReading
+    ? sourceComponentReading.componentResolutions.map((resolution) => {
+        const records = resolution.sourceRecordIds.flatMap((sourceRecordId) =>
+          sourceComponentReading.components.filter((component) =>
+            component.sourceRecordId === sourceRecordId &&
+            sameAlbanianSourceForm(component.form, resolution.sourceForm),
+          ),
+        );
+        return { resolution, records };
+      })
+    : [];
+  const componentRecordAmbiguityOnly = Boolean(
+    sourceComponentReading?.status === "NULL" &&
+    sourceComponentReading.reasonCodes.length > 0 &&
+    sourceComponentReading.reasonCodes.every((reason) => reason === "SOURCE_COMPONENT_RECORD_AMBIGUOUS") &&
+    sourceComponentReading.componentResolutions.some((resolution) => resolution.status === "AMBIGUOUS"),
+  );
+  const sourceComponentSenseEvidenceComplete = Boolean(
+    (sourceComponentReading?.status === "SUPPORTED" || componentRecordAmbiguityOnly) &&
+    componentReferencesAreStructured &&
+    sourceComponentMeaningGroups.length >= 2 &&
+    sourceComponentMeaningGroups.every(({ resolution, records }) =>
+      (resolution.status === "RESOLVED" || resolution.status === "AMBIGUOUS") &&
+      resolution.sourceRecordIds.length > 0 &&
+      new Set(resolution.sourceRecordIds).size === resolution.sourceRecordIds.length &&
+      records.length === resolution.sourceRecordIds.length &&
+      records.every((record) => record.sourceSenses?.some((sense) =>
+        sense.glosses.some((gloss) => gloss.trim().length > 0),
+      )),
+    ),
+  );
+  const sourceMotivationBaseNounSenseCandidates: SourceMotivationSenseCandidateV0_1[] = [];
+  const sourceMotivationAgentNounSuffixSenses: SourceMotivationSenseCandidateV0_1[] = [];
+  for (const { resolution, records } of sourceComponentMeaningGroups) {
+    const isSuffixForm = resolution.sourceForm.startsWith("-");
+    for (const record of records) {
+      const recordPartOfSpeech = record.partOfSpeech?.normalize("NFC").trim().toLocaleLowerCase("en-US");
+      if (isSuffixForm && recordPartOfSpeech === "suffix") {
+        for (const sense of record.sourceSenses ?? []) {
+          const qualifyingGlosses = sense.glosses.filter(isExplicitAgentNounFormationGlossV0_1);
+          if (typeof sense.senseId !== "string" || !sense.senseId.trim() || qualifyingGlosses.length === 0) continue;
+          sourceMotivationAgentNounSuffixSenses.push({
+            sourceForm: resolution.sourceForm,
+            sourceRecordId: record.sourceRecordId,
+            entryLocator: record.entryLocator,
+            sourceSenseOrdinal: sense.sourceSenseOrdinal,
+            senseId: sense.senseId,
+            glosses: qualifyingGlosses,
+          });
+        }
+      } else if (!isSuffixForm && recordPartOfSpeech === "noun") {
+        for (const sense of record.sourceSenses ?? []) {
+          if (typeof sense.senseId !== "string" || !sense.senseId.trim() || sense.glosses.length === 0 ||
+            !sense.glosses.every(isSourceReportedNounMeaningV0_1)) continue;
+          sourceMotivationBaseNounSenseCandidates.push({
+            sourceForm: resolution.sourceForm,
+            sourceRecordId: record.sourceRecordId,
+            entryLocator: record.entryLocator,
+            sourceSenseOrdinal: sense.sourceSenseOrdinal,
+            senseId: sense.senseId,
+            glosses: sense.glosses,
+          });
+        }
+      }
+    }
+  }
+  const sourceMotivationSuffixTemplate = sourceComponentReading
+    ? validatedSuffixTemplateForMotivationV0_1(sourceComponentReading)
+    : null;
+  const sourceMotivationBaseNounSenses = sourceMotivationSuffixTemplate
+    ? sourceMotivationBaseNounSenseCandidates.flatMap((candidate) => {
+        if (!sourceMotivationSuffixTemplate.baseGlossAnnotation) {
+          return sourceMotivationBaseNounSenseCandidates.length === 1 ? [candidate] : [];
+        }
+        const matchingGlosses = candidate.glosses.filter((gloss) =>
+          glossContainsSourceAnnotationV0_1(sourceMotivationSuffixTemplate.baseGlossAnnotation!, gloss),
+        );
+        return matchingGlosses.length > 0 ? [{ ...candidate, glosses: matchingGlosses }] : [];
+      })
+    : [];
+  const isBoundedAgentSuffixFormation = Boolean(
+    sourceMotivationSuffixTemplate &&
+    sourceComponentMeaningGroups.length === 2 &&
+    sourceComponentMeaningGroups.filter(({ resolution }) => resolution.sourceForm.startsWith("-")).length === 1 &&
+    sourceComponentMeaningGroups.filter(({ resolution }) => !resolution.sourceForm.startsWith("-")).length === 1 &&
+    sourceComponentMeaningGroups.some(({ resolution }) =>
+      !resolution.sourceForm.startsWith("-") &&
+      sameAlbanianSourceForm(resolution.sourceForm, sourceMotivationSuffixTemplate.baseForm),
+    ) &&
+    sourceComponentMeaningGroups.some(({ resolution }) =>
+      resolution.sourceForm.startsWith("-") &&
+      sameAlbanianSourceForm(resolution.sourceForm, sourceMotivationSuffixTemplate.suffixForm),
+    ) &&
+    sourceMotivationBaseNounSenses.length > 0 &&
+    sourceMotivationAgentNounSuffixSenses.length > 0,
+  );
+  const exactComponentTargetSenses = sourceComponentReading?.primary.sourceSenses ?? [];
+  const exactComponentTargetRecord = sourceComponentReading?.primary ?? null;
+  const exactComponentTargetFact = sourceFacts.find((fact) =>
+    fact.sourceRecordId === exactComponentTargetRecord?.sourceRecordId &&
+    fact.entryLocator === exactComponentTargetRecord?.entryLocator,
+  );
+  const exactComponentTargetSensesMatchFact = Boolean(
+    exactComponentTargetFact &&
+    exactComponentTargetSenses.length === exactComponentTargetFact.senses.length &&
+    exactComponentTargetSenses.every((sense, index) => {
+      const sourceSense = exactComponentTargetFact.senses[index];
+      return Boolean(sourceSense &&
+        sense.senseId === sourceSense.senseId &&
+        sense.glosses.length === sourceSense.glosses.length &&
+        sense.glosses.every((gloss, glossIndex) => gloss === sourceSense.glosses[glossIndex]),
+      );
+    }),
+  );
+  const componentTargetSenseEvidenceComplete = Boolean(
+    componentTargetRecordBinding === "MATCH" &&
+    exactComponentTargetSenses.length > 0 &&
+    exactComponentTargetSenses.some((sense) => sense.glosses.some((gloss) => gloss.trim().length > 0)) &&
+    exactComponentTargetSensesMatchFact,
+  );
+  const functionalBridgeSensesMatchComponentTarget = Boolean(
+    functionalBridgeRecords.length === 1 &&
+    exactComponentTargetSenses.length === functionalBridgeRecords[0]?.sourceSenses.length &&
+    exactComponentTargetSenses.every((sense, index) => {
+      const bridgeSense = functionalBridgeRecords[0]?.sourceSenses[index];
+      return Boolean(bridgeSense &&
+        sense.senseId === bridgeSense.senseId &&
+        sense.glosses.length === bridgeSense.glosses.length &&
+        sense.glosses.every((gloss, glossIndex) => gloss === bridgeSense.glosses[glossIndex]),
+      );
+    }),
+  );
+  const functionalBridgeMatchesComponentTarget = Boolean(
+    functionalBridge?.status === "SUPPORTED" &&
+    functionalBridgeTargetBinding === "MATCH" &&
+    functionalBridge.functionalHypothesis.status === "EXPLORATORY_FUNCTIONAL_HYPOTHESIS" &&
+    functionalBridge.functionalHypothesis.functionalOperation &&
+    functionalBridge.sourceFacts &&
+    functionalBridgeRecords.length === 1 &&
+    functionalBridgeRecords[0]?.sourceRecordId === sourceComponentReading?.primary.sourceRecordId &&
+    functionalBridgeRecords[0]?.entryLocator === sourceComponentReading?.primary.entryLocator &&
+    functionalBridgeSensesMatchComponentTarget,
+  );
+  const sourceMotivatedExplanationAvailable = Boolean(
+    sourceContextIsAlbanian &&
+    sourceComponentMeaningGroups.length >= 2 &&
+    sourceComponentSenseEvidenceComplete &&
+    componentTargetSenseEvidenceComplete &&
+    functionalBridgeMatchesComponentTarget &&
+    functionalBridge?.functionalHypothesis.functionalOperation === "AGENT" &&
+    isBoundedAgentSuffixFormation,
+  );
+  const sourceMotivatedBaseForm = sourceMotivationBaseNounSenses[0]?.sourceForm ?? "UNKNOWN_OR_NULL";
+  const sourceMotivatedSuffixForm = sourceMotivationAgentNounSuffixSenses[0]?.sourceForm ?? "UNKNOWN_OR_NULL";
+  const sourceMotivatedBaseGlosses = sourceMotivationBaseNounSenses
+    .flatMap((candidate) => candidate.glosses)
+    .map((gloss) => `“${gloss}”`)
+    .join("; ");
+  const sourceMotivatedBaseSenseQualification = sourceMotivationSuffixTemplate?.baseGlossAnnotation
+    ? `The source-template gloss annotation “${sourceMotivationSuffixTemplate.baseGlossAnnotation}” matches these candidate glosses by complete-token inclusion; this is a candidate filter, not an exact sense crosswalk.`
+    : "One source-reported noun candidate is available without a template gloss annotation; exact sense crosswalk remains UNKNOWN_OR_NULL.";
+  const sourceMotivatedSuffixGlosses = sourceMotivationAgentNounSuffixSenses
+    .flatMap((candidate) => candidate.glosses)
+    .map((gloss) => `“${gloss}”`)
+    .join("; ");
+  const sourceMotivatedTargetGlosses = exactComponentTargetSenses
+    .flatMap((sense) => sense.glosses)
+    .filter((gloss) => gloss.trim().length > 0)
+    .map((gloss) => `“${gloss}”`)
+    .join("; ");
 
   return (
     <section
@@ -749,6 +1030,67 @@ function CurrentWordEvidenceSectionV0_1({
                   <ul className="ml-3 list-disc">
                     {lexicalReading.interpretation.alternatives.map((alternative, index) => <li key={`${index}:${alternative}`}>{alternative}</li>)}
                   </ul>
+                ) : null}
+                {sourceMotivatedExplanationAvailable && sourceComponentReading && functionalBridge?.status === "SUPPORTED" ? (
+                  <div className="mt-2 rounded border border-[#46523b] bg-[#121811] p-2" data-testid="single-word-progressive-source-motivated-explanation">
+                    <h5 className="font-semibold">Possible source-motivated explanation · CONDITIONAL_INFERENCE</h5>
+                    <p className="mt-1" data-testid="single-word-progressive-source-motivated-pairing">
+                      Exact target form: {visibleDiscovery?.inputWord}. The source attributes these ordered component forms: {sourceComponentReading.relation.references.map((reference) => reference.sourceForm).join(" + ")}. If a source-reported noun sense of {sourceMotivatedBaseForm} (candidate glosses: {sourceMotivatedBaseGlosses}) and an explicitly agent-noun-forming sense of {sourceMotivatedSuffixForm} (candidate glosses: {sourceMotivatedSuffixGlosses}) apply to this exact source-attributed suffix formation, a person associated with the source-reported base meaning {sourceMotivatedBaseGlosses} is consistent with the existing whole-word AGENT hypothesis and the target source-meaning alternatives {sourceMotivatedTargetGlosses}. This is a conditional functional motivation, not a source-authored compound meaning, selected sense, exact sense crosswalk, or asserted derivation.
+                    </p>
+                    <div className="mt-1 break-words">Conditional source-sense evidence candidates (source order; none selected):</div>
+                    <ul className="ml-3 list-disc">
+                      {sourceMotivationBaseNounSenses.map((candidate) => (
+                        <li key={`${candidate.sourceRecordId}:${candidate.senseId}`}>
+                          Noun candidate · {candidate.sourceForm} · {candidate.sourceRecordId} · sense {candidate.sourceSenseOrdinal} {candidate.senseId} · {candidate.glosses.join("; ")}
+                        </li>
+                      ))}
+                      {sourceMotivationAgentNounSuffixSenses.map((candidate) => (
+                        <li key={`${candidate.sourceRecordId}:${candidate.senseId}`}>
+                          Agent-noun-forming suffix candidate · {candidate.sourceForm} · {candidate.sourceRecordId} · sense {candidate.sourceSenseOrdinal} {candidate.senseId} · {candidate.glosses.join("; ")}
+                        </li>
+                      ))}
+                    </ul>
+                    <div className="mt-1 break-words" data-testid="single-word-progressive-source-motivated-candidate-qualification">
+                      {sourceMotivatedBaseSenseQualification}
+                    </div>
+                    <div className="mt-1 break-words">Source-attributed relationship: {sourceComponentReading.relation.sourceAuthoredExplanation ?? "UNKNOWN_OR_NULL"} · {sourceComponentReading.primary.sourceRecordId} · {sourceComponentReading.primary.entryLocator}</div>
+                    <div className="mt-2">Component sense alternatives (source order; none selected):</div>
+                    <ol className="mt-1 space-y-1">
+                      {sourceComponentMeaningGroups.map(({ resolution, records }, componentIndex) => (
+                        <li key={`${resolution.sourceForm}:${componentIndex}`} className="break-words">
+                          {componentIndex + 1}. {resolution.sourceForm} · {resolution.status}
+                          <ul className="ml-3 list-disc">
+                            {records.map((record) => (
+                              <li key={record.sourceRecordId} className="break-words">
+                                {record.sourceRecordId} · {record.entryLocator} · {record.partOfSpeech ?? "POS UNKNOWN_OR_NULL"}
+                                <ul className="ml-3 list-[circle]">
+                                  {(record.sourceSenses ?? []).map((sense, senseIndex) => (
+                                    <li key={`${record.sourceRecordId}:${sense.senseId ?? senseIndex}`}>
+                                      Sense {sense.sourceSenseOrdinal}: {sense.senseId ?? "UNKNOWN_OR_NULL"} · {sense.glosses.join("; ") || "UNKNOWN_OR_NULL"}
+                                    </li>
+                                  ))}
+                                </ul>
+                              </li>
+                            ))}
+                          </ul>
+                        </li>
+                      ))}
+                    </ol>
+                    <div className="mt-2">Exact target record senses (source order; none selected):</div>
+                    <ul className="ml-3 list-disc">
+                      {exactComponentTargetSenses.map((sense, senseIndex) => (
+                        <li key={`${sourceComponentReading.primary.sourceRecordId}:${sense.senseId ?? senseIndex}`} className="break-words">
+                          {sourceComponentReading.primary.sourceRecordId} · {sourceComponentReading.primary.entryLocator} · Sense {sense.sourceSenseOrdinal}: {sense.senseId ?? "UNKNOWN_OR_NULL"} · {sense.glosses.join("; ") || "UNKNOWN_OR_NULL"}
+                        </li>
+                      ))}
+                    </ul>
+                    {componentSurfaceJoin !== null ? (
+                      <div className="mt-1 break-words">
+                        Source-form reconstruction: {componentSurfaceJoin.toLocaleUpperCase("sq-AL")} {surfaceJoinMatchesTarget ? "=" : "≠"} {visibleDiscovery?.inputWord.toLocaleUpperCase("sq-AL")} · {surfaceJoinMatchesTarget ? "EXACT_SURFACE_JOIN" : "SURFACE_MISMATCH"}. The comparison does not authorize a spelling change.
+                      </div>
+                    ) : null}
+                    <div className="mt-1 break-words">Whole-word evidence remains {functionalBridge.functionalHypothesis.status} · {functionalBridge.functionalHypothesis.functionalOperation}. Component-sense alignment and independent embryo function remain UNKNOWN_OR_NULL; source-record juxtaposition is not independent corroboration. Claim boundary: {functionalBridge.claimBoundary}</div>
+                  </div>
                 ) : null}
                 <div className="mt-1 font-semibold">Structural embryo meaning/function: UNKNOWN_OR_NULL. Structural candidates do not establish a lexical meaning or functional operation.</div>
                 <div>No single winner: {visibleDiscovery.noSingleWinner ? "true" : "UNKNOWN_OR_NULL"} · user decision posture: {visibleDiscovery.userDecisionPosture}.</div>
