@@ -91,6 +91,13 @@ function sameAlbanianSourceForm(left: string, right: string): boolean {
     right.normalize("NFC").trim().toLocaleLowerCase("sq-AL");
 }
 
+function isExactAlbanianEtymologyLinkV0_1(link: { sourceForm: string; reference: string }): boolean {
+  const sourceForm = link.sourceForm.normalize("NFC").trim();
+  const body = sourceForm.startsWith("-") ? sourceForm.slice(1) : sourceForm;
+  return Boolean(body) && !sourceForm.startsWith("--") && /^[\p{L}]+$/u.test(body) &&
+    link.reference.normalize("NFC").trim() === sourceForm + "#Albanian";
+}
+
 function isAlbanianSourceContextV0_1(discovery: MotivationDiscoveryV0_1VM): boolean {
   const languageValues = [discovery.inputLanguage, discovery.sourceFact.language]
     .map((value) => value.normalize("NFC").trim().toLocaleLowerCase("en-US"))
@@ -130,6 +137,16 @@ function CurrentWordEvidenceSectionV0_1({
         fact.languageCode === "sq" && sourceInputWord !== undefined && sameAlbanianSourceForm(fact.form, sourceInputWord),
       )
     : [];
+  const lexicalPrimarySourceFact = visibleDiscovery?.albanianLexicalReading?.primarySourceFact ?? null;
+  const lexicalPrimaryRecordBinding = !lexicalPrimarySourceFact
+    ? "UNKNOWN_OR_NULL"
+    : !sameAlbanianSourceForm(lexicalPrimarySourceFact.form, visibleDiscovery?.inputWord ?? "")
+      ? "MISMATCH"
+      : sourceFacts.length === 0
+        ? "UNKNOWN_OR_NULL"
+        : sourceFacts.some((fact) => fact.sourceRecordId === lexicalPrimarySourceFact.sourceRecordId)
+          ? "MATCH"
+          : "MISMATCH";
   const voiceProvenance = visibleDiscovery?.derivedStructure.voicePathProvenance;
   const writtenInputMatches = voiceProvenance?.writtenInput.inputForm === visibleDiscovery?.inputWord;
   const writtenInput = writtenInputMatches ? voiceProvenance?.writtenInput : undefined;
@@ -143,28 +160,10 @@ function CurrentWordEvidenceSectionV0_1({
   );
   const lexicalReading = sourceContextIsAlbanian ? visibleDiscovery?.albanianLexicalReading : undefined;
   const sourceComponentReading = lexicalReading?.sourceLinkedComponentReading ?? null;
-  const componentReferencesAreUnique = Boolean(
-    sourceComponentReading?.status === "SUPPORTED" &&
-    sourceComponentReading.components.length > 0 &&
-    sourceComponentReading.components.length === sourceComponentReading.componentResolutions.length &&
-    sourceComponentReading.components.length === sourceComponentReading.relation.references.length &&
-    sourceComponentReading.componentResolutions.every((resolution, index) =>
-      resolution.status === "RESOLVED" &&
-      resolution.sourceRecordIds.length === 1 &&
-      sourceComponentReading.components[index]?.sourceRecordId === resolution.sourceRecordIds[0] &&
-      sourceComponentReading.components[index]?.form === resolution.sourceForm &&
-      sourceComponentReading.relation.references[index]?.sourceForm === resolution.sourceForm,
-    ),
-  );
-  const componentSurfaceJoin = componentReferencesAreUnique && sourceComponentReading
-    ? sourceComponentReading.components.map((component, index) => {
-        const isSuffixNotation = sourceComponentReading.relation.relation === "SOURCE_AUTHORED_SUFFIX_TEMPLATE" &&
-          index > 0 && component.form.startsWith("-") && !component.form.startsWith("--");
-        return isSuffixNotation ? component.form.slice(1) : component.form;
-      }).join("")
-    : null;
   const componentTargetRecordBinding = sourceComponentReading
-    ? !sameAlbanianSourceForm(sourceComponentReading.primary.form, visibleDiscovery?.inputWord ?? "")
+    ? !sameAlbanianSourceForm(sourceComponentReading.primary.form, visibleDiscovery?.inputWord ?? "") ||
+      sourceComponentReading.relation.primarySourceRecordId !== sourceComponentReading.primary.sourceRecordId ||
+      sourceComponentReading.relation.primaryEntryLocator !== sourceComponentReading.primary.entryLocator
       ? "MISMATCH"
       : sourceFacts.length === 0
         ? "UNKNOWN_OR_NULL"
@@ -172,9 +171,129 @@ function CurrentWordEvidenceSectionV0_1({
           ? "MATCH"
           : "MISMATCH"
     : "UNKNOWN_OR_NULL";
-  const surfaceJoinMatchesTarget = componentSurfaceJoin !== null && sourceComponentReading !== null && componentTargetRecordBinding === "MATCH"
+  const componentResolutionReasonsAllowed = new Set([
+    "SOURCE_COMPONENT_LOOKUP_UNAVAILABLE",
+    "SOURCE_COMPONENT_RECORD_NOT_FOUND",
+    "SOURCE_COMPONENT_RECORD_AMBIGUOUS",
+    "SOURCE_COMPONENT_RECORD_IDENTITY_DUPLICATE",
+    "SOURCE_COMPONENT_RECORD_LOOKUP_FAILED",
+    "PRIMARY_MEANING_EVIDENCE_MISSING",
+    "SOURCE_COMPONENT_MEANING_EVIDENCE_MISSING",
+  ]);
+  const componentReferenceForms = sourceComponentReading?.relation.references ?? [];
+  const componentReferencesAreStructured = Boolean(sourceComponentReading &&
+    componentTargetRecordBinding === "MATCH" &&
+    sourceComponentReading.relation.relation !== "SOURCE_COMPOUND_ARITY_UNSUPPORTED" &&
+    componentReferenceForms.length >= 2 &&
+    componentReferenceForms.length === sourceComponentReading.componentResolutions.length &&
+    new Set(componentReferenceForms.map((item) =>
+      item.sourceForm.normalize("NFC").trim().toLocaleLowerCase("sq-AL"),
+    )).size === componentReferenceForms.length &&
+    sourceComponentReading.componentResolutions.every((resolution, index) => {
+      const reference = componentReferenceForms[index];
+      const resolutionHasReason = resolution.reasonCodes.some((reason) =>
+        componentResolutionReasonsAllowed.has(reason),
+      );
+      const resolutionStatusIsConsistent = resolution.status === "RESOLVED"
+        ? resolution.sourceRecordIds.length === 1 &&
+          sourceComponentReading.components.some((component) =>
+            component.sourceRecordId === resolution.sourceRecordIds[0] &&
+            sameAlbanianSourceForm(component.form, resolution.sourceForm),
+          )
+        : resolution.status === "AMBIGUOUS"
+          ? resolution.reasonCodes.includes("SOURCE_COMPONENT_RECORD_AMBIGUOUS") &&
+            (resolution.sourceRecordIds.length > 1
+              ? resolution.sourceRecordIds.every((sourceRecordId) =>
+                  sourceComponentReading.components.some((component) =>
+                    component.sourceRecordId === sourceRecordId &&
+                    sameAlbanianSourceForm(component.form, resolution.sourceForm),
+                  ),
+                )
+              : resolution.reasonCodes.includes("SOURCE_COMPONENT_RECORD_IDENTITY_DUPLICATE"))
+          : resolution.status === "UNRESOLVED" &&
+            resolution.sourceRecordIds.length === 0 &&
+            resolutionHasReason;
+      return Boolean(reference?.reference) &&
+        isExactAlbanianEtymologyLinkV0_1({
+          sourceForm: reference?.sourceForm ?? "",
+          reference: reference?.reference ?? "",
+        }) &&
+        resolution.sourceForm === reference?.sourceForm &&
+        resolution.reference === reference?.reference &&
+        resolutionStatusIsConsistent;
+    }) &&
+    sourceComponentReading.reasonCodes.every((reason) => componentResolutionReasonsAllowed.has(reason)));
+  const componentSurfaceJoin = componentReferencesAreStructured && sourceComponentReading
+    ? componentReferenceForms.map((reference, index) => {
+        const form = reference.sourceForm.normalize("NFC").trim();
+        const isAffixNotation = index > 0 && form.startsWith("-") && !form.startsWith("--");
+        return isAffixNotation ? form.slice(1) : form;
+      }).join("")
+    : null;
+  const surfaceJoinMatchesTarget = componentSurfaceJoin !== null
     ? sameAlbanianSourceForm(componentSurfaceJoin, visibleDiscovery?.inputWord ?? "")
     : null;
+
+  const sourceComparison = lexicalReading?.sourceLinkedComparison ?? null;
+  const comparisonRecordInternallyBound = Boolean(sourceComparison &&
+    sourceComparison.primary.sourceRecordId === sourceComparison.relation.primarySourceRecordId &&
+    sourceComparison.primary.entryLocator === sourceComparison.relation.primaryEntryLocator &&
+    (sourceComparison.related ? (
+      sourceComparison.related.sourceRecordId === sourceComparison.relation.relatedSourceRecordId &&
+      sourceComparison.related.entryLocator === sourceComparison.relation.relatedEntryLocator &&
+      sameAlbanianSourceForm(sourceComparison.related.form, sourceComparison.relation.relatedForm)
+    ) : sourceComparison.relation.relatedSourceRecordId === null));
+  const comparisonTargetRecords = sourceComparison
+    ? [sourceComparison.primary, ...(sourceComparison.related ? [sourceComparison.related] : [])]
+      .filter((record) => sameAlbanianSourceForm(record.form, visibleDiscovery?.inputWord ?? ""))
+    : [];
+  const sourceComparisonTargetBinding = !sourceComparison
+    ? "UNKNOWN_OR_NULL"
+    : !comparisonRecordInternallyBound
+      ? "MISMATCH"
+      : comparisonTargetRecords.length !== 1
+        ? "UNKNOWN_OR_NULL"
+        : sourceFacts.length === 0
+          ? "UNKNOWN_OR_NULL"
+          : sourceFacts.some((fact) => fact.sourceRecordId === comparisonTargetRecords[0]?.sourceRecordId)
+            ? "MATCH"
+            : "MISMATCH";
+  const sourceComparisonTargetRecord = sourceComparisonTargetBinding === "MATCH"
+    ? comparisonTargetRecords[0] ?? null
+    : null;
+  const linkedTargetForms = sourceComparisonTargetRecord?.etymologyLinks ?? [];
+  const linkedTargetFormsAreStructured = Boolean(
+    linkedTargetForms.length >= 2 &&
+    linkedTargetForms.every((link) => isExactAlbanianEtymologyLinkV0_1(link)) &&
+    new Set(linkedTargetForms.map((link) =>
+      link.sourceForm.normalize("NFC").trim().toLocaleLowerCase("sq-AL"),
+    )).size === linkedTargetForms.length,
+  );
+  const linkedFormSurfaceJoin = linkedTargetFormsAreStructured
+    ? linkedTargetForms.map((link, index) => {
+        const form = link.sourceForm.normalize("NFC").trim();
+        const isAffixNotation = index > 0 && form.startsWith("-") && !form.startsWith("--");
+        return isAffixNotation ? form.slice(1) : form;
+      }).join("")
+    : null;
+  const linkedFormSurfaceMatchesTarget = linkedFormSurfaceJoin !== null
+    ? sameAlbanianSourceForm(linkedFormSurfaceJoin, visibleDiscovery?.inputWord ?? "")
+    : null;
+
+  const functionalBridge = lexicalReading?.functionalMeaningBridge;
+  const functionalBridgeRecords = functionalBridge?.sourceFacts
+    ? [functionalBridge.sourceFacts.primary, ...(functionalBridge.sourceFacts.related ? [functionalBridge.sourceFacts.related] : [])]
+      .filter((record) => sameAlbanianSourceForm(record.form, visibleDiscovery?.inputWord ?? ""))
+    : [];
+  const functionalBridgeTargetBinding = !functionalBridge || functionalBridge.status !== "SUPPORTED"
+    ? "UNKNOWN_OR_NULL"
+    : !functionalBridge.sourceFacts || functionalBridgeRecords.length !== 1
+      ? "UNKNOWN_OR_NULL"
+      : sourceFacts.length === 0
+        ? "UNKNOWN_OR_NULL"
+        : sourceFacts.some((fact) => fact.sourceRecordId === functionalBridgeRecords[0]?.sourceRecordId)
+          ? "MATCH"
+          : "MISMATCH";
 
   return (
     <section
@@ -448,21 +567,21 @@ function CurrentWordEvidenceSectionV0_1({
                 ) : (
                   <div>Albanian source relations: UNKNOWN_OR_NULL · no Albanian context is established.</div>
                 )}
-                {sourceComponentReading ? (
+                {sourceComponentReading && componentTargetRecordBinding === "MATCH" ? (
                   <div className="mt-2 rounded border border-[#26323d] p-2">
                     <div>Source-linked component reading: {sourceComponentReading.status} · {sourceComponentReading.relation.relation}</div>
                     <div className="break-words">Target record: {sourceComponentReading.primary.sourceRecordId} · {sourceComponentReading.primary.entryLocator} · {sourceComponentReading.primary.form} · {sourceComponentReading.primary.partOfSpeech ?? "POS UNKNOWN_OR_NULL"}</div>
                     <div>Target record/query binding: {componentTargetRecordBinding}</div>
                     <div className="break-words">Source-authored explanation: {sourceComponentReading.relation.sourceAuthoredExplanation ?? "UNKNOWN_OR_NULL"}</div>
-                    <div className="break-words">Raw source component forms (ordered): {sourceComponentReading.components.length ? sourceComponentReading.components.map((component) => component.form).join(" + ") : "UNKNOWN_OR_NULL"}</div>
+                    <div className="break-words">Validated source-attributed component forms (ordered; separate from lexical records): {sourceComponentReading.relation.references.map((reference) => reference.sourceForm).join(" + ") || "UNKNOWN_OR_NULL"}</div>
                     {componentSurfaceJoin !== null ? (
                       <div className="break-words" data-testid="single-word-source-surface-join">
-                        Surface join (template hyphen is notation only; raw forms above are preserved): {surfaceJoinMatchesTarget === null
-                          ? `${componentSurfaceJoin.toLocaleUpperCase("sq-AL")} · comparison UNKNOWN_OR_NULL because target-record/query binding is ${componentTargetRecordBinding}`
+                        Structured source-form concatenation (leading affix hyphen omitted as notation only): {surfaceJoinMatchesTarget === null
+                          ? `${componentSurfaceJoin.toLocaleUpperCase("sq-AL")} · comparison UNKNOWN_OR_NULL`
                           : `${componentSurfaceJoin.toLocaleUpperCase("sq-AL")} ${surfaceJoinMatchesTarget ? "=" : "≠"} ${visibleDiscovery.inputWord.toLocaleUpperCase("sq-AL")} · ${surfaceJoinMatchesTarget ? "EXACT_SURFACE_JOIN" : "SURFACE_MISMATCH"}`}
                       </div>
                     ) : (
-                      <div>Surface join: UNKNOWN_OR_NULL · the component partition is not supported for exact reconstruction.</div>
+                      <div>Structured component-form reconstruction: UNKNOWN_OR_NULL · the validated ordered references do not support a safe concatenation.</div>
                     )}
                     <div className="mt-1">Component reference resolution (source order):</div>
                     <ol className="mt-1 space-y-1">
@@ -498,8 +617,12 @@ function CurrentWordEvidenceSectionV0_1({
                     <div className="break-words">Relationship claim boundary: {sourceComponentReading.claimBoundary}</div>
                     <div className="break-words">Target/component exact-sense crosswalk: UNKNOWN_OR_NULL · no canonical sense alignment is emitted by this record-level relationship.</div>
                   </div>
+                ) : sourceComponentReading ? (
+                  <div className="mt-2 rounded border border-[#674b3a] p-2" data-testid="single-word-source-component-withheld">
+                    Source component relationship withheld from this analyzed word: target record/query binding {componentTargetRecordBinding}. Its source record payload does not authorize a relationship or functional reading for the current exact source record.
+                  </div>
                 ) : null}
-                {lexicalReading?.relatedForms.length ? (
+                {lexicalReading?.relatedForms.length && lexicalPrimaryRecordBinding === "MATCH" ? (
                   <div className="mt-2 rounded border border-[#26323d] p-2">
                     <div>Source-reported related forms (original order):</div>
                     <ol className="mt-1 space-y-1">
@@ -512,19 +635,41 @@ function CurrentWordEvidenceSectionV0_1({
                     </ol>
                   </div>
                 ) : null}
-                {lexicalReading?.sourceLinkedComparison ? (
+                {sourceComparison ? sourceComparisonTargetBinding === "MATCH" ? (
                   <div className="mt-2 rounded border border-[#26323d] p-2" data-testid="single-word-progressive-source-comparison">
-                    <div>Source-linked comparison: {lexicalReading.sourceLinkedComparison.status} · {lexicalReading.sourceLinkedComparison.relation.relation} · {lexicalReading.sourceLinkedComparison.summary.text}</div>
-                    <div className="break-words">Primary record: {lexicalReading.sourceLinkedComparison.primary.sourceRecordId} · {lexicalReading.sourceLinkedComparison.primary.entryLocator} · related form {lexicalReading.sourceLinkedComparison.relation.relatedForm} · related record {lexicalReading.sourceLinkedComparison.relation.relatedSourceRecordId ?? "UNKNOWN_OR_NULL"} · {lexicalReading.sourceLinkedComparison.relation.relatedEntryLocator}</div>
-                    {[lexicalReading.sourceLinkedComparison.primary, ...(lexicalReading.sourceLinkedComparison.related ? [lexicalReading.sourceLinkedComparison.related] : [])].map((record) => (
+                    <div>Source-linked comparison: {sourceComparison.status} · {sourceComparison.relation.relation} · {sourceComparison.summary.text}</div>
+                    <div className="break-words">Primary record: {sourceComparison.primary.sourceRecordId} · {sourceComparison.primary.entryLocator} · related form {sourceComparison.relation.relatedForm} · related record {sourceComparison.relation.relatedSourceRecordId ?? "UNKNOWN_OR_NULL"} · {sourceComparison.relation.relatedEntryLocator}</div>
+                    {[sourceComparison.primary, ...(sourceComparison.related ? [sourceComparison.related] : [])].map((record) => (
                       <div key={record.sourceRecordId} className="mt-1 break-words">
                         {record.form} source senses (original order): {record.sourceSenses?.length
                           ? record.sourceSenses.map((sense) => `${sense.sourceSenseOrdinal}:${sense.senseId ?? "UNKNOWN_OR_NULL"}=${sense.glosses.join("; ") || "UNKNOWN_OR_NULL"}`).join(" · ")
                           : "UNKNOWN_OR_NULL"}
                       </div>
                     ))}
-                    <div className="break-words">Comparison claim boundary: {lexicalReading.sourceLinkedComparison.claimBoundary}</div>
+                    {sourceComparisonTargetRecord?.etymologyText ? (
+                      <div className="mt-1 break-words" data-testid="single-word-target-etymology-text">
+                        Target-record source-attributed etymology prose (not parsed into components): {sourceComparisonTargetRecord.etymologyText} · {sourceComparisonTargetRecord.sourceRecordId} · {sourceComparisonTargetRecord.entryLocator}
+                      </div>
+                    ) : null}
+                    {sourceComparisonTargetRecord?.etymologyLinks.length ? (
+                      <div className="mt-1 break-words">
+                        Target-record source-attributed etymology links (ordered): {sourceComparisonTargetRecord.etymologyLinks.map((link) => `${link.sourceForm} (${link.reference})`).join(" · ")}
+                      </div>
+                    ) : null}
+                    {linkedFormSurfaceJoin !== null ? (
+                      <div className="mt-1 break-words" data-testid="single-word-source-linked-form-join">
+                        Linked-form concatenation (leading affix hyphen omitted as notation only; not a component-sense or historical analysis): {linkedFormSurfaceJoin.toLocaleUpperCase("sq-AL")} {linkedFormSurfaceMatchesTarget ? "=" : "≠"} {visibleDiscovery.inputWord.toLocaleUpperCase("sq-AL")} · {linkedFormSurfaceMatchesTarget ? "EXACT_SURFACE_JOIN" : "SURFACE_MISMATCH"}
+                      </div>
+                    ) : (
+                      <div className="mt-1">Linked-form reconstruction: UNKNOWN_OR_NULL · ordered exact-form Albanian links are unavailable.</div>
+                    )}
+                    <div>Independent component record/sense resolution: UNKNOWN_OR_NULL unless emitted by the separate component-reading contract; exact-sense alignment is not established.</div>
+                    <div className="break-words">Comparison claim boundary: {sourceComparison.claimBoundary}</div>
                     <div>Cross-source exact-sense identity: UNKNOWN_OR_NULL unless separately emitted by a sense-alignment contract.</div>
+                  </div>
+                ) : (
+                  <div className="mt-2 rounded border border-[#674b3a] p-2" data-testid="single-word-progressive-source-comparison-withheld">
+                    Source-linked comparison withheld: target record/query binding {sourceComparisonTargetBinding}. The comparison payload does not authorize a relationship or function for the current exact source record.
                   </div>
                 ) : null}
                 {lexicalReading?.senseAlignedLexicalRole ? (
@@ -549,7 +694,9 @@ function CurrentWordEvidenceSectionV0_1({
                 {!sourceComponentReading && !lexicalReading?.relatedForms.length && !lexicalReading?.sourceLinkedComparison ? (
                   <p className="mt-1">No source-authored component relation is available in this Discovery payload: UNKNOWN_OR_NULL. A spelling resemblance or user proposal is not a source relation.</p>
                 ) : null}
-                {sourceComponentReading?.functionalHypothesis.status === "EXPLORATORY_FUNCTIONAL_HYPOTHESIS" ? (
+                {sourceComponentReading?.status === "SUPPORTED" &&
+                sourceComponentReading.functionalHypothesis.status === "EXPLORATORY_FUNCTIONAL_HYPOTHESIS" &&
+                componentTargetRecordBinding === "MATCH" ? (
                   <div className="mt-2 break-words" data-testid="single-word-source-component-hypothesis">
                     Source-component role hypothesis: EXPLORATORY · {sourceComponentReading.functionalHypothesis.statement ?? "UNKNOWN_OR_NULL"} · functional operation {sourceComponentReading.functionalHypothesis.functionalOperation ?? "Null"}.
                     <div>Evidence references: {sourceComponentReading.functionalHypothesis.evidenceRefs.map((reference) => `${reference.sourceRecordId} (${reference.entryLocator}; senses ${reference.senseIds.join(", ") || "UNKNOWN_OR_NULL"})`).join(" · ") || "UNKNOWN_OR_NULL"}</div>
@@ -561,7 +708,7 @@ function CurrentWordEvidenceSectionV0_1({
             <li>
               <section data-testid="single-word-progressive-functional-reading" className="rounded border border-[#34495a] bg-[#10161c] p-2">
                 <h4 className="font-semibold text-[#dce9ca]">5 · Existing whole-word functional reading or Null</h4>
-                {lexicalReading?.functionalFamilyReading ? (
+                {lexicalReading?.functionalFamilyReading && lexicalPrimaryRecordBinding === "MATCH" ? (
                   <div className="mb-2 rounded border border-[#26323d] p-2" data-testid="single-word-progressive-functional-family">
                     <div>Source-family reading: EXPLORATORY_FUNCTIONAL_FAMILY · operation {lexicalReading.functionalFamilyReading.functionalOperation}</div>
                     <div className="break-words">{lexicalReading.functionalFamilyReading.statement}</div>
@@ -577,7 +724,7 @@ function CurrentWordEvidenceSectionV0_1({
                     <div className="text-[#9fb1bf]">Same-source family evidence does not establish independent corroboration or embryo meaning.</div>
                   </div>
                 ) : null}
-                {lexicalReading?.functionalMeaningBridge?.status === "SUPPORTED" ? (
+                {lexicalReading?.functionalMeaningBridge?.status === "SUPPORTED" && functionalBridgeTargetBinding === "MATCH" ? (
                   <>
                     <div>Whole-word bridge: SUPPORTED · operation {lexicalReading.functionalMeaningBridge.functionalHypothesis.functionalOperation ?? "Null"} · {lexicalReading.functionalMeaningBridge.functionalHypothesis.status}</div>
                     <div className="break-words">{lexicalReading.functionalMeaningBridge.functionalHypothesis.statement ?? "UNKNOWN_OR_NULL"}</div>
@@ -588,10 +735,14 @@ function CurrentWordEvidenceSectionV0_1({
                     ) : null}
                     <div className="break-words">Bridge claim boundary: {lexicalReading.functionalMeaningBridge.claimBoundary}</div>
                   </>
+                ) : lexicalReading?.functionalMeaningBridge?.status === "SUPPORTED" ? (
+                  <div data-testid="single-word-progressive-functional-bridge-withheld">
+                    Whole-word functional bridge withheld: exact target record/query binding {functionalBridgeTargetBinding}. Functional operation UNKNOWN_OR_NULL for this displayed source record.
+                  </div>
                 ) : (
                   <div>Whole-word functional bridge: UNKNOWN_OR_NULL{lexicalReading?.functionalMeaningBridge?.reasonCodes.length ? ` · ${lexicalReading.functionalMeaningBridge.reasonCodes.join(", ")}` : " · no supported bridge emitted"}</div>
                 )}
-                {lexicalReading?.interpretation.status === "EXPLORATORY_ZHEJI_READING" ? (
+                {lexicalReading?.interpretation.status === "EXPLORATORY_ZHEJI_READING" && functionalBridgeTargetBinding === "MATCH" ? (
                   <div className="mt-1 break-words">Existing product interpretation: EXPLORATORY · {lexicalReading.interpretation.statement ?? "UNKNOWN_OR_NULL"}</div>
                 ) : null}
                 {lexicalReading?.interpretation.alternatives.length ? (
