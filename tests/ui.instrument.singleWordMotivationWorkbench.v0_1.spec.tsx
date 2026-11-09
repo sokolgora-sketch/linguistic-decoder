@@ -17,6 +17,7 @@ function makeCurrentWordEvidence(
     structuralHypotheses?: unknown[];
     language?: string;
     profile?: string;
+    albanianLexicalReading?: unknown;
   } = {},
 ): SingleWordCurrentWordEvidenceContextV0_1 {
   const status = options.status ?? "SOURCE_NOT_FOUND";
@@ -90,6 +91,9 @@ function makeCurrentWordEvidence(
     },
     exactLexicalSourceFacts: fixtureFacts,
     sourceIpaSevenVoiceAnalyses: [],
+      ...(options.albanianLexicalReading !== undefined
+        ? { albanianLexicalReading: options.albanianLexicalReading }
+        : {}),
     derivedStructure: {
       layer: "DERIVED_STRUCTURE",
       voicePath: options.solverVoices ?? ["I", "A"],
@@ -131,6 +135,305 @@ function makeCurrentWordEvidence(
   return {
     analyzedWord: word,
     discovery: { kind: "present", value: discovery },
+  };
+}
+
+function makeProgressiveExactFact(
+  form: string,
+  sourceRecordId: string,
+  senses: readonly { senseId: string; gloss: string }[],
+) {
+  return {
+    sourceRecordId,
+    entryLocator: `fixture-entry:${form}`,
+    physicalRecordOrdinal: 0,
+    language: "Albanian",
+    languageCode: "sq",
+    form,
+    partOfSpeech: "noun",
+    senses: senses.map((sense) => ({ senseId: sense.senseId, glosses: [sense.gloss] })),
+    ipaObservations: [],
+    sourceStatus: "observed_external_snapshot",
+    attestationTruth: "fact",
+    pronunciationAuthority: "fixture source only",
+    sourceSnapshot: {
+      sourceFamilyId: "fixture-kaikki-albanian",
+      sourceUrl: "https://example.invalid/fixture.jsonl",
+      sha256: "b".repeat(64),
+      bytes: 1,
+    },
+  };
+}
+
+function makeProgressiveLexicalReading(input: {
+  targetForm: string;
+  baseForm: string;
+  suffixForm: string;
+  targetSenses: readonly { senseId: string; gloss: string }[];
+  baseSenses: readonly { senseId: string; gloss: string }[];
+  suffixSenses: readonly { senseId: string; gloss: string }[];
+  functionalOperation?: "AGENT" | "ENABLE_PASSAGE";
+}) {
+  const targetSourceRecordId = `fixture:kaikki:${input.targetForm}:target`;
+  const baseSourceRecordId = `fixture:kaikki:${input.baseForm}:base`;
+  const suffixSourceRecordId = `fixture:kaikki:${input.suffixForm}:suffix`;
+  const record = (
+    form: string,
+    sourceRecordId: string,
+    partOfSpeech: string,
+    senses: readonly { senseId: string; gloss: string }[],
+    physicalRecordOrdinal: number,
+  ) => ({
+    sourceRecordId,
+    entryLocator: `fixture-entry:${form}`,
+    physicalRecordOrdinal,
+    form,
+    partOfSpeech,
+    meaningGlosses: senses.map((sense) => sense.gloss),
+    sourceSenses: senses.map((sense, index) => ({
+      sourceSenseOrdinal: index,
+      senseId: sense.senseId,
+      glosses: [sense.gloss],
+      categories: [],
+    })),
+    etymologyText: null,
+    etymologyLinks: [],
+    etymologyTemplates: [],
+    pronunciationVariants: [],
+  });
+  const primary = record(input.targetForm, targetSourceRecordId, "noun", input.targetSenses, 0);
+  const base = record(input.baseForm, baseSourceRecordId, "noun", input.baseSenses, 0);
+  const suffix = record(input.suffixForm, suffixSourceRecordId, "suffix", input.suffixSenses, 0);
+  const relationText = `From ${input.baseForm} + ${input.suffixForm}; fixture source-authored relation text.`;
+  const componentReading = {
+    status: "SUPPORTED",
+    reasonCodes: [],
+    relation: {
+      relation: "SOURCE_AUTHORED_SUFFIX_TEMPLATE",
+      primarySourceRecordId: targetSourceRecordId,
+      primaryEntryLocator: primary.entryLocator,
+      sourceAuthoredExplanation: relationText,
+      references: [
+        { sourceForm: input.baseForm, reference: `${input.baseForm}#Albanian` },
+        { sourceForm: input.suffixForm, reference: `${input.suffixForm}#Albanian` },
+      ],
+    },
+    primary,
+    components: [base, suffix],
+    componentResolutions: [
+      { sourceForm: input.baseForm, reference: `${input.baseForm}#Albanian`, status: "RESOLVED", sourceRecordIds: [baseSourceRecordId], reasonCodes: [] },
+      { sourceForm: input.suffixForm, reference: `${input.suffixForm}#Albanian`, status: "RESOLVED", sourceRecordIds: [suffixSourceRecordId], reasonCodes: [] },
+    ],
+    exploratoryRelationship: {
+      status: "EXPLORATORY_SOURCE_COMPONENT_RELATION",
+      statement: `The fixture source links ${input.baseForm} and ${input.suffixForm} to the target record.`,
+      alternatives: ["The source record relationship does not select component senses."],
+      claimBoundary: "Record-level source relationship only.",
+    },
+    functionalHypothesis: {
+      status: "UNKNOWN_OR_NULL",
+      functionalOperation: null,
+      statement: null,
+      basis: [],
+      alternatives: [],
+      evidenceRefs: [],
+      reasonCodes: ["SENSE_ALIGNMENT_NOT_ESTABLISHED"],
+      claimBoundary: "No component function or sense alignment is established.",
+      noSingleWinner: true,
+      userDecisionPosture: "user_decides",
+    },
+    claimBoundary: "Source-authored record-level relation; no canonical target/component sense crosswalk.",
+  };
+  const sourceComparison = {
+    status: "SUPPORTED",
+    reasonCodes: [],
+    relation: {
+      relation: "TARGET_AUTHORED_ETYMOLOGY_REFERENCE",
+      primarySourceRecordId: targetSourceRecordId,
+      primaryEntryLocator: primary.entryLocator,
+      relatedForm: input.baseForm,
+      relatedSourceRecordId: baseSourceRecordId,
+      relatedEntryLocator: base.entryLocator,
+      direction: "RELATED_FORM_TO_PRIMARY_ETYMOLOGY_REFERENCE",
+      referencedForm: input.baseForm,
+      reference: base.entryLocator,
+      sourceRelationAssertion: null,
+    },
+    primary,
+    related: base,
+    summary: {
+      voicePathRelationship: "UNKNOWN",
+      consonantalContextRelationship: "UNKNOWN",
+      text: "Fixture source record comparison; sense alignment remains unknown.",
+    },
+    claimBoundary: "Record-level comparison only; no sense crosswalk.",
+  };
+  const operation = input.functionalOperation ?? null;
+  const functionalMeaningBridge = {
+    status: operation ? "SUPPORTED" : "NULL",
+    truthLayers: operation ? ["SOURCE_FACT", "EXPLORATORY_FUNCTIONAL_HYPOTHESIS"] : ["UNKNOWN_OR_NULL"],
+    relatedForm: input.baseForm,
+    sourceFacts: operation ? {
+      primary: {
+        sourceRecordId: targetSourceRecordId,
+        entryLocator: primary.entryLocator,
+        form: input.targetForm,
+        meaningGlosses: input.targetSenses.map((sense) => sense.gloss),
+        sourceSenses: primary.sourceSenses,
+      },
+      related: {
+        sourceRecordId: baseSourceRecordId,
+        entryLocator: base.entryLocator,
+        form: input.baseForm,
+        meaningGlosses: input.baseSenses.map((sense) => sense.gloss),
+        sourceAuthoredExplanation: relationText,
+        sourceSenses: base.sourceSenses,
+      },
+      structuredReference: { referencedForm: input.baseForm, reference: `${input.baseForm}#Albanian` },
+    } : null,
+    derivedStructure: null,
+    functionalHypothesis: {
+      status: operation ? "EXPLORATORY_FUNCTIONAL_HYPOTHESIS" : "UNKNOWN_OR_NULL",
+      functionalOperation: operation,
+      statement: operation ? `Existing bounded whole-word ${operation} bridge fixture.` : null,
+      alternatives: operation ? ["Ordinary morphology remains an alternative explanation."] : [],
+      basis: operation ? ["EXISTING_SOURCE_BACKED_WHOLE_WORD_BRIDGE"] : [],
+      claimBoundary: "Whole-word evidence does not establish embryo meaning or function.",
+    },
+    reasonCodes: operation ? [] : ["NO_SUPPORTED_FUNCTIONAL_BRIDGE"],
+    claimBoundary: "Whole-word bridge only; embryo meaning remains Unknown / Null.",
+  };
+
+  return {
+    status: "SUPPORTED",
+    primarySourceFact: {
+      sourceRecordId: targetSourceRecordId,
+      entryLocator: primary.entryLocator,
+      form: input.targetForm,
+      partOfSpeech: "noun",
+      meaningGlosses: input.targetSenses.map((sense) => sense.gloss),
+      etymologyText: relationText,
+    },
+    relatedForms: [],
+    relatedCandidateEvaluations: [],
+    functionalFamilyReading: null,
+    sourceLinkedComponentReading: componentReading,
+    sourceLinkedComparison: sourceComparison,
+    functionalMeaningBridge,
+    composition: { status: "NULL", relatedForm: null, sourceRelation: { status: "SOURCE_RELATION_NOT_VERIFIED", sourceRecordId: null, entryLocator: null, evidenceText: null }, primaryStructure: null, relatedStructure: null, interpretation: { status: "UNKNOWN_OR_NULL", statement: null, alternatives: [], basis: [], claimBoundary: "fixture" } },
+    interpretation: { status: "UNKNOWN_OR_NULL", statement: null, alternatives: [], basis: [], claimBoundary: "fixture" },
+  };
+}
+
+function makeDirectDritareLexicalReading(
+  targetSenses: readonly { senseId: string; gloss: string }[],
+  includeOrderedEtymologyLinks = true,
+) {
+  const dritareRecord = {
+    sourceRecordId: "kaikki-albanian-jsonl:word=dritare:ordinal=0",
+    entryLocator: "jsonl://word/dritare/match/0",
+    physicalRecordOrdinal: 2171,
+    form: "dritare",
+    partOfSpeech: "noun",
+    meaningGlosses: targetSenses.map((sense) => sense.gloss),
+    sourceSenses: targetSenses.map((sense, sourceSenseOrdinal) => ({
+      sourceSenseOrdinal,
+      senseId: sense.senseId,
+      glosses: [sense.gloss],
+      categories: [],
+    })),
+    etymologyText: "From dritë (“light”) + -are (“-er”), meaning to let light through or similar.",
+    etymologyLinks: includeOrderedEtymologyLinks ? [
+      { sourceForm: "dritë", reference: "dritë#Albanian" },
+      { sourceForm: "-are", reference: "-are#Albanian" },
+    ] : [],
+    etymologyTemplates: [],
+    pronunciationVariants: [],
+  };
+  const dritëRecord = {
+    sourceRecordId: "kaikki-albanian-jsonl:word=drit%C3%AB:ordinal=0",
+    entryLocator: "jsonl://word/drit%C3%AB/match/0",
+    physicalRecordOrdinal: 3461,
+    form: "dritë",
+    partOfSpeech: "noun",
+    meaningGlosses: ["light", "light (such as a lamp)", "firefly"],
+    sourceSenses: [
+      { sourceSenseOrdinal: 0, senseId: "en-dritë-sq-noun-macCYXLU", glosses: ["light"], categories: [] },
+      { sourceSenseOrdinal: 1, senseId: "en-dritë-sq-noun-ssgdmJru", glosses: ["light (such as a lamp)"], categories: [] },
+      { sourceSenseOrdinal: 2, senseId: "en-dritë-sq-noun-r6wyfnNp", glosses: ["firefly"], categories: [] },
+    ],
+    etymologyText: null,
+    etymologyLinks: [],
+    etymologyTemplates: [],
+    pronunciationVariants: [],
+  };
+  const reading = makeProgressiveLexicalReading({
+    targetForm: "dritare",
+    baseForm: "dritë",
+    suffixForm: "-are",
+    targetSenses,
+    baseSenses: [{ senseId: "en-dritë-sq-noun-macCYXLU", gloss: "light" }],
+    suffixSenses: [],
+    functionalOperation: "ENABLE_PASSAGE",
+  });
+
+  return {
+    ...reading,
+    primarySourceFact: {
+      sourceRecordId: dritareRecord.sourceRecordId,
+      entryLocator: dritareRecord.entryLocator,
+      form: dritareRecord.form,
+      partOfSpeech: dritareRecord.partOfSpeech,
+      meaningGlosses: dritareRecord.meaningGlosses,
+      etymologyText: dritareRecord.etymologyText,
+    },
+    sourceLinkedComponentReading: null,
+    sourceLinkedComparison: {
+      status: "SUPPORTED",
+      reasonCodes: [],
+      relation: {
+        relation: "TARGET_AUTHORED_ETYMOLOGY_REFERENCE",
+        primarySourceRecordId: dritëRecord.sourceRecordId,
+        primaryEntryLocator: dritëRecord.entryLocator,
+        relatedForm: "dritare",
+        relatedSourceRecordId: dritareRecord.sourceRecordId,
+        relatedEntryLocator: dritareRecord.entryLocator,
+        direction: "RELATED_FORM_TO_PRIMARY_ETYMOLOGY_REFERENCE",
+        referencedForm: "dritë",
+        reference: "dritë#Albanian",
+        sourceRelationAssertion: null,
+      },
+      primary: dritëRecord,
+      related: dritareRecord,
+      summary: {
+        voicePathRelationship: "UNKNOWN",
+        consonantalContextRelationship: "UNKNOWN",
+        text: "Direct target-authored etymology reference; exact-sense alignment remains unknown.",
+      },
+      claimBoundary: "Target-authored reference is source-attributed; it does not establish a canonical sense crosswalk or historical derivation.",
+    },
+    functionalMeaningBridge: {
+      ...reading.functionalMeaningBridge,
+      relatedForm: "dritare",
+      sourceFacts: {
+        primary: {
+          sourceRecordId: dritëRecord.sourceRecordId,
+          entryLocator: dritëRecord.entryLocator,
+          form: dritëRecord.form,
+          meaningGlosses: dritëRecord.meaningGlosses,
+          sourceSenses: dritëRecord.sourceSenses,
+        },
+        related: {
+          sourceRecordId: dritareRecord.sourceRecordId,
+          entryLocator: dritareRecord.entryLocator,
+          form: dritareRecord.form,
+          meaningGlosses: dritareRecord.meaningGlosses,
+          sourceAuthoredExplanation: dritareRecord.etymologyText,
+          sourceSenses: dritareRecord.sourceSenses,
+        },
+        structuredReference: { referencedForm: "dritë", reference: "dritë#Albanian" },
+      },
+    },
   };
 }
 
@@ -253,6 +556,12 @@ describe("Single-word motivation workbench v0.1", () => {
     expect(written).toHaveTextContent("A at source position 7 (A)");
     expect(written).toHaveTextContent("Solver-selected path");
     expect(written).toHaveTextContent("Ë → Y → U → O → I → E → A");
+    const progressiveWritten = screen.getByTestId("single-word-progressive-written-analysis");
+    expect(progressiveWritten).toHaveTextContent("Complete input events: A → E → I → O → U → Y → Ë → A");
+    expect(progressiveWritten).toHaveTextContent("A at source position 7 (A)");
+    expect(progressiveWritten).toHaveTextContent("API/event sequence comparison: MATCH");
+    expect(progressiveWritten).toHaveTextContent("Ë [6, 7) single_letter");
+    expect(screen.getByTestId("single-word-progressive-functional-reading")).toHaveTextContent("Structural embryo meaning/function: UNKNOWN_OR_NULL");
     expect(screen.getByTestId("single-word-current-structural-evidence")).toHaveTextContent(
       "No structural hypotheses emitted",
     );
@@ -305,6 +614,320 @@ describe("Single-word motivation workbench v0.1", () => {
     expect(screen.getByLabelText("Component 1 proposed meaning")).toHaveValue("");
   });
 
+  it("traces direct dritare attribution and ordered target links without inventing resolved -are component evidence", () => {
+    const targetSenses = [
+      { senseId: "en-dritare-sq-noun-RP97AsgN", gloss: "window" },
+      { senseId: "en-dritare-sq-noun-~k6zu7Ra", gloss: "access to the sea" },
+      { senseId: "en-dritare-sq-noun-1Zl6eJVE", gloss: "key, opening, access to knowledge (that helps broadening your horizon of knowledge)" },
+      { senseId: "en-dritare-sq-noun-CIjOT75H", gloss: "free time (between work hours or lessons)" },
+    ];
+    const targetSourceRecordId = "kaikki-albanian-jsonl:word=dritare:ordinal=0";
+    const reading = makeDirectDritareLexicalReading(targetSenses);
+    const facts = [makeProgressiveExactFact("dritare", targetSourceRecordId, targetSenses)];
+
+    render(
+      <SingleWordMotivationWorkbenchV0_1
+        initialTargetWord="dritare"
+        currentWordEvidence={makeCurrentWordEvidence("dritare", {
+          status: "MATCHES_FOUND",
+          voices: ["I", "A", "E"],
+          positions: [2, 4, 6],
+          facts,
+          albanianLexicalReading: reading,
+        })}
+      />,
+    );
+
+    const trace = screen.getByTestId("single-word-progressive-evidence-trace");
+    expect(trace).toHaveTextContent("Analyzed form: dritare · language sq · profile albanian");
+    expect(trace).toHaveTextContent("Sense en-dritare-sq-noun-RP97AsgN: window");
+    expect(trace).toHaveTextContent("Sense en-dritare-sq-noun-~k6zu7Ra: access to the sea");
+    expect(trace).toHaveTextContent("Sense en-dritare-sq-noun-1Zl6eJVE: key, opening, access to knowledge");
+    expect(trace).toHaveTextContent("Sense en-dritare-sq-noun-CIjOT75H: free time");
+    expect(trace).toHaveTextContent("Complete input events: I → A → E");
+    expect(trace).toHaveTextContent("API/event sequence comparison: MATCH");
+
+    const relations = screen.getByTestId("single-word-progressive-source-relationships");
+    expect(reading.sourceLinkedComponentReading).toBeNull();
+    expect(relations).not.toHaveTextContent("SOURCE_AUTHORED_SUFFIX_TEMPLATE");
+    expect(relations).toHaveTextContent("kaikki-albanian-jsonl:word=dritare:ordinal=0");
+    expect(relations).toHaveTextContent("jsonl://word/dritare/match/0");
+    expect(relations).toHaveTextContent("en-dritare-sq-noun-RP97AsgN");
+    expect(relations).toHaveTextContent("en-dritare-sq-noun-~k6zu7Ra");
+    expect(relations).toHaveTextContent("en-dritare-sq-noun-1Zl6eJVE");
+    expect(relations).toHaveTextContent("en-dritare-sq-noun-CIjOT75H");
+    expect(relations).toHaveTextContent("Target-record source-attributed etymology prose (not parsed into components): From dritë (“light”) + -are (“-er”), meaning to let light through or similar.");
+    expect(relations).toHaveTextContent("Target-record source-attributed etymology links (ordered): dritë (dritë#Albanian) · -are (-are#Albanian)");
+    expect(screen.getByTestId("single-word-source-linked-form-join")).toHaveTextContent("DRITËARE ≠ DRITARE · SURFACE_MISMATCH");
+    expect(relations).toHaveTextContent("Independent component record/sense resolution: UNKNOWN_OR_NULL");
+    expect(relations).toHaveTextContent("Cross-source exact-sense identity: UNKNOWN_OR_NULL");
+    expect(relations).not.toHaveTextContent("are-suffix-1");
+    expect(relations).not.toHaveTextContent("are-suffix-2");
+
+    const functional = screen.getByTestId("single-word-progressive-functional-reading");
+    expect(functional).toHaveTextContent("operation ENABLE_PASSAGE");
+    expect(functional).toHaveTextContent("Whole-word bridge: SUPPORTED");
+    expect(functional).toHaveTextContent("EXPLORATORY_FUNCTIONAL_HYPOTHESIS");
+    expect(functional).toHaveTextContent("Structural embryo meaning/function: UNKNOWN_OR_NULL");
+    expect(screen.getByLabelText("Component 1 exact spelling")).toHaveValue("");
+    expect(screen.getByLabelText("Component 1 proposed meaning")).toHaveValue("");
+    expect(screen.queryByTestId("fjalori-selected-sense")).not.toBeInTheDocument();
+
+    fireEvent.change(screen.getByLabelText("Exact target word"), { target: { value: "KANDIL" } });
+    expect(trace).toHaveTextContent("Analyzed form: dritare");
+    expect(trace).not.toHaveTextContent("Analyzed form: KANDIL");
+    expect(screen.getByTestId("single-word-proposal-evidence-target-mismatch")).toHaveTextContent("not transferred");
+  });
+
+  it("keeps reconstruction Unknown when the exact target record supplies prose but no ordered component links", () => {
+    const targetSenses = [{ senseId: "en-dritare-sq-noun-RP97AsgN", gloss: "window" }];
+    render(
+      <SingleWordMotivationWorkbenchV0_1
+        initialTargetWord="dritare"
+        currentWordEvidence={makeCurrentWordEvidence("dritare", {
+          status: "MATCHES_FOUND",
+          voices: ["I", "A", "E"],
+          positions: [2, 4, 6],
+          facts: [makeProgressiveExactFact("dritare", "kaikki-albanian-jsonl:word=dritare:ordinal=0", targetSenses)],
+          albanianLexicalReading: makeDirectDritareLexicalReading(targetSenses, false),
+        })}
+      />,
+    );
+
+    const relationships = screen.getByTestId("single-word-progressive-source-relationships");
+    expect(relationships).toHaveTextContent("From dritë (“light”) + -are (“-er”), meaning to let light through or similar.");
+    expect(relationships).toHaveTextContent("Linked-form reconstruction: UNKNOWN_OR_NULL");
+    expect(screen.queryByTestId("single-word-source-linked-form-join")).not.toBeInTheDocument();
+    expect(relationships).toHaveTextContent("Independent component record/sense resolution: UNKNOWN_OR_NULL");
+  });
+
+  it("keeps shkencëtar source suffix senses beside intact SH grapheme structure and Null embryo function", () => {
+    const targetSourceRecordId = "fixture:kaikki:shkencëtar:target";
+    const targetSenses = [{ senseId: "shkencetar-scientist", gloss: "scientist" }];
+    const reading = makeProgressiveLexicalReading({
+      targetForm: "shkencëtar",
+      baseForm: "shkencë",
+      suffixForm: "-tar",
+      targetSenses,
+      baseSenses: [{ senseId: "shkence-knowledge", gloss: "science, knowledge" }],
+      suffixSenses: [
+        { senseId: "tar-agent", gloss: "used to form agent nouns" },
+        { senseId: "tar-alternative", gloss: "a retained alternative suffix sense" },
+      ],
+    });
+
+    render(
+      <SingleWordMotivationWorkbenchV0_1
+        initialTargetWord="SHKENCËTAR"
+        currentWordEvidence={makeCurrentWordEvidence("SHKENCËTAR", {
+          status: "MATCHES_FOUND",
+          voices: ["E", "Ë", "A"],
+          positions: [3, 6, 8],
+          facts: [makeProgressiveExactFact("shkencëtar", targetSourceRecordId, targetSenses)],
+          albanianLexicalReading: reading,
+        })}
+      />,
+    );
+
+    const trace = screen.getByTestId("single-word-progressive-evidence-trace");
+    expect(trace).toHaveTextContent("SH [0, 2) digraph");
+    expect(trace).toHaveTextContent("SOURCE_AUTHORED_SUFFIX_TEMPLATE");
+    expect(trace).toHaveTextContent("Validated source-attributed component forms (ordered; separate from lexical records): shkencë + -tar");
+    expect(screen.getByTestId("single-word-source-surface-join")).toHaveTextContent("SHKENCËTAR = SHKENCËTAR · EXACT_SURFACE_JOIN");
+    const relations = screen.getByTestId("single-word-progressive-source-relationships");
+    expect(relations).toHaveTextContent("tar-agent");
+    expect(relations).toHaveTextContent("tar-alternative");
+    expect(relations).toHaveTextContent("no canonical target/component sense crosswalk");
+    expect(screen.getByTestId("single-word-progressive-functional-reading")).toHaveTextContent("Whole-word functional bridge: UNKNOWN_OR_NULL");
+    expect(screen.getByTestId("single-word-progressive-functional-reading")).toHaveTextContent("Structural embryo meaning/function: UNKNOWN_OR_NULL");
+  });
+
+  it("keeps an existing whole-word AGENT family reading separate from embryo meaning", () => {
+    const reading = makeProgressiveLexicalReading({
+      targetForm: "bletar",
+      baseForm: "bletë",
+      suffixForm: "-ar",
+      targetSenses: [{ senseId: "beekeeper", gloss: "beekeeper" }],
+      baseSenses: [{ senseId: "bee", gloss: "bee" }],
+      suffixSenses: [{ senseId: "agent-suffix", gloss: "agent suffix" }],
+    });
+    const familyReading = {
+      status: "EXPLORATORY_FUNCTIONAL_FAMILY",
+      functionalOperation: "AGENT",
+      primary: {
+        form: "bletar",
+        sourceRecordId: "fixture:kaikki:bletar:target",
+        entryLocator: "fixture-entry:bletar",
+        senseId: "beekeeper",
+        meaningGlosses: ["beekeeper"],
+      },
+      members: [],
+      statement: "The existing whole-word source family supports an exploratory AGENT reading.",
+      alternatives: ["This does not establish an embryo function."],
+      claimBoundary: "Source-backed whole-word role only.",
+      noSingleWinner: true,
+      userDecisionPosture: "user_decides",
+    };
+
+    render(
+      <SingleWordMotivationWorkbenchV0_1
+        initialTargetWord="bletar"
+        currentWordEvidence={makeCurrentWordEvidence("bletar", {
+          status: "MATCHES_FOUND",
+          voices: ["A", "E", "A"],
+          positions: [2, 4, 5],
+          facts: [makeProgressiveExactFact("bletar", "fixture:kaikki:bletar:target", [{ senseId: "beekeeper", gloss: "beekeeper" }])],
+          albanianLexicalReading: { ...reading, functionalFamilyReading: familyReading },
+        })}
+      />,
+    );
+
+    const functional = screen.getByTestId("single-word-progressive-functional-reading");
+    expect(screen.getByTestId("single-word-progressive-functional-family")).toHaveTextContent("operation AGENT");
+    expect(functional).toHaveTextContent("Source-backed whole-word role only.");
+    expect(functional).toHaveTextContent("Structural embryo meaning/function: UNKNOWN_OR_NULL");
+  });
+
+  it("does not surface-join source components when the exact target record does not bind to current source facts", () => {
+    const reading = makeProgressiveLexicalReading({
+      targetForm: "dritare",
+      baseForm: "dritë",
+      suffixForm: "-are",
+      targetSenses: [{ senseId: "reading-target-sense", gloss: "window" }],
+      baseSenses: [{ senseId: "base-sense", gloss: "light" }],
+      suffixSenses: [{ senseId: "suffix-sense", gloss: "suffix" }],
+      functionalOperation: "ENABLE_PASSAGE",
+    });
+    render(
+      <SingleWordMotivationWorkbenchV0_1
+        initialTargetWord="dritare"
+        currentWordEvidence={makeCurrentWordEvidence("dritare", {
+          status: "MATCHES_FOUND",
+          voices: ["I", "A", "E"],
+          positions: [2, 4, 6],
+          facts: [makeProgressiveExactFact("dritare", "fixture:different-target-record", [{ senseId: "other-target-sense", gloss: "window" }])],
+          albanianLexicalReading: reading,
+        })}
+      />,
+    );
+
+    expect(screen.getByTestId("single-word-source-component-withheld")).toHaveTextContent("target record/query binding MISMATCH");
+    expect(screen.getByTestId("single-word-progressive-source-comparison-withheld")).toHaveTextContent("target record/query binding MISMATCH");
+    expect(screen.getByTestId("single-word-progressive-functional-bridge-withheld")).toHaveTextContent("exact target record/query binding MISMATCH");
+    expect(screen.queryByTestId("single-word-source-surface-join")).not.toBeInTheDocument();
+    expect(screen.getByTestId("single-word-progressive-functional-reading")).not.toHaveTextContent("operation ENABLE_PASSAGE");
+  });
+
+  it("synthetically separates validated source forms from an unresolved component-record lookup", () => {
+    const reading = makeProgressiveLexicalReading({
+      targetForm: "dritare",
+      baseForm: "dritë",
+      suffixForm: "-are",
+      targetSenses: [{ senseId: "target-window", gloss: "window" }],
+      baseSenses: [{ senseId: "light-sense", gloss: "light" }],
+      suffixSenses: [],
+    });
+    const componentReading = reading.sourceLinkedComponentReading;
+    const unresolvedReading = {
+      ...reading,
+      sourceLinkedComponentReading: {
+        ...componentReading,
+        status: "NULL",
+        components: componentReading.components.slice(0, 1),
+        componentResolutions: [
+          componentReading.componentResolutions[0],
+          {
+            ...componentReading.componentResolutions[1],
+            status: "UNRESOLVED",
+            sourceRecordIds: [],
+            reasonCodes: ["SOURCE_COMPONENT_RECORD_NOT_FOUND"],
+          },
+        ],
+        reasonCodes: ["SOURCE_COMPONENT_RECORD_NOT_FOUND"],
+      },
+    };
+    render(
+      <SingleWordMotivationWorkbenchV0_1
+        initialTargetWord="dritare"
+        currentWordEvidence={makeCurrentWordEvidence("dritare", {
+          status: "MATCHES_FOUND",
+          voices: ["I", "A", "E"],
+          positions: [2, 4, 6],
+          facts: [makeProgressiveExactFact("dritare", "fixture:kaikki:dritare:target", [{ senseId: "target-window", gloss: "window" }])],
+          albanianLexicalReading: unresolvedReading,
+        })}
+      />,
+    );
+
+    expect(screen.getByTestId("single-word-source-surface-join")).toHaveTextContent("DRITËARE ≠ DRITARE · SURFACE_MISMATCH");
+    const relationships = screen.getByTestId("single-word-progressive-source-relationships");
+    expect(relationships).toHaveTextContent("dritë + -are");
+    expect(relationships).toHaveTextContent("-are · UNRESOLVED");
+    expect(relationships).not.toHaveTextContent("suffix-sense");
+    expect(screen.getByTestId("single-word-progressive-functional-reading")).toHaveTextContent("Structural embryo meaning/function: UNKNOWN_OR_NULL");
+  });
+
+  it("keeps ordered source forms reconstructable when independent component records are ambiguous", () => {
+    const reading = makeProgressiveLexicalReading({
+      targetForm: "dritare",
+      baseForm: "dritë",
+      suffixForm: "-are",
+      targetSenses: [{ senseId: "target-window", gloss: "window" }],
+      baseSenses: [{ senseId: "light-sense", gloss: "light" }],
+      suffixSenses: [{ senseId: "are-sense", gloss: "suffix" }],
+    });
+    const [baseRecord, suffixRecord] = reading.sourceLinkedComponentReading.components;
+    const alternativeBaseRecord = {
+      ...baseRecord,
+      sourceRecordId: "fixture:kaikki:dritë:alternative",
+      entryLocator: "fixture-entry:dritë:alternative",
+      sourceSenses: [{
+        sourceSenseOrdinal: 0,
+        senseId: "light-alternative-sense",
+        glosses: ["an alternative dritë sense"],
+        categories: [],
+      }],
+    };
+    const ambiguousReading = {
+      ...reading,
+      sourceLinkedComponentReading: {
+        ...reading.sourceLinkedComponentReading,
+        status: "NULL",
+        components: [baseRecord, alternativeBaseRecord, suffixRecord],
+        componentResolutions: [
+          {
+            ...reading.sourceLinkedComponentReading.componentResolutions[0],
+            status: "AMBIGUOUS",
+            sourceRecordIds: [baseRecord.sourceRecordId, alternativeBaseRecord.sourceRecordId],
+            reasonCodes: ["SOURCE_COMPONENT_RECORD_AMBIGUOUS"],
+          },
+          reading.sourceLinkedComponentReading.componentResolutions[1],
+        ],
+        reasonCodes: ["SOURCE_COMPONENT_RECORD_AMBIGUOUS"],
+      },
+    };
+    render(
+      <SingleWordMotivationWorkbenchV0_1
+        initialTargetWord="dritare"
+        currentWordEvidence={makeCurrentWordEvidence("dritare", {
+          status: "MATCHES_FOUND",
+          voices: ["I", "A", "E"],
+          positions: [2, 4, 6],
+          facts: [makeProgressiveExactFact("dritare", "fixture:kaikki:dritare:target", [{ senseId: "target-window", gloss: "window" }])],
+          albanianLexicalReading: ambiguousReading,
+        })}
+      />,
+    );
+
+    const relations = screen.getByTestId("single-word-progressive-source-relationships");
+    expect(relations).toHaveTextContent("dritë · AMBIGUOUS");
+    expect(relations).toHaveTextContent("fixture:kaikki:dritë:base, fixture:kaikki:dritë:alternative");
+    expect(relations).toHaveTextContent("light-sense");
+    expect(relations).toHaveTextContent("light-alternative-sense");
+    expect(screen.getByTestId("single-word-source-surface-join")).toHaveTextContent("DRITËARE ≠ DRITARE · SURFACE_MISMATCH");
+    expect(relations).toHaveTextContent("dritë · AMBIGUOUS");
+  });
+
   it("withholds a discovery payload whose word differs from the current analysis", () => {
     const wrongDiscovery = makeCurrentWordEvidence("KANDIL", { status: "MATCHES_FOUND" }).discovery;
     render(
@@ -316,8 +939,31 @@ describe("Single-word motivation workbench v0.1", () => {
 
     const evidence = screen.getByTestId("single-word-current-evidence");
     expect(screen.getByTestId("single-word-discovery-word-mismatch")).toBeInTheDocument();
+    const trace = screen.getByTestId("single-word-progressive-evidence-trace");
+    expect(trace).toHaveTextContent("WITHHELD_INPUT_MISMATCH");
+    expect(trace).toHaveTextContent("Source-authored relationships and sense alignment: UNKNOWN_OR_NULL");
     expect(evidence).not.toHaveTextContent("fixture:source-record-1");
     expect(evidence).not.toHaveTextContent("fixture gloss one");
+  });
+
+  it("renders an explicit Unknown trace for a matching context with missing Discovery", () => {
+    render(
+      <SingleWordMotivationWorkbenchV0_1
+        initialTargetWord="SHKENCËTAR"
+        currentWordEvidence={{
+          analyzedWord: "SHKENCËTAR",
+          discovery: { kind: "missing", missing: "not_emitted", note: "fixture missing payload" },
+        }}
+      />,
+    );
+
+    const trace = screen.getByTestId("single-word-progressive-evidence-trace");
+    expect(trace).toHaveTextContent("Discovery status: MISSING · not_emitted · fixture missing payload");
+    expect(trace).toHaveTextContent("Written Voice events and graphemes: UNKNOWN_OR_NULL");
+    expect(trace).toHaveTextContent("Source-authored relationships and sense alignment: UNKNOWN_OR_NULL");
+    expect(trace).toHaveTextContent("embryo meaning/function: UNKNOWN_OR_NULL");
+    expect(trace).not.toHaveTextContent("SOURCE_NOT_FOUND");
+    expect(screen.getByLabelText("Component 1 exact spelling")).toHaveValue("");
   });
 
   it("keeps the KANDIL source-sense proposal separate from explicit mechanical replay", () => {
@@ -402,7 +1048,12 @@ describe("Single-word motivation workbench v0.1", () => {
   });
 
   it("lets a user inspect the KANDIL proposal and keeps mismatch, unverified evidence, and embryo Null visible", () => {
-    render(<SingleWordMotivationWorkbenchV0_1 initialTargetWord="KANDIL" />);
+    render(
+      <SingleWordMotivationWorkbenchV0_1
+        initialTargetWord="KANDIL"
+        currentWordEvidence={makeCurrentWordEvidence("KANDIL", { status: "UNAVAILABLE" })}
+      />,
+    );
     fireEvent.change(screen.getByLabelText("Target language"), { target: { value: "Albanian" } });
     fireEvent.click(screen.getByTestId("single-word-add-component"));
 
@@ -439,9 +1090,14 @@ describe("Single-word motivation workbench v0.1", () => {
     expect(screen.getByTestId("single-word-proposal-result")).toHaveTextContent("Has sun / carries light");
     expect(screen.getByTestId("single-word-proposal-result")).toHaveTextContent("metaphorical");
     expect(screen.getByTestId("single-word-proposal-result")).toHaveTextContent("Strict embryo meaning: Unknown / Null");
-    expect(screen.getByText("A → I")).toBeInTheDocument();
+    expect(screen.getAllByText("A → I")).toHaveLength(2);
     expect(screen.getByTestId("single-word-proposal-result")).toHaveTextContent("not independently verified");
     expect(screen.getByTestId("single-word-proposal-result")).toHaveTextContent("user-declared and unverified; not applied");
+    const sourceTrace = screen.getByTestId("single-word-progressive-source-relationships");
+    expect(sourceTrace).toHaveTextContent("Exact-form source status: UNAVAILABLE");
+    expect(sourceTrace).toHaveTextContent("No source-authored component relation is available");
+    expect(sourceTrace).not.toHaveTextContent("KAN + DILL");
+    expect(screen.getByTestId("single-word-progressive-functional-reading")).toHaveTextContent("UNKNOWN_OR_NULL");
   });
 
   it("supports a fresh arbitrary word and keeps an incomplete proposal from producing a result", () => {
