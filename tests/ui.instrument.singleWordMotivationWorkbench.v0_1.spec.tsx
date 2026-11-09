@@ -618,6 +618,7 @@ describe("Single-word motivation workbench v0.1", () => {
     expect(source).not.toHaveTextContent("fixture:source-record-1");
     expect(source).not.toHaveTextContent("fixture gloss one");
     expect(screen.queryByTestId("single-word-progressive-source-motivated-explanation")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("single-word-structural-source-component-alignment")).not.toBeInTheDocument();
   });
 
   it("shows emitted structural candidates only as candidates with their existing reasons", () => {
@@ -679,6 +680,7 @@ describe("Single-word motivation workbench v0.1", () => {
 
     const relations = screen.getByTestId("single-word-progressive-source-relationships");
     expect(reading.sourceLinkedComponentReading).toBeNull();
+    expect(screen.queryByTestId("single-word-structural-source-component-alignment")).not.toBeInTheDocument();
     expect(relations).not.toHaveTextContent("SOURCE_AUTHORED_SUFFIX_TEMPLATE");
     expect(relations).toHaveTextContent("kaikki-albanian-jsonl:word=dritare:ordinal=0");
     expect(relations).toHaveTextContent("jsonl://word/dritare/match/0");
@@ -726,6 +728,7 @@ describe("Single-word motivation workbench v0.1", () => {
     );
 
     const relationships = screen.getByTestId("single-word-progressive-source-relationships");
+    expect(screen.queryByTestId("single-word-structural-source-component-alignment")).not.toBeInTheDocument();
     expect(relationships).toHaveTextContent("From dritë (“light”) + -are (“-er”), meaning to let light through or similar.");
     expect(relationships).toHaveTextContent("Linked-form reconstruction: UNKNOWN_OR_NULL");
     expect(screen.queryByTestId("single-word-source-linked-form-join")).not.toBeInTheDocument();
@@ -772,6 +775,11 @@ describe("Single-word motivation workbench v0.1", () => {
     expect(relations).toHaveTextContent("tar-agent");
     expect(relations).toHaveTextContent("tar-relational");
     expect(relations).toHaveTextContent("no canonical target/component sense crosswalk");
+    const sourceAlignment = screen.getByTestId("single-word-structural-source-component-alignment");
+    expect(sourceAlignment).toHaveAttribute("data-status", "NO_MATCHING_REDUCTION");
+    expect(sourceAlignment).toHaveTextContent("Complete written Voice events: E@3 → Ë@6 → A@8");
+    expect(sourceAlignment).toHaveTextContent("No exact source-positioned extracted engine component matched this suffix");
+    expect(sourceAlignment).not.toHaveTextContent("Engine component:");
     const functional = screen.getByTestId("single-word-progressive-functional-reading");
     expect(functional).toHaveTextContent("Whole-word bridge: SUPPORTED · operation AGENT");
     expect(functional).toHaveTextContent("Structural embryo meaning/function: UNKNOWN_OR_NULL");
@@ -923,6 +931,23 @@ describe("Single-word motivation workbench v0.1", () => {
     }
     expect(sourceAlternatives).toHaveTextContent("Source-linked component reading: NULL");
     expect(sourceAlternatives).toHaveTextContent("AMBIGUOUS");
+    const sourceAlignment = screen.getByTestId("single-word-structural-source-component-alignment");
+    expect(sourceAlignment).toHaveAttribute("data-status", "MATCHED_ENGINE_REDUCTION");
+    expect(sourceAlignment).toHaveTextContent("fixture:kaikki:bletar:target · fixture-entry:bletar");
+    expect(sourceAlignment).toHaveTextContent("-ar · reference -ar#Albanian · resolution RESOLVED");
+    expect(sourceAlignment).toHaveTextContent("fixture:kaikki:-ar:suffix");
+    expect(sourceAlignment).toHaveTextContent("agent-suffix");
+    expect(sourceAlignment).toHaveTextContent("Exact suffix surface span: ar [4, 6)");
+    expect(sourceAlignment).toHaveTextContent("Engine component: AR");
+    expect(sourceAlignment).toHaveTextContent("source span [4, 6)");
+    expect(sourceAlignment).toHaveTextContent("engine components matching target-prefix surface (not source-base correspondence)");
+    expect(sourceAlignment).toHaveTextContent("peel_right_vowel_led_expansion");
+    expect(sourceAlignment).toHaveTextContent("meaning UNKNOWN_OR_NULL");
+    expect(sourceAlignment).toHaveTextContent("Source base bletë · resolution AMBIGUOUS");
+    expect(sourceAlignment).toHaveTextContent("Target prefix surface blet [0, 4) · exact source-base spelling MISMATCH");
+    expect(sourceAlternatives).toHaveTextContent("BLETËAR ≠ BLETAR · SURFACE_MISMATCH");
+    expect(sourceAlignment).toHaveTextContent("Complete written Voice events: E@2 → A@4");
+    expect(sourceAlignment).toHaveTextContent("derivation, a target-to-component sense crosswalk, historical change");
     expect(screen.getByLabelText("Component 1 proposed meaning")).toHaveValue("");
     expect(screen.getByLabelText("Component 2 proposed meaning")).toHaveValue("");
   });
@@ -1089,6 +1114,7 @@ describe("Single-word motivation workbench v0.1", () => {
     expect(screen.getByTestId("single-word-progressive-source-comparison-withheld")).toHaveTextContent("target record/query binding MISMATCH");
     expect(screen.getByTestId("single-word-progressive-functional-bridge-withheld")).toHaveTextContent("exact target record/query binding MISMATCH");
     expect(screen.queryByTestId("single-word-source-surface-join")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("single-word-structural-source-component-alignment")).not.toBeInTheDocument();
     expect(screen.getByTestId("single-word-progressive-functional-reading")).not.toHaveTextContent("operation ENABLE_PASSAGE");
     expect(screen.queryByTestId("single-word-progressive-source-motivated-explanation")).not.toBeInTheDocument();
   });
@@ -1119,6 +1145,7 @@ describe("Single-word motivation workbench v0.1", () => {
 
     expect(screen.getByTestId("single-word-current-source-evidence")).toHaveTextContent("Sense beekeeper: beekeeper");
     expect(screen.queryByTestId("single-word-progressive-source-motivated-explanation")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("single-word-structural-source-component-alignment")).not.toBeInTheDocument();
   });
 
   it("synthetically separates validated source forms from an unresolved component-record lookup", () => {
@@ -1211,6 +1238,7 @@ describe("Single-word motivation workbench v0.1", () => {
 
     expect(screen.getByTestId("single-word-progressive-functional-reading")).toHaveTextContent("operation AGENT");
     expect(screen.queryByTestId("single-word-progressive-source-motivated-explanation")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("single-word-structural-source-component-alignment")).not.toBeInTheDocument();
   });
 
   it("withholds source-motivated output when a valid-looking relation has no exact source match or is outside Albanian context", () => {
@@ -1308,6 +1336,7 @@ describe("Single-word motivation workbench v0.1", () => {
     );
 
     const relations = screen.getByTestId("single-word-progressive-source-relationships");
+    expect(screen.queryByTestId("single-word-structural-source-component-alignment")).not.toBeInTheDocument();
     expect(relations).toHaveTextContent("dritë · AMBIGUOUS");
     expect(relations).toHaveTextContent("fixture:kaikki:dritë:base, fixture:kaikki:dritë:alternative");
     expect(relations).toHaveTextContent("light-sense");
@@ -1328,6 +1357,7 @@ describe("Single-word motivation workbench v0.1", () => {
     const evidence = screen.getByTestId("single-word-current-evidence");
     expect(screen.getByTestId("single-word-discovery-word-mismatch")).toBeInTheDocument();
     const trace = screen.getByTestId("single-word-progressive-evidence-trace");
+    expect(screen.queryByTestId("single-word-structural-source-component-alignment")).not.toBeInTheDocument();
     expect(trace).toHaveTextContent("WITHHELD_INPUT_MISMATCH");
     expect(trace).toHaveTextContent("Source-authored relationships and sense alignment: UNKNOWN_OR_NULL");
     expect(evidence).not.toHaveTextContent("fixture:source-record-1");
@@ -1379,6 +1409,7 @@ describe("Single-word motivation workbench v0.1", () => {
     fireEvent.click(screen.getByTestId("single-word-examine-interpretation"));
 
     const mechanical = screen.getByTestId("single-word-mechanical-result");
+    expect(screen.queryByTestId("single-word-structural-source-component-alignment")).not.toBeInTheDocument();
     expect(mechanical).toHaveAttribute("data-status", "EXAMINED");
     expect(mechanical).toHaveTextContent("Raw component concatenation: KANDILL");
     expect(mechanical).toHaveTextContent("Final mechanical spelling: KANDIL");
