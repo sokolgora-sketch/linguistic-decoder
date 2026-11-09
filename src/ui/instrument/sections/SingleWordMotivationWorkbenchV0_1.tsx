@@ -294,6 +294,85 @@ function CurrentWordEvidenceSectionV0_1({
         : sourceFacts.some((fact) => fact.sourceRecordId === functionalBridgeRecords[0]?.sourceRecordId)
           ? "MATCH"
           : "MISMATCH";
+  const sourceComponentMeaningGroups = sourceComponentReading
+    ? sourceComponentReading.componentResolutions.map((resolution) => {
+        const records = resolution.sourceRecordIds.flatMap((sourceRecordId) =>
+          sourceComponentReading.components.filter((component) =>
+            component.sourceRecordId === sourceRecordId &&
+            sameAlbanianSourceForm(component.form, resolution.sourceForm),
+          ),
+        );
+        return { resolution, records };
+      })
+    : [];
+  const sourceComponentSenseEvidenceComplete = Boolean(
+    sourceComponentReading?.status === "SUPPORTED" &&
+    componentReferencesAreStructured &&
+    sourceComponentMeaningGroups.length >= 2 &&
+    sourceComponentMeaningGroups.every(({ resolution, records }) =>
+      (resolution.status === "RESOLVED" || resolution.status === "AMBIGUOUS") &&
+      resolution.sourceRecordIds.length > 0 &&
+      new Set(resolution.sourceRecordIds).size === resolution.sourceRecordIds.length &&
+      records.length === resolution.sourceRecordIds.length &&
+      records.every((record) => record.sourceSenses?.some((sense) =>
+        sense.glosses.some((gloss) => gloss.trim().length > 0),
+      )),
+    ),
+  );
+  const exactComponentTargetSenses = sourceComponentReading?.primary.sourceSenses ?? [];
+  const exactComponentTargetRecord = sourceComponentReading?.primary ?? null;
+  const exactComponentTargetFact = sourceFacts.find((fact) =>
+    fact.sourceRecordId === exactComponentTargetRecord?.sourceRecordId &&
+    fact.entryLocator === exactComponentTargetRecord?.entryLocator,
+  );
+  const exactComponentTargetSensesMatchFact = Boolean(
+    exactComponentTargetFact &&
+    exactComponentTargetSenses.length === exactComponentTargetFact.senses.length &&
+    exactComponentTargetSenses.every((sense, index) => {
+      const sourceSense = exactComponentTargetFact.senses[index];
+      return Boolean(sourceSense &&
+        sense.senseId === sourceSense.senseId &&
+        sense.glosses.length === sourceSense.glosses.length &&
+        sense.glosses.every((gloss, glossIndex) => gloss === sourceSense.glosses[glossIndex]),
+      );
+    }),
+  );
+  const componentTargetSenseEvidenceComplete = Boolean(
+    componentTargetRecordBinding === "MATCH" &&
+    exactComponentTargetSenses.length > 0 &&
+    exactComponentTargetSenses.some((sense) => sense.glosses.some((gloss) => gloss.trim().length > 0)) &&
+    exactComponentTargetSensesMatchFact,
+  );
+  const functionalBridgeSensesMatchComponentTarget = Boolean(
+    functionalBridgeRecords.length === 1 &&
+    exactComponentTargetSenses.length === functionalBridgeRecords[0]?.sourceSenses.length &&
+    exactComponentTargetSenses.every((sense, index) => {
+      const bridgeSense = functionalBridgeRecords[0]?.sourceSenses[index];
+      return Boolean(bridgeSense &&
+        sense.senseId === bridgeSense.senseId &&
+        sense.glosses.length === bridgeSense.glosses.length &&
+        sense.glosses.every((gloss, glossIndex) => gloss === bridgeSense.glosses[glossIndex]),
+      );
+    }),
+  );
+  const functionalBridgeMatchesComponentTarget = Boolean(
+    functionalBridge?.status === "SUPPORTED" &&
+    functionalBridgeTargetBinding === "MATCH" &&
+    functionalBridge.functionalHypothesis.status === "EXPLORATORY_FUNCTIONAL_HYPOTHESIS" &&
+    functionalBridge.functionalHypothesis.functionalOperation &&
+    functionalBridge.sourceFacts &&
+    functionalBridgeRecords.length === 1 &&
+    functionalBridgeRecords[0]?.sourceRecordId === sourceComponentReading?.primary.sourceRecordId &&
+    functionalBridgeRecords[0]?.entryLocator === sourceComponentReading?.primary.entryLocator &&
+    functionalBridgeSensesMatchComponentTarget,
+  );
+  const sourceMotivatedExplanationAvailable = Boolean(
+    sourceContextIsAlbanian &&
+    sourceComponentMeaningGroups.length >= 2 &&
+    sourceComponentSenseEvidenceComplete &&
+    componentTargetSenseEvidenceComplete &&
+    functionalBridgeMatchesComponentTarget,
+  );
 
   return (
     <section
@@ -749,6 +828,51 @@ function CurrentWordEvidenceSectionV0_1({
                   <ul className="ml-3 list-disc">
                     {lexicalReading.interpretation.alternatives.map((alternative, index) => <li key={`${index}:${alternative}`}>{alternative}</li>)}
                   </ul>
+                ) : null}
+                {sourceMotivatedExplanationAvailable && sourceComponentReading && functionalBridge?.status === "SUPPORTED" ? (
+                  <div className="mt-2 rounded border border-[#46523b] bg-[#121811] p-2" data-testid="single-word-progressive-source-motivated-explanation">
+                    <h5 className="font-semibold">Possible source-motivated explanation · CONDITIONAL_INFERENCE</h5>
+                    <p className="mt-1">
+                      Exact target form: {visibleDiscovery?.inputWord}. The source attributes these ordered component forms: {sourceComponentReading.relation.references.map((reference) => reference.sourceForm).join(" + ")}. One possible pairing among the listed component and target sense alternatives may help explain the existing whole-word {functionalBridge.functionalHypothesis.functionalOperation} reading. This is an inference, not a source-authored compound meaning; no component sense or target/component crosswalk is selected.
+                    </p>
+                    <div className="mt-1 break-words">Source-attributed relationship: {sourceComponentReading.relation.sourceAuthoredExplanation ?? "UNKNOWN_OR_NULL"} · {sourceComponentReading.primary.sourceRecordId} · {sourceComponentReading.primary.entryLocator}</div>
+                    <div className="mt-2">Component sense alternatives (source order; none selected):</div>
+                    <ol className="mt-1 space-y-1">
+                      {sourceComponentMeaningGroups.map(({ resolution, records }, componentIndex) => (
+                        <li key={`${resolution.sourceForm}:${componentIndex}`} className="break-words">
+                          {componentIndex + 1}. {resolution.sourceForm} · {resolution.status}
+                          <ul className="ml-3 list-disc">
+                            {records.map((record) => (
+                              <li key={record.sourceRecordId} className="break-words">
+                                {record.sourceRecordId} · {record.entryLocator} · {record.partOfSpeech ?? "POS UNKNOWN_OR_NULL"}
+                                <ul className="ml-3 list-[circle]">
+                                  {(record.sourceSenses ?? []).map((sense, senseIndex) => (
+                                    <li key={`${record.sourceRecordId}:${sense.senseId ?? senseIndex}`}>
+                                      Sense {sense.sourceSenseOrdinal}: {sense.senseId ?? "UNKNOWN_OR_NULL"} · {sense.glosses.join("; ") || "UNKNOWN_OR_NULL"}
+                                    </li>
+                                  ))}
+                                </ul>
+                              </li>
+                            ))}
+                          </ul>
+                        </li>
+                      ))}
+                    </ol>
+                    <div className="mt-2">Exact target record senses (source order; none selected):</div>
+                    <ul className="ml-3 list-disc">
+                      {exactComponentTargetSenses.map((sense, senseIndex) => (
+                        <li key={`${sourceComponentReading.primary.sourceRecordId}:${sense.senseId ?? senseIndex}`} className="break-words">
+                          {sourceComponentReading.primary.sourceRecordId} · {sourceComponentReading.primary.entryLocator} · Sense {sense.sourceSenseOrdinal}: {sense.senseId ?? "UNKNOWN_OR_NULL"} · {sense.glosses.join("; ") || "UNKNOWN_OR_NULL"}
+                        </li>
+                      ))}
+                    </ul>
+                    {componentSurfaceJoin !== null ? (
+                      <div className="mt-1 break-words">
+                        Source-form reconstruction: {componentSurfaceJoin.toLocaleUpperCase("sq-AL")} {surfaceJoinMatchesTarget ? "=" : "≠"} {visibleDiscovery?.inputWord.toLocaleUpperCase("sq-AL")} · {surfaceJoinMatchesTarget ? "EXACT_SURFACE_JOIN" : "SURFACE_MISMATCH"}. The comparison does not authorize a spelling change.
+                      </div>
+                    ) : null}
+                    <div className="mt-1 break-words">Whole-word evidence remains {functionalBridge.functionalHypothesis.status} · {functionalBridge.functionalHypothesis.functionalOperation}. Component-sense alignment and independent embryo function remain UNKNOWN_OR_NULL; source-record juxtaposition is not independent corroboration. Claim boundary: {functionalBridge.claimBoundary}</div>
+                  </div>
                 ) : null}
                 <div className="mt-1 font-semibold">Structural embryo meaning/function: UNKNOWN_OR_NULL. Structural candidates do not establish a lexical meaning or functional operation.</div>
                 <div>No single winner: {visibleDiscovery.noSingleWinner ? "true" : "UNKNOWN_OR_NULL"} · user decision posture: {visibleDiscovery.userDecisionPosture}.</div>
