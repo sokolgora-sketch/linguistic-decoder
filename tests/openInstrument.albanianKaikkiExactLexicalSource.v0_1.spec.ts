@@ -26,6 +26,7 @@ import {
 import { projectAlbanianSourceOrderContextSignatureV0_1 } from "@/shared/openInstrument/albanianSourceOrderContextSignature.v0_1";
 import { adaptAnalysisToTelemetryVM } from "@/ui/instrument/contractAdapter";
 import { MotivationDiscoveryCardV0_1 } from "@/ui/instrument/sections/MotivationDiscoveryCard.v0_1";
+import { SingleWordMotivationWorkbenchV0_1 } from "@/ui/instrument/sections/SingleWordMotivationWorkbenchV0_1";
 import { createElement } from "react";
 import { cleanup, render, screen } from "@testing-library/react";
 
@@ -6767,6 +6768,50 @@ describe("pinned BLETAR source-authored suffix template v0.1", () => {
       expect(senseEvidence).toContain("en-bletar-sq-noun-KI12VIJ3");
       expect(senseEvidence).toContain("Occupations (sq:Occupations; sq; w)");
       expect(senseEvidence).not.toContain("base sense selected");
+      cleanup();
+
+      const componentReading = reading?.sourceLinkedComponentReading;
+      const suffixResolution = componentReading?.componentResolutions.find((resolution) => resolution.sourceForm === "-ar");
+      const suffixRecord = componentReading?.components.find((record) =>
+        record.sourceRecordId === suffixResolution?.sourceRecordIds[0],
+      );
+      expect(suffixResolution).toMatchObject({ status: "RESOLVED", sourceForm: "-ar" });
+      expect(suffixRecord?.sourceSenses).toEqual(expect.arrayContaining([expect.objectContaining({
+        senseId: "en--ar-sq-suffix-QBm9Eqa-",
+      })]));
+
+      render(createElement(SingleWordMotivationWorkbenchV0_1, {
+        initialTargetWord: "bletar",
+        currentWordEvidence: {
+          analyzedWord: "bletar",
+          discovery: vm.motivationDiscoveryV0_1,
+        },
+      }));
+      const structuralAlignment = screen.getByTestId("single-word-structural-source-component-alignment");
+      expect(structuralAlignment).toHaveAttribute("data-status", "MATCHED_ENGINE_REDUCTION");
+      expect(structuralAlignment).toHaveTextContent("kaikki-albanian-jsonl:word=bletar:ordinal=0");
+      expect(structuralAlignment).toHaveTextContent("jsonl://word/bletar/match/0");
+      expect(structuralAlignment).toHaveTextContent("en-bletar-sq-noun-KI12VIJ3");
+      expect(structuralAlignment).toHaveTextContent(suffixRecord!.sourceRecordId);
+      expect(structuralAlignment).toHaveTextContent("en--ar-sq-suffix-QBm9Eqa-");
+      expect(structuralAlignment).toHaveTextContent("Exact suffix surface span: ar [4, 6)");
+      expect(structuralAlignment).toHaveTextContent("Engine component: AR");
+      expect(structuralAlignment).toHaveTextContent("peel_right_vowel_led_expansion");
+      expect(structuralAlignment).toHaveTextContent("meaning UNKNOWN_OR_NULL");
+      expect(structuralAlignment).toHaveTextContent("Source base bletë · resolution AMBIGUOUS");
+      expect(structuralAlignment).toHaveTextContent("blet [0, 4) · exact source-base spelling MISMATCH");
+      expect(screen.getByTestId("single-word-source-surface-join")).toHaveTextContent("BLETËAR ≠ BLETAR · SURFACE_MISMATCH");
+      const sourceRelationships = screen.getByTestId("single-word-progressive-source-relationships");
+      expect(sourceRelationships).toHaveTextContent("Source-linked component reading: NULL");
+      expect(sourceRelationships).toHaveTextContent("en-bletë-sq-noun-~JN5tcXA");
+      expect(sourceRelationships).toHaveTextContent("en-bletë-sq-noun-3dqkHBPD");
+      expect(sourceRelationships).toHaveTextContent("en-bletë-sq-verb-Y~5OQeyQ");
+      const structuralOutput = screen.getByTestId("single-word-progressive-v02-structure");
+      expect(structuralOutput).toHaveTextContent("ET");
+      expect(structuralOutput).toHaveTextContent("meaning UNKNOWN_OR_NULL");
+      expect(screen.getByTestId("single-word-progressive-written-analysis")).toHaveTextContent("Complete input events: E → A");
+      expect(screen.getByTestId("single-word-progressive-functional-reading")).toHaveTextContent("Structural embryo meaning/function: UNKNOWN_OR_NULL");
+      expect(structuralAlignment).toHaveTextContent("target-to-component sense crosswalk");
       cleanup();
     },
   );

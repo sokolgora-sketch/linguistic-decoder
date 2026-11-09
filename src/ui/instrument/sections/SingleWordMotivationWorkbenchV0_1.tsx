@@ -548,6 +548,136 @@ function CurrentWordEvidenceSectionV0_1({
     functionalBridgeRecords[0]?.entryLocator === sourceComponentReading?.primary.entryLocator &&
     functionalBridgeSensesMatchComponentTarget,
   );
+  const structuralSourceSuffixAlignment = (() => {
+    if (
+      !sourceContextIsAlbanian ||
+      sourceStatus?.status !== "MATCHES_FOUND" ||
+      !visibleDiscovery ||
+      !sourceComponentReading ||
+      sourceComponentReading.relation.relation !== "SOURCE_AUTHORED_SUFFIX_TEMPLATE" ||
+      sourceComponentReading.primary.partOfSpeech?.normalize("NFC").trim().toLocaleLowerCase("en-US") !== "noun" ||
+      componentTargetRecordBinding !== "MATCH" ||
+      !componentReferencesAreStructured ||
+      !componentTargetSenseEvidenceComplete ||
+      !functionalBridgeMatchesComponentTarget ||
+      functionalBridge?.functionalHypothesis.functionalOperation !== "AGENT" ||
+      !sourceMotivationSuffixTemplate ||
+      !structuralAnalysis ||
+      structuralAnalysis.analysisStatus !== "analyzed" ||
+      structuralAnalysis.inputVoiceSequenceStatus !== "complete" ||
+      structuralAnalysis.inputForm !== visibleDiscovery.inputWord ||
+      structuralAnalysis.hypotheses.some((hypothesis) =>
+        hypothesis.losslessDecomposition.conservation.status !== "complete",
+      )
+    ) return null;
+
+    const suffixReferenceIndex = componentReferenceForms.findIndex((reference) =>
+      reference.sourceForm === sourceMotivationSuffixTemplate.suffixForm,
+    );
+    const baseReferenceIndex = componentReferenceForms.findIndex((reference) =>
+      reference.sourceForm === sourceMotivationSuffixTemplate.baseForm,
+    );
+    const suffixResolution = sourceComponentReading.componentResolutions[suffixReferenceIndex];
+    const baseResolution = sourceComponentReading.componentResolutions[baseReferenceIndex];
+    if (
+      suffixReferenceIndex < 0 ||
+      baseReferenceIndex < 0 ||
+      !suffixResolution ||
+      !baseResolution ||
+      suffixResolution.status !== "RESOLVED" ||
+      suffixResolution.sourceRecordIds.length !== 1
+    ) return null;
+
+    const suffixSourceRecordId = suffixResolution.sourceRecordIds[0];
+    const suffixRecord = sourceComponentReading.components.find((record) =>
+      record.sourceRecordId === suffixSourceRecordId &&
+      sameAlbanianSourceForm(record.form, suffixResolution.sourceForm) &&
+      record.partOfSpeech?.normalize("NFC").trim().toLocaleLowerCase("en-US") === "suffix",
+    );
+    const agentNounSuffixSenses = sourceMotivationAgentNounSuffixSenses.filter((candidate) =>
+      candidate.sourceRecordId === suffixSourceRecordId &&
+      candidate.entryLocator === suffixRecord?.entryLocator,
+    );
+    if (!suffixRecord || agentNounSuffixSenses.length === 0) return null;
+
+    const suffixBody = sourceMotivationSuffixTemplate.suffixForm.startsWith("-") &&
+      !sourceMotivationSuffixTemplate.suffixForm.startsWith("--")
+      ? sourceMotivationSuffixTemplate.suffixForm.slice(1)
+      : "";
+    const inputCharacters = Array.from(visibleDiscovery.inputWord.normalize("NFC"));
+    const suffixCharacters = Array.from(suffixBody.normalize("NFC"));
+    if (suffixCharacters.length === 0) return null;
+
+    const suffixStart = inputCharacters.length - suffixCharacters.length;
+    const targetSuffix = suffixStart >= 0
+      ? inputCharacters.slice(suffixStart).join("")
+      : "";
+    const targetHasExactSuffix = Boolean(targetSuffix) && sameAlbanianSourceForm(targetSuffix, suffixBody);
+    const suffixSourceSpan = targetHasExactSuffix
+      ? { start: suffixStart, end: inputCharacters.length }
+      : null;
+    const matchingEngineComponents = suffixSourceSpan
+      ? structuralAnalysis.hypotheses.flatMap((hypothesis) =>
+          hypothesis.losslessDecomposition.components
+            .filter((component) =>
+              component.componentKind === "extracted_component" &&
+              sameAlbanianSourceForm(component.form, suffixBody) &&
+              component.sourceSpan.start === suffixSourceSpan.start &&
+              component.sourceSpan.end === suffixSourceSpan.end,
+            )
+            .map((component) => ({ hypothesisId: hypothesis.hypothesisId, component })),
+        )
+      : [];
+    const comparisonStatus = !suffixSourceSpan
+      ? "UNKNOWN" as const
+      : matchingEngineComponents.length > 0
+        ? "MATCHED_ENGINE_REDUCTION" as const
+        : "NO_MATCHING_REDUCTION" as const;
+    const baseSurface = suffixSourceSpan
+      ? inputCharacters.slice(0, suffixSourceSpan.start).join("")
+      : null;
+    const baseSurfaceSpan = suffixSourceSpan
+      ? { start: 0, end: suffixSourceSpan.start }
+      : null;
+    const baseEngineComponents = baseSurface !== null && baseSurfaceSpan
+      ? structuralAnalysis.hypotheses.flatMap((hypothesis) =>
+          hypothesis.losslessDecomposition.components
+            .filter((component) =>
+              component.componentKind !== "whole_input" &&
+              sameAlbanianSourceForm(component.form, baseSurface) &&
+              component.sourceSpan.start === baseSurfaceSpan.start &&
+              component.sourceSpan.end === baseSurfaceSpan.end,
+            )
+            .map((component) => ({ hypothesisId: hypothesis.hypothesisId, component })),
+        )
+      : [];
+
+    return {
+      comparisonStatus,
+      targetSourceRecordId: sourceComponentReading.primary.sourceRecordId,
+      targetEntryLocator: sourceComponentReading.primary.entryLocator,
+      targetSenseIds: sourceComponentReading.primary.sourceSenses?.map((sense) => sense.senseId) ?? [],
+      sourceAuthoredExplanation: sourceComponentReading.relation.sourceAuthoredExplanation,
+      suffixReference: componentReferenceForms[suffixReferenceIndex]!,
+      suffixResolution,
+      suffixRecord,
+      agentNounSuffixSenses,
+      suffixBody,
+      suffixSourceSpan,
+      matchingEngineComponents,
+      baseReference: componentReferenceForms[baseReferenceIndex]!,
+      baseResolution,
+      baseRecords: sourceComponentReading.components.filter((record) =>
+        baseResolution.sourceRecordIds.includes(record.sourceRecordId),
+      ),
+      baseSurface,
+      baseSurfaceSpan,
+      baseSurfaceMatchesSourceForm: baseSurface !== null &&
+        sameAlbanianSourceForm(baseSurface, sourceMotivationSuffixTemplate.baseForm),
+      baseEngineComponents,
+      writtenVoiceEvents: structuralAnalysis.inputVoiceEvents,
+    };
+  })();
   const sourceMotivatedExplanationAvailable = Boolean(
     sourceContextIsAlbanian &&
     sourceComponentMeaningGroups.length >= 2 &&
@@ -897,6 +1027,40 @@ function CurrentWordEvidenceSectionV0_1({
                     ) : null}
                     <div className="break-words">Relationship claim boundary: {sourceComponentReading.claimBoundary}</div>
                     <div className="break-words">Target/component exact-sense crosswalk: UNKNOWN_OR_NULL · no canonical sense alignment is emitted by this record-level relationship.</div>
+                    {structuralSourceSuffixAlignment ? (
+                      <div className="mt-2 rounded border border-[#46523b] bg-[#121811] p-2" data-testid="single-word-structural-source-component-alignment" data-status={structuralSourceSuffixAlignment.comparisonStatus}>
+                        <div className="font-semibold">Source-positioned component comparison · {structuralSourceSuffixAlignment.comparisonStatus}</div>
+                        <div className="break-words">Exact target binding: {structuralSourceSuffixAlignment.targetSourceRecordId} · {structuralSourceSuffixAlignment.targetEntryLocator} · senses {structuralSourceSuffixAlignment.targetSenseIds.join(", ") || "UNKNOWN_OR_NULL"}.</div>
+                        <div className="break-words">Source-authored relationship: {structuralSourceSuffixAlignment.sourceAuthoredExplanation ?? "UNKNOWN_OR_NULL"}</div>
+                        <div className="break-words">Source suffix {structuralSourceSuffixAlignment.suffixReference.sourceForm} · reference {structuralSourceSuffixAlignment.suffixReference.reference ?? "UNKNOWN_OR_NULL"} · resolution {structuralSourceSuffixAlignment.suffixResolution.status} · record {structuralSourceSuffixAlignment.suffixRecord.sourceRecordId} · {structuralSourceSuffixAlignment.suffixRecord.entryLocator} · POS {structuralSourceSuffixAlignment.suffixRecord.partOfSpeech ?? "UNKNOWN_OR_NULL"}.</div>
+                        <div className="break-words">Agent-noun suffix evidence references: {structuralSourceSuffixAlignment.agentNounSuffixSenses.map((candidate) => `${candidate.sourceRecordId} (${candidate.entryLocator}; sense ${candidate.senseId}; ${candidate.glosses.join("; ")})`).join(" · ")}</div>
+                        {structuralSourceSuffixAlignment.suffixSourceSpan ? (
+                          <div className="break-words">Exact suffix surface span: {structuralSourceSuffixAlignment.suffixBody} [{structuralSourceSuffixAlignment.suffixSourceSpan.start}, {structuralSourceSuffixAlignment.suffixSourceSpan.end}) · Unicode code points in NFC input.</div>
+                        ) : (
+                          <div>Exact suffix surface span: UNKNOWN_OR_NULL · the source suffix spelling is not an exact target ending.</div>
+                        )}
+                        {structuralSourceSuffixAlignment.matchingEngineComponents.length ? (
+                          <ol className="mt-1 space-y-1">
+                            {structuralSourceSuffixAlignment.matchingEngineComponents.map(({ hypothesisId, component }) => (
+                              <li key={`${hypothesisId}:${component.componentId}`} className="break-words">
+                                Engine component: {component.form} · hypothesis {hypothesisId} · component {component.componentId} · source span [{component.sourceSpan.start}, {component.sourceSpan.end}) · {component.operationId ?? "operation UNKNOWN_OR_NULL"} · written Voice events {component.voiceEvents.map((event) => `${event.voice}@${event.sourcePosition}`).join(" → ") || "∅"} · meaning {component.meaning === null ? "UNKNOWN_OR_NULL" : "not emitted"} · {component.claimBoundary}.
+                              </li>
+                            ))}
+                          </ol>
+                        ) : (
+                          <div>No exact source-positioned extracted engine component matched this suffix · {structuralSourceSuffixAlignment.comparisonStatus}.</div>
+                        )}
+                        <div className="break-words">Source base {structuralSourceSuffixAlignment.baseReference.sourceForm} · resolution {structuralSourceSuffixAlignment.baseResolution.status} · source records {structuralSourceSuffixAlignment.baseResolution.sourceRecordIds.join(", ") || "UNKNOWN_OR_NULL"} · exact sense alternatives remain above.</div>
+                        {structuralSourceSuffixAlignment.baseRecords.length ? (
+                          <div className="break-words">Base-record evidence references: {structuralSourceSuffixAlignment.baseRecords.map((record) => `${record.sourceRecordId} (${record.entryLocator}; ${record.partOfSpeech ?? "POS UNKNOWN_OR_NULL"})`).join(" · ")}</div>
+                        ) : null}
+                        {structuralSourceSuffixAlignment.baseSurfaceSpan && structuralSourceSuffixAlignment.baseSurface !== null ? (
+                          <div className="break-words">Target prefix surface {structuralSourceSuffixAlignment.baseSurface} [{structuralSourceSuffixAlignment.baseSurfaceSpan.start}, {structuralSourceSuffixAlignment.baseSurfaceSpan.end}) · exact source-base spelling {structuralSourceSuffixAlignment.baseSurfaceMatchesSourceForm ? "MATCH" : "MISMATCH"} · engine components matching target-prefix surface (not source-base correspondence) {structuralSourceSuffixAlignment.baseEngineComponents.map(({ component }) => `${component.form} (${component.componentKind}; ${component.operationId ?? "operation UNKNOWN_OR_NULL"})`).join(" · ") || "UNKNOWN_OR_NULL"}.</div>
+                        ) : null}
+                        <div className="break-words">Complete written Voice events: {structuralSourceSuffixAlignment.writtenVoiceEvents.map((event) => `${event.voice}@${event.sourcePosition}`).join(" → ") || "∅"} · orthographic only; pronunciation authority not established.</div>
+                        <div className="break-words">Boundary: exact source-record, spelling, and source-span correspondence only. It does not prove derivation, a target-to-component sense crosswalk, historical change, or component/embryo meaning. Whole-word function remains the separate exploratory reading above.</div>
+                      </div>
+                    ) : null}
                   </div>
                 ) : sourceComponentReading ? (
                   <div className="mt-2 rounded border border-[#674b3a] p-2" data-testid="single-word-source-component-withheld">
