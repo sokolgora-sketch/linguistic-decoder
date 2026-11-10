@@ -33,10 +33,27 @@ export function PrimaryAlbanianReadingCardV0_1({
   );
   const bridge = reading?.functionalMeaningBridge;
   const hypothesis = bridge?.functionalHypothesis;
-  const supportedHypothesis = bridge?.status === "SUPPORTED" &&
+  const primarySourceFact = reading?.primarySourceFact ?? null;
+  const bridgePrimary = bridge?.sourceFacts?.primary ?? null;
+  const bridgeMatchesQueriedSource = reading?.status === "SUPPORTED" &&
+    exactSourceStatus === "MATCHES_FOUND" &&
+    primarySourceFact !== null &&
+    bridgePrimary !== null &&
+    sameWord(primarySourceFact.form, value.inputWord) &&
+    sameWord(bridgePrimary.form, primarySourceFact.form) &&
+    bridgePrimary.sourceRecordId === primarySourceFact.sourceRecordId &&
+    bridgePrimary.entryLocator === primarySourceFact.entryLocator &&
+    records.filter((record) =>
+      record.sourceRecordId === bridgePrimary.sourceRecordId &&
+      record.entryLocator === bridgePrimary.entryLocator &&
+      sameWord(record.form, bridgePrimary.form),
+    ).length === 1;
+  const supportedHypothesis = bridgeMatchesQueriedSource &&
+    bridge?.status === "SUPPORTED" &&
     hypothesis?.status === "EXPLORATORY_FUNCTIONAL_HYPOTHESIS" &&
-    typeof hypothesis.functionalOperation === "string" &&
-    typeof hypothesis.statement === "string";
+    (hypothesis.functionalOperation === "AGENT" || hypothesis.functionalOperation === "ENABLE_PASSAGE") &&
+    typeof hypothesis.statement === "string" &&
+    hypothesis.statement.trim().length > 0;
   const sourceComponentReading = reading?.sourceLinkedComponentReading ?? null;
   const sourceComponentHypothesis = sourceComponentReading?.functionalHypothesis;
   const sourceComponentPrimary = sourceComponentReading?.primary;
@@ -160,6 +177,12 @@ export function PrimaryAlbanianReadingCardV0_1({
             <>
               <p className="mt-2 font-semibold">
                 Functional role: {hypothesis.functionalOperation} · exploratory
+              </p>
+              <p
+                className="mt-2 break-words"
+                data-testid="primary-albanian-functional-hypothesis-statement"
+              >
+                Word-specific explanation: {hypothesis.statement}
               </p>
               <p className="mt-2 break-words">
                 {hypothesis.functionalOperation === "AGENT"

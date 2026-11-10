@@ -32,17 +32,37 @@ type FixtureOptions = Readonly<{
   relationSourceRecordId?: string;
   relationKind?: string;
   classifiedOperation?: string | null;
+  functionalStatement?: string | null;
+  bridgeStatus?: "SUPPORTED" | "NULL";
+  bridgeSourceRecordId?: string;
+  bridgeEntryLocator?: string;
+  bridgeForm?: string;
+  includeBridgeSourceFacts?: boolean;
+  readingStatus?: "SUPPORTED" | "NULL";
+  exactSourceRecordId?: string;
+  exactSourceEntryLocator?: string;
+  exactSourceForm?: string;
+  targetGloss?: string;
 }>;
 
 function sourceRecord(sourceForm: string, sourceRecordId: string, entryLocator: string, senseId: string) {
+  const sourceGloss = sourceForm === "zjarr"
+    ? "fire"
+    : sourceForm === "fik"
+      ? "extinguish; fig"
+      : sourceForm === "peshk"
+        ? "fish"
+        : sourceForm === "dritë"
+          ? "light"
+          : "suffix";
   return {
     sourceRecordId,
     entryLocator,
     physicalRecordOrdinal: 0,
     form: sourceForm,
     partOfSpeech: "noun",
-    meaningGlosses: [sourceForm === "zjarr" ? "fire" : sourceForm === "fik" ? "extinguish; fig" : "suffix"],
-    sourceSenses: [{ sourceSenseOrdinal: 0, senseId, glosses: [sourceForm], categories: [] }],
+    meaningGlosses: [sourceGloss],
+    sourceSenses: [{ sourceSenseOrdinal: 0, senseId, glosses: [sourceGloss], categories: [] }],
     etymologyText: null,
     etymologyLinks: [],
     etymologyTemplates: [],
@@ -52,8 +72,23 @@ function sourceRecord(sourceForm: string, sourceRecordId: string, entryLocator: 
 
 function makeDiscovery(options: FixtureOptions = {}): PresentOrMissing<MotivationDiscoveryV0_1VM> {
   const inputWord = options.inputWord ?? TARGET;
-  const targetRecordId = options.primarySourceRecordId ?? TARGET_RECORD_ID;
-  const targetEntryLocator = TARGET_ENTRY_LOCATOR;
+  const defaultTargetRecordId = inputWord === TARGET
+    ? TARGET_RECORD_ID
+    : "synthetic-kaikki:word=" + encodeURIComponent(inputWord) + ":ordinal=0";
+  const targetRecordId = options.primarySourceRecordId ?? defaultTargetRecordId;
+  const targetEntryLocator = inputWord === TARGET
+    ? TARGET_ENTRY_LOCATOR
+    : "synthetic://word/" + encodeURIComponent(inputWord) + "/0";
+  const targetSenseId = inputWord === TARGET ? TARGET_SENSE_ID : "synthetic-" + inputWord + "-sense";
+  const targetGloss = options.targetGloss ?? (
+    inputWord === "peshk" ? "fish" : inputWord === "dritë" ? "light" : "firefighter"
+  );
+  const exactSourceRecordId = options.exactSourceRecordId ?? defaultTargetRecordId;
+  const exactSourceEntryLocator = options.exactSourceEntryLocator ?? targetEntryLocator;
+  const exactSourceForm = options.exactSourceForm ?? inputWord;
+  const bridgeSourceRecordId = options.bridgeSourceRecordId ?? targetRecordId;
+  const bridgeEntryLocator = options.bridgeEntryLocator ?? targetEntryLocator;
+  const bridgeForm = options.bridgeForm ?? inputWord;
   const componentRecords = [
     sourceRecord("zjarr", "synthetic-kaikki:word=zjarr:ordinal=0", "synthetic://word/zjarr/0", "synthetic-zjarr-sense"),
     sourceRecord("fik", "synthetic-kaikki:word=fik:ordinal=0", "synthetic://word/fik/0", "synthetic-fik-noun-sense"),
@@ -77,7 +112,7 @@ function makeDiscovery(options: FixtureOptions = {}): PresentOrMissing<Motivatio
       sourceAuthoredExplanation: "From zjarr + fik + -ës.",
       references,
     },
-    primary: sourceRecord(options.primaryForm ?? TARGET, targetRecordId, targetEntryLocator, TARGET_SENSE_ID),
+    primary: sourceRecord(options.primaryForm ?? inputWord, targetRecordId, targetEntryLocator, targetSenseId),
     components: componentRecords,
     componentResolutions: [
       { sourceForm: "zjarr", reference: "zjarr#Albanian", status: "RESOLVED", sourceRecordIds: [componentRecords[0]!.sourceRecordId], reasonCodes: [] },
@@ -99,7 +134,7 @@ function makeDiscovery(options: FixtureOptions = {}): PresentOrMissing<Motivatio
       basis: hypothesisStatus === "EXPLORATORY_FUNCTIONAL_HYPOTHESIS" ? ["SYNTHETIC_SOURCE_LINKED_COMPONENT_FIXTURE"] : [],
       alternatives: ["The component source senses are alternatives; no canonical crosswalk is selected."],
       evidenceRefs: [
-        { sourceRecordId: targetRecordId, entryLocator: targetEntryLocator, senseIds: [TARGET_SENSE_ID] },
+        { sourceRecordId: targetRecordId, entryLocator: targetEntryLocator, senseIds: [targetSenseId] },
         ...componentRecords.map((record) => ({ sourceRecordId: record.sourceRecordId, entryLocator: record.entryLocator, senseIds: record.sourceSenses.map((sense) => sense.senseId ?? "") })),
       ],
       reasonCodes: [],
@@ -128,22 +163,22 @@ function makeDiscovery(options: FixtureOptions = {}): PresentOrMissing<Motivatio
     exactLexicalSourceFacts: options.sourceStatus === "UNAVAILABLE" || options.sourceStatus === "SOURCE_NOT_FOUND"
       ? []
       : [{
-          sourceRecordId: TARGET_RECORD_ID,
-          entryLocator: TARGET_ENTRY_LOCATOR,
-          form: TARGET,
+          sourceRecordId: exactSourceRecordId,
+          entryLocator: exactSourceEntryLocator,
+          form: exactSourceForm,
           languageCode: "sq",
           partOfSpeech: "noun",
-          senses: [{ senseId: TARGET_SENSE_ID, glosses: ["firefighter"], categories: [] }],
+          senses: [{ senseId: targetSenseId, glosses: [targetGloss], categories: [] }],
         }],
     albanianLexicalReading: {
-      status: "SUPPORTED",
+      status: options.readingStatus ?? "SUPPORTED",
       primarySourceFact: {
-        sourceRecordId: TARGET_RECORD_ID,
-        entryLocator: TARGET_ENTRY_LOCATOR,
-        form: TARGET,
+        sourceRecordId: targetRecordId,
+        entryLocator: targetEntryLocator,
+        form: inputWord,
         partOfSpeech: "noun",
-        meaningGlosses: ["firefighter"],
-        etymologyText: "From zjarr + fik + -ës.",
+        meaningGlosses: [targetGloss],
+        etymologyText: inputWord === TARGET ? "From zjarr + fik + -ës." : null,
       },
       sourcePronunciation: null,
       relatedForms: [],
@@ -152,20 +187,51 @@ function makeDiscovery(options: FixtureOptions = {}): PresentOrMissing<Motivatio
       sourceLinkedComponentReading: componentReading,
       functionalMeaningBridge: classifiedOperation
         ? {
-            status: "SUPPORTED",
+            status: options.bridgeStatus ?? "SUPPORTED",
+            truthLayers: ["SOURCE_FACT", "EXPLORATORY_FUNCTIONAL_HYPOTHESIS"],
+            relatedForm: null,
+            sourceFacts: options.includeBridgeSourceFacts === false
+              ? null
+              : {
+                  primary: sourceRecord(
+                    bridgeForm,
+                    bridgeSourceRecordId,
+                    bridgeEntryLocator,
+                    targetSenseId,
+                  ),
+                  related: null,
+                  structuredReference: { referencedForm: null, reference: null },
+                },
+            derivedStructure: null,
             functionalHypothesis: {
               status: "EXPLORATORY_FUNCTIONAL_HYPOTHESIS",
               functionalOperation: classifiedOperation,
-              statement: "A separate classified functional bridge remains available.",
+              statement: options.functionalStatement === undefined
+                ? "A separate classified functional bridge remains available."
+                : options.functionalStatement,
+              alternatives: [],
+              basis: ["SYNTHETIC_BOUND_FUNCTIONAL_BRIDGE_FIXTURE"],
+              claimBoundary: "Synthetic UI fixture; no additional authority is implied.",
             },
+            reasonCodes: [],
+            claimBoundary: "Synthetic UI fixture; no additional authority is implied.",
           }
         : {
             status: "NULL",
+            truthLayers: ["UNKNOWN_OR_NULL"],
+            relatedForm: null,
+            sourceFacts: null,
+            derivedStructure: null,
             functionalHypothesis: {
               status: "UNKNOWN_OR_NULL",
               functionalOperation: null,
               statement: null,
+              alternatives: [],
+              basis: [],
+              claimBoundary: "Null.",
             },
+            reasonCodes: ["SYNTHETIC_NULL_CONTROL"],
+            claimBoundary: "Null.",
           },
       composition: { status: "NULL" },
       interpretation: { status: "UNKNOWN_OR_NULL", statement: null, alternatives: [], basis: [], claimBoundary: "Null." },
@@ -217,8 +283,48 @@ describe("primary Albanian conditional component reading", () => {
     render(<PrimaryAlbanianReadingCardV0_1 discovery={makeDiscovery({ classifiedOperation: "AGENT" })} analysisStatus={undefined} />);
 
     expect(screen.getByTestId("primary-albanian-reading")).toHaveTextContent("Functional role: AGENT · exploratory");
+    expect(screen.getByTestId("primary-albanian-functional-hypothesis-statement")).toHaveTextContent(
+      "A separate classified functional bridge remains available.",
+    );
     expect(screen.getByTestId("primary-albanian-source-component-hypothesis")).toHaveTextContent("EXPLORATORY_FUNCTIONAL_HYPOTHESIS");
     expect(screen.getByTestId("primary-albanian-unknown-null")).toHaveTextContent("Independent embryo meaning or function: UNKNOWN_OR_NULL.");
+  });
+
+  it.each([
+    [
+      "peshk",
+      "AGENT",
+      "Source-bounded functional operation AGENT (exploratory): the source lists peshkatar as a derived form of peshk; its glosses identify peshk as “fish” and peshkatar as “fisherman”.",
+      "fish",
+    ],
+    [
+      "dritë",
+      "ENABLE_PASSAGE",
+      "Directional functional interpretation (exploratory): the source relates dritë (“light”) to dritare (“window”) and describes letting light through.",
+      "light",
+    ],
+  ] as const)("shows the existing source-bound %s %s statement in the primary reading", (inputWord, operation, statement, targetGloss) => {
+    render(<PrimaryAlbanianReadingCardV0_1 discovery={makeDiscovery({
+      inputWord,
+      targetGloss,
+      includeComponentReading: false,
+      classifiedOperation: operation,
+      functionalStatement: statement,
+    })} analysisStatus={undefined} />);
+
+    const primary = screen.getByTestId("primary-albanian-reading");
+    expect(primary).toHaveTextContent(inputWord);
+    expect(screen.getByTestId("primary-albanian-source-fact")).toHaveTextContent(targetGloss);
+    expect(primary).toHaveTextContent("Functional role: " + operation + " · exploratory");
+    expect(screen.getByTestId("primary-albanian-functional-hypothesis-statement"))
+      .toHaveTextContent("Word-specific explanation: " + statement);
+    expect(screen.getByTestId("primary-albanian-functional-reading")).toHaveTextContent(
+      "It does not establish morphology, historical derivation, or embryo meaning.",
+    );
+    expect(screen.getByTestId("primary-albanian-unknown-null")).toHaveTextContent(
+      "Independent embryo meaning or function: UNKNOWN_OR_NULL.",
+    );
+    expect(primary).not.toHaveTextContent("Evidence references:");
   });
 
   it.each([
@@ -252,7 +358,34 @@ describe("primary Albanian conditional component reading", () => {
     })} analysisStatus={undefined} />);
 
     expect(screen.getByTestId("primary-albanian-reading")).toHaveTextContent("Functional role: ENABLE_PASSAGE · exploratory");
+    expect(screen.getByTestId("primary-albanian-functional-hypothesis-statement")).toHaveTextContent(
+      "A separate classified functional bridge remains available.",
+    );
     expect(screen.queryByTestId("primary-albanian-source-component-hypothesis")).not.toBeInTheDocument();
+  });
+
+  it.each([
+    ["bridge source record mismatch", { bridgeSourceRecordId: "synthetic-kaikki:word=other:ordinal=0" }],
+    ["bridge entry locator mismatch", { bridgeEntryLocator: "synthetic://word/other/0" }],
+    ["bridge form mismatch", { bridgeForm: "another-word" }],
+    ["source facts do not contain the bridge record", { exactSourceRecordId: "synthetic-kaikki:word=other:ordinal=0" }],
+    ["missing bridge source facts", { includeBridgeSourceFacts: false }],
+    ["Null lexical reading", { readingStatus: "NULL" }],
+    ["unsupported operation", { classifiedOperation: "UNSUPPORTED_OPERATION" }],
+    ["empty statement", { functionalStatement: "   " }],
+    ["Null bridge", { bridgeStatus: "NULL" }],
+    ["unavailable exact source", { sourceStatus: "UNAVAILABLE" }],
+  ] as const)("withholds a classified statement for %s", (_label, options) => {
+    render(<PrimaryAlbanianReadingCardV0_1 discovery={makeDiscovery({
+      includeComponentReading: false,
+      classifiedOperation: "AGENT",
+      ...options,
+    })} analysisStatus={undefined} />);
+
+    expect(screen.queryByTestId("primary-albanian-functional-hypothesis-statement")).not.toBeInTheDocument();
+    expect(screen.getByTestId("primary-albanian-functional-reading")).toHaveTextContent(
+      "UNKNOWN_OR_NULL · no supported functional interpretation is emitted for this exact source reading.",
+    );
   });
 
   (PINNED_SOURCE_PATH ? it : it.skip)("renders the existing conditional hypothesis from the pinned zjarrfikës source record", async () => {
