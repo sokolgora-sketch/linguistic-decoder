@@ -5398,7 +5398,14 @@ describe("real Albanian exact lexical source integration v0.1", () => {
           ]),
         },
       },
-      functionalMeaningBridge: { status: "NULL" },
+      functionalMeaningBridge: {
+        status: "NULL",
+        reasonCodes: expect.arrayContaining([
+          "SOURCE_LINKED_RELATION_NOT_SUPPORTED",
+          "DERIVED_STRUCTURE_NOT_SUPPORTED_FOR_BOTH_RECORDS",
+        ]),
+        functionalHypothesis: { status: "UNKNOWN_OR_NULL", statement: null },
+      },
       composition: { status: "NULL", interpretation: { status: "UNKNOWN_OR_NULL", statement: null } },
       interpretation: { status: "UNKNOWN_OR_NULL", statement: null },
     });
@@ -5441,8 +5448,60 @@ describe("real Albanian exact lexical source integration v0.1", () => {
       expect(hypothesisCard).toHaveTextContent("conditionally compatible with an agent reading");
       expect(hypothesisCard).toHaveTextContent("Functional operation: none classified");
       expect(hypothesisCard).toHaveTextContent("embryo function: Null");
+      const bridgeNull = screen.getByTestId("albanian-functional-meaning-bridge-null");
+      expect(bridgeNull).toHaveTextContent("UNKNOWN_OR_NULL — no classified functional bridge was established.");
+      expect(bridgeNull).toHaveTextContent("SOURCE_LINKED_RELATION_NOT_SUPPORTED");
+      expect(bridgeNull).toHaveTextContent("DERIVED_STRUCTURE_NOT_SUPPORTED_FOR_BOTH_RECORDS");
+      expect(bridgeNull).not.toHaveTextContent("no source-supported functional prompt is available");
+      const integratedNull = screen.getByTestId("albanian-reading-interpretation");
+      expect(integratedNull).toHaveTextContent("UNKNOWN_OR_NULL — no integrated functional reading was emitted.");
+      expect(integratedNull).not.toHaveTextContent("No bounded product interpretation is currently authorized");
       expect(card).toHaveTextContent("IPA variants: Null");
       expect(screen.getByTestId("albanian-reading-composition-null")).toHaveTextContent("Null");
+    }
+  });
+
+  it("keeps true Null copy scoped when no conditional component hypothesis is supported", async () => {
+    const discovery = await discoveryForFactsV0_1(zjarrfikesThreeComponentFixtureFactsV0_1({
+      verbComponent: { senses: [{ senseId: "fik-verb-no-parenthetical", glosses: ["to extinguish"] }] },
+    }), "zjarrfikës");
+    const reading = discovery.albanianLexicalReading;
+
+    expect(reading).toMatchObject({
+      sourceLinkedComponentReading: {
+        functionalHypothesis: {
+          status: "UNKNOWN_OR_NULL",
+          statement: null,
+          reasonCodes: expect.arrayContaining(["SOURCE_COMPONENT_GLOSS_TEXT_OVERLAP_NOT_EXPLICIT"]),
+        },
+      },
+      functionalMeaningBridge: {
+        status: "NULL",
+        reasonCodes: expect.arrayContaining([
+          "SOURCE_LINKED_RELATION_NOT_SUPPORTED",
+          "DERIVED_STRUCTURE_NOT_SUPPORTED_FOR_BOTH_RECORDS",
+        ]),
+        functionalHypothesis: { status: "UNKNOWN_OR_NULL", statement: null },
+      },
+      interpretation: { status: "UNKNOWN_OR_NULL", statement: null },
+    });
+
+    const vm = adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: discovery });
+    expect(vm.motivationDiscoveryV0_1).toMatchObject({ kind: "present" });
+    if (vm.motivationDiscoveryV0_1?.kind === "present") {
+      render(createElement(MotivationDiscoveryCardV0_1, { discovery: vm.motivationDiscoveryV0_1 }));
+      const componentHypothesis = screen.getByTestId("albanian-source-linked-functional-hypothesis");
+      expect(componentHypothesis).toHaveTextContent("UNKNOWN_OR_NULL");
+      expect(componentHypothesis).toHaveTextContent("SOURCE_COMPONENT_GLOSS_TEXT_OVERLAP_NOT_EXPLICIT");
+      expect(componentHypothesis).not.toHaveTextContent("conditionally compatible with an agent reading");
+
+      const bridgeNull = screen.getByTestId("albanian-functional-meaning-bridge-null");
+      expect(bridgeNull).toHaveTextContent("no classified functional bridge was established");
+      expect(bridgeNull).toHaveTextContent("SOURCE_LINKED_RELATION_NOT_SUPPORTED");
+      expect(bridgeNull).toHaveTextContent("DERIVED_STRUCTURE_NOT_SUPPORTED_FOR_BOTH_RECORDS");
+      const integratedNull = screen.getByTestId("albanian-reading-interpretation");
+      expect(integratedNull).toHaveTextContent("no integrated functional reading was emitted");
+      expect(integratedNull).not.toHaveTextContent("conditional component hypothesis");
     }
   });
 

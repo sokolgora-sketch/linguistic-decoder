@@ -1319,7 +1319,7 @@ export function MotivationDiscoveryCardV0_1({
               </>
             ) : (
               <div data-testid="albanian-functional-meaning-bridge-null" className="mt-2 text-sm">
-                UNKNOWN_OR_NULL — no source-supported functional prompt is available. Reasons: {albanianLexicalReading.functionalMeaningBridge.reasonCodes.join(", ") || "not recorded"}.
+                UNKNOWN_OR_NULL — no classified functional bridge was established. Reasons: {albanianLexicalReading.functionalMeaningBridge.reasonCodes.join(", ") || "not recorded"}.
               </div>
             )}
             <div className="mt-2 text-[10px] text-[#d5c28f]">
@@ -1543,7 +1543,7 @@ export function MotivationDiscoveryCardV0_1({
           <div className="mt-3 rounded border border-[#66532e] bg-[#1b180f] p-2 text-[#f0ddb0]">
             <div className="font-semibold uppercase tracking-[0.1em]">INTEGRATED FUNCTIONAL READING · EXPLORATORY</div>
             <div data-testid="albanian-reading-interpretation" className="mt-1 text-sm">
-              {albanianLexicalReading.interpretation.statement ?? "No bounded product interpretation is currently authorized; Null is valid."}
+              {albanianLexicalReading.interpretation.statement ?? "UNKNOWN_OR_NULL — no integrated functional reading was emitted."}
             </div>
             <div className="mt-1 text-xs text-[#d5c28f]">
               {albanianLexicalReading.interpretation.claimBoundary}
