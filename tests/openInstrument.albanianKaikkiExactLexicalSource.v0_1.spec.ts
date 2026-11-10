@@ -5718,14 +5718,14 @@ describe("real Albanian exact lexical source integration v0.1", () => {
         status: "UNKNOWN_OR_NULL",
         functionalOperation: null,
         statement: null,
-        reasonCodes: expect.arrayContaining(["ACTION_COMPONENT_VERB_RECORD_NOT_UNIQUE"]),
+        reasonCodes: expect.arrayContaining(["VERB_COMPONENT_RECORD_NOT_UNIQUE"]),
       },
     });
   });
 
   it("fails closed when multiple component rows reuse one source record identity", async () => {
     const facts = zjarrfikesThreeComponentFixtureFactsV0_1({
-      actionVerb: {
+      verbComponent: {
         sourceRecordId: "kaikki-albanian-jsonl:word=fik:ordinal=0",
       },
     });
