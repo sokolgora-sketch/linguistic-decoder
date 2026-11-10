@@ -37,6 +37,34 @@ export function PrimaryAlbanianReadingCardV0_1({
     hypothesis?.status === "EXPLORATORY_FUNCTIONAL_HYPOTHESIS" &&
     typeof hypothesis.functionalOperation === "string" &&
     typeof hypothesis.statement === "string";
+  const sourceComponentReading = reading?.sourceLinkedComponentReading ?? null;
+  const sourceComponentHypothesis = sourceComponentReading?.functionalHypothesis;
+  const sourceComponentPrimary = sourceComponentReading?.primary;
+  const sourceComponentTargetIsBound = sourceComponentReading?.status === "SUPPORTED" &&
+    sourceComponentPrimary != null &&
+    sameWord(sourceComponentPrimary.form, value.inputWord) &&
+    sourceComponentReading.relation.primarySourceRecordId === sourceComponentPrimary.sourceRecordId &&
+    sourceComponentReading.relation.primaryEntryLocator === sourceComponentPrimary.entryLocator &&
+    records.some((record) =>
+      record.sourceRecordId === sourceComponentPrimary.sourceRecordId &&
+      record.entryLocator === sourceComponentPrimary.entryLocator &&
+      sameWord(record.form, sourceComponentPrimary.form),
+    );
+  const supportedSourceComponentHypothesis = exactSourceStatus === "MATCHES_FOUND" &&
+    sourceComponentTargetIsBound &&
+    sourceComponentReading?.relation.relation !== "SOURCE_COMPOUND_ARITY_UNSUPPORTED" &&
+    sourceComponentReading?.relation.references.length > 0 &&
+    sourceComponentHypothesis?.status === "EXPLORATORY_FUNCTIONAL_HYPOTHESIS" &&
+    sourceComponentHypothesis.functionalOperation === null &&
+    typeof sourceComponentHypothesis.statement === "string" &&
+    sourceComponentHypothesis.statement.trim().length > 0 &&
+    sourceComponentHypothesis.evidenceRefs.length > 0 &&
+    sourceComponentHypothesis.reasonCodes.length === 0 &&
+    sourceComponentHypothesis.claimBoundary.trim().length > 0 &&
+    sourceComponentReading.reasonCodes.length === 0 &&
+    sourceComponentReading.claimBoundary.trim().length > 0 &&
+    sourceComponentHypothesis.noSingleWinner === true &&
+    sourceComponentHypothesis.userDecisionPosture === "user_decides";
   const sourceUnavailable = exactSourceStatus === "UNAVAILABLE";
 
   return (
@@ -139,12 +167,64 @@ export function PrimaryAlbanianReadingCardV0_1({
                   : "This exploratory interpretation is bounded to the exact source evidence and sense above. It does not establish morphology, historical derivation, or embryo meaning."}
               </p>
             </>
+          ) : supportedSourceComponentHypothesis ? (
+            <p className="mt-2">
+              No functional operation is classified for this source reading. A separate source-linked conditional component hypothesis is shown below; canonical component-sense selection and independent embryo meaning remain UNKNOWN_OR_NULL.
+            </p>
           ) : (
             <p className="mt-2">
               UNKNOWN_OR_NULL · no supported functional interpretation is emitted for this exact source reading.
             </p>
           )}
         </section>
+
+        {supportedSourceComponentHypothesis && sourceComponentReading && sourceComponentHypothesis ? (
+          <section
+            aria-label="Source-linked conditional component reading"
+            data-testid="primary-albanian-source-component-hypothesis"
+            className="min-w-0 rounded-lg border border-[#66532e] bg-[#1b180f] p-3 text-sm leading-5 text-[#f0ddb0]"
+          >
+            <h3 className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#d8bb7a]">
+              Source-linked conditional component reading
+            </h3>
+            <p className="mt-2 font-semibold">EXPLORATORY_FUNCTIONAL_HYPOTHESIS</p>
+            <p className="mt-1 break-words">
+              Source-attributed component forms (source order): {sourceComponentReading.relation.references
+                .map((reference) => reference.sourceForm)
+                .join(" + ")}
+            </p>
+            {sourceComponentReading.relation.sourceAuthoredExplanation ? (
+              <p className="mt-1 break-words">
+                Source-authored account (attributed): {sourceComponentReading.relation.sourceAuthoredExplanation}
+              </p>
+            ) : null}
+            <p className="mt-2 break-words">{sourceComponentHypothesis.statement}</p>
+            <ul className="mt-2 list-disc space-y-1 pl-5 text-xs text-[#d5c28f]">
+              <li>Grammatical role: unclassified by this component hypothesis.</li>
+              <li>Canonical component-sense selection: UNKNOWN_OR_NULL; no single sense winner, user decides.</li>
+              <li>Functional operation: Null — none is classified by this hypothesis.</li>
+            </ul>
+            {sourceComponentHypothesis.alternatives.length > 0 ? (
+              <div className="mt-2 break-words text-xs">
+                Alternatives: {sourceComponentHypothesis.alternatives.join(" ")}
+              </div>
+            ) : null}
+            <div className="mt-2 break-words text-xs">
+              Evidence references: {sourceComponentHypothesis.evidenceRefs
+                .map((reference) => `${reference.sourceRecordId} · ${reference.entryLocator} · senses ${reference.senseIds.join(", ") || "UNKNOWN_OR_NULL"}`)
+                .join(" | ")}
+            </div>
+            <p className="mt-2 break-words text-xs text-[#d5c28f]">
+              Source-linked reading boundary: {sourceComponentReading.claimBoundary}
+            </p>
+            <p className="mt-1 break-words text-xs text-[#d5c28f]">
+              Functional hypothesis boundary: {sourceComponentHypothesis.claimBoundary}
+            </p>
+            <p className="mt-1 text-xs text-[#aeb7c5]">
+              Attributed source components do not independently prove morphology, derivation, historical origin, or embryo meaning.
+            </p>
+          </section>
+        ) : null}
 
         <section
           aria-label="Canonical and structural candidate status"
