@@ -1,4 +1,8 @@
 import { GET, POST } from "@/app/api/analyze-v1/route";
+import { createElement } from "react";
+import { renderToStaticMarkup } from "react-dom/server";
+import { adaptAnalysisToTelemetryVM } from "@/ui/instrument/contractAdapter";
+import { PrimaryAlbanianReadingCardV0_1 } from "@/ui/instrument/sections/PrimaryAlbanianReadingCard.v0_1";
 
 jest.mock("@/lib/runAnalysisDeterministic", () => {
   const actual = jest.requireActual("@/lib/runAnalysisDeterministic");
@@ -519,6 +523,14 @@ async function analyzeDritareV0_1(): Promise<any> {
   return { status: response.status, body: await response.json() };
 }
 
+function renderPrimaryAlbanianReadingCard(payload: unknown): string {
+  const vm = adaptAnalysisToTelemetryVM(payload);
+  return renderToStaticMarkup(createElement(PrimaryAlbanianReadingCardV0_1, {
+    discovery: vm.motivationDiscoveryV0_1,
+    analysisStatus: vm.analysisStatusV0_1,
+  }));
+}
+
 async function analyzePeshkV0_1(): Promise<any> {
   const response = await POST(new Request("http://localhost/api/analyze-v1", {
     method: "POST",
@@ -898,6 +910,50 @@ describe("analyze-v1 Albanian lexical reading reachability", () => {
       }),
       composition: { status: "NULL" },
     });
+
+    const reading = result.body.motivationDiscoveryV0_1.albanianLexicalReading;
+    const card = renderPrimaryAlbanianReadingCard(result.body);
+    expect(card).toContain("Functional role: ENABLE_PASSAGE · exploratory");
+    expect(card).toContain(`Word-specific explanation: ${reading.functionalMeaningBridge.functionalHypothesis.statement}`);
+    expect(card).toContain("Independent embryo meaning or function: UNKNOWN_OR_NULL.");
+  });
+
+  const directDritareBindingMismatches: readonly [string, (payload: any) => void][] = [
+    ["related source-record ID mismatch", (payload) => {
+      payload.motivationDiscoveryV0_1.albanianLexicalReading.functionalMeaningBridge.sourceFacts.related.sourceRecordId =
+        "kaikki-albanian-jsonl:word=other:ordinal=0";
+    }],
+    ["related entry-locator mismatch", (payload) => {
+      payload.motivationDiscoveryV0_1.albanianLexicalReading.functionalMeaningBridge.sourceFacts.related.entryLocator =
+        "jsonl://word/other/match/0";
+    }],
+    ["related form mismatch", (payload) => {
+      payload.motivationDiscoveryV0_1.albanianLexicalReading.functionalMeaningBridge.sourceFacts.related.form = "dritari";
+    }],
+    ["source-relation direction mismatch", (payload) => {
+      payload.motivationDiscoveryV0_1.albanianLexicalReading.relatedCandidateEvaluations[0]
+        .sourceLinkedComparison.relation.direction = "PRIMARY_TO_RELATED_FORM";
+    }],
+    ["unsupported target source identity", (payload) => {
+      payload.motivationDiscoveryV0_1.albanianLexicalReading.primarySourceFact.sourceRecordId =
+        "kaikki-albanian-jsonl:word=other:ordinal=0";
+    }],
+    ["ambiguous target source identity", (payload) => {
+      const facts = payload.motivationDiscoveryV0_1.exactLexicalSourceFacts;
+      const target = facts.find((fact: any) => fact.sourceRecordId === "kaikki-albanian-jsonl:word=dritare:ordinal=0");
+      facts.push(JSON.parse(JSON.stringify(target)));
+    }],
+  ];
+
+  it.each(directDritareBindingMismatches)("withholds direct dritare's bridge for %s", async (_label, mutate) => {
+    const result = await analyzeDritareV0_1();
+    expect(result.status).toBe(200);
+    const payload = JSON.parse(JSON.stringify(result.body));
+    mutate(payload);
+
+    const card = renderPrimaryAlbanianReadingCard(payload);
+    expect(card).not.toContain("Functional role: ENABLE_PASSAGE · exploratory");
+    expect(card).not.toContain("Word-specific explanation:");
   });
 
   it("projects direct malor as the queried adjective with the base-attested entity-property bridge", async () => {
