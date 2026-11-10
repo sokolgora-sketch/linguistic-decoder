@@ -1335,22 +1335,39 @@ function exactSourceGlossPhraseV0_1(gloss: string): string {
   return normalizedSourceTemplateTextV0_1(gloss).replace(/[.!?;:,]+$/u, "").trim();
 }
 
-function explicitObjectPhraseFromActionGlossV0_1(gloss: string): string | null {
+function reconstructSourceComponentSurfaceV0_1(componentForms: readonly string[]): string | null {
+  if (componentForms.length !== 3) return null;
+  const surfaces = componentForms.map((form) => {
+    const normalized = form.normalize("NFC");
+    if (!normalized || normalized !== normalized.trim() || normalized.startsWith("--")) return null;
+    // A single leading hyphen marks an affix; retain every other source character.
+    return normalized.startsWith("-") ? normalized.slice(1) : normalized;
+  });
+  if (surfaces.some((surface) => !surface)) return null;
+  return surfaces.join("");
+}
+
+function singleParentheticalPhraseFromVerbGlossV0_1(gloss: string): string | null {
   const normalizedGloss = exactSourceGlossPhraseV0_1(gloss);
   if (!/^to\s+\p{L}/u.test(normalizedGloss)) return null;
   const parentheticalPhrases = [...normalizedGloss.matchAll(/\(([^()]*)\)/gu)];
   if (parentheticalPhrases.length !== 1) return null;
-  const objectPhrase = exactSourceGlossPhraseV0_1(parentheticalPhrases[0]?.[1] ?? "");
-  return objectPhrase.length > 0 ? objectPhrase : null;
+  const phrase = exactSourceGlossPhraseV0_1(parentheticalPhrases[0]?.[1] ?? "");
+  return phrase.length > 0 ? phrase : null;
 }
 
 function buildThreeComponentFunctionalHypothesisV0_1(input: Readonly<{
   primary: AlbanianSourceLinkedRecordV0_1;
+  componentForms: readonly string[];
   components: readonly AlbanianSourceLinkedRecordV0_1[];
   componentResolutions: readonly AlbanianSourceLinkedComponentResolutionV0_1[];
 }>): AlbanianSourceLinkedFunctionalHypothesisV0_1 {
   const reasons: string[] = [];
   if (input.primary.partOfSpeech !== "noun") reasons.push("TARGET_NOUN_POS_NOT_ATTESTED");
+  const reconstructedSurface = reconstructSourceComponentSurfaceV0_1(input.componentForms);
+  if (!reconstructedSurface || reconstructedSurface.normalize("NFC") !== input.primary.form.normalize("NFC")) {
+    reasons.push("SOURCE_COMPONENT_SURFACES_DO_NOT_RECONSTRUCT_TARGET");
+  }
 
   const occupationSenses = (input.primary.sourceSenses ?? []).filter((sense) =>
     Boolean(sense.senseId) && sense.glosses.some((gloss) => gloss.trim().length > 0) &&
@@ -1363,17 +1380,17 @@ function buildThreeComponentFunctionalHypothesisV0_1(input: Readonly<{
   );
   if (occupationSenses.length !== 1) reasons.push("TARGET_OCCUPATION_SENSE_NOT_UNIQUE");
 
-  const [objectResolution, actionResolution, suffixResolution] = input.componentResolutions;
+  const [firstComponentResolution, verbResolution, suffixResolution] = input.componentResolutions;
   const recordsForResolution = (resolution: AlbanianSourceLinkedComponentResolutionV0_1 | undefined) =>
     resolution ? input.components.filter((record) => resolution.sourceRecordIds.includes(record.sourceRecordId)) : [];
-  const objectRecords = recordsForResolution(objectResolution);
-  const actionRecords = recordsForResolution(actionResolution);
+  const firstComponentRecords = recordsForResolution(firstComponentResolution);
+  const verbComponentRecords = recordsForResolution(verbResolution);
   const suffixRecords = recordsForResolution(suffixResolution);
-  if (objectRecords.length !== 1 || objectRecords[0]?.partOfSpeech !== "noun" || objectResolution?.status !== "RESOLVED") {
-    reasons.push("OBJECT_COMPONENT_POS_OR_IDENTITY_UNRESOLVED");
+  if (firstComponentRecords.length !== 1 || firstComponentRecords[0]?.partOfSpeech !== "noun" || firstComponentResolution?.status !== "RESOLVED") {
+    reasons.push("FIRST_COMPONENT_NOUN_POS_OR_IDENTITY_UNRESOLVED");
   }
-  const verbRecords = actionRecords.filter((record) => record.partOfSpeech === "verb");
-  if (verbRecords.length !== 1 || !verbRecords[0]) reasons.push("ACTION_COMPONENT_VERB_RECORD_NOT_UNIQUE");
+  const verbRecords = verbComponentRecords.filter((record) => record.partOfSpeech === "verb");
+  if (verbRecords.length !== 1 || !verbRecords[0]) reasons.push("VERB_COMPONENT_RECORD_NOT_UNIQUE");
   if (suffixRecords.length !== 1 || suffixRecords[0]?.partOfSpeech !== "suffix" || suffixResolution?.status !== "RESOLVED") {
     reasons.push("SUFFIX_COMPONENT_POS_OR_IDENTITY_UNRESOLVED");
   }
@@ -1390,37 +1407,37 @@ function buildThreeComponentFunctionalHypothesisV0_1(input: Readonly<{
   );
   if (incompleteSenseIdentity) reasons.push("SOURCE_SENSE_IDENTITY_OR_MEANING_INCOMPLETE");
 
-  const objectActionGlossPairs = objectRecords[0] && objectResolution?.status === "RESOLVED" && verbRecords[0]
-    ? (objectRecords[0].sourceSenses ?? []).flatMap((objectSense) =>
-        objectSense.glosses.flatMap((objectGloss) => {
-          const normalizedObjectGloss = exactSourceGlossPhraseV0_1(objectGloss);
-          if (!normalizedObjectGloss) return [];
+  const componentGlossOverlapPairs = firstComponentRecords[0] && firstComponentResolution?.status === "RESOLVED" && verbRecords[0]
+    ? (firstComponentRecords[0].sourceSenses ?? []).flatMap((firstComponentSense) =>
+        firstComponentSense.glosses.flatMap((firstComponentGloss) => {
+          const normalizedComponentGloss = exactSourceGlossPhraseV0_1(firstComponentGloss);
+          if (!normalizedComponentGloss) return [];
           return (verbRecords[0]?.sourceSenses ?? []).flatMap((actionSense) =>
             actionSense.glosses.flatMap((actionGloss) =>
-              explicitObjectPhraseFromActionGlossV0_1(actionGloss) === normalizedObjectGloss
-                ? [{ objectSense, objectGloss, actionSense, actionGloss }]
+              singleParentheticalPhraseFromVerbGlossV0_1(actionGloss) === normalizedComponentGloss
+                ? [{ firstComponentSense, firstComponentGloss, actionSense, actionGloss, parentheticalText: normalizedComponentGloss }]
                 : [],
             ),
           );
         }),
       )
     : [];
-  if (objectActionGlossPairs.length !== 1) {
-    reasons.push(objectActionGlossPairs.length === 0
-      ? "SOURCE_OBJECT_ACTION_GLOSS_COMPATIBILITY_NOT_EXPLICIT"
-      : "SOURCE_OBJECT_ACTION_GLOSS_PAIR_NOT_UNIQUE");
+  if (componentGlossOverlapPairs.length !== 1) {
+    reasons.push(componentGlossOverlapPairs.length === 0
+      ? "SOURCE_COMPONENT_GLOSS_TEXT_OVERLAP_NOT_EXPLICIT"
+      : "SOURCE_COMPONENT_GLOSS_TEXT_OVERLAP_NOT_UNIQUE");
   }
   if (reasons.length > 0) return unknownComponentFunctionalHypothesisV0_1(reasons);
 
-  const objectRecord = objectRecords[0];
+  const firstComponentRecord = firstComponentRecords[0];
   const actionRecord = verbRecords[0];
   const suffixRecord = suffixRecords[0];
   const occupationSense = occupationSenses[0];
   const suffixSense = suffixAgentSenses[0];
-  const objectActionGlossPair = objectActionGlossPairs[0];
-  if (!objectRecord || !actionRecord || !suffixRecord || !occupationSense || !suffixSense ||
-    !objectResolution || !actionResolution || !suffixResolution || !objectActionGlossPair) {
-    return unknownComponentFunctionalHypothesisV0_1(["SOURCE_ROLE_OR_OBJECT_ACTION_PAIR_EVIDENCE_MISSING"]);
+  const componentGlossOverlapPair = componentGlossOverlapPairs[0];
+  if (!firstComponentRecord || !actionRecord || !suffixRecord || !occupationSense || !suffixSense ||
+    !firstComponentResolution || !verbResolution || !suffixResolution || !componentGlossOverlapPair) {
+    return unknownComponentFunctionalHypothesisV0_1(["SOURCE_COMPONENT_ROLE_OR_GLOSS_OVERLAP_EVIDENCE_MISSING"]);
   }
 
   const senseAlternative = (record: AlbanianSourceLinkedRecordV0_1): string[] =>
@@ -1433,7 +1450,8 @@ function buildThreeComponentFunctionalHypothesisV0_1(input: Readonly<{
     ...input.componentResolutions
       .filter((resolution) => resolution.status === "AMBIGUOUS")
       .map((resolution) => `${resolution.sourceForm}: multiple exact Albanian source records remain unresolved; no record or sense is selected.`),
-    `Conditional source-side gloss pair: ${objectActionGlossPair.objectSense.senseId ?? "Unknown object sense"} “${objectActionGlossPair.objectGloss}” + ${objectActionGlossPair.actionSense.senseId ?? "Unknown action sense"} “${objectActionGlossPair.actionGloss}”. This is not an exact target/component sense crosswalk.`,
+    `Source component surfaces ${input.componentForms.join(" + ")} reconstruct ${reconstructedSurface} exactly after NFC normalization and omission of one leading affix-notation hyphen where present.`,
+    `Conditional source-side gloss overlap: ${componentGlossOverlapPair.firstComponentSense.senseId ?? "Unknown component sense"} “${componentGlossOverlapPair.firstComponentGloss}” + ${componentGlossOverlapPair.actionSense.senseId ?? "Unknown verb sense"} “${componentGlossOverlapPair.actionGloss}”. The matched parenthetical text “${componentGlossOverlapPair.parentheticalText}” is lexical gloss text only; its grammatical role is unclassified, and this is not an exact target/component sense crosswalk.`,
     "No component sense is selected as canonical, and the source does not align a specific component sense with a specific target sense.",
   ];
   const evidenceRefs = evidenceRecords.map((record) => Object.freeze({
@@ -1445,13 +1463,14 @@ function buildThreeComponentFunctionalHypothesisV0_1(input: Readonly<{
   return Object.freeze({
     status: "EXPLORATORY_FUNCTIONAL_HYPOTHESIS" as const,
     functionalOperation: null,
-    statement: `If the source-recorded noun sense “${objectActionGlossPair.objectGloss}” (${objectActionGlossPair.objectSense.senseId}) and verb sense “${objectActionGlossPair.actionGloss}” (${objectActionGlossPair.actionSense.senseId}) are the intended component readings, and the suffix sense “${suffixSense.glosses.join("; ")}” (${suffixSense.senseId}) applies, the formation is conditionally readable as an agent whose recorded action is “${objectActionGlossPair.actionGloss}”. This is consistent with the target’s separate occupation-category sense “${occupationSense.glosses.join("; ")}” (${occupationSense.senseId}); no source crosswalk aligns these exact senses.`,
+    statement: `If the source-recorded noun sense “${componentGlossOverlapPair.firstComponentGloss}” (${componentGlossOverlapPair.firstComponentSense.senseId}) and verb sense “${componentGlossOverlapPair.actionGloss}” (${componentGlossOverlapPair.actionSense.senseId}) are the intended component readings, and the suffix sense “${suffixSense.glosses.join("; ")}” (${suffixSense.senseId}) applies, these source descriptions are conditionally compatible with an agent reading for the target’s separate occupation-category sense “${occupationSense.glosses.join("; ")}” (${occupationSense.senseId}). The repeated parenthetical text “${componentGlossOverlapPair.parentheticalText}” is lexical gloss overlap only; its grammatical role is unclassified. No source crosswalk aligns these exact senses.`,
     basis: Object.freeze([
       "SOURCE_AUTHORED_THREE_COMPONENT_COMPOUND",
+      "SOURCE_COMPONENT_SURFACE_RECONSTRUCTION_EXACT_NFC",
       "EXACT_ALBANIAN_COMPONENT_REFERENCES",
       "SOURCE_COMPONENT_POS_NOUN_VERB_SUFFIX",
       "SOURCE_SUFFIX_SENSE_DESCRIBES_AGENT_NOUN_FORMATION",
-      "SOURCE_ACTION_GLOSS_EXPLICIT_OBJECT_MATCHES_NOUN_GLOSS",
+      "SOURCE_COMPONENT_GLOSS_TEXT_OVERLAP",
       "TARGET_SOURCE_SENSE_HAS_SQ_OCCUPATIONS_CATEGORY",
     ]),
     alternatives: Object.freeze(alternatives),
@@ -1599,6 +1618,7 @@ async function buildSourceLinkedComponentReadingV0_1(input: Readonly<{
   const functionalHypothesis = isThreeComponent
     ? buildThreeComponentFunctionalHypothesisV0_1({
       primary: sourceRecordProjectionV0_1(input.primary, input.primaryAnalyses),
+      componentForms: componentEvidence.componentForms,
       components,
       componentResolutions,
     })
