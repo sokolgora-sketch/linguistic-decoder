@@ -1160,6 +1160,8 @@ describe("analyze-v1 Albanian lexical reading reachability", () => {
     });
     const hypothesis = reading.sourceLinkedComponentReading.functionalHypothesis;
     expect(hypothesis.functionalOperation).toBeNull();
-    expect(hypothesis.statement).toContain("no component sense is aligned to a target sense");
+    expect(hypothesis.statement).toContain("If the source-recorded noun sense “fire”");
+    expect(hypothesis.statement).toContain("agent whose recorded action is “to extinguish (fire)”");
+    expect(hypothesis.statement).toContain("no source crosswalk aligns these exact senses");
   });
 });

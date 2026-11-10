@@ -5392,7 +5392,7 @@ describe("real Albanian exact lexical source integration v0.1", () => {
           basis: expect.arrayContaining([
             "SOURCE_AUTHORED_THREE_COMPONENT_COMPOUND",
             "SOURCE_SUFFIX_SENSE_DESCRIBES_AGENT_NOUN_FORMATION",
-            "SOURCE_OBJECT_ACTION_GLOSS_PAIR_EXACTLY_COMPATIBLE",
+            "SOURCE_ACTION_GLOSS_EXPLICIT_OBJECT_MATCHES_NOUN_GLOSS",
             "TARGET_SOURCE_SENSE_HAS_SQ_OCCUPATIONS_CATEGORY",
           ]),
         },
@@ -6174,7 +6174,7 @@ describe("pinned Albanian three-component functional composition v0.1", () => {
           basis: expect.arrayContaining([
             "SOURCE_AUTHORED_THREE_COMPONENT_COMPOUND",
             "SOURCE_SUFFIX_SENSE_DESCRIBES_AGENT_NOUN_FORMATION",
-            "SOURCE_OBJECT_ACTION_GLOSS_PAIR_EXACTLY_COMPATIBLE",
+            "SOURCE_ACTION_GLOSS_EXPLICIT_OBJECT_MATCHES_NOUN_GLOSS",
           ]),
           noSingleWinner: true,
           userDecisionPosture: "user_decides",
