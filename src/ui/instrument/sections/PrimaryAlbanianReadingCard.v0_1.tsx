@@ -35,19 +35,76 @@ export function PrimaryAlbanianReadingCardV0_1({
   const hypothesis = bridge?.functionalHypothesis;
   const primarySourceFact = reading?.primarySourceFact ?? null;
   const bridgePrimary = bridge?.sourceFacts?.primary ?? null;
+  const bridgeRelated = bridge?.sourceFacts?.related ?? null;
+  const sameSourceRecord = (
+    left: { sourceRecordId: string; entryLocator: string; form: string } | null | undefined,
+    right: { sourceRecordId: string; entryLocator: string; form: string } | null | undefined,
+  ): boolean => left != null && right != null &&
+    left.sourceRecordId === right.sourceRecordId &&
+    left.entryLocator === right.entryLocator &&
+    sameWord(left.form, right.form);
+  const queriedSourceIdentityIsUnique = primarySourceFact !== null &&
+    sameWord(primarySourceFact.form, value.inputWord) &&
+    records.filter((record) => sameSourceRecord(record, primarySourceFact)).length === 1;
+  const sourcePrimaryBinding = queriedSourceIdentityIsUnique &&
+    sameSourceRecord(bridgePrimary, primarySourceFact);
+  const relatedTargetBinding = (() => {
+    if (!queriedSourceIdentityIsUnique || !reading || !bridge || !bridgePrimary || !bridgeRelated ||
+      !sameSourceRecord(bridgeRelated, primarySourceFact) ||
+      !sameWord(bridge.relatedForm ?? "", primarySourceFact?.form ?? "") ||
+      records.filter((record) => sameSourceRecord(record, bridgeRelated)).length !== 1) return false;
+
+    const structuredReference = bridge.sourceFacts?.structuredReference;
+    if (!structuredReference || !structuredReference.referencedForm || !structuredReference.reference) return false;
+
+    const matchingTargetAuthoredRelations = reading.relatedCandidateEvaluations.filter((candidate) => {
+      const comparison = candidate.sourceLinkedComparison;
+      const relation = comparison.relation;
+      const candidateBridge = candidate.functionalMeaningBridge;
+      const candidateBridgeFacts = candidateBridge.sourceFacts;
+      const candidatePrimary = candidateBridgeFacts?.primary;
+      const candidateRelated = candidateBridgeFacts?.related;
+      const comparisonRelated = comparison.related;
+      const comparisonPrimary = comparison.primary;
+      const sameHypothesis = candidateBridge.functionalHypothesis.status === hypothesis?.status &&
+        candidateBridge.functionalHypothesis.functionalOperation === hypothesis?.functionalOperation &&
+        candidateBridge.functionalHypothesis.statement === hypothesis?.statement;
+
+      const checks = {
+        resolution: candidate.resolution === "RESOLVED",
+        sourceRelation: candidate.sourceRelation === "TARGET_AUTHORED_ETYMOLOGY_REFERENCE",
+        sourceRelationAssertion: candidate.sourceRelationAssertion === null,
+        candidateRelatedForm: sameWord(candidate.relatedForm, primarySourceFact?.form ?? ""),
+        comparisonStatus: comparison.status === "SUPPORTED",
+        comparisonRelation: relation.relation === "TARGET_AUTHORED_ETYMOLOGY_REFERENCE",
+        direction: relation.direction === "RELATED_FORM_TO_PRIMARY_ETYMLOGY_REFERENCE",
+        comparisonRelationAssertion: relation.sourceRelationAssertion === null,
+        relationPrimaryId: relation.primarySourceRecordId === bridgePrimary.sourceRecordId,
+        relationPrimaryLocator: relation.primaryEntryLocator === bridgePrimary.entryLocator,
+        relationRelatedId: relation.relatedSourceRecordId === bridgeRelated.sourceRecordId,
+        relationRelatedLocator: relation.relatedEntryLocator === bridgeRelated.entryLocator,
+        relationRelatedForm: sameWord(relation.relatedForm, bridgeRelated.form),
+        referencedForm: sameWord(relation.referencedForm ?? "", bridgePrimary.form),
+        reference: relation.reference === structuredReference.reference,
+        structuredReferenceForm: sameWord(structuredReference.referencedForm ?? "", bridgePrimary.form),
+        comparisonPrimary: sameSourceRecord(comparisonPrimary, bridgePrimary),
+        comparisonRelated: sameSourceRecord(comparisonRelated, bridgeRelated),
+        candidateBridgeStatus: candidateBridge.status === "SUPPORTED",
+        candidateBridgeRelatedForm: sameWord(candidateBridge.relatedForm ?? "", bridge.relatedForm ?? ""),
+        candidateBridgePrimary: sameSourceRecord(candidatePrimary, bridgePrimary),
+        candidateBridgeRelated: sameSourceRecord(candidateRelated, bridgeRelated),
+        candidateBridgeReference: candidateBridgeFacts?.structuredReference?.reference === structuredReference.reference,
+        candidateBridgeReferenceForm: sameWord(candidateBridgeFacts?.structuredReference?.referencedForm ?? "", bridgePrimary.form),
+        sameHypothesis,
+      };
+      return Object.values(checks).every(Boolean);
+    });
+
+    return matchingTargetAuthoredRelations.length === 1;
+  })();
   const bridgeMatchesQueriedSource = reading?.status === "SUPPORTED" &&
     exactSourceStatus === "MATCHES_FOUND" &&
-    primarySourceFact !== null &&
-    bridgePrimary !== null &&
-    sameWord(primarySourceFact.form, value.inputWord) &&
-    sameWord(bridgePrimary.form, primarySourceFact.form) &&
-    bridgePrimary.sourceRecordId === primarySourceFact.sourceRecordId &&
-    bridgePrimary.entryLocator === primarySourceFact.entryLocator &&
-    records.filter((record) =>
-      record.sourceRecordId === bridgePrimary.sourceRecordId &&
-      record.entryLocator === bridgePrimary.entryLocator &&
-      sameWord(record.form, bridgePrimary.form),
-    ).length === 1;
+    (sourcePrimaryBinding || relatedTargetBinding);
   const supportedHypothesis = bridgeMatchesQueriedSource &&
     bridge?.status === "SUPPORTED" &&
     hypothesis?.status === "EXPLORATORY_FUNCTIONAL_HYPOTHESIS" &&
