@@ -331,9 +331,9 @@ function dritareTargetFirstFixtureFactsV0_1(): readonly AlbanianKaikkiExactLexic
 
 function zjarrfikesThreeComponentFixtureFactsV0_1(overrides: Readonly<{
   primary?: Partial<AlbanianKaikkiExactLexicalSourceFactV0_1>;
-  object?: Partial<AlbanianKaikkiExactLexicalSourceFactV0_1>;
+  firstComponent?: Partial<AlbanianKaikkiExactLexicalSourceFactV0_1>;
   actionNoun?: Partial<AlbanianKaikkiExactLexicalSourceFactV0_1>;
-  actionVerb?: Partial<AlbanianKaikkiExactLexicalSourceFactV0_1>;
+  verbComponent?: Partial<AlbanianKaikkiExactLexicalSourceFactV0_1>;
   suffix?: Partial<AlbanianKaikkiExactLexicalSourceFactV0_1>;
 }> = {}): readonly AlbanianKaikkiExactLexicalSourceFactV0_1[] {
   const occupationCategory = {
@@ -381,7 +381,7 @@ function zjarrfikesThreeComponentFixtureFactsV0_1(overrides: Readonly<{
         { senseId: "zjarr-family", glosses: ["family, clan"] },
       ],
       ipaObservations: [],
-      ...overrides.object,
+      ...overrides.firstComponent,
     }),
     fixtureFact({
       sourceRecordId: "kaikki-albanian-jsonl:word=fik:ordinal=0",
@@ -405,7 +405,7 @@ function zjarrfikesThreeComponentFixtureFactsV0_1(overrides: Readonly<{
         { senseId: "en-fik-sq-verb-JbZbl6zi", glosses: ["to bring misfortune, ruin, destroy"] },
       ],
       ipaObservations: [],
-      ...overrides.actionVerb,
+      ...overrides.verbComponent,
     }),
     fixtureFact({
       sourceRecordId: "kaikki-albanian-jsonl:word=-%C3%ABs:ordinal=0",
@@ -5339,7 +5339,7 @@ describe("real Albanian exact lexical source integration v0.1", () => {
     });
   });
 
-  it("renders a source-qualified three-component functional hypothesis without selecting senses or classifying an operation", async () => {
+  it("renders a synthetic source-qualified three-component conditional hypothesis without selecting senses or classifying an operation", async () => {
     const discovery = await discoveryForFactsV0_1(zjarrfikesThreeComponentFixtureFactsV0_1(), "zjarrfikës");
     const reading = discovery.albanianLexicalReading;
 
@@ -5391,7 +5391,9 @@ describe("real Albanian exact lexical source integration v0.1", () => {
           functionalOperation: null,
           basis: expect.arrayContaining([
             "SOURCE_AUTHORED_THREE_COMPONENT_COMPOUND",
+            "SOURCE_COMPONENT_SURFACE_RECONSTRUCTION_EXACT_NFC",
             "SOURCE_SUFFIX_SENSE_DESCRIBES_AGENT_NOUN_FORMATION",
+            "SOURCE_COMPONENT_GLOSS_TEXT_OVERLAP",
             "TARGET_SOURCE_SENSE_HAS_SQ_OCCUPATIONS_CATEGORY",
           ]),
         },
@@ -5402,8 +5404,15 @@ describe("real Albanian exact lexical source integration v0.1", () => {
     });
 
     const hypothesis = reading?.sourceLinkedComponentReading?.functionalHypothesis;
-    expect(hypothesis?.statement).toContain("source-grounded object/action/role hypothesis");
-    expect(hypothesis?.statement).toContain("no component sense is aligned to a target sense");
+    expect(hypothesis?.alternatives).toContain(
+      "Source component surfaces zjarr + fik + -ës reconstruct zjarrfikës exactly after NFC normalization and omission of one leading affix-notation hyphen where present.",
+    );
+    expect(hypothesis?.statement).toContain("If the source-recorded noun sense “fire”");
+    expect(hypothesis?.statement).toContain("verb sense “to extinguish (fire)”");
+    expect(hypothesis?.statement).toContain("conditionally compatible with an agent reading");
+    expect(hypothesis?.statement).toContain("grammatical role is unclassified");
+    expect(hypothesis?.statement).not.toContain("grammatical object");
+    expect(hypothesis?.statement).toContain("No source crosswalk aligns these exact senses");
     expect(hypothesis?.alternatives).toEqual(expect.arrayContaining([
       expect.stringContaining("en-fik-sq-noun-jDnGNIgm: fig"),
       expect.stringContaining("en-fik-sq-verb-3UhMn1WK: to extinguish (fire)"),
@@ -5411,6 +5420,7 @@ describe("real Albanian exact lexical source integration v0.1", () => {
       expect.stringContaining("en-fik-sq-verb-JbZbl6zi: to bring misfortune, ruin, destroy"),
       expect.stringContaining("en-zjarrfikës-sq-noun-P9hAbGCJ: firefighter"),
       expect.stringContaining("en-zjarrfikës-sq-noun-3IRd5pZ-: fireman"),
+      expect.stringContaining("Conditional source-side gloss overlap: zjarr-fire “fire” + en-fik-sq-verb-3UhMn1WK “to extinguish (fire)”"),
     ]));
 
     const vm = adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: discovery });
@@ -5428,11 +5438,160 @@ describe("real Albanian exact lexical source integration v0.1", () => {
       expect(hypothesisCard).toHaveTextContent("fireman");
       expect(hypothesisCard).toHaveTextContent("to extinguish (fire)");
       expect(hypothesisCard).toHaveTextContent("to switch off, turn off");
+      expect(hypothesisCard).toHaveTextContent("conditionally compatible with an agent reading");
       expect(hypothesisCard).toHaveTextContent("Functional operation: none classified");
       expect(hypothesisCard).toHaveTextContent("embryo function: Null");
       expect(card).toHaveTextContent("IPA variants: Null");
       expect(screen.getByTestId("albanian-reading-composition-null")).toHaveTextContent("Null");
     }
+  });
+
+  it.each([
+    ["the first-component gloss is only family/clan", {
+      firstComponent: { senses: [{ senseId: "zjarr-family-only", glosses: ["family, clan"] }] },
+    }],
+    ["the verb gloss has no parenthetical phrase", {
+      verbComponent: { senses: [{ senseId: "fik-verb-no-parenthetical", glosses: ["to extinguish"] }] },
+    }],
+    ["the verb gloss is unrelated", {
+      verbComponent: { senses: [{ senseId: "fik-verb-unrelated", glosses: ["to switch off, turn off"] }] },
+    }],
+  ])("withholds a functional hypothesis when %s", async (_label, overrides) => {
+    const discovery = await discoveryForFactsV0_1(zjarrfikesThreeComponentFixtureFactsV0_1(overrides), "zjarrfikës");
+    expect(discovery.albanianLexicalReading?.sourceLinkedComponentReading).toMatchObject({
+      status: "SUPPORTED",
+      functionalHypothesis: {
+        status: "UNKNOWN_OR_NULL",
+        functionalOperation: null,
+        statement: null,
+        reasonCodes: expect.arrayContaining(["SOURCE_COMPONENT_GLOSS_TEXT_OVERLAP_NOT_EXPLICIT"]),
+      },
+    });
+    expect(discovery.albanianLexicalReading?.functionalMeaningBridge.status).toBe("NULL");
+  });
+
+  it("withholds a single conditional reading when multiple exact component/verb gloss overlaps match", async () => {
+    const discovery = await discoveryForFactsV0_1(zjarrfikesThreeComponentFixtureFactsV0_1({
+      firstComponent: {
+        senses: [
+          { senseId: "zjarr-fire", glosses: ["fire"] },
+          { senseId: "zjarr-family", glosses: ["clan"] },
+        ],
+      },
+      verbComponent: {
+        senses: [
+          { senseId: "fik-extinguish", glosses: ["to extinguish (fire)"] },
+          { senseId: "fik-defend", glosses: ["to defend (clan)"] },
+        ],
+      },
+    }), "zjarrfikës");
+
+    expect(discovery.albanianLexicalReading?.sourceLinkedComponentReading?.functionalHypothesis).toMatchObject({
+      status: "UNKNOWN_OR_NULL",
+      functionalOperation: null,
+      statement: null,
+      reasonCodes: expect.arrayContaining(["SOURCE_COMPONENT_GLOSS_TEXT_OVERLAP_NOT_UNIQUE"]),
+    });
+  });
+
+  it("reports a matching parenthetical as lexical overlap without assigning object or context grammar", async () => {
+    const discovery = await discoveryForFactsV0_1(zjarrfikesThreeComponentFixtureFactsV0_1({
+      firstComponent: { senses: [{ senseId: "night-noun", glosses: ["night"] }] },
+      verbComponent: { senses: [{ senseId: "work-verb", glosses: ["to work (night)"] }] },
+      primary: {
+        senses: [{
+          senseId: "night-worker",
+          glosses: ["night worker"],
+          categories: [{
+            name: "Occupations",
+            kind: "other",
+            parents: [],
+            source: "w+disamb",
+            orig: "sq:Occupations",
+            langcode: "sq",
+            _dis: null,
+          }],
+        }],
+      },
+    }), "zjarrfikës");
+    const hypothesis = discovery.albanianLexicalReading?.sourceLinkedComponentReading?.functionalHypothesis;
+
+    expect(hypothesis).toMatchObject({
+      status: "EXPLORATORY_FUNCTIONAL_HYPOTHESIS",
+      functionalOperation: null,
+      basis: expect.arrayContaining(["SOURCE_COMPONENT_GLOSS_TEXT_OVERLAP"]),
+    });
+    expect(hypothesis?.statement).toContain("to work (night)");
+    expect(hypothesis?.statement).toContain("repeated parenthetical text “night” is lexical gloss overlap only");
+    expect(hypothesis?.statement).toContain("grammatical role is unclassified");
+    expect(hypothesis?.statement).not.toContain("grammatical object");
+    expect(discovery.albanianLexicalReading?.functionalMeaningBridge.status).toBe("NULL");
+  });
+
+  it("withholds the conditional hypothesis when source component surfaces do not reconstruct the target", async () => {
+    const facts = [...zjarrfikesThreeComponentFixtureFactsV0_1()];
+    const target = facts[0]!;
+    facts[0] = {
+      ...target,
+      etymologyText: "From zjarr + fiku + -ës.",
+      etymologyLinks: [
+        { sourceForm: "zjarr", reference: "zjarr#Albanian" },
+        { sourceForm: "fiku", reference: "fiku#Albanian" },
+        { sourceForm: "-ës", reference: "-ës#Albanian" },
+      ],
+      etymologyTemplates: [{
+        name: "compound",
+        args: { "1": "sq", "2": "zjarr", "3": "fiku", "4": "-ës" },
+        expansion: "zjarr + fiku + -ës",
+      }],
+    };
+    facts.push(fixtureFact({
+      sourceRecordId: "kaikki-albanian-jsonl:word=fiku:ordinal=0",
+      entryLocator: "jsonl://word/fiku/match/0",
+      physicalRecordOrdinal: 339,
+      form: "fiku",
+      partOfSpeech: "verb",
+      senses: [{ senseId: "fiku-extinguish", glosses: ["to extinguish (fire)"] }],
+      ipaObservations: [],
+    }));
+
+    const reading = (await discoveryForFactsV0_1(facts, "zjarrfikës")).albanianLexicalReading;
+    expect(reading?.sourceLinkedComponentReading).toMatchObject({
+      status: "SUPPORTED",
+      relation: {
+        relation: "SOURCE_EXPLICIT_THREE_COMPONENT_COMPOUND",
+        references: expect.arrayContaining([{ sourceForm: "fiku", reference: "fiku#Albanian" }]),
+      },
+      functionalHypothesis: {
+        status: "UNKNOWN_OR_NULL",
+        functionalOperation: null,
+        statement: null,
+        reasonCodes: expect.arrayContaining(["SOURCE_COMPONENT_SURFACES_DO_NOT_RECONSTRUCT_TARGET"]),
+      },
+    });
+    expect(reading?.functionalMeaningBridge.status).toBe("NULL");
+  });
+
+  it("compares reconstructed and target spellings after NFC normalization only", async () => {
+    const facts = [...zjarrfikesThreeComponentFixtureFactsV0_1()];
+    const target = facts[0]!;
+    const decomposedForm = target.form.normalize("NFD");
+    facts[0] = {
+      ...target,
+      form: decomposedForm,
+      sourceRecordId: `kaikki-albanian-jsonl:word=${encodeURIComponent(decomposedForm)}:ordinal=0`,
+      entryLocator: `jsonl://word/${encodeURIComponent(decomposedForm)}/match/0`,
+    };
+
+    const reading = (await discoveryForFactsV0_1(facts, "zjarrfikës")).albanianLexicalReading;
+    expect(reading?.sourceLinkedComponentReading?.functionalHypothesis).toMatchObject({
+      status: "EXPLORATORY_FUNCTIONAL_HYPOTHESIS",
+      functionalOperation: null,
+      basis: expect.arrayContaining(["SOURCE_COMPONENT_SURFACE_RECONSTRUCTION_EXACT_NFC"]),
+    });
+    expect(reading?.sourceLinkedComponentReading?.functionalHypothesis.alternatives).toContain(
+      "Source component surfaces zjarr + fik + -ës reconstruct zjarrfikës exactly after NFC normalization and omission of one leading affix-notation hyphen where present.",
+    );
   });
 
   it("fails closed when a three-component target has multiple Albanian source records", async () => {
@@ -5559,14 +5718,14 @@ describe("real Albanian exact lexical source integration v0.1", () => {
         status: "UNKNOWN_OR_NULL",
         functionalOperation: null,
         statement: null,
-        reasonCodes: expect.arrayContaining(["ACTION_COMPONENT_VERB_RECORD_NOT_UNIQUE"]),
+        reasonCodes: expect.arrayContaining(["VERB_COMPONENT_RECORD_NOT_UNIQUE"]),
       },
     });
   });
 
   it("fails closed when multiple component rows reuse one source record identity", async () => {
     const facts = zjarrfikesThreeComponentFixtureFactsV0_1({
-      actionVerb: {
+      verbComponent: {
         sourceRecordId: "kaikki-albanian-jsonl:word=fik:ordinal=0",
       },
     });
@@ -6081,6 +6240,123 @@ describe("real Albanian exact lexical source integration v0.1", () => {
 const pinnedAlbanianSourceTestV0_1 = process.env[ALBANIAN_KAIKKI_LEXICAL_SOURCE_PATH_ENV_V0_1]
   ? it
   : it.skip;
+
+describe("pinned Albanian three-component functional composition v0.1", () => {
+  pinnedAlbanianSourceTestV0_1("builds the conditional zjarrfikës reading from the actual frozen Kaikki provider", async () => {
+    const provider = await createAlbanianKaikkiServerOnlyExactLexicalSourceProviderV0_1(
+      process.env[ALBANIAN_KAIKKI_LEXICAL_SOURCE_PATH_ENV_V0_1],
+    );
+    const targetResult = await provider.query("zjarrfikës");
+    expect(targetResult.status).toBe("MATCHES_FOUND");
+    if (targetResult.status !== "MATCHES_FOUND") return;
+    expect(targetResult.facts.map((fact) => fact.sourceRecordId)).toContain(
+      "kaikki-albanian-jsonl:word=zjarrfik%C3%ABs:ordinal=0",
+    );
+
+    const discovery = await discoveryForProviderV0_1(provider, "zjarrfikës");
+    const reading = discovery.albanianLexicalReading;
+    expect(reading).toMatchObject({
+      status: "SUPPORTED",
+      primarySourceFact: {
+        sourceRecordId: "kaikki-albanian-jsonl:word=zjarrfik%C3%ABs:ordinal=0",
+        form: "zjarrfikës",
+        partOfSpeech: "noun",
+      },
+      sourceLinkedComponentReading: {
+        status: "SUPPORTED",
+        relation: {
+          relation: "SOURCE_EXPLICIT_THREE_COMPONENT_COMPOUND",
+          primarySourceRecordId: "kaikki-albanian-jsonl:word=zjarrfik%C3%ABs:ordinal=0",
+          references: [
+            { sourceForm: "zjarr", reference: "zjarr#Albanian" },
+            { sourceForm: "fik", reference: "fik#Albanian" },
+            { sourceForm: "-ës", reference: "-ës#Albanian" },
+          ],
+        },
+        componentResolutions: expect.any(Array),
+        functionalHypothesis: {
+          status: "EXPLORATORY_FUNCTIONAL_HYPOTHESIS",
+          functionalOperation: null,
+          basis: expect.arrayContaining([
+            "SOURCE_AUTHORED_THREE_COMPONENT_COMPOUND",
+            "SOURCE_COMPONENT_SURFACE_RECONSTRUCTION_EXACT_NFC",
+            "SOURCE_SUFFIX_SENSE_DESCRIBES_AGENT_NOUN_FORMATION",
+            "SOURCE_COMPONENT_GLOSS_TEXT_OVERLAP",
+          ]),
+          noSingleWinner: true,
+          userDecisionPosture: "user_decides",
+        },
+      },
+      functionalMeaningBridge: { status: "NULL", functionalHypothesis: { status: "UNKNOWN_OR_NULL", functionalOperation: null } },
+      interpretation: { status: "UNKNOWN_OR_NULL", statement: null },
+    });
+
+    const componentReading = reading?.sourceLinkedComponentReading;
+    const hypothesis = componentReading?.functionalHypothesis;
+    expect(componentReading?.componentResolutions).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        sourceForm: "zjarr",
+        status: "RESOLVED",
+        sourceRecordIds: ["kaikki-albanian-jsonl:word=zjarr:ordinal=0"],
+      }),
+      expect.objectContaining({
+        sourceForm: "fik",
+        status: "AMBIGUOUS",
+        sourceRecordIds: [
+          "kaikki-albanian-jsonl:word=fik:ordinal=0",
+          "kaikki-albanian-jsonl:word=fik:ordinal=1",
+        ],
+      }),
+      expect.objectContaining({ sourceForm: "-ës", status: "RESOLVED" }),
+    ]));
+    expect(componentReading?.components.find((record) => record.form === "zjarr")?.sourceSenses).toEqual(
+      expect.arrayContaining([expect.objectContaining({ senseId: "en-zjarr-sq-noun-3J8osS3R", glosses: ["fire"] })]),
+    );
+    expect(componentReading?.components.find((record) => record.form === "fik" && record.partOfSpeech === "noun")?.sourceSenses)
+      .toEqual(expect.arrayContaining([expect.objectContaining({ senseId: "en-fik-sq-noun-jDnGNIgm", glosses: ["fig"] })]));
+    expect(componentReading?.components.find((record) => record.form === "fik" && record.partOfSpeech === "verb")?.sourceSenses)
+      .toEqual(expect.arrayContaining([expect.objectContaining({ senseId: "en-fik-sq-verb-3UhMn1WK", glosses: ["to extinguish (fire)"] })]));
+    expect(componentReading?.components.find((record) => record.form === "-ës")?.sourceSenses)
+      .toEqual(expect.arrayContaining([expect.objectContaining({ senseId: "en--ës-sq-suffix-5nXSOZjB" })]));
+    expect(componentReading?.primary.sourceSenses).toEqual(expect.arrayContaining([
+      expect.objectContaining({ senseId: "en-zjarrfikës-sq-noun-P9hAbGCJ", glosses: ["firefighter"] }),
+      expect.objectContaining({ senseId: "en-zjarrfikës-sq-noun-3IRd5pZ-", glosses: ["fireman"] }),
+    ]));
+    expect(hypothesis?.statement).toContain("noun sense “fire” (en-zjarr-sq-noun-3J8osS3R)");
+    expect(hypothesis?.statement).toContain("verb sense “to extinguish (fire)” (en-fik-sq-verb-3UhMn1WK)");
+    expect(hypothesis?.statement).toContain("grammatical role is unclassified");
+    expect(hypothesis?.statement).not.toContain("grammatical object");
+    expect(hypothesis?.statement).toContain("occupation-category sense");
+    expect(hypothesis?.claimBoundary).toContain("not cross-aligned");
+    expect(hypothesis?.alternatives).toEqual(expect.arrayContaining([
+      expect.stringContaining("en-zjarrfikës-sq-noun-P9hAbGCJ: firefighter"),
+      expect.stringContaining("en-zjarrfikës-sq-noun-3IRd5pZ-: fireman"),
+      expect.stringContaining("Source component surfaces zjarr + fik + -ës reconstruct zjarrfikës exactly after NFC normalization"),
+    ]));
+    expect(hypothesis?.evidenceRefs).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        sourceRecordId: "kaikki-albanian-jsonl:word=zjarrfik%C3%ABs:ordinal=0",
+        senseIds: expect.arrayContaining(["en-zjarrfikës-sq-noun-3IRd5pZ-"]),
+      }),
+      expect.objectContaining({
+        sourceRecordId: "kaikki-albanian-jsonl:word=zjarr:ordinal=0",
+        senseIds: expect.arrayContaining(["en-zjarr-sq-noun-3J8osS3R"]),
+      }),
+    ]));
+    expect(reading?.composition).toMatchObject({ status: "NULL", interpretation: { status: "UNKNOWN_OR_NULL", statement: null } });
+
+    const vm = adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: discovery });
+    expect(vm.motivationDiscoveryV0_1).toMatchObject({ kind: "present" });
+    if (vm.motivationDiscoveryV0_1?.kind !== "present") throw new Error("Expected actual source-backed discovery to project");
+    render(createElement(MotivationDiscoveryCardV0_1, { discovery: vm.motivationDiscoveryV0_1 }));
+    expect(screen.getByTestId("albanian-source-linked-functional-hypothesis")).toHaveTextContent("conditionally compatible with an agent reading");
+    expect(screen.getByTestId("albanian-source-linked-functional-hypothesis")).toHaveTextContent("firefighter");
+    expect(screen.getByTestId("albanian-source-linked-functional-hypothesis")).toHaveTextContent("fireman");
+    expect(screen.getByTestId("albanian-source-linked-functional-hypothesis")).toHaveTextContent("Functional operation: none classified");
+    expect(screen.getByTestId("albanian-reading-composition-null")).toHaveTextContent("Null");
+    cleanup();
+  });
+});
 
 describe("explicit Albanian source-record selector fail-closed behavior v0.1", () => {
   const ownerId = "kaikki-albanian-jsonl:word=krye:ordinal=1";
