@@ -167,6 +167,10 @@ export function PrimaryAlbanianReadingCardV0_1({
                   : "This exploratory interpretation is bounded to the exact source evidence and sense above. It does not establish morphology, historical derivation, or embryo meaning."}
               </p>
             </>
+          ) : supportedSourceComponentHypothesis ? (
+            <p className="mt-2">
+              No functional operation is classified for this source reading. A separate source-linked conditional component hypothesis is shown below; canonical component-sense selection and independent embryo meaning remain UNKNOWN_OR_NULL.
+            </p>
           ) : (
             <p className="mt-2">
               UNKNOWN_OR_NULL · no supported functional interpretation is emitted for this exact source reading.
