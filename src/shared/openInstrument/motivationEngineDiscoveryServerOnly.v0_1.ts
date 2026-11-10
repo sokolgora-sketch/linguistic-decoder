@@ -1331,6 +1331,19 @@ function unknownComponentFunctionalHypothesisV0_1(
   });
 }
 
+function exactSourceGlossPhraseV0_1(gloss: string): string {
+  return normalizedSourceTemplateTextV0_1(gloss).replace(/[.!?;:,]+$/u, "").trim();
+}
+
+function explicitObjectPhraseFromActionGlossV0_1(gloss: string): string | null {
+  const normalizedGloss = exactSourceGlossPhraseV0_1(gloss);
+  if (!/^to\s+\p{L}/u.test(normalizedGloss)) return null;
+  const parentheticalPhrases = [...normalizedGloss.matchAll(/\(([^()]*)\)/gu)];
+  if (parentheticalPhrases.length !== 1) return null;
+  const objectPhrase = exactSourceGlossPhraseV0_1(parentheticalPhrases[0]?.[1] ?? "");
+  return objectPhrase.length > 0 ? objectPhrase : null;
+}
+
 function buildThreeComponentFunctionalHypothesisV0_1(input: Readonly<{
   primary: AlbanianSourceLinkedRecordV0_1;
   components: readonly AlbanianSourceLinkedRecordV0_1[];
@@ -1376,6 +1389,27 @@ function buildThreeComponentFunctionalHypothesisV0_1(input: Readonly<{
     ),
   );
   if (incompleteSenseIdentity) reasons.push("SOURCE_SENSE_IDENTITY_OR_MEANING_INCOMPLETE");
+
+  const objectActionGlossPairs = objectRecords[0] && objectResolution?.status === "RESOLVED" && verbRecords[0]
+    ? (objectRecords[0].sourceSenses ?? []).flatMap((objectSense) =>
+        objectSense.glosses.flatMap((objectGloss) => {
+          const normalizedObjectGloss = exactSourceGlossPhraseV0_1(objectGloss);
+          if (!normalizedObjectGloss) return [];
+          return (verbRecords[0]?.sourceSenses ?? []).flatMap((actionSense) =>
+            actionSense.glosses.flatMap((actionGloss) =>
+              explicitObjectPhraseFromActionGlossV0_1(actionGloss) === normalizedObjectGloss
+                ? [{ objectSense, objectGloss, actionSense, actionGloss }]
+                : [],
+            ),
+          );
+        }),
+      )
+    : [];
+  if (objectActionGlossPairs.length !== 1) {
+    reasons.push(objectActionGlossPairs.length === 0
+      ? "SOURCE_OBJECT_ACTION_GLOSS_COMPATIBILITY_NOT_EXPLICIT"
+      : "SOURCE_OBJECT_ACTION_GLOSS_PAIR_NOT_UNIQUE");
+  }
   if (reasons.length > 0) return unknownComponentFunctionalHypothesisV0_1(reasons);
 
   const objectRecord = objectRecords[0];
@@ -1383,9 +1417,10 @@ function buildThreeComponentFunctionalHypothesisV0_1(input: Readonly<{
   const suffixRecord = suffixRecords[0];
   const occupationSense = occupationSenses[0];
   const suffixSense = suffixAgentSenses[0];
+  const objectActionGlossPair = objectActionGlossPairs[0];
   if (!objectRecord || !actionRecord || !suffixRecord || !occupationSense || !suffixSense ||
-    !objectResolution || !actionResolution || !suffixResolution) {
-    return unknownComponentFunctionalHypothesisV0_1(["SOURCE_ROLE_EVIDENCE_MISSING"]);
+    !objectResolution || !actionResolution || !suffixResolution || !objectActionGlossPair) {
+    return unknownComponentFunctionalHypothesisV0_1(["SOURCE_ROLE_OR_OBJECT_ACTION_PAIR_EVIDENCE_MISSING"]);
   }
 
   const senseAlternative = (record: AlbanianSourceLinkedRecordV0_1): string[] =>
@@ -1398,7 +1433,8 @@ function buildThreeComponentFunctionalHypothesisV0_1(input: Readonly<{
     ...input.componentResolutions
       .filter((resolution) => resolution.status === "AMBIGUOUS")
       .map((resolution) => `${resolution.sourceForm}: multiple exact Albanian source records remain unresolved; no record or sense is selected.`),
-    "The source does not align a specific object or action sense with a specific target sense.",
+    `Conditional source-side gloss pair: ${objectActionGlossPair.objectSense.senseId ?? "Unknown object sense"} “${objectActionGlossPair.objectGloss}” + ${objectActionGlossPair.actionSense.senseId ?? "Unknown action sense"} “${objectActionGlossPair.actionGloss}”. This is not an exact target/component sense crosswalk.`,
+    "No component sense is selected as canonical, and the source does not align a specific component sense with a specific target sense.",
   ];
   const evidenceRefs = evidenceRecords.map((record) => Object.freeze({
     sourceRecordId: record.sourceRecordId,
@@ -1409,12 +1445,13 @@ function buildThreeComponentFunctionalHypothesisV0_1(input: Readonly<{
   return Object.freeze({
     status: "EXPLORATORY_FUNCTIONAL_HYPOTHESIS" as const,
     functionalOperation: null,
-    statement: `A source-grounded object/action/role hypothesis can be explored: ${objectRecord.form} has a noun record with ${objectRecord.sourceSenses?.length ?? 0} retained senses; ${actionResolution.sourceForm} has a verb record among ${actionRecords.length} exact source records, with ${actionRecord.sourceSenses?.length ?? 0} retained verb senses; ${suffixRecord.form} has a source sense described as “${suffixSense.glosses.join("; ")}”; and the target has the separate ${occupationSense.senseId} occupation-category sense (${occupationSense.glosses.join("; ")}). The noun and verb alternatives remain unresolved: no component sense is aligned to a target sense, and no functional operation is classified.`,
+    statement: `If the source-recorded noun sense “${objectActionGlossPair.objectGloss}” (${objectActionGlossPair.objectSense.senseId}) and verb sense “${objectActionGlossPair.actionGloss}” (${objectActionGlossPair.actionSense.senseId}) are the intended component readings, and the suffix sense “${suffixSense.glosses.join("; ")}” (${suffixSense.senseId}) applies, the formation is conditionally readable as an agent whose recorded action is “${objectActionGlossPair.actionGloss}”. This is consistent with the target’s separate occupation-category sense “${occupationSense.glosses.join("; ")}” (${occupationSense.senseId}); no source crosswalk aligns these exact senses.`,
     basis: Object.freeze([
       "SOURCE_AUTHORED_THREE_COMPONENT_COMPOUND",
       "EXACT_ALBANIAN_COMPONENT_REFERENCES",
       "SOURCE_COMPONENT_POS_NOUN_VERB_SUFFIX",
       "SOURCE_SUFFIX_SENSE_DESCRIBES_AGENT_NOUN_FORMATION",
+      "SOURCE_OBJECT_ACTION_GLOSS_PAIR_EXACTLY_COMPATIBLE",
       "TARGET_SOURCE_SENSE_HAS_SQ_OCCUPATIONS_CATEGORY",
     ]),
     alternatives: Object.freeze(alternatives),
