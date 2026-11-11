@@ -2025,4 +2025,81 @@ describe("Single-word motivation workbench v0.1", () => {
     expect(screen.getByTestId("cross-language-target-components")).toHaveTextContent("DI + ETB");
   });
 
+  describe("cross-language dependent-state invalidation", () => {
+    beforeEach(() => {
+      render(<SingleWordMotivationWorkbenchV0_1 initialTargetWord="DIETA" />);
+      fireEvent.change(screen.getByLabelText("Target language"), { target: { value: "Albanian" } });
+      fireEvent.change(screen.getByLabelText("Component 1 exact spelling"), { target: { value: "DI" } });
+      fireEvent.change(screen.getByLabelText("Component 1 proposed meaning"), { target: { value: "know" } });
+      fireEvent.change(screen.getByLabelText("Component 1 grammatical role"), { target: { value: "verb" } });
+      fireEvent.change(screen.getByLabelText("Component 1 language"), { target: { value: "Albanian" } });
+      fireEvent.change(screen.getByLabelText("Component 2 exact spelling"), { target: { value: "ETA" } });
+      fireEvent.change(screen.getByLabelText("Component 2 language"), { target: { value: "Albanian" } });
+      fireEvent.click(screen.getByLabelText("Component 2 not yet explained"));
+      fireEvent.change(screen.getByLabelText("Proposed functional explanation"), { target: { value: "Knowledge-guided eating." } });
+      fireEvent.change(screen.getByLabelText("Cross-language proposed synthesis"), {
+        target: { value: "Prior synthesis for DI meaning know." },
+      });
+    });
+
+    it.each([
+      {
+        field: "proposed meaning",
+        change: () => fireEvent.change(screen.getByLabelText("Component 1 proposed meaning"), { target: { value: "recognize" } }),
+      },
+      {
+        field: "grammatical role",
+        change: () => fireEvent.change(screen.getByLabelText("Component 1 grammatical role"), { target: { value: "noun" } }),
+      },
+      {
+        field: "evidence status",
+        change: () => fireEvent.change(screen.getByLabelText("Component 1 evidence status"), { target: { value: "UNKNOWN_OR_NULL" } }),
+      },
+      {
+        field: "unresolved flag",
+        change: () => fireEvent.click(screen.getByLabelText("Component 1 not yet explained")),
+      },
+    ])("clears a prior cross-language synthesis when component $field changes", ({ change }) => {
+      expect(screen.getByLabelText("Cross-language proposed synthesis")).toHaveValue("Prior synthesis for DI meaning know.");
+      expect(screen.getByTestId("cross-language-proposal-result")).toHaveTextContent("Prior synthesis for DI meaning know.");
+
+      change();
+
+      expect(screen.getByLabelText("Cross-language proposed synthesis")).toHaveValue("");
+      expect(screen.queryByText("Prior synthesis for DI meaning know.")).not.toBeInTheDocument();
+    });
+
+    it("clears a functional parallel when the component meaning it used changes", () => {
+      fireEvent.click(screen.getByTestId("cross-language-add-parallel"));
+      fireEvent.change(screen.getByLabelText("Parallel structure 1 language"), { target: { value: "Albanian" } });
+      fireEvent.change(screen.getByLabelText("Parallel structure 1 exact form"), { target: { value: "DI TË HA" } });
+      fireEvent.change(screen.getByLabelText("Parallel structure 1 contribution 1 form"), { target: { value: "DI" } });
+      fireEvent.change(screen.getByLabelText("Parallel structure 1 contribution 1 meaning"), { target: { value: "know" } });
+      fireEvent.change(screen.getByLabelText("Parallel structure 1 contribution 1 role"), { target: { value: "knowing" } });
+      fireEvent.click(screen.getByRole("button", { name: "Add contribution to parallel structure 1" }));
+      fireEvent.change(screen.getByLabelText("Parallel structure 1 contribution 2 form"), { target: { value: "TË HA" } });
+      fireEvent.change(screen.getByLabelText("Parallel structure 1 contribution 2 meaning"), { target: { value: "know how to eat" } });
+      fireEvent.change(screen.getByLabelText("Parallel structure 1 contribution 2 role"), { target: { value: "eating" } });
+
+      fireEvent.change(screen.getByLabelText("Parallel structure 2 language"), { target: { value: "Sanskrit" } });
+      fireEvent.change(screen.getByLabelText("Parallel structure 2 exact form"), { target: { value: "MITĀHĀRA" } });
+      fireEvent.change(screen.getByLabelText("Parallel structure 2 contribution 1 form"), { target: { value: "mita" } });
+      fireEvent.change(screen.getByLabelText("Parallel structure 2 contribution 1 meaning"), { target: { value: "measured / moderate" } });
+      fireEvent.change(screen.getByLabelText("Parallel structure 2 contribution 1 role"), { target: { value: "measurement" } });
+      fireEvent.click(screen.getByRole("button", { name: "Add contribution to parallel structure 2" }));
+      fireEvent.change(screen.getByLabelText("Parallel structure 2 contribution 2 form"), { target: { value: "āhāra" } });
+      fireEvent.change(screen.getByLabelText("Parallel structure 2 contribution 2 meaning"), { target: { value: "food intake" } });
+      fireEvent.change(screen.getByLabelText("Parallel structure 2 contribution 2 role"), { target: { value: "nourishment" } });
+      fireEvent.change(screen.getByLabelText("Functional parallel proposed similarity"), { target: { value: "Regulating food intake." } });
+      fireEvent.change(screen.getByLabelText("Functional parallel differences"), { target: { value: "Knowing and measuring are different functions." } });
+
+      expect(screen.getByTestId("cross-language-functional-parallel-result")).toHaveTextContent("MITĀHĀRA");
+      fireEvent.change(screen.getByLabelText("Component 1 proposed meaning"), { target: { value: "recognize" } });
+
+      expect(screen.queryByTestId("cross-language-functional-parallel-result")).not.toBeInTheDocument();
+      expect(screen.getByLabelText("Cross-language proposed synthesis")).toHaveValue("");
+      expect(screen.getByTestId("cross-language-add-parallel")).toBeInTheDocument();
+    });
+  });
+
 });

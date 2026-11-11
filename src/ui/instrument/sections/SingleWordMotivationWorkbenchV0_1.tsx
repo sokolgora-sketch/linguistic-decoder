@@ -1408,7 +1408,25 @@ export function SingleWordMotivationWorkbenchV0_1({
     targetWord,
     targetLanguage,
     targetDialect,
-    components: segments.map(({ exactSpelling, language, dialect }) => ({ exactSpelling, language, dialect })),
+    components: segments.map(({
+      exactSpelling,
+      language,
+      dialect,
+      proposedMeaning,
+      proposedGrammaticalRole,
+      evidenceStatus,
+      evidenceReference,
+      unresolved,
+    }) => ({
+      exactSpelling,
+      language,
+      dialect,
+      proposedMeaning,
+      proposedGrammaticalRole,
+      evidenceStatus,
+      evidenceReference,
+      unresolved,
+    })),
     crossLanguageResetVersion,
   });
   const mechanicalDraftSnapshot = useMemo(() => JSON.stringify({ input, mechanicalOperations }), [input, mechanicalOperations]);

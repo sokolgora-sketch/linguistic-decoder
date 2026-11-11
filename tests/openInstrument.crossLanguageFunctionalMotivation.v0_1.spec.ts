@@ -142,6 +142,14 @@ describe("cross-language functional motivation v0.1", () => {
       ["target-component-2", "ETA"],
     ]);
     expect(result.proposal.targetComponents[1]).toMatchObject({ unresolved: true, proposedMeaning: null, evidenceStatus: "UNKNOWN_OR_NULL" });
+    expect(result.proposal.targetComponents.map((component) => ({
+      targetCodePointSpan: component.targetCodePointSpan,
+      voiceAttributionStatus: component.voiceAttributionStatus,
+      voiceAttributionReasonCodes: component.voiceAttributionReasonCodes,
+    }))).toEqual([
+      { targetCodePointSpan: { start: 0, end: 2 }, voiceAttributionStatus: "ATTRIBUTED", voiceAttributionReasonCodes: [] },
+      { targetCodePointSpan: { start: 2, end: 5 }, voiceAttributionStatus: "ATTRIBUTED", voiceAttributionReasonCodes: [] },
+    ]);
     expect(result.proposal.witnesses).toEqual([expect.objectContaining({
       witnessId: "eat-witness",
       kind: "USER_PROPOSED",
@@ -178,11 +186,77 @@ describe("cross-language functional motivation v0.1", () => {
       })],
     })]);
     expect(result.proposal.targetWrittenVoices.path).toEqual(["I", "E", "A"]);
+    expect(result.proposal.targetWrittenVoices.events.map(({ voice, sourcePosition }) => [voice, sourcePosition])).toEqual([
+      ["I", 1], ["E", 2], ["A", 4],
+    ]);
     expect(result.proposal.targetComponents.flatMap((component) => component.voiceEvents.map((event) => event.voice))).toEqual(["I", "E", "A"]);
+    expect(result.proposal.targetComponents.map((component) => component.voiceEvents.map(({ voice, sourcePosition }) => [voice, sourcePosition]))).toEqual([
+      [["I", 1]], [["E", 2], ["A", 4]],
+    ]);
     expect(result.proposal.functionalSynthesis).toEqual({ text: "Knowledge-guided eating.", status: "EXPLORATORY_HYPOTHESIS" });
     expect(result.proposal.strictEmbryoMeaning).toEqual({ status: "UNKNOWN_OR_NULL", meaning: null });
     expect(result.proposal.sourceAuthorityPromotion).toBe("NONE");
     expect(result.proposal.selection).toEqual({ mode: "no_single_winner", selectedCandidateId: null, userDecisionPosture: "user_decides" });
+  });
+
+  it("withholds component spans for PEX + O = PEXO versus exact target PEO while retaining target Voices", () => {
+    const parent = buildSingleWordFunctionalMotivationProposalV0_1({
+      ...dietaProposalInput,
+      targetWord: "PEO",
+      segments: [
+        { ...dietaProposalInput.segments[0]!, exactSpelling: "PEX" },
+        { ...dietaProposalInput.segments[1]!, exactSpelling: "O" },
+      ],
+      unresolvedConnectingMaterial: "The component join does not match PEO.",
+    });
+    expect(parent.status).toBe("READY");
+    if (parent.status !== "READY") return;
+    expect(parent.proposal.reconstruction).toMatchObject({ exactConcatenation: "PEXO", targetSpelling: "PEO", formComparison: "MISMATCH" });
+
+    const result = buildCrossLanguageFunctionalMotivationV0_1(parent, { ...dietaInput, correspondences: [] });
+    expect(result.status).toBe("READY");
+    if (result.status !== "READY") return;
+    expect(result.proposal.target.exactWord).toBe("PEO");
+    expect(result.proposal.targetComponents.map(({ componentId, exactSpelling, targetCodePointSpan }) => [componentId, exactSpelling, targetCodePointSpan])).toEqual([
+      ["target-component-1", "PEX", null],
+      ["target-component-2", "O", null],
+    ]);
+    expect(result.proposal.targetComponents.map(({ voiceAttributionStatus, voiceAttributionReasonCodes, voiceEvents }) => ({
+      voiceAttributionStatus,
+      voiceAttributionReasonCodes,
+      voiceEvents,
+    }))).toEqual([
+      { voiceAttributionStatus: "UNKNOWN_OR_NULL", voiceAttributionReasonCodes: ["TARGET_COMPONENT_CONCATENATION_MISMATCH"], voiceEvents: [] },
+      { voiceAttributionStatus: "UNKNOWN_OR_NULL", voiceAttributionReasonCodes: ["TARGET_COMPONENT_CONCATENATION_MISMATCH"], voiceEvents: [] },
+    ]);
+    expect(result.proposal.targetWrittenVoices.path).toEqual(["E", "O"]);
+    expect(result.proposal.targetWrittenVoices.events.map(({ voice, sourcePosition }) => [voice, sourcePosition])).toEqual([["E", 1], ["O", 2]]);
+  });
+
+  it("preserves the KANDIL component mismatch without granting inferred component spans", () => {
+    const parent = buildSingleWordFunctionalMotivationProposalV0_1({
+      ...dietaProposalInput,
+      targetWord: "KANDIL",
+      segments: [
+        { ...dietaProposalInput.segments[0]!, exactSpelling: "KAN", proposedMeaning: "have" },
+        { ...dietaProposalInput.segments[1]!, exactSpelling: "DILL", proposedMeaning: "sun/light", proposedGrammaticalRole: "noun", unresolved: false, evidenceStatus: "USER_PROPOSED" },
+      ],
+      unresolvedConnectingMaterial: "The proposed KANDILL spelling differs from KANDIL.",
+    });
+    expect(parent.status).toBe("READY");
+    if (parent.status !== "READY") return;
+    expect(parent.proposal.reconstruction).toMatchObject({ exactConcatenation: "KANDILL", targetSpelling: "KANDIL", formComparison: "MISMATCH" });
+
+    const result = buildCrossLanguageFunctionalMotivationV0_1(parent, { ...dietaInput, correspondences: [] });
+    expect(result.status).toBe("READY");
+    if (result.status !== "READY") return;
+    expect(result.proposal.targetComponents.map(({ componentId, exactSpelling, targetCodePointSpan }) => [componentId, exactSpelling, targetCodePointSpan])).toEqual([
+      ["target-component-1", "KAN", null],
+      ["target-component-2", "DILL", null],
+    ]);
+    expect(result.proposal.targetComponents.every((component) => component.voiceAttributionStatus === "UNKNOWN_OR_NULL" && component.voiceEvents.length === 0)).toBe(true);
+    expect(result.proposal.targetWrittenVoices.path).toEqual(["A", "I"]);
+    expect(result.proposal.targetWrittenVoices.events.map(({ voice, sourcePosition }) => [voice, sourcePosition])).toEqual([["A", 1], ["I", 4]]);
   });
 
   it("defines versioned reusable Identity and adjacent-transposition operations", () => {

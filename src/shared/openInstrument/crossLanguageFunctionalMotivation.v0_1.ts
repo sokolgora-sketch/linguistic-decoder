@@ -138,9 +138,11 @@ export type CrossLanguageFunctionalMotivationV0_1 = Readonly<{
     exactSpelling: string;
     language: string;
     dialect: string | null;
-    targetCodePointSpan: Readonly<{ start: number; end: number }>;
+    targetCodePointSpan: Readonly<{ start: number; end: number }> | null;
     proposedMeaning: string | null;
     evidenceStatus: CrossLanguageEvidenceStatusV0_1;
+    voiceAttributionStatus: "ATTRIBUTED" | "UNKNOWN_OR_NULL";
+    voiceAttributionReasonCodes: readonly string[];
     voiceEvents: readonly StructuralVoiceEventV0_2[];
     unresolved: boolean;
   }>[];
@@ -695,16 +697,25 @@ export function buildCrossLanguageFunctionalMotivationV0_1(
   const resolvedWitnesses = witnesses as CrossLanguageFunctionalMotivationV0_1["witnesses"];
   const witnessById = new Map(resolvedWitnesses.map((witness) => [witness.witnessId, witness]));
 
-  const componentOffsets: Array<{ start: number; end: number }> = [];
-  let offset = 0;
-  proposal.segments.forEach((segment) => {
-    const end = offset + Array.from(segment.exactSpelling).length;
-    componentOffsets.push({ start: offset, end });
-    offset = end;
-  });
+  const targetComponentsExactlyAlign = proposal.reconstruction.formComparison === "EXACT_MATCH" &&
+    proposal.reconstruction.exactConcatenation === proposal.target.exactWord;
+  const targetVoiceEventsAvailable = proposal.writtenStructure.status === "COMPLETE";
+  let componentOffset = 0;
   const targetComponents = proposal.segments.map((segment, segmentIndex) => {
-    const span = componentOffsets[segmentIndex]!;
-    const voiceEvents = proposal.writtenStructure.status === "COMPLETE"
+    const segmentLength = Array.from(segment.exactSpelling).length;
+    const span = targetComponentsExactlyAlign
+      ? { start: componentOffset, end: componentOffset + segmentLength }
+      : null;
+    if (span) componentOffset = span.end;
+    const voiceAttributionStatus = span !== null && targetVoiceEventsAvailable
+      ? "ATTRIBUTED" as const
+      : "UNKNOWN_OR_NULL" as const;
+    const voiceAttributionReasonCodes = span === null
+      ? ["TARGET_COMPONENT_CONCATENATION_MISMATCH"]
+      : !targetVoiceEventsAvailable
+        ? [proposal.writtenStructure.reasonCode ?? "TARGET_WRITTEN_VOICE_EVENTS_UNAVAILABLE"]
+        : [];
+    const voiceEvents = span !== null && targetVoiceEventsAvailable
       ? proposal.writtenStructure.voiceEvents.filter((event) => event.sourcePosition >= span.start && event.sourcePosition < span.end).map(cloneVoiceEvent)
       : [];
     return {
@@ -716,6 +727,8 @@ export function buildCrossLanguageFunctionalMotivationV0_1(
       targetCodePointSpan: span,
       proposedMeaning: segment.proposedMeaning,
       evidenceStatus: segment.evidence.status,
+      voiceAttributionStatus,
+      voiceAttributionReasonCodes,
       voiceEvents,
       unresolved: segment.unresolved,
     };
