@@ -1846,25 +1846,49 @@ export function SingleWordMotivationWorkbenchV0_1({
               <span>{result.proposal.target.language}{result.proposal.target.dialect ? ` · ${result.proposal.target.dialect}` : ""}</span>
               <span className="rounded-full border border-[#746541] px-2 py-0.5 text-[10px] font-semibold uppercase text-[#f0ddb0]">PROPOSED</span>
             </div>
-            <div className="mt-2 font-mono">{result.proposal.segments.map((segment) => segment.exactSpelling).join(" + ")} → {result.proposal.reconstruction.exactConcatenation}</div>
-            <div>Target spelling: <span className="font-mono">{result.proposal.reconstruction.targetSpelling}</span> · {result.proposal.reconstruction.formComparison}</div>
-            <div className="mt-2 space-y-1">
-              {result.proposal.segments.map((segment, index) => (
-                <div key={`${index}:${segment.exactSpelling}`} data-testid="single-word-proposal-segment">
-                  <span className="font-mono">{segment.exactSpelling}</span> — {segment.proposedMeaning ?? "meaning Unknown / Null"} · role {segment.proposedGrammaticalRole ?? "Unknown / Null"} · {segment.language}{segment.dialect ? ` (${segment.dialect})` : ""} · {evidenceStatusLabel(segment.evidence.status)}{segment.evidence.sourceReference ? ` · ${segment.evidence.sourceReference}` : ""}
-                  {segment.unresolved ? " · not yet explained" : ""}
-                  {segment.evidence.status === "CITATION_ENTERED_UNVERIFIED" ? " · citation entered by user; not independently verified" : ""}
-                </div>
-              ))}
-            </div>
-            {result.proposal.unresolvedConnectingMaterial ? <div className="mt-2">Unexplained connecting material: {result.proposal.unresolvedConnectingMaterial}</div> : null}
-            {result.proposal.declaredTransformations.map((transformation, index) => (
-              <div key={index} className="mt-1 text-[#d5c28f]">
-                Declared transform {transformation.from} → {transformation.to}: user-declared and unverified; not applied.
+            <section data-testid="single-word-functional-motivation-reading" aria-label="Functional Motivation Reading" className="mt-3 rounded border border-[#53604a] bg-[#0b100b] p-3">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <h3 className="font-semibold text-white">Functional Motivation Reading</h3>
+                <span className="rounded-full border border-[#746541] px-2 py-0.5 text-[10px] font-semibold uppercase text-[#f0ddb0]">USER_PROPOSED · exploratory motivation</span>
               </div>
-            ))}
-            <div className="mt-2"><strong>Functional motivation:</strong> {result.proposal.functionalMotivation.explanation} · {transparencyLabel(result.proposal.functionalMotivation.transparency)}</div>
-            <div className="mt-1">Strict embryo meaning: <strong>Unknown / Null</strong> · compound attestation: not claimed · historical origin: not claimed.</div>
+              <p className="mt-2"><strong>Whole word:</strong> <span className="font-mono">{result.proposal.target.exactWord}</span></p>
+              <div className="mt-2">
+                <strong>Proposed components</strong>
+                <ol className="mt-1 list-inside list-decimal space-y-1">
+                  {result.proposal.segments.map((segment, index) => (
+                    <li key={`${index}:${segment.exactSpelling}`} data-testid="single-word-proposal-segment">
+                      <span className="font-mono">{segment.exactSpelling}</span> — meaning {segment.unresolved ? "Unknown / Null (UNKNOWN_OR_NULL)" : segment.proposedMeaning ?? "Unknown / Null (UNKNOWN_OR_NULL)"}; grammatical role {segment.unresolved ? "Unknown / Null (UNKNOWN_OR_NULL)" : segment.proposedGrammaticalRole ?? "Unknown / Null (UNKNOWN_OR_NULL)"}; {segment.language}{segment.dialect ? ` (${segment.dialect})` : ""}. {evidenceStatusLabel(segment.evidence.status)}{segment.evidence.sourceReference ? ` · ${segment.evidence.sourceReference}` : ""}
+                      {segment.unresolved ? " · user-marked not yet explained" : ""}
+                      {segment.evidence.status === "CITATION_ENTERED_UNVERIFIED" ? " · citation entered by user; not independently verified" : ""}
+                    </li>
+                  ))}
+                </ol>
+              </div>
+              <p className="mt-2"><strong>User-proposed functional interaction:</strong> {result.proposal.functionalMotivation.explanation} · {transparencyLabel(result.proposal.functionalMotivation.transparency)}</p>
+              <div data-testid="single-word-functional-reading-reconstruction" className="mt-2 rounded border border-[#66532e] bg-[#18140e] p-2">
+                <strong>Structural spelling comparison:</strong> <span className="font-mono">{result.proposal.segments.map((segment) => segment.exactSpelling).join(" + ")} = {result.proposal.reconstruction.exactConcatenation}</span>; target <span className="font-mono">{result.proposal.reconstruction.targetSpelling}</span> · {result.proposal.reconstruction.formComparison}.
+                {result.proposal.reconstruction.formComparison === "MISMATCH" ? " The spelling correspondence remains unresolved." : " No spelling mismatch is recorded; exact concatenation alone does not establish morphology or etymology."}
+              </div>
+              <div data-testid="single-word-functional-reading-additional-tensions" className="mt-2">
+                <strong>Additional unresolved proposal tensions</strong>
+                {result.proposal.segments.some((segment) => segment.unresolved) || result.proposal.unresolvedConnectingMaterial ? (
+                  <ul className="mt-1 list-inside list-disc">
+                    {result.proposal.segments.map((segment, index) => segment.unresolved ? (
+                      <li key={`${index}:${segment.exactSpelling}`}>{segment.exactSpelling}: meaning and grammatical role UNKNOWN_OR_NULL; marked by the user as not yet explained.</li>
+                    ) : null)}
+                    {result.proposal.unresolvedConnectingMaterial ? <li>User-entered unresolved material: {result.proposal.unresolvedConnectingMaterial}</li> : null}
+                  </ul>
+                ) : <p className="mt-1">No additional unresolved component or connecting-material note was entered.</p>}
+                {result.proposal.declaredTransformations.map((transformation, index) => (
+                  <p key={index} className="mt-1 text-[#d5c28f]">
+                    Declared transform {transformation.from} → {transformation.to}: user-declared and unverified; not applied.
+                  </p>
+                ))}
+              </div>
+              <p className="mt-2 text-xs text-[#d5c28f]">
+                Interpretation status: USER_PROPOSED · exploratory. Strict embryo meaning: <strong>Unknown / Null (UNKNOWN_OR_NULL)</strong>; compound attestation: not claimed · historical origin: not claimed. No single winner is selected; the user decides. Mechanical replay remains separate and does not validate this reading.
+              </p>
+            </section>
             <div className="mt-2 rounded border border-[#303843] bg-[#0b0f0c] p-2">
               <div className="font-semibold">Written Seven-Voices events</div>
               <div className="font-mono">{result.proposal.writtenStructure.status === "COMPLETE" ? result.proposal.writtenStructure.voicePath.join(" → ") || "∅" : "Unknown / Null"}</div>

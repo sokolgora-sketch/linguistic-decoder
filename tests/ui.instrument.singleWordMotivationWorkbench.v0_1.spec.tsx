@@ -1389,16 +1389,16 @@ describe("Single-word motivation workbench v0.1", () => {
     fireEvent.change(screen.getByLabelText("Target language"), { target: { value: "Albanian" } });
     const values = [
       ["Component 1 exact spelling", "KAN"],
-      ["Component 1 proposed meaning", "have"],
+      ["Component 1 proposed meaning", "have/possess"],
       ["Component 1 grammatical role", "verb"],
       ["Component 1 language", "Albanian"],
       ["Component 1 dialect", "Gheg"],
       ["Component 2 exact spelling", "DILL"],
-      ["Component 2 proposed meaning", "sun"],
+      ["Component 2 proposed meaning", "sun/light"],
       ["Component 2 grammatical role", "noun"],
       ["Component 2 language", "Albanian"],
       ["Component 2 dialect", "Gheg"],
-      ["Proposed functional explanation", "Have sun / have light"],
+      ["Proposed functional explanation", "A lamp contains or provides light"],
     ] as const;
     for (const [label, value] of values) fireEvent.change(screen.getByLabelText(label), { target: { value } });
 
@@ -1420,10 +1420,23 @@ describe("Single-word motivation workbench v0.1", () => {
 
     const proposal = screen.getByTestId("single-word-proposal-result");
     expect(proposal).toHaveTextContent("PROPOSED");
-    expect(proposal).toHaveTextContent("Have sun / have light");
+    expect(proposal).toHaveTextContent("A lamp contains or provides light");
     expect(proposal).toHaveTextContent("Strict embryo meaning: Unknown / Null");
     expect(proposal).toHaveTextContent("A → I");
     expect(proposal).toHaveTextContent("historical origin: not claimed");
+
+    const reading = screen.getByTestId("single-word-functional-motivation-reading");
+    expect(reading).toHaveTextContent("USER_PROPOSED · exploratory motivation");
+    expect(reading).toHaveTextContent("Whole word: KANDIL");
+    expect(reading).toHaveTextContent("KAN — meaning have/possess; grammatical role verb");
+    expect(reading).toHaveTextContent("DILL — meaning sun/light; grammatical role noun");
+    expect(reading).toHaveTextContent("User-proposed functional interaction: A lamp contains or provides light");
+    expect(reading).toHaveTextContent("KAN + DILL = KANDILL; target KANDIL · MISMATCH");
+    expect(reading).toHaveTextContent("The spelling correspondence remains unresolved");
+    expect(reading).toHaveTextContent("Strict embryo meaning: Unknown / Null (UNKNOWN_OR_NULL)");
+    expect(reading).toHaveTextContent("No single winner is selected; the user decides");
+    expect(reading).toHaveTextContent("Mechanical replay remains separate and does not validate this reading");
+    expect(reading).not.toHaveTextContent("Final mechanical spelling:");
   });
 
   it("replays the DRITARE H omission and keeps the HARE spelling unchanged", () => {
@@ -1446,8 +1459,18 @@ describe("Single-word motivation workbench v0.1", () => {
 
   it("marks replay stale after proposal changes and clears all local proposal and source state", () => {
     render(<SingleWordMotivationWorkbenchV0_1 initialTargetWord="KANDIL" />);
+    fireEvent.change(screen.getByLabelText("Target language"), { target: { value: "Albanian" } });
     fireEvent.change(screen.getByLabelText("Component 1 exact spelling"), { target: { value: "KAN" } });
+    fireEvent.change(screen.getByLabelText("Component 1 proposed meaning"), { target: { value: "have" } });
+    fireEvent.change(screen.getByLabelText("Component 1 grammatical role"), { target: { value: "verb" } });
+    fireEvent.change(screen.getByLabelText("Component 1 language"), { target: { value: "Albanian" } });
     fireEvent.change(screen.getByLabelText("Component 2 exact spelling"), { target: { value: "DIL" } });
+    fireEvent.change(screen.getByLabelText("Component 2 proposed meaning"), { target: { value: "light" } });
+    fireEvent.change(screen.getByLabelText("Component 2 grammatical role"), { target: { value: "noun" } });
+    fireEvent.change(screen.getByLabelText("Component 2 language"), { target: { value: "Albanian" } });
+    fireEvent.change(screen.getByLabelText("Proposed functional explanation"), { target: { value: "Carries light." } });
+    const reading = screen.getByTestId("single-word-functional-motivation-reading");
+    expect(reading).toHaveTextContent("KANDIL · EXACT_MATCH");
     fireEvent.click(screen.getByTestId("single-word-examine-interpretation"));
     expect(screen.getByTestId("single-word-mechanical-result")).toHaveAttribute("data-status", "EXAMINED");
 
@@ -1455,6 +1478,9 @@ describe("Single-word motivation workbench v0.1", () => {
     expect(screen.getByTestId("single-word-mechanical-result-stale")).toHaveTextContent("STALE");
     expect(screen.getByTestId("single-word-mechanical-result")).toHaveAttribute("data-status", "NOT_SUBMITTED");
     expect(screen.queryByText(/Final mechanical spelling:/)).not.toBeInTheDocument();
+    expect(reading).toHaveTextContent("DILL — meaning light; grammatical role noun");
+    expect(reading).toHaveTextContent("KANDILL; target KANDIL · MISMATCH");
+    expect(reading).toHaveTextContent("Carries light.");
 
     fireEvent.change(screen.getByLabelText("Proposed functional explanation"), { target: { value: "local-only proposal" } });
     fireEvent.click(screen.getByTestId("single-word-clear-interpretation"));
@@ -1509,6 +1535,12 @@ describe("Single-word motivation workbench v0.1", () => {
     expect(screen.getByTestId("single-word-proposal-result")).toHaveTextContent("Has sun / carries light");
     expect(screen.getByTestId("single-word-proposal-result")).toHaveTextContent("metaphorical");
     expect(screen.getByTestId("single-word-proposal-result")).toHaveTextContent("Strict embryo meaning: Unknown / Null");
+    const reading = screen.getByTestId("single-word-functional-motivation-reading");
+    expect(reading).toHaveTextContent("KA + N + DILL = KANDILL; target KANDIL · MISMATCH");
+    expect(reading).toHaveTextContent("N: meaning and grammatical role UNKNOWN_OR_NULL; marked by the user as not yet explained.");
+    expect(reading).toHaveTextContent("User-entered unresolved material: N role and LL/L correspondence remain unexplained.");
+    expect(reading).toHaveTextContent("KAN");
+    expect(reading).toHaveTextContent("DILL");
     expect(screen.getAllByText("A → I")).toHaveLength(2);
     expect(screen.getByTestId("single-word-proposal-result")).toHaveTextContent("not independently verified");
     expect(screen.getByTestId("single-word-proposal-result")).toHaveTextContent("user-declared and unverified; not applied");
@@ -1523,6 +1555,7 @@ describe("Single-word motivation workbench v0.1", () => {
     render(<SingleWordMotivationWorkbenchV0_1 initialTargetWord="RRUGË" />);
     expect(screen.getByTestId("single-word-proposal-incomplete")).toBeInTheDocument();
     expect(screen.queryByTestId("single-word-proposal-result")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("single-word-functional-motivation-reading")).not.toBeInTheDocument();
     fireEvent.change(screen.getByLabelText("Exact target word"), { target: { value: "RRUGË" } });
     fireEvent.change(screen.getByLabelText("Target language"), { target: { value: "Albanian" } });
     fireEvent.change(screen.getByLabelText("Component 1 exact spelling"), { target: { value: "RR" } });
@@ -1536,6 +1569,11 @@ describe("Single-word motivation workbench v0.1", () => {
     fireEvent.change(screen.getByLabelText("Proposed functional explanation"), { target: { value: "A separately labeled proposal." } });
     expect(screen.getByTestId("single-word-proposal-result")).toHaveTextContent("RRUGË");
     expect(screen.getByTestId("single-word-proposal-result")).toHaveTextContent("U → Ë");
+    const reading = screen.getByTestId("single-word-functional-motivation-reading");
+    expect(reading).toHaveTextContent("Whole word: RRUGË");
+    expect(reading).toHaveTextContent("RR + UGË = RRUGË; target RRUGË · EXACT_MATCH");
+    expect(reading).toHaveTextContent("User-proposed functional interaction: A separately labeled proposal.");
+    expect(reading).toHaveTextContent("No spelling mismatch is recorded; exact concatenation alone does not establish morphology or etymology.");
   });
 
   it("shows field-specific citation and explanation errors with their supported limits", () => {
