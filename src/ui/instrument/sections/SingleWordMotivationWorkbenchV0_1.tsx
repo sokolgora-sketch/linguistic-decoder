@@ -17,8 +17,10 @@ import {
   type SingleWordMechanicalExaminerResultV0_1,
 } from "@/shared/openInstrument/singleWordMechanicalExaminer.v0_1";
 import { analyzeStructuralInputV0_2 } from "@/shared/structuralHypothesisDiscovery.v0_2";
+import type { GenericFunctionalWitnessV1 } from "@/shared/openInstrument/genericFunctionalWitnessDiscovery.v1";
 import type { MotivationDiscoveryV0_1VM, PresentOrMissing } from "@/ui/telemetry/types";
 import { FjaloriCrossSourceEvidenceV0_1 } from "@/ui/instrument/sections/FjaloriCrossSourceEvidence.v0_1";
+import { CrossLanguageFunctionalMotivationWorkbenchV0_1 } from "@/ui/instrument/sections/CrossLanguageFunctionalMotivationWorkbenchV0_1";
 
 type DraftSegment = SingleWordFunctionalMotivationSegmentInputV0_1;
 type DraftTransformation = SingleWordFunctionalMotivationTransformationInputV0_1;
@@ -32,6 +34,7 @@ type ExaminedMechanicalDraft = Readonly<{
 export type SingleWordCurrentWordEvidenceContextV0_1 = Readonly<{
   analyzedWord: string;
   discovery?: PresentOrMissing<MotivationDiscoveryV0_1VM>;
+  sourceWitnesses?: readonly GenericFunctionalWitnessV1[];
 }>;
 
 function blankSegment(): DraftSegment {
@@ -1382,6 +1385,7 @@ export function SingleWordMotivationWorkbenchV0_1({
   const [examinedMechanicalDraft, setExaminedMechanicalDraft] = useState<ExaminedMechanicalDraft | null>(null);
   const [functionalExplanation, setFunctionalExplanation] = useState("");
   const [transparency, setTransparency] = useState<SingleWordTransparencyV0_1>("UNKNOWN_OR_NULL");
+  const [crossLanguageResetVersion, setCrossLanguageResetVersion] = useState(0);
 
   const input = useMemo<SingleWordFunctionalMotivationInputV0_1>(() => ({
     targetWord,
@@ -1394,6 +1398,37 @@ export function SingleWordMotivationWorkbenchV0_1({
     transparency,
   }), [targetWord, targetLanguage, targetDialect, segments, unresolvedConnectingMaterial, transformations, functionalExplanation, transparency]);
   const result = useMemo(() => buildSingleWordFunctionalMotivationProposalV0_1(input), [input]);
+  const availableGenericWitnesses = useMemo(() => {
+    if (currentWordEvidence?.analyzedWord !== targetWord) return [];
+    const records = new Map<string, GenericFunctionalWitnessV1>();
+    for (const witness of currentWordEvidence.sourceWitnesses ?? []) records.set(witness.witnessId, witness);
+    return [...records.values()];
+  }, [currentWordEvidence, targetWord]);
+  const crossLanguageResetKey = JSON.stringify({
+    targetWord,
+    targetLanguage,
+    targetDialect,
+    components: segments.map(({
+      exactSpelling,
+      language,
+      dialect,
+      proposedMeaning,
+      proposedGrammaticalRole,
+      evidenceStatus,
+      evidenceReference,
+      unresolved,
+    }) => ({
+      exactSpelling,
+      language,
+      dialect,
+      proposedMeaning,
+      proposedGrammaticalRole,
+      evidenceStatus,
+      evidenceReference,
+      unresolved,
+    })),
+    crossLanguageResetVersion,
+  });
   const mechanicalDraftSnapshot = useMemo(() => JSON.stringify({ input, mechanicalOperations }), [input, mechanicalOperations]);
   const currentMechanicalResult = examinedMechanicalDraft?.snapshot === mechanicalDraftSnapshot
     ? examinedMechanicalDraft.result
@@ -1463,9 +1498,11 @@ export function SingleWordMotivationWorkbenchV0_1({
     setExaminedMechanicalDraft(null);
     setFunctionalExplanation("");
     setTransparency("UNKNOWN_OR_NULL");
+    setCrossLanguageResetVersion((version) => version + 1);
   }
 
   return (
+    <>
     <section
       aria-label="Single-word functional motivation workbench"
       data-testid="single-word-motivation-workbench"
@@ -1903,5 +1940,11 @@ export function SingleWordMotivationWorkbenchV0_1({
         )}
       </div>
     </section>
+    <CrossLanguageFunctionalMotivationWorkbenchV0_1
+      key={crossLanguageResetKey}
+      parentProposal={result}
+      sourceWitnesses={availableGenericWitnesses}
+    />
+    </>
   );
 }
