@@ -699,23 +699,34 @@ export function buildCrossLanguageFunctionalMotivationV0_1(
 
   const targetComponentsExactlyAlign = proposal.reconstruction.formComparison === "EXACT_MATCH" &&
     proposal.reconstruction.exactConcatenation === proposal.target.exactWord;
+  const targetAndComponentNfcCoordinatesCompatible =
+    proposal.target.exactWord === proposal.target.exactWord.normalize("NFC") &&
+    proposal.segments.every((segment) => segment.exactSpelling === segment.exactSpelling.normalize("NFC"));
   const targetVoiceEventsAvailable = proposal.writtenStructure.status === "COMPLETE";
+  const targetComponentAttributionAuthorized = targetComponentsExactlyAlign &&
+    targetAndComponentNfcCoordinatesCompatible &&
+    targetVoiceEventsAvailable;
   let componentOffset = 0;
   const targetComponents = proposal.segments.map((segment, segmentIndex) => {
     const segmentLength = Array.from(segment.exactSpelling).length;
-    const span = targetComponentsExactlyAlign
+    const span = targetComponentAttributionAuthorized
       ? { start: componentOffset, end: componentOffset + segmentLength }
       : null;
     if (span) componentOffset = span.end;
-    const voiceAttributionStatus = span !== null && targetVoiceEventsAvailable
+    const voiceAttributionStatus = span !== null
       ? "ATTRIBUTED" as const
       : "UNKNOWN_OR_NULL" as const;
-    const voiceAttributionReasonCodes = span === null
-      ? ["TARGET_COMPONENT_CONCATENATION_MISMATCH"]
-      : !targetVoiceEventsAvailable
-        ? [proposal.writtenStructure.reasonCode ?? "TARGET_WRITTEN_VOICE_EVENTS_UNAVAILABLE"]
-        : [];
-    const voiceEvents = span !== null && targetVoiceEventsAvailable
+    const voiceAttributionReasonCodes = span !== null
+      ? []
+      : !targetComponentsExactlyAlign
+        ? ["TARGET_COMPONENT_CONCATENATION_MISMATCH"]
+        : [
+            ...(!targetAndComponentNfcCoordinatesCompatible ? ["TARGET_COMPONENT_NFC_ALIGNMENT_UNAVAILABLE"] : []),
+            ...(!targetVoiceEventsAvailable
+              ? [proposal.writtenStructure.reasonCode ?? "TARGET_WRITTEN_VOICE_EVENTS_UNAVAILABLE"]
+              : []),
+          ];
+    const voiceEvents = span !== null
       ? proposal.writtenStructure.voiceEvents.filter((event) => event.sourcePosition >= span.start && event.sourcePosition < span.end).map(cloneVoiceEvent)
       : [];
     return {

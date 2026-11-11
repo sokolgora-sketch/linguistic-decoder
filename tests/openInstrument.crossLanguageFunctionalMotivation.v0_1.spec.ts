@@ -199,6 +199,94 @@ describe("cross-language functional motivation v0.1", () => {
     expect(result.proposal.selection).toEqual({ mode: "no_single_winner", selectedCandidateId: null, userDecisionPosture: "user_decides" });
   });
 
+  it("attributes composed PË + O spans in the analyzer's NFC code-point coordinates", () => {
+    const parent = buildSingleWordFunctionalMotivationProposalV0_1({
+      ...dietaProposalInput,
+      targetWord: "PËO",
+      segments: [
+        { ...dietaProposalInput.segments[0]!, exactSpelling: "PË" },
+        { ...dietaProposalInput.segments[1]!, exactSpelling: "O" },
+      ],
+      unresolvedConnectingMaterial: "",
+    });
+    expect(parent.status).toBe("READY");
+    if (parent.status !== "READY") return;
+
+    const result = buildCrossLanguageFunctionalMotivationV0_1(parent, { ...dietaInput, correspondences: [] });
+    expect(result.status).toBe("READY");
+    if (result.status !== "READY") return;
+    expect(result.proposal.target.exactWord).toBe("PËO");
+    expect(result.proposal.targetComponents.map(({ exactSpelling, targetCodePointSpan, voiceAttributionStatus }) => ({
+      exactSpelling,
+      targetCodePointSpan,
+      voiceAttributionStatus,
+    }))).toEqual([
+      { exactSpelling: "PË", targetCodePointSpan: { start: 0, end: 2 }, voiceAttributionStatus: "ATTRIBUTED" },
+      { exactSpelling: "O", targetCodePointSpan: { start: 2, end: 3 }, voiceAttributionStatus: "ATTRIBUTED" },
+    ]);
+    expect(result.proposal.targetWrittenVoices.events.map(({ voice, sourcePosition }) => [voice, sourcePosition])).toEqual([
+      ["Ë", 1], ["O", 2],
+    ]);
+    expect(result.proposal.targetComponents.map((component) => component.voiceEvents.map(({ voice, sourcePosition }) => [voice, sourcePosition]))).toEqual([
+      [["Ë", 1]], [["O", 2]],
+    ]);
+  });
+
+  it("withholds component spans for decomposed PE + combining diaeresis + O while retaining NFC target Voices", () => {
+    const decomposedTarget = "PE\u0308O";
+    const decomposedFirstComponent = "PE\u0308";
+    const parent = buildSingleWordFunctionalMotivationProposalV0_1({
+      ...dietaProposalInput,
+      targetWord: decomposedTarget,
+      segments: [
+        { ...dietaProposalInput.segments[0]!, exactSpelling: decomposedFirstComponent },
+        { ...dietaProposalInput.segments[1]!, exactSpelling: "O" },
+      ],
+      unresolvedConnectingMaterial: "",
+    });
+    expect(parent.status).toBe("READY");
+    if (parent.status !== "READY") return;
+    expect(parent.proposal.reconstruction).toMatchObject({
+      exactConcatenation: decomposedTarget,
+      targetSpelling: decomposedTarget,
+      formComparison: "EXACT_MATCH",
+    });
+
+    const result = buildCrossLanguageFunctionalMotivationV0_1(parent, { ...dietaInput, correspondences: [] });
+    expect(result.status).toBe("READY");
+    if (result.status !== "READY") return;
+    expect(result.proposal.target.exactWord).toBe(decomposedTarget);
+    expect(result.proposal.targetComponents.map(({ componentId, exactSpelling, targetCodePointSpan, voiceAttributionStatus, voiceAttributionReasonCodes, voiceEvents }) => ({
+      componentId,
+      exactSpelling,
+      targetCodePointSpan,
+      voiceAttributionStatus,
+      voiceAttributionReasonCodes,
+      voiceEvents,
+    }))).toEqual([
+      {
+        componentId: "target-component-1",
+        exactSpelling: decomposedFirstComponent,
+        targetCodePointSpan: null,
+        voiceAttributionStatus: "UNKNOWN_OR_NULL",
+        voiceAttributionReasonCodes: ["TARGET_COMPONENT_NFC_ALIGNMENT_UNAVAILABLE"],
+        voiceEvents: [],
+      },
+      {
+        componentId: "target-component-2",
+        exactSpelling: "O",
+        targetCodePointSpan: null,
+        voiceAttributionStatus: "UNKNOWN_OR_NULL",
+        voiceAttributionReasonCodes: ["TARGET_COMPONENT_NFC_ALIGNMENT_UNAVAILABLE"],
+        voiceEvents: [],
+      },
+    ]);
+    expect(result.proposal.targetWrittenVoices).toMatchObject({ status: "COMPLETE", path: ["Ë", "O"] });
+    expect(result.proposal.targetWrittenVoices.events.map(({ voice, sourcePosition }) => [voice, sourcePosition])).toEqual([
+      ["Ë", 1], ["O", 2],
+    ]);
+  });
+
   it("withholds component spans for PEX + O = PEXO versus exact target PEO while retaining target Voices", () => {
     const parent = buildSingleWordFunctionalMotivationProposalV0_1({
       ...dietaProposalInput,
