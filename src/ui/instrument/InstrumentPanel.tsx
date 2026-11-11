@@ -45,6 +45,7 @@ import { SpokenResultCompositionSummaryV0_1 } from "./sections/SpokenResultCompo
 import { PrimaryAlbanianReadingCardV0_1 } from "./sections/PrimaryAlbanianReadingCard.v0_1";
 import { MotivationDiscoveryCardV0_1 } from "./sections/MotivationDiscoveryCard.v0_1";
 import { SingleWordMotivationWorkbenchV0_1 } from "./sections/SingleWordMotivationWorkbenchV0_1";
+import type { GenericFunctionalWitnessV1 } from "@/shared/openInstrument/genericFunctionalWitnessDiscovery.v1";
 import { OriginClaimCard } from '@/components/OriginClaimCard';
 import { cn } from "@/lib/utils";
 import { safeText } from "./safeText";
@@ -328,6 +329,17 @@ export function InstrumentPanel(props: Props) {
   const candidateRows = React.useMemo(() => {
     if (!isValidVm) return null;
     return buildCandidateRowsFromVM(vm);
+  }, [isValidVm, vm]);
+
+  const crossLanguageSourceWitnesses = React.useMemo(() => {
+    if (!isValidVm || !Array.isArray(vm.candidates)) return [];
+    const records = new Map<string, GenericFunctionalWitnessV1>();
+    for (const candidate of vm.candidates) {
+      const projection = candidate.genericFunctionalWitnessRuntimeProjectionV1;
+      if (projection?.kind !== "present" || projection.value.targetWord !== vm.readout.word) continue;
+      for (const witness of projection.value.discovery.matches) records.set(witness.witnessId, witness);
+    }
+    return [...records.values()];
   }, [isValidVm, vm]);
 
   async function copyText(label: string, text: string) {
@@ -633,6 +645,7 @@ export function InstrumentPanel(props: Props) {
                   ? {
                       analyzedWord: vm.readout.word,
                       discovery: vm.motivationDiscoveryV0_1,
+                      sourceWitnesses: crossLanguageSourceWitnesses,
                     }
                   : undefined}
               />
