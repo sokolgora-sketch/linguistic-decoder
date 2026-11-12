@@ -13,6 +13,13 @@ import {
   type FunctionalArchitectureInputV0_1,
   type FunctionalArchitectureParallelInputV0_1,
 } from "@/shared/openInstrument/crossLanguageFunctionalMotivation.v0_1";
+import {
+  buildCrossLanguageOperationLedgerV0_2,
+  CROSS_LANGUAGE_OPERATION_DEFINITIONS_V0_2,
+  type CrossLanguageOperationApplicationInputV0_2,
+  type CrossLanguageOperationIdV0_2,
+  type CrossLanguageOperationLedgerInputV0_2,
+} from "@/shared/openInstrument/crossLanguageOperationLedger.v0_2";
 import type { GenericFunctionalWitnessV1 } from "@/shared/openInstrument/genericFunctionalWitnessDiscovery.v1";
 import type { SingleWordFunctionalMotivationBuildResultV0_1 } from "@/shared/openInstrument/singleWordFunctionalMotivation.v0_1";
 
@@ -123,6 +130,16 @@ function clearBoundaryDependentState(): Pick<
   };
 }
 
+function blankOperationLedger(initialForm: string): CrossLanguageOperationLedgerInputV0_2 {
+  return {
+    initialForm,
+    declaredFinalForm: "",
+    operations: [],
+    proposedRelationship: "",
+    evidenceReference: "",
+  };
+}
+
 function evidenceLabel(status: CrossLanguageEvidenceStatusV0_1 | "SOURCE_RECORD_ONLY"): string {
   switch (status) {
     case "SOURCE_RECORD_ONLY":
@@ -152,6 +169,7 @@ export function CrossLanguageFunctionalMotivationWorkbenchV0_1({
   const [unresolvedText, setUnresolvedText] = useState("");
   const [functionalParallel, setFunctionalParallel] = useState<FunctionalArchitectureParallelInputV0_1 | null>(null);
   const [boundaryOperationWitness, setBoundaryOperationWitness] = useState<CrossLanguageBoundaryOperationWitnessInputV0_1 | null>(null);
+  const [operationLedger, setOperationLedger] = useState<CrossLanguageOperationLedgerInputV0_2 | null>(null);
 
   const input = useMemo(() => ({
     targetSense: {
@@ -171,15 +189,32 @@ export function CrossLanguageFunctionalMotivationWorkbenchV0_1({
     () => buildCrossLanguageFunctionalMotivationV0_1(parentProposal, input),
     [parentProposal, input],
   );
+  const operationLedgerResult = useMemo(
+    () => operationLedger ? buildCrossLanguageOperationLedgerV0_2(operationLedger) : null,
+    [operationLedger],
+  );
   const parent = parentProposal.status === "READY" ? parentProposal.proposal : null;
-  const hasCrossLanguageContent = witnesses.length > 0 || correspondences.length > 0 || boundaryOperationWitness !== null || Boolean(
+  const hasCrossLanguageContent = witnesses.length > 0 || correspondences.length > 0 || boundaryOperationWitness !== null || operationLedger !== null || Boolean(
     proposedSynthesis.trim() || targetSenseLabel.trim() || targetSenseReference.trim() || unresolvedText.trim() || functionalParallel,
   );
 
   function updateWitness(witnessId: string, update: Partial<CrossLanguageWitnessInputV0_1>) {
+    const identityChanged = ["exactForm", "language", "variety", "proposedMeaning", "genericWitnessId"]
+      .some((field) => Object.hasOwn(update, field));
     setWitnesses((current) => current.map((witness) => witness.witnessId === witnessId
-      ? { ...witness, ...update } as CrossLanguageWitnessInputV0_1
+      ? {
+          ...witness,
+          ...update,
+          ...(identityChanged && witness.kind === "USER_PROPOSED"
+            ? { evidenceReference: "", evidenceStatus: "USER_PROPOSED" as const }
+            : {}),
+        } as CrossLanguageWitnessInputV0_1
       : witness));
+    if (identityChanged) {
+      setCorrespondences((current) => current.map((relation) => relation.witnessId === witnessId
+        ? { ...relation, applications: [], proposedRelationship: "" }
+        : relation));
+    }
   }
 
   function addWitness() {
@@ -197,7 +232,14 @@ export function CrossLanguageFunctionalMotivationWorkbenchV0_1({
   }
 
   function updateCorrespondence(relationId: string, update: Partial<CrossLanguageCorrespondenceInputV0_1>) {
-    setCorrespondences((current) => current.map((item) => item.relationId === relationId ? { ...item, ...update } : item));
+    const dependencyChanged = Object.hasOwn(update, "targetComponentIndex") || Object.hasOwn(update, "witnessId");
+    setCorrespondences((current) => current.map((item) => item.relationId === relationId
+      ? {
+          ...item,
+          ...update,
+          ...(dependencyChanged ? { applications: [], proposedRelationship: "" } : {}),
+        }
+      : item));
   }
 
   function updateApplication(
@@ -206,7 +248,11 @@ export function CrossLanguageFunctionalMotivationWorkbenchV0_1({
     update: Partial<CrossLanguageOperationApplicationInputV0_1>,
   ) {
     setCorrespondences((current) => current.map((relation) => relation.relationId === relationId
-      ? { ...relation, applications: relation.applications.map((application) => application.applicationId === applicationId ? { ...application, ...update } : application) }
+      ? {
+          ...relation,
+          proposedRelationship: "",
+          applications: relation.applications.map((application) => application.applicationId === applicationId ? { ...application, ...update } : application),
+        }
       : relation));
   }
 
@@ -219,8 +265,63 @@ export function CrossLanguageFunctionalMotivationWorkbenchV0_1({
         operationId,
         positions: operationId === "TRANSPOSE_ADJACENT.v0_1" ? [0, 1] : [],
       };
-      return { ...relation, applications: [...relation.applications, application] };
+      return { ...relation, applications: [...relation.applications, application], proposedRelationship: "" };
     }));
+  }
+
+  function addOperationLedger(initialForm: string) {
+    setOperationLedger(blankOperationLedger(initialForm));
+  }
+
+  function updateOperationLedgerForm(field: "initialForm" | "declaredFinalForm", value: string) {
+    setOperationLedger((current) => current ? {
+      ...current,
+      [field]: value,
+      operations: [],
+      proposedRelationship: "",
+      evidenceReference: "",
+    } : current);
+  }
+
+  function addOperationLedgerApplication(operationId: CrossLanguageOperationIdV0_2) {
+    setOperationLedger((current) => {
+      if (!current) return current;
+      const applicationId = nextId("ledger-application", current.operations.map((item) => item.applicationId));
+      let application: CrossLanguageOperationApplicationInputV0_2;
+      if (operationId === "IDENTITY.v0_1") {
+        application = { applicationId, operationId, positions: [] };
+      } else if (operationId === "TRANSPOSE_ADJACENT.v0_1") {
+        application = { applicationId, operationId, positions: [0, 1] };
+      } else {
+        application = { applicationId, operationId, position: 0, expectedRemovedText: "" };
+      }
+      return {
+        ...current,
+        operations: [...current.operations, application],
+        proposedRelationship: "",
+        evidenceReference: "",
+      };
+    });
+  }
+
+  function updateOperationLedgerApplication(
+    applicationId: string,
+    transform: (application: CrossLanguageOperationApplicationInputV0_2) => CrossLanguageOperationApplicationInputV0_2,
+  ) {
+    setOperationLedger((current) => current ? {
+      ...current,
+      operations: current.operations.map((application) => application.applicationId === applicationId ? transform(application) : application),
+      proposedRelationship: "",
+      evidenceReference: "",
+    } : current);
+  }
+
+  function changeOperationLedgerApplicationKind(application: CrossLanguageOperationApplicationInputV0_2, operationId: CrossLanguageOperationIdV0_2) {
+    updateOperationLedgerApplication(application.applicationId, () => {
+      if (operationId === "IDENTITY.v0_1") return { applicationId: application.applicationId, operationId, positions: [] };
+      if (operationId === "TRANSPOSE_ADJACENT.v0_1") return { applicationId: application.applicationId, operationId, positions: [0, 1] };
+      return { applicationId: application.applicationId, operationId, position: 0, expectedRemovedText: "" };
+    });
   }
 
   function updateParallel(update: Partial<FunctionalArchitectureParallelInputV0_1>) {
@@ -422,13 +523,72 @@ export function CrossLanguageFunctionalMotivationWorkbenchV0_1({
                           updateApplication(relation.relationId, application.applicationId, { positions: [left, left + 1] });
                         }} /><span className="mt-1 block text-[11px] text-[#9fb1bf]">The next code point is the right position; both positions are recorded.</span></label>
                       ) : <p className="self-end text-[11px] text-[#9fb1bf]">Identity has no position parameter and cost 0.</p>}
-                      <button type="button" aria-label={`Correspondence ${index + 1} remove operation ${applicationIndex + 1}`} className="text-left text-xs underline sm:col-span-2" onClick={() => updateCorrespondence(relation.relationId, { applications: relation.applications.filter((item) => item.applicationId !== application.applicationId) })}>Remove application</button>
+                      <button type="button" aria-label={`Correspondence ${index + 1} remove operation ${applicationIndex + 1}`} className="text-left text-xs underline sm:col-span-2" onClick={() => setCorrespondences((current) => current.map((item) => item.relationId === relation.relationId ? { ...item, applications: item.applications.filter((candidate) => candidate.applicationId !== application.applicationId), proposedRelationship: "" } : item))}>Remove application</button>
                     </div>
                   ))}
                 </div>
                 <button type="button" aria-label={`Remove correspondence ${index + 1}`} className="mt-2 text-xs underline" onClick={() => setCorrespondences((current) => current.filter((item) => item.relationId !== relation.relationId))}>Remove correspondence</button>
               </fieldset>
             ))}
+          </div>
+
+          <div data-testid="cross-language-reversible-operation-ledger-editor" className="mt-4 min-w-0 rounded-lg border border-[#66532e] bg-[#0d1117] p-3 [overflow-wrap:anywhere]">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <strong className="text-xs text-[#dce9ca]">Optional reversible spelling-operation ledger · v0.2</strong>
+              {operationLedger ? (
+                <button type="button" data-testid="cross-language-remove-operation-ledger" className="rounded border border-[#53604a] px-2 py-1 text-xs" onClick={() => setOperationLedger(null)}>Remove ledger</button>
+              ) : (
+                <button type="button" data-testid="cross-language-add-operation-ledger" className="rounded border border-[#53604a] px-2 py-1 text-xs" onClick={() => addOperationLedger(parent.segments[0]?.exactSpelling ?? "")}>Add reversible ledger</button>
+              )}
+            </div>
+            <p className="mt-1 text-xs leading-5 text-[#aeb7c5]">Record exact spelling steps and their inverse. OMIT removes one declared Unicode code point at a time. Costs describe mechanical operations only; they do not establish linguistic applicability or a historical relationship.</p>
+            {operationLedger ? (
+              <>
+                <div className="mt-3 grid min-w-0 gap-2 sm:grid-cols-2">
+                  <label className={labelClass}>Initial exact form (target component or word)<input aria-label="Reversible ledger initial form" maxLength={80} className={`${inputClass} font-mono`} value={operationLedger.initialForm} onChange={(event) => updateOperationLedgerForm("initialForm", event.target.value)} /></label>
+                  <label className={labelClass}>Declared comparison form<input aria-label="Reversible ledger declared final form" maxLength={80} className={`${inputClass} font-mono`} value={operationLedger.declaredFinalForm} onChange={(event) => updateOperationLedgerForm("declaredFinalForm", event.target.value)} /></label>
+                </div>
+                <div className="mt-3 rounded border border-[#354234] p-2">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <span className="text-xs font-semibold">Ordered operations</span>
+                    <div className="flex flex-wrap gap-2">
+                      {CROSS_LANGUAGE_OPERATION_DEFINITIONS_V0_2.map((definition) => (
+                        <button key={definition.operationId} type="button" aria-label={`Reversible ledger add ${definition.kind}`} className="rounded border border-[#53604a] px-2 py-1 text-[11px]" onClick={() => addOperationLedgerApplication(definition.operationId)}>
+                          Add {definition.kind === "TRANSPOSE_ADJACENT" ? "adjacent transpose" : definition.kind} · cost {definition.cost}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  {!operationLedger.operations.length ? <p className="mt-2 text-xs text-[#9fb1bf]">No operation declared. A spelling that needs an undeclared edit remains a mismatch.</p> : null}
+                  {operationLedger.operations.map((application, index) => (
+                    <div key={application.applicationId} className="mt-2 grid min-w-0 gap-2 rounded border border-[#303843] p-2 sm:grid-cols-2">
+                      <label className={labelClass}>Operation {index + 1}<select aria-label={`Reversible ledger operation ${index + 1}`} className={inputClass} value={application.operationId} onChange={(event) => changeOperationLedgerApplicationKind(application, event.target.value as CrossLanguageOperationIdV0_2)}>
+                        {CROSS_LANGUAGE_OPERATION_DEFINITIONS_V0_2.map((definition) => <option key={definition.operationId} value={definition.operationId}>{definition.kind === "TRANSPOSE_ADJACENT" ? "Adjacent transpose" : definition.kind} · cost {definition.cost}</option>)}
+                      </select></label>
+                      {application.operationId === "TRANSPOSE_ADJACENT.v0_1" ? (
+                        <label className={labelClass}>Left zero-based Unicode code-point position<input aria-label={`Reversible ledger operation ${index + 1} left position`} type="number" min={0} className={inputClass} value={application.positions[0] ?? ""} onChange={(event) => {
+                          const left = event.target.value === "" ? Number.NaN : Number(event.target.value);
+                          updateOperationLedgerApplication(application.applicationId, (current) => current.operationId === "TRANSPOSE_ADJACENT.v0_1" ? { ...current, positions: [left, left + 1] } : current);
+                        }} /></label>
+                      ) : application.operationId === "OMIT.v0_2" ? (
+                        <>
+                          <label className={labelClass}>Omit position (zero-based Unicode code point)<input aria-label={`Reversible ledger operation ${index + 1} omit position`} type="number" min={0} className={inputClass} value={application.position} onChange={(event) => {
+                            const position = event.target.value === "" ? Number.NaN : Number(event.target.value);
+                            updateOperationLedgerApplication(application.applicationId, (current) => current.operationId === "OMIT.v0_2" ? { ...current, position } : current);
+                          }} /></label>
+                          <label className={labelClass}>Exact expected code point to remove<input aria-label={`Reversible ledger operation ${index + 1} expected removed text`} maxLength={4} className={`${inputClass} font-mono`} value={application.expectedRemovedText} onChange={(event) => updateOperationLedgerApplication(application.applicationId, (current) => current.operationId === "OMIT.v0_2" ? { ...current, expectedRemovedText: event.target.value } : current)} /></label>
+                        </>
+                      ) : <p className="self-end text-[11px] text-[#9fb1bf]">Identity has no position parameter and cost 0.</p>}
+                      <button type="button" aria-label={`Reversible ledger remove operation ${index + 1}`} className="text-left text-xs underline sm:col-span-2" onClick={() => setOperationLedger((current) => current ? { ...current, operations: current.operations.filter((item) => item.applicationId !== application.applicationId), proposedRelationship: "", evidenceReference: "" } : current)}>Remove operation</button>
+                    </div>
+                  ))}
+                </div>
+                <div className="mt-3 grid min-w-0 gap-2">
+                  <label className={labelClass}>User-proposed relationship<input aria-label="Reversible ledger proposed relationship" maxLength={1000} className={inputClass} value={operationLedger.proposedRelationship} onChange={(event) => setOperationLedger((current) => current ? { ...current, proposedRelationship: event.target.value, evidenceReference: "" } : current)} placeholder="A user-declared functional comparison; no historical relationship claimed" /></label>
+                  <label className={labelClass}>Relationship source reference (entered, not verified)<input aria-label="Reversible ledger evidence reference" maxLength={1000} className={inputClass} value={operationLedger.evidenceReference} onChange={(event) => setOperationLedger((current) => current ? { ...current, evidenceReference: event.target.value } : current)} /></label>
+                </div>
+              </>
+            ) : null}
           </div>
 
           <div className="mt-4 grid gap-3">
@@ -535,6 +695,27 @@ export function CrossLanguageFunctionalMotivationWorkbenchV0_1({
                   <p>Authority: {relation.authority}; linguistic validity: {relation.linguisticValidity}; Voice conservation: {relation.voiceConservation}{relation.unresolvedVoices.length ? ` · unresolved Voices: ${relation.unresolvedVoices.join("; ")}` : ""}.</p>
                 </div>
               ))}
+              {operationLedgerResult ? operationLedgerResult.status === "INVALID" ? (
+                <div data-testid="cross-language-operation-ledger-invalid" className="mt-3 rounded border border-[#8b5b42] p-3 [overflow-wrap:anywhere]">Reversible ledger input invalid: {operationLedgerResult.reasonCodes.join(" · ")}</div>
+              ) : (
+                <article data-testid="cross-language-operation-ledger-result" data-status={operationLedgerResult.ledger.mechanicalReconstructionStatus} className="mt-3 min-w-0 rounded border border-[#66532e] p-3 [overflow-wrap:anywhere]">
+                  <h4 className="font-semibold text-white">Reversible operation ledger · {operationLedgerResult.ledger.replayStatus}</h4>
+                  {operationLedgerResult.status === "REJECTED" ? <p role="alert">Rejected operation: {operationLedgerResult.reasonCodes.join(" · ")}</p> : null}
+                  <p className="mt-1 font-mono">{operationLedgerResult.ledger.initialForm} → {operationLedgerResult.ledger.replayedFinalForm} · declared {operationLedgerResult.ledger.declaredFinalForm} · {operationLedgerResult.ledger.mechanicalReconstructionStatus}.</p>
+                  <p>Operations: {operationLedgerResult.ledger.operationCount}; cost: {operationLedgerResult.ledger.totalCost}. Positions are zero-based Unicode code points; spans are half-open.</p>
+                  {operationLedgerResult.ledger.operations.map((application) => (
+                    <div key={application.applicationId} className="mt-2 border-t border-[#303843] pt-2">
+                      <p className="font-mono">{application.sequence}. {application.kind} [{application.positions.join(", ")}] {application.before} → {application.after ?? "not applied"} · cost {application.cost} · {application.status}{application.reasonCodes.length ? ` · ${application.reasonCodes.join(", ")}` : ""}</p>
+                      {application.removedText !== null ? <p>Removed exact text “{application.removedText}” · span in prior form [{application.removedSpan?.start}, {application.removedSpan?.end}) · original input span [{application.originalInputSpan?.start}, {application.originalInputSpan?.end}) · omitted canonical Voices: {application.omittedVoiceEvents.map((event) => `${event.voice}@${event.position}`).join(", ") || "none"}.</p> : null}
+                      <p>Written Voices before: {application.writtenVoicesBefore.status === "COMPLETE" ? application.writtenVoicesBefore.path.join(" → ") || "∅" : "UNKNOWN_OR_NULL"}; after: {application.writtenVoicesAfter?.status === "COMPLETE" ? application.writtenVoicesAfter.path.join(" → ") || "∅" : "UNKNOWN_OR_NULL"}; conservation: {application.voiceConservation}.</p>
+                      {application.inverse ? <p>Inverse: {application.inverse.kind}{application.inverse.positions.length ? ` at [${application.inverse.positions.join(", ")}]` : ""}{application.inverse.text !== null ? ` · exact text “${application.inverse.text}”` : ""}.</p> : null}
+                    </div>
+                  ))}
+                  <p className="mt-2">Original written Voices: {operationLedgerResult.ledger.initialWrittenVoices.status === "COMPLETE" ? operationLedgerResult.ledger.initialWrittenVoices.path.join(" → ") || "∅" : "UNKNOWN_OR_NULL"}; final written Voices: {operationLedgerResult.ledger.finalWrittenVoices.status === "COMPLETE" ? operationLedgerResult.ledger.finalWrittenVoices.path.join(" → ") || "∅" : "UNKNOWN_OR_NULL"}; overall conservation: {operationLedgerResult.ledger.voiceConservation}. Omitted canonical Voices: {operationLedgerResult.ledger.omittedCanonicalVoices.join(", ") || "none"}.</p>
+                  <p>Reverse replay: {operationLedgerResult.ledger.inverseReplay.status} · reconstructed initial form: <span className="font-mono">{operationLedgerResult.ledger.inverseReplay.reconstructedInitialForm ?? "not run"}</span>{operationLedgerResult.ledger.inverseReplay.applications.map((application) => <span key={application.applicationId}> · {application.kind} {application.before} → {application.after ?? "rejected"}</span>)}</p>
+                  <p>Relationship: {operationLedgerResult.ledger.relationship.text ?? "Unknown / Null"} · {operationLedgerResult.ledger.relationship.status}; evidence: {operationLedgerResult.ledger.relationship.evidenceStatus}{operationLedgerResult.ledger.relationship.evidenceReference ? ` · ${operationLedgerResult.ledger.relationship.evidenceReference}` : ""}; authority: {operationLedgerResult.ledger.relationship.authority}; linguistic applicability: {operationLedgerResult.ledger.relationship.linguisticApplicabilityStatus}; source authority promotion: NONE. No historical origin claim; no single winner; user decides.</p>
+                </article>
+              ) : null}
               {result.proposal.boundaryOperationWitness ? (
                 <div data-testid="cross-language-boundary-witness-result" data-status={result.proposal.boundaryOperationWitness.mechanicalReconstructionStatus} className="mt-2 min-w-0 rounded border border-[#66532e] p-2 [overflow-wrap:anywhere]">
                   <p><strong>{result.proposal.boundaryOperationWitness.language} · {result.proposal.boundaryOperationWitness.componentForms.join(" + ")} = {result.proposal.boundaryOperationWitness.rawConcatenation}</strong></p>
