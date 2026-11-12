@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   buildCrossLanguageFunctionalMotivationV0_1,
   CROSS_LANGUAGE_OPERATION_DEFINITIONS_V0_1,
@@ -20,11 +20,75 @@ import {
   type CrossLanguageOperationIdV0_2,
   type CrossLanguageOperationLedgerInputV0_2,
 } from "@/shared/openInstrument/crossLanguageOperationLedger.v0_2";
+import {
+  buildCrossLanguageWitnessOperationLedgerV0_2,
+  CROSS_LANGUAGE_WITNESS_OPERATION_LEDGER_SCHEMA_V0_2,
+  type BuildCrossLanguageWitnessOperationLedgerResultV0_2,
+  type CrossLanguageWitnessOperationBindingIdentityV0_2,
+} from "@/shared/openInstrument/crossLanguageWitnessOperationLedger.v0_2";
 import type { GenericFunctionalWitnessV1 } from "@/shared/openInstrument/genericFunctionalWitnessDiscovery.v1";
 import type { SingleWordFunctionalMotivationBuildResultV0_1 } from "@/shared/openInstrument/singleWordFunctionalMotivation.v0_1";
 
 const inputClass = "mt-1 w-full rounded border border-[#46505c] bg-[#0d1117] px-2 py-1.5 text-sm text-[#f5f7fb] placeholder:text-[#7f8b99] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#d8bb7a]";
 const labelClass = "block text-xs font-medium text-[#c5ced8]";
+
+type AttachedOperationLedgerDraftV0_2 = Readonly<{
+  bindingSnapshot: CrossLanguageWitnessOperationBindingIdentityV0_2;
+  operations: readonly CrossLanguageOperationApplicationInputV0_2[];
+  evidenceReference: string;
+}>;
+
+function BoundOperationLedgerReadoutV0_2({
+  result,
+}: {
+  result: BuildCrossLanguageWitnessOperationLedgerResultV0_2 | undefined;
+}) {
+  if (!result) return null;
+  if (result.status === "STALE_BINDING") {
+    return (
+      <div data-testid="cross-language-bound-operation-ledger-result" data-status="STALE_BINDING" className="mt-3 min-w-0 rounded border border-[#8b5b42] p-3 [overflow-wrap:anywhere]">
+        The selected component or witness changed. This attached ledger, its relationship claim, and its citation are invalidated.
+      </div>
+    );
+  }
+  if (result.status === "INVALID_BINDING") {
+    return (
+      <div data-testid="cross-language-bound-operation-ledger-result" data-status="INVALID_BINDING" className="mt-3 min-w-0 rounded border border-[#8b5b42] p-3 [overflow-wrap:anywhere]">
+        Bound correspondence input invalid: {result.reasonCodes.join(" · ")}
+      </div>
+    );
+  }
+  if (result.operationLedgerResult.status === "INVALID") {
+    return (
+      <div data-testid="cross-language-bound-operation-ledger-result" data-status="INVALID" className="mt-3 min-w-0 rounded border border-[#8b5b42] p-3 [overflow-wrap:anywhere]">
+        Bound operation ledger input invalid: {result.operationLedgerResult.reasonCodes.join(" · ")}
+      </div>
+    );
+  }
+
+  const built = result.operationLedgerResult;
+  const ledger = built.ledger;
+  return (
+    <article data-testid="cross-language-bound-operation-ledger-result" data-status={ledger.mechanicalReconstructionStatus} className="mt-3 min-w-0 rounded border border-[#66532e] p-3 [overflow-wrap:anywhere]">
+      <h5 className="font-semibold text-white">Bound v0.2 operation ledger · {ledger.replayStatus}</h5>
+      {built.status === "REJECTED" ? <p role="alert">Rejected operation: {built.reasonCodes.join(" · ")}</p> : null}
+      <p className="mt-1 font-mono">{ledger.initialForm} → {ledger.replayedFinalForm} · witness form {ledger.declaredFinalForm} · {ledger.mechanicalReconstructionStatus}.</p>
+      <p>Bound target component {result.binding.targetComponentIndex + 1} ({result.binding.targetComponentLanguage}{result.binding.targetComponentDialect ? " · " + result.binding.targetComponentDialect : ""}) to witness {result.binding.witnessId} ({result.binding.witnessLanguage}{result.binding.witnessVariety ? " · " + result.binding.witnessVariety : ""}).</p>
+      <p>Operations: {ledger.operationCount}; mechanical cost: {ledger.totalCost}. Positions are zero-based Unicode code points; spans are half-open.</p>
+      {ledger.operations.map((application) => (
+        <div key={application.applicationId} className="mt-2 border-t border-[#303843] pt-2">
+          <p className="font-mono">{application.sequence}. {application.kind} [{application.positions.join(", ")}] {application.before} → {application.after ?? "not applied"} · cost {application.cost} · {application.status}{application.reasonCodes.length ? " · " + application.reasonCodes.join(", ") : ""}</p>
+          {application.removedText !== null ? <p>Removed exact text “{application.removedText}” · prior-form span [{application.removedSpan?.start}, {application.removedSpan?.end}) · original input span [{application.originalInputSpan?.start}, {application.originalInputSpan?.end}) · omitted canonical Voices: {application.omittedVoiceEvents.map((event) => event.voice + "@" + event.position).join(", ") || "none"}.</p> : null}
+          <p>Written Voices before: {application.writtenVoicesBefore.status === "COMPLETE" ? application.writtenVoicesBefore.path.join(" → ") || "∅" : "UNKNOWN_OR_NULL"}; after: {application.writtenVoicesAfter?.status === "COMPLETE" ? application.writtenVoicesAfter.path.join(" → ") || "∅" : "UNKNOWN_OR_NULL"}; conservation: {application.voiceConservation}.</p>
+          {application.inverse ? <p>Inverse: {application.inverse.kind}{application.inverse.positions.length ? " at [" + application.inverse.positions.join(", ") + "]" : ""}{application.inverse.text !== null ? " · exact text “" + application.inverse.text + "”" : ""}.</p> : null}
+        </div>
+      ))}
+      <p className="mt-2">Original written Voices: {ledger.initialWrittenVoices.status === "COMPLETE" ? ledger.initialWrittenVoices.path.join(" → ") || "∅" : "UNKNOWN_OR_NULL"}; final written Voices: {ledger.finalWrittenVoices.status === "COMPLETE" ? ledger.finalWrittenVoices.path.join(" → ") || "∅" : "UNKNOWN_OR_NULL"}; overall conservation: {ledger.voiceConservation}. Omitted canonical Voices: {ledger.omittedCanonicalVoices.join(", ") || "none"}.</p>
+      <p>Reverse replay: {ledger.inverseReplay.status} · reconstructed initial form: <span className="font-mono">{ledger.inverseReplay.reconstructedInitialForm ?? "not run"}</span>{ledger.inverseReplay.applications.map((application) => <span key={application.applicationId}> · {application.kind} {application.before} → {application.after ?? "rejected"}</span>)}</p>
+      <p>Relationship: {ledger.relationship.text ?? "Unknown / Null"} · {ledger.relationship.status}; relationship citation: {ledger.relationship.evidenceStatus}{ledger.relationship.evidenceReference ? " · " + ledger.relationship.evidenceReference : ""}; authority: {ledger.relationship.authority}; linguistic applicability: {ledger.relationship.linguisticApplicabilityStatus}; source authority promotion: NONE. No historical origin claim; no single winner; user decides.</p>
+    </article>
+  );
+}
 
 function nextId(prefix: string, ids: readonly string[]): string {
   let suffix = ids.length + 1;
@@ -170,6 +234,7 @@ export function CrossLanguageFunctionalMotivationWorkbenchV0_1({
   const [functionalParallel, setFunctionalParallel] = useState<FunctionalArchitectureParallelInputV0_1 | null>(null);
   const [boundaryOperationWitness, setBoundaryOperationWitness] = useState<CrossLanguageBoundaryOperationWitnessInputV0_1 | null>(null);
   const [operationLedger, setOperationLedger] = useState<CrossLanguageOperationLedgerInputV0_2 | null>(null);
+  const [attachedOperationLedgers, setAttachedOperationLedgers] = useState<Record<string, AttachedOperationLedgerDraftV0_2>>({});
 
   const input = useMemo(() => ({
     targetSense: {
@@ -194,7 +259,74 @@ export function CrossLanguageFunctionalMotivationWorkbenchV0_1({
     [operationLedger],
   );
   const parent = parentProposal.status === "READY" ? parentProposal.proposal : null;
-  const hasCrossLanguageContent = witnesses.length > 0 || correspondences.length > 0 || boundaryOperationWitness !== null || operationLedger !== null || Boolean(
+  function currentBindingFor(relation: CrossLanguageCorrespondenceInputV0_1): CrossLanguageWitnessOperationBindingIdentityV0_2 | null {
+    const targetComponent = parent?.segments[relation.targetComponentIndex];
+    const witness = witnesses.find((item) => item.witnessId === relation.witnessId);
+    if (!targetComponent || !witness) return null;
+
+    if (witness.kind === "USER_PROPOSED") {
+      return {
+        targetComponentIndex: relation.targetComponentIndex,
+        targetComponentForm: targetComponent.exactSpelling,
+        targetComponentLanguage: targetComponent.language,
+        targetComponentDialect: targetComponent.dialect ?? "",
+        witnessId: witness.witnessId,
+        witnessForm: witness.exactForm,
+        witnessLanguage: witness.language,
+        witnessVariety: witness.variety,
+      };
+    }
+
+    const source = sourceWitnesses.find((item) => item.witnessId === witness.genericWitnessId);
+    if (!source) return null;
+    return {
+      targetComponentIndex: relation.targetComponentIndex,
+      targetComponentForm: targetComponent.exactSpelling,
+      targetComponentLanguage: targetComponent.language,
+      targetComponentDialect: targetComponent.dialect ?? "",
+      witnessId: witness.witnessId,
+      witnessForm: source.sourceForm,
+      witnessLanguage: source.language,
+      witnessVariety: source.languageVariety ?? "",
+    };
+  }
+  const attachedOperationLedgerResults = new Map<string, BuildCrossLanguageWitnessOperationLedgerResultV0_2>();
+  for (const relation of correspondences) {
+    const draft = attachedOperationLedgers[relation.relationId];
+    if (!draft) continue;
+    const currentIdentity = currentBindingFor(relation);
+    attachedOperationLedgerResults.set(
+      relation.relationId,
+      currentIdentity
+        ? buildCrossLanguageWitnessOperationLedgerV0_2({
+            attachedIdentity: draft.bindingSnapshot,
+            currentIdentity,
+            operations: draft.operations,
+            proposedRelationship: relation.proposedRelationship,
+            evidenceReference: draft.evidenceReference,
+          })
+        : {
+            schemaVersion: CROSS_LANGUAGE_WITNESS_OPERATION_LEDGER_SCHEMA_V0_2,
+            status: "STALE_BINDING",
+            reasonCodes: ["ATTACHED_COMPONENT_OR_WITNESS_IDENTITY_CHANGED"],
+          },
+    );
+  }
+  const staleBoundRelationIdKey = [...attachedOperationLedgerResults.entries()]
+    .filter(([, boundResult]) => boundResult.status === "STALE_BINDING" || boundResult.status === "INVALID_BINDING")
+    .map(([relationId]) => relationId)
+    .join("|");
+  useEffect(() => {
+    if (!staleBoundRelationIdKey) return;
+    const staleIds = new Set(staleBoundRelationIdKey.split("|"));
+    setAttachedOperationLedgers((current) => Object.fromEntries(
+      Object.entries(current).filter(([relationId]) => !staleIds.has(relationId)),
+    ));
+    setCorrespondences((current) => current.map((relation) => staleIds.has(relation.relationId)
+      ? { ...relation, applications: [], proposedRelationship: "" }
+      : relation));
+  }, [staleBoundRelationIdKey]);
+  const hasCrossLanguageContent = witnesses.length > 0 || correspondences.length > 0 || boundaryOperationWitness !== null || operationLedger !== null || Object.keys(attachedOperationLedgers).length > 0 || Boolean(
     proposedSynthesis.trim() || targetSenseLabel.trim() || targetSenseReference.trim() || unresolvedText.trim() || functionalParallel,
   );
 
@@ -211,9 +343,15 @@ export function CrossLanguageFunctionalMotivationWorkbenchV0_1({
         } as CrossLanguageWitnessInputV0_1
       : witness));
     if (identityChanged) {
+      const affectedRelationIds = new Set(correspondences
+        .filter((relation) => relation.witnessId === witnessId)
+        .map((relation) => relation.relationId));
       setCorrespondences((current) => current.map((relation) => relation.witnessId === witnessId
         ? { ...relation, applications: [], proposedRelationship: "" }
         : relation));
+      setAttachedOperationLedgers((current) => Object.fromEntries(
+        Object.entries(current).filter(([relationId]) => !affectedRelationIds.has(relationId)),
+      ));
     }
   }
 
@@ -240,6 +378,96 @@ export function CrossLanguageFunctionalMotivationWorkbenchV0_1({
           ...(dependencyChanged ? { applications: [], proposedRelationship: "" } : {}),
         }
       : item));
+    if (dependencyChanged) {
+      setAttachedOperationLedgers((current) => {
+        const next = { ...current };
+        delete next[relationId];
+        return next;
+      });
+    } else if (Object.hasOwn(update, "proposedRelationship")) {
+      setAttachedOperationLedgers((current) => current[relationId]
+        ? { ...current, [relationId]: { ...current[relationId]!, evidenceReference: "" } }
+        : current);
+    }
+  }
+
+  function attachBoundOperationLedger(relation: CrossLanguageCorrespondenceInputV0_1) {
+    const bindingSnapshot = currentBindingFor(relation);
+    if (!bindingSnapshot) return;
+    setAttachedOperationLedgers((current) => ({
+      ...current,
+      [relation.relationId]: { bindingSnapshot, operations: [], evidenceReference: "" },
+    }));
+  }
+
+  function updateBoundOperationLedgerDraft(
+    relationId: string,
+    update: Partial<AttachedOperationLedgerDraftV0_2>,
+  ) {
+    setAttachedOperationLedgers((current) => current[relationId]
+      ? {
+          ...current,
+          [relationId]: {
+            ...current[relationId]!,
+            ...update,
+            ...(Object.hasOwn(update, "operations") ? { evidenceReference: "" } : {}),
+          },
+        }
+      : current);
+    if (Object.hasOwn(update, "operations")) {
+      setCorrespondences((current) => current.map((relation) => relation.relationId === relationId
+        ? { ...relation, proposedRelationship: "" }
+        : relation));
+    }
+  }
+
+  function addBoundOperationLedgerApplication(
+    relationId: string,
+    operationId: CrossLanguageOperationIdV0_2,
+  ) {
+    const currentDraft = attachedOperationLedgers[relationId];
+    if (!currentDraft) return;
+    const applicationId = nextId(
+      relationId + "-bound-application",
+      currentDraft.operations.map((item) => item.applicationId),
+    );
+    let application: CrossLanguageOperationApplicationInputV0_2;
+    if (operationId === "IDENTITY.v0_1") {
+      application = { applicationId, operationId, positions: [] };
+    } else if (operationId === "TRANSPOSE_ADJACENT.v0_1") {
+      application = { applicationId, operationId, positions: [0, 1] };
+    } else {
+      application = { applicationId, operationId, position: 0, expectedRemovedText: "" };
+    }
+    updateBoundOperationLedgerDraft(relationId, {
+      operations: [...currentDraft.operations, application],
+    });
+  }
+
+  function updateBoundOperationLedgerApplication(
+    relationId: string,
+    applicationId: string,
+    transform: (application: CrossLanguageOperationApplicationInputV0_2) => CrossLanguageOperationApplicationInputV0_2,
+  ) {
+    const currentDraft = attachedOperationLedgers[relationId];
+    if (!currentDraft) return;
+    updateBoundOperationLedgerDraft(relationId, {
+      operations: currentDraft.operations.map((application) => application.applicationId === applicationId
+        ? transform(application)
+        : application),
+    });
+  }
+
+  function changeBoundOperationLedgerApplicationKind(
+    relationId: string,
+    application: CrossLanguageOperationApplicationInputV0_2,
+    operationId: CrossLanguageOperationIdV0_2,
+  ) {
+    updateBoundOperationLedgerApplication(relationId, application.applicationId, () => {
+      if (operationId === "IDENTITY.v0_1") return { applicationId: application.applicationId, operationId, positions: [] };
+      if (operationId === "TRANSPOSE_ADJACENT.v0_1") return { applicationId: application.applicationId, operationId, positions: [0, 1] };
+      return { applicationId: application.applicationId, operationId, position: 0, expectedRemovedText: "" };
+    });
   }
 
   function updateApplication(
@@ -254,6 +482,9 @@ export function CrossLanguageFunctionalMotivationWorkbenchV0_1({
           applications: relation.applications.map((application) => application.applicationId === applicationId ? { ...application, ...update } : application),
         }
       : relation));
+    setAttachedOperationLedgers((current) => current[relationId]
+      ? { ...current, [relationId]: { ...current[relationId]!, evidenceReference: "" } }
+      : current);
   }
 
   function addApplication(relationId: string, operationId: CrossLanguageOperationApplicationInputV0_1["operationId"]) {
@@ -267,6 +498,9 @@ export function CrossLanguageFunctionalMotivationWorkbenchV0_1({
       };
       return { ...relation, applications: [...relation.applications, application], proposedRelationship: "" };
     }));
+    setAttachedOperationLedgers((current) => current[relationId]
+      ? { ...current, [relationId]: { ...current[relationId]!, evidenceReference: "" } }
+      : current);
   }
 
   function addOperationLedger(initialForm: string) {
@@ -486,7 +720,18 @@ export function CrossLanguageFunctionalMotivationWorkbenchV0_1({
                     <label className={labelClass}>Citation / locator<input aria-label={`Witness ${index + 1} citation`} maxLength={500} className={inputClass} value={witness.evidenceReference} onChange={(event) => updateWitness(witness.witnessId, { evidenceReference: event.target.value })} /></label>
                   </div>
                 )}
-                <button type="button" aria-label={`Remove witness ${index + 1}`} className="mt-2 text-xs underline" onClick={() => setWitnesses((current) => current.filter((item) => item.witnessId !== witness.witnessId))}>Remove witness</button>
+                <button type="button" aria-label={"Remove witness " + (index + 1)} className="mt-2 text-xs underline" onClick={() => {
+                  const affectedRelationIds = new Set(correspondences
+                    .filter((relation) => relation.witnessId === witness.witnessId)
+                    .map((relation) => relation.relationId));
+                  setWitnesses((current) => current.filter((item) => item.witnessId !== witness.witnessId));
+                  setCorrespondences((current) => current.map((relation) => relation.witnessId === witness.witnessId
+                    ? { ...relation, witnessId: "", applications: [], proposedRelationship: "" }
+                    : relation));
+                  setAttachedOperationLedgers((current) => Object.fromEntries(
+                    Object.entries(current).filter(([relationId]) => !affectedRelationIds.has(relationId)),
+                  ));
+                }}>Remove witness</button>
               </fieldset>
             ))}
           </div>
@@ -523,25 +768,98 @@ export function CrossLanguageFunctionalMotivationWorkbenchV0_1({
                           updateApplication(relation.relationId, application.applicationId, { positions: [left, left + 1] });
                         }} /><span className="mt-1 block text-[11px] text-[#9fb1bf]">The next code point is the right position; both positions are recorded.</span></label>
                       ) : <p className="self-end text-[11px] text-[#9fb1bf]">Identity has no position parameter and cost 0.</p>}
-                      <button type="button" aria-label={`Correspondence ${index + 1} remove operation ${applicationIndex + 1}`} className="text-left text-xs underline sm:col-span-2" onClick={() => setCorrespondences((current) => current.map((item) => item.relationId === relation.relationId ? { ...item, applications: item.applications.filter((candidate) => candidate.applicationId !== application.applicationId), proposedRelationship: "" } : item))}>Remove application</button>
+                      <button type="button" aria-label={`Correspondence ${index + 1} remove operation ${applicationIndex + 1}`} className="text-left text-xs underline sm:col-span-2" onClick={() => {
+                        setCorrespondences((current) => current.map((item) => item.relationId === relation.relationId ? { ...item, applications: item.applications.filter((candidate) => candidate.applicationId !== application.applicationId), proposedRelationship: "" } : item));
+                        setAttachedOperationLedgers((current) => current[relation.relationId]
+                          ? { ...current, [relation.relationId]: { ...current[relation.relationId]!, evidenceReference: "" } }
+                          : current);
+                      }}>Remove application</button>
                     </div>
                   ))}
                 </div>
-                <button type="button" aria-label={`Remove correspondence ${index + 1}`} className="mt-2 text-xs underline" onClick={() => setCorrespondences((current) => current.filter((item) => item.relationId !== relation.relationId))}>Remove correspondence</button>
+                <div data-testid="cross-language-bound-operation-ledger-editor" className="mt-3 min-w-0 rounded border border-[#66532e] p-3 [overflow-wrap:anywhere]">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <strong className="text-xs">Component-to-witness operation ledger · v0.2</strong>
+                    {attachedOperationLedgers[relation.relationId] ? (
+                      <button type="button" aria-label={"Correspondence " + (index + 1) + " remove bound v0.2 ledger"} className="rounded border border-[#53604a] px-2 py-1 text-xs" onClick={() => {
+                        setAttachedOperationLedgers((current) => {
+                          const next = { ...current };
+                          delete next[relation.relationId];
+                          return next;
+                        });
+                        setCorrespondences((current) => current.map((item) => item.relationId === relation.relationId
+                          ? { ...item, proposedRelationship: "" }
+                          : item));
+                      }}>Remove bound ledger</button>
+                    ) : (
+                      <button type="button" aria-label={"Correspondence " + (index + 1) + " attach v0.2 operation ledger"} className="rounded border border-[#53604a] px-2 py-1 text-xs" disabled={!currentBindingFor(relation)} onClick={() => attachBoundOperationLedger(relation)}>Attach v0.2 operation ledger</button>
+                    )}
+                  </div>
+                  {attachedOperationLedgers[relation.relationId] ? (
+                    <>
+                      <p className="mt-2 text-xs text-[#aeb7c5]">Forms are derived from the selected component and witness. Editing either identity invalidates this ledger and its relationship claim.</p>
+                      <p className="mt-1 font-mono text-xs">{attachedOperationLedgers[relation.relationId]!.bindingSnapshot.targetComponentForm} → {attachedOperationLedgers[relation.relationId]!.bindingSnapshot.witnessForm} · component {attachedOperationLedgers[relation.relationId]!.bindingSnapshot.targetComponentIndex + 1} · witness {attachedOperationLedgers[relation.relationId]!.bindingSnapshot.witnessId}</p>
+                      <div className="mt-2 flex flex-wrap gap-2">
+                        {CROSS_LANGUAGE_OPERATION_DEFINITIONS_V0_2.map((definition) => (
+                          <button key={definition.operationId} type="button" aria-label={"Correspondence " + (index + 1) + " bound add " + definition.kind} className="rounded border border-[#53604a] px-2 py-1 text-[11px]" onClick={() => addBoundOperationLedgerApplication(relation.relationId, definition.operationId)}>
+                            Add {definition.kind === "TRANSPOSE_ADJACENT" ? "adjacent transpose" : definition.kind} · cost {definition.cost}
+                          </button>
+                        ))}
+                      </div>
+                      {attachedOperationLedgers[relation.relationId]!.operations.map((application, applicationIndex) => (
+                        <div key={application.applicationId} className="mt-2 grid min-w-0 gap-2 rounded border border-[#303843] p-2 sm:grid-cols-2">
+                          <label className={labelClass}>Bound operation {applicationIndex + 1}<select aria-label={"Correspondence " + (index + 1) + " bound operation " + (applicationIndex + 1)} className={inputClass} value={application.operationId} onChange={(event) => changeBoundOperationLedgerApplicationKind(relation.relationId, application, event.target.value as CrossLanguageOperationIdV0_2)}>
+                            {CROSS_LANGUAGE_OPERATION_DEFINITIONS_V0_2.map((definition) => <option key={definition.operationId} value={definition.operationId}>{definition.kind === "TRANSPOSE_ADJACENT" ? "Adjacent transpose" : definition.kind} · cost {definition.cost}</option>)}
+                          </select></label>
+                          {application.operationId === "TRANSPOSE_ADJACENT.v0_1" ? (
+                            <label className={labelClass}>Left zero-based Unicode code-point position<input aria-label={"Correspondence " + (index + 1) + " bound operation " + (applicationIndex + 1) + " left position"} type="number" min={0} className={inputClass} value={application.positions[0] ?? ""} onChange={(event) => {
+                              const left = event.target.value === "" ? Number.NaN : Number(event.target.value);
+                              updateBoundOperationLedgerApplication(relation.relationId, application.applicationId, (current) => current.operationId === "TRANSPOSE_ADJACENT.v0_1" ? { ...current, positions: [left, left + 1] } : current);
+                            }} /></label>
+                          ) : application.operationId === "OMIT.v0_2" ? (
+                            <>
+                              <label className={labelClass}>Omit position (zero-based Unicode code point)<input aria-label={"Correspondence " + (index + 1) + " bound operation " + (applicationIndex + 1) + " omit position"} type="number" min={0} className={inputClass} value={application.position} onChange={(event) => {
+                                const position = event.target.value === "" ? Number.NaN : Number(event.target.value);
+                                updateBoundOperationLedgerApplication(relation.relationId, application.applicationId, (current) => current.operationId === "OMIT.v0_2" ? { ...current, position } : current);
+                              }} /></label>
+                              <label className={labelClass}>Exact expected code point to remove<input aria-label={"Correspondence " + (index + 1) + " bound operation " + (applicationIndex + 1) + " expected removed text"} maxLength={4} className={inputClass + " font-mono"} value={application.expectedRemovedText} onChange={(event) => updateBoundOperationLedgerApplication(relation.relationId, application.applicationId, (current) => current.operationId === "OMIT.v0_2" ? { ...current, expectedRemovedText: event.target.value } : current)} /></label>
+                            </>
+                          ) : <p className="self-end text-[11px] text-[#9fb1bf]">Identity has no position parameter and cost 0.</p>}
+                          <button type="button" aria-label={"Correspondence " + (index + 1) + " remove bound operation " + (applicationIndex + 1)} className="text-left text-xs underline sm:col-span-2" onClick={() => {
+                            const draft = attachedOperationLedgers[relation.relationId];
+                            if (draft) updateBoundOperationLedgerDraft(relation.relationId, {
+                              operations: draft.operations.filter((candidate) => candidate.applicationId !== application.applicationId),
+                            });
+                          }}>Remove operation</button>
+                        </div>
+                      ))}
+                      <label className={labelClass + " mt-2 block"}>Relationship source reference (entered, not verified)<input aria-label={"Correspondence " + (index + 1) + " bound relationship source reference"} maxLength={1000} className={inputClass} value={attachedOperationLedgers[relation.relationId]!.evidenceReference} onChange={(event) => updateBoundOperationLedgerDraft(relation.relationId, { evidenceReference: event.target.value })} /></label>
+                      <BoundOperationLedgerReadoutV0_2 result={attachedOperationLedgerResults.get(relation.relationId)} />
+                    </>
+                  ) : <p className="mt-2 text-xs text-[#9fb1bf]">No v0.2 ledger is attached to this correspondence.</p>}
+                </div>
+                <button type="button" aria-label={"Remove correspondence " + (index + 1)} className="mt-2 text-xs underline" onClick={() => {
+                  setCorrespondences((current) => current.filter((item) => item.relationId !== relation.relationId));
+                  setAttachedOperationLedgers((current) => {
+                    const next = { ...current };
+                    delete next[relation.relationId];
+                    return next;
+                  });
+                }}>Remove correspondence</button>
               </fieldset>
             ))}
           </div>
 
           <div data-testid="cross-language-reversible-operation-ledger-editor" className="mt-4 min-w-0 rounded-lg border border-[#66532e] bg-[#0d1117] p-3 [overflow-wrap:anywhere]">
             <div className="flex flex-wrap items-center justify-between gap-2">
-              <strong className="text-xs text-[#dce9ca]">Optional reversible spelling-operation ledger · v0.2</strong>
+              <strong className="text-xs text-[#dce9ca]">Unbound exploratory spelling comparison · ledger v0.2</strong>
               {operationLedger ? (
                 <button type="button" data-testid="cross-language-remove-operation-ledger" className="rounded border border-[#53604a] px-2 py-1 text-xs" onClick={() => setOperationLedger(null)}>Remove ledger</button>
               ) : (
                 <button type="button" data-testid="cross-language-add-operation-ledger" className="rounded border border-[#53604a] px-2 py-1 text-xs" onClick={() => addOperationLedger(parent.segments[0]?.exactSpelling ?? "")}>Add reversible ledger</button>
               )}
             </div>
-            <p className="mt-1 text-xs leading-5 text-[#aeb7c5]">Record exact spelling steps and their inverse. OMIT removes one declared Unicode code point at a time. Costs describe mechanical operations only; they do not establish linguistic applicability or a historical relationship.</p>
+            <p className="mt-1 text-xs leading-5 text-[#aeb7c5]">This independent MITA/MAT-style comparison is not attached to a selected component-to-witness correspondence. Record exact spelling steps and their inverse. OMIT removes one declared Unicode code point at a time. Costs describe mechanical operations only; they do not establish linguistic applicability or a historical relationship.</p>
             {operationLedger ? (
               <>
                 <div className="mt-3 grid min-w-0 gap-2 sm:grid-cols-2">
@@ -699,7 +1017,7 @@ export function CrossLanguageFunctionalMotivationWorkbenchV0_1({
                 <div data-testid="cross-language-operation-ledger-invalid" className="mt-3 rounded border border-[#8b5b42] p-3 [overflow-wrap:anywhere]">Reversible ledger input invalid: {operationLedgerResult.reasonCodes.join(" · ")}</div>
               ) : (
                 <article data-testid="cross-language-operation-ledger-result" data-status={operationLedgerResult.ledger.mechanicalReconstructionStatus} className="mt-3 min-w-0 rounded border border-[#66532e] p-3 [overflow-wrap:anywhere]">
-                  <h4 className="font-semibold text-white">Reversible operation ledger · {operationLedgerResult.ledger.replayStatus}</h4>
+                  <h4 className="font-semibold text-white">Unbound exploratory operation ledger · {operationLedgerResult.ledger.replayStatus}</h4>
                   {operationLedgerResult.status === "REJECTED" ? <p role="alert">Rejected operation: {operationLedgerResult.reasonCodes.join(" · ")}</p> : null}
                   <p className="mt-1 font-mono">{operationLedgerResult.ledger.initialForm} → {operationLedgerResult.ledger.replayedFinalForm} · declared {operationLedgerResult.ledger.declaredFinalForm} · {operationLedgerResult.ledger.mechanicalReconstructionStatus}.</p>
                   <p>Operations: {operationLedgerResult.ledger.operationCount}; cost: {operationLedgerResult.ledger.totalCost}. Positions are zero-based Unicode code points; spans are half-open.</p>
