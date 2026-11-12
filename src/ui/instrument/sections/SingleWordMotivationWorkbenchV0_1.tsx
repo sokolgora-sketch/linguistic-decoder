@@ -785,7 +785,7 @@ function CurrentWordEvidenceSectionV0_1({
             <h4 className="font-semibold text-[#dce9ca]">1 · Albanian Kaikki whole-word source</h4>
             <div className="mt-1 break-words">Analyzed form: {visibleDiscovery.inputWord} · language {visibleDiscovery.inputLanguage} · profile {visibleDiscovery.inputProfile}</div>
             {sourceContextIsAlbanian ? (
-              <div className="mt-1">
+              <div className="mt-1 break-words">
                 Exact-form lookup: {sourceStatus?.status ?? "NOT_EMITTED"}
                 {sourceStatus?.queryForm ? ` · query ${sourceStatus.queryForm}` : ""}
                 {sourceStatus?.reasonCode ? ` · ${sourceStatus.reasonCode}` : ""}
@@ -983,7 +983,7 @@ function CurrentWordEvidenceSectionV0_1({
               <section data-testid="single-word-progressive-source-relationships" className="rounded border border-[#303843] bg-[#10161c] p-2">
                 <h4 className="font-semibold text-[#dce9ca]">4 · Source-authored relationships and sense alternatives</h4>
                 {sourceContextIsAlbanian ? (
-                  <div>Exact-form source status: {sourceStatus?.status ?? "NOT_EMITTED"} · source relation evidence is shown only if emitted by the current Discovery.</div>
+                  <div className="break-words">Exact-form source status: {sourceStatus?.status ?? "NOT_EMITTED"} · source relation evidence is shown only if emitted by the current Discovery.</div>
                 ) : (
                   <div>Albanian source relations: UNKNOWN_OR_NULL · no Albanian context is established.</div>
                 )}
@@ -1127,7 +1127,7 @@ function CurrentWordEvidenceSectionV0_1({
                   </div>
                 ) : null}
                 {lexicalReading?.senseAlignedLexicalRole ? (
-                  <div className="mt-2 rounded border border-[#26323d] p-2" data-testid="single-word-progressive-sense-alignment">
+                  <div className="mt-2 break-words rounded border border-[#26323d] p-2" data-testid="single-word-progressive-sense-alignment">
                     <div>Separate sense-aligned lexical-role contract: {lexicalReading.senseAlignedLexicalRole.status} · lineage independence {lexicalReading.senseAlignedLexicalRole.lineageIndependence} · functional operation Null.</div>
                     {lexicalReading.senseAlignedLexicalRole.candidates.length ? (
                       <ol className="mt-1 space-y-1">
@@ -1138,12 +1138,12 @@ function CurrentWordEvidenceSectionV0_1({
                         ))}
                       </ol>
                     ) : (
-                      <div className="mt-1">UNKNOWN_OR_NULL · {lexicalReading.senseAlignedLexicalRole.reasonCodes.join(", ") || "no candidate evidence"}</div>
+                      <div className="mt-1 break-words">UNKNOWN_OR_NULL · {lexicalReading.senseAlignedLexicalRole.reasonCodes.join(", ") || "no candidate evidence"}</div>
                     )}
                     <div className="mt-1 break-words">{lexicalReading.senseAlignedLexicalRole.claimBoundary} No single winner; user decides. This contract does not establish an embryo function or a component-sense crosswalk.</div>
                   </div>
                 ) : (
-                  <div className="mt-1">Separate exact sense-alignment artifact: UNKNOWN_OR_NULL · not emitted in this Discovery.</div>
+                  <div className="mt-1 break-words">Separate exact sense-alignment artifact: UNKNOWN_OR_NULL · not emitted in this Discovery.</div>
                 )}
                 {!sourceComponentReading && !lexicalReading?.relatedForms.length && !lexicalReading?.sourceLinkedComparison ? (
                   <p className="mt-1">No source-authored component relation is available in this Discovery payload: UNKNOWN_OR_NULL. A spelling resemblance or user proposal is not a source relation.</p>
@@ -1420,6 +1420,7 @@ export function SingleWordMotivationWorkbenchV0_1({
   const [wholeWordMeaningClaim, setWholeWordMeaningClaim] = useState("");
   const [wholeWordSourceEvidenceStatus, setWholeWordSourceEvidenceStatus] = useState<WholeWordOpaqueSourceEvidenceStatusV0_2>("UNKNOWN_OR_NULL");
   const [wholeWordSourceReference, setWholeWordSourceReference] = useState("");
+  const [targetIdentityChanged, setTargetIdentityChanged] = useState(false);
   const [crossLanguageResetVersion, setCrossLanguageResetVersion] = useState(0);
 
   const input = useMemo<SingleWordFunctionalMotivationInputV0_1>(() => ({
@@ -1508,6 +1509,24 @@ export function SingleWordMotivationWorkbenchV0_1({
     setWholeWordMeaningClaim("");
     setWholeWordSourceEvidenceStatus("UNKNOWN_OR_NULL");
     setWholeWordSourceReference("");
+    setTargetIdentityChanged(false);
+    setCrossLanguageResetVersion((version) => version + 1);
+  }
+
+  function invalidateTargetIdentityBoundState() {
+    setSegments((current) => current.map((segment) => ({
+      ...segment,
+      evidenceStatus: segment.evidenceStatus === "CITATION_ENTERED_UNVERIFIED"
+        ? "UNKNOWN_OR_NULL"
+        : segment.evidenceStatus,
+      evidenceReference: "",
+    })));
+    setSelectedComponentSource(null);
+    setTransformations((current) => current.map((transformation) => ({ ...transformation, evidenceReference: "" })));
+    setExaminedMechanicalDraft(null);
+    setWholeWordSourceEvidenceStatus("UNKNOWN_OR_NULL");
+    setWholeWordSourceReference("");
+    setTargetIdentityChanged(true);
     setCrossLanguageResetVersion((version) => version + 1);
   }
 
@@ -1517,12 +1536,12 @@ export function SingleWordMotivationWorkbenchV0_1({
   }
 
   function changeTargetLanguage(value: string) {
-    if (value !== targetLanguage) clearDraftClaims();
+    if (value !== targetLanguage) invalidateTargetIdentityBoundState();
     setTargetLanguage(value);
   }
 
   function changeTargetDialect(value: string) {
-    if (value !== targetDialect) clearDraftClaims();
+    if (value !== targetDialect) invalidateTargetIdentityBoundState();
     setTargetDialect(value);
   }
 
@@ -1576,6 +1595,14 @@ export function SingleWordMotivationWorkbenchV0_1({
     clearDraftClaims("SEGMENTED");
   }
 
+  function clearOpaqueInterpretation() {
+    setWholeWordMeaningClaim("");
+    setWholeWordSourceEvidenceStatus("UNKNOWN_OR_NULL");
+    setWholeWordSourceReference("");
+    setFunctionalExplanation("");
+    setTargetIdentityChanged(false);
+  }
+
   return (
     <>
     <section
@@ -1624,6 +1651,11 @@ export function SingleWordMotivationWorkbenchV0_1({
           </select>
         </label>
       </div>
+      {targetIdentityChanged ? (
+        <p role="status" data-testid="single-word-target-identity-changed" className="mt-3 rounded border border-[#746541] bg-[#18140e] p-2 text-xs leading-5 text-[#f0ddb0]">
+          Target language or dialect changed. Draft spellings and descriptions are retained as entered; component language and dialect labels were not rewritten. Source bindings and citations were cleared, and prior examined analyses were reset. Retained text remains user-proposed, not source evidence for the new target identity.
+        </p>
+      ) : null}
 
       {proposalMode === "SEGMENTED" ? (
       <>
@@ -1631,6 +1663,14 @@ export function SingleWordMotivationWorkbenchV0_1({
         {segments.map((segment, index) => (
           <fieldset key={index} className="rounded-lg border border-[#354234] bg-[#0d1117] p-3">
             <legend className="px-1 text-xs font-semibold text-[#dce9ca]">Component {index + 1}</legend>
+            {Boolean(
+              (targetLanguage && segment.language && segment.language !== targetLanguage) ||
+              (segment.dialect && segment.dialect !== targetDialect)
+            ) ? (
+              <p role="status" data-testid="single-word-component-identity-mismatch" className="mb-3 rounded border border-[#746541] bg-[#18140e] p-2 text-xs leading-5 text-[#f0ddb0]">
+                Component identity differs from the target: recorded {segment.language || "UNKNOWN_OR_NULL"} · {segment.dialect || "dialect UNKNOWN_OR_NULL"}; target {targetLanguage || "UNKNOWN_OR_NULL"} · {targetDialect || "dialect UNKNOWN_OR_NULL"}. The component identity is retained as entered.
+              </p>
+            ) : null}
             <div className="grid gap-3 sm:grid-cols-2">
               <label className={labelClass}>
                 Exact component spelling
@@ -2067,7 +2107,7 @@ export function SingleWordMotivationWorkbenchV0_1({
               <textarea aria-label="User-proposed whole-word functional description" maxLength={1000} className={inputClass} rows={2} value={functionalExplanation} onChange={(event) => setFunctionalExplanation(event.target.value)} placeholder="Leave blank when the internal functional reading is unresolved." />
             </label>
           </div>
-          <button type="button" data-testid="single-word-clear-opaque-interpretation" className="mt-3 rounded border border-[#53604a] px-3 py-1.5 text-xs text-[#dce9ca]" onClick={clearInterpretation}>
+          <button type="button" data-testid="single-word-clear-opaque-interpretation" className="mt-3 rounded border border-[#53604a] px-3 py-1.5 text-xs text-[#dce9ca]" onClick={clearOpaqueInterpretation}>
             Clear / reset interpretation
           </button>
 
