@@ -93,6 +93,26 @@ export type FunctionalArchitectureParallelInputV0_1 = Readonly<{
   unresolvedMaterial: string;
 }>;
 
+export type CrossLanguageBoundaryOperationWitnessInputV0_1 = Readonly<{
+  witnessId: string;
+  targetForm: string;
+  language: string;
+  componentForms: readonly string[];
+  rawConcatenation: string;
+  boundaryAfterComponentIndex: number;
+  boundaryPosition: number;
+  affectedInputSpan: Readonly<{ start: number; end: number }>;
+  boundaryInput: string;
+  boundaryOutput: string;
+  declaredResultForm: string;
+  linguisticRuleName: string;
+  linguisticRuleAttribution: string;
+  linguisticRuleReference: string;
+  sourceReferences: readonly string[];
+  evidenceStatus: CrossLanguageEvidenceStatusV0_1;
+  functionalInterpretation: string;
+}>;
+
 export type CrossLanguageFunctionalMotivationInputV0_1 = Readonly<{
   targetSense: Readonly<{
     label: string;
@@ -105,6 +125,7 @@ export type CrossLanguageFunctionalMotivationInputV0_1 = Readonly<{
   unresolvedMaterial: readonly string[];
   functionalParallel: FunctionalArchitectureParallelInputV0_1 | null;
   sourceWitnesses: readonly GenericFunctionalWitnessV1[];
+  boundaryOperationWitness?: CrossLanguageBoundaryOperationWitnessInputV0_1 | null;
 }>;
 
 export type CrossLanguageFunctionalMotivationOperationApplicationV0_1 = Readonly<{
@@ -121,6 +142,48 @@ export type CrossLanguageFunctionalMotivationOperationApplicationV0_1 = Readonly
   voicePathBefore: readonly string[] | null;
   voicePathAfter: readonly string[] | null;
   unresolvedVoices: readonly string[];
+}>;
+
+export type CrossLanguageBoundaryOperationWitnessV0_1 = Readonly<{
+  witnessId: string;
+  targetForm: string;
+  language: string;
+  positionUnit: "zero_based_unicode_code_point";
+  spanConvention: "half_open";
+  componentForms: readonly string[];
+  rawConcatenation: string;
+  boundaryAfterComponentIndex: number;
+  boundaryPosition: number;
+  boundaryInput: string;
+  boundaryOutput: string;
+  affectedInputSpan: Readonly<{ start: number; end: number }>;
+  affectedOutputSpan: Readonly<{ start: number; end: number }>;
+  declaredResultForm: string;
+  reconstructedForm: string;
+  mechanicalReconstructionStatus: "EXACT_MATCH" | "MISMATCH";
+  linguisticRule: Readonly<{
+    name: string;
+    attribution: string | null;
+    reference: string | null;
+    evidenceStatus: CrossLanguageEvidenceStatusV0_1;
+  }>;
+  sourceReferences: readonly string[];
+  evidenceStatus: CrossLanguageEvidenceStatusV0_1;
+  linguisticApplicabilityStatus: CrossLanguageEvidenceStatusV0_1;
+  authority: "USER_DECLARED_UNVERIFIED";
+  operationCost: null;
+  writtenVoices: Readonly<{
+    status: "COMPLETE" | "UNKNOWN_OR_NULL";
+    path: readonly string[];
+    events: readonly StructuralVoiceEventV0_2[];
+    unresolvedReason: string | null;
+  }>;
+  unresolvedVoices: readonly string[];
+  functionalInterpretation: Readonly<{
+    text: string | null;
+    status: "USER_PROPOSED" | "UNKNOWN_OR_NULL";
+  }>;
+  sourceAuthorityPromotion: "NONE";
 }>;
 
 export type CrossLanguageFunctionalMotivationV0_1 = Readonly<{
@@ -225,6 +288,7 @@ export type CrossLanguageFunctionalMotivationV0_1 = Readonly<{
     historicalRelation: "NOT_CLAIMED";
     automaticSemanticEvaluation: "NOT_PERFORMED";
   }> | null;
+  boundaryOperationWitness?: CrossLanguageBoundaryOperationWitnessV0_1;
   strictEmbryoMeaning: Readonly<{ status: "UNKNOWN_OR_NULL"; meaning: null }>;
   sourceAuthorityPromotion: "NONE";
   historicalOrigin: "NOT_CLAIMED";
@@ -296,6 +360,152 @@ function projectWrittenVoices(form: string): Readonly<{
 
 function isCombiningMark(value: string | undefined): boolean {
   return value !== undefined && /^\p{M}$/u.test(value);
+}
+
+function validateBoundaryOperationWitness(value: unknown): string[] {
+  if (value === undefined || value === null) return [];
+  if (!isRecord(value)) return ["BOUNDARY_WITNESS_MALFORMED"];
+  const reasons: string[] = [];
+  if (!isNonEmpty(value.witnessId) || value.witnessId.length > 100) reasons.push("BOUNDARY_WITNESS_ID_REQUIRED");
+  if (!exactToken(value.targetForm, 120)) reasons.push("BOUNDARY_WITNESS_TARGET_FORM_REQUIRED");
+  if (!isNonEmpty(value.language) || value.language.length > 100) reasons.push("BOUNDARY_WITNESS_LANGUAGE_REQUIRED");
+  if (!Array.isArray(value.componentForms) || value.componentForms.length < 2 || value.componentForms.length > 8) {
+    reasons.push("BOUNDARY_WITNESS_TWO_TO_EIGHT_COMPONENTS_REQUIRED");
+  } else if (value.componentForms.some((form) => !exactToken(form, 120))) {
+    reasons.push("BOUNDARY_WITNESS_COMPONENT_FORMS_MUST_BE_EXACT_TOKENS");
+  }
+  if (!exactToken(value.rawConcatenation, 960)) reasons.push("BOUNDARY_WITNESS_RAW_CONCATENATION_REQUIRED");
+  if (Array.isArray(value.componentForms) && value.componentForms.every((form) => exactToken(form, 120)) &&
+    typeof value.rawConcatenation === "string" && value.rawConcatenation !== value.componentForms.join("")) {
+    reasons.push("BOUNDARY_WITNESS_RAW_CONCATENATION_MISMATCH");
+  }
+  if (!Number.isInteger(value.boundaryAfterComponentIndex) || (value.boundaryAfterComponentIndex as number) < 0 ||
+    !Array.isArray(value.componentForms) || (value.boundaryAfterComponentIndex as number) >= value.componentForms.length - 1) {
+    reasons.push("BOUNDARY_WITNESS_COMPONENT_BOUNDARY_INDEX_INVALID");
+  }
+  if (!Number.isInteger(value.boundaryPosition) || (value.boundaryPosition as number) < 1) {
+    reasons.push("BOUNDARY_WITNESS_CODE_POINT_POSITION_INVALID");
+  }
+  if (Array.isArray(value.componentForms) && value.componentForms.every((form) => exactToken(form, 120)) &&
+    Number.isInteger(value.boundaryAfterComponentIndex) && (value.boundaryAfterComponentIndex as number) >= 0 &&
+    (value.boundaryAfterComponentIndex as number) < value.componentForms.length - 1) {
+    const expectedPosition = value.componentForms.slice(0, (value.boundaryAfterComponentIndex as number) + 1)
+      .reduce((sum: number, form) => sum + Array.from(form).length, 0);
+    if (value.boundaryPosition !== expectedPosition) reasons.push("BOUNDARY_WITNESS_CODE_POINT_POSITION_MISMATCH");
+  }
+
+  const rawCharacters = typeof value.rawConcatenation === "string" ? Array.from(value.rawConcatenation) : [];
+  const span = value.affectedInputSpan;
+  let validSpan: Readonly<{ start: number; end: number }> | null = null;
+  if (!isRecord(span) || !Number.isInteger(span.start) || !Number.isInteger(span.end) ||
+    (span.start as number) < 0 || (span.end as number) <= (span.start as number) || (span.end as number) > rawCharacters.length) {
+    reasons.push("BOUNDARY_WITNESS_INPUT_SPAN_INVALID");
+  } else {
+    validSpan = { start: span.start as number, end: span.end as number };
+    if (Number.isInteger(value.boundaryPosition) &&
+      !(validSpan.start < (value.boundaryPosition as number) && validSpan.end > (value.boundaryPosition as number))) {
+      reasons.push("BOUNDARY_WITNESS_INPUT_SPAN_MUST_COVER_BOUNDARY");
+    }
+    if (rawCharacters[validSpan.start] && isCombiningMark(rawCharacters[validSpan.start])) {
+      reasons.push("BOUNDARY_WITNESS_INPUT_SPAN_SPLITS_COMBINING_SEQUENCE");
+    }
+    if (rawCharacters[validSpan.end] && isCombiningMark(rawCharacters[validSpan.end])) {
+      reasons.push("BOUNDARY_WITNESS_INPUT_SPAN_SPLITS_COMBINING_SEQUENCE");
+    }
+  }
+  if (!exactToken(value.boundaryInput, 80)) reasons.push("BOUNDARY_WITNESS_INPUT_REQUIRED");
+  else if (validSpan && value.boundaryInput !== rawCharacters.slice(validSpan.start, validSpan.end).join("")) {
+    reasons.push("BOUNDARY_WITNESS_INPUT_SPAN_TEXT_MISMATCH");
+  }
+  if (typeof value.boundaryPosition === "number" && isCombiningMark(rawCharacters[value.boundaryPosition])) {
+    reasons.push("BOUNDARY_WITNESS_BOUNDARY_SPLITS_COMBINING_SEQUENCE");
+  }
+  if (!exactToken(value.boundaryOutput, 80)) reasons.push("BOUNDARY_WITNESS_OUTPUT_REQUIRED");
+  else if (typeof value.boundaryInput === "string" && value.boundaryInput === value.boundaryOutput) {
+    reasons.push("BOUNDARY_WITNESS_OPERATION_MUST_CHANGE_BOUNDARY_MATERIAL");
+  }
+  if (!exactToken(value.declaredResultForm, 120)) reasons.push("BOUNDARY_WITNESS_DECLARED_RESULT_REQUIRED");
+  if (!isNonEmpty(value.linguisticRuleName) || value.linguisticRuleName.length > 200) reasons.push("BOUNDARY_WITNESS_RULE_NAME_REQUIRED");
+  if (typeof value.linguisticRuleAttribution !== "string" || value.linguisticRuleAttribution.length > 300) reasons.push("BOUNDARY_WITNESS_RULE_ATTRIBUTION_MALFORMED");
+  if (typeof value.linguisticRuleReference !== "string" || value.linguisticRuleReference.length > 1000) reasons.push("BOUNDARY_WITNESS_RULE_REFERENCE_MALFORMED");
+  if (!Array.isArray(value.sourceReferences) || value.sourceReferences.length > 12 ||
+    value.sourceReferences.some((reference) => !isNonEmpty(reference) || reference.length > 1000)) {
+    reasons.push("BOUNDARY_WITNESS_SOURCE_REFERENCES_MALFORMED");
+  }
+  if (!isEvidenceStatus(value.evidenceStatus)) reasons.push("BOUNDARY_WITNESS_EVIDENCE_STATUS_UNSUPPORTED");
+  else if (value.evidenceStatus === "CITATION_ENTERED_UNVERIFIED" &&
+    !((Array.isArray(value.sourceReferences) && value.sourceReferences.some(isNonEmpty)) ||
+      (typeof value.linguisticRuleReference === "string" && isNonEmpty(value.linguisticRuleReference)))) {
+    reasons.push("BOUNDARY_WITNESS_UNVERIFIED_CITATION_REQUIRED");
+  }
+  if (typeof value.functionalInterpretation !== "string" || value.functionalInterpretation.length > 1000) {
+    reasons.push("BOUNDARY_WITNESS_FUNCTIONAL_INTERPRETATION_MALFORMED");
+  }
+
+  if (validSpan && typeof value.boundaryOutput === "string" && exactToken(value.boundaryOutput, 80) &&
+    rawCharacters.length > 0) {
+    const reconstructed = [
+      ...rawCharacters.slice(0, validSpan.start),
+      ...Array.from(value.boundaryOutput),
+      ...rawCharacters.slice(validSpan.end),
+    ].join("");
+    if (typeof value.declaredResultForm === "string" && exactToken(value.declaredResultForm, 120) &&
+      reconstructed !== value.declaredResultForm) {
+      reasons.push("BOUNDARY_WITNESS_DECLARED_RESULT_MISMATCH");
+    }
+  }
+  return [...new Set(reasons)];
+}
+
+function buildBoundaryOperationWitness(
+  value: CrossLanguageBoundaryOperationWitnessInputV0_1 | null | undefined,
+): CrossLanguageBoundaryOperationWitnessV0_1 | undefined {
+  if (!value) return undefined;
+  const rawCharacters = Array.from(value.rawConcatenation);
+  const span = value.affectedInputSpan;
+  const outputCharacters = Array.from(value.boundaryOutput);
+  const reconstructedForm = [
+    ...rawCharacters.slice(0, span.start),
+    ...outputCharacters,
+    ...rawCharacters.slice(span.end),
+  ].join("");
+  const writtenVoices = projectWrittenVoices(reconstructedForm);
+  return {
+    witnessId: value.witnessId,
+    targetForm: value.targetForm,
+    language: value.language,
+    positionUnit: "zero_based_unicode_code_point",
+    spanConvention: "half_open",
+    componentForms: [...value.componentForms],
+    rawConcatenation: value.rawConcatenation,
+    boundaryAfterComponentIndex: value.boundaryAfterComponentIndex,
+    boundaryPosition: value.boundaryPosition,
+    boundaryInput: value.boundaryInput,
+    boundaryOutput: value.boundaryOutput,
+    affectedInputSpan: { ...span },
+    affectedOutputSpan: { start: span.start, end: span.start + outputCharacters.length },
+    declaredResultForm: value.declaredResultForm,
+    reconstructedForm,
+    mechanicalReconstructionStatus: reconstructedForm === value.targetForm ? "EXACT_MATCH" : "MISMATCH",
+    linguisticRule: {
+      name: value.linguisticRuleName,
+      attribution: value.linguisticRuleAttribution.trim() || null,
+      reference: value.linguisticRuleReference.trim() || null,
+      evidenceStatus: value.evidenceStatus,
+    },
+    sourceReferences: [...value.sourceReferences],
+    evidenceStatus: value.evidenceStatus,
+    linguisticApplicabilityStatus: value.evidenceStatus,
+    authority: "USER_DECLARED_UNVERIFIED",
+    operationCost: null,
+    writtenVoices,
+    unresolvedVoices: writtenVoices.status === "COMPLETE" ? [] : [writtenVoices.unresolvedReason ?? "VOICE_PATH_UNKNOWN"],
+    functionalInterpretation: {
+      text: value.functionalInterpretation.trim() || null,
+      status: value.functionalInterpretation.trim() ? "USER_PROPOSED" : "UNKNOWN_OR_NULL",
+    },
+    sourceAuthorityPromotion: "NONE",
+  };
 }
 
 function validateOperationApplication(value: unknown, index: number): string[] {
@@ -637,6 +847,7 @@ function validateInput(value: unknown): string[] {
     value.unresolvedMaterial.some((item) => typeof item !== "string" || item.length > 500)) reasons.push("UNRESOLVED_MATERIAL_MALFORMED");
   reasons.push(...validateParallel(value.functionalParallel));
   reasons.push(...validateSourceWitnessContext(value.sourceWitnesses));
+  reasons.push(...validateBoundaryOperationWitness(value.boundaryOperationWitness));
   return [...new Set(reasons)];
 }
 
@@ -652,6 +863,10 @@ export function buildCrossLanguageFunctionalMotivationV0_1(
   const reasons = validateInput(input);
   if (reasons.length) return invalid(reasons);
   const proposal = parent.proposal;
+  if (input.boundaryOperationWitness && input.boundaryOperationWitness.targetForm !== proposal.target.exactWord) {
+    return invalid(["BOUNDARY_WITNESS_TARGET_FORM_MISMATCH"]);
+  }
+  const boundaryOperationWitness = buildBoundaryOperationWitness(input.boundaryOperationWitness);
   const sourceWitnesses = input.sourceWitnesses;
   const sourceWitnessById = new Map(sourceWitnesses.map((witness) => [witness.witnessId, witness]));
   const witnesses = input.witnesses.map((witness) => {
@@ -822,6 +1037,7 @@ export function buildCrossLanguageFunctionalMotivationV0_1(
       },
       unresolvedMaterial: input.unresolvedMaterial.map((item) => item.trim()).filter(Boolean),
       functionalParallel: buildParallel(input.functionalParallel),
+      ...(boundaryOperationWitness ? { boundaryOperationWitness } : {}),
       strictEmbryoMeaning: { status: "UNKNOWN_OR_NULL", meaning: null },
       sourceAuthorityPromotion: "NONE",
       historicalOrigin: "NOT_CLAIMED",

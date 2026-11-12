@@ -1900,6 +1900,55 @@ describe("Single-word motivation workbench v0.1", () => {
     expect(result).toHaveTextContent("No single winner; user decides");
   });
 
+  it("records a boundary witness with exact coordinates and clears it when its target changes", () => {
+    render(<SingleWordMotivationWorkbenchV0_1 initialTargetWord="mitāhāra" />);
+    fireEvent.change(screen.getByLabelText("Target language"), { target: { value: "Sanskrit" } });
+    fireEvent.change(screen.getByLabelText("Component 1 exact spelling"), { target: { value: "mita" } });
+    fireEvent.change(screen.getByLabelText("Component 1 proposed meaning"), { target: { value: "measured" } });
+    fireEvent.change(screen.getByLabelText("Component 1 grammatical role"), { target: { value: "modifier" } });
+    fireEvent.change(screen.getByLabelText("Component 1 language"), { target: { value: "Sanskrit" } });
+    fireEvent.change(screen.getByLabelText("Component 2 exact spelling"), { target: { value: "āhāra" } });
+    fireEvent.change(screen.getByLabelText("Component 2 language"), { target: { value: "Sanskrit" } });
+    fireEvent.click(screen.getByLabelText("Component 2 not yet explained"));
+    fireEvent.change(screen.getByLabelText("Proposed functional explanation"), { target: { value: "A user-proposed reading of measured nourishment." } });
+    fireEvent.click(screen.getByTestId("cross-language-add-boundary-witness"));
+
+    fireEvent.change(screen.getByLabelText("Boundary witness language"), { target: { value: "Sanskrit" } });
+    fireEvent.change(screen.getByLabelText("Boundary witness component forms"), { target: { value: "mita\nāhāra" } });
+    fireEvent.change(screen.getByLabelText("Boundary witness position"), { target: { value: "4" } });
+    fireEvent.change(screen.getByLabelText("Boundary witness span start"), { target: { value: "3" } });
+    fireEvent.change(screen.getByLabelText("Boundary witness span end"), { target: { value: "5" } });
+    fireEvent.change(screen.getByLabelText("Boundary witness input"), { target: { value: "aā" } });
+    fireEvent.change(screen.getByLabelText("Boundary witness output"), { target: { value: "ā" } });
+    fireEvent.change(screen.getByLabelText("Boundary witness declared result"), { target: { value: "mitāhāra" } });
+    fireEvent.change(screen.getByLabelText("Boundary witness rule name"), { target: { value: "savarṇa-dīrgha sandhi" } });
+    fireEvent.change(screen.getByLabelText("Boundary witness rule attribution"), { target: { value: "Sanskrit grammatical rule; user attributed" } });
+    fireEvent.change(screen.getByLabelText("Boundary witness rule reference"), { target: { value: "https://learnsanskrit.org/vyakarana/sounds/savarna-sounds/" } });
+    fireEvent.change(screen.getByLabelText("Boundary witness evidence status"), { target: { value: "CITATION_ENTERED_UNVERIFIED" } });
+    fireEvent.change(screen.getByLabelText("Boundary witness source references"), { target: { value: "https://www.wisdomlib.org/definition/mitahara" } });
+    fireEvent.change(screen.getByLabelText("Boundary witness functional interpretation"), { target: { value: "Measured intake can be read as moderation." } });
+
+    const witness = screen.getByTestId("cross-language-boundary-witness-result");
+    expect(witness).toHaveAttribute("data-status", "EXACT_MATCH");
+    expect(witness).toHaveTextContent("mita + āhāra = mitaāhāra");
+    expect(witness).toHaveTextContent("position 4: aā → ā");
+    expect(witness).toHaveTextContent("span [3, 5)");
+    expect(witness).toHaveTextContent("reconstructed: mitāhāra");
+    expect(witness).toHaveTextContent("citation entered; not independently verified");
+    expect(witness).toHaveTextContent("operation cost: null");
+    expect(witness).toHaveTextContent("Canonical written Voices: UNKNOWN_OR_NULL");
+    expect(witness).toHaveTextContent("User-proposed functional interpretation: Measured intake can be read as moderation.");
+    expect(witness).toHaveTextContent("Source authority promotion: NONE");
+
+    fireEvent.change(screen.getByLabelText("Boundary witness component forms"), { target: { value: "mita\nāhara" } });
+    expect(screen.queryByTestId("cross-language-boundary-witness-result")).not.toBeInTheDocument();
+    expect(screen.getByLabelText("Boundary witness declared result")).toHaveValue("");
+
+    fireEvent.change(screen.getByLabelText("Exact target word"), { target: { value: "mitāhāras" } });
+    expect(screen.queryByTestId("cross-language-boundary-witness-result")).not.toBeInTheDocument();
+    expect(screen.getByTestId("cross-language-add-boundary-witness")).toBeInTheDocument();
+  });
+
   it("offers existing generic witnesses supplied for the current analyzed target", () => {
     const sourceWitness: GenericFunctionalWitnessV1 = {
       witnessId: "generic-witness-eat",

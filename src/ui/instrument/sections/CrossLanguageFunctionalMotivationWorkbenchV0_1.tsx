@@ -6,6 +6,7 @@ import {
   CROSS_LANGUAGE_OPERATION_DEFINITIONS_V0_1,
   type CrossLanguageCorrespondenceInputV0_1,
   type CrossLanguageEvidenceStatusV0_1,
+  type CrossLanguageBoundaryOperationWitnessInputV0_1,
   type CrossLanguageOperationApplicationInputV0_1,
   type CrossLanguageWitnessInputV0_1,
   type FunctionalArchitectureContributionInputV0_1,
@@ -71,6 +72,28 @@ function blankParallel(): FunctionalArchitectureParallelInputV0_1 {
   };
 }
 
+function blankBoundaryOperationWitness(targetForm: string, witnessId: string): CrossLanguageBoundaryOperationWitnessInputV0_1 {
+  return {
+    witnessId,
+    targetForm,
+    language: "",
+    componentForms: [],
+    rawConcatenation: "",
+    boundaryAfterComponentIndex: 0,
+    boundaryPosition: 0,
+    affectedInputSpan: { start: 0, end: 0 },
+    boundaryInput: "",
+    boundaryOutput: "",
+    declaredResultForm: "",
+    linguisticRuleName: "",
+    linguisticRuleAttribution: "",
+    linguisticRuleReference: "",
+    sourceReferences: [],
+    evidenceStatus: "USER_PROPOSED",
+    functionalInterpretation: "",
+  };
+}
+
 function evidenceLabel(status: CrossLanguageEvidenceStatusV0_1 | "SOURCE_RECORD_ONLY"): string {
   switch (status) {
     case "SOURCE_RECORD_ONLY":
@@ -99,6 +122,7 @@ export function CrossLanguageFunctionalMotivationWorkbenchV0_1({
   const [proposedSynthesis, setProposedSynthesis] = useState("");
   const [unresolvedText, setUnresolvedText] = useState("");
   const [functionalParallel, setFunctionalParallel] = useState<FunctionalArchitectureParallelInputV0_1 | null>(null);
+  const [boundaryOperationWitness, setBoundaryOperationWitness] = useState<CrossLanguageBoundaryOperationWitnessInputV0_1 | null>(null);
 
   const input = useMemo(() => ({
     targetSense: {
@@ -112,13 +136,14 @@ export function CrossLanguageFunctionalMotivationWorkbenchV0_1({
     unresolvedMaterial: unresolvedText.split("\n").map((item) => item.trim()).filter(Boolean),
     functionalParallel,
     sourceWitnesses,
-  }), [targetSenseLabel, targetSenseEvidenceStatus, targetSenseReference, witnesses, correspondences, proposedSynthesis, unresolvedText, functionalParallel, sourceWitnesses]);
+    boundaryOperationWitness,
+  }), [targetSenseLabel, targetSenseEvidenceStatus, targetSenseReference, witnesses, correspondences, proposedSynthesis, unresolvedText, functionalParallel, sourceWitnesses, boundaryOperationWitness]);
   const result = useMemo(
     () => buildCrossLanguageFunctionalMotivationV0_1(parentProposal, input),
     [parentProposal, input],
   );
   const parent = parentProposal.status === "READY" ? parentProposal.proposal : null;
-  const hasCrossLanguageContent = witnesses.length > 0 || correspondences.length > 0 || Boolean(
+  const hasCrossLanguageContent = witnesses.length > 0 || correspondences.length > 0 || boundaryOperationWitness !== null || Boolean(
     proposedSynthesis.trim() || targetSenseLabel.trim() || targetSenseReference.trim() || unresolvedText.trim() || functionalParallel,
   );
 
@@ -198,6 +223,26 @@ export function CrossLanguageFunctionalMotivationWorkbenchV0_1({
         ? { ...architecture, contributions: [...architecture.contributions, blankContribution(nextId(`${architectureId}-contribution`, architecture.contributions.map((item) => item.contributionId)))] }
         : architecture),
     } : current);
+  }
+
+  function updateBoundaryWitness(update: Partial<CrossLanguageBoundaryOperationWitnessInputV0_1>) {
+    setBoundaryOperationWitness((current) => current ? { ...current, ...update } : current);
+  }
+
+  function updateBoundaryComponents(text: string) {
+    if (!boundaryOperationWitness) return;
+    const componentForms = text.split("\n");
+    setBoundaryOperationWitness({
+      ...boundaryOperationWitness,
+      componentForms,
+      rawConcatenation: componentForms.join(""),
+      boundaryAfterComponentIndex: 0,
+      boundaryPosition: 0,
+      affectedInputSpan: { start: 0, end: 0 },
+      boundaryInput: "",
+      boundaryOutput: "",
+      declaredResultForm: "",
+    });
   }
 
   return (
@@ -388,6 +433,39 @@ export function CrossLanguageFunctionalMotivationWorkbenchV0_1({
             ) : null}
           </div>
 
+          <div data-testid="cross-language-boundary-witness-editor" className="mt-4 rounded-lg border border-[#66532e] bg-[#0d1117] p-3">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <strong className="text-xs text-[#dce9ca]">Optional attributed boundary-operation witness</strong>
+              {boundaryOperationWitness ? (
+                <button type="button" data-testid="cross-language-remove-boundary-witness" className="rounded border border-[#53604a] px-2 py-1 text-xs" onClick={() => setBoundaryOperationWitness(null)}>Remove boundary witness</button>
+              ) : (
+                <button type="button" data-testid="cross-language-add-boundary-witness" className="rounded border border-[#53604a] px-2 py-1 text-xs" onClick={() => setBoundaryOperationWitness(blankBoundaryOperationWitness(parent.target.exactWord, "boundary-witness-1"))}>Add boundary witness</button>
+              )}
+            </div>
+            <p className="mt-1 text-xs leading-5 text-[#aeb7c5]">Records a user-declared spelling reconstruction with code-point coordinates. The form does not execute a language rule or verify its source attribution.</p>
+            {boundaryOperationWitness ? (
+              <div className="mt-3 grid gap-2 sm:grid-cols-2">
+                <label className={labelClass}>Witness language<input aria-label="Boundary witness language" maxLength={100} className={inputClass} value={boundaryOperationWitness.language} onChange={(event) => updateBoundaryWitness({ language: event.target.value })} /></label>
+                <label className={labelClass}>Target exact spelling<input aria-label="Boundary witness target form" className={inputClass} value={boundaryOperationWitness.targetForm} readOnly /></label>
+                <label className={labelClass}>Component forms (one exact form per line)<textarea aria-label="Boundary witness component forms" maxLength={1000} className={inputClass} rows={2} value={boundaryOperationWitness.componentForms.join("\n")} onChange={(event) => updateBoundaryComponents(event.target.value)} /></label>
+                <label className={labelClass}>Raw concatenation (preserved)<input aria-label="Boundary witness raw concatenation" className={`${inputClass} font-mono`} value={boundaryOperationWitness.rawConcatenation} readOnly /></label>
+                <label className={labelClass}>Boundary after component<select aria-label="Boundary witness component boundary" className={inputClass} value={boundaryOperationWitness.boundaryAfterComponentIndex} onChange={(event) => updateBoundaryWitness({ boundaryAfterComponentIndex: Number(event.target.value) })}>{boundaryOperationWitness.componentForms.slice(0, -1).map((form, index) => <option key={`${index}:${form}`} value={index}>{index + 1}: {form}</option>)}</select></label>
+                <label className={labelClass}>Boundary position (zero-based code points)<input aria-label="Boundary witness position" type="number" min={0} className={inputClass} value={boundaryOperationWitness.boundaryPosition} onChange={(event) => updateBoundaryWitness({ boundaryPosition: event.target.value === "" ? Number.NaN : Number(event.target.value) })} /></label>
+                <label className={labelClass}>Affected input span start (inclusive code point)<input aria-label="Boundary witness span start" type="number" min={0} className={inputClass} value={boundaryOperationWitness.affectedInputSpan.start} onChange={(event) => updateBoundaryWitness({ affectedInputSpan: { ...boundaryOperationWitness.affectedInputSpan, start: event.target.value === "" ? Number.NaN : Number(event.target.value) } })} /></label>
+                <label className={labelClass}>Affected input span end (exclusive code point)<input aria-label="Boundary witness span end" type="number" min={0} className={inputClass} value={boundaryOperationWitness.affectedInputSpan.end} onChange={(event) => updateBoundaryWitness({ affectedInputSpan: { ...boundaryOperationWitness.affectedInputSpan, end: event.target.value === "" ? Number.NaN : Number(event.target.value) } })} /></label>
+                <label className={labelClass}>Exact boundary input<input aria-label="Boundary witness input" maxLength={80} className={`${inputClass} font-mono`} value={boundaryOperationWitness.boundaryInput} onChange={(event) => updateBoundaryWitness({ boundaryInput: event.target.value })} /></label>
+                <label className={labelClass}>Declared boundary output<input aria-label="Boundary witness output" maxLength={80} className={`${inputClass} font-mono`} value={boundaryOperationWitness.boundaryOutput} onChange={(event) => updateBoundaryWitness({ boundaryOutput: event.target.value })} /></label>
+                <label className={labelClass}>Declared resulting spelling<input aria-label="Boundary witness declared result" maxLength={120} className={`${inputClass} font-mono`} value={boundaryOperationWitness.declaredResultForm} onChange={(event) => updateBoundaryWitness({ declaredResultForm: event.target.value })} /></label>
+                <label className={labelClass}>Attributed rule name<input aria-label="Boundary witness rule name" maxLength={200} className={inputClass} value={boundaryOperationWitness.linguisticRuleName} onChange={(event) => updateBoundaryWitness({ linguisticRuleName: event.target.value })} /></label>
+                <label className={labelClass}>Rule attribution<input aria-label="Boundary witness rule attribution" maxLength={300} className={inputClass} value={boundaryOperationWitness.linguisticRuleAttribution} onChange={(event) => updateBoundaryWitness({ linguisticRuleAttribution: event.target.value })} /></label>
+                <label className={labelClass}>Rule reference / locator<input aria-label="Boundary witness rule reference" maxLength={1000} className={inputClass} value={boundaryOperationWitness.linguisticRuleReference} onChange={(event) => updateBoundaryWitness({ linguisticRuleReference: event.target.value })} /></label>
+                <label className={labelClass}>Evidence status<select aria-label="Boundary witness evidence status" className={inputClass} value={boundaryOperationWitness.evidenceStatus} onChange={(event) => updateBoundaryWitness({ evidenceStatus: event.target.value as CrossLanguageEvidenceStatusV0_1 })}><option value="USER_PROPOSED">User proposed</option><option value="CITATION_ENTERED_UNVERIFIED">Citation entered; unverified</option><option value="UNKNOWN_OR_NULL">Unknown / Null</option></select></label>
+                <label className={`${labelClass} sm:col-span-2`}>Source references (one per line)<textarea aria-label="Boundary witness source references" maxLength={12000} className={inputClass} rows={2} value={boundaryOperationWitness.sourceReferences.join("\n")} onChange={(event) => updateBoundaryWitness({ sourceReferences: event.target.value.split("\n").filter((line) => line.length > 0) })} /></label>
+                <label className={`${labelClass} sm:col-span-2`}>Separate user-proposed functional interpretation<textarea aria-label="Boundary witness functional interpretation" maxLength={1000} className={inputClass} rows={2} value={boundaryOperationWitness.functionalInterpretation} onChange={(event) => updateBoundaryWitness({ functionalInterpretation: event.target.value })} /></label>
+              </div>
+            ) : null}
+          </div>
+
           {!hasCrossLanguageContent ? (
             <p data-testid="cross-language-proposal-empty" className="mt-3 text-xs text-[#9fb1bf]">Add a witness, synthesis, unresolved note, target sense, or functional parallel to create a cross-language proposal.</p>
           ) : result.status === "INVALID" ? (
@@ -416,6 +494,17 @@ export function CrossLanguageFunctionalMotivationWorkbenchV0_1({
                   <p>Authority: {relation.authority}; linguistic validity: {relation.linguisticValidity}; Voice conservation: {relation.voiceConservation}{relation.unresolvedVoices.length ? ` · unresolved Voices: ${relation.unresolvedVoices.join("; ")}` : ""}.</p>
                 </div>
               ))}
+              {result.proposal.boundaryOperationWitness ? (
+                <div data-testid="cross-language-boundary-witness-result" data-status={result.proposal.boundaryOperationWitness.mechanicalReconstructionStatus} className="mt-2 rounded border border-[#66532e] p-2">
+                  <p><strong>{result.proposal.boundaryOperationWitness.language} · {result.proposal.boundaryOperationWitness.componentForms.join(" + ")} = {result.proposal.boundaryOperationWitness.rawConcatenation}</strong></p>
+                  <p className="font-mono">Boundary after component {result.proposal.boundaryOperationWitness.boundaryAfterComponentIndex + 1}, code-point position {result.proposal.boundaryOperationWitness.boundaryPosition}: {result.proposal.boundaryOperationWitness.boundaryInput} → {result.proposal.boundaryOperationWitness.boundaryOutput} · input span [{result.proposal.boundaryOperationWitness.affectedInputSpan.start}, {result.proposal.boundaryOperationWitness.affectedInputSpan.end}) · output span [{result.proposal.boundaryOperationWitness.affectedOutputSpan.start}, {result.proposal.boundaryOperationWitness.affectedOutputSpan.end}).</p>
+                  <p>Declared result: <span className="font-mono">{result.proposal.boundaryOperationWitness.declaredResultForm}</span> · reconstructed: <span className="font-mono">{result.proposal.boundaryOperationWitness.reconstructedForm}</span> · {result.proposal.boundaryOperationWitness.mechanicalReconstructionStatus}.</p>
+                  <p>Attributed rule: {result.proposal.boundaryOperationWitness.linguisticRule.name}{result.proposal.boundaryOperationWitness.linguisticRule.attribution ? ` · ${result.proposal.boundaryOperationWitness.linguisticRule.attribution}` : ""}{result.proposal.boundaryOperationWitness.linguisticRule.reference ? ` · ${result.proposal.boundaryOperationWitness.linguisticRule.reference}` : ""}. Evidence: {evidenceLabel(result.proposal.boundaryOperationWitness.evidenceStatus)}; linguistic applicability: {evidenceLabel(result.proposal.boundaryOperationWitness.linguisticApplicabilityStatus)}; authority: {result.proposal.boundaryOperationWitness.authority}; operation cost: null.</p>
+                  {result.proposal.boundaryOperationWitness.sourceReferences.length ? <p>Source references: {result.proposal.boundaryOperationWitness.sourceReferences.join(" · ")}</p> : null}
+                  <p>Canonical written Voices: {result.proposal.boundaryOperationWitness.writtenVoices.status === "COMPLETE" ? result.proposal.boundaryOperationWitness.writtenVoices.path.join(" → ") || "∅" : `UNKNOWN_OR_NULL (${result.proposal.boundaryOperationWitness.writtenVoices.unresolvedReason})`}{result.proposal.boundaryOperationWitness.unresolvedVoices.length ? ` · unresolved: ${result.proposal.boundaryOperationWitness.unresolvedVoices.join("; ")}` : ""}.</p>
+                  <p>User-proposed functional interpretation: {result.proposal.boundaryOperationWitness.functionalInterpretation.text ?? "Unknown / Null"} · {result.proposal.boundaryOperationWitness.functionalInterpretation.status}. Source authority promotion: NONE.</p>
+                </div>
+              ) : null}
               <p className="mt-2">User-proposed synthesis: {result.proposal.functionalSynthesis.text ?? "Unknown / Null"} · {result.proposal.functionalSynthesis.status}.</p>
               {result.proposal.functionalParallel ? (
                 <div data-testid="cross-language-functional-parallel-result" className="mt-2 rounded border border-[#354234] p-2">

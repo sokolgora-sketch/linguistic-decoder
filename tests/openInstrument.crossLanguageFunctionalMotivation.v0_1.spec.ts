@@ -2,6 +2,7 @@ import {
   buildCrossLanguageFunctionalMotivationV0_1,
   CROSS_LANGUAGE_OPERATION_DEFINITIONS_V0_1,
   replayCrossLanguageOperationSequenceV0_1,
+  type CrossLanguageBoundaryOperationWitnessInputV0_1,
   type CrossLanguageFunctionalMotivationInputV0_1,
   type CrossLanguageOperationApplicationInputV0_1,
 } from "@/shared/openInstrument/crossLanguageFunctionalMotivation.v0_1";
@@ -130,6 +131,61 @@ function buildDieta() {
   );
 }
 
+const boundaryBaseInput: CrossLanguageFunctionalMotivationInputV0_1 = {
+  ...dietaInput,
+  witnesses: [],
+  correspondences: [],
+  proposedSynthesis: "",
+  unresolvedMaterial: [],
+  functionalParallel: null,
+};
+
+const mitaAharaBoundary: CrossLanguageBoundaryOperationWitnessInputV0_1 = {
+  witnessId: "sanskrit-boundary-1",
+  targetForm: "mitāhāra",
+  language: "Sanskrit",
+  componentForms: ["mita", "āhāra"],
+  rawConcatenation: "mitaāhāra",
+  boundaryAfterComponentIndex: 0,
+  boundaryPosition: 4,
+  affectedInputSpan: { start: 3, end: 5 },
+  boundaryInput: "aā",
+  boundaryOutput: "ā",
+  declaredResultForm: "mitāhāra",
+  linguisticRuleName: "savarṇa-dīrgha sandhi",
+  linguisticRuleAttribution: "Sanskrit grammatical rule; user attributed",
+  linguisticRuleReference: "https://learnsanskrit.org/vyakarana/sounds/savarna-sounds/",
+  sourceReferences: ["https://www.wisdomlib.org/definition/mitahara"],
+  evidenceStatus: "CITATION_ENTERED_UNVERIFIED",
+  functionalInterpretation: "Measured intake can be read as moderation in nourishment.",
+};
+
+function buildBoundaryCase(
+  targetWord: string,
+  segments: SingleWordFunctionalMotivationInputV0_1["segments"],
+  boundaryOperationWitness: CrossLanguageBoundaryOperationWitnessInputV0_1,
+) {
+  const parent = buildSingleWordFunctionalMotivationProposalV0_1({
+    targetWord,
+    targetLanguage: boundaryOperationWitness.language,
+    targetDialect: "",
+    segments: segments.map((segment) => ({
+      ...segment,
+      proposedMeaning: "",
+      proposedGrammaticalRole: "",
+      language: boundaryOperationWitness.language,
+      evidenceStatus: "UNKNOWN_OR_NULL" as const,
+      evidenceReference: "",
+      unresolved: true,
+    })),
+    unresolvedConnectingMaterial: "The boundary interaction is user declared and remains linguistically unverified.",
+    transformations: [],
+    functionalExplanation: "Boundary-witness fixture; no whole-word functional claim is asserted.",
+    transparency: "UNKNOWN_OR_NULL",
+  });
+  return buildCrossLanguageFunctionalMotivationV0_1(parent, { ...boundaryBaseInput, boundaryOperationWitness });
+}
+
 describe("cross-language functional motivation v0.1", () => {
   it("records DIETA's target components separately from the user-proposed English witness", () => {
     const result = buildDieta();
@@ -197,6 +253,148 @@ describe("cross-language functional motivation v0.1", () => {
     expect(result.proposal.strictEmbryoMeaning).toEqual({ status: "UNKNOWN_OR_NULL", meaning: null });
     expect(result.proposal.sourceAuthorityPromotion).toBe("NONE");
     expect(result.proposal.selection).toEqual({ mode: "no_single_winner", selectedCandidateId: null, userDecisionPosture: "user_decides" });
+  });
+
+  it("records the MITĀHĀRA boundary as an exact, attributed, non-executable witness", () => {
+    const result = buildBoundaryCase("mitāhāra", [
+      { ...dietaProposalInput.segments[0]!, exactSpelling: "mita", language: "Sanskrit", proposedMeaning: "measured", unresolved: false },
+      { ...dietaProposalInput.segments[1]!, exactSpelling: "āhāra", language: "Sanskrit", proposedMeaning: "food intake", unresolved: false },
+    ], mitaAharaBoundary);
+    expect(result.status).toBe("READY");
+    if (result.status !== "READY") return;
+
+    expect(result.proposal.boundaryOperationWitness).toMatchObject({
+      targetForm: "mitāhāra",
+      language: "Sanskrit",
+      positionUnit: "zero_based_unicode_code_point",
+      spanConvention: "half_open",
+      componentForms: ["mita", "āhāra"],
+      rawConcatenation: "mitaāhāra",
+      boundaryAfterComponentIndex: 0,
+      boundaryPosition: 4,
+      boundaryInput: "aā",
+      boundaryOutput: "ā",
+      affectedInputSpan: { start: 3, end: 5 },
+      affectedOutputSpan: { start: 3, end: 4 },
+      declaredResultForm: "mitāhāra",
+      reconstructedForm: "mitāhāra",
+      mechanicalReconstructionStatus: "EXACT_MATCH",
+      linguisticRule: {
+        name: "savarṇa-dīrgha sandhi",
+        evidenceStatus: "CITATION_ENTERED_UNVERIFIED",
+      },
+      evidenceStatus: "CITATION_ENTERED_UNVERIFIED",
+      linguisticApplicabilityStatus: "CITATION_ENTERED_UNVERIFIED",
+      authority: "USER_DECLARED_UNVERIFIED",
+      operationCost: null,
+      writtenVoices: { status: "UNKNOWN_OR_NULL", path: [], events: [] },
+      unresolvedVoices: ["FOREIGN_ORTHOGRAPHY_NOT_PROJECTED_TO_CANONICAL_WRITTEN_VOICES"],
+      functionalInterpretation: {
+        text: "Measured intake can be read as moderation in nourishment.",
+        status: "USER_PROPOSED",
+      },
+      sourceAuthorityPromotion: "NONE",
+    });
+    expect(result.proposal.targetWrittenVoices.status).toBe("UNKNOWN_OR_NULL");
+    expect(result.proposal.strictEmbryoMeaning).toEqual({ status: "UNKNOWN_OR_NULL", meaning: null });
+    expect(buildBoundaryCase("mitāhāra", [
+      { ...dietaProposalInput.segments[0]!, exactSpelling: "mita", language: "Sanskrit", proposedMeaning: "measured", unresolved: false },
+      { ...dietaProposalInput.segments[1]!, exactSpelling: "āhāra", language: "Sanskrit", proposedMeaning: "food intake", unresolved: false },
+    ], mitaAharaBoundary)).toEqual(result);
+  });
+
+  it("uses code-point coordinates for a synthetic non-Sanskrit boundary fixture", () => {
+    const syntheticWitness: CrossLanguageBoundaryOperationWitnessInputV0_1 = {
+      ...mitaAharaBoundary,
+      witnessId: "synthetic-boundary-1",
+      targetForm: "xQ",
+      language: "Synthetic fixture language",
+      componentForms: ["x😀y", "z"],
+      rawConcatenation: "x😀yz",
+      boundaryAfterComponentIndex: 0,
+      boundaryPosition: 3,
+      affectedInputSpan: { start: 1, end: 4 },
+      boundaryInput: "😀yz",
+      boundaryOutput: "Q",
+      declaredResultForm: "xQ",
+      linguisticRuleName: "synthetic replacement",
+      linguisticRuleAttribution: "synthetic test fixture only",
+      linguisticRuleReference: "",
+      sourceReferences: [],
+      evidenceStatus: "USER_PROPOSED",
+      functionalInterpretation: "Synthetic fixture only.",
+    };
+    const result = buildBoundaryCase("xQ", [
+      { ...dietaProposalInput.segments[0]!, exactSpelling: "x", language: syntheticWitness.language },
+      { ...dietaProposalInput.segments[1]!, exactSpelling: "Q", language: syntheticWitness.language },
+    ], syntheticWitness);
+    expect(result.status).toBe("READY");
+    if (result.status !== "READY") return;
+    expect(result.proposal.boundaryOperationWitness).toMatchObject({
+      rawConcatenation: "x😀yz",
+      boundaryPosition: 3,
+      affectedInputSpan: { start: 1, end: 4 },
+      boundaryInput: "😀yz",
+      reconstructedForm: "xQ",
+      mechanicalReconstructionStatus: "EXACT_MATCH",
+    });
+  });
+
+  it("rejects inconsistent boundary positions, declared outputs, and combining-sequence splits", () => {
+    const validSegments = [
+      { ...dietaProposalInput.segments[0]!, exactSpelling: "mita", language: "Sanskrit" },
+      { ...dietaProposalInput.segments[1]!, exactSpelling: "āhāra", language: "Sanskrit" },
+    ];
+    const wrongPosition = buildBoundaryCase("mitāhāra", validSegments, { ...mitaAharaBoundary, boundaryPosition: 3 });
+    expect(wrongPosition).toMatchObject({ status: "INVALID", reasonCodes: expect.arrayContaining(["BOUNDARY_WITNESS_CODE_POINT_POSITION_MISMATCH"]) });
+
+    const wrongOutput = buildBoundaryCase("mitāhāra", validSegments, { ...mitaAharaBoundary, boundaryOutput: "āh" });
+    expect(wrongOutput).toMatchObject({ status: "INVALID", reasonCodes: expect.arrayContaining(["BOUNDARY_WITNESS_DECLARED_RESULT_MISMATCH"]) });
+
+    const malformedSpan = buildBoundaryCase("mitāhāra", validSegments, {
+      ...mitaAharaBoundary,
+      affectedInputSpan: { start: 3, end: 3 },
+    });
+    expect(malformedSpan).toMatchObject({ status: "INVALID", reasonCodes: expect.arrayContaining(["BOUNDARY_WITNESS_INPUT_SPAN_INVALID"]) });
+
+    const combiningWitness: CrossLanguageBoundaryOperationWitnessInputV0_1 = {
+      ...mitaAharaBoundary,
+      witnessId: "synthetic-combining-boundary",
+      targetForm: "ab",
+      language: "Synthetic fixture language",
+      componentForms: ["a\u0301", "b"],
+      rawConcatenation: "a\u0301b",
+      boundaryPosition: 2,
+      affectedInputSpan: { start: 1, end: 3 },
+      boundaryInput: "\u0301b",
+      boundaryOutput: "b",
+      declaredResultForm: "ab",
+      evidenceStatus: "USER_PROPOSED",
+      sourceReferences: [],
+      linguisticRuleReference: "",
+    };
+    const combining = buildBoundaryCase("ab", [
+      { ...dietaProposalInput.segments[0]!, exactSpelling: "a", language: combiningWitness.language },
+      { ...dietaProposalInput.segments[1]!, exactSpelling: "b", language: combiningWitness.language },
+    ], combiningWitness);
+    expect(combining).toMatchObject({ status: "INVALID", reasonCodes: expect.arrayContaining(["BOUNDARY_WITNESS_INPUT_SPAN_SPLITS_COMBINING_SEQUENCE"]) });
+  });
+
+  it("keeps entered citations unverified and rejects a witness attached to another target", () => {
+    const segments = [
+      { ...dietaProposalInput.segments[0]!, exactSpelling: "mita", language: "Sanskrit" },
+      { ...dietaProposalInput.segments[1]!, exactSpelling: "āhāra", language: "Sanskrit" },
+    ];
+    const result = buildBoundaryCase("mitāhāra", segments, mitaAharaBoundary);
+    expect(result.status).toBe("READY");
+    if (result.status === "READY") {
+      expect(result.proposal.boundaryOperationWitness?.authority).toBe("USER_DECLARED_UNVERIFIED");
+      expect(result.proposal.boundaryOperationWitness?.sourceAuthorityPromotion).toBe("NONE");
+    }
+    expect(buildBoundaryCase("mitāhāra", segments, { ...mitaAharaBoundary, targetForm: "another-word" })).toMatchObject({
+      status: "INVALID",
+      reasonCodes: ["BOUNDARY_WITNESS_TARGET_FORM_MISMATCH"],
+    });
   });
 
   it("attributes composed PË + O spans in the analyzer's NFC code-point coordinates", () => {
