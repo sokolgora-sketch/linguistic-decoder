@@ -10,6 +10,11 @@ import {
   type SingleWordTransparencyV0_1,
 } from "@/shared/openInstrument/singleWordFunctionalMotivation.v0_1";
 import {
+  buildWholeWordOpaqueFunctionalMotivationV0_2,
+  type WholeWordOpaqueFunctionalMotivationInputV0_2,
+  type WholeWordOpaqueSourceEvidenceStatusV0_2,
+} from "@/shared/openInstrument/singleWordFunctionalMotivation.v0_2";
+import {
   examineSingleWordMechanicalInterpretationV0_1,
   notSubmittedMechanicalInterpretationV0_1,
   type MechanicalEditInputV0_1,
@@ -24,6 +29,7 @@ import { CrossLanguageFunctionalMotivationWorkbenchV0_1 } from "@/ui/instrument/
 
 type DraftSegment = SingleWordFunctionalMotivationSegmentInputV0_1;
 type DraftTransformation = SingleWordFunctionalMotivationTransformationInputV0_1;
+type ProposalModeV0_2 = "SEGMENTED" | "WHOLE_WORD_OPAQUE";
 type DraftMechanicalOperation = Omit<MechanicalEditInputV0_1, "position"> & { position: number | "" };
 type SelectedComponentSourceLookupV0_1 = Readonly<{ componentIndex: number; exactSpelling: string }>;
 type ExaminedMechanicalDraft = Readonly<{
@@ -779,7 +785,7 @@ function CurrentWordEvidenceSectionV0_1({
             <h4 className="font-semibold text-[#dce9ca]">1 · Albanian Kaikki whole-word source</h4>
             <div className="mt-1 break-words">Analyzed form: {visibleDiscovery.inputWord} · language {visibleDiscovery.inputLanguage} · profile {visibleDiscovery.inputProfile}</div>
             {sourceContextIsAlbanian ? (
-              <div className="mt-1">
+              <div className="mt-1 break-words">
                 Exact-form lookup: {sourceStatus?.status ?? "NOT_EMITTED"}
                 {sourceStatus?.queryForm ? ` · query ${sourceStatus.queryForm}` : ""}
                 {sourceStatus?.reasonCode ? ` · ${sourceStatus.reasonCode}` : ""}
@@ -977,7 +983,7 @@ function CurrentWordEvidenceSectionV0_1({
               <section data-testid="single-word-progressive-source-relationships" className="rounded border border-[#303843] bg-[#10161c] p-2">
                 <h4 className="font-semibold text-[#dce9ca]">4 · Source-authored relationships and sense alternatives</h4>
                 {sourceContextIsAlbanian ? (
-                  <div>Exact-form source status: {sourceStatus?.status ?? "NOT_EMITTED"} · source relation evidence is shown only if emitted by the current Discovery.</div>
+                  <div className="break-words">Exact-form source status: {sourceStatus?.status ?? "NOT_EMITTED"} · source relation evidence is shown only if emitted by the current Discovery.</div>
                 ) : (
                   <div>Albanian source relations: UNKNOWN_OR_NULL · no Albanian context is established.</div>
                 )}
@@ -1121,7 +1127,7 @@ function CurrentWordEvidenceSectionV0_1({
                   </div>
                 ) : null}
                 {lexicalReading?.senseAlignedLexicalRole ? (
-                  <div className="mt-2 rounded border border-[#26323d] p-2" data-testid="single-word-progressive-sense-alignment">
+                  <div className="mt-2 break-words rounded border border-[#26323d] p-2" data-testid="single-word-progressive-sense-alignment">
                     <div>Separate sense-aligned lexical-role contract: {lexicalReading.senseAlignedLexicalRole.status} · lineage independence {lexicalReading.senseAlignedLexicalRole.lineageIndependence} · functional operation Null.</div>
                     {lexicalReading.senseAlignedLexicalRole.candidates.length ? (
                       <ol className="mt-1 space-y-1">
@@ -1132,12 +1138,12 @@ function CurrentWordEvidenceSectionV0_1({
                         ))}
                       </ol>
                     ) : (
-                      <div className="mt-1">UNKNOWN_OR_NULL · {lexicalReading.senseAlignedLexicalRole.reasonCodes.join(", ") || "no candidate evidence"}</div>
+                      <div className="mt-1 break-words">UNKNOWN_OR_NULL · {lexicalReading.senseAlignedLexicalRole.reasonCodes.join(", ") || "no candidate evidence"}</div>
                     )}
                     <div className="mt-1 break-words">{lexicalReading.senseAlignedLexicalRole.claimBoundary} No single winner; user decides. This contract does not establish an embryo function or a component-sense crosswalk.</div>
                   </div>
                 ) : (
-                  <div className="mt-1">Separate exact sense-alignment artifact: UNKNOWN_OR_NULL · not emitted in this Discovery.</div>
+                  <div className="mt-1 break-words">Separate exact sense-alignment artifact: UNKNOWN_OR_NULL · not emitted in this Discovery.</div>
                 )}
                 {!sourceComponentReading && !lexicalReading?.relatedForms.length && !lexicalReading?.sourceLinkedComparison ? (
                   <p className="mt-1">No source-authored component relation is available in this Discovery payload: UNKNOWN_OR_NULL. A spelling resemblance or user proposal is not a source relation.</p>
@@ -1367,6 +1373,31 @@ function validationMessageForReasonCode(reasonCode: string): string {
   }
 }
 
+function opaqueValidationMessageForReasonCode(reasonCode: string): string {
+  switch (reasonCode) {
+    case "TARGET_WORD_REQUIRED_AS_ONE_SUPPORTED_TOKEN":
+      return "Exact target word: enter one word of up to 80 Unicode code points.";
+    case "TARGET_LANGUAGE_REQUIRED":
+      return "Target language: enter a language of up to 80 characters.";
+    case "TARGET_DIALECT_MALFORMED":
+      return "Target dialect: use 80 characters or fewer.";
+    case "WHOLE_WORD_MEANING_CLAIM_MALFORMED":
+      return "Whole-word meaning claim: use 300 characters or fewer.";
+    case "WHOLE_WORD_CITATION_REFERENCE_REQUIRED":
+      return "Whole-word source reference: add a citation locator or change the evidence status.";
+    case "WHOLE_WORD_REFERENCE_REQUIRES_CITATION_STATUS":
+      return "Whole-word source reference: select Citation entered; unverified, or clear the reference.";
+    case "WHOLE_WORD_SOURCE_REFERENCE_MALFORMED":
+      return "Whole-word source reference: use 500 characters or fewer.";
+    case "WHOLE_WORD_FUNCTIONAL_DESCRIPTION_MALFORMED":
+      return "Functional description: use 1,000 characters or fewer.";
+    case "ORTHOGRAPHIC_STRUCTURE_ANALYSIS_FAILED":
+      return "Written Voice analysis is unavailable for this target word.";
+    default:
+      return "This whole-word control field needs correction. Check its label and limits.";
+  }
+}
+
 export function SingleWordMotivationWorkbenchV0_1({
   initialTargetWord,
   currentWordEvidence,
@@ -1377,6 +1408,7 @@ export function SingleWordMotivationWorkbenchV0_1({
   const [targetWord, setTargetWord] = useState(initialTargetWord);
   const [targetLanguage, setTargetLanguage] = useState("");
   const [targetDialect, setTargetDialect] = useState("");
+  const [proposalMode, setProposalMode] = useState<ProposalModeV0_2>("SEGMENTED");
   const [segments, setSegments] = useState<DraftSegment[]>([blankSegment(), blankSegment()]);
   const [selectedComponentSource, setSelectedComponentSource] = useState<SelectedComponentSourceLookupV0_1 | null>(null);
   const [unresolvedConnectingMaterial, setUnresolvedConnectingMaterial] = useState("");
@@ -1385,6 +1417,10 @@ export function SingleWordMotivationWorkbenchV0_1({
   const [examinedMechanicalDraft, setExaminedMechanicalDraft] = useState<ExaminedMechanicalDraft | null>(null);
   const [functionalExplanation, setFunctionalExplanation] = useState("");
   const [transparency, setTransparency] = useState<SingleWordTransparencyV0_1>("UNKNOWN_OR_NULL");
+  const [wholeWordMeaningClaim, setWholeWordMeaningClaim] = useState("");
+  const [wholeWordSourceEvidenceStatus, setWholeWordSourceEvidenceStatus] = useState<WholeWordOpaqueSourceEvidenceStatusV0_2>("UNKNOWN_OR_NULL");
+  const [wholeWordSourceReference, setWholeWordSourceReference] = useState("");
+  const [targetIdentityChanged, setTargetIdentityChanged] = useState(false);
   const [crossLanguageResetVersion, setCrossLanguageResetVersion] = useState(0);
 
   const input = useMemo<SingleWordFunctionalMotivationInputV0_1>(() => ({
@@ -1398,6 +1434,17 @@ export function SingleWordMotivationWorkbenchV0_1({
     transparency,
   }), [targetWord, targetLanguage, targetDialect, segments, unresolvedConnectingMaterial, transformations, functionalExplanation, transparency]);
   const result = useMemo(() => buildSingleWordFunctionalMotivationProposalV0_1(input), [input]);
+  const opaqueInput = useMemo<WholeWordOpaqueFunctionalMotivationInputV0_2>(() => ({
+    mode: "WHOLE_WORD_OPAQUE",
+    targetWord,
+    targetLanguage,
+    targetDialect,
+    wholeWordMeaningClaim,
+    sourceEvidenceStatus: wholeWordSourceEvidenceStatus,
+    sourceReference: wholeWordSourceReference,
+    functionalDescription: functionalExplanation,
+  }), [targetWord, targetLanguage, targetDialect, wholeWordMeaningClaim, wholeWordSourceEvidenceStatus, wholeWordSourceReference, functionalExplanation]);
+  const opaqueResult = useMemo(() => buildWholeWordOpaqueFunctionalMotivationV0_2(opaqueInput), [opaqueInput]);
   const availableGenericWitnesses = useMemo(() => {
     if (currentWordEvidence?.analyzedWord !== targetWord) return [];
     const records = new Map<string, GenericFunctionalWitnessV1>();
@@ -1450,6 +1497,60 @@ export function SingleWordMotivationWorkbenchV0_1({
     setSegments((current) => current.map((segment, at) => at === index ? { ...segment, ...update } : segment));
   }
 
+  function clearDraftClaims(mode: ProposalModeV0_2 = proposalMode) {
+    setSegments(mode === "SEGMENTED" ? [blankSegment(), blankSegment()] : []);
+    setSelectedComponentSource(null);
+    setUnresolvedConnectingMaterial("");
+    setTransformations([]);
+    setMechanicalOperations([]);
+    setExaminedMechanicalDraft(null);
+    setFunctionalExplanation("");
+    setTransparency("UNKNOWN_OR_NULL");
+    setWholeWordMeaningClaim("");
+    setWholeWordSourceEvidenceStatus("UNKNOWN_OR_NULL");
+    setWholeWordSourceReference("");
+    setTargetIdentityChanged(false);
+    setCrossLanguageResetVersion((version) => version + 1);
+  }
+
+  function invalidateTargetIdentityBoundState() {
+    setSegments((current) => current.map((segment) => ({
+      ...segment,
+      evidenceStatus: segment.evidenceStatus === "CITATION_ENTERED_UNVERIFIED"
+        ? "UNKNOWN_OR_NULL"
+        : segment.evidenceStatus,
+      evidenceReference: "",
+    })));
+    setSelectedComponentSource(null);
+    setTransformations((current) => current.map((transformation) => ({ ...transformation, evidenceReference: "" })));
+    setExaminedMechanicalDraft(null);
+    setWholeWordSourceEvidenceStatus("UNKNOWN_OR_NULL");
+    setWholeWordSourceReference("");
+    setTargetIdentityChanged(true);
+    setCrossLanguageResetVersion((version) => version + 1);
+  }
+
+  function changeTargetWord(value: string) {
+    if (value !== targetWord) clearDraftClaims();
+    setTargetWord(value);
+  }
+
+  function changeTargetLanguage(value: string) {
+    if (value !== targetLanguage) invalidateTargetIdentityBoundState();
+    setTargetLanguage(value);
+  }
+
+  function changeTargetDialect(value: string) {
+    if (value !== targetDialect) invalidateTargetIdentityBoundState();
+    setTargetDialect(value);
+  }
+
+  function changeProposalMode(value: ProposalModeV0_2) {
+    if (value === proposalMode) return;
+    setProposalMode(value);
+    clearDraftClaims(value);
+  }
+
   function removeSegment(index: number) {
     setSelectedComponentSource(null);
     setSegments((current) => current.filter((_, at) => at !== index));
@@ -1490,15 +1591,16 @@ export function SingleWordMotivationWorkbenchV0_1({
     setTargetWord(initialTargetWord);
     setTargetLanguage("");
     setTargetDialect("");
-    setSegments([blankSegment(), blankSegment()]);
-    setSelectedComponentSource(null);
-    setUnresolvedConnectingMaterial("");
-    setTransformations([]);
-    setMechanicalOperations([]);
-    setExaminedMechanicalDraft(null);
+    setProposalMode("SEGMENTED");
+    clearDraftClaims("SEGMENTED");
+  }
+
+  function clearOpaqueInterpretation() {
+    setWholeWordMeaningClaim("");
+    setWholeWordSourceEvidenceStatus("UNKNOWN_OR_NULL");
+    setWholeWordSourceReference("");
     setFunctionalExplanation("");
-    setTransparency("UNKNOWN_OR_NULL");
-    setCrossLanguageResetVersion((version) => version + 1);
+    setTargetIdentityChanged(false);
   }
 
   return (
@@ -1511,15 +1613,15 @@ export function SingleWordMotivationWorkbenchV0_1({
       <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#b9cf8a]">
         SINGLE-WORD MOTIVATION WORKBENCH
       </div>
-      <h2 className="mt-1 text-base font-semibold text-[#f5f7fb]">Propose components inside one word</h2>
+      <h2 className="mt-1 text-base font-semibold text-[#f5f7fb]">Explore a single-word functional reading</h2>
       <p className="mt-1 max-w-3xl text-xs leading-5 text-[#aeb7c5]">
-        This is a user-authored functional motivation proposal. Segment citations are entered by you and are not independently verified here; a proposed compound is not an attested compound or an embryo meaning.
+        Choose a segmented proposal or a whole-word-only opaque control. User-entered claims and citations are kept separate and are not independently verified here.
       </p>
       <p className="mt-1 max-w-3xl text-xs leading-5 text-[#aeb7c5]">
         Keep component languages aligned with the target language; record dialect differences separately.
       </p>
       <p data-testid="single-word-motivation-field-limits" className="mt-1 max-w-4xl text-xs leading-5 text-[#aeb7c5]">
-        Limits: target word 80 Unicode code points; target/component language and dialect 80 characters; component spelling 80, meaning 300, role 200; evidence references and connecting material 500; transformation endpoints 80, explanation 300, reference 500; functional explanation 1,000 characters. Use 2–12 components and at most 8 transformations.
+        Limits: target word 80 Unicode code points; target/component language and dialect 80 characters; component spelling 80, meaning 300, role 200; evidence references and connecting material 500; transformation endpoints 80, explanation 300, reference 500; functional description 1,000 characters. Segmented mode accepts 2–12 components; opaque mode records zero components.
       </p>
 
       <CurrentWordEvidenceSectionV0_1
@@ -1531,22 +1633,44 @@ export function SingleWordMotivationWorkbenchV0_1({
       <div className="mt-3 grid gap-3 sm:grid-cols-2">
         <label className={labelClass}>
           Exact target word
-          <input aria-label="Exact target word" maxLength={80} className={inputClass} value={targetWord} onChange={(event) => setTargetWord(event.target.value)} />
+          <input aria-label="Exact target word" maxLength={80} className={inputClass} value={targetWord} onChange={(event) => changeTargetWord(event.target.value)} />
         </label>
         <label className={labelClass}>
           Target language
-          <input aria-label="Target language" maxLength={80} className={inputClass} value={targetLanguage} onChange={(event) => setTargetLanguage(event.target.value)} placeholder="Language or code" />
+          <input aria-label="Target language" maxLength={80} className={inputClass} value={targetLanguage} onChange={(event) => changeTargetLanguage(event.target.value)} placeholder="Language or code" />
         </label>
         <label className={labelClass}>
           Target dialect (optional)
-          <input aria-label="Target dialect" maxLength={80} className={inputClass} value={targetDialect} onChange={(event) => setTargetDialect(event.target.value)} placeholder="Unknown / not specified" />
+          <input aria-label="Target dialect (optional)" maxLength={80} className={inputClass} value={targetDialect} onChange={(event) => changeTargetDialect(event.target.value)} placeholder="Unknown / not specified" />
+        </label>
+        <label className={labelClass}>
+          Proposal structure
+          <select aria-label="Proposal structure" className={inputClass} value={proposalMode} onChange={(event) => changeProposalMode(event.target.value as ProposalModeV0_2)}>
+            <option value="SEGMENTED">Segmented component proposal</option>
+            <option value="WHOLE_WORD_OPAQUE">Whole-word-only opaque control</option>
+          </select>
         </label>
       </div>
+      {targetIdentityChanged ? (
+        <p role="status" data-testid="single-word-target-identity-changed" className="mt-3 rounded border border-[#746541] bg-[#18140e] p-2 text-xs leading-5 text-[#f0ddb0]">
+          Target language or dialect changed. Draft spellings and descriptions are retained as entered; component language and dialect labels were not rewritten. Source bindings and citations were cleared, and prior examined analyses were reset. Retained text remains user-proposed, not source evidence for the new target identity.
+        </p>
+      ) : null}
 
+      {proposalMode === "SEGMENTED" ? (
+      <>
       <div className="mt-4 space-y-3">
         {segments.map((segment, index) => (
           <fieldset key={index} className="rounded-lg border border-[#354234] bg-[#0d1117] p-3">
             <legend className="px-1 text-xs font-semibold text-[#dce9ca]">Component {index + 1}</legend>
+            {Boolean(
+              (targetLanguage && segment.language && segment.language !== targetLanguage) ||
+              (segment.dialect && segment.dialect !== targetDialect)
+            ) ? (
+              <p role="status" data-testid="single-word-component-identity-mismatch" className="mb-3 rounded border border-[#746541] bg-[#18140e] p-2 text-xs leading-5 text-[#f0ddb0]">
+                Component identity differs from the target: recorded {segment.language || "UNKNOWN_OR_NULL"} · {segment.dialect || "dialect UNKNOWN_OR_NULL"}; target {targetLanguage || "UNKNOWN_OR_NULL"} · {targetDialect || "dialect UNKNOWN_OR_NULL"}. The component identity is retained as entered.
+              </p>
+            ) : null}
             <div className="grid gap-3 sm:grid-cols-2">
               <label className={labelClass}>
                 Exact component spelling
@@ -1929,6 +2053,11 @@ export function SingleWordMotivationWorkbenchV0_1({
             <div className="mt-2 rounded border border-[#303843] bg-[#0b0f0c] p-2">
               <div className="font-semibold">Written Seven-Voices events</div>
               <div className="font-mono">{result.proposal.writtenStructure.status === "COMPLETE" ? result.proposal.writtenStructure.voicePath.join(" → ") || "∅" : "Unknown / Null"}</div>
+              {result.proposal.writtenStructure.status === "COMPLETE" ? (
+                <div data-testid="single-word-positioned-written-voices" className="font-mono text-xs">
+                  {result.proposal.writtenStructure.voiceEvents.map((event) => `${event.voice}@${event.sourcePosition}`).join(" → ") || "∅"}
+                </div>
+              ) : null}
               <div className="text-xs text-[#9fb1bf]">
                 {result.proposal.writtenStructure.status === "COMPLETE"
                   ? `${result.proposal.writtenStructure.eventCount} events retained in order; source code-point positions ${result.proposal.writtenStructure.voiceEvents.map((event) => event.sourcePosition).join(", ") || "none"}.`
@@ -1939,12 +2068,108 @@ export function SingleWordMotivationWorkbenchV0_1({
           </article>
         )}
       </div>
+      </>
+      ) : (
+        <section aria-label="Whole-word-only opaque control" data-testid="single-word-whole-word-opaque-mode" className="mt-4 rounded-lg border border-[#354234] bg-[#0d1117] p-3">
+          <h3 className="text-sm font-semibold text-[#dce9ca]">Whole-word-only opaque control</h3>
+          <p className="mt-1 max-w-3xl text-xs leading-5 text-[#aeb7c5]">
+            Record a whole-word meaning and optional user-proposed functional description without adding component boundaries. Switching modes or changing the target clears proposal claims and entered source references.
+          </p>
+          <div className="mt-3 grid gap-3 sm:grid-cols-2">
+            <label className={labelClass}>
+              Whole-word meaning claim (optional)
+              <textarea aria-label="Whole-word meaning claim" maxLength={300} className={inputClass} rows={2} value={wholeWordMeaningClaim} onChange={(event) => setWholeWordMeaningClaim(event.target.value)} placeholder="Meaning as you wish to record it" />
+              <span className="mt-1 block text-[11px] leading-4 text-[#9fb1bf]">Displayed as a USER_PROPOSED claim, separate from its source citation.</span>
+            </label>
+            <label className={labelClass}>
+              Whole-word source evidence status
+              <select
+                aria-label="Whole-word source evidence status"
+                className={inputClass}
+                value={wholeWordSourceEvidenceStatus}
+                onChange={(event) => {
+                  const status = event.target.value as WholeWordOpaqueSourceEvidenceStatusV0_2;
+                  setWholeWordSourceEvidenceStatus(status);
+                  if (status === "UNKNOWN_OR_NULL") setWholeWordSourceReference("");
+                }}
+              >
+                <option value="UNKNOWN_OR_NULL">Unknown / Null</option>
+                <option value="CITATION_ENTERED_UNVERIFIED">Citation entered; unverified</option>
+              </select>
+            </label>
+            <label className={labelClass}>
+              Whole-word source reference / citation locator
+              <input aria-label="Whole-word source reference" maxLength={500} className={inputClass} value={wholeWordSourceReference} onChange={(event) => setWholeWordSourceReference(event.target.value)} placeholder="URL, work and entry/sense locator" />
+              <span className="mt-1 block text-[11px] leading-4 text-[#9fb1bf]">Required for “Citation entered; unverified.” The workbench does not verify or promote the citation.</span>
+            </label>
+            <label className={labelClass}>
+              User-proposed whole-word functional description (optional)
+              <textarea aria-label="User-proposed whole-word functional description" maxLength={1000} className={inputClass} rows={2} value={functionalExplanation} onChange={(event) => setFunctionalExplanation(event.target.value)} placeholder="Leave blank when the internal functional reading is unresolved." />
+            </label>
+          </div>
+          <button type="button" data-testid="single-word-clear-opaque-interpretation" className="mt-3 rounded border border-[#53604a] px-3 py-1.5 text-xs text-[#dce9ca]" onClick={clearOpaqueInterpretation}>
+            Clear / reset interpretation
+          </button>
+
+          <div className="mt-4" aria-live="polite">
+            {opaqueResult.status === "INVALID" ? (
+              <div data-testid="single-word-opaque-proposal-incomplete" className="rounded border border-[#584c34] bg-[#18140e] p-3 text-xs leading-5 text-[#f0ddb0]">
+                <p className="font-semibold">Correct these fields to see the whole-word control:</p>
+                <ul className="mt-1 list-inside list-disc">
+                  {opaqueResult.reasonCodes.map((reasonCode) => <li key={reasonCode}>{opaqueValidationMessageForReasonCode(reasonCode)}</li>)}
+                </ul>
+              </div>
+            ) : (
+              <article data-testid="single-word-opaque-proposal-result" className="rounded-lg border border-[#53604a] bg-[#111710] p-3 text-sm leading-6 text-[#d7dde7]">
+                <div className="flex flex-wrap items-center gap-2">
+                  <strong className="font-mono text-base text-white">{opaqueResult.proposal.target.exactWord}</strong>
+                  <span>{opaqueResult.proposal.target.language}{opaqueResult.proposal.target.dialect ? ` · ${opaqueResult.proposal.target.dialect}` : ""}</span>
+                  <span className="rounded-full border border-[#746541] px-2 py-0.5 text-[10px] font-semibold uppercase text-[#f0ddb0]">WHOLE_WORD_OPAQUE · PROPOSED</span>
+                </div>
+                <p className="mt-2"><strong>Proposed components:</strong> 0 · no component boundaries entered.</p>
+                <p className="mt-2" data-testid="single-word-opaque-meaning-claim">
+                  <strong>Whole-word meaning claim:</strong> {opaqueResult.proposal.wholeWordMeaningClaim.text ?? "Unknown / Null"} · {opaqueResult.proposal.wholeWordMeaningClaim.status} · entered by the user.
+                </p>
+                <div className="mt-2 break-words" data-testid="single-word-opaque-source-evidence">
+                  <strong>Separate whole-word source evidence:</strong> {opaqueResult.proposal.wholeWordSourceEvidence.status}
+                  {opaqueResult.proposal.wholeWordSourceEvidence.sourceReference ? ` · ${opaqueResult.proposal.wholeWordSourceEvidence.sourceReference}` : ""} · entered by the user; not independently verified.
+                </div>
+                <p className="mt-2" data-testid="single-word-opaque-functional-description">
+                  <strong>User-proposed functional description:</strong> {opaqueResult.proposal.functionalMotivation.description ?? "Unknown / Null"} · {opaqueResult.proposal.functionalMotivation.status}.
+                </p>
+                <div data-testid="single-word-functional-reading-reconstruction" className="mt-2 rounded border border-[#66532e] bg-[#18140e] p-2">
+                  <strong>Component reconstruction:</strong> {opaqueResult.proposal.componentReconstruction.status} · internal functional structure {opaqueResult.proposal.internalFunctionalStructure.status}.
+                </div>
+                <div className="mt-2 rounded border border-[#303843] bg-[#0b0f0c] p-2" data-testid="single-word-opaque-written-voices">
+                  <div className="font-semibold">Written Seven-Voices events</div>
+                  <div className="font-mono">
+                    {opaqueResult.proposal.writtenStructure.status === "COMPLETE"
+                      ? opaqueResult.proposal.writtenStructure.voiceEvents.map((event) => `${event.voice}@${event.sourcePosition}`).join(" → ") || "∅"
+                      : "Unknown / Null"}
+                  </div>
+                  <div className="text-xs text-[#9fb1bf]">
+                    {opaqueResult.proposal.writtenStructure.status === "COMPLETE"
+                      ? `${opaqueResult.proposal.writtenStructure.eventCount} canonical events retained in order at Unicode code-point positions.`
+                      : `Structure unavailable: ${opaqueResult.proposal.writtenStructure.reasonCode ?? "unknown"}.`}
+                    {" "}Orthographic only; pronunciation authority not established.
+                  </div>
+                </div>
+                <p className="mt-2 text-xs text-[#d5c28f]">
+                  Strict embryo meaning: Unknown / Null · source authority promotion: NONE · historical origin: not claimed. No single winner is selected; the user decides.
+                </p>
+              </article>
+            )}
+          </div>
+        </section>
+      )}
     </section>
-    <CrossLanguageFunctionalMotivationWorkbenchV0_1
-      key={crossLanguageResetKey}
-      parentProposal={result}
-      sourceWitnesses={availableGenericWitnesses}
-    />
+    {proposalMode === "SEGMENTED" ? (
+      <CrossLanguageFunctionalMotivationWorkbenchV0_1
+        key={crossLanguageResetKey}
+        parentProposal={result}
+        sourceWitnesses={availableGenericWitnesses}
+      />
+    ) : null}
     </>
   );
 }

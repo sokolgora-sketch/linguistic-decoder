@@ -1960,6 +1960,15 @@ describe("Single-word motivation workbench v0.1", () => {
 
     fireEvent.change(screen.getByLabelText("Exact target word"), { target: { value: "mitāhāras" } });
     expect(screen.queryByTestId("cross-language-boundary-witness-result")).not.toBeInTheDocument();
+    expect(screen.getByLabelText("Proposed functional explanation")).toHaveValue("");
+    fireEvent.change(screen.getByLabelText("Component 1 exact spelling"), { target: { value: "mita" } });
+    fireEvent.change(screen.getByLabelText("Component 1 proposed meaning"), { target: { value: "measured" } });
+    fireEvent.change(screen.getByLabelText("Component 1 grammatical role"), { target: { value: "modifier" } });
+    fireEvent.change(screen.getByLabelText("Component 1 language"), { target: { value: "Sanskrit" } });
+    fireEvent.change(screen.getByLabelText("Component 2 exact spelling"), { target: { value: "āhāra" } });
+    fireEvent.change(screen.getByLabelText("Component 2 language"), { target: { value: "Sanskrit" } });
+    fireEvent.click(screen.getByLabelText("Component 2 not yet explained"));
+    fireEvent.change(screen.getByLabelText("Proposed functional explanation"), { target: { value: "A fresh proposal for the changed word." } });
     expect(screen.getByTestId("cross-language-add-boundary-witness")).toBeInTheDocument();
   });
 
@@ -2202,6 +2211,196 @@ describe("Single-word motivation workbench v0.1", () => {
       expect(screen.getByLabelText("Cross-language proposed synthesis")).toHaveValue("");
       expect(screen.getByTestId("cross-language-add-parallel")).toBeInTheDocument();
     });
+  });
+
+  it("records BUKË as a whole-word opaque control with separate meaning and source provenance", () => {
+    render(<SingleWordMotivationWorkbenchV0_1 initialTargetWord="BUKË" />);
+    fireEvent.change(screen.getByLabelText("Target language"), { target: { value: "Albanian" } });
+    fireEvent.change(screen.getByLabelText("Proposal structure"), { target: { value: "WHOLE_WORD_OPAQUE" } });
+    fireEvent.change(screen.getByLabelText("Whole-word meaning claim"), { target: { value: "bread; meal" } });
+    fireEvent.change(screen.getByLabelText("Whole-word source evidence status"), { target: { value: "CITATION_ENTERED_UNVERIFIED" } });
+    fireEvent.change(screen.getByLabelText("Whole-word source reference"), { target: { value: "https://fjale.al/buk%C3%AB" } });
+
+    const result = screen.getByTestId("single-word-opaque-proposal-result");
+    expect(result).toHaveTextContent("BUKË");
+    expect(result).toHaveTextContent("WHOLE_WORD_OPAQUE");
+    expect(result).toHaveTextContent("Proposed components: 0");
+    expect(screen.getByTestId("single-word-opaque-meaning-claim")).toHaveTextContent("bread; meal · USER_PROPOSED");
+    expect(screen.getByTestId("single-word-opaque-source-evidence")).toHaveTextContent("CITATION_ENTERED_UNVERIFIED");
+    expect(screen.getByTestId("single-word-opaque-source-evidence")).toHaveTextContent("https://fjale.al/buk%C3%AB");
+    expect(screen.getByTestId("single-word-opaque-source-evidence")).toHaveTextContent("not independently verified");
+    expect(screen.getByTestId("single-word-functional-reading-reconstruction")).toHaveTextContent("NOT_APPLICABLE");
+    expect(screen.getByTestId("single-word-functional-reading-reconstruction")).toHaveTextContent("UNKNOWN_OR_NULL");
+    expect(screen.getByTestId("single-word-opaque-functional-description")).toHaveTextContent("Unknown / Null · UNKNOWN_OR_NULL");
+    expect(screen.getByTestId("single-word-opaque-written-voices")).toHaveTextContent("U@1 → Ë@3");
+    expect(result).toHaveTextContent("No single winner is selected; the user decides.");
+    expect(screen.queryByLabelText("Component 1 exact spelling")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("cross-language-functional-motivation")).not.toBeInTheDocument();
+    expect(result).not.toHaveTextContent("suffix");
+  });
+
+  it("resets opaque claims without leaving opaque mode or restoring segmented claims", () => {
+    render(<SingleWordMotivationWorkbenchV0_1 initialTargetWord="KANDIL" />);
+    fireEvent.change(screen.getByLabelText("Target language"), { target: { value: "Albanian" } });
+    fireEvent.change(screen.getByLabelText("Target dialect (optional)"), { target: { value: "Gheg" } });
+    fireEvent.change(screen.getByLabelText("Component 1 exact spelling"), { target: { value: "KAN" } });
+    fireEvent.change(screen.getByLabelText("Component 1 proposed meaning"), { target: { value: "have" } });
+    fireEvent.change(screen.getByLabelText("Component 1 grammatical role"), { target: { value: "verb" } });
+    fireEvent.change(screen.getByLabelText("Component 1 language"), { target: { value: "Albanian" } });
+    fireEvent.change(screen.getByLabelText("Proposal structure"), { target: { value: "WHOLE_WORD_OPAQUE" } });
+    fireEvent.change(screen.getByLabelText("Whole-word meaning claim"), { target: { value: "lamp" } });
+    fireEvent.change(screen.getByLabelText("Whole-word source evidence status"), { target: { value: "CITATION_ENTERED_UNVERIFIED" } });
+    fireEvent.change(screen.getByLabelText("Whole-word source reference"), { target: { value: "https://example.test/kandil" } });
+    fireEvent.change(screen.getByLabelText("User-proposed whole-word functional description"), { target: { value: "A lamp gives light." } });
+
+    fireEvent.change(screen.getByLabelText("Target dialect (optional)"), { target: { value: "Tosk" } });
+    expect(screen.getByTestId("single-word-target-identity-changed")).toBeInTheDocument();
+    expect(screen.getByLabelText("Whole-word meaning claim")).toHaveValue("lamp");
+    expect(screen.getByLabelText("User-proposed whole-word functional description")).toHaveValue("A lamp gives light.");
+    expect(screen.getByLabelText("Whole-word source evidence status")).toHaveValue("UNKNOWN_OR_NULL");
+    expect(screen.getByLabelText("Whole-word source reference")).toHaveValue("");
+
+    fireEvent.change(screen.getByLabelText("Whole-word source evidence status"), { target: { value: "CITATION_ENTERED_UNVERIFIED" } });
+    fireEvent.change(screen.getByLabelText("Whole-word source reference"), { target: { value: "https://example.test/kandil-current" } });
+    fireEvent.click(screen.getByTestId("single-word-clear-opaque-interpretation"));
+
+    expect(screen.getByLabelText("Exact target word")).toHaveValue("KANDIL");
+    expect(screen.getByLabelText("Target language")).toHaveValue("Albanian");
+    expect(screen.getByLabelText("Target dialect (optional)")).toHaveValue("Tosk");
+    expect(screen.getByLabelText("Proposal structure")).toHaveValue("WHOLE_WORD_OPAQUE");
+    expect(screen.getByLabelText("Whole-word meaning claim")).toHaveValue("");
+    expect(screen.getByLabelText("Whole-word source evidence status")).toHaveValue("UNKNOWN_OR_NULL");
+    expect(screen.getByLabelText("Whole-word source reference")).toHaveValue("");
+    expect(screen.getByLabelText("User-proposed whole-word functional description")).toHaveValue("");
+    expect(screen.queryByLabelText("Component 1 exact spelling")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("single-word-target-identity-changed")).not.toBeInTheDocument();
+    expect(screen.getByTestId("single-word-opaque-proposal-result")).toHaveTextContent("Proposed components: 0");
+    expect(screen.getByTestId("single-word-opaque-proposal-result")).not.toHaveTextContent("A lamp gives light.");
+  });
+
+  it("preserves component drafts while invalidating language- and dialect-bound evidence and analyses", () => {
+    render(<SingleWordMotivationWorkbenchV0_1 initialTargetWord="KANDIL" />);
+    fireEvent.change(screen.getByLabelText("Target language"), { target: { value: "Albanian" } });
+    fireEvent.change(screen.getByLabelText("Target dialect (optional)"), { target: { value: "Tosk" } });
+    const values = [
+      ["Component 1 exact spelling", "KAN"],
+      ["Component 1 proposed meaning", "have/possess"],
+      ["Component 1 grammatical role", "verb"],
+      ["Component 1 language", "Albanian"],
+      ["Component 1 dialect", "Tosk"],
+      ["Component 1 evidence status", "CITATION_ENTERED_UNVERIFIED"],
+      ["Component 1 evidence reference", "https://example.test/kan-tosk"],
+      ["Component 2 exact spelling", "DILL"],
+      ["Component 2 proposed meaning", "sun/light"],
+      ["Component 2 grammatical role", "noun"],
+      ["Component 2 language", "Albanian"],
+      ["Component 2 dialect", "Tosk"],
+      ["Proposed functional explanation", "A lamp contains or provides light."],
+    ] as const;
+    for (const [label, value] of values) fireEvent.change(screen.getByLabelText(label), { target: { value } });
+    fireEvent.click(screen.getByTestId("single-word-add-transformation"));
+    fireEvent.change(screen.getByLabelText("Transformation 1 from"), { target: { value: "DILL" } });
+    fireEvent.change(screen.getByLabelText("Transformation 1 to"), { target: { value: "DIL" } });
+    fireEvent.change(screen.getByLabelText("Transformation 1 explanation"), { target: { value: "User-declared spelling change" } });
+    fireEvent.change(screen.getByLabelText("Transformation 1 evidence reference"), { target: { value: "https://example.test/digraph" } });
+    fireEvent.click(screen.getByTestId("single-word-examine-interpretation"));
+    expect(screen.getByTestId("single-word-mechanical-result")).toHaveAttribute("data-status", "EXAMINED");
+    fireEvent.click(screen.getByRole("button", { name: "Check source for component 1" }));
+    expect(screen.getByTestId("single-word-component-source-evidence")).toBeInTheDocument();
+
+    fireEvent.change(screen.getByLabelText("Target dialect (optional)"), { target: { value: "Gheg" } });
+
+    expect(screen.getByLabelText("Component 1 exact spelling")).toHaveValue("KAN");
+    expect(screen.getByLabelText("Component 1 proposed meaning")).toHaveValue("have/possess");
+    expect(screen.getByLabelText("Component 1 grammatical role")).toHaveValue("verb");
+    expect(screen.getByLabelText("Component 1 language")).toHaveValue("Albanian");
+    expect(screen.getByLabelText("Component 1 dialect")).toHaveValue("Tosk");
+    expect(screen.getByLabelText("Component 1 evidence status")).toHaveValue("UNKNOWN_OR_NULL");
+    expect(screen.getByLabelText("Component 1 evidence reference")).toHaveValue("");
+    expect(screen.queryByTestId("single-word-component-source-evidence")).not.toBeInTheDocument();
+    expect(screen.getByLabelText("Transformation 1 from")).toHaveValue("DILL");
+    expect(screen.getByLabelText("Transformation 1 to")).toHaveValue("DIL");
+    expect(screen.getByLabelText("Transformation 1 explanation")).toHaveValue("User-declared spelling change");
+    expect(screen.getByLabelText("Transformation 1 evidence reference")).toHaveValue("");
+    expect(screen.getByLabelText("Proposed functional explanation")).toHaveValue("A lamp contains or provides light.");
+    expect(screen.getByTestId("single-word-mechanical-result")).toHaveAttribute("data-status", "NOT_SUBMITTED");
+    const dialectMismatches = screen.getAllByTestId("single-word-component-identity-mismatch");
+    expect(dialectMismatches).toHaveLength(2);
+    expect(dialectMismatches[0]).toHaveTextContent("Albanian · Tosk");
+    expect(dialectMismatches[0]).toHaveTextContent("Albanian · Gheg");
+
+    fireEvent.change(screen.getByLabelText("Component 1 evidence status"), { target: { value: "CITATION_ENTERED_UNVERIFIED" } });
+    fireEvent.change(screen.getByLabelText("Component 1 evidence reference"), { target: { value: "https://example.test/kan-albanian" } });
+    fireEvent.click(screen.getByRole("button", { name: "Check source for component 1" }));
+    fireEvent.change(screen.getByLabelText("Target language"), { target: { value: "English" } });
+
+    expect(screen.getByLabelText("Component 1 exact spelling")).toHaveValue("KAN");
+    expect(screen.getByLabelText("Component 1 proposed meaning")).toHaveValue("have/possess");
+    expect(screen.getByLabelText("Component 1 language")).toHaveValue("Albanian");
+    expect(screen.getByLabelText("Component 1 dialect")).toHaveValue("Tosk");
+    expect(screen.getByLabelText("Component 1 evidence status")).toHaveValue("UNKNOWN_OR_NULL");
+    expect(screen.getByLabelText("Component 1 evidence reference")).toHaveValue("");
+    expect(screen.queryByTestId("single-word-component-source-evidence")).not.toBeInTheDocument();
+    expect(screen.getByTestId("single-word-target-identity-changed")).toHaveTextContent("not source evidence for the new target identity");
+    expect(screen.getAllByTestId("single-word-component-identity-mismatch")).toHaveLength(2);
+    expect(screen.getByTestId("single-word-proposal-incomplete")).toHaveTextContent("language must match the target language");
+  });
+
+  it("preserves HAMËS as the user-proposed HA + MËS partial reading with positioned Voices", () => {
+    render(<SingleWordMotivationWorkbenchV0_1 initialTargetWord="HAMËS" />);
+    fireEvent.change(screen.getByLabelText("Target language"), { target: { value: "Albanian" } });
+    fireEvent.change(screen.getByLabelText("Component 1 exact spelling"), { target: { value: "HA" } });
+    fireEvent.change(screen.getByLabelText("Component 1 proposed meaning"), { target: { value: "eat" } });
+    fireEvent.change(screen.getByLabelText("Component 1 grammatical role"), { target: { value: "verb" } });
+    fireEvent.change(screen.getByLabelText("Component 1 language"), { target: { value: "Albanian" } });
+    fireEvent.change(screen.getByLabelText("Component 2 exact spelling"), { target: { value: "MËS" } });
+    fireEvent.change(screen.getByLabelText("Component 2 language"), { target: { value: "Albanian" } });
+    fireEvent.click(screen.getByLabelText("Component 2 not yet explained"));
+    fireEvent.change(screen.getByLabelText("Proposed functional explanation"), {
+      target: { value: "HA may contribute eating; MËS and the excessive reading remain unresolved." },
+    });
+
+    const result = screen.getByTestId("single-word-proposal-result");
+    expect(result).toHaveTextContent("HA + MËS = HAMËS");
+    expect(screen.getByTestId("single-word-positioned-written-voices")).toHaveTextContent("A@1 → Ë@3");
+    expect(result).toHaveTextContent("MËS: meaning and grammatical role UNKNOWN_OR_NULL");
+    expect(result).toHaveTextContent("HA may contribute eating");
+    expect(result).not.toHaveTextContent("participial marker");
+  });
+
+  it("clears component and source claims when switching modes or changing the target word", () => {
+    render(<SingleWordMotivationWorkbenchV0_1 initialTargetWord="KANDIL" />);
+    fireEvent.change(screen.getByLabelText("Target language"), { target: { value: "Albanian" } });
+    fireEvent.change(screen.getByLabelText("Component 1 exact spelling"), { target: { value: "KA" } });
+    fireEvent.change(screen.getByLabelText("Component 1 proposed meaning"), { target: { value: "has" } });
+    fireEvent.change(screen.getByLabelText("Component 1 grammatical role"), { target: { value: "verb" } });
+    fireEvent.change(screen.getByLabelText("Component 1 language"), { target: { value: "Albanian" } });
+    fireEvent.change(screen.getByLabelText("Component 1 evidence status"), { target: { value: "CITATION_ENTERED_UNVERIFIED" } });
+    fireEvent.change(screen.getByLabelText("Component 1 evidence reference"), { target: { value: "https://example.test/ka" } });
+    fireEvent.change(screen.getByLabelText("Proposed functional explanation"), { target: { value: "Prior component reading." } });
+
+    fireEvent.change(screen.getByLabelText("Proposal structure"), { target: { value: "WHOLE_WORD_OPAQUE" } });
+    expect(screen.queryByLabelText("Component 1 exact spelling")).not.toBeInTheDocument();
+    expect(screen.getByLabelText("Whole-word meaning claim")).toHaveValue("");
+    expect(screen.getByLabelText("Whole-word source evidence status")).toHaveValue("UNKNOWN_OR_NULL");
+    expect(screen.getByLabelText("Whole-word source reference")).toHaveValue("");
+
+    fireEvent.change(screen.getByLabelText("Whole-word meaning claim"), { target: { value: "lamp" } });
+    fireEvent.change(screen.getByLabelText("Whole-word source evidence status"), { target: { value: "CITATION_ENTERED_UNVERIFIED" } });
+    fireEvent.change(screen.getByLabelText("Whole-word source reference"), { target: { value: "https://example.test/kandil" } });
+    fireEvent.change(screen.getByLabelText("User-proposed whole-word functional description"), { target: { value: "Prior opaque reading." } });
+    fireEvent.change(screen.getByLabelText("Exact target word"), { target: { value: "BUKË" } });
+
+    expect(screen.getByLabelText("Whole-word meaning claim")).toHaveValue("");
+    expect(screen.getByLabelText("Whole-word source evidence status")).toHaveValue("UNKNOWN_OR_NULL");
+    expect(screen.getByLabelText("Whole-word source reference")).toHaveValue("");
+    expect(screen.getByLabelText("User-proposed whole-word functional description")).toHaveValue("");
+    expect(screen.getByTestId("single-word-opaque-source-evidence")).not.toHaveTextContent("example.test");
+
+    fireEvent.change(screen.getByLabelText("Proposal structure"), { target: { value: "SEGMENTED" } });
+    expect(screen.getByLabelText("Component 1 exact spelling")).toHaveValue("");
+    expect(screen.getByLabelText("Component 1 evidence reference")).toHaveValue("");
+    expect(screen.getByLabelText("Proposed functional explanation")).toHaveValue("");
   });
 
 });
