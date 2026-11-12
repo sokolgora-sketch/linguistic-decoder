@@ -1900,6 +1900,193 @@ describe("Single-word motivation workbench v0.1", () => {
     expect(result).toHaveTextContent("No single winner; user decides");
   });
 
+  it("records and reverses a user-declared MITA → MAT omission ledger, then invalidates stale claims", () => {
+    render(<SingleWordMotivationWorkbenchV0_1 initialTargetWord="DIETA" />);
+    fireEvent.change(screen.getByLabelText("Target language"), { target: { value: "Albanian" } });
+    fireEvent.change(screen.getByLabelText("Component 1 exact spelling"), { target: { value: "DI" } });
+    fireEvent.change(screen.getByLabelText("Component 1 proposed meaning"), { target: { value: "know" } });
+    fireEvent.change(screen.getByLabelText("Component 1 grammatical role"), { target: { value: "verb" } });
+    fireEvent.change(screen.getByLabelText("Component 1 language"), { target: { value: "Albanian" } });
+    fireEvent.change(screen.getByLabelText("Component 2 exact spelling"), { target: { value: "ETA" } });
+    fireEvent.change(screen.getByLabelText("Component 2 language"), { target: { value: "Albanian" } });
+    fireEvent.click(screen.getByLabelText("Component 2 not yet explained"));
+    fireEvent.change(screen.getByLabelText("Proposed functional explanation"), { target: { value: "Knowledge-guided eating." } });
+
+    fireEvent.click(screen.getByTestId("cross-language-add-operation-ledger"));
+    fireEvent.change(screen.getByLabelText("Reversible ledger initial form"), { target: { value: "MITA" } });
+    fireEvent.change(screen.getByLabelText("Reversible ledger declared final form"), { target: { value: "MAT" } });
+    fireEvent.click(screen.getByRole("button", { name: "Reversible ledger add OMIT" }));
+    fireEvent.change(screen.getByLabelText("Reversible ledger operation 1 omit position"), { target: { value: "1" } });
+    fireEvent.change(screen.getByLabelText("Reversible ledger operation 1 expected removed text"), { target: { value: "I" } });
+    fireEvent.click(screen.getByRole("button", { name: "Reversible ledger add TRANSPOSE_ADJACENT" }));
+    fireEvent.change(screen.getByLabelText("Reversible ledger operation 2 left position"), { target: { value: "1" } });
+    fireEvent.change(screen.getByLabelText("Reversible ledger proposed relationship"), { target: { value: "User-proposed comparison; no source-established relation." } });
+    fireEvent.change(screen.getByLabelText("Reversible ledger evidence reference"), { target: { value: "https://example.test/entered-not-verified" } });
+
+    let ledger = screen.getByTestId("cross-language-operation-ledger-result");
+    expect(ledger).toHaveTextContent("Unbound exploratory operation ledger");
+    expect(ledger).toHaveAttribute("data-status", "EXACT_MATCH");
+    expect(ledger).toHaveTextContent("MITA → MAT");
+    expect(ledger).toHaveTextContent("OMIT [1] MITA → MTA");
+    expect(ledger).toHaveTextContent("Removed exact text “I”");
+    expect(ledger).toHaveTextContent("omitted canonical Voices: I@1");
+    expect(ledger).toHaveTextContent("Original written Voices: I → A");
+    expect(ledger).toHaveTextContent("final written Voices: A");
+    expect(ledger).toHaveTextContent("overall conservation: CHANGED");
+    expect(ledger).toHaveTextContent("Reverse replay: EXACT_MATCH");
+    expect(ledger).toHaveTextContent("reconstructed initial form: MITA");
+    expect(ledger).toHaveTextContent("CITATION_ENTERED_UNVERIFIED");
+    expect(ledger).toHaveTextContent("linguistic applicability: NOT_ASSESSED");
+    expect(ledger).toHaveTextContent("USER_DECLARED_UNVERIFIED");
+
+    fireEvent.change(screen.getByLabelText("Reversible ledger operation 1 expected removed text"), { target: { value: "X" } });
+    ledger = screen.getByTestId("cross-language-operation-ledger-result");
+    expect(ledger).toHaveAttribute("data-status", "NOT_RUN");
+    expect(ledger).toHaveTextContent("OMIT_EXPECTED_TEXT_MISMATCH");
+    expect(screen.getByLabelText("Reversible ledger proposed relationship")).toHaveValue("");
+    expect(screen.getByLabelText("Reversible ledger evidence reference")).toHaveValue("");
+
+    fireEvent.change(screen.getByLabelText("Reversible ledger initial form"), { target: { value: "MITX" } });
+    expect(screen.queryByLabelText("Reversible ledger operation 1 omit position")).not.toBeInTheDocument();
+    expect(screen.queryByLabelText("Reversible ledger operation 2 left position")).not.toBeInTheDocument();
+    expect(screen.getByTestId("cross-language-operation-ledger-result")).toHaveAttribute("data-status", "MISMATCH");
+  });
+
+  it("binds ETA → EAT to the selected correspondence and invalidates it when either identity changes", () => {
+    render(<SingleWordMotivationWorkbenchV0_1 initialTargetWord="DIETA" />);
+    fireEvent.change(screen.getByLabelText("Target language"), { target: { value: "Albanian" } });
+    fireEvent.change(screen.getByLabelText("Component 1 exact spelling"), { target: { value: "DI" } });
+    fireEvent.change(screen.getByLabelText("Component 1 proposed meaning"), { target: { value: "know" } });
+    fireEvent.change(screen.getByLabelText("Component 1 grammatical role"), { target: { value: "verb" } });
+    fireEvent.change(screen.getByLabelText("Component 1 language"), { target: { value: "Albanian" } });
+    fireEvent.change(screen.getByLabelText("Component 2 exact spelling"), { target: { value: "ETA" } });
+    fireEvent.change(screen.getByLabelText("Component 2 language"), { target: { value: "Albanian" } });
+    fireEvent.click(screen.getByLabelText("Component 2 not yet explained"));
+    fireEvent.change(screen.getByLabelText("Proposed functional explanation"), { target: { value: "Knowledge-guided eating." } });
+
+    fireEvent.click(screen.getByTestId("cross-language-add-witness"));
+    fireEvent.change(screen.getByLabelText("Witness 1 exact form"), { target: { value: "EAT" } });
+    fireEvent.change(screen.getByLabelText("Witness 1 language"), { target: { value: "English" } });
+    fireEvent.change(screen.getByLabelText("Witness 1 evidence status"), { target: { value: "CITATION_ENTERED_UNVERIFIED" } });
+    fireEvent.change(screen.getByLabelText("Witness 1 citation"), { target: { value: "https://example.test/eat-witness" } });
+    fireEvent.click(screen.getByTestId("cross-language-add-correspondence"));
+    fireEvent.change(screen.getByLabelText("Correspondence 1 target component"), { target: { value: "1" } });
+    fireEvent.change(screen.getByLabelText("Correspondence 1 witness"), { target: { value: "witness-1" } });
+    fireEvent.click(screen.getByRole("button", { name: "Correspondence 1 attach v0.2 operation ledger" }));
+    fireEvent.click(screen.getByRole("button", { name: "Correspondence 1 bound add TRANSPOSE_ADJACENT" }));
+    fireEvent.change(screen.getByLabelText("Correspondence 1 bound operation 1 left position"), { target: { value: "1" } });
+    fireEvent.change(screen.getByLabelText("Correspondence 1 proposed relationship"), { target: { value: "Bound user-proposed functional comparison." } });
+    fireEvent.change(screen.getByLabelText("Correspondence 1 bound relationship source reference"), { target: { value: "https://example.test/relation" } });
+
+    let bound = screen.getByTestId("cross-language-bound-operation-ledger-result");
+    expect(bound).toHaveAttribute("data-status", "EXACT_MATCH");
+    expect(bound).toHaveTextContent("ETA → EAT");
+    expect(bound).toHaveTextContent("Operations: 1; mechanical cost: 1");
+    expect(bound).toHaveTextContent("Reverse replay: EXACT_MATCH");
+    expect(bound).toHaveTextContent("reconstructed initial form: ETA");
+    expect(bound).toHaveTextContent("overall conservation: PRESERVED");
+    expect(bound).toHaveTextContent("USER_DECLARED_UNVERIFIED");
+    expect(bound).toHaveTextContent("linguistic applicability: NOT_ASSESSED");
+
+    fireEvent.change(screen.getByLabelText("Witness 1 exact form"), { target: { value: "ATE" } });
+    expect(screen.getByLabelText("Witness 1 citation")).toHaveValue("");
+    expect(screen.getByLabelText("Witness 1 evidence status")).toHaveValue("USER_PROPOSED");
+    expect(screen.getByLabelText("Correspondence 1 proposed relationship")).toHaveValue("");
+    expect(screen.getByTestId("cross-language-bound-operation-ledger-editor")).toHaveTextContent("No v0.2 ledger is attached");
+    expect(screen.queryByTestId("cross-language-bound-operation-ledger-result")).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: "Correspondence 1 attach v0.2 operation ledger" }));
+    fireEvent.change(screen.getByLabelText("Correspondence 1 proposed relationship"), { target: { value: "Claim tied to the reselected witness." } });
+    fireEvent.change(screen.getByLabelText("Correspondence 1 bound relationship source reference"), { target: { value: "https://example.test/reselected" } });
+    fireEvent.change(screen.getByLabelText("Correspondence 1 target component"), { target: { value: "0" } });
+    expect(screen.getByLabelText("Correspondence 1 proposed relationship")).toHaveValue("");
+    expect(screen.getByTestId("cross-language-bound-operation-ledger-editor")).toHaveTextContent("No v0.2 ledger is attached");
+    expect(screen.queryByLabelText("Correspondence 1 bound relationship source reference")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("cross-language-bound-operation-ledger-result")).not.toBeInTheDocument();
+  });
+
+  it("attaches OMIT to a selected component and witness, records removed I, and reverses MITA exactly", () => {
+    render(<SingleWordMotivationWorkbenchV0_1 initialTargetWord="MITAX" />);
+    fireEvent.change(screen.getByLabelText("Target language"), { target: { value: "Albanian" } });
+    fireEvent.change(screen.getByLabelText("Component 1 exact spelling"), { target: { value: "MITA" } });
+    fireEvent.change(screen.getByLabelText("Component 1 proposed meaning"), { target: { value: "synthetic component fixture" } });
+    fireEvent.change(screen.getByLabelText("Component 1 grammatical role"), { target: { value: "noun" } });
+    fireEvent.change(screen.getByLabelText("Component 1 language"), { target: { value: "Albanian" } });
+    fireEvent.change(screen.getByLabelText("Component 2 exact spelling"), { target: { value: "X" } });
+    fireEvent.change(screen.getByLabelText("Component 2 language"), { target: { value: "Albanian" } });
+    fireEvent.click(screen.getByLabelText("Component 2 not yet explained"));
+    fireEvent.change(screen.getByLabelText("Proposed functional explanation"), { target: { value: "Synthetic UI fixture only." } });
+    fireEvent.click(screen.getByTestId("cross-language-add-witness"));
+    fireEvent.change(screen.getByLabelText("Witness 1 exact form"), { target: { value: "MAT" } });
+    fireEvent.change(screen.getByLabelText("Witness 1 language"), { target: { value: "User proposed" } });
+    fireEvent.click(screen.getByTestId("cross-language-add-correspondence"));
+    fireEvent.change(screen.getByLabelText("Correspondence 1 target component"), { target: { value: "0" } });
+    fireEvent.change(screen.getByLabelText("Correspondence 1 witness"), { target: { value: "witness-1" } });
+    fireEvent.click(screen.getByRole("button", { name: "Correspondence 1 attach v0.2 operation ledger" }));
+    fireEvent.click(screen.getByRole("button", { name: "Correspondence 1 bound add OMIT" }));
+    fireEvent.change(screen.getByLabelText("Correspondence 1 bound operation 1 omit position"), { target: { value: "1" } });
+    fireEvent.change(screen.getByLabelText("Correspondence 1 bound operation 1 expected removed text"), { target: { value: "I" } });
+    fireEvent.click(screen.getByRole("button", { name: "Correspondence 1 bound add TRANSPOSE_ADJACENT" }));
+    fireEvent.change(screen.getByLabelText("Correspondence 1 bound operation 2 left position"), { target: { value: "1" } });
+    fireEvent.change(screen.getByLabelText("Correspondence 1 proposed relationship"), { target: { value: "User-proposed mechanical comparison." } });
+
+    const bound = screen.getByTestId("cross-language-bound-operation-ledger-result");
+    expect(bound).toHaveAttribute("data-status", "EXACT_MATCH");
+    expect(bound).toHaveTextContent("MITA → MAT");
+    expect(bound).toHaveTextContent("OMIT [1] MITA → MTA");
+    expect(bound).toHaveTextContent("omitted canonical Voices: I@1");
+    expect(bound).toHaveTextContent("reconstructed initial form: MITA");
+    expect(bound).toHaveTextContent("Reverse replay: EXACT_MATCH");
+    expect(bound).toHaveTextContent("overall conservation: CHANGED");
+    expect(bound).toHaveTextContent("USER_DECLARED_UNVERIFIED");
+    expect(bound).toHaveTextContent("NOT_ASSESSED");
+
+    fireEvent.change(screen.getByLabelText("Correspondence 1 target component"), { target: { value: "1" } });
+    expect(screen.getByLabelText("Correspondence 1 proposed relationship")).toHaveValue("");
+    expect(screen.getByTestId("cross-language-bound-operation-ledger-editor")).toHaveTextContent("No v0.2 ledger is attached");
+    expect(screen.queryByTestId("cross-language-bound-operation-ledger-result")).not.toBeInTheDocument();
+  });
+
+  it("invalidates correspondence operations, relationship text and citations when witness or target component changes", () => {
+    render(<SingleWordMotivationWorkbenchV0_1 initialTargetWord="DIETA" />);
+    fireEvent.change(screen.getByLabelText("Target language"), { target: { value: "Albanian" } });
+    fireEvent.change(screen.getByLabelText("Component 1 exact spelling"), { target: { value: "DI" } });
+    fireEvent.change(screen.getByLabelText("Component 1 proposed meaning"), { target: { value: "know" } });
+    fireEvent.change(screen.getByLabelText("Component 1 grammatical role"), { target: { value: "verb" } });
+    fireEvent.change(screen.getByLabelText("Component 1 language"), { target: { value: "Albanian" } });
+    fireEvent.change(screen.getByLabelText("Component 2 exact spelling"), { target: { value: "ETA" } });
+    fireEvent.change(screen.getByLabelText("Component 2 language"), { target: { value: "Albanian" } });
+    fireEvent.click(screen.getByLabelText("Component 2 not yet explained"));
+    fireEvent.change(screen.getByLabelText("Proposed functional explanation"), { target: { value: "Knowledge-guided eating." } });
+    fireEvent.click(screen.getByTestId("cross-language-add-witness"));
+    fireEvent.change(screen.getByLabelText("Witness 1 exact form"), { target: { value: "EAT" } });
+    fireEvent.change(screen.getByLabelText("Witness 1 language"), { target: { value: "English" } });
+    fireEvent.change(screen.getByLabelText("Witness 1 evidence status"), { target: { value: "CITATION_ENTERED_UNVERIFIED" } });
+    fireEvent.change(screen.getByLabelText("Witness 1 citation"), { target: { value: "https://example.test/witness" } });
+    fireEvent.click(screen.getByTestId("cross-language-add-correspondence"));
+    fireEvent.change(screen.getByLabelText("Correspondence 1 target component"), { target: { value: "1" } });
+    fireEvent.change(screen.getByLabelText("Correspondence 1 witness"), { target: { value: "witness-1" } });
+    fireEvent.change(screen.getByLabelText("Correspondence 1 proposed relationship"), { target: { value: "Relationship tied to ETA and EAT." } });
+    fireEvent.click(screen.getByRole("button", { name: "Correspondence 1 add TRANSPOSE_ADJACENT" }));
+    fireEvent.change(screen.getByLabelText("Correspondence 1 operation 1 left position"), { target: { value: "1" } });
+    expect(screen.getByTestId("cross-language-correspondence-result")).toHaveAttribute("data-status", "EXACT_MATCH");
+
+    fireEvent.change(screen.getByLabelText("Witness 1 exact form"), { target: { value: "ATE" } });
+    expect(screen.getByLabelText("Witness 1 citation")).toHaveValue("");
+    expect(screen.getByLabelText("Witness 1 evidence status")).toHaveValue("USER_PROPOSED");
+    expect(screen.getByLabelText("Correspondence 1 proposed relationship")).toHaveValue("");
+    expect(screen.queryByLabelText("Correspondence 1 operation 1 left position")).not.toBeInTheDocument();
+
+    fireEvent.change(screen.getByLabelText("Correspondence 1 proposed relationship"), { target: { value: "Target-specific relationship." } });
+    fireEvent.click(screen.getByRole("button", { name: "Correspondence 1 add TRANSPOSE_ADJACENT" }));
+    expect(screen.getByLabelText("Correspondence 1 proposed relationship")).toHaveValue("");
+    fireEvent.change(screen.getByLabelText("Correspondence 1 proposed relationship"), { target: { value: "Component-specific relationship." } });
+    expect(screen.getByLabelText("Correspondence 1 operation 1 left position")).toBeInTheDocument();
+    fireEvent.change(screen.getByLabelText("Correspondence 1 target component"), { target: { value: "0" } });
+    expect(screen.getByLabelText("Correspondence 1 proposed relationship")).toHaveValue("");
+    expect(screen.queryByLabelText("Correspondence 1 operation 1 left position")).not.toBeInTheDocument();
+  });
+
   it("records a boundary witness with exact coordinates and clears it when its target changes", () => {
     render(<SingleWordMotivationWorkbenchV0_1 initialTargetWord="mitāhāra" />);
     fireEvent.change(screen.getByLabelText("Target language"), { target: { value: "Sanskrit" } });
@@ -2128,7 +2315,7 @@ describe("Single-word motivation workbench v0.1", () => {
 
     fireEvent.change(screen.getByLabelText("Witness 1 exact form"), { target: { value: "ATE" } });
     expect(screen.getByTestId("cross-language-correspondence-result")).toHaveAttribute("data-status", "MISMATCH");
-    expect(screen.getByTestId("cross-language-proposal-result")).toHaveTextContent("ETA → EAT");
+    expect(screen.getByTestId("cross-language-proposal-result")).toHaveTextContent("ETA → ETA");
 
     fireEvent.change(screen.getByLabelText("Component 2 exact spelling"), { target: { value: "ETB" } });
     expect(screen.queryByLabelText("Witness 1 exact form")).not.toBeInTheDocument();
