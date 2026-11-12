@@ -1931,6 +1931,7 @@ describe("Single-word motivation workbench v0.1", () => {
 
     const witness = screen.getByTestId("cross-language-boundary-witness-result");
     expect(witness).toHaveAttribute("data-status", "EXACT_MATCH");
+    expect(witness).toHaveClass("min-w-0", "[overflow-wrap:anywhere]");
     expect(witness).toHaveTextContent("mita + āhāra = mitaāhāra");
     expect(witness).toHaveTextContent("position 4: aā → ā");
     expect(witness).toHaveTextContent("span [3, 5)");
@@ -1939,6 +1940,9 @@ describe("Single-word motivation workbench v0.1", () => {
     expect(witness).toHaveTextContent("linguistic applicability: NOT_ASSESSED");
     expect(witness).toHaveTextContent("operation cost: null");
     expect(witness).toHaveTextContent("Canonical written Voices: UNKNOWN_OR_NULL");
+    expect(witness).toHaveTextContent("FOREIGN_ORTHOGRAPHY_NOT_PROJECTED_TO_CANONICAL_WRITTEN_VOICES");
+    expect(witness).toHaveTextContent("https://learnsanskrit.org/vyakarana/sounds/savarna-sounds/");
+    expect(witness).toHaveTextContent("https://www.wisdomlib.org/definition/mitahara");
     expect(witness).toHaveTextContent("User-proposed functional interpretation: Measured intake can be read as moderation.");
     expect(witness).toHaveTextContent("Source authority promotion: NONE");
 
