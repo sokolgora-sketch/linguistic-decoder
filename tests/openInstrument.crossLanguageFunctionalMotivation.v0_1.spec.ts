@@ -284,7 +284,7 @@ describe("cross-language functional motivation v0.1", () => {
         evidenceStatus: "CITATION_ENTERED_UNVERIFIED",
       },
       evidenceStatus: "CITATION_ENTERED_UNVERIFIED",
-      linguisticApplicabilityStatus: "CITATION_ENTERED_UNVERIFIED",
+      linguisticApplicabilityStatus: "NOT_ASSESSED",
       authority: "USER_DECLARED_UNVERIFIED",
       operationCost: null,
       writtenVoices: { status: "UNKNOWN_OR_NULL", path: [], events: [] },
@@ -302,6 +302,24 @@ describe("cross-language functional motivation v0.1", () => {
       { ...dietaProposalInput.segments[1]!, exactSpelling: "āhāra", language: "Sanskrit", proposedMeaning: "food intake", unresolved: false },
     ], mitaAharaBoundary)).toEqual(result);
   });
+
+  it.each(["USER_PROPOSED", "CITATION_ENTERED_UNVERIFIED", "UNKNOWN_OR_NULL"] as const)(
+    "keeps linguistic applicability NOT_ASSESSED when evidence is %s",
+    (evidenceStatus) => {
+      const result = buildBoundaryCase("mitāhāra", [
+        { ...dietaProposalInput.segments[0]!, exactSpelling: "mita", language: "Sanskrit" },
+        { ...dietaProposalInput.segments[1]!, exactSpelling: "āhāra", language: "Sanskrit" },
+      ], { ...mitaAharaBoundary, evidenceStatus });
+      expect(result.status).toBe("READY");
+      if (result.status !== "READY") return;
+
+      expect(result.proposal.boundaryOperationWitness).toMatchObject({
+        evidenceStatus,
+        linguisticRule: { evidenceStatus },
+        linguisticApplicabilityStatus: "NOT_ASSESSED",
+      });
+    },
+  );
 
   it("uses code-point coordinates for a synthetic non-Sanskrit boundary fixture", () => {
     const syntheticWitness: CrossLanguageBoundaryOperationWitnessInputV0_1 = {

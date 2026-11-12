@@ -94,6 +94,35 @@ function blankBoundaryOperationWitness(targetForm: string, witnessId: string): C
   };
 }
 
+function clearBoundaryDependentState(): Pick<
+  CrossLanguageBoundaryOperationWitnessInputV0_1,
+  | "boundaryPosition"
+  | "affectedInputSpan"
+  | "boundaryInput"
+  | "boundaryOutput"
+  | "declaredResultForm"
+  | "linguisticRuleName"
+  | "linguisticRuleAttribution"
+  | "linguisticRuleReference"
+  | "sourceReferences"
+  | "evidenceStatus"
+  | "functionalInterpretation"
+> {
+  return {
+    boundaryPosition: 0,
+    affectedInputSpan: { start: 0, end: 0 },
+    boundaryInput: "",
+    boundaryOutput: "",
+    declaredResultForm: "",
+    linguisticRuleName: "",
+    linguisticRuleAttribution: "",
+    linguisticRuleReference: "",
+    sourceReferences: [],
+    evidenceStatus: "UNKNOWN_OR_NULL",
+    functionalInterpretation: "",
+  };
+}
+
 function evidenceLabel(status: CrossLanguageEvidenceStatusV0_1 | "SOURCE_RECORD_ONLY"): string {
   switch (status) {
     case "SOURCE_RECORD_ONLY":
@@ -230,18 +259,30 @@ export function CrossLanguageFunctionalMotivationWorkbenchV0_1({
   }
 
   function updateBoundaryComponents(text: string) {
-    if (!boundaryOperationWitness) return;
     const componentForms = text.split("\n");
-    setBoundaryOperationWitness({
-      ...boundaryOperationWitness,
-      componentForms,
-      rawConcatenation: componentForms.join(""),
-      boundaryAfterComponentIndex: 0,
-      boundaryPosition: 0,
-      affectedInputSpan: { start: 0, end: 0 },
-      boundaryInput: "",
-      boundaryOutput: "",
-      declaredResultForm: "",
+    setBoundaryOperationWitness((current) => {
+      if (!current || componentForms.join("\n") === current.componentForms.join("\n")) return current;
+      return {
+        ...current,
+        ...clearBoundaryDependentState(),
+        language: "",
+        componentForms,
+        rawConcatenation: componentForms.join(""),
+        boundaryAfterComponentIndex: 0,
+      };
+    });
+  }
+
+  function updateBoundaryComponentBoundary(boundaryAfterComponentIndex: number) {
+    setBoundaryOperationWitness((current) => {
+      if (!current || !Number.isInteger(boundaryAfterComponentIndex) ||
+        boundaryAfterComponentIndex < 0 || boundaryAfterComponentIndex >= current.componentForms.length - 1 ||
+        boundaryAfterComponentIndex === current.boundaryAfterComponentIndex) return current;
+      return {
+        ...current,
+        ...clearBoundaryDependentState(),
+        boundaryAfterComponentIndex,
+      };
     });
   }
 
@@ -449,7 +490,7 @@ export function CrossLanguageFunctionalMotivationWorkbenchV0_1({
                 <label className={labelClass}>Target exact spelling<input aria-label="Boundary witness target form" className={inputClass} value={boundaryOperationWitness.targetForm} readOnly /></label>
                 <label className={labelClass}>Component forms (one exact form per line)<textarea aria-label="Boundary witness component forms" maxLength={1000} className={inputClass} rows={2} value={boundaryOperationWitness.componentForms.join("\n")} onChange={(event) => updateBoundaryComponents(event.target.value)} /></label>
                 <label className={labelClass}>Raw concatenation (preserved)<input aria-label="Boundary witness raw concatenation" className={`${inputClass} font-mono`} value={boundaryOperationWitness.rawConcatenation} readOnly /></label>
-                <label className={labelClass}>Boundary after component<select aria-label="Boundary witness component boundary" className={inputClass} value={boundaryOperationWitness.boundaryAfterComponentIndex} onChange={(event) => updateBoundaryWitness({ boundaryAfterComponentIndex: Number(event.target.value) })}>{boundaryOperationWitness.componentForms.slice(0, -1).map((form, index) => <option key={`${index}:${form}`} value={index}>{index + 1}: {form}</option>)}</select></label>
+                <label className={labelClass}>Boundary after component<select aria-label="Boundary witness component boundary" className={inputClass} value={boundaryOperationWitness.boundaryAfterComponentIndex} onChange={(event) => updateBoundaryComponentBoundary(Number(event.target.value))}>{boundaryOperationWitness.componentForms.slice(0, -1).map((form, index) => <option key={`${index}:${form}`} value={index}>{index + 1}: {form}</option>)}</select></label>
                 <label className={labelClass}>Boundary position (zero-based code points)<input aria-label="Boundary witness position" type="number" min={0} className={inputClass} value={boundaryOperationWitness.boundaryPosition} onChange={(event) => updateBoundaryWitness({ boundaryPosition: event.target.value === "" ? Number.NaN : Number(event.target.value) })} /></label>
                 <label className={labelClass}>Affected input span start (inclusive code point)<input aria-label="Boundary witness span start" type="number" min={0} className={inputClass} value={boundaryOperationWitness.affectedInputSpan.start} onChange={(event) => updateBoundaryWitness({ affectedInputSpan: { ...boundaryOperationWitness.affectedInputSpan, start: event.target.value === "" ? Number.NaN : Number(event.target.value) } })} /></label>
                 <label className={labelClass}>Affected input span end (exclusive code point)<input aria-label="Boundary witness span end" type="number" min={0} className={inputClass} value={boundaryOperationWitness.affectedInputSpan.end} onChange={(event) => updateBoundaryWitness({ affectedInputSpan: { ...boundaryOperationWitness.affectedInputSpan, end: event.target.value === "" ? Number.NaN : Number(event.target.value) } })} /></label>
@@ -499,7 +540,7 @@ export function CrossLanguageFunctionalMotivationWorkbenchV0_1({
                   <p><strong>{result.proposal.boundaryOperationWitness.language} · {result.proposal.boundaryOperationWitness.componentForms.join(" + ")} = {result.proposal.boundaryOperationWitness.rawConcatenation}</strong></p>
                   <p className="font-mono">Boundary after component {result.proposal.boundaryOperationWitness.boundaryAfterComponentIndex + 1}, code-point position {result.proposal.boundaryOperationWitness.boundaryPosition}: {result.proposal.boundaryOperationWitness.boundaryInput} → {result.proposal.boundaryOperationWitness.boundaryOutput} · input span [{result.proposal.boundaryOperationWitness.affectedInputSpan.start}, {result.proposal.boundaryOperationWitness.affectedInputSpan.end}) · output span [{result.proposal.boundaryOperationWitness.affectedOutputSpan.start}, {result.proposal.boundaryOperationWitness.affectedOutputSpan.end}).</p>
                   <p>Declared result: <span className="font-mono">{result.proposal.boundaryOperationWitness.declaredResultForm}</span> · reconstructed: <span className="font-mono">{result.proposal.boundaryOperationWitness.reconstructedForm}</span> · {result.proposal.boundaryOperationWitness.mechanicalReconstructionStatus}.</p>
-                  <p>Attributed rule: {result.proposal.boundaryOperationWitness.linguisticRule.name}{result.proposal.boundaryOperationWitness.linguisticRule.attribution ? ` · ${result.proposal.boundaryOperationWitness.linguisticRule.attribution}` : ""}{result.proposal.boundaryOperationWitness.linguisticRule.reference ? ` · ${result.proposal.boundaryOperationWitness.linguisticRule.reference}` : ""}. Evidence: {evidenceLabel(result.proposal.boundaryOperationWitness.evidenceStatus)}; linguistic applicability: {evidenceLabel(result.proposal.boundaryOperationWitness.linguisticApplicabilityStatus)}; authority: {result.proposal.boundaryOperationWitness.authority}; operation cost: null.</p>
+                  <p>Attributed rule: {result.proposal.boundaryOperationWitness.linguisticRule.name}{result.proposal.boundaryOperationWitness.linguisticRule.attribution ? ` · ${result.proposal.boundaryOperationWitness.linguisticRule.attribution}` : ""}{result.proposal.boundaryOperationWitness.linguisticRule.reference ? ` · ${result.proposal.boundaryOperationWitness.linguisticRule.reference}` : ""}. Evidence: {evidenceLabel(result.proposal.boundaryOperationWitness.evidenceStatus)}; linguistic applicability: {result.proposal.boundaryOperationWitness.linguisticApplicabilityStatus}; authority: {result.proposal.boundaryOperationWitness.authority}; operation cost: null.</p>
                   {result.proposal.boundaryOperationWitness.sourceReferences.length ? <p>Source references: {result.proposal.boundaryOperationWitness.sourceReferences.join(" · ")}</p> : null}
                   <p>Canonical written Voices: {result.proposal.boundaryOperationWitness.writtenVoices.status === "COMPLETE" ? result.proposal.boundaryOperationWitness.writtenVoices.path.join(" → ") || "∅" : `UNKNOWN_OR_NULL (${result.proposal.boundaryOperationWitness.writtenVoices.unresolvedReason})`}{result.proposal.boundaryOperationWitness.unresolvedVoices.length ? ` · unresolved: ${result.proposal.boundaryOperationWitness.unresolvedVoices.join("; ")}` : ""}.</p>
                   <p>User-proposed functional interpretation: {result.proposal.boundaryOperationWitness.functionalInterpretation.text ?? "Unknown / Null"} · {result.proposal.boundaryOperationWitness.functionalInterpretation.status}. Source authority promotion: NONE.</p>

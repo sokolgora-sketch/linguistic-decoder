@@ -37,6 +37,8 @@ export type CrossLanguageEvidenceStatusV0_1 =
   | "CITATION_ENTERED_UNVERIFIED"
   | "UNKNOWN_OR_NULL";
 
+export type CrossLanguageLinguisticApplicabilityStatusV0_1 = "NOT_ASSESSED";
+
 export type CrossLanguageWitnessInputV0_1 =
   | Readonly<{
       kind: "USER_PROPOSED";
@@ -169,7 +171,7 @@ export type CrossLanguageBoundaryOperationWitnessV0_1 = Readonly<{
   }>;
   sourceReferences: readonly string[];
   evidenceStatus: CrossLanguageEvidenceStatusV0_1;
-  linguisticApplicabilityStatus: CrossLanguageEvidenceStatusV0_1;
+  linguisticApplicabilityStatus: CrossLanguageLinguisticApplicabilityStatusV0_1;
   authority: "USER_DECLARED_UNVERIFIED";
   operationCost: null;
   writtenVoices: Readonly<{
@@ -495,7 +497,7 @@ function buildBoundaryOperationWitness(
     },
     sourceReferences: [...value.sourceReferences],
     evidenceStatus: value.evidenceStatus,
-    linguisticApplicabilityStatus: value.evidenceStatus,
+    linguisticApplicabilityStatus: "NOT_ASSESSED",
     authority: "USER_DECLARED_UNVERIFIED",
     operationCost: null,
     writtenVoices,

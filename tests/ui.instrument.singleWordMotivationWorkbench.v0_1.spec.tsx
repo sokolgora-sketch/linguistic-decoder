@@ -1915,6 +1915,7 @@ describe("Single-word motivation workbench v0.1", () => {
 
     fireEvent.change(screen.getByLabelText("Boundary witness language"), { target: { value: "Sanskrit" } });
     fireEvent.change(screen.getByLabelText("Boundary witness component forms"), { target: { value: "mita\nāhāra" } });
+    fireEvent.change(screen.getByLabelText("Boundary witness language"), { target: { value: "Sanskrit" } });
     fireEvent.change(screen.getByLabelText("Boundary witness position"), { target: { value: "4" } });
     fireEvent.change(screen.getByLabelText("Boundary witness span start"), { target: { value: "3" } });
     fireEvent.change(screen.getByLabelText("Boundary witness span end"), { target: { value: "5" } });
@@ -1935,6 +1936,7 @@ describe("Single-word motivation workbench v0.1", () => {
     expect(witness).toHaveTextContent("span [3, 5)");
     expect(witness).toHaveTextContent("reconstructed: mitāhāra");
     expect(witness).toHaveTextContent("citation entered; not independently verified");
+    expect(witness).toHaveTextContent("linguistic applicability: NOT_ASSESSED");
     expect(witness).toHaveTextContent("operation cost: null");
     expect(witness).toHaveTextContent("Canonical written Voices: UNKNOWN_OR_NULL");
     expect(witness).toHaveTextContent("User-proposed functional interpretation: Measured intake can be read as moderation.");
@@ -1942,11 +1944,58 @@ describe("Single-word motivation workbench v0.1", () => {
 
     fireEvent.change(screen.getByLabelText("Boundary witness component forms"), { target: { value: "mita\nāhara" } });
     expect(screen.queryByTestId("cross-language-boundary-witness-result")).not.toBeInTheDocument();
+    expect(screen.getByLabelText("Boundary witness language")).toHaveValue("");
+    expect(screen.getByLabelText("Boundary witness rule name")).toHaveValue("");
+    expect(screen.getByLabelText("Boundary witness rule attribution")).toHaveValue("");
+    expect(screen.getByLabelText("Boundary witness rule reference")).toHaveValue("");
+    expect(screen.getByLabelText("Boundary witness evidence status")).toHaveValue("UNKNOWN_OR_NULL");
+    expect(screen.getByLabelText("Boundary witness source references")).toHaveValue("");
+    expect(screen.getByLabelText("Boundary witness functional interpretation")).toHaveValue("");
     expect(screen.getByLabelText("Boundary witness declared result")).toHaveValue("");
+    expect(screen.getByLabelText("Proposed functional explanation")).toHaveValue("A user-proposed reading of measured nourishment.");
 
     fireEvent.change(screen.getByLabelText("Exact target word"), { target: { value: "mitāhāras" } });
     expect(screen.queryByTestId("cross-language-boundary-witness-result")).not.toBeInTheDocument();
     expect(screen.getByTestId("cross-language-add-boundary-witness")).toBeInTheDocument();
+  });
+
+  it("clears boundary-specific claims when the selected component boundary changes", () => {
+    render(<SingleWordMotivationWorkbenchV0_1 initialTargetWord="mitāhāra" />);
+    fireEvent.change(screen.getByLabelText("Target language"), { target: { value: "Sanskrit" } });
+    fireEvent.change(screen.getByLabelText("Component 1 exact spelling"), { target: { value: "mita" } });
+    fireEvent.change(screen.getByLabelText("Component 1 proposed meaning"), { target: { value: "measured" } });
+    fireEvent.change(screen.getByLabelText("Component 1 grammatical role"), { target: { value: "modifier" } });
+    fireEvent.change(screen.getByLabelText("Component 1 language"), { target: { value: "Sanskrit" } });
+    fireEvent.change(screen.getByLabelText("Component 2 exact spelling"), { target: { value: "āhāra" } });
+    fireEvent.change(screen.getByLabelText("Component 2 language"), { target: { value: "Sanskrit" } });
+    fireEvent.click(screen.getByLabelText("Component 2 not yet explained"));
+    fireEvent.change(screen.getByLabelText("Proposed functional explanation"), { target: { value: "Parent proposal stays intact." } });
+    fireEvent.click(screen.getByTestId("cross-language-add-boundary-witness"));
+
+    fireEvent.change(screen.getByLabelText("Boundary witness language"), { target: { value: "Sanskrit" } });
+    fireEvent.change(screen.getByLabelText("Boundary witness component forms"), { target: { value: "mita\nā\nhāra" } });
+    fireEvent.change(screen.getByLabelText("Boundary witness language"), { target: { value: "Sanskrit" } });
+    fireEvent.change(screen.getByLabelText("Boundary witness rule name"), { target: { value: "first-boundary rule" } });
+    fireEvent.change(screen.getByLabelText("Boundary witness rule attribution"), { target: { value: "first-boundary attribution" } });
+    fireEvent.change(screen.getByLabelText("Boundary witness rule reference"), { target: { value: "first-boundary-reference" } });
+    fireEvent.change(screen.getByLabelText("Boundary witness evidence status"), { target: { value: "CITATION_ENTERED_UNVERIFIED" } });
+    fireEvent.change(screen.getByLabelText("Boundary witness source references"), { target: { value: "first-boundary-source" } });
+    fireEvent.change(screen.getByLabelText("Boundary witness functional interpretation"), { target: { value: "First-boundary functional proposal." } });
+
+    fireEvent.change(screen.getByLabelText("Boundary witness component boundary"), { target: { value: "1" } });
+
+    expect(screen.getByLabelText("Boundary witness component boundary")).toHaveValue("1");
+    expect(screen.getByLabelText("Boundary witness rule name")).toHaveValue("");
+    expect(screen.getByLabelText("Boundary witness rule attribution")).toHaveValue("");
+    expect(screen.getByLabelText("Boundary witness rule reference")).toHaveValue("");
+    expect(screen.getByLabelText("Boundary witness evidence status")).toHaveValue("UNKNOWN_OR_NULL");
+    expect(screen.getByLabelText("Boundary witness source references")).toHaveValue("");
+    expect(screen.getByLabelText("Boundary witness functional interpretation")).toHaveValue("");
+    expect(screen.getByLabelText("Boundary witness position")).toHaveValue(0);
+    expect(screen.getByLabelText("Boundary witness input")).toHaveValue("");
+    expect(screen.getByLabelText("Boundary witness output")).toHaveValue("");
+    expect(screen.getByLabelText("Boundary witness declared result")).toHaveValue("");
+    expect(screen.getByLabelText("Proposed functional explanation")).toHaveValue("Parent proposal stays intact.");
   });
 
   it("offers existing generic witnesses supplied for the current analyzed target", () => {
