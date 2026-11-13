@@ -7,18 +7,18 @@ function readUtf8(rel: string): string {
 }
 
 describe("Evals source-engine autofill guard v0.1", () => {
-  it("locks runtime-backed analyze-v1 autofill wiring inside the collapsed upstream provenance panel", () => {
+  it("locks runtime-backed analyze-v2 autofill wiring inside the collapsed upstream provenance panel", () => {
     const ui = readUtf8("src/ui/evals/EvalsPageClient.v0.1.tsx");
     const route = readUtf8("app/api/evals/source-engine-provenance/route.ts");
 
-    expect(ui).toContain('const showAnalyzeV1Autofill = mode === "run_bundle";');
+    expect(ui).toContain('const showAnalyzeV2Autofill = mode === "run_bundle";');
     expect(ui).toContain("const hasSourceEngineMeta = Boolean(");
     expect(ui).toContain("Upstream engine provenance");
     expect(ui).toContain(
       "Only fill sourceEngine* when the JSON being scored already came from an upstream ZË-RO engine/export."
     );
     expect(ui).toContain('fetch("/api/evals/source-engine-provenance"');
-    expect(ui).toContain('setSourceEngineId(String(data.sourceEngineId ?? "analyze-v1"))');
+    expect(ui).toContain('setSourceEngineId(String(data.sourceEngineId ?? "analyze-v2"))');
     expect(ui).toContain('setSourceEngineVersion(String(data.sourceEngineVersion ?? ""))');
     expect(ui).toContain('setSourceEngineBuild(String(data.sourceEngineBuild ?? ""))');
     expect(ui).toContain("function clearSourceEngineProvenance() {");
@@ -29,14 +29,14 @@ describe("Evals source-engine autofill guard v0.1", () => {
     expect(ui).toContain("Clear sourceEngine*");
     expect(ui).toContain("disabled={busy || !hasSourceEngineMeta}");
     expect(ui).toContain(
-      "Only use this when the JSON being scored was produced by the current /api/analyze-v1 route."
+      "Only use this when the JSON being scored was produced by the current /api/analyze-v2 route."
     );
     expect(ui).toContain("group-open:rotate-180");
 
     expect(ui).not.toContain("const autofillSourceEngineBuild = useMemo(");
     expect(ui).not.toContain("process.env.NEXT_PUBLIC_GIT_SHA");
 
-    expect(route).toContain('sourceEngineId: "analyze-v1"');
+    expect(route).toContain('sourceEngineId: "analyze-v2"');
     expect(route).toContain("sourceEngineVersion: ENGINE_VERSION_V1");
     expect(route).toContain('execSync("git rev-parse --short HEAD"');
   });

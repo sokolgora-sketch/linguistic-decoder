@@ -12,9 +12,9 @@ import { useToast } from '@/hooks/use-toast';
 import { toPrettyJson } from "@/ui/instrument/prettyJson";
 import { downloadText } from "@/lib/downloadJson";
 import {
-  buildEvidencePackageExportV0_1,
-  serializeEvidencePackageExportV0_1,
-} from "@/shared/openInstrument/evidencePackageExport.v0_1";
+  buildEvidencePackageExportV0_2,
+  serializeEvidencePackageExportV0_2,
+} from "@/shared/openInstrument/evidencePackageExport.v0_2";
 import { buildEvidencePackageFromVM } from "@/ui/telemetry/buildEvidencePackageFromVM";
 import { buildEvidenceSummaryTextFromVM } from "@/ui/telemetry/buildEvidenceSummaryTextFromVM";
 import type { MissingState, PresentOrMissing, ResonanceProfileV1VM, RootMapVM, SoundRootsVM, TelemetryViewModel, Vowel } from "@/ui/telemetry/types";
@@ -55,7 +55,7 @@ import { AlbanianStructuralEvidenceCardV0_1 } from "./sections/AlbanianStructura
 
 type Props =
   | {
-      /** Raw /api/analyze-v1 payload (unknown shape). We adapt it, never trust it. */
+      /** Raw /api/analyze-v2 payload (unknown shape). We adapt it, never trust it. */
       payload: unknown;
       vm?: never;
         wordForMask?: string;
@@ -277,7 +277,7 @@ export function InstrumentPanel(props: Props) {
   );
 
   const analysisStatusForUi = isValidVm
-    ? vm.analysisStatusV0_2 ?? vm.analysisStatusV0_1
+    ? vm.analysisStatusV0_2
     : undefined;
   const primaryNullStatus =
     isValidVm &&
@@ -355,7 +355,7 @@ export function InstrumentPanel(props: Props) {
   }
 
   function downloadEvidencePackage() {
-    const projected = buildEvidencePackageExportV0_1(vm, ledgerModel ?? undefined);
+    const projected = buildEvidencePackageExportV0_2(vm, ledgerModel ?? undefined);
     if (!projected.ok) {
       toast({
         title: "Download failed",
@@ -365,7 +365,7 @@ export function InstrumentPanel(props: Props) {
       return;
     }
 
-    const serialized = serializeEvidencePackageExportV0_1(projected.value);
+    const serialized = serializeEvidencePackageExportV0_2(projected.value);
     if (!serialized.ok) {
       toast({
         title: "Download failed",

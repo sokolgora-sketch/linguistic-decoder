@@ -6,13 +6,18 @@ import ZroChatPage from "@/components/ZroChatPage";
 import { downloadText } from "@/lib/downloadJson";
 import {
   buildReproducibleRunBundleV0_1,
-  parseReproducibleRunBundleV0_1,
-  serializeReproducibleRunBundleV0_1,
+  serializeReproducibleRunBundleV0_1 as serializeLegacyRunBundle,
 } from "@/shared/openInstrument/reproducibleRunBundle.v0_1";
 import {
-  serializeEvidencePackageExportV0_1,
+  buildReproducibleRunBundleV0_2,
+  parseReproducibleRunBundleV0_2,
+  serializeReproducibleRunBundleV0_2,
+} from "@/shared/openInstrument/reproducibleRunBundle.v0_2";
+import {
   validateEvidencePackageExportV0_1,
 } from "@/shared/openInstrument/evidencePackageExport.v0_1";
+import { serializeEvidencePackageExportV0_2 } from "@/shared/openInstrument/evidencePackageExport.v0_2";
+import { toAnalyzeWordResultV2Contract } from "@/shared/analyzeWordResult.v2.contract";
 
 jest.mock("@/lib/downloadJson", () => ({
   downloadText: jest.fn(),
@@ -37,9 +42,9 @@ function makeResult(overrides: Record<string, unknown> = {}) {
     sanitized: "study",
     engineVersion: "0.2.0-symbolic",
     mode: "strict",
-    alphabet: ["A", "E", "I", "O", "U", "Y", "Ë"],
+    alphabet: "latin",
     strictInput: true,
-    primaryPath: { voicePath: ["U", "I"], ringPath: [1, 1], levelPath: [], ops: [] },
+    primaryPath: { voicePath: ["U", "I"], ringPath: [1, 1], levelPath: "" },
     heart: { math7: { primary: { basis: "UI", principlesPath: ["UNITY"] } } },
     heartPrimaryPath: ["U", "I"],
     functionalVoiceNormalizationV0_1: {
@@ -61,14 +66,28 @@ function makeResult(overrides: Record<string, unknown> = {}) {
         discoveryStatus: "structural_hypothesis",
         claimType: "structuralHypothesis",
         sourceKind: "logic_derived_structural_hypothesis",
+        originClaim: "not_claimed",
+        historicalRelation: "not_evaluated",
+        embryo: null,
+        embryoSize: null,
+        embryoLanguage: null,
+        isolatedStandaloneForm: null,
+        plainStandaloneGloss: null,
+        sourceNote: null,
+        segmentation: null,
+        semanticBridge: null,
+        expansionChain: [],
+        validationOutcome: "not_evaluated",
+        validationReasons: [],
+        rankGroup: "structuralHypothesis",
+        rankScore: 0,
+        rankReason: "structural only",
         claimBoundary: "structural hypothesis only; not reviewed lexical evidence",
         functionalSupportStatus: "unknown",
         independentStandaloneMeaning: null,
         candidateTruthClaim: "not_claimed",
         historicalOriginClaim: "not_claimed",
         userDecisionPosture: "user_decides",
-        validationOutcome: "not_evaluated",
-        rankGroup: "structuralHypothesis",
         vowelPath: ["U", "I"],
         functionalStatement: "A bounded structural hypothesis.",
         evidenceRefs: [],
@@ -88,7 +107,6 @@ function makeResult(overrides: Record<string, unknown> = {}) {
       claimBoundary,
       userDecisionPosture: "user_decides",
     },
-    originClaim: "not_claimed",
     originClaimGates: { winnerClaim: "not_claimed" },
     resonanceProfileV1: { status: "present", path: ["U", "I"] },
     ...overrides,
@@ -99,8 +117,8 @@ async function makeBundle(
   result = makeResult(),
   input: { ipa?: string; targetSenseLabel?: string } = {},
 ) {
-  return buildReproducibleRunBundleV0_1({
-    result,
+  return buildReproducibleRunBundleV0_2({
+    result: toAnalyzeWordResultV2Contract(result),
     ...input,
     createdAt: "2026-09-10T00:00:00.000Z",
   });
@@ -114,12 +132,13 @@ function fileFrom(text: string): File {
 }
 
 function mockSuccessfulAnalysis(result = makeResult()) {
+  const v2Result = toAnalyzeWordResultV2Contract(result);
   global.fetch = jest
     .fn()
     .mockResolvedValueOnce({
       ok: true,
       status: 200,
-      json: async () => result,
+      json: async () => v2Result,
     } as any)
     .mockResolvedValueOnce({
       ok: false,
@@ -130,7 +149,7 @@ function mockSuccessfulAnalysis(result = makeResult()) {
 
 function analyzeFetchCount() {
   return (global.fetch as jest.Mock).mock.calls.filter(([input]) =>
-    String(input).includes("/api/analyze-v1?"),
+    String(input).includes("/api/analyze-v2?"),
   ).length;
 }
 
@@ -181,9 +200,12 @@ describe("reproducible run bundle UI handoff v0.1", () => {
     const [filename, serialized] = mockedDownloadText.mock.calls[0];
     expect(filename).toBe("open-instrument-study.json");
 
-    const parsed = await parseReproducibleRunBundleV0_1(serialized);
+    const parsed = await parseReproducibleRunBundleV0_2(serialized);
     expect(parsed.ok).toBe(true);
     if (!parsed.ok) return;
+    expect(parsed.value.schemaVersion).toBe("open-instrument.reproducible-run-bundle.v0.2");
+    expect(parsed.value.result.analysisStatusV0_2).toBeDefined();
+    expect(JSON.stringify(parsed.value)).not.toMatch(/winner|no_single_winner/i);
     expect(parsed.value.result.word).toBe("study");
     expect(parsed.value.input).toEqual({
       ipa: "/ˈstʌdi/",
@@ -191,6 +213,32 @@ describe("reproducible run bundle UI handoff v0.1", () => {
     });
     expect(analyzeFetchCount()).toBe(1);
     expect(researchFetchCount()).toBe(1);
+  });
+
+  it("opens a legacy v0.1 snapshot through the import boundary and reexports neutral v0.2", async () => {
+    global.fetch = jest.fn();
+    const legacyBundle = await buildReproducibleRunBundleV0_1({
+      result: makeResult(),
+      createdAt: "2026-01-02T00:00:00.000Z",
+    });
+    const legacySerialized = serializeLegacyRunBundle(legacyBundle);
+
+    render(<ZroChatPage />);
+    fireEvent.change(screen.getByLabelText("Open saved analysis"), {
+      target: { files: [fileFrom(legacySerialized)] },
+    });
+
+    await screen.findByText("Imported local snapshot");
+    expect(screen.getByText("open-instrument.reproducible-run-bundle.v0.2")).toBeInTheDocument();
+    expect(global.fetch).not.toHaveBeenCalled();
+
+    fireEvent.click(screen.getByRole("button", { name: "Download analysis" }));
+    await waitFor(() => expect(mockedDownloadText).toHaveBeenCalledTimes(1));
+    const [, reexported] = mockedDownloadText.mock.calls[0];
+    const parsed = await parseReproducibleRunBundleV0_2(reexported);
+    expect(parsed.ok).toBe(true);
+    expect(reexported).not.toMatch(/winner|no_single_winner/i);
+    expect(global.fetch).not.toHaveBeenCalled();
   });
 
   it("downloads the exact durable evidence package without reanalysis", async () => {
@@ -210,11 +258,17 @@ describe("reproducible run bundle UI handoff v0.1", () => {
     expect(mimeType).toBe("application/json");
 
     const exported = JSON.parse(serialized);
-    expect(validateEvidencePackageExportV0_1(exported)).toEqual({ ok: true });
-    expect(exported.schemaVersion).toBe("open-instrument.evidence-package-export.v0.1");
+    expect(exported.schemaVersion).toBe("open-instrument.evidence-package-export.v0.2");
     expect(exported.input.word).toBe("study");
     expect(JSON.stringify(exported)).not.toMatch(/raw|debug|provider|runtime|researchRows/);
-    expect(serializeEvidencePackageExportV0_1(exported)).toEqual({ ok: true, value: serialized });
+    expect(JSON.stringify(exported)).not.toMatch(/winner|no_single_winner/i);
+    expect(exported.interpretationDecisionPolicy).toMatchObject({
+      multipleInterpretationsMayCoexist: true,
+      automaticInterpretationSelection: "DISABLED",
+      interpretationDecisionAuthority: "USER_DECIDES",
+    });
+    expect(serializeEvidencePackageExportV0_2(exported)).toEqual({ ok: true, value: serialized });
+    expect(validateEvidencePackageExportV0_1(exported)).not.toEqual({ ok: true });
     expect(analyzeFetchCount()).toBe(1);
   });
 
@@ -238,7 +292,7 @@ describe("reproducible run bundle UI handoff v0.1", () => {
 
     await waitFor(() => expect(mockedDownloadText).toHaveBeenCalledTimes(1));
     const [, serialized] = mockedDownloadText.mock.calls[0];
-    expect(JSON.parse(serialized).analysisStatusV0_1.status).toBe("null_no_supported_candidate");
+    expect(JSON.parse(serialized).analysisStatusV0_2.status).toBe("null_no_supported_candidate");
     expect(analyzeFetchCount()).toBe(1);
   });
 
@@ -255,7 +309,7 @@ describe("reproducible run bundle UI handoff v0.1", () => {
     await waitFor(() => expect(mockedDownloadText).toHaveBeenCalledTimes(1));
     const [, serialized] = mockedDownloadText.mock.calls[0];
     const exported = JSON.parse(serialized);
-    expect(exported.analysisStatusV0_1.status).toBe("candidate_only");
+    expect(exported.analysisStatusV0_2.status).toBe("candidate_only");
     expect(exported.candidates.map((candidate: { index: number }) => candidate.index)).toEqual([0]);
     expect(exported.candidates[0].status).toBe("unknown");
     expect(exported.candidates[0].discoveryStatus).toBe("structural_hypothesis");
@@ -297,7 +351,7 @@ describe("reproducible run bundle UI handoff v0.1", () => {
 
     render(<ZroChatPage />);
     fireEvent.change(screen.getByLabelText("Open saved analysis"), {
-      target: { files: [fileFrom(serializeReproducibleRunBundleV0_1(bundle))] },
+      target: { files: [fileFrom(serializeReproducibleRunBundleV0_2(bundle))] },
     });
 
     await screen.findByText("Imported local snapshot");
@@ -318,7 +372,7 @@ describe("reproducible run bundle UI handoff v0.1", () => {
 
     render(<ZroChatPage />);
     fireEvent.change(screen.getByLabelText("Open saved analysis"), {
-      target: { files: [fileFrom(serializeReproducibleRunBundleV0_1(withoutCreatedAt))] },
+      target: { files: [fileFrom(serializeReproducibleRunBundleV0_2(withoutCreatedAt))] },
     });
 
     await screen.findByText("Imported local snapshot");
@@ -333,7 +387,7 @@ describe("reproducible run bundle UI handoff v0.1", () => {
 
     render(<ZroChatPage />);
     fireEvent.change(screen.getByLabelText("Open saved analysis"), {
-      target: { files: [fileFrom(serializeReproducibleRunBundleV0_1(bundle))] },
+      target: { files: [fileFrom(serializeReproducibleRunBundleV0_2(bundle))] },
     });
     await screen.findByText("Imported local snapshot");
 
@@ -354,7 +408,7 @@ describe("reproducible run bundle UI handoff v0.1", () => {
 
     render(<ZroChatPage />);
     fireEvent.change(screen.getByLabelText("Open saved analysis"), {
-      target: { files: [fileFrom(serializeReproducibleRunBundleV0_1(bundle))] },
+      target: { files: [fileFrom(serializeReproducibleRunBundleV0_2(bundle))] },
     });
     await screen.findByText("Imported local snapshot");
 
@@ -395,7 +449,7 @@ describe("reproducible run bundle UI handoff v0.1", () => {
 
     await waitFor(() => expect(mockedDownloadText).toHaveBeenCalledTimes(1));
     const [, serialized] = mockedDownloadText.mock.calls[0];
-    const parsed = await parseReproducibleRunBundleV0_1(serialized);
+    const parsed = await parseReproducibleRunBundleV0_2(serialized);
     expect(parsed.ok).toBe(true);
     if (!parsed.ok) return;
     expect(parsed.value.input).toEqual({
@@ -435,7 +489,7 @@ describe("reproducible run bundle UI handoff v0.1", () => {
     render(<ZroChatPage />);
     const fileInput = screen.getByLabelText("Open saved analysis");
     fireEvent.change(fileInput, {
-      target: { files: [fileFrom(serializeReproducibleRunBundleV0_1(bundle))] },
+      target: { files: [fileFrom(serializeReproducibleRunBundleV0_2(bundle))] },
     });
 
     await screen.findByTestId("open-instrument-shell");
@@ -455,8 +509,8 @@ describe("reproducible run bundle UI handoff v0.1", () => {
   it("reopens structural discovery and functional normalization data without replay", async () => {
     global.fetch = jest.fn();
     const bundle = await makeBundle();
-    const serialized = serializeReproducibleRunBundleV0_1(bundle);
-    const parsed = await parseReproducibleRunBundleV0_1(serialized);
+    const serialized = serializeReproducibleRunBundleV0_2(bundle);
+    const parsed = await parseReproducibleRunBundleV0_2(serialized);
     expect(parsed.ok).toBe(true);
     if (!parsed.ok) return;
     expect(parsed.value.result.candidates[0].discoveryStatus).toBe("structural_hypothesis");
@@ -495,7 +549,7 @@ describe("reproducible run bundle UI handoff v0.1", () => {
 
     const bundle = await makeBundle(makeResult({ word: "saved" }));
     fireEvent.change(screen.getByLabelText("Open saved analysis"), {
-      target: { files: [fileFrom(serializeReproducibleRunBundleV0_1(bundle))] },
+      target: { files: [fileFrom(serializeReproducibleRunBundleV0_2(bundle))] },
     });
 
     await waitFor(() => expect(screen.getByTestId("instrument-word")).toHaveTextContent("saved"));
@@ -518,7 +572,7 @@ describe("reproducible run bundle UI handoff v0.1", () => {
       "fingerprint mismatch",
       async () => {
         const bundle = await makeBundle();
-        const tampered = JSON.parse(serializeReproducibleRunBundleV0_1(bundle));
+        const tampered = JSON.parse(serializeReproducibleRunBundleV0_2(bundle));
         tampered.result.word = "tampered";
         return JSON.stringify(tampered);
       },

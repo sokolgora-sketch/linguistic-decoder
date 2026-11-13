@@ -111,7 +111,7 @@ export async function startNextServer(mode: "dev" | "start") {
     while (Date.now() < deadline) {
       owned.assertRunning();
       try {
-        const response = await requestJson(`${base}/api/analyze-v1?word=study&mode=strict`, "GET", null, Math.min(5_000, deadline - Date.now()));
+        const response = await requestJson(`${base}/api/analyze-v2?word=study&mode=strict`, "GET", null, Math.min(5_000, deadline - Date.now()));
         owned.assertRunning();
         if (response.status === 200) return { base, stop: owned.stop };
       } catch { owned.assertRunning(); }

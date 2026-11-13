@@ -233,11 +233,8 @@ describe(
           "not_claimed",
         );
 
-        expect(
-          er.winnerClaim,
-        ).toBe(
-          "not_claimed",
-        );
+        expect(er).not.toHaveProperty("winnerClaim");
+        expect(er.interpretationDecisionPolicy.automaticInterpretationSelection).toBe("DISABLED");
 
         expect(
           er.languageSuperiorityClaim,
@@ -256,24 +253,24 @@ describe(
           );
 
         expect(
-          body.analysisStatusV0_1
+          body.analysisStatusV0_2
             .status,
         ).toBe(
           "research_functional_hypothesis",
         );
 
         expect(
-          body.analysisStatusV0_1
+          body.analysisStatusV0_2
             .reviewedOperators,
         ).toEqual([]);
 
         expect(
-          body.analysisStatusV0_1
+          body.analysisStatusV0_2
             .candidateOnlyOperators,
         ).toEqual([]);
 
         expect(
-          body.analysisStatusV0_1
+          body.analysisStatusV0_2
             .researchHypothesisEmbryos,
         ).toEqual([
           "ER",
@@ -284,12 +281,12 @@ describe(
         ]);
 
         expect(
-          body.analysisStatusV0_1
+          body.analysisStatusV0_2
             .structuralTokens,
         ).toEqual([]);
 
         expect(
-          body.analysisStatusV0_1
+          body.analysisStatusV0_2
             .claimBoundary
             .candidateTruthClaim,
         ).toBe(
@@ -297,7 +294,7 @@ describe(
         );
 
         expect(
-          body.analysisStatusV0_1
+          body.analysisStatusV0_2
             .userDecisionPosture,
         ).toBe(
           "user_decides",
@@ -313,12 +310,9 @@ describe(
             "sterile",
           );
 
-        expect(
-          body.originClaim
-            ?.policy,
-        ).toBe(
-          "no_single_winner",
-        );
+        expect(body.originClaim).not.toHaveProperty("policy");
+        expect(body.originClaim.interpretationDecisionPolicy.automaticInterpretationSelection)
+          .toBe("DISABLED");
 
         expect(
           Array.isArray(

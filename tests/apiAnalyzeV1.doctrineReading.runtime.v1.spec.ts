@@ -2,15 +2,13 @@ jest.mock("next/server", () => ({
   NextResponse: {
     json: (body: unknown, init?: { status?: number }) => ({
       status: init?.status ?? 200,
+      headers: new Headers(),
       json: async () => body,
     }),
   },
 }));
 
-import {
-  AnalyzeWordResultV1ContractSchema,
-  toAnalyzeWordResultV1Contract,
-} from "@/shared/analyzeWordResult.v1.contract";
+import { AnalyzeWordResultV2ContractSchema } from "@/shared/analyzeWordResult.v2.contract";
 
 type AnalyzeBody = Record<string, any>;
 
@@ -25,14 +23,16 @@ async function analyze(word: string, suffix = ""): Promise<AnalyzeBody> {
 }
 
 function expectDoctrineBoundaries(reading: AnalyzeBody) {
-  expect(reading.schemaVersion).toBe("open-instrument.doctrine-reading.v1");
+  expect(reading.schemaVersion).toBe("open-instrument.doctrine-reading.v2");
   expect(reading.compositionMode).toBe("ORDERED_ROLES_ONLY");
   expect(reading.pathComposition).toBe("NOT_AUTHORIZED");
   expect(reading.providerIndependent).toBe(true);
   expect(reading.externalEvidenceIndependent).toBe(true);
-  expect(reading.candidateWinnerIndependent).toBe(true);
   expect(reading.userDecisionPosture).toBe("user_decides");
-  expect(reading.noSingleWinner).toBe(true);
+  expect(reading).not.toHaveProperty("candidateWinnerIndependent");
+  expect(reading).not.toHaveProperty("noSingleWinner");
+  expect(reading.claimBoundary).not.toHaveProperty("winnerClaim");
+  expect(reading.interpretationDecisionPolicy.automaticInterpretationSelection).toBe("DISABLED");
 }
 
 describe("/api/analyze-v1 doctrine reading runtime projection v1", () => {
@@ -110,7 +110,7 @@ describe("/api/analyze-v1 doctrine reading runtime projection v1", () => {
     const body = await analyze("wind");
     const reading = body.doctrineReading as AnalyzeBody;
 
-    expect(body.analysisStatusV0_1.status).toBe("null_no_supported_candidate");
+    expect(body.analysisStatusV0_2.status).toBe("null_no_supported_candidate");
     expect(body.heartInstrumentV1.surfaceVowels.length).toBeGreaterThan(0);
     expect(body.heartInstrumentV1.canonicalSpokenVoicePath).toBeNull();
     expect(reading).toBeNull();
@@ -129,11 +129,10 @@ describe("/api/analyze-v1 doctrine reading runtime projection v1", () => {
 
   it("keeps the additive field inside the strict public contract", async () => {
     const body = await analyze("study");
-    const projected = toAnalyzeWordResultV1Contract(body);
-    const parsed = AnalyzeWordResultV1ContractSchema.safeParse(projected);
+    const parsed = AnalyzeWordResultV2ContractSchema.safeParse(body);
 
     expect(parsed.success).toBe(true);
-    expect(projected.doctrineReading).not.toBeNull();
+    expect(body.doctrineReading).not.toBeNull();
   });
 
   it("returns null doctrine reading for the empty canonical surface path", async () => {

@@ -98,9 +98,7 @@ function buildOrientationState(vm: TelemetryViewModel): OrientationState {
   const status =
     vm.analysisStatusV0_2?.kind === "present"
       ? vm.analysisStatusV0_2.value.status
-      : vm.analysisStatusV0_2 === undefined && vm.analysisStatusV0_1?.kind === "present"
-        ? vm.analysisStatusV0_1.value.status
-        : undefined;
+      : undefined;
 
   return {
     structure: formattedPath

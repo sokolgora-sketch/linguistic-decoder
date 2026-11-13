@@ -13,7 +13,10 @@ describe("analyzeClient localhost config seam", () => {
       ok: true,
       status: 200,
       statusText: "OK",
-      json: async () => ({ payload: { ok: true } }),
+      json: async () => ({
+        responseContractVersion: "open-instrument.analyze-word-result.v2",
+        word: "study",
+      }),
       text: async () => "",
     })) as any;
   });
@@ -27,7 +30,7 @@ describe("analyzeClient localhost config seam", () => {
   it("defaults to the explicit local loopback base url", () => {
     expect(resolveAnalyzeClientBaseUrl()).toBe("http://127.0.0.1:3000");
     expect(buildAnalyzeClientUrl({ word: "study", mode: "strict" })).toBe(
-      "http://127.0.0.1:3000/api/analyze-v1?word=study&mode=strict"
+      "http://127.0.0.1:3000/api/analyze-v2?word=study&mode=strict"
     );
   });
 
@@ -37,16 +40,20 @@ describe("analyzeClient localhost config seam", () => {
     expect(
       buildAnalyzeClientUrl({ word: "study", mode: "open", alphabet: "auto" })
     ).toBe(
-      "http://localhost:3001/api/analyze-v1?word=study&mode=open&alphabet=auto"
+      "http://localhost:3001/api/analyze-v2?word=study&mode=open&alphabet=auto"
     );
   });
 
-  it("keeps the legacy positional call shape used by the dev script", async () => {
-    await analyzeClient("study", "strict", "auto", { useAi: true });
+  it("keeps the dev-script positional call shape on the neutral V2 route", async () => {
+    const result = await analyzeClient("study", "strict", "auto", { useAi: true });
 
     expect(global.fetch).toHaveBeenCalledWith(
-      "http://127.0.0.1:3000/api/analyze-v1?word=study&mode=strict&alphabet=auto",
+      "http://127.0.0.1:3000/api/analyze-v2?word=study&mode=strict&alphabet=auto",
       { method: "GET" }
     );
+    expect(result).toEqual({
+      responseContractVersion: "open-instrument.analyze-word-result.v2",
+      word: "study",
+    });
   });
 });

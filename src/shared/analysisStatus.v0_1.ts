@@ -373,9 +373,8 @@ export function isReviewedFunctionalEvidenceLineV0_1(
     normalized.includes(
       "historicaloriginclaim=not_claimed",
     ) &&
-    normalized.includes(
-      "winnerclaim=not_claimed",
-    ) &&
+    (normalized.includes("winnerclaim=not_claimed") ||
+      normalized.includes("automaticinterpretationselection=disabled")) &&
     normalized.includes(
       "languagesuperiorityclaim=not_claimed",
     ) &&

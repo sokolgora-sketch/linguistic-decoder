@@ -6,7 +6,6 @@ import type {
   AnalysisStatusV0_2VM,
   PresentOrMissing,
 } from "@/ui/telemetry/types";
-import { presentNeutralInterpretationBoundaryV0_1 } from "@/ui/instrument/neutralInterpretationLanguage.v0_1";
 
 const STATUS_LABELS: Record<AnalysisStatusCodeV0_1, string> = {
   reviewed_functional_evidence: "Reviewed functional evidence",
@@ -74,7 +73,7 @@ export function AnalysisStatusCardV0_1({
           {STATUS_LABELS[value.status]}
         </h2>
         <p className="mt-3 text-sm leading-6 text-[#c5ced8]">
-          {presentNeutralInterpretationBoundaryV0_1(value.summary)}
+          {(value.summary)}
         </p>
         <StatusBoundaryNoticeV0_1 />
       </section>
@@ -102,7 +101,7 @@ export function AnalysisStatusCardV0_1({
       </div>
 
       <p className="mt-3 text-sm leading-6 text-[#c5ced8]">
-        {presentNeutralInterpretationBoundaryV0_1(value.summary)}
+        {(value.summary)}
       </p>
 
       <dl className="mt-4 grid gap-2 text-sm sm:grid-cols-3">

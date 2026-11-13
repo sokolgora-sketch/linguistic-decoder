@@ -196,7 +196,7 @@ describe(
         });
 
         expect(
-          body.analysisStatusV0_1,
+          body.analysisStatusV0_2,
         ).toMatchObject({
           status:
             "candidate_only",
@@ -207,7 +207,7 @@ describe(
 
         expect(
           body
-            .analysisStatusV0_1
+            .analysisStatusV0_2
             .summary,
         ).toBe(
           "Deterministically verified Proposed functional candidate available: MI. It remains an unreviewed functional hypothesis, not candidate truth or historical-origin evidence. User decides.",
@@ -317,7 +317,7 @@ describe(
           await response.json();
 
         expect(
-          body.analysisStatusV0_1,
+          body.analysisStatusV0_2,
         ).toMatchObject({
           status:
             "reviewed_functional_evidence",
@@ -476,7 +476,7 @@ describe(
         // Research owns the aggregate status by precedence, while EM
         // remains a lower-precedence meaning-unknown structural candidate.
         expect(
-          body.analysisStatusV0_1,
+          body.analysisStatusV0_2,
         ).toMatchObject({
           status:
             "structural_unreviewed",

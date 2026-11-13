@@ -113,13 +113,13 @@ describe(
 
       expect(
         out
-          .analysisStatusV0_1
+          .analysisStatusV0_2
           ?.reviewedOperators,
       ).toContain("AT");
 
       expect(
         out
-          .analysisStatusV0_1
+          .analysisStatusV0_2
           ?.status,
       ).not.toBe(
         "null_no_supported_candidate",
@@ -149,7 +149,7 @@ describe(
 
       expect(
         out
-          .analysisStatusV0_1
+          .analysisStatusV0_2
           ?.reviewedOperators ??
           [],
       ).not.toContain(

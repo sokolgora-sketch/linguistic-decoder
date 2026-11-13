@@ -17,10 +17,10 @@ import { projectRecentAnalysisResultsV0_1 } from '@/ui/instrument/recentAnalysis
 import { WordToWordStructuralAuthorityComparisonCard } from '@/ui/instrument/sections/WordToWordStructuralAuthorityComparisonCard.v0_1';
 import {
   ReproducibleRunBundleControls,
-  type ReproducibleRunBundleDisplaySourceV0_1,
+  type ReproducibleRunBundleDisplaySourceV0_2,
 } from '@/ui/instrument/ReproducibleRunBundleControls.v0_1';
 import { CrossLanguageRecurrenceCardV0_1 } from '@/ui/instrument/sections/CrossLanguageRecurrenceCard.v0.1';
-import type { ReproducibleRunBundleV0_1 } from '@/shared/openInstrument/reproducibleRunBundle.v0_1';
+import type { ReproducibleRunBundleV0_2 } from '@/shared/openInstrument/reproducibleRunBundle.v0_2';
 import type { SevenVoiceFunctionalRecurrenceResearchAvailableV0_1 } from '@/shared/openInstrument/sevenVoiceFunctionalRecurrenceResearchCatalog.v0_1';
 import type { AlphabetId, Mode } from '@/types/engine';
 import { MT } from '@/ui/typography/marketingType.v0.1';
@@ -210,7 +210,7 @@ export default function ZroChatPage() {
   const [recurrenceResearch, setRecurrenceResearch] =
     React.useState<SevenVoiceFunctionalRecurrenceResearchAvailableV0_1 | null>(null);
   const [importedBundle, setImportedBundle] =
-    React.useState<ReproducibleRunBundleV0_1 | null>(null);
+    React.useState<ReproducibleRunBundleV0_2 | null>(null);
   const [messages, setMessages] = React.useState<Msg[]>([
       { id: 'init', role: 'assistant', text: 'Type a word and press Enter.' },
     ]);
@@ -300,7 +300,7 @@ export default function ZroChatPage() {
       const sourceRecordSelectorQuery = albanianSourceRecordId
         ? `&language=sq&albanianSourceRecordId=${encodeURIComponent(albanianSourceRecordId)}`
         : "";
-      const url = `/api/analyze-v1?word=${encodeURIComponent(w)}&mode=${encodeURIComponent(mode)}${alphabetQuery}${providerExecutionQuery}${ipaTrim ? `&ipa=${encodeURIComponent(ipaTrim)}` : ""}${targetSenseTrim ? `&targetSenseLabel=${encodeURIComponent(targetSenseTrim)}` : ""}${sourceRecordSelectorQuery}`;
+      const url = `/api/analyze-v2?word=${encodeURIComponent(w)}&mode=${encodeURIComponent(mode)}${alphabetQuery}${providerExecutionQuery}${ipaTrim ? `&ipa=${encodeURIComponent(ipaTrim)}` : ""}${targetSenseTrim ? `&targetSenseLabel=${encodeURIComponent(targetSenseTrim)}` : ""}${sourceRecordSelectorQuery}`;
       const res = await fetch(url, { method: 'GET' });
       const json: unknown =
         typeof res.json === 'function' ? await res.json() : null;
@@ -560,7 +560,7 @@ export default function ZroChatPage() {
     [messages],
   );
 
-  const displayedAnalysisSource: ReproducibleRunBundleDisplaySourceV0_1 =
+  const displayedAnalysisSource: ReproducibleRunBundleDisplaySourceV0_2 =
     importedBundle
       ? {
           kind: "imported",
@@ -572,7 +572,7 @@ export default function ZroChatPage() {
         }
       : { kind: "current" };
 
-  function handleImportedBundle(bundle: ReproducibleRunBundleV0_1) {
+  function handleImportedBundle(bundle: ReproducibleRunBundleV0_2) {
     setImportedBundle(bundle);
     setInput(bundle.result.word);
     setIpa(bundle.input.ipa ?? '');

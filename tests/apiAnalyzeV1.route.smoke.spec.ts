@@ -2,6 +2,7 @@ jest.mock("next/server", () => ({
   NextResponse: {
     json: (body: any, init?: { status?: number }) => ({
       status: init?.status ?? 200,
+      headers: new Headers(),
       json: async () => body,
     }),
   },
@@ -59,7 +60,10 @@ describe("/api/analyze-v1 (adapter) — smoke", () => {
   test("POST returns adapter output", async () => {
     const mod = await import("../app/api/analyze-v1/route");
 
-    const req: any = { json: async () => ({ word: "study", mode: "strict" }) };
+    const req: any = {
+      url: "http://localhost/api/analyze-v1",
+      json: async () => ({ word: "study", mode: "strict" }),
+    };
 
     const res: any = await mod.POST(req);
     expect(res.status).toBe(200);
@@ -67,7 +71,31 @@ describe("/api/analyze-v1 (adapter) — smoke", () => {
     const json: any = await res.json();
     expect(json.word.toLowerCase()).toBe("study");
     expect(json).toHaveProperty("heart");
+    expect(res.headers.get("X-Analyze-Response-Contract")).toBe("open-instrument.analyze-word-result.v2");
+    expect(res.headers.get("Deprecation")).toBe("true");
     expect(json).toHaveProperty("candidates");
+    expect(json.responseContractVersion).toBe("open-instrument.analyze-word-result.v2");
+    expect(json).not.toHaveProperty("analysisStatusV0_1");
+    expect(json).not.toHaveProperty("functionalMotivationInterpretationV0_2");
+    expect(res.headers.get("X-Analyze-Response-Contract")).toBe("open-instrument.analyze-word-result.v2");
+    expect(res.headers.get("Deprecation")).toBe("true");
+    expect(res.headers.get("Link")).toBe("</api/analyze-v2>; rel=\"successor-version\"");
+  });
+
+  test("the successor Analyze V2 endpoint is the active neutral response route", async () => {
+    const mod = await import("../app/api/analyze-v2/route");
+    const response: any = await mod.GET({
+      url: "http://localhost/api/analyze-v2?word=study&mode=strict",
+    } as any);
+    const payload: any = await response.json();
+    expect(response.status).toBe(200);
+    expect(payload.responseContractVersion).toBe("open-instrument.analyze-word-result.v2");
+    expect(payload.analysisStatusV0_2).toBeDefined();
+    expect(payload).not.toHaveProperty("analysisStatusV0_1");
+    expect(payload).not.toHaveProperty("functionalMotivationInterpretationV0_2");
+    expect(response.headers.get("Deprecation")).toBeNull();
+    expect(response.headers.get("Link")).toBeNull();
+    expect(response.headers.get("X-Analyze-Response-Contract")).toBe("open-instrument.analyze-word-result.v2");
   });
 
   test("GET returns adapter output", async () => {
@@ -107,20 +135,20 @@ describe("/api/analyze-v1 (adapter) — smoke", () => {
 
       expect(firstResponse.status).toBe(200);
       expect(secondResponse.status).toBe(200);
-      expect(firstBody).toHaveProperty("motivationDiscoveryV0_1");
+      expect(firstBody).toHaveProperty("motivationDiscoveryV0_2");
       expect(firstBody).not.toHaveProperty("englishProvider");
-      expect(firstBody.motivationDiscoveryV0_1.exactLexicalSourceStatus).toMatchObject({
+      expect(firstBody.motivationDiscoveryV0_2.exactLexicalSourceStatus).toMatchObject({
         status: "NOT_QUERIED",
         reasonCode: "NOT_ALBANIAN_INPUT",
       });
-      expect(firstBody.motivationDiscoveryV0_1.candidates.filter(
+      expect(firstBody.motivationDiscoveryV0_2.candidates.filter(
         (candidate: { candidateLanguage: string }) => candidate.candidateLanguage === "English",
       )).toEqual([]);
-      expect(secondBody.motivationDiscoveryV0_1).toEqual(
-        firstBody.motivationDiscoveryV0_1,
+      expect(secondBody.motivationDiscoveryV0_2).toEqual(
+        firstBody.motivationDiscoveryV0_2,
       );
-      expect(secondBody.functionalMotivationInterpretationV0_2).toEqual(
-        firstBody.functionalMotivationInterpretationV0_2,
+      expect(secondBody.functionalMotivationInterpretationV0_3).toEqual(
+        firstBody.functionalMotivationInterpretationV0_3,
       );
       expect(buildDiscoveryMock).toHaveBeenCalledTimes(2);
       expect(consoleWarnSpy).toHaveBeenCalledTimes(2);

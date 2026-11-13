@@ -383,7 +383,7 @@ function buildReviewedFunctionalRuntimeEvidenceByEmbryoV0_1(): ReadonlyMap<
         language: row.candidateLanguage,
         evidenceRefs: projection.evidenceRefs,
         evidenceText:
-          `reviewed functional free-operator evidence: ${projection.evidenceText}; historicalOriginClaim=${projection.claimBoundary.historicalOriginClaim}; winnerClaim=${projection.claimBoundary.winnerClaim}; languageSuperiorityClaim=${projection.claimBoundary.languageSuperiorityClaim}; userDecisionPosture=${projection.claimBoundary.userDecisionPosture}`,
+          `reviewed functional free-operator evidence: ${projection.evidenceText}; historicalOriginClaim=${projection.claimBoundary.historicalOriginClaim}; automaticInterpretationSelection=DISABLED; languageSuperiorityClaim=${projection.claimBoundary.languageSuperiorityClaim}; userDecisionPosture=${projection.claimBoundary.userDecisionPosture}`,
       },
     ]);
   }

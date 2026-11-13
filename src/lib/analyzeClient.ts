@@ -35,7 +35,7 @@ export function buildAnalyzeClientUrl(
   const mode = input.mode ?? "strict";
   const alphabet = typeof input.alphabet === "string" ? input.alphabet.trim() : "";
 
-  const url = new URL("/api/analyze-v1", `${baseUrl}/`);
+  const url = new URL("/api/analyze-v2", `${baseUrl}/`);
   url.searchParams.set("word", word);
   url.searchParams.set("mode", String(mode));
 

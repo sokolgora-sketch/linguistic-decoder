@@ -15,7 +15,6 @@ import type {
   AlbanianSourceLinkedRecordV0_1,
 } from "@/shared/openInstrument/motivationEngineDiscoveryServerOnly.v0_1";
 import { FjaloriCrossSourceEvidenceV0_1 } from "@/ui/instrument/sections/FjaloriCrossSourceEvidence.v0_1";
-import { presentNeutralInterpretationBoundaryV0_1 } from "@/ui/instrument/neutralInterpretationLanguage.v0_1";
 import {
   aggregateMotivationDiscoveryCandidatesV0_1,
   measureMotivationDiscoveryAggregationV0_1,
@@ -980,7 +979,7 @@ export function MotivationDiscoveryCardV0_1({
             Alternatives: {albanianLexicalReading.fiveWindowsComparison.alternatives.join(" ")}
           </div>
           <div className="mt-2 text-[10px] text-[#aebbd5]">
-            {presentNeutralInterpretationBoundaryV0_1(albanianLexicalReading.fiveWindowsComparison.claimBoundary)}
+            {(albanianLexicalReading.fiveWindowsComparison.claimBoundary)}
           </div>
         </section>
       ) : null}
@@ -1082,7 +1081,7 @@ export function MotivationDiscoveryCardV0_1({
                 ) : null}
               </div>
               <div className="mt-2">Alternatives: {albanianLexicalReading.senseAlignedLexicalRole.alternatives.join(" ")}</div>
-              <div className="mt-1 text-[10px]">{presentNeutralInterpretationBoundaryV0_1(albanianLexicalReading.senseAlignedLexicalRole.claimBoundary)} Multiple interpretations may coexist; the user decides.</div>
+              <div className="mt-1 text-[10px]">{(albanianLexicalReading.senseAlignedLexicalRole.claimBoundary)} Multiple interpretations may coexist; the user decides.</div>
             </section>
           ) : null}
           {albanianLexicalReading.sourceLinkedComparison ? (
@@ -1117,7 +1116,7 @@ export function MotivationDiscoveryCardV0_1({
               ) : (
                 <div className="mt-2 text-[#d5c28f]">{sourceLinkedComparisonSummaryV0_1(albanianLexicalReading.sourceLinkedComparison)}</div>
               )}
-              <div className="mt-2 text-[10px] text-[#91aebb]">{presentNeutralInterpretationBoundaryV0_1(albanianLexicalReading.sourceLinkedComparison.claimBoundary)}</div>
+              <div className="mt-2 text-[10px] text-[#91aebb]">{(albanianLexicalReading.sourceLinkedComparison.claimBoundary)}</div>
             </div>
           ) : null}
           {albanianLexicalReading.sourceLinkedComponentReading ? (
@@ -1229,12 +1228,12 @@ export function MotivationDiscoveryCardV0_1({
                     </div>
                   )}
                   <div className="mt-2 text-[10px] text-[#91aebb]">
-                    {presentNeutralInterpretationBoundaryV0_1(albanianLexicalReading.sourceLinkedComponentReading.functionalHypothesis.claimBoundary)}
+                    {(albanianLexicalReading.sourceLinkedComponentReading.functionalHypothesis.claimBoundary)}
                   </div>
                 </div>
               ) : null}
               <div className="mt-2 text-[10px] text-[#91aebb]">
-                {presentNeutralInterpretationBoundaryV0_1(albanianLexicalReading.sourceLinkedComponentReading.claimBoundary)}
+                {(albanianLexicalReading.sourceLinkedComponentReading.claimBoundary)}
                 {albanianLexicalReading.sourceLinkedComponentReading.reasonCodes.length
                   ? ` Reasons: ${albanianLexicalReading.sourceLinkedComponentReading.reasonCodes.join(", ")}.`
                   : ""}
@@ -1329,7 +1328,7 @@ export function MotivationDiscoveryCardV0_1({
               </div>
             )}
             <div className="mt-2 text-[10px] text-[#d5c28f]">
-              {presentNeutralInterpretationBoundaryV0_1(albanianLexicalReading.functionalMeaningBridge.claimBoundary)}
+              {(albanianLexicalReading.functionalMeaningBridge.claimBoundary)}
             </div>
           </div>
           {albanianLexicalReading.functionalFamilyReading ? (
@@ -1344,7 +1343,7 @@ export function MotivationDiscoveryCardV0_1({
                 ))}
               </ul>
               <p className="mt-2 text-[#9fbdb5]">Same frozen Kaikki source; no independent-source corroboration. {albanianLexicalReading.functionalFamilyReading.alternatives.join(" ")}</p>
-              <p className="mt-1 text-[10px] text-[#d5c28f]">{presentNeutralInterpretationBoundaryV0_1(albanianLexicalReading.functionalFamilyReading.claimBoundary)} Multiple interpretations may coexist; the user decides.</p>
+              <p className="mt-1 text-[10px] text-[#d5c28f]">{(albanianLexicalReading.functionalFamilyReading.claimBoundary)} Multiple interpretations may coexist; the user decides.</p>
             </section>
           ) : null}
           {relatedCandidateEvaluations.length > 0 ? (
@@ -1443,7 +1442,7 @@ export function MotivationDiscoveryCardV0_1({
                           <div className="mt-1 break-words">
                             Functional reasons: {bridge.reasonCodes.join(", ") || "none recorded"}
                           </div>
-                          <div className="mt-1 text-[10px] text-[#d5c28f]">{presentNeutralInterpretationBoundaryV0_1(bridge.claimBoundary)}</div>
+                          <div className="mt-1 text-[10px] text-[#d5c28f]">{(bridge.claimBoundary)}</div>
                         </article>
                       );
                     })}
@@ -1519,12 +1518,12 @@ export function MotivationDiscoveryCardV0_1({
                       </div>
                     ) : <div className="mt-2">SOURCE_FACT candidate only; no reviewed research hypothesis record is attached.</div>}
                     <div className="mt-2 font-semibold">Functional operation: Null · production authorization: NOT_AUTHORIZED · embryo function: UNKNOWN_OR_NULL · historical relation: NOT_CLAIMED · no interpretation is selected automatically · user_decides</div>
-                    <div className="mt-1 text-[10px] text-[#d5c28f]">{presentNeutralInterpretationBoundaryV0_1(candidate.claimBoundary)}</div>
+                    <div className="mt-1 text-[10px] text-[#d5c28f]">{(candidate.claimBoundary)}</div>
                     <div className="mt-1 break-words text-[10px] text-[#9fb1bf]">Reason codes: {candidate.reasonCodes.join(", ")}</div>
                   </article>
                 ))}
               </div>
-              <div className="mt-2 text-[10px] text-[#9fb1bf]">{presentNeutralInterpretationBoundaryV0_1(occupationalRoleResearchCandidates.claimBoundary)}</div>
+              <div className="mt-2 text-[10px] text-[#9fb1bf]">{(occupationalRoleResearchCandidates.claimBoundary)}</div>
             </details>
           ) : null}
           <div className="mt-3">
@@ -1552,7 +1551,7 @@ export function MotivationDiscoveryCardV0_1({
               {albanianLexicalReading.interpretation.statement ?? "UNKNOWN_OR_NULL — no integrated functional reading was emitted."}
             </div>
             <div className="mt-1 text-xs text-[#d5c28f]">
-              {presentNeutralInterpretationBoundaryV0_1(albanianLexicalReading.interpretation.claimBoundary)}
+              {(albanianLexicalReading.interpretation.claimBoundary)}
             </div>
             {albanianLexicalReading.interpretation.alternatives.length ? (
               <div className="mt-2 text-xs text-[#d5c28f]">
@@ -1581,7 +1580,7 @@ export function MotivationDiscoveryCardV0_1({
                 Alternatives: {albanianLexicalReading.composition.interpretation.alternatives.join(" ")}
               </div>
               <div className="mt-1 text-xs text-[#91aebb]">
-                {presentNeutralInterpretationBoundaryV0_1(albanianLexicalReading.composition.interpretation.claimBoundary)}
+                {(albanianLexicalReading.composition.interpretation.claimBoundary)}
               </div>
             </div>
           ) : (

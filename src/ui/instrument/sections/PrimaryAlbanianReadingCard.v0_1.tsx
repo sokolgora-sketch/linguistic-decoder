@@ -6,7 +6,6 @@ import type {
   MotivationDiscoveryV0_1VM,
   PresentOrMissing,
 } from "@/ui/telemetry/types";
-import { presentNeutralInterpretationBoundaryV0_1 } from "@/ui/instrument/neutralInterpretationLanguage.v0_1";
 
 const KAIKKI_ALBANIAN_URL =
   "https://kaikki.org/dictionary/Albanian/kaikki.org-dictionary-Albanian.jsonl";
@@ -297,10 +296,10 @@ export function PrimaryAlbanianReadingCardV0_1({
                 .join(" | ")}
             </div>
             <p className="mt-2 break-words text-xs text-[#d5c28f]">
-              Source-linked reading boundary: {presentNeutralInterpretationBoundaryV0_1(sourceComponentReading.claimBoundary)}
+              Source-linked reading boundary: {(sourceComponentReading.claimBoundary)}
             </p>
             <p className="mt-1 break-words text-xs text-[#d5c28f]">
-              Functional hypothesis boundary: {presentNeutralInterpretationBoundaryV0_1(sourceComponentHypothesis.claimBoundary)}
+              Functional hypothesis boundary: {(sourceComponentHypothesis.claimBoundary)}
             </p>
             <p className="mt-1 text-xs text-[#aeb7c5]">
               Attributed source components do not independently prove morphology, derivation, historical origin, or embryo meaning.

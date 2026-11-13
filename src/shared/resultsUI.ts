@@ -57,7 +57,7 @@ export interface HistoryItem {
 
 /**
  * Defines the clean, UI-first result shape that the
- * /api/analyze-v1 endpoint should return.
+ * Active /api/analyze-v2 endpoint payload after the telemetry adapter.
  */
 export interface CandidateUI {
   id: string;

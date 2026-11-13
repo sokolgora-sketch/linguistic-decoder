@@ -5,12 +5,12 @@ import { readFileSync, mkdirSync, writeFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { NextRequest } from "next/server";
 
-import { GET } from "@/app/api/analyze-v1/route";
+import { GET } from "@/app/api/analyze-v2/route";
 import { resolveCandidateEvidenceReferenceV0_1 } from "@/ui/candidates/EvidenceReferenceLink";
 import { adaptAnalysisToTelemetryVM } from "@/ui/instrument/contractAdapter";
 import {
-  buildReproducibleRunBundleV0_1,
-} from "@/shared/openInstrument/reproducibleRunBundle.v0_1";
+  buildReproducibleRunBundleV0_2,
+} from "@/shared/openInstrument/reproducibleRunBundle.v0_2";
 // The stable fingerprint utility is an existing executable seam. Keep its
 // timestamp-removal policy in one place rather than reproducing it here.
 import {
@@ -66,6 +66,33 @@ function presentStringArray(value: unknown): string[] {
     : [];
 }
 
+function capabilityStatusInputV1FromV2(value: unknown): UnknownRecord {
+  if (!isRecord(value) || !isRecord(value.claimBoundary)) {
+    throw new Error("Analyze V2 status is required for the capability baseline projection");
+  }
+  const boundary = value.claimBoundary;
+  return {
+    schemaVersion: "open-instrument.analysis-status.v0_1",
+    status: value.status,
+    summary: value.summary,
+    reviewedOperators: value.reviewedOperators,
+    candidateOnlyOperators: value.candidateOnlyOperators,
+    researchHypothesisEmbryos: value.researchHypothesisEmbryos,
+    structuralTokens: value.structuralTokens,
+    claimBoundary: {
+      historicalOriginClaim: boundary.historicalOriginClaim,
+      historicalTransmissionClaim: boundary.historicalTransmissionClaim,
+      winnerClaim: "not_claimed",
+      languageSuperiorityClaim: boundary.languageSuperiorityClaim,
+      linguisticOwnershipClaim: boundary.linguisticOwnershipClaim,
+      candidateTruthClaim: boundary.candidateTruthClaim,
+      structuralOutputIsCandidateTruth: boundary.structuralOutputIsCandidateTruth,
+      nullIsValid: boundary.nullIsValid,
+    },
+    userDecisionPosture: "user_decides",
+  };
+}
+
 function responseUrl(input: AnalysisCapabilityBaselineCaseV1): string {
   const params = new URLSearchParams({
     word: input.word,
@@ -81,7 +108,7 @@ function responseUrl(input: AnalysisCapabilityBaselineCaseV1): string {
     params.set("targetSenseLabel", input.targetSenseLabel);
   }
 
-  return `http://open-instrument.local/api/analyze-v1?${params.toString()}`;
+  return `http://open-instrument.local/api/analyze-v2?${params.toString()}`;
 }
 
 function disableProviderExecution(): Record<string, string | undefined> {
@@ -150,7 +177,7 @@ async function requestAnalysis(
   const body: unknown = await response.json();
   if (response.status !== 200) {
     throw new Error(
-      `${input.caseId}: Analyze V1 returned HTTP ${response.status}: ${JSON.stringify(body)}`,
+      `${input.caseId}: Analyze V2 returned HTTP ${response.status}: ${JSON.stringify(body)}`,
     );
   }
   return body;
@@ -204,16 +231,23 @@ async function buildCaseResult(
   }
 
   const firstViewModel = adaptAnalysisToTelemetryVM(firstRaw);
-  const firstBundle = await buildReproducibleRunBundleV0_1({
+  const firstBundle = await buildReproducibleRunBundleV0_2({
     result: firstRaw,
     ...(input.ipa !== undefined ? { ipa: input.ipa } : {}),
     ...(input.targetSenseLabel !== undefined
       ? { targetSenseLabel: input.targetSenseLabel }
       : {}),
   });
+  const publicResult = {
+    ...firstBundle.result,
+    // The frozen capability-baseline measurement schema remains v1. This
+    // in-memory adapter supplies its historical status shape from V2; it is
+    // never emitted by the application or written into the Analyze response.
+    analysisStatusV0_1: capabilityStatusInputV1FromV2(firstRaw.analysisStatusV0_2),
+  };
   return buildAnalysisCapabilityBaselineCaseV1({
     input,
-    publicResult: firstBundle.result,
+    publicResult,
     viewModel: firstViewModel,
     fingerprint: stableRegressionFingerprintForAnalyzeV1Json(firstRaw).sha256,
     repeatedFingerprint: stableRegressionFingerprintForAnalyzeV1Json(secondRaw).sha256,

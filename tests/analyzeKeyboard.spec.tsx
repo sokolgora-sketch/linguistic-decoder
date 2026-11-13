@@ -11,7 +11,7 @@ global.fetch = jest.fn(() =>
 
 function countAnalyzeV1Fetches(): number {
   return (global.fetch as jest.Mock).mock.calls.filter(
-    ([input]) => String(input).includes('/api/analyze-v1?')
+    ([input]) => String(input).includes('/api/analyze-v2?')
   ).length;
 }
 
@@ -89,7 +89,7 @@ describe('Analyze keyboard interactions', () => {
     });
 
     const [request] = (global.fetch as jest.Mock).mock.calls.find(([input]) =>
-      String(input).includes('/api/analyze-v1?'),
+      String(input).includes('/api/analyze-v2?'),
     ) ?? [];
     const requestUrl = new URL(String(request), 'http://localhost');
     expect(requestUrl.searchParams.get('mode')).toBe('strict');
@@ -124,7 +124,7 @@ describe('Analyze keyboard interactions', () => {
     await waitFor(() => expect(countAnalyzeV1Fetches()).toBe(2));
 
     const analyzeRequests = (global.fetch as jest.Mock).mock.calls.filter(([input]) =>
-      String(input).includes('/api/analyze-v1?'),
+      String(input).includes('/api/analyze-v2?'),
     );
     for (const [request] of analyzeRequests) {
       const requestUrl = new URL(String(request), 'http://localhost');
@@ -147,7 +147,7 @@ describe('Analyze keyboard interactions', () => {
     });
 
     const [request] = (global.fetch as jest.Mock).mock.calls.find(([input]) =>
-      String(input).includes('/api/analyze-v1?'),
+      String(input).includes('/api/analyze-v2?'),
     ) ?? [];
     const requestUrl = new URL(String(request), 'http://localhost');
     expect(requestUrl.searchParams.get('providerExecution')).toBe('disabled');
@@ -177,7 +177,7 @@ describe('Analyze keyboard interactions', () => {
     });
 
     const [request] = (global.fetch as jest.Mock).mock.calls.find(([input]) =>
-      String(input).includes('/api/analyze-v1?'),
+      String(input).includes('/api/analyze-v2?'),
     ) ?? [];
     const requestUrl = new URL(String(request), 'http://localhost');
     expect(requestUrl.searchParams.get('mode')).toBe('open');
@@ -194,7 +194,7 @@ describe('Analyze keyboard interactions', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Analyze' }));
     await waitFor(() => expect(countAnalyzeV1Fetches()).toBe(2));
     const secondRequest = (global.fetch as jest.Mock).mock.calls.filter(([input]) =>
-      String(input).includes('/api/analyze-v1?'),
+      String(input).includes('/api/analyze-v2?'),
     )[1]?.[0];
     expect(new URL(String(secondRequest), 'http://localhost').searchParams.get('alphabet')).toBe('latin');
   });
@@ -269,7 +269,7 @@ describe('Analyze keyboard interactions', () => {
     });
 
     const [request] = (global.fetch as jest.Mock).mock.calls.find(([input]) =>
-      String(input).includes('/api/analyze-v1?'),
+      String(input).includes('/api/analyze-v2?'),
     ) ?? [];
     const requestUrl = new URL(String(request), 'http://localhost');
     expect(requestUrl.searchParams.get('targetSenseLabel')).toBe('a wax light source');

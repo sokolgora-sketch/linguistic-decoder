@@ -62,11 +62,11 @@ function reviewedOperators(
 ): readonly string[] {
   return Array.isArray(
     out
-      ?.analysisStatusV0_1
+      ?.analysisStatusV0_2
       ?.reviewedOperators,
   )
     ? out
-        .analysisStatusV0_1
+        .analysisStatusV0_2
         .reviewedOperators
     : [];
 }

@@ -1020,9 +1020,7 @@ export function EmbryoExpansionContextCardV0_1({
     vm.analysisStatusV0_2?.kind ===
     "present"
       ? vm.analysisStatusV0_2.value
-      : vm.analysisStatusV0_2 === undefined && vm.analysisStatusV0_1?.kind === "present"
-        ? vm.analysisStatusV0_1.value
-        : null;
+      : null;
 
   const word =
     String(

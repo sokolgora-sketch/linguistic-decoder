@@ -71,7 +71,7 @@ export default function DeterminismLab() {
     for (const w of words) {
       const t0 = performance.now();
       try {
-        const res = await fetch(`/api/analyze-v1?word=${encodeURIComponent(w)}`);
+        const res = await fetch(`/api/analyze-v2?word=${encodeURIComponent(w)}`);
         const ms = Math.round(performance.now() - t0);
 
         if (!res.ok) {
@@ -117,7 +117,7 @@ export default function DeterminismLab() {
       <CardHeader>
         <CardTitle className="text-base">Determinism Lab</CardTitle>
         <CardDescription>
-          Batch-run <span className="font-mono">/api/analyze-v1</span>, compute stable SHA-256 hashes, and verify consistent outputs.
+          Batch-run <span className="font-mono">/api/analyze-v2</span>, compute stable SHA-256 hashes, and verify consistent outputs.
         </CardDescription>
       </CardHeader>
 

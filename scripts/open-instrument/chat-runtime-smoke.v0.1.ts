@@ -72,7 +72,7 @@ async function main(): Promise<void> {
       ) {
         externalRequests.add(request.url());
       }
-      if (requestUrl.hostname === baseUrl.hostname && requestUrl.port === baseUrl.port && requestUrl.pathname === "/api/analyze-v1") {
+      if (requestUrl.hostname === baseUrl.hostname && requestUrl.port === baseUrl.port && requestUrl.pathname === "/api/analyze-v2") {
         analyzeRequests += 1;
       }
     });

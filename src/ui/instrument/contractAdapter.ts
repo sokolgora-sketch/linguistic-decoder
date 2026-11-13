@@ -30,7 +30,8 @@ import {
   ALBANIAN_SENSE_ALIGNED_LEXICAL_ROLE_STATEMENT_V0_1,
 } from "@/shared/openInstrument/albanianSenseAlignedLexicalRolePolicy.v0_1";
 /**
- * UI contract adapter: raw analyze-v1 payload → TelemetryViewModel (VM).
+ * UI contract adapter: active analyze-v2 payload → TelemetryViewModel (VM).
+ * Legacy stored inputs are migrated at the adapter boundary.
  *
  * Rules:
  * - UI must consume ONLY the VM (no raw payload parsing in components).
@@ -115,6 +116,12 @@ import type {
 import type {
   GenericFunctionalWitnessSourceProvenanceV1,
 } from "@/shared/openInstrument/genericFunctionalWitnessDiscovery.v1";
+import { isInterpretationDecisionPolicyV0_1 } from "@/shared/openInstrument/interpretationDecisionPolicy.v0_1";
+import {
+  toAnalyzeWordResultV2Contract,
+  projectNeutralInterpretationNodeV2,
+} from "@/shared/analyzeWordResult.v2.contract";
+import { migrateOriginClaimV1ToV0_2 } from "@/shared/originClaim.v2";
 
 type ParseRootMapResult = { ok: true; value: RootMapV1 } | { ok: false; reason: string };
 
@@ -414,6 +421,24 @@ function isRecord(v: unknown): v is Record<string, unknown> {
   return !!v && typeof v === "object" && !Array.isArray(v);
 }
 
+function materializeLegacyInternalView(value: unknown): unknown {
+  if (Array.isArray(value)) return value.map(materializeLegacyInternalView);
+  if (!isRecord(value)) return value;
+
+  const output: Record<string, unknown> = {};
+  for (const [key, child] of Object.entries(value)) {
+    if (key !== "interpretationDecisionPolicy") output[key] = materializeLegacyInternalView(child);
+  }
+  if (isRecord(value.interpretationDecisionPolicy)) {
+    if (typeof value.userDecisionPosture === "string") output.noSingleWinner = true;
+    const outputBoundary = output.claimBoundary;
+    if (isRecord(value.claimBoundary) && isRecord(outputBoundary) && !("winnerClaim" in outputBoundary)) {
+      output.claimBoundary = { ...outputBoundary, winnerClaim: "not_claimed" };
+    }
+  }
+  return output;
+}
+
 type ZeroConsonantalStructuralCompositionParseV0_1 =
   | { ok: true; value: ZeroConsonantalStructuralCompositionV0_1VM | null }
   | { ok: false; reason: string };
@@ -700,6 +725,21 @@ function parseDoctrineReading(
 ): PresentOrMissing<DoctrineReadingV1 | null> {
   if (value === undefined) return missing("not_emitted", "doctrineReading");
   if (value === null) return present(null);
+  if (
+    isRecord(value) &&
+    value.schemaVersion === "open-instrument.doctrine-reading.v2" &&
+    isInterpretationDecisionPolicyV0_1(value.interpretationDecisionPolicy)
+  ) {
+    const internal = materializeLegacyInternalView(value);
+    if (isRecord(internal)) {
+      internal.schemaVersion = "open-instrument.doctrine-reading.v1";
+      internal.candidateWinnerIndependent = true;
+      internal.noSingleWinner = true;
+      return isDoctrineReadingV1(internal)
+        ? present(internal)
+        : missing("malformed", "doctrineReading v2 compatibility projection invalid");
+    }
+  }
   return isDoctrineReadingV1(value)
     ? present(value)
     : missing("malformed", "doctrineReading expected the public V1 shape");
@@ -3562,8 +3602,57 @@ function parseAnalysisStatusV0_2(
 }
 // ----------------------- adapter -----------------------
 
+/**
+ * Lift the active neutral API contract into the adapter's established VM
+ * shapes. This is an input-only compatibility boundary: `raw` remains the
+ * neutral V2 payload and is never serialized from these in-memory aliases.
+ */
+function adaptAnalyzeV2ForInternalView(raw: unknown): unknown {
+  if (!isRecord(raw) || raw.responseContractVersion !== "open-instrument.analyze-word-result.v2") {
+    return raw;
+  }
+
+  const payload: Record<string, unknown> = { ...raw };
+  const discovery = payload.motivationDiscoveryV0_2;
+  if (isRecord(discovery)) {
+    payload.motivationDiscoveryV0_1 = {
+      ...materializeLegacyInternalView(discovery) as Record<string, unknown>,
+      schemaVersion: "open-instrument.motivation-engine-discovery.v0_1",
+    };
+    delete payload.motivationDiscoveryV0_2;
+  }
+
+  const depth = payload.wordSpecificFunctionalDepth;
+  if (isRecord(depth)) {
+    payload.wordSpecificFunctionalDepth = {
+      ...materializeLegacyInternalView(depth) as Record<string, unknown>,
+      schemaVersion: "open-instrument.word-specific-functional-depth.v0_1",
+    };
+  }
+  return payload;
+}
+
 export function adaptAnalysisToTelemetryVM(raw: unknown): TelemetryViewModel {
-  const payload = raw;
+  let normalizedInput = raw;
+  if (
+    !isRecord(raw) ||
+    raw.responseContractVersion !== "open-instrument.analyze-word-result.v2"
+  ) {
+    try {
+      normalizedInput = toAnalyzeWordResultV2Contract(raw);
+    } catch {
+      // Older focused/source projections may be partial records rather than a
+      // complete persisted Analyze response. They remain input-only fallbacks.
+    }
+  }
+  const rawForView = projectNeutralInterpretationNodeV2(normalizedInput);
+  let payload = adaptAnalyzeV2ForInternalView(normalizedInput);
+  if (isRecord(payload) && isRecord(payload.originClaim)) {
+    const migratedOriginClaim = migrateOriginClaimV1ToV0_2(payload.originClaim);
+    if (migratedOriginClaim) {
+      payload = { ...payload, originClaim: migratedOriginClaim };
+    }
+  }
   const doctrineReading = parseDoctrineReading(getField(payload, "doctrineReading"));
   const wordSpecificFunctionalDepth = parseWordSpecificFunctionalDepthV0_1(
     getField(payload, "wordSpecificFunctionalDepth"),
@@ -4878,7 +4967,7 @@ const evidenceId = String(id).toLowerCase().replace(/[^a-z0-9_]/g, "_");
     return present({ ipa, voices, unmapped });
   })();
 const originClaimGatesActiveRecord =
-    isRecord(raw) && isRecord(raw["originClaimGates"]) ? raw["originClaimGates"] : null;
+    isRecord(payload) && isRecord(payload["originClaimGates"]) ? payload["originClaimGates"] : null;
 
 const originClaimGates: OriginClaimGatesVM = {
     active: (() => {
@@ -4963,7 +5052,7 @@ const originClaimGates: OriginClaimGatesVM = {
     ...(analysisStatusV0_2Available
       ? { analysisStatusV0_2 }
       : {}),
-    raw,
+    raw: rawForView,
   };
 }
 

@@ -314,7 +314,7 @@ export function compareTelemetryViewModelsV0_1(
     row("sourceNotation", "Pronunciation notation", fieldFromPronunciation(left, "sourceNotation"), fieldFromPronunciation(right, "sourceNotation")),
     row("sourceRevision", "Pronunciation source revision", fieldFromPronunciation(left, "sourceRevision"), fieldFromPronunciation(right, "sourceRevision")),
     row("voicePath", "Canonical spoken Voice path", sideFromPresentOrMissingV0_1(left.readout.voicePath), sideFromPresentOrMissingV0_1(right.readout.voicePath)),
-    row("analysisStatus", "Analysis status", left.analysisStatusV0_1?.kind === "present" ? comparisonValueV0_1(left.analysisStatusV0_1.value.status) : comparisonMissingV0_1(), right.analysisStatusV0_1?.kind === "present" ? comparisonValueV0_1(right.analysisStatusV0_1.value.status) : comparisonMissingV0_1()),
+    row("analysisStatus", "Analysis status", left.analysisStatusV0_2?.kind === "present" ? comparisonValueV0_1(left.analysisStatusV0_2.value.status) : comparisonMissingV0_1(), right.analysisStatusV0_2?.kind === "present" ? comparisonValueV0_1(right.analysisStatusV0_2.value.status) : comparisonMissingV0_1()),
     row("functionalStatus", "Word-specific functional evidence status", functionalStatus(left), functionalStatus(right)),
     row("functionalEvidenceRefs", "Word-specific evidence references", functionalEvidenceRefs(left), functionalEvidenceRefs(right)),
   ];

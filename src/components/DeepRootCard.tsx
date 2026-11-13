@@ -2,7 +2,6 @@
 
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { presentNeutralInterpretationBoundaryV0_1 } from "@/ui/instrument/neutralInterpretationLanguage.v0_1";
 
 type Carrier = {
   protoRootId?: string;
@@ -205,12 +204,12 @@ export default function DeepRootCard({ deepRoot }: { deepRoot?: DeepRootLike | n
                       ) : null}
                     </div>
 
-                    {f.gloss ? <div className="mt-1 text-sm">{presentNeutralInterpretationBoundaryV0_1(f.gloss)}</div> : null}
+                    {f.gloss ? <div className="mt-1 text-sm">{f.gloss}</div> : null}
 
                     {Array.isArray(f.notes) && f.notes.length > 0 ? (
                       <ul className="mt-2 list-disc pl-5 text-xs opacity-80">
                         {f.notes.slice(0, 6).map((n, j) => (
-                          <li key={j}>{presentNeutralInterpretationBoundaryV0_1(n)}</li>
+                          <li key={j}>{n}</li>
                         ))}
                       </ul>
                     ) : null}

@@ -7,10 +7,21 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import DeepRootCard from "@/components/DeepRootCard";
 import { CandidatesAccordion } from "@/ui/candidates/CandidatesAccordion";
 import { AnalysisStatusCardV0_1 } from "@/ui/instrument/sections/AnalysisStatusCard.v0.1";
-import {
-  LEGACY_INTERPRETATION_COPY_PATTERNS_V0_1,
-  presentNeutralInterpretationBoundaryV0_1,
-} from "@/ui/instrument/neutralInterpretationLanguage.v0_1";
+import { migrateLegacyInterpretationTextAtInputV0_1 } from "@/shared/openInstrument/neutralInterpretationInputMigration.v0_1";
+
+const PROHIBITED_COPY_PATTERNS = [
+  /\bno single sense winner\b/iu,
+  /\bwinning sense\b/iu,
+  /\bsense winner\b/iu,
+  /\bno single winner\b/iu,
+  /\bno winner(?: selected)?\b/iu,
+  /\bwinner selection\b/iu,
+  /\bwithout selecting a winner\b/iu,
+  /\border is not a ranking\b/iu,
+  /\bautomatic ranking\b/iu,
+  /\bsense is ranked\b/iu,
+  /\ba unique winner\b/iu,
+] as const;
 
 const USER_FACING_COPY_FILES = [
   "src/ui/instrument/sections/SingleWordMotivationWorkbenchV0_1.tsx",
@@ -49,14 +60,62 @@ const USER_FACING_COPY_FILES = [
   "src/ui/telemetry/buildEvidenceSummaryTextFromVM.ts",
 ] as const;
 
-describe("legacy interpretation boundary-copy compatibility", () => {
-  it("renders old claim-boundary text neutrally without mutating the stored value", () => {
+describe("legacy interpretation input migration", () => {
+  it("migrates old claim-boundary text once at the input boundary", () => {
     const legacy = "No single winner is selected; winner claims remain unclaimed.";
-    const presented = presentNeutralInterpretationBoundaryV0_1(legacy);
+    const presented = migrateLegacyInterpretationTextAtInputV0_1(legacy) as string;
 
     expect(presented).toBe("No interpretation is selected automatically; interpretation remains with the user.");
     expect(legacy).toBe("No single winner is selected; winner claims remain unclaimed.");
-    expect(LEGACY_INTERPRETATION_COPY_PATTERNS_V0_1.some((pattern) => pattern.test(presented))).toBe(false);
+    expect(PROHIBITED_COPY_PATTERNS.some((pattern) => pattern.test(presented))).toBe(false);
+  });
+
+  it("migrates only typed policy text in stored records and preserves lexical/source text", () => {
+    const legacyRecord = {
+      analysisStatusV0_1: {
+        summary: "No single winner is selected; preserve alternatives.",
+      },
+      word: "winner",
+      candidate: {
+        form: "winner",
+        sourceId: "source.winner",
+        citation: "A citation whose title contains winner.",
+        gloss: "winner: an attested lexical sense.",
+        sourceNote: "User-entered claim: winner.",
+      },
+      rootMap: {
+        evidenceText: "reviewed functional free-operator evidence: citation title mentions winner claim; historicalOriginClaim=not_claimed; winnerClaim=not_claimed; languageSuperiorityClaim=not_claimed; userDecisionPosture=user_decides",
+      },
+      deepRoot: {
+        functionalRoots: [{
+          gloss: "winner: a preserved lexical gloss",
+          notes: ["No winner; functional carrier only.", "Source citation title includes winner."],
+        }],
+      },
+    };
+
+    expect(migrateLegacyInterpretationTextAtInputV0_1(legacyRecord)).toEqual({
+      analysisStatusV0_1: {
+        summary: "No interpretation is selected automatically; preserve alternatives.",
+      },
+      word: "winner",
+      candidate: {
+        form: "winner",
+        sourceId: "source.winner",
+        citation: "A citation whose title contains winner.",
+        gloss: "winner: an attested lexical sense.",
+        sourceNote: "User-entered claim: winner.",
+      },
+      rootMap: {
+        evidenceText: "reviewed functional free-operator evidence: citation title mentions winner claim; historicalOriginClaim=not_claimed; automaticInterpretationSelection=DISABLED; languageSuperiorityClaim=not_claimed; userDecisionPosture=user_decides",
+      },
+      deepRoot: {
+        functionalRoots: [{
+          gloss: "winner: a preserved lexical gloss",
+          notes: ["Interpretation remains with the user; functional carrier only.", "Source citation title includes winner."],
+        }],
+      },
+    });
   });
 
   it.each([
@@ -69,8 +128,8 @@ describe("legacy interpretation boundary-copy compatibility", () => {
     "No automatic ranking is performed.",
     "No sense is ranked.",
   ])("neutralizes legacy boundary copy: %s", (legacy) => {
-    const presented = presentNeutralInterpretationBoundaryV0_1(legacy);
-    expect(LEGACY_INTERPRETATION_COPY_PATTERNS_V0_1.some((pattern) => pattern.test(presented))).toBe(false);
+    const presented = migrateLegacyInterpretationTextAtInputV0_1(legacy) as string;
+    expect(PROHIBITED_COPY_PATTERNS.some((pattern) => pattern.test(presented))).toBe(false);
   });
 
   it("renders legacy DeepRoot notes with neutral interpretation wording", () => {
@@ -81,9 +140,9 @@ describe("legacy interpretation boundary-copy compatibility", () => {
             id: "legacy-carrier",
             language: "sq",
             roots: ["DËM"],
-            gloss: "Harm or loss.",
+          gloss: "Harm or loss.",
             vowelPath: "Ë",
-            notes: ["No winner; functional carrier only."],
+          notes: [migrateLegacyInterpretationTextAtInputV0_1("No winner; functional carrier only.") as string],
           }],
         }}
       />,
@@ -103,7 +162,7 @@ describe("legacy interpretation boundary-copy compatibility", () => {
             language: "sq",
             form: "studim",
             embryo: "stu",
-            claimBoundary: "No single winner is selected; winner claims remain unclaimed.",
+            claimBoundary: migrateLegacyInterpretationTextAtInputV0_1("No single winner is selected; winner claims remain unclaimed.") as string,
             raw: {},
           },
         ]}
@@ -125,7 +184,7 @@ describe("legacy interpretation boundary-copy compatibility", () => {
           kind: "present",
           value: {
             status: "reviewed_functional_evidence",
-            summary: "This is functional evidence, not a historical-origin or winner claim.",
+            summary: migrateLegacyInterpretationTextAtInputV0_1("This is functional evidence, not a historical-origin or winner claim.") as string,
             reviewedOperators: ["DI"],
             candidateOnlyOperators: [],
             researchHypothesisEmbryos: [],
@@ -142,7 +201,7 @@ describe("legacy interpretation boundary-copy compatibility", () => {
   it("keeps reachable interface copy free of competition-style interpretation wording", () => {
     for (const file of USER_FACING_COPY_FILES) {
       const source = readFileSync(resolve(process.cwd(), file), "utf8");
-      for (const pattern of LEGACY_INTERPRETATION_COPY_PATTERNS_V0_1) {
+      for (const pattern of PROHIBITED_COPY_PATTERNS) {
         expect(source).not.toMatch(pattern);
       }
     }

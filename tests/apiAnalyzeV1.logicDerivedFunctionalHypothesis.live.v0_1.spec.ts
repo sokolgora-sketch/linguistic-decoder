@@ -36,7 +36,7 @@ describe("/api/analyze-v1 logic-derived functional hypothesis v0.1", () => {
     );
 
     expect(logicCandidates.length).toBeGreaterThan(0);
-    expect(body.analysisStatusV0_1.status).toBe("research_functional_hypothesis");
+    expect(body.analysisStatusV0_2.status).toBe("research_functional_hypothesis");
 
     for (const candidate of logicCandidates) {
       expect(candidate.targetWord).toBe("sterile");
@@ -46,7 +46,8 @@ describe("/api/analyze-v1 logic-derived functional hypothesis v0.1", () => {
       expect(candidate.validationOutcome).toBe("not_evaluated");
       expect(candidate.historicalOriginClaim).toBe("not_claimed");
       expect(candidate.historicalTransmissionClaim).toBe("not_claimed");
-      expect(candidate.winnerClaim).toBe("not_claimed");
+      expect(candidate).not.toHaveProperty("winnerClaim");
+      expect(candidate.interpretationDecisionPolicy.automaticInterpretationSelection).toBe("DISABLED");
       expect(candidate.languageSuperiorityClaim).toBe("not_claimed");
       expect(candidate.candidateTruthClaim).toBe("not_claimed");
       expect(candidate.userDecisionPosture).toBe("user_decides");
@@ -79,7 +80,7 @@ describe("/api/analyze-v1 logic-derived functional hypothesis v0.1", () => {
         candidate.sourceKind === "logic_derived_functional_hypothesis",
     );
 
-    expect(body.analysisStatusV0_1.status).toBe("candidate_only");
+    expect(body.analysisStatusV0_2.status).toBe("candidate_only");
     expect(logicCandidate?.targetWord).toBe("candle");
     expect(logicCandidate?.targetSenseId).toBe("user_sense_a_wax_light_source");
     expect(logicCandidate?.targetSenseLabel).toBe("a wax light source");
@@ -90,7 +91,8 @@ describe("/api/analyze-v1 logic-derived functional hypothesis v0.1", () => {
     ]);
     expect(logicCandidate?.functionalBridgeTruth).toBe("hypothesis");
     expect(logicCandidate?.historicalOriginClaim).toBe("not_claimed");
-    expect(logicCandidate?.winnerClaim).toBe("not_claimed");
+    expect(logicCandidate).not.toHaveProperty("winnerClaim");
+    expect(logicCandidate?.interpretationDecisionPolicy.automaticInterpretationSelection).toBe("DISABLED");
     expect(logicCandidate?.candidateTruthClaim).toBe("not_claimed");
   });
 });

@@ -1272,7 +1272,7 @@ export function EvalsPageClientV0_1() {
     ]);
 
   const inputProbe = useMemo(() => probeInput(inputText), [inputText]);
-  const showAnalyzeV1Autofill = mode === "run_bundle";
+  const showAnalyzeV2Autofill = mode === "run_bundle";
   const hasSourceEngineMeta = Boolean(
     sourceEngineId.trim() || sourceEngineVersion.trim() || sourceEngineBuild.trim(),
   );
@@ -2761,7 +2761,7 @@ export function EvalsPageClientV0_1() {
     () => extractMdFrontMatterValueV0_1(md, "scorerBuild") || "unknown",
     [md],
   );
-  async function autofillAnalyzeV1SourceEngine() {
+  async function autofillAnalyzeV2SourceEngine() {
     try {
       const res = await fetch("/api/evals/source-engine-provenance", {
         method: "GET",
@@ -2776,18 +2776,18 @@ export function EvalsPageClientV0_1() {
       };
 
       if (!res.ok || !data?.ok) {
-        throw new Error(data?.message || "Could not load analyze-v1 provenance.");
+        throw new Error(data?.message || "Could not load analyze-v2 provenance.");
       }
 
-      setSourceEngineId(String(data.sourceEngineId ?? "analyze-v1"));
+      setSourceEngineId(String(data.sourceEngineId ?? "analyze-v2"));
       setSourceEngineVersion(String(data.sourceEngineVersion ?? ""));
       setSourceEngineBuild(String(data.sourceEngineBuild ?? ""));
-      setNotice("Filled sourceEngine* from live /api/analyze-v1 provenance.");
+      setNotice("Filled sourceEngine* from live /api/analyze-v2 provenance.");
     } catch (err) {
       setNotice(
         err instanceof Error
           ? err.message
-          : "Could not autofill /api/analyze-v1 provenance."
+          : "Could not autofill /api/analyze-v2 provenance."
       );
     }
   }
@@ -3652,16 +3652,16 @@ export function EvalsPageClientV0_1() {
               </summary>
 
               <div className="border-t border-[#2f3b46] px-3 py-2">
-                {showAnalyzeV1Autofill ? (
+                {showAnalyzeV2Autofill ? (
                   <div className="flex flex-col items-start gap-2">
                     <div className="flex flex-wrap items-center gap-2">
                       <button
                         type="button"
                         className={`${MT.actionUtility} border-[#444] bg-transparent text-[#b8b8b8] transition hover:border-[#777] hover:bg-[#1f1f1f] hover:text-[#f2f2f2]`}
-                        onClick={autofillAnalyzeV1SourceEngine}
+                        onClick={autofillAnalyzeV2SourceEngine}
                         disabled={busy}
                       >
-                        Autofill analyze-v1
+                        Autofill analyze-v2
                       </button>
                       <button
                         type="button"
@@ -3673,7 +3673,7 @@ export function EvalsPageClientV0_1() {
                       </button>
                     </div>
                     <div className={`${MT.helper} max-w-[340px] text-[#8f8f8f]`}>
-                      Only use this when the JSON being scored was produced by the current /api/analyze-v1 route.
+                      Only use this when the JSON being scored was produced by the current /api/analyze-v2 route.
                     </div>
                   </div>
                 ) : null}
@@ -3705,7 +3705,7 @@ export function EvalsPageClientV0_1() {
                       className={`w-full rounded-[5px] border border-[#3a3a3a] bg-[#161616] px-3 py-[7px] ${MT.fieldControl} text-[#e6e6e6] outline-none transition focus:border-[#666]`}
                       value={sourceEngineVersion}
                       onChange={(e) => setSourceEngineVersion(e.target.value)}
-                      placeholder="e.g. analyze-v1"
+                      placeholder="e.g. v1.0.0"
                     />
                   </div>
 

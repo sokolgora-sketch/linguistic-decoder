@@ -18,7 +18,6 @@ const CANONICAL_ALPHABETS = [
 const CLAIM_BOUNDARY = {
   historicalOriginClaim: "not_claimed",
   historicalTransmissionClaim: "not_claimed",
-  winnerClaim: "not_claimed",
   languageSuperiorityClaim: "not_claimed",
   linguisticOwnershipClaim: "not_claimed",
   candidateTruthClaim: "not_claimed",
@@ -95,8 +94,8 @@ function originClaimProjection(value: unknown): JsonObject {
   const originClaim = object(value, "originClaim");
 
   return {
-    version: originClaim.version,
-    policy: originClaim.policy,
+    schemaVersion: originClaim.schemaVersion,
+    interpretationDecisionPolicy: originClaim.interpretationDecisionPolicy,
     candidates: array(originClaim.candidates).map((candidate) => {
       const projected = object(candidate, "origin candidate");
       return {
@@ -115,7 +114,7 @@ function originClaimProjection(value: unknown): JsonObject {
  */
 function projectSemanticResponse(value: unknown): JsonObject {
   const response = object(value, "analyze-v1 response");
-  const status = object(response.analysisStatusV0_1, "analysis status");
+  const status = object(response.analysisStatusV0_2, "analysis status");
   const primaryPath =
     response.primaryPath == null
       ? null
@@ -133,7 +132,7 @@ function projectSemanticResponse(value: unknown): JsonObject {
           ringPath: primaryPath.ringPath,
         }
       : null,
-    analysisStatusV0_1: status,
+    analysisStatusV0_2: status,
     candidates: array(response.candidates).map(candidateProjection),
     evidence: {
       basis: evidence.basis,
@@ -275,13 +274,14 @@ describe("/api/analyze-v1 GET/POST semantic parity v0.1", () => {
         projectSemanticResponse(pair.post),
       );
 
-      const analysisStatus = object(pair.get.analysisStatusV0_1, "analysis status");
+      const analysisStatus = object(pair.get.analysisStatusV0_2, "analysis status");
       expect(analysisStatus.status).toBe(status);
       expect(analysisStatus.userDecisionPosture).toBe("user_decides");
       expect(analysisStatus.claimBoundary).toEqual(CLAIM_BOUNDARY);
 
       const originClaim = object(pair.get.originClaim, "origin claim");
-      expect(originClaim.policy).toBe("no_single_winner");
+      expect(object(originClaim.interpretationDecisionPolicy, "decision policy").automaticInterpretationSelection)
+        .toBe("DISABLED");
       expectCanonicalPrimaryVoicePath(pair.get);
       expectCanonicalPrimaryVoicePath(pair.post);
 
@@ -482,8 +482,8 @@ describe("/api/analyze-v1 GET/POST semantic parity v0.1", () => {
     expect(padded.status).toBe(200);
     expect(canonical.status).toBe(200);
     expect(inputMetadata(padded.body).word).toBe(" study ");
-    expect(padded.body.analysisStatusV0_1).toEqual(
-      canonical.body.analysisStatusV0_1,
+    expect(padded.body.analysisStatusV0_2).toEqual(
+      canonical.body.analysisStatusV0_2,
     );
     expect(padded.body.primaryPath).toEqual(canonical.body.primaryPath);
     expect(padded.body.candidates).toEqual(canonical.body.candidates);

@@ -187,17 +187,17 @@ describe(
       ).toBe("study!");
 
       expect(
-        body?.analysisStatusV0_1?.status,
+        body?.analysisStatusV0_2?.status,
       ).toBe(
         "reviewed_functional_evidence",
       );
 
       expect(
-        body?.analysisStatusV0_1?.reviewedOperators,
+        body?.analysisStatusV0_2?.reviewedOperators,
       ).toContain("DI");
 
       expect(
-        body?.analysisStatusV0_1?.candidateOnlyOperators,
+        body?.analysisStatusV0_2?.candidateOnlyOperators,
       ).not.toContain("DI");
 
       const reviewedDi =
@@ -288,13 +288,13 @@ describe(
       );
 
       expect(
-        body?.analysisStatusV0_1?.status,
+        body?.analysisStatusV0_2?.status,
       ).toBe(
         "reviewed_functional_evidence",
       );
 
       expect(
-        body?.analysisStatusV0_1
+        body?.analysisStatusV0_2
           ?.reviewedOperators,
       ).toContain("DI");
 

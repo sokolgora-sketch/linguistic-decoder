@@ -93,7 +93,7 @@ describe("Evals UI rendered mode regression v0.1", () => {
     expect(upstreamPanel).toHaveAttribute("open");
 
     expect(
-      screen.getByRole("button", { name: "Autofill analyze-v1" })
+      screen.getByRole("button", { name: "Autofill analyze-v2" })
     ).toBeInTheDocument();
 
     expect(
@@ -102,7 +102,7 @@ describe("Evals UI rendered mode regression v0.1", () => {
 
     expect(
       screen.getByText(
-        "Only use this when the JSON being scored was produced by the current /api/analyze-v1 route."
+        "Only use this when the JSON being scored was produced by the current /api/analyze-v2 route."
       )
     ).toBeInTheDocument();
 
@@ -147,7 +147,7 @@ describe("Evals UI rendered mode regression v0.1", () => {
     ).toBeInTheDocument();
 
     expect(
-      screen.queryByRole("button", { name: "Autofill analyze-v1" })
+      screen.queryByRole("button", { name: "Autofill analyze-v2" })
     ).not.toBeInTheDocument();
 
     expect(
@@ -161,7 +161,7 @@ describe("Evals UI rendered mode regression v0.1", () => {
     ).toBeInTheDocument();
 
     expect(screen.getByPlaceholderText("e.g. zero-api")).toBeInTheDocument();
-    expect(screen.getByPlaceholderText("e.g. analyze-v1")).toBeInTheDocument();
+    expect(screen.getByPlaceholderText("e.g. v1.0.0")).toBeInTheDocument();
     expect(screen.getByPlaceholderText("e.g. 845bb5a")).toBeInTheDocument();
   });
 });

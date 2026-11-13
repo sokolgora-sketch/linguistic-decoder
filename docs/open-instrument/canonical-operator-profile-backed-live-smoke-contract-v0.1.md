@@ -58,8 +58,8 @@ If any requirement fails, the smoke exits with failure.
 
 ## Positive cases
 
-Each profile’s `positiveProofWords` is executed against the real production
-`/api/analyze-v1` route.
+Each profile’s `positiveProofWords` is executed against the active production
+`/api/analyze-v2` route.
 
 For every positive word, the smoke requires:
 
@@ -68,8 +68,8 @@ For every positive word, the smoke requires:
 
 ## Negative controls
 
-Each profile’s `negativeControlWords` is executed against the same production
-route.
+Each profile’s `negativeControlWords` is executed against the same active
+production route.
 
 For every negative control, the smoke requires:
 
@@ -92,7 +92,7 @@ The migration preserves:
 - local port selection;
 - optional explicit port;
 - `/chat` and `/` route checks;
-- real `/api/analyze-v1` requests;
+- real `/api/analyze-v2` requests;
 - deterministic failure exit codes;
 - server cleanup;
 - no external provider calls.

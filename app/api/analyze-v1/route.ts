@@ -65,6 +65,7 @@ import {
   migrateFunctionalMotivationInterpretationV0_2ToV0_3,
 } from "@/shared/openInstrument/functionalMotivationInterpretation.v0_3";
 import { buildAnalysisStatusV0_2 } from "@/shared/analysisStatus.v0_2";
+import { toAnalyzeWordResultV2Contract } from "@/shared/analyzeWordResult.v2.contract";
 
 const BodySchema = z
   .object({
@@ -934,12 +935,11 @@ function genericInternalFailureResponse() {
 }
 
 function contractFailResponse(params: { message: string; issues?: unknown; out?: unknown }) {
-  const outPreview = safeJsonPreview(params.out);
   const diagnosticBody = {
     error: "analyze-v1 contract failure",
     message: params.message,
     issues: params.issues ?? null,
-    outPreview,
+    responseContractVersion: "open-instrument.analyze-word-result.v2",
   };
 
   logInternalFailure({
@@ -952,6 +952,19 @@ function contractFailResponse(params: { message: string; issues?: unknown; out?:
   if (isProductionEnvironment()) return genericInternalFailureResponse();
 
   return NextResponse.json(diagnosticBody, { status: 500 });
+}
+
+function analyzeV2JsonResponse(payload: unknown, deprecatedAlias: boolean): NextResponse {
+  const response = NextResponse.json(payload);
+  response.headers.set(
+    "X-Analyze-Response-Contract",
+    "open-instrument.analyze-word-result.v2",
+  );
+  if (deprecatedAlias) {
+    response.headers.set("Deprecation", "true");
+    response.headers.set("Link", '</api/analyze-v2>; rel="successor-version"');
+  }
+  return response;
 }
 
 
@@ -1123,6 +1136,7 @@ type AnalyzeV1OrchestrationInput = {
   seedFallbackEnabled: boolean;
   gatesOn: boolean | null;
   preserveMalformedEvidencePackageFallback: boolean;
+  deprecatedAlias: boolean;
 };
 
 async function runAnalyzeV1Orchestration(
@@ -1146,6 +1160,7 @@ async function runAnalyzeV1Orchestration(
     seedFallbackEnabled,
     gatesOn,
     preserveMalformedEvidencePackageFallback,
+    deprecatedAlias,
   } = input;
 
   try {
@@ -1587,7 +1602,8 @@ async function runAnalyzeV1Orchestration(
         );
     }
 
-    return NextResponse.json(final);
+    const activeResponse = toAnalyzeWordResultV2Contract(final);
+    return analyzeV2JsonResponse(activeResponse, deprecatedAlias);
   } catch (err: any) {
     const details = String(err?.stack ?? err?.message ?? err);
     logInternalFailure({
@@ -1804,6 +1820,7 @@ export async function POST(req: Request) {
     seedFallbackEnabled,
     gatesOn,
     preserveMalformedEvidencePackageFallback: false,
+    deprecatedAlias: new URL(req.url, "http://localhost").pathname === "/api/analyze-v1",
   });
 }
 
@@ -1936,5 +1953,6 @@ if (!word) {
     seedFallbackEnabled,
     gatesOn,
     preserveMalformedEvidencePackageFallback: true,
+    deprecatedAlias: new URL(req.url, "http://localhost").pathname === "/api/analyze-v1",
   });
 }
