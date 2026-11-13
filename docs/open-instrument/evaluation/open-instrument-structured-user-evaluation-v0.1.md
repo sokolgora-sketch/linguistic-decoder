@@ -17,7 +17,7 @@ confusing:
 - Null with an engine or network failure;
 - a candidate record with a primary readout;
 - Evidence Package export with Reproducible Run Bundle reopen;
-- candidate ordering with a forced winner;
+- candidate order being mistaken for an automatically selected interpretation;
 - a source link with proof of a claim;
 - functional interpretation with historical origin.
 
@@ -130,15 +130,15 @@ for v0.1 and must not be made more leading during a session.
 
 | Task ID | Case | Input | Expected product state | User instruction | Question | Correct interpretation | Common failure mode | Scoring rule | Truth boundary |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| T1 | C1 | `study` | Current analysis with a reviewed functional candidate | Analyze the word and inspect the visible result. | What do you think this result says, and what would you inspect next? | A reviewed functional evidence status and candidate are present; this does not declare historical origin or a winner. | Treats the first row as the final origin answer. | 2 identifies reviewed support and one non-claim; 1 identifies only one; 0 makes an origin/winner claim. | Reviewed evidence is not historical proof. |
+| T1 | C1 | `study` | Current analysis with a reviewed functional candidate | Analyze the word and inspect the visible result. | What do you think this result says, and what would you inspect next? | A reviewed functional evidence status and candidate are present; this does not declare historical origin or select an interpretation automatically. | Treats the first row as the final origin answer. | 2 identifies reviewed support and one non-claim; 1 identifies only one; 0 makes an origin claim or treats an interpretation as automatically selected. | Reviewed evidence is not historical proof. |
 | T2 | C3 | `xyz` | Primary Null | Analyze the word and describe the result. | What happened here? | Null is a valid analytical result meaning no supported functional conclusion is available at this boundary; it is not a request, network, or engine failure. | Calls Null an error or says the word has no possible history. | 2 distinguishes Null from failure and avoids broader claims; 1 recognizes no supported result but is uncertain; 0 calls it failure or disproves all relations. | Null is not failure and is not proof of nonexistence. |
 | T3 | C4 | `mode` | Structural hypothesis | Analyze the word, open candidate records, and describe the candidate type. | How should this candidate be treated? | It is a structural, unreviewed hypothesis and not candidate truth or reviewed evidence. | Treats embryo or structure as a verified candidate. | 2 states hypothesis-only status; 1 notices uncertainty without the boundary; 0 treats it as reviewed truth. | Structural output is not candidate truth. |
 | T4 | C5 | `sterile` | Research functional hypothesis | Analyze the word and find the research-labelled candidate information. | How is this information different from reviewed evidence? | Research status remains research/unreviewed; the functional bridge is a hypothesis and is not promoted to reviewed evidence. | Treats citations or research labels as production verification. | 2 preserves research distinction and hypothesis status; 1 identifies research but overstates one part; 0 calls it reviewed/confirmed. | Research evidence is not reviewed production truth. |
-| T5 | C1 | `study` | Candidate evidence references | Open candidate records, locate an evidence reference, and open a navigable source if available. | What did the source link help you inspect, and what does the link itself establish? | The link opens a known source record; it does not independently verify the candidate, origin, or winner. | Cannot find the reference or calls the link proof. | 2 completes navigation and states the limited meaning; 1 completes only one; 0 cannot locate or overclaims. | Navigation is traceability, not verification. |
-| T6 | C1 | `study` | Evidence Package | Open the Evidence tab and inspect the Evidence Package actions. | What is this package for, and what would you use it for? | It is a VM-derived audit/handoff export; it is not origin proof, a forced answer, or a reopenable analysis snapshot. | Expects the package to restore or reproduce analysis. | 2 distinguishes audit export from reopenable snapshot; 1 identifies export but not the boundary; 0 treats it as the saved analysis. | Evidence Package and RRB are separate artifacts. |
+| T5 | C1 | `study` | Candidate evidence references | Open candidate records, locate an evidence reference, and open a navigable source if available. | What did the source link help you inspect, and what does the link itself establish? | The link opens a known source record; it does not independently verify the candidate, origin, or interpretation. | Cannot find the reference or calls the link proof. | 2 completes navigation and states the limited meaning; 1 completes only one; 0 cannot locate or overclaims. | Navigation is traceability, not verification. |
+| T6 | C1 | `study` | Evidence Package | Open the Evidence tab and inspect the Evidence Package actions. | What is this package for, and what would you use it for? | It is a VM-derived audit/handoff export; it is not origin proof, an automatically selected interpretation, or a reopenable analysis snapshot. | Expects the package to restore or reproduce analysis. | 2 distinguishes audit export from reopenable snapshot; 1 identifies export but not the boundary; 0 treats it as the saved analysis. | Evidence Package and RRB are separate artifacts. |
 | T7 | C1 | `study` | Reproducible Run Bundle controls | Download the analysis, then open the saved file through the existing control. | What changed after opening the saved file? | The local snapshot was reopened from the file; import does not mean a fresh analysis was run. | Assumes the file is only a report or assumes import triggered analysis. | 2 identifies reopen and no re-analysis; 1 identifies import without the request distinction; 0 misidentifies the flow. | Reopen is local handoff, not fresh execution. |
 | T8 | C6 | saved `study` bundle | Imported local snapshot | Inspect the provenance label and bundle metadata after import. | Is the visible result current or imported, and what supports your answer? | It is an imported local snapshot; schema and fingerprint identify the saved bundle, not analytical truth. | Calls it current analysis or treats the fingerprint as proof of the claim. | 2 identifies imported state and limits fingerprint meaning; 1 identifies state only; 0 confuses state or truth. | Provenance and integrity are not analytical validation. |
-| T9 | C1 or C2 | `study` or `damage` | Candidate list with user decision posture | Return to candidate records and compare the visible candidates. | Does the interface indicate that the engine selected one candidate as the winner? What do you see? | No single winner is declared; ordering and presentation do not replace `user_decides`. | Treats the first candidate as an engine-selected winner. | 2 states that no engine-selected winner is indicated and identifies the user decision posture; 1 says uncertain; 0 names a winner. | No single winner; user decides. |
+| T9 | C1 or C2 | `study` or `damage` | Candidate list with user decision posture | Return to candidate records and compare the visible candidates. | Does the interface indicate that it selected one interpretation automatically? What do you see? | No interpretation is selected automatically; ordering and presentation do not replace `user_decides`. | Treats the first candidate as automatically selected. | 2 states that no automatic selection is indicated and identifies the user decision posture; 1 says uncertain; 0 names an interpretation as engine-selected. | Display order does not select an interpretation; the user decides. |
 
 `TASK_COUNT=9`.
 
@@ -205,7 +205,7 @@ automatically authorize a product change.
 
 | Severity | Condition |
 | --- | --- |
-| CRITICAL | Participant says the product declared historical origin, treats structural output as reviewed evidence, treats research as production truth, interprets Null as system failure, believes import reanalyzed the word, or identifies a forced engine winner. |
+| CRITICAL | Participant says the product declared historical origin, treats structural output as reviewed evidence, treats research as production truth, interprets Null as system failure, believes import reanalyzed the word, or believes the engine automatically selected an interpretation. |
 | MAJOR | Participant cannot locate the evidence supporting a visible candidate, cannot distinguish candidate record from primary readout, or believes Evidence Package can reopen the analysis. |
 | MINOR | Participant hesitates, misses a control, needs a mechanical locator, or finds wording/layout difficult without making a truth-boundary error. |
 
@@ -225,7 +225,7 @@ Say:
 > help. There are no personal data questions in this session.
 
 Do not define reviewed evidence, research evidence, Null, structural
-hypothesis, winner, or provenance before T1-T9.
+hypothesis, or provenance before T1-T9.
 
 ### Neutral instructions
 
@@ -255,7 +255,8 @@ RRB file for C6 only; do not use an Evidence Package as a saved-analysis file.
 
 Clarification may explain mechanics only, such as "the task requires the
 Evidence tab" or "use the saved file from the previous task." Clarification
-may not explain what Null, research, reviewed, structural, or winner means.
+may not explain what Null, research, reviewed, structural, or automatic
+interpretation selection means.
 
 ### Post-task questions
 
@@ -312,7 +313,7 @@ change scoring criteria after participant results are seen.
 
 ## Non-goals and boundaries
 
-- No production code, engine, adapter, ranking, API, provider, or Firebase
+- No production code, engine, adapter, candidate list order, API, provider, or Firebase
   changes.
 - No new evidence or Petro terminology.
 - No evidence promotion or origin declaration.

@@ -27,6 +27,8 @@ const USER_FACING_COPY_FILES = [
   "app/instrument-preview/page.tsx",
   "docs/ZERO_REALITY_GUIDE.md",
   "docs/ui-telemetry-contract.v0.1.md",
+  "docs/open-instrument/evaluation/open-instrument-structured-user-evaluation-v0.1.md",
+  "docs/open-instrument/evaluation/open-instrument-structured-user-evaluation-score-sheet-v0.1.md",
   "src/ui/instrument/spokenPronunciationPresentation.v0_1.ts",
   "src/ui/telemetry/buildEvidenceSummaryTextFromVM.ts",
   "src/shared/reviewedExternalLexiconFunctionalReadiness.v0_1.ts",
