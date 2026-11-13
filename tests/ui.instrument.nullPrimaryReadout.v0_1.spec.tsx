@@ -137,8 +137,15 @@ describe("Open Instrument canonical Null primary readout v0.1", () => {
     expect(
       within(overview).getByText(/Null is a valid result/i),
     ).toBeVisible();
-    expect(within(overview).getByText(/candidate-truth claim/i)).toBeVisible();
-    expect(within(overview).getByText(/Interpretation remains with the user/i)).toBeVisible();
+    expect(
+      within(overview).getByText(/Structural output is not candidate truth/i),
+    ).toBeVisible();
+    expect(
+      within(overview).getByText(/Multiple interpretations may coexist/i),
+    ).toBeVisible();
+    expect(
+      within(overview).getByText(/The user decides how to interpret the evidence/i),
+    ).toBeVisible();
   });
 
   it.each([
@@ -186,7 +193,9 @@ describe("Open Instrument canonical Null primary readout v0.1", () => {
     expect(
       within(overview).getByRole("heading", { name: "Candidate only" }),
     ).toBeVisible();
-    expect(within(overview).getByText(/candidate-truth claim/i)).toBeVisible();
+    expect(
+      within(overview).getByText(/Structural output is not candidate truth/i),
+    ).toBeVisible();
   });
 
   it.each([

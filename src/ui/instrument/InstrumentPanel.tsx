@@ -276,18 +276,21 @@ export function InstrumentPanel(props: Props) {
     [structuralInput],
   );
 
+  const analysisStatusForUi = isValidVm
+    ? vm.analysisStatusV0_2 ?? vm.analysisStatusV0_1
+    : undefined;
   const primaryNullStatus =
     isValidVm &&
-    vm.analysisStatusV0_2?.kind === "present" &&
-    vm.analysisStatusV0_2.value.status ===
+    analysisStatusForUi?.kind === "present" &&
+    analysisStatusForUi.value.status ===
       "null_no_supported_candidate"
-      ? vm.analysisStatusV0_2
+      ? analysisStatusForUi
       : null;
 
   const primaryAnalysisStatus =
     isValidVm &&
-    vm.analysisStatusV0_2?.kind === "present"
-      ? vm.analysisStatusV0_2
+    analysisStatusForUi?.kind === "present"
+      ? analysisStatusForUi
       : null;
 
   React.useEffect(() => {
@@ -558,7 +561,7 @@ export function InstrumentPanel(props: Props) {
                 ) : null}
                 <PrimaryAlbanianReadingCardV0_1
                   discovery={vm.motivationDiscoveryV0_1}
-                  analysisStatus={vm.analysisStatusV0_2}
+                  analysisStatus={analysisStatusForUi}
                 />
               </div>
 
@@ -758,7 +761,7 @@ export function InstrumentPanel(props: Props) {
                 {!primaryNullStatus ? (
                   <AnalysisStatusCardV0_1
                     status={
-                      vm.analysisStatusV0_2 ?? {
+                      analysisStatusForUi ?? {
                         kind: "missing",
                         missing: "not_emitted",
                         note: "analysisStatusV0_2",
