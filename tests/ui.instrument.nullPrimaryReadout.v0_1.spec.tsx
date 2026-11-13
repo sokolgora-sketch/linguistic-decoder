@@ -138,7 +138,7 @@ describe("Open Instrument canonical Null primary readout v0.1", () => {
       within(overview).getByText(/Null is a valid result/i),
     ).toBeVisible();
     expect(within(overview).getByText(/candidate-truth claim/i)).toBeVisible();
-    expect(within(overview).getByText(/User decides/i)).toBeVisible();
+    expect(within(overview).getByText(/Interpretation remains with the user/i)).toBeVisible();
   });
 
   it.each([

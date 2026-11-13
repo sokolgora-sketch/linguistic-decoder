@@ -483,7 +483,7 @@ describe("analyze-v1 Functional Motivation Interpretation v0.2 boundary", () => 
     expect(screen.getAllByText("ZË-RO FUNCTIONAL HYPOTHESIS").length).toBeGreaterThan(0);
     expect(screen.getAllByText("This candidate and input do not have an authorized structural relation for this comparison.").length).toBeGreaterThan(0);
     expect(screen.getAllByText(/Interpretation reason code: NO_AUTHORIZED_STRUCTURAL_RELATION/).length).toBeGreaterThan(0);
-    expect(screen.getByText(/No winner · user decides · historical relation not claimed/)).toBeInTheDocument();
+    expect(screen.getByText(/Interpretation remains with the user · historical relation not claimed/)).toBeInTheDocument();
   });
 
   it("renders the DA source note and explicit Null Voice authority", async () => {

@@ -56,9 +56,9 @@ describe("Open Instrument primary truth status v0.1", () => {
     expect(
       within(overview).getByText(/Structural output is not candidate truth/i),
     ).toBeVisible();
-    expect(
-      within(overview).getByText(/No historical-origin.*winner/i),
-    ).toBeVisible();
+    const userDecisionCopy = within(overview).getAllByText(/Interpretation remains with the user/i);
+    expect(userDecisionCopy.length).toBeGreaterThan(0);
+    userDecisionCopy.forEach((element) => expect(element).toBeVisible());
   });
 
   it("keeps research visibly separate from reviewed evidence", async () => {

@@ -244,7 +244,7 @@ describe("FjaloriShqip Albanian meaning evidence v0.1", () => {
       target: { value: "POTENTIALLY_SUPPORTS_PROPOSAL" },
     });
     expect(screen.getByTestId("fjalori-selected-sense")).toHaveTextContent("Current assessment: POTENTIALLY_SUPPORTS_PROPOSAL");
-    expect(screen.getByTestId("fjalori-component-senses")).toHaveTextContent("No sense is ranked or matched automatically");
+    expect(screen.getByTestId("fjalori-component-senses")).toHaveTextContent("No source sense is selected or aligned automatically with the proposed meaning");
 
     let currentProposal = componentProposal;
     const proposalChanges = [
