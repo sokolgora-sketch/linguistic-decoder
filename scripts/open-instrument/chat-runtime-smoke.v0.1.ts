@@ -106,7 +106,7 @@ async function main(): Promise<void> {
       await page.getByTestId("multilingual-discovery-role").first().waitFor({ state: "visible" });
       await page.getByText("WORD-SPECIFIC READING", { exact: true }).first().waitFor({ state: "visible" });
       await page.getByTestId("word-specific-reading-role").first().waitFor({ state: "visible" });
-      await page.getByText(/No single winner.*(?:You decide|User decides)/i).first().waitFor({ state: "visible" });
+      await page.getByText(/Multiple interpretations may coexist.*(?:You decide|user decides)/i).first().waitFor({ state: "visible" });
       console.log(`${viewportLabel}_VISUAL_AUTHORITY_HIERARCHY=PASS`);
     };
 
