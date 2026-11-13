@@ -101,7 +101,7 @@ describe("spoken pronunciation default Overview surface v0.1", () => {
     render(<SpokenPronunciationOverviewCardV0_1 readout={readout} />);
 
     const overview = screen.getByTestId("spoken-pronunciation-overview");
-    expect(within(overview).getByText("2 variants unresolved; no winner selected")).toBeVisible();
+    expect(within(overview).getByText("2 variants unresolved; no single spoken path is established")).toBeVisible();
     expect(within(overview).queryByText("canonical spoken Voice path: Null")).not.toBeInTheDocument();
     expect(within(overview).queryByText("reason: PRONUNCIATION_VARIANT_AMBIGUOUS")).not.toBeInTheDocument();
 

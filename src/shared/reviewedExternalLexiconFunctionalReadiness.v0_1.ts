@@ -155,7 +155,7 @@ export function buildReviewedExternalLexiconFunctionalReadinessV0_1(
     },
     {
       id: "winner_not_claimed",
-      label: "No historical or linguistic winner is declared.",
+      label: "No historical or linguistic interpretation is selected automatically.",
       passed: row.winnerClaim === false,
     },
     {

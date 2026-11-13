@@ -268,6 +268,7 @@ describe("primary Albanian conditional component reading", () => {
     expect(componentHypothesis).toHaveTextContent("synthetic-zjarrfikës-sense");
     expect(componentHypothesis).toHaveTextContent("Functional operation: Null — none is classified by this hypothesis.");
     expect(componentHypothesis).toHaveTextContent("Canonical component-sense selection: UNKNOWN_OR_NULL");
+    expect(primary).not.toHaveTextContent(/\b(?:winner|winning|ranking|ranked)\b/i);
     expect(componentHypothesis).toHaveTextContent("Grammatical role: unclassified");
     expect(componentHypothesis).toHaveTextContent("do not establish independent morphology");
     const functionalReading = screen.getByTestId("primary-albanian-functional-reading");

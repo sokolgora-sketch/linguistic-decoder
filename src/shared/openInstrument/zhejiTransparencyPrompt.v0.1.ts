@@ -72,10 +72,10 @@ export function buildZhejiPromptContractSectionV0_1(
       "Use atomic only when candidate meaning is directly motivated as a literal, physical, or functional sum of smallest meaningful parts inside that language.",
       "Use metaphorical when roots or structure exist but the embryo meaning requires conceptual leap.",
       "Use opaque when no useful internal structural explanation exists for the embryo meaning.",
-      "This layer inspects semantic/function motivation. It does not declare winner, history, or origin. Missing enrichment is an ENRICHMENT_WARNING, not a reason to drop the structural Brain schema.",
+      "This layer inspects semantic/function motivation. It does not select an interpretation automatically or claim history or origin. Missing enrichment is an ENRICHMENT_WARNING, not a reason to drop the structural Brain schema.",
       "Do not return transparencyContrast.",
       "Do not return transparencyContrastNote.",
-      "Do not score, rank, choose a winner, claim origin, or modify candidateType.",
+      "Do not score or order interpretations by preference, select one automatically, claim origin, or modify candidateType.",
     ].join("\n"),
   };
 }

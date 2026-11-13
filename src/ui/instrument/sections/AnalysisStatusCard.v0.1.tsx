@@ -5,6 +5,7 @@ import type {
   AnalysisStatusV0_1VM,
   PresentOrMissing,
 } from "@/ui/telemetry/types";
+import { presentNeutralInterpretationBoundaryV0_1 } from "@/ui/instrument/neutralInterpretationLanguage.v0_1";
 
 const STATUS_LABELS: Record<AnalysisStatusCodeV0_1, string> = {
   reviewed_functional_evidence: "Reviewed functional evidence",
@@ -23,9 +24,9 @@ function joinOrNone(values: readonly string[]): string {
 function StatusBoundaryNoticeV0_1() {
   return (
     <div className="mt-4 rounded-[8px] border border-[#33423a] bg-[#111a16] p-3 text-xs leading-5 text-[#b7d8c1]">
-      No historical-origin, transmission, winner, superiority, ownership, or
+      No historical-origin, transmission, superiority, ownership, or
       candidate-truth claim is made. Structural output is not candidate truth.
-      Null remains valid. User decides.
+      Null remains valid. Interpretation remains with the user.
     </div>
   );
 }
@@ -71,7 +72,7 @@ export function AnalysisStatusCardV0_1({
           {STATUS_LABELS[value.status]}
         </h2>
         <p className="mt-3 text-sm leading-6 text-[#c5ced8]">
-          {value.summary}
+          {presentNeutralInterpretationBoundaryV0_1(value.summary)}
         </p>
         <StatusBoundaryNoticeV0_1 />
       </section>
@@ -99,7 +100,7 @@ export function AnalysisStatusCardV0_1({
       </div>
 
       <p className="mt-3 text-sm leading-6 text-[#c5ced8]">
-        {value.summary}
+        {presentNeutralInterpretationBoundaryV0_1(value.summary)}
       </p>
 
       <dl className="mt-4 grid gap-2 text-sm sm:grid-cols-3">

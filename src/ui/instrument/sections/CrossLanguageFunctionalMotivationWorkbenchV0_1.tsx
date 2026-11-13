@@ -85,7 +85,7 @@ function BoundOperationLedgerReadoutV0_2({
       ))}
       <p className="mt-2">Original written Voices: {ledger.initialWrittenVoices.status === "COMPLETE" ? ledger.initialWrittenVoices.path.join(" → ") || "∅" : "UNKNOWN_OR_NULL"}; final written Voices: {ledger.finalWrittenVoices.status === "COMPLETE" ? ledger.finalWrittenVoices.path.join(" → ") || "∅" : "UNKNOWN_OR_NULL"}; overall conservation: {ledger.voiceConservation}. Omitted canonical Voices: {ledger.omittedCanonicalVoices.join(", ") || "none"}.</p>
       <p>Reverse replay: {ledger.inverseReplay.status} · reconstructed initial form: <span className="font-mono">{ledger.inverseReplay.reconstructedInitialForm ?? "not run"}</span>{ledger.inverseReplay.applications.map((application) => <span key={application.applicationId}> · {application.kind} {application.before} → {application.after ?? "rejected"}</span>)}</p>
-      <p>Relationship: {ledger.relationship.text ?? "Unknown / Null"} · {ledger.relationship.status}; relationship citation: {ledger.relationship.evidenceStatus}{ledger.relationship.evidenceReference ? " · " + ledger.relationship.evidenceReference : ""}; authority: {ledger.relationship.authority}; linguistic applicability: {ledger.relationship.linguisticApplicabilityStatus}; source authority promotion: NONE. No historical origin claim; no single winner; user decides.</p>
+      <p>Relationship: {ledger.relationship.text ?? "Unknown / Null"} · {ledger.relationship.status}; relationship citation: {ledger.relationship.evidenceStatus}{ledger.relationship.evidenceReference ? " · " + ledger.relationship.evidenceReference : ""}; authority: {ledger.relationship.authority}; linguistic applicability: {ledger.relationship.linguisticApplicabilityStatus}; source authority promotion: NONE. No historical origin claim. Multiple interpretations may coexist; the user decides.</p>
     </article>
   );
 }
@@ -1031,7 +1031,7 @@ export function CrossLanguageFunctionalMotivationWorkbenchV0_1({
                   ))}
                   <p className="mt-2">Original written Voices: {operationLedgerResult.ledger.initialWrittenVoices.status === "COMPLETE" ? operationLedgerResult.ledger.initialWrittenVoices.path.join(" → ") || "∅" : "UNKNOWN_OR_NULL"}; final written Voices: {operationLedgerResult.ledger.finalWrittenVoices.status === "COMPLETE" ? operationLedgerResult.ledger.finalWrittenVoices.path.join(" → ") || "∅" : "UNKNOWN_OR_NULL"}; overall conservation: {operationLedgerResult.ledger.voiceConservation}. Omitted canonical Voices: {operationLedgerResult.ledger.omittedCanonicalVoices.join(", ") || "none"}.</p>
                   <p>Reverse replay: {operationLedgerResult.ledger.inverseReplay.status} · reconstructed initial form: <span className="font-mono">{operationLedgerResult.ledger.inverseReplay.reconstructedInitialForm ?? "not run"}</span>{operationLedgerResult.ledger.inverseReplay.applications.map((application) => <span key={application.applicationId}> · {application.kind} {application.before} → {application.after ?? "rejected"}</span>)}</p>
-                  <p>Relationship: {operationLedgerResult.ledger.relationship.text ?? "Unknown / Null"} · {operationLedgerResult.ledger.relationship.status}; evidence: {operationLedgerResult.ledger.relationship.evidenceStatus}{operationLedgerResult.ledger.relationship.evidenceReference ? ` · ${operationLedgerResult.ledger.relationship.evidenceReference}` : ""}; authority: {operationLedgerResult.ledger.relationship.authority}; linguistic applicability: {operationLedgerResult.ledger.relationship.linguisticApplicabilityStatus}; source authority promotion: NONE. No historical origin claim; no single winner; user decides.</p>
+                  <p>Relationship: {operationLedgerResult.ledger.relationship.text ?? "Unknown / Null"} · {operationLedgerResult.ledger.relationship.status}; evidence: {operationLedgerResult.ledger.relationship.evidenceStatus}{operationLedgerResult.ledger.relationship.evidenceReference ? ` · ${operationLedgerResult.ledger.relationship.evidenceReference}` : ""}; authority: {operationLedgerResult.ledger.relationship.authority}; linguistic applicability: {operationLedgerResult.ledger.relationship.linguisticApplicabilityStatus}; source authority promotion: NONE. No historical origin claim. Multiple interpretations may coexist; the user decides.</p>
                 </article>
               ) : null}
               {result.proposal.boundaryOperationWitness ? (
@@ -1060,7 +1060,7 @@ export function CrossLanguageFunctionalMotivationWorkbenchV0_1({
                 </div>
               ) : null}
               {result.proposal.unresolvedMaterial.map((item, index) => <p key={`${index}:${item}`}>Unresolved: {item}</p>)}
-              <p className="mt-2 text-[#d5c28f]">No source authority promotion. No historical origin claim. No single winner; user decides.</p>
+              <p className="mt-2 text-[#d5c28f]">No source authority promotion. No historical origin claim. Interpretation remains with the user.</p>
             </article>
           )}
         </>

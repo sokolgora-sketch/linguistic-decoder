@@ -295,7 +295,7 @@ describe("Motivation Discovery Lab presentation v0.1", () => {
     expect(screen.getAllByText(/Candidate pronunciation and spoken Voice path are Null/).length).toBeGreaterThan(0);
     expect(screen.getAllByText(/orthographic_profile_derived/).length).toBeGreaterThan(0);
     expect(screen.getAllByText("Functional motivation unknown").length).toBeGreaterThan(0);
-    expect(screen.getAllByText("No single winner · You decide").length).toBeGreaterThan(0);
+    expect(screen.getAllByText("Multiple interpretations may coexist · You decide").length).toBeGreaterThan(0);
   });
 
   it("shows fact, derived structure, hypothesis, status, and provenance without a winner", () => {
@@ -337,9 +337,10 @@ describe("Motivation Discovery Lab presentation v0.1", () => {
     expect(screen.getByText("FUNCTIONAL MOTIVATION")).toBeInTheDocument();
     expect(screen.getByText("Reviewed functional hypothesis")).toBeInTheDocument();
     expect(screen.getByText("reviewed.external.di.knowledge.candidate.v0_1")).toBeInTheDocument();
-    expect(screen.getByText("No single winner · You decide")).toBeInTheDocument();
+    expect(screen.getByText("Multiple interpretations may coexist · You decide")).toBeInTheDocument();
     expect(screen.getByTestId("motivation-candidate-details")).toBeInTheDocument();
-    expect(screen.getByText(/No single winner/)).toBeInTheDocument();
+    expect(screen.getByText(/does not select a candidate/)).toBeInTheDocument();
+    expect(screen.getByTestId("motivation-discovery-card")).not.toHaveTextContent(/\b(?:winner|winning|ranking|ranked)\b/i);
   });
 
   it("shows additive AlbaNet synset details without turning them into functional evidence", () => {
@@ -430,7 +431,7 @@ describe("Motivation Discovery Lab presentation v0.1", () => {
     expect(screen.getAllByText("WHY THIS CANDIDATE")).toHaveLength(2);
     expect(screen.getAllByText("Functional motivation unknown")).toHaveLength(1);
     expect(screen.getByText("No reviewed functional evidence currently supports this bridge.")).toBeInTheDocument();
-    expect(screen.getByText("No single winner · You decide")).toBeInTheDocument();
+    expect(screen.getByText("Multiple interpretations may coexist · You decide")).toBeInTheDocument();
 
     const structural = screen.getAllByText("WHY THIS CANDIDATE")[0];
     const functional = screen.getAllByText("FUNCTIONAL MOTIVATION")[0];

@@ -650,7 +650,7 @@ function FunctionalCandidateStackV0_1({
       </div>
 
       <div className="mt-3 text-xs leading-5 text-slate-600 dark:text-slate-400">
-        No single winner is selected. User decides.
+        No interpretation is selected automatically. User decides.
       </div>
     </section>
   );
@@ -932,7 +932,7 @@ function GenericFunctionalWitnesses({
         <>
           <div className="mt-2 text-sm leading-6 text-slate-800 dark:text-slate-200">
             The following source-attested forms match this embryo. They are
-            witnesses, not historical origins or automatic functional winners.
+            witnesses; by themselves they do not establish historical origins or functional readings.
           </div>
 
           <div className="mt-3 grid gap-3">

@@ -26,8 +26,8 @@ Telemetry is:
 
 ## 4) What UI Telemetry IS NOT (Hard Prohibitions)
 The UI must never:
-- Crown a single “winner” candidate
-- Rank candidates (“best”, “most likely”, “top 1”, etc.)
+- Automatically select one preferred interpretation
+- Present an interpretation as preferred or recommended without evidence
 - Beautify uncertainty into certainty (“this IS the origin”)
 - Invent confidence or truth-claims not present in VM
 - Hide ambiguity that exists in VM
@@ -59,5 +59,5 @@ requires a contract bump (v0.1 → v0.2) and updated tests.
 ## 8) Definition of Done (v0.1)
 v0.1 is closed when:
 1) This contract file exists.
-2) A guardrail test enforces instrument rules (no winner/ranking/beautification).
+2) A guardrail test enforces instrument rules (no automatically preferred interpretation, unsupported preference ordering, or beautification).
 3) The repo is tagged: `ui-telemetry-contract-v0.1`.

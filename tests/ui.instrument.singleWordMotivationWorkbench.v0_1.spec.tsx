@@ -925,7 +925,7 @@ describe("Single-word motivation workbench v0.1", () => {
     expect(screen.getByTestId("single-word-progressive-source-motivated-candidate-qualification")).toHaveTextContent(
       "The source-template gloss annotation “bee” matches these candidate glosses by complete-token inclusion; this is a candidate filter, not an exact sense crosswalk.",
     );
-    expect(trace).toHaveTextContent("No single winner: true · user decision posture: user_decides");
+    expect(trace).toHaveTextContent("No interpretation is selected automatically: true · user decision posture: user_decides");
     const sourceAlternatives = screen.getByTestId("single-word-progressive-source-relationships");
     for (const alternativeSense of ["bee-insect", "bee-swarm", "bee-hive", "bee-quick", "blej-form"]) {
       expect(sourceAlternatives).toHaveTextContent(alternativeSense);
@@ -1435,7 +1435,7 @@ describe("Single-word motivation workbench v0.1", () => {
     expect(reading).toHaveTextContent("KAN + DILL = KANDILL; target KANDIL · MISMATCH");
     expect(reading).toHaveTextContent("The spelling correspondence remains unresolved");
     expect(reading).toHaveTextContent("Strict embryo meaning: Unknown / Null (UNKNOWN_OR_NULL)");
-    expect(reading).toHaveTextContent("No single winner is selected; the user decides");
+    expect(reading).toHaveTextContent("No interpretation is selected automatically; the user decides");
     expect(reading).toHaveTextContent("Mechanical replay remains separate and does not validate this reading");
     expect(reading).not.toHaveTextContent("Final mechanical spelling:");
   });
@@ -1897,7 +1897,7 @@ describe("Single-word motivation workbench v0.1", () => {
     expect(result).toHaveTextContent("Voice conservation: PRESERVED");
     expect(result).toHaveTextContent("EXPLORATORY_HYPOTHESIS");
     expect(result).toHaveTextContent("No source authority promotion");
-    expect(result).toHaveTextContent("No single winner; user decides");
+    expect(result).toHaveTextContent("Interpretation remains with the user.");
   });
 
   it("records and reverses a user-declared MITA → MAT omission ledger, then invalidates stale claims", () => {
@@ -2420,7 +2420,7 @@ describe("Single-word motivation workbench v0.1", () => {
     expect(screen.getByTestId("single-word-functional-reading-reconstruction")).toHaveTextContent("UNKNOWN_OR_NULL");
     expect(screen.getByTestId("single-word-opaque-functional-description")).toHaveTextContent("Unknown / Null · UNKNOWN_OR_NULL");
     expect(screen.getByTestId("single-word-opaque-written-voices")).toHaveTextContent("U@1 → Ë@3");
-    expect(result).toHaveTextContent("No single winner is selected; the user decides.");
+    expect(result).toHaveTextContent("No interpretation is selected automatically; interpretation remains with the user.");
     expect(screen.queryByLabelText("Component 1 exact spelling")).not.toBeInTheDocument();
     expect(screen.queryByTestId("cross-language-functional-motivation")).not.toBeInTheDocument();
     expect(result).not.toHaveTextContent("suffix");

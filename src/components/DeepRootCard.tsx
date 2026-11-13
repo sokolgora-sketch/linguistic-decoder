@@ -2,6 +2,7 @@
 
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { presentNeutralInterpretationBoundaryV0_1 } from "@/ui/instrument/neutralInterpretationLanguage.v0_1";
 
 type Carrier = {
   protoRootId?: string;
@@ -178,7 +179,7 @@ export default function DeepRootCard({ deepRoot }: { deepRoot?: DeepRootLike | n
             <div className="flex flex-wrap items-center gap-2">
               <span className="font-semibold">Functional Roots</span>
               <span className="font-mono text-xs opacity-70">
-                micro-root hypotheses (no winner)
+                micro-root hypotheses; interpretation remains with the user
               </span>
             </div>
 
@@ -204,12 +205,12 @@ export default function DeepRootCard({ deepRoot }: { deepRoot?: DeepRootLike | n
                       ) : null}
                     </div>
 
-                    {f.gloss ? <div className="mt-1 text-sm">{f.gloss}</div> : null}
+                    {f.gloss ? <div className="mt-1 text-sm">{presentNeutralInterpretationBoundaryV0_1(f.gloss)}</div> : null}
 
                     {Array.isArray(f.notes) && f.notes.length > 0 ? (
                       <ul className="mt-2 list-disc pl-5 text-xs opacity-80">
                         {f.notes.slice(0, 6).map((n, j) => (
-                          <li key={j}>{n}</li>
+                          <li key={j}>{presentNeutralInterpretationBoundaryV0_1(n)}</li>
                         ))}
                       </ul>
                     ) : null}

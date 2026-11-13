@@ -58,7 +58,7 @@ describe("Open Instrument Seven-Voices doctrine reading UI v0.1", () => {
       "balanced mediation with harmonious resolution",
     );
     expect(within(card).getByTestId("doctrine-level3-reading-boundary")).toHaveTextContent(
-      /Doctrine inference only.*not a lexical definition.*historical origin claim.*candidate proof.*winner selection/i,
+      /Doctrine inference only.*not a lexical definition.*historical origin claim.*candidate proof.*No interpretation is selected automatically/i,
     );
   });
 
@@ -158,11 +158,11 @@ describe("Open Instrument Seven-Voices doctrine reading UI v0.1", () => {
       "harmonious resolution with clear understanding",
     );
     expect(within(card).getByTestId("doctrine-level3-reading-boundary")).toHaveTextContent(
-      /Doctrine inference only.*not a lexical definition.*historical origin claim.*candidate proof.*winner selection/i,
+      /Doctrine inference only.*not a lexical definition.*historical origin claim.*candidate proof.*No interpretation is selected automatically/i,
     );
     expect(within(card).getByText("Completion/Unit")).toBeInTheDocument();
     expect(within(card).getByText("Direction/Focus")).toBeInTheDocument();
-    expect(within(card).getByText("This is not a lexical definition, historical origin claim, candidate proof, or winner selection. User decides the final interpretation.")).toBeInTheDocument();
+    expect(within(card).getByText("This is not a lexical definition, historical origin claim, or candidate proof. No interpretation is selected automatically; the user decides.")).toBeInTheDocument();
     expect(screen.getAllByText("Evidence: Reviewed lexical bridge · exploratory")).toHaveLength(2);
   });
 

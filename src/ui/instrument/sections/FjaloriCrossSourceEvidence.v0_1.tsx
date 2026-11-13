@@ -374,7 +374,7 @@ export function FjaloriCrossSourceEvidenceV0_1({
             <section className="mt-3 rounded border border-[#3d465c] bg-[#10131d] p-2" data-testid="fjalori-component-senses">
               <h3 className="font-semibold text-[#f0f1fa]">Individual source senses · response order</h3>
               <p className="mt-1 text-[10px] text-[#aeb4ce]">
-                No sense is ranked or matched automatically against the proposed meaning. Entry and sense numbers are positions in this response, not source-issued IDs; no stable source sense ID is supplied here.
+                No source sense is selected or aligned automatically with the proposed meaning. Entry and sense numbers identify positions in this response, not source-issued IDs; no stable source sense ID is supplied here.
               </p>
               {evidence.entries.some((entry) => entry.senses.length > 0) ? (
                 <div className="mt-2 space-y-2">
@@ -404,7 +404,7 @@ export function FjaloriCrossSourceEvidenceV0_1({
                                 </p>
                                 {isSelected ? (
                                   <div className="mt-2 rounded border border-[#53604a] p-2" data-testid="fjalori-selected-sense">
-                                    <p className="font-semibold">Manually selected source sense · no automatic ranking or alignment</p>
+                                    <p className="font-semibold">Manually selected source sense · no automatic interpretation selection or alignment</p>
                                     {context === "component" ? (
                                       <section className="mt-2 rounded border border-[#46505c] bg-[#0d1117] p-2" data-testid="fjalori-component-meaning-comparison">
                                         <h5 className="font-semibold text-[#f0f1fa]">Component meaning comparison · USER_INTERPRETATION</h5>

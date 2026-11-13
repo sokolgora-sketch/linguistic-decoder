@@ -1149,7 +1149,7 @@ export function buildFunctionalCandidateCompositionsFromRootMapV0_1(
       plainStandaloneGloss: null,
 
       sourceNote:
-        "Composition projected from live RootMap component evidence. Component review states remain separate; this is functional motivation, not historical-origin or winner evidence.",
+        "Composition projected from live RootMap component evidence. Component review states remain separate; this is functional motivation, not historical-origin evidence or support for selecting one interpretation.",
 
       segmentation: {
         kind: "functionalComposition",

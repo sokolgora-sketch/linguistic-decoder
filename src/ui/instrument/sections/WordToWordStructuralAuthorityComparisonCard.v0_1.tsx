@@ -188,7 +188,7 @@ export function WordToWordStructuralAuthorityComparisonCard({
           <div className={`${MT.sectionLabel} text-[#8ea4ba]`}>ZË-RO structural / authority comparison</div>
           <h2 className="mt-2 text-lg font-semibold text-[#f5f7fb]">Compare two established results</h2>
           <p className="mt-2 max-w-3xl text-sm leading-6 text-[#b8c3cf]">
-            This comparison reports established structural, authority, status, and provenance differences. It does not assign semantic meaning, historical origin, or a winner.
+            This comparison reports established structural, authority, status, and provenance differences. It does not assign semantic meaning, claim historical origin, or select an interpretation automatically.
           </p>
         </div>
         {current ? (

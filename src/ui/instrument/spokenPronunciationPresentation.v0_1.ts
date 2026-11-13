@@ -13,7 +13,7 @@ export function pronunciationVariantStatusV0_1(
   }
 
   if (value.reasonCode === "PRONUNCIATION_VARIANT_AMBIGUOUS") {
-    return `${value.variants.length} variants unresolved; no winner selected`;
+    return `${value.variants.length} variants unresolved; no single spoken path is established`;
   }
 
   if (!value.variants.length) return "no pronunciation variant";

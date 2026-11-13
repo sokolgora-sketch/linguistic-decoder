@@ -82,6 +82,6 @@ export function buildEvidenceSummaryTextFromVM(
     `notes=${safeText(r.counts?.notes)}`,
     `signals=${safeText(r.counts?.signals)}`,
     ...ledgerSummary(opts?.ledgerModel),
-    "boundary=deterministic inspection; not origin proof; no single winner",
+    "boundary=deterministic inspection; not origin proof; interpretations remain open to user review",
   ].join("\n");
 }

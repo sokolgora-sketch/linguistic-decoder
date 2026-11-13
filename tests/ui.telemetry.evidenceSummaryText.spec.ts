@@ -46,7 +46,7 @@ describe("buildEvidenceSummaryTextFromVM", () => {
     expect(text).toContain("candidatePaths=2/2");
     expect(text).toContain("ledger.normalization=present; items=1");
     expect(text).toContain("ledger.ops=none; items=0");
-    expect(text).toContain("boundary=deterministic inspection; not origin proof; no single winner");
+    expect(text).toContain("boundary=deterministic inspection; not origin proof; interpretations remain open to user review");
   });
 
   it("does not read raw VM payload fields", () => {
@@ -71,6 +71,6 @@ describe("buildEvidenceSummaryTextFromVM", () => {
     });
 
     expect(text).toContain("word=safe");
-    expect(text).toContain("boundary=deterministic inspection; not origin proof; no single winner");
+    expect(text).toContain("boundary=deterministic inspection; not origin proof; interpretations remain open to user review");
   });
 });

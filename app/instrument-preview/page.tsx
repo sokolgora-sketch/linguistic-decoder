@@ -82,9 +82,9 @@ export default function Page() {
             <h2 className="mb-3 text-lg font-semibold">Why this exists</h2>
             <p className="text-sm leading-7 text-neutral-200">
               ZË-RO needs a serious analysis surface where a user can inspect one
-              word at a time without hidden ranking, fuzzy summaries, or fake
-              certainty. The Instrument exists to make structure, evidence, and
-              uncertainty visible in a form that can be reviewed and discussed.
+              word at a time with transparent structure, evidence, and uncertainty.
+              The Instrument makes those elements visible in a form that can be
+              reviewed and discussed.
             </p>
           </section>
 

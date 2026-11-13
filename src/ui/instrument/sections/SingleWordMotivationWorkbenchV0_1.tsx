@@ -24,6 +24,7 @@ import {
 import { analyzeStructuralInputV0_2 } from "@/shared/structuralHypothesisDiscovery.v0_2";
 import type { GenericFunctionalWitnessV1 } from "@/shared/openInstrument/genericFunctionalWitnessDiscovery.v1";
 import type { MotivationDiscoveryV0_1VM, PresentOrMissing } from "@/ui/telemetry/types";
+import { presentNeutralInterpretationBoundaryV0_1 } from "@/ui/instrument/neutralInterpretationLanguage.v0_1";
 import { FjaloriCrossSourceEvidenceV0_1 } from "@/ui/instrument/sections/FjaloriCrossSourceEvidence.v0_1";
 import { CrossLanguageFunctionalMotivationWorkbenchV0_1 } from "@/ui/instrument/sections/CrossLanguageFunctionalMotivationWorkbenchV0_1";
 
@@ -778,7 +779,7 @@ function CurrentWordEvidenceSectionV0_1({
       {visibleDiscovery ? (
         <section aria-label="Progressive evidence trace" data-testid="single-word-progressive-evidence-trace" className="mt-3 rounded border border-[#34495a] bg-[#10161c] p-2">
           <h4 className="font-semibold text-[#f5f7fb]">Progressive evidence trace</h4>
-          <p className="mt-1 text-[#9fb1bf]">The steps keep source facts, structural candidates, source relations, and whole-word interpretations distinct. No step supplies an embryo meaning or selects a winning sense.</p>
+          <p className="mt-1 text-[#9fb1bf]">The steps keep source facts, structural candidates, source relations, and whole-word interpretations distinct. No step supplies an embryo meaning or selects an interpretation automatically.</p>
           <ol className="mt-2 space-y-2">
             <li>
           <section data-testid="single-word-current-source-evidence" className="rounded border border-[#303843] bg-[#10161c] p-2">
@@ -1034,7 +1035,7 @@ function CurrentWordEvidenceSectionV0_1({
                         {sourceComponentReading.exploratoryRelationship.alternatives.map((alternative, index) => <li key={`${index}:${alternative}`}>{alternative}</li>)}
                       </ul>
                     ) : null}
-                    <div className="break-words">Relationship claim boundary: {sourceComponentReading.claimBoundary}</div>
+                    <div className="break-words">Relationship claim boundary: {presentNeutralInterpretationBoundaryV0_1(sourceComponentReading.claimBoundary)}</div>
                     <div className="break-words">Target/component exact-sense crosswalk: UNKNOWN_OR_NULL · no canonical sense alignment is emitted by this record-level relationship.</div>
                     {structuralSourceSuffixAlignment ? (
                       <div className="mt-2 rounded border border-[#46523b] bg-[#121811] p-2" data-testid="single-word-structural-source-component-alignment" data-status={structuralSourceSuffixAlignment.comparisonStatus}>
@@ -1052,7 +1053,7 @@ function CurrentWordEvidenceSectionV0_1({
                           <ol className="mt-1 space-y-1">
                             {structuralSourceSuffixAlignment.matchingEngineComponents.map(({ hypothesisId, component }) => (
                               <li key={`${hypothesisId}:${component.componentId}`} className="break-words">
-                                Engine component: {component.form} · hypothesis {hypothesisId} · component {component.componentId} · source span [{component.sourceSpan.start}, {component.sourceSpan.end}) · {component.operationId ?? "operation UNKNOWN_OR_NULL"} · written Voice events {component.voiceEvents.map((event) => `${event.voice}@${event.sourcePosition}`).join(" → ") || "∅"} · meaning {component.meaning === null ? "UNKNOWN_OR_NULL" : "not emitted"} · {component.claimBoundary}.
+                                Engine component: {component.form} · hypothesis {hypothesisId} · component {component.componentId} · source span [{component.sourceSpan.start}, {component.sourceSpan.end}) · {component.operationId ?? "operation UNKNOWN_OR_NULL"} · written Voice events {component.voiceEvents.map((event) => `${event.voice}@${event.sourcePosition}`).join(" → ") || "∅"} · meaning {component.meaning === null ? "UNKNOWN_OR_NULL" : "not emitted"} · {presentNeutralInterpretationBoundaryV0_1(component.claimBoundary)}.
                               </li>
                             ))}
                           </ol>
@@ -1118,7 +1119,7 @@ function CurrentWordEvidenceSectionV0_1({
                       <div className="mt-1">Linked-form reconstruction: UNKNOWN_OR_NULL · ordered exact-form Albanian links are unavailable.</div>
                     )}
                     <div>Independent component record/sense resolution: UNKNOWN_OR_NULL unless emitted by the separate component-reading contract; exact-sense alignment is not established.</div>
-                    <div className="break-words">Comparison claim boundary: {sourceComparison.claimBoundary}</div>
+                    <div className="break-words">Comparison claim boundary: {presentNeutralInterpretationBoundaryV0_1(sourceComparison.claimBoundary)}</div>
                     <div>Cross-source exact-sense identity: UNKNOWN_OR_NULL unless separately emitted by a sense-alignment contract.</div>
                   </div>
                 ) : (
@@ -1140,7 +1141,7 @@ function CurrentWordEvidenceSectionV0_1({
                     ) : (
                       <div className="mt-1 break-words">UNKNOWN_OR_NULL · {lexicalReading.senseAlignedLexicalRole.reasonCodes.join(", ") || "no candidate evidence"}</div>
                     )}
-                    <div className="mt-1 break-words">{lexicalReading.senseAlignedLexicalRole.claimBoundary} No single winner; user decides. This contract does not establish an embryo function or a component-sense crosswalk.</div>
+                    <div className="mt-1 break-words">{presentNeutralInterpretationBoundaryV0_1(lexicalReading.senseAlignedLexicalRole.claimBoundary)} Multiple interpretations may coexist; the user decides. This contract does not establish an embryo function or a component-sense crosswalk.</div>
                   </div>
                 ) : (
                   <div className="mt-1 break-words">Separate exact sense-alignment artifact: UNKNOWN_OR_NULL · not emitted in this Discovery.</div>
@@ -1154,7 +1155,7 @@ function CurrentWordEvidenceSectionV0_1({
                   <div className="mt-2 break-words" data-testid="single-word-source-component-hypothesis">
                     Source-component role hypothesis: EXPLORATORY · {sourceComponentReading.functionalHypothesis.statement ?? "UNKNOWN_OR_NULL"} · functional operation {sourceComponentReading.functionalHypothesis.functionalOperation ?? "Null"}.
                     <div>Evidence references: {sourceComponentReading.functionalHypothesis.evidenceRefs.map((reference) => `${reference.sourceRecordId} (${reference.entryLocator}; senses ${reference.senseIds.join(", ") || "UNKNOWN_OR_NULL"})`).join(" · ") || "UNKNOWN_OR_NULL"}</div>
-                    <div>Claim boundary: {sourceComponentReading.functionalHypothesis.claimBoundary}</div>
+                    <div>Claim boundary: {presentNeutralInterpretationBoundaryV0_1(sourceComponentReading.functionalHypothesis.claimBoundary)}</div>
                   </div>
                 ) : null}
               </section>
@@ -1174,7 +1175,7 @@ function CurrentWordEvidenceSectionV0_1({
                         </li>
                       ))}
                     </ol>
-                    <div className="break-words">{lexicalReading.functionalFamilyReading.claimBoundary} {lexicalReading.functionalFamilyReading.alternatives.join(" ")}</div>
+                    <div className="break-words">{presentNeutralInterpretationBoundaryV0_1(lexicalReading.functionalFamilyReading.claimBoundary)} {lexicalReading.functionalFamilyReading.alternatives.join(" ")}</div>
                     <div className="text-[#9fb1bf]">Same-source family evidence does not establish independent corroboration or embryo meaning.</div>
                   </div>
                 ) : null}
@@ -1187,7 +1188,7 @@ function CurrentWordEvidenceSectionV0_1({
                         {lexicalReading.functionalMeaningBridge.functionalHypothesis.alternatives.map((alternative, index) => <li key={`${index}:${alternative}`}>{alternative}</li>)}
                       </ul>
                     ) : null}
-                    <div className="break-words">Bridge claim boundary: {lexicalReading.functionalMeaningBridge.claimBoundary}</div>
+                    <div className="break-words">Bridge claim boundary: {presentNeutralInterpretationBoundaryV0_1(lexicalReading.functionalMeaningBridge.claimBoundary)}</div>
                   </>
                 ) : lexicalReading?.functionalMeaningBridge?.status === "SUPPORTED" ? (
                   <div data-testid="single-word-progressive-functional-bridge-withheld">
@@ -1262,11 +1263,11 @@ function CurrentWordEvidenceSectionV0_1({
                         Source-form reconstruction: {componentSurfaceJoin.toLocaleUpperCase("sq-AL")} {surfaceJoinMatchesTarget ? "=" : "≠"} {visibleDiscovery?.inputWord.toLocaleUpperCase("sq-AL")} · {surfaceJoinMatchesTarget ? "EXACT_SURFACE_JOIN" : "SURFACE_MISMATCH"}. The comparison does not authorize a spelling change.
                       </div>
                     ) : null}
-                    <div className="mt-1 break-words">Whole-word evidence remains {functionalBridge.functionalHypothesis.status} · {functionalBridge.functionalHypothesis.functionalOperation}. Component-sense alignment and independent embryo function remain UNKNOWN_OR_NULL; source-record juxtaposition is not independent corroboration. Claim boundary: {functionalBridge.claimBoundary}</div>
+                    <div className="mt-1 break-words">Whole-word evidence remains {functionalBridge.functionalHypothesis.status} · {functionalBridge.functionalHypothesis.functionalOperation}. Component-sense alignment and independent embryo function remain UNKNOWN_OR_NULL; source-record juxtaposition is not independent corroboration. Claim boundary: {presentNeutralInterpretationBoundaryV0_1(functionalBridge.claimBoundary)}</div>
                   </div>
                 ) : null}
                 <div className="mt-1 font-semibold">Structural embryo meaning/function: UNKNOWN_OR_NULL. Structural candidates do not establish a lexical meaning or functional operation.</div>
-                <div>No single winner: {visibleDiscovery.noSingleWinner ? "true" : "UNKNOWN_OR_NULL"} · user decision posture: {visibleDiscovery.userDecisionPosture}.</div>
+                <div>No interpretation is selected automatically: {visibleDiscovery.noSingleWinner ? "true" : "UNKNOWN_OR_NULL"} · user decision posture: {visibleDiscovery.userDecisionPosture}.</div>
               </section>
             </li>
           </ol>
@@ -2047,7 +2048,7 @@ export function SingleWordMotivationWorkbenchV0_1({
                 ))}
               </div>
               <p className="mt-2 text-xs text-[#d5c28f]">
-                Interpretation status: USER_PROPOSED · exploratory. Strict embryo meaning: <strong>Unknown / Null (UNKNOWN_OR_NULL)</strong>; compound attestation: not claimed · historical origin: not claimed. No single winner is selected; the user decides. Mechanical replay remains separate and does not validate this reading.
+                Interpretation status: USER_PROPOSED · exploratory. Strict embryo meaning: <strong>Unknown / Null (UNKNOWN_OR_NULL)</strong>; compound attestation: not claimed · historical origin: not claimed. No interpretation is selected automatically; the user decides. Mechanical replay remains separate and does not validate this reading.
               </p>
             </section>
             <div className="mt-2 rounded border border-[#303843] bg-[#0b0f0c] p-2">
@@ -2155,7 +2156,7 @@ export function SingleWordMotivationWorkbenchV0_1({
                   </div>
                 </div>
                 <p className="mt-2 text-xs text-[#d5c28f]">
-                  Strict embryo meaning: Unknown / Null · source authority promotion: NONE · historical origin: not claimed. No single winner is selected; the user decides.
+                  Strict embryo meaning: Unknown / Null · source authority promotion: NONE · historical origin: not claimed. No interpretation is selected automatically; interpretation remains with the user.
                 </p>
               </article>
             )}

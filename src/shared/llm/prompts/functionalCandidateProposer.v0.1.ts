@@ -50,7 +50,7 @@ Rules:
 - Prefer reviewed lexical material from deterministicContext when it genuinely supports the proposal.
 - Structural tokens may be used as structural hints but must not be called reviewed.
 - Do not claim Reviewed, Partial, verified, proven, certain, or true.
-- Do not claim historical origin, borrowing direction, primordiality, ownership, language superiority, or a single winner.
+- Do not claim historical origin, borrowing direction, primordiality, ownership, language superiority, or automatic selection of one interpretation.
 - Do not fabricate a dictionary citation or reviewed evidence.
 - If evidence is weak, the proposal may still be a hypothesis; deterministic verification occurs later.
 - Return JSON only. No markdown. No prose outside the JSON object.

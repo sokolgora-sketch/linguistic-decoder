@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import type { UICandidateRow } from "./candidateModel";
 import { CandidateEvidenceReferences } from "./EvidenceReferenceLink";
 import { toPrettyJson } from "@/ui/instrument/prettyJson";
+import { presentNeutralInterpretationBoundaryV0_1 } from "@/ui/instrument/neutralInterpretationLanguage.v0_1";
 
 function CopyButton({ text, label }: { text: string; label: string }) {
   return (
@@ -295,7 +296,7 @@ export function CandidatesAccordion({
                             <CandidateChip
                               title="Deterministic embryo-first ordering group."
                             >
-                              {`Rank group: ${c.rankGroup}`}
+                              {`Candidate group: ${c.rankGroup}`}
                             </CandidateChip>
                           ) : null}
                         </div>
@@ -385,7 +386,7 @@ export function CandidatesAccordion({
 
                         {c.claimBoundary ? (
                           <div className="break-words text-xs text-slate-400">
-                            {`Boundary: ${c.claimBoundary}`}
+                            {`Boundary: ${presentNeutralInterpretationBoundaryV0_1(c.claimBoundary)}`}
                           </div>
                         ) : null}
 

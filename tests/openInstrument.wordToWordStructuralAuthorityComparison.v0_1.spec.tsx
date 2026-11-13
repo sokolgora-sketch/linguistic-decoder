@@ -104,6 +104,7 @@ describe("word-to-word structural and authority comparison v0.1", () => {
     expect(within(card).getByTestId("comparison-slot-right")).toHaveTextContent("home");
     expect(within(card).getByTestId("comparison-row-voicePath")).toHaveTextContent("EQUAL");
     expect(within(card).getByText(/does not assign semantic meaning/i)).toBeVisible();
+    expect(card).not.toHaveTextContent(/\b(?:winner|winning|ranking|ranked)\b/i);
     expect(within(card).getByTestId("word-comparison-rows")).not.toHaveTextContent(/similarity|winner|ranking|score/i);
   });
 });

@@ -89,7 +89,7 @@ describe(
 
         expect(
           screen.getByText(
-            /User decides/i,
+            /Interpretation remains with the user/i,
           ),
         ).toBeInTheDocument();
       },
