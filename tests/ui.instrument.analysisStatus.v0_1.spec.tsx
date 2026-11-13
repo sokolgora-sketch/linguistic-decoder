@@ -164,11 +164,14 @@ describe(
         );
 
         expect(panel).toContain(
-          "vm.analysisStatusV0_2 ?? {",
+          "vm.analysisStatusV0_2 ?? vm.analysisStatusV0_1",
         );
 
         expect(adapter).toContain(
-          "analysisStatusV0_2: parseAnalysisStatusV0_2(payload)",
+          "const analysisStatusV0_2 = parseAnalysisStatusV0_2(payload);",
+        );
+        expect(adapter).toContain(
+          "analysisStatusV0_2FieldEmitted || analysisStatusV0_1.kind === \"present\"",
         );
 
         expect(card).not.toContain(
