@@ -153,17 +153,21 @@ function readRawChanges(repoRoot, baseSha, headSha) {
     const match = /^:([0-7]{6}) ([0-7]{6}) ([0-9a-f]{40}|[0-9a-f]{64}) ([0-9a-f]{40}|[0-9a-f]{64}) ([A-Z])$/.exec(header);
     if (!match) return { error: "Git returned an unrecognized raw diff record" };
     const [, oldMode, newMode, , , status] = match;
+    const regularModes = ["100644", "100755"];
     if (
       !["A", "M"].includes(status) ||
-      !["000000", "100644"].includes(oldMode) ||
-      newMode !== "100644"
+      !["000000", ...regularModes].includes(oldMode) ||
+      !regularModes.includes(newMode)
     ) {
       return { error: "the pushed diff contains a delete, rename, or non-regular file change" };
     }
-    if ((status === "A" && oldMode !== "000000") || (status === "M" && oldMode !== "100644")) {
+    if (
+      (status === "A" && oldMode !== "000000") ||
+      (status === "M" && !regularModes.includes(oldMode))
+    ) {
       return { error: "the pushed diff has inconsistent file status and mode" };
     }
-    changes.push({ path: filePath, status });
+    changes.push({ path: filePath, status, oldMode, newMode });
   }
 
   return changes.length > 0 ? { changes } : { error: "the pushed update has no verifiable file changes" };
@@ -275,7 +279,12 @@ function classifyPrePush({ repoRoot, remoteName, remoteUrl, stdin }) {
   const diff = readRawChanges(topLevel, baseSha, headSha);
   if (diff.error) return full(diff.error);
   const changedPaths = diff.changes.map((change) => change.path);
-  if (changedPaths.every(isAllowedDocsPath)) {
+  const fastPathEligible = diff.changes.every(
+    ({ status, oldMode, newMode }) =>
+      (status === "A" && oldMode === "000000" && newMode === "100644") ||
+      (status === "M" && oldMode === "100644" && newMode === "100644"),
+  );
+  if (fastPathEligible && changedPaths.every(isAllowedDocsPath)) {
     return {
       tier: "DOCS_ONLY",
       reason: "single clean branch update verified against its live remote base",
@@ -284,7 +293,7 @@ function classifyPrePush({ repoRoot, remoteName, remoteUrl, stdin }) {
       changedPaths,
     };
   }
-  if (changedPaths.every(isAllowedScopedCodePath)) {
+  if (fastPathEligible && changedPaths.every(isAllowedScopedCodePath)) {
     return {
       tier: "SCOPED_CODE",
       reason: "single clean branch update contains only bounded Instrument UI sources and focused UI tests",
