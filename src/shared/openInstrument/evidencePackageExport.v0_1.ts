@@ -9,7 +9,7 @@ import type { TelemetryViewModel, Vowel } from "@/ui/telemetry/types";
 export const EVIDENCE_PACKAGE_EXPORT_SCHEMA_VERSION_V0_1 =
   "open-instrument.evidence-package-export.v0.1" as const;
 export const EVIDENCE_PACKAGE_EXPORT_PURPOSE_V0_1 =
-  "VM-derived evidence export for audit/handoff; no origin proof; no forced answer." as const;
+  "VM-derived evidence export for audit/handoff; no origin proof; interpretations remain open for user review." as const;
 export const EVIDENCE_PACKAGE_EXPORT_FORBIDDEN_KEYS_V0_1 = [
   "raw",
   "debug",

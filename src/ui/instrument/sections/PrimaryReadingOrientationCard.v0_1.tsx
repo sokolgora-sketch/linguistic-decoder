@@ -96,8 +96,8 @@ function buildOrientationState(vm: TelemetryViewModel): OrientationState {
   const hasLexicalEvidence = hasLexicalSourceEvidence(vm);
   const formattedPath = formatVoicePath(vm);
   const status =
-    vm.analysisStatusV0_1?.kind === "present"
-      ? vm.analysisStatusV0_1.value.status
+    vm.analysisStatusV0_2?.kind === "present"
+      ? vm.analysisStatusV0_2.value.status
       : undefined;
 
   return {

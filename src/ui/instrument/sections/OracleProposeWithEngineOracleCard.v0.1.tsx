@@ -352,7 +352,7 @@ export function OracleProposeWithEngineOracleCardV01(props: Props) {
       </div>
 
       <div className="mt-4 rounded-[10px] border border-[#27313d] bg-[#0d1117] p-3 text-[11px] leading-5 text-[#7d8ea3]">
-        Boundary: optional diagnostic only; does not change this readout; no automatic origin proof; no forced answer.
+        Boundary: optional diagnostic only; does not change this readout; no automatic origin proof; interpretation remains with the user.
       </div>
 
       <div className="mt-4 min-w-0 space-y-3">

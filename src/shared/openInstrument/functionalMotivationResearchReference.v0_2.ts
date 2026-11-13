@@ -1,10 +1,14 @@
 import type { CrossLanguageOperationLedgerInputV0_2 } from "@/shared/openInstrument/crossLanguageOperationLedger.v0_2";
 import type { SingleWordFunctionalMotivationInputV0_1 } from "@/shared/openInstrument/singleWordFunctionalMotivation.v0_1";
+import {
+  INTERPRETATION_DECISION_POLICY_V0_1,
+  type InterpretationDecisionPolicyV0_1,
+} from "@/shared/openInstrument/interpretationDecisionPolicy.v0_1";
 
-export const FUNCTIONAL_MOTIVATION_RESEARCH_REFERENCE_SCHEMA_V0_1 =
-  "open-instrument.functional-motivation-research-reference.v0_1" as const;
+export const FUNCTIONAL_MOTIVATION_RESEARCH_REFERENCE_SCHEMA_V0_2 =
+  "open-instrument.functional-motivation-research-reference.v0_2" as const;
 
-export type FunctionalMotivationResearchClaimLayerV0_1 =
+export type FunctionalMotivationResearchClaimLayerV0_2 =
   | "SOURCE_FACT"
   | "DERIVED_STRUCTURE"
   | "LOGICAL_INFERENCE"
@@ -12,8 +16,8 @@ export type FunctionalMotivationResearchClaimLayerV0_1 =
   | "EXPLORATORY_HYPOTHESIS"
   | "UNKNOWN_OR_NULL";
 
-export type FunctionalMotivationResearchReferenceV0_1 = Readonly<{
-  schemaVersion: typeof FUNCTIONAL_MOTIVATION_RESEARCH_REFERENCE_SCHEMA_V0_1;
+export type FunctionalMotivationResearchReferenceV0_2 = Readonly<{
+  schemaVersion: typeof FUNCTIONAL_MOTIVATION_RESEARCH_REFERENCE_SCHEMA_V0_2;
   referenceId: string;
   status: "ACTIVE_METHOD_SPECIMEN";
   authorityBoundary: Readonly<{
@@ -67,7 +71,7 @@ export type FunctionalMotivationResearchReferenceV0_1 = Readonly<{
     components: readonly Readonly<{
       exactSpelling: string;
       proposedRole: string | null;
-      claimLayer: FunctionalMotivationResearchClaimLayerV0_1;
+      claimLayer: FunctionalMotivationResearchClaimLayerV0_2;
       unresolved: boolean;
     }>[];
     exactConcatenation: string;
@@ -114,7 +118,7 @@ export type FunctionalMotivationResearchReferenceV0_1 = Readonly<{
     reason: string;
   }>;
   interpretationBoundary: Readonly<{
-    noSingleWinner: true;
+    decisionPolicy: InterpretationDecisionPolicyV0_1;
     userDecisionPosture: "user_decides";
     embryoMeaning: "UNKNOWN_OR_NULL";
     compoundAttestation: "NOT_CLAIMED";
@@ -123,9 +127,9 @@ export type FunctionalMotivationResearchReferenceV0_1 = Readonly<{
 
 const FJALE = "https://fjale.al";
 
-export const STUDIM_FUNCTIONAL_MOTIVATION_REFERENCE_V0_1 = {
-  schemaVersion: FUNCTIONAL_MOTIVATION_RESEARCH_REFERENCE_SCHEMA_V0_1,
-  referenceId: "sq.standard.studim.two-root-method-specimen.v0_1",
+export const STUDIM_FUNCTIONAL_MOTIVATION_REFERENCE_V0_2 = {
+  schemaVersion: FUNCTIONAL_MOTIVATION_RESEARCH_REFERENCE_SCHEMA_V0_2,
+  referenceId: "sq.standard.studim.two-root-method-specimen.v0_2",
   status: "ACTIVE_METHOD_SPECIMEN",
   authorityBoundary: {
     canonicality: "APPROVED_RESEARCH_EXAMPLE_AND_METHOD_ONLY",
@@ -345,9 +349,9 @@ export const STUDIM_FUNCTIONAL_MOTIVATION_REFERENCE_V0_1 = {
     reason: "This Standard Albanian worked case makes no foreign-language witness claim; source references remain separately attributed.",
   },
   interpretationBoundary: {
-    noSingleWinner: true,
+    decisionPolicy: INTERPRETATION_DECISION_POLICY_V0_1,
     userDecisionPosture: "user_decides",
     embryoMeaning: "UNKNOWN_OR_NULL",
     compoundAttestation: "NOT_CLAIMED",
   },
-} satisfies FunctionalMotivationResearchReferenceV0_1;
+} satisfies FunctionalMotivationResearchReferenceV0_2;

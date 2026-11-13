@@ -43,7 +43,7 @@ personally identifying information.
 | T6 Evidence Package |  |  |  |  |  |  |  |  |
 | T7 RRB export/reopen |  |  |  |  |  |  |  |  |
 | T8 imported provenance |  |  |  |  |  |  |  |  |
-| T9 automatic selection/user decides |  |  |  |  |  |  |  |  |
+| T9 no winner/user decides |  |  |  |  |  |  |  |  |
 
 ## Verbatim answers and notes
 
@@ -128,7 +128,7 @@ Follow-up question and answer:
 | Evidence trace success | |
 | Export/reopen understanding | |
 | Null/error distinction | |
-| Automatic selection avoidance | |
+| Winner avoidance | |
 | Confidence in interpretation | |
 | Repeated critical misunderstanding observed | Yes / No |
 | Product contradiction observed | Yes / No |
@@ -143,7 +143,7 @@ Check any observed critical condition:
 - [ ] Research evidence treated as production truth.
 - [ ] Null treated as system failure.
 - [ ] Imported snapshot believed to have been freshly reanalyzed.
-- [ ] One interpretation treated as automatically selected by the engine.
+- [ ] One candidate treated as an engine-selected winner.
 
 Critical details:
 

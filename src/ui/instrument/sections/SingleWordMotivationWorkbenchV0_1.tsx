@@ -1267,7 +1267,7 @@ function CurrentWordEvidenceSectionV0_1({
                   </div>
                 ) : null}
                 <div className="mt-1 font-semibold">Structural embryo meaning/function: UNKNOWN_OR_NULL. Structural candidates do not establish a lexical meaning or functional operation.</div>
-                <div>No interpretation is selected automatically: {visibleDiscovery.noSingleWinner ? "true" : "UNKNOWN_OR_NULL"} · user decision posture: {visibleDiscovery.userDecisionPosture}.</div>
+                <div>Multiple interpretations may coexist. Automatic interpretation selection is disabled; the user decides how to interpret the evidence.</div>
               </section>
             </li>
           </ol>

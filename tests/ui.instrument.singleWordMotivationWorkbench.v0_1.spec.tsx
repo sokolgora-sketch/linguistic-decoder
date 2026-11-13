@@ -925,7 +925,7 @@ describe("Single-word motivation workbench v0.1", () => {
     expect(screen.getByTestId("single-word-progressive-source-motivated-candidate-qualification")).toHaveTextContent(
       "The source-template gloss annotation “bee” matches these candidate glosses by complete-token inclusion; this is a candidate filter, not an exact sense crosswalk.",
     );
-    expect(trace).toHaveTextContent("No interpretation is selected automatically: true · user decision posture: user_decides");
+    expect(trace).toHaveTextContent("Multiple interpretations may coexist. Automatic interpretation selection is disabled; the user decides how to interpret the evidence.");
     const sourceAlternatives = screen.getByTestId("single-word-progressive-source-relationships");
     for (const alternativeSense of ["bee-insect", "bee-swarm", "bee-hive", "bee-quick", "blej-form"]) {
       expect(sourceAlternatives).toHaveTextContent(alternativeSense);

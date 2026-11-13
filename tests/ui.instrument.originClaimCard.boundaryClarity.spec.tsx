@@ -18,17 +18,17 @@ describe("OriginClaimCard boundary clarity", () => {
     expect(screen.getByText("Origin Claim")).toBeInTheDocument();
     expect(
       screen.getByText(
-        /Observational claim summary for inspection only\. No historical proof, no forced answer, and the final decision stays with the user\./i
+        /Observational claim summary for inspection only\. Multiple interpretations may coexist; automatic selection is disabled, and the user decides\. No historical proof is claimed\./i
       )
     ).toBeInTheDocument();
     expect(screen.getByText("Decision posture:")).toBeInTheDocument();
     const postureLabel = screen.getByText("Decision posture:");
-    expect(postureLabel.parentElement?.textContent ?? "").toMatch(/no forced answer/i);
+    expect(postureLabel.parentElement?.textContent ?? "").toMatch(/multiple interpretations may coexist/i);
     expect(screen.getByText("Gate diagnostics active:")).toBeInTheDocument();
     expect(screen.getByText("false")).toBeInTheDocument();
     expect(
       screen.getByText(
-        /Boundary: observational summary only; no historical proof; no forced answer; user decides\./i
+        /Boundary: observational summary only; no historical proof; automatic interpretation selection is disabled; the user decides\./i
       )
     ).toBeInTheDocument();
   });

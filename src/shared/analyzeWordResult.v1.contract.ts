@@ -1,5 +1,46 @@
 import { z } from "zod";
 import { WordSpecificFunctionalDepthContractSchema } from "./openInstrument/wordSpecificFunctionalDepth.v0_1";
+import { isFunctionalMotivationInterpretationV0_3 } from "./openInstrument/functionalMotivationInterpretation.v0_3";
+
+export const InterpretationDecisionPolicyV0_1ContractSchema = z
+  .object({
+    schemaVersion: z.literal("open-instrument.interpretation-decision-policy.v0_1"),
+    multipleInterpretationsMayCoexist: z.literal(true),
+    automaticInterpretationSelection: z.literal("DISABLED"),
+    interpretationDecisionAuthority: z.literal("USER_DECIDES"),
+    alternativeProvenance: z.literal("PRESERVED_PER_INTERPRETATION"),
+    alternativeClaimStatus: z.literal("PRESERVED_PER_INTERPRETATION"),
+  })
+  .strict();
+
+export const AnalysisStatusV0_2ContractSchema = z
+  .object({
+    schemaVersion: z.literal("open-instrument.analysis-status.v0_2"),
+    status: z.enum([
+      "reviewed_functional_evidence",
+      "research_functional_hypothesis",
+      "candidate_only",
+      "structural_unreviewed",
+      "null_no_supported_candidate",
+    ]),
+    summary: z.string().min(1),
+    reviewedOperators: z.array(z.string()),
+    candidateOnlyOperators: z.array(z.string()),
+    researchHypothesisEmbryos: z.array(z.string()),
+    structuralTokens: z.array(z.string()),
+    claimBoundary: z.object({
+      historicalOriginClaim: z.literal("not_claimed"),
+      historicalTransmissionClaim: z.literal("not_claimed"),
+      languageSuperiorityClaim: z.literal("not_claimed"),
+      linguisticOwnershipClaim: z.literal("not_claimed"),
+      candidateTruthClaim: z.literal("not_claimed"),
+      structuralOutputIsCandidateTruth: z.literal(false),
+      nullIsValid: z.literal(true),
+    }).strict(),
+    interpretationDecisionPolicy: InterpretationDecisionPolicyV0_1ContractSchema,
+    userDecisionPosture: z.literal("user_decides"),
+  })
+  .strict();
 
 /**
  * analyze-v1 CONTRACT (runtime enforced)
@@ -208,6 +249,7 @@ export const AnalyzeWordResultV1ContractSchema = z
     deepRoot: z.unknown().optional(),
     rootMap: z.unknown().optional(),
     analysisStatusV0_1: AnalysisStatusV0_1ContractSchema.optional(),
+    analysisStatusV0_2: AnalysisStatusV0_2ContractSchema.optional(),
       heartPrimaryPath: z.unknown().optional(),
       resonanceProfileV1: z.unknown().optional(),
     // Origin Claim Protocol (V1) — keep loose until protocol stabilizes
@@ -226,6 +268,10 @@ export const AnalyzeWordResultV1ContractSchema = z
     wordSpecificFunctionalDepth:
       WordSpecificFunctionalDepthContractSchema.nullable().optional(),
     functionalMotivationInterpretationV0_2: z.unknown().optional(),
+    functionalMotivationInterpretationV0_3: z.unknown().refine(
+      (value) => isFunctionalMotivationInterpretationV0_3(value),
+      "functionalMotivationInterpretationV0_3 contract invalid",
+    ).optional(),
   })
   .strict();
 
@@ -261,6 +307,7 @@ export function toAnalyzeWordResultV1Contract(input: unknown): AnalyzeWordResult
     deepRoot: o.deepRoot,
     rootMap: o.rootMap,
     analysisStatusV0_1: o.analysisStatusV0_1,
+    analysisStatusV0_2: o.analysisStatusV0_2,
       heartPrimaryPath: o.heartPrimaryPath,
       resonanceProfileV1: o.resonanceProfileV1,
     wordMatrix: o.wordMatrix,
@@ -276,6 +323,7 @@ export function toAnalyzeWordResultV1Contract(input: unknown): AnalyzeWordResult
     doctrineReading: o.doctrineReading,
     wordSpecificFunctionalDepth: o.wordSpecificFunctionalDepth,
     functionalMotivationInterpretationV0_2: o.functionalMotivationInterpretationV0_2,
+    functionalMotivationInterpretationV0_3: o.functionalMotivationInterpretationV0_3,
   };
 
   return AnalyzeWordResultV1ContractSchema.parse(picked);

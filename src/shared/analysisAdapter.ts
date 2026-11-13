@@ -616,7 +616,7 @@ export function enginePayloadToAnalysisResult(payload: EnginePayload): AnalyzeWo
   //   Null only when structural discovery emits no defensible embryo;
   // - both paths remain target/embryo generic and source rows own
   //   their target-specific functional hypotheses;
-  // - no reviewed evidence, OriginClaim, winner truth, or provider
+  // - no reviewed evidence, OriginClaim, interpretation-selection authority, or provider
   //   execution is created here;
   // - structural candidates remain present only on the structural path.
   const projectedStructuralResearchCandidatesV0_1 =
@@ -701,7 +701,7 @@ export function enginePayloadToAnalysisResult(payload: EnginePayload): AnalyzeWo
   // Source-attested exact-form evidence is independent authority and MUST
   // NOT be interpreted as validating a logic-derived structural embryo.
   // Source rows must directly attest their declared embryo as an exact form.
-  // No structural chain is fabricated and no reviewed/origin/winner/
+  // No structural chain is fabricated and no reviewed/origin/selection/
   // candidate truth is created here.
   const shouldProjectSourceAttestedResearchV0_1 =
     baselineAnalysisStatusV0_1
@@ -1067,7 +1067,7 @@ export function enginePayloadToAnalysisResult(payload: EnginePayload): AnalyzeWo
   // - RootMap remains the reviewed-evidence authority.
   // - OriginClaim and analysisStatus are already computed before this overlay.
   // - This layer exposes already-authorized functional evidence; it does not
-  //   create evidence, rewrite RootMap, or feed origin/winner computation.
+  //   create evidence, rewrite RootMap, or feed origin/interpretation-selection computation.
   const reviewedVisibleCandidates =
     buildReviewedFunctionalCandidateProjectionsFromRootMapV0_1({
       rootMap,

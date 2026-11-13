@@ -22,24 +22,35 @@ const USER_FACING_COPY_FILES = [
   "src/ui/instrument/sections/AnalysisStatusCard.v0.1.tsx",
   "src/ui/instrument/sections/EmbryoExpansionContextCard.v0_1.tsx",
   "src/ui/instrument/sections/FjaloriCrossSourceEvidence.v0_1.tsx",
+  "src/ui/instrument/sections/CountsRatiosCard.tsx",
+  "src/ui/instrument/sections/EvidencePackageCard.tsx",
+  "src/ui/instrument/sections/EvidenceTraceCard.tsx",
+  "src/ui/instrument/sections/OracleProposeWithEngineOracleCard.v0.1.tsx",
+  "src/ui/instrument/sections/OriginClaimGatesCard.tsx",
+  "src/ui/instrument/sections/RawJsonCard.tsx",
+  "src/ui/instrument/sections/ReadoutCard.tsx",
   "src/ui/candidates/CandidatesAccordion.tsx",
   "src/components/DeepRootCard.tsx",
+  "src/components/OriginClaimCard.tsx",
+  "src/ui/instrument/MeaningPanel.tsx",
+  "src/ui/instrument/RootMapCard.tsx",
   "app/instrument-preview/page.tsx",
   "docs/ZERO_REALITY_GUIDE.md",
-  "docs/ui-telemetry-contract.v0.1.md",
-  "docs/open-instrument/evaluation/open-instrument-structured-user-evaluation-v0.1.md",
-  "docs/open-instrument/evaluation/open-instrument-structured-user-evaluation-score-sheet-v0.1.md",
+  "docs/ui-telemetry-contract.v0.2.md",
+  "docs/open-instrument/evaluation/open-instrument-structured-user-evaluation-v0.2.md",
+  "docs/open-instrument/evaluation/open-instrument-structured-user-evaluation-score-sheet-v0.2.md",
   "src/ui/instrument/spokenPronunciationPresentation.v0_1.ts",
-  "src/ui/telemetry/buildEvidenceSummaryTextFromVM.ts",
-  "src/shared/reviewedExternalLexiconFunctionalReadiness.v0_1.ts",
+  "src/shared/openInstrument/evidencePackageExport.v0_1.ts",
+  "src/shared/deepRoot.rootMap.builder.v1.ts",
   "src/shared/openInstrument/motivationEngineDiscoveryServerOnly.v0_1.ts",
   "src/shared/llm/prompts/functionalCandidateProposer.v0.1.ts",
   "src/shared/llm/prompts/semanticAlignmentProposer.v0.1.ts",
   "src/shared/openInstrument/zhejiTransparencyPrompt.v0.1.ts",
+  "src/ui/telemetry/buildEvidenceSummaryTextFromVM.ts",
 ] as const;
 
-describe("neutral interpretation language presentation v0.1", () => {
-  it("rewrites legacy claim-boundary copy only at presentation time", () => {
+describe("legacy interpretation boundary-copy compatibility", () => {
+  it("renders old claim-boundary text neutrally without mutating the stored value", () => {
     const legacy = "No single winner is selected; winner claims remain unclaimed.";
     const presented = presentNeutralInterpretationBoundaryV0_1(legacy);
 

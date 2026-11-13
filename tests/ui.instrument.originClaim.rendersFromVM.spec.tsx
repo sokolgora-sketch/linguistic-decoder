@@ -75,11 +75,11 @@ describe("ui: InstrumentPanel renders Origin Claim from VM", () => {
     expect(title).toBeInTheDocument();
 
     // Raw JSON may preserve the contract token; the visible Origin Claim card should use reader-facing copy.
-    const cardRoot = findNearestAncestorWithText(title as HTMLElement, /no forced answer/i);
+    const cardRoot = findNearestAncestorWithText(title as HTMLElement, /multiple interpretations may coexist/i);
     expect(cardRoot).toBeTruthy();
 
     const postureLabel = within(cardRoot as HTMLElement).getByText("Decision posture:");
-    expect(postureLabel.parentElement?.textContent ?? "").toMatch(/no forced answer/i);
+    expect(postureLabel.parentElement?.textContent ?? "").toMatch(/multiple interpretations may coexist/i);
     expect((cardRoot as HTMLElement).textContent).not.toContain("no_single_winner");
   });
 });

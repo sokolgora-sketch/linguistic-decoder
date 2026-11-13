@@ -21,7 +21,9 @@ describe("OriginClaimGatesCard clarity", () => {
     expect(screen.getByText(/Candidates:/)).toHaveTextContent("Candidates: 3");
     expect(screen.getByText(/Boundary: diagnostics only/i)).toBeInTheDocument();
     expect(screen.getByText(/no origin proof/i)).toBeInTheDocument();
-    expect(screen.getByText(/no forced answer/i)).toBeInTheDocument();
+    expect(screen.getByText(/multiple interpretations may coexist/i)).toBeInTheDocument();
+    expect(screen.getByText(/automatic selection is disabled/i)).toBeInTheDocument();
+    expect(screen.getByText(/the user decides/i)).toBeInTheDocument();
     expect(screen.getByText(/"KEEP":\s*2/)).toBeInTheDocument();
     expect(screen.getByText(/"DROP":\s*1/)).toBeInTheDocument();
   });

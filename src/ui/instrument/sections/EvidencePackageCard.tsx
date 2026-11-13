@@ -82,7 +82,7 @@ export function EvidencePackageCard(props: Props) {
       </div>
 
       <div className="mt-4 rounded-[10px] border border-[#27313d] bg-[#0d1117] p-3 text-[11px] leading-5 text-[#7d8ea3]">
-        Boundary: VM-derived export actions only; raw engine JSON stays in Advanced; no origin proof; no forced answer.
+        Boundary: VM-derived export actions only; raw engine JSON stays in Advanced; no origin proof; interpretations remain open for user review.
       </div>
     </section>
   );

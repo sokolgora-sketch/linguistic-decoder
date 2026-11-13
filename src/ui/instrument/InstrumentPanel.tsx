@@ -278,16 +278,16 @@ export function InstrumentPanel(props: Props) {
 
   const primaryNullStatus =
     isValidVm &&
-    vm.analysisStatusV0_1?.kind === "present" &&
-    vm.analysisStatusV0_1.value.status ===
+    vm.analysisStatusV0_2?.kind === "present" &&
+    vm.analysisStatusV0_2.value.status ===
       "null_no_supported_candidate"
-      ? vm.analysisStatusV0_1
+      ? vm.analysisStatusV0_2
       : null;
 
   const primaryAnalysisStatus =
     isValidVm &&
-    vm.analysisStatusV0_1?.kind === "present"
-      ? vm.analysisStatusV0_1
+    vm.analysisStatusV0_2?.kind === "present"
+      ? vm.analysisStatusV0_2
       : null;
 
   React.useEffect(() => {
@@ -558,7 +558,7 @@ export function InstrumentPanel(props: Props) {
                 ) : null}
                 <PrimaryAlbanianReadingCardV0_1
                   discovery={vm.motivationDiscoveryV0_1}
-                  analysisStatus={vm.analysisStatusV0_1}
+                  analysisStatus={vm.analysisStatusV0_2}
                 />
               </div>
 
@@ -568,7 +568,7 @@ export function InstrumentPanel(props: Props) {
 
               <MotivationDiscoveryCardV0_1
                 discovery={vm.motivationDiscoveryV0_1}
-                interpretation={vm.functionalMotivationInterpretationV0_2}
+                interpretation={vm.functionalMotivationInterpretationV0_3}
                 onAnalyzeAlbanianSourceRecord={props.onAnalyzeAlbanianSourceRecord}
                 sourceRecordSelectionDisabled={props.sourceRecordSelectionDisabled}
               />
@@ -758,10 +758,10 @@ export function InstrumentPanel(props: Props) {
                 {!primaryNullStatus ? (
                   <AnalysisStatusCardV0_1
                     status={
-                      vm.analysisStatusV0_1 ?? {
+                      vm.analysisStatusV0_2 ?? {
                         kind: "missing",
                         missing: "not_emitted",
-                        note: "analysisStatusV0_1",
+                        note: "analysisStatusV0_2",
                       }
                     }
                   />

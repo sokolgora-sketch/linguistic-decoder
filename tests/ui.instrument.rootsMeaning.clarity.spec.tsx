@@ -63,7 +63,7 @@ describe("Open Instrument roots/meaning clarity", () => {
     expect(screen.getByText("Root Map")).toBeInTheDocument();
     expect(screen.getByText("Constructed reading (hypothesis)")).toBeInTheDocument();
     expect(screen.getByText(/not origin proof/i)).toBeInTheDocument();
-    expect(screen.getByText(/no forced answer/i)).toBeInTheDocument();
+    expect(screen.getByText(/interpretations are not selected automatically/i)).toBeInTheDocument();
     expect(screen.getByText("Keys")).toBeInTheDocument();
   });
 

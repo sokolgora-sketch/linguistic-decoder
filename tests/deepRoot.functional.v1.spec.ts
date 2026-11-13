@@ -51,7 +51,7 @@ describe("DeepRoot functional roots v1 (conservative)", () => {
           "english surface → sq carrier (short form)",
           "note: this is a minimal-root hypothesis, not a historical-chain claim",
           "Deterministic pilot hypothesis (v1.1).",
-          "No winner; functional carrier only.",
+          "Multiple interpretations may coexist; functional carrier only.",
         ],
       },
     ]);

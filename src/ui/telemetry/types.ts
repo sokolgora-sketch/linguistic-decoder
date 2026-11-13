@@ -9,6 +9,8 @@ import type {
   FunctionalMotivationCandidateInterpretationV0_2,
   FunctionalMotivationInterpretationV0_2,
 } from "@/shared/openInstrument/functionalMotivationInterpretation.v0_2";
+import type { FunctionalMotivationInterpretationV0_3 } from "@/shared/openInstrument/functionalMotivationInterpretation.v0_3";
+import type { AnalysisStatusV0_2 } from "@/shared/analysisStatus.v0_2";
 import type {
   GenericFunctionalWitnessSourceProvenanceV1,
 } from "@/shared/openInstrument/genericFunctionalWitnessDiscovery.v1";
@@ -45,6 +47,8 @@ export type PresentOrMissing<T> =
 export type RootMapVM = RootMapV1;
 export type DoctrineReadingVM = DoctrineReadingV1;
 export type FunctionalMotivationInterpretationV0_2VM = FunctionalMotivationInterpretationV0_2;
+export type FunctionalMotivationInterpretationV0_3VM = FunctionalMotivationInterpretationV0_3;
+export type AnalysisStatusV0_2VM = AnalysisStatusV0_2;
 export type FunctionalMotivationCandidateInterpretationV0_2VM = FunctionalMotivationCandidateInterpretationV0_2;
 
 export type SoundRootsWarningVM = {
@@ -230,8 +234,8 @@ export interface CandidateRowVM {
   fitTag?: PresentOrMissing<string>;
 
   // v0.3 honest-provenance: SEED | LLM_PROPOSED | DATASET | USER_ADDED, etc.
-  // Surfaced from candidateRecord.source.kind. Blueprint section 0: "no single
-  // winner" — provenance must be visible, not implied.
+  // Surfaced from candidateRecord.source.kind. Multiple interpretations may
+  // coexist, so provenance must be visible rather than implied.
   sourceKind: PresentOrMissing<string>;
 
   // Multi-source functional-research provenance.
@@ -506,6 +510,8 @@ export interface TelemetryViewModel {
   raw: unknown;
 
   analysisStatusV0_1?: PresentOrMissing<AnalysisStatusV0_1VM>;
+  analysisStatusV0_2?: PresentOrMissing<AnalysisStatusV0_2>;
   motivationDiscoveryV0_1?: PresentOrMissing<MotivationDiscoveryV0_1VM>;
   functionalMotivationInterpretationV0_2?: PresentOrMissing<FunctionalMotivationInterpretationV0_2VM>;
+  functionalMotivationInterpretationV0_3?: PresentOrMissing<FunctionalMotivationInterpretationV0_3VM>;
 }

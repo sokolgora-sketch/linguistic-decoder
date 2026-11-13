@@ -52,7 +52,7 @@ describe("Open Instrument Overview readout clarity", () => {
     expect(screen.getByText("Detection")).toBeInTheDocument();
     expect(screen.getByText(/Boundary: deterministic readout only/i)).toBeInTheDocument();
     expect(screen.getByText(/no origin proof/i)).toBeInTheDocument();
-    expect(screen.getByText(/no forced answer/i)).toBeInTheDocument();
+    expect(screen.getByText(/interpretations are not selected automatically/i)).toBeInTheDocument();
   });
 
   it("presents counts and ratios as humanized overview metrics", () => {
@@ -65,8 +65,8 @@ describe("Open Instrument Overview readout clarity", () => {
     expect(screen.getByText("Counts")).toBeInTheDocument();
     expect(screen.getByText("Ratios")).toBeInTheDocument();
     expect(screen.getByText(/Boundary: overview metrics only/i)).toBeInTheDocument();
-    expect(screen.getByText(/no score order/i)).toBeInTheDocument();
-    expect(screen.getByText(/no forced answer/i)).toBeInTheDocument();
+    expect(screen.getByText(/display order does not recommend an interpretation/i)).toBeInTheDocument();
+    expect(screen.getByText(/automatic selection is disabled/i)).toBeInTheDocument();
   });
 
   it("presents evidence trace as a VM field trace, not a proof chain", () => {
@@ -86,6 +86,6 @@ describe("Open Instrument Overview readout clarity", () => {
     expect(screen.getByText("vm.readout: present")).toBeInTheDocument();
     expect(screen.getByText(/Boundary: VM field trace only/i)).toBeInTheDocument();
     expect(screen.getByText(/not a proof chain/i)).toBeInTheDocument();
-    expect(screen.getByText(/no forced answer/i)).toBeInTheDocument();
+    expect(screen.getByText(/interpretations are not selected automatically/i)).toBeInTheDocument();
   });
 });

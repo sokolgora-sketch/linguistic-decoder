@@ -2,17 +2,17 @@ import {
   buildCrossLanguageOperationLedgerV0_2,
 } from "@/shared/openInstrument/crossLanguageOperationLedger.v0_2";
 import {
-  STUDIM_FUNCTIONAL_MOTIVATION_REFERENCE_V0_1 as specimen,
-} from "@/shared/openInstrument/functionalMotivationResearchReference.v0_1";
+  STUDIM_FUNCTIONAL_MOTIVATION_REFERENCE_V0_2 as specimen,
+} from "@/shared/openInstrument/functionalMotivationResearchReference.v0_2";
 import {
   buildSingleWordFunctionalMotivationProposalV0_1,
 } from "@/shared/openInstrument/singleWordFunctionalMotivation.v0_1";
 
-describe("data-driven functional-motivation research reference v0.1", () => {
+describe("data-driven functional-motivation research reference v0.2", () => {
   it("keeps the approved STUDIM example active and separates claim layers", () => {
     expect(specimen).toMatchObject({
       status: "ACTIVE_METHOD_SPECIMEN",
-      referenceId: "sq.standard.studim.two-root-method-specimen.v0_1",
+      referenceId: "sq.standard.studim.two-root-method-specimen.v0_2",
       authorityBoundary: {
         canonicality: "APPROVED_RESEARCH_EXAMPLE_AND_METHOD_ONLY",
         productionAuthority: "NONE",
@@ -138,9 +138,17 @@ describe("data-driven functional-motivation research reference v0.1", () => {
     ]);
     expect(specimen.crossLanguageWitnesses.status).toBe("NOT_ASSERTED");
     expect(specimen.interpretationBoundary).toMatchObject({
-      noSingleWinner: true,
+      decisionPolicy: {
+        schemaVersion: "open-instrument.interpretation-decision-policy.v0_1",
+        multipleInterpretationsMayCoexist: true,
+        automaticInterpretationSelection: "DISABLED",
+        interpretationDecisionAuthority: "USER_DECIDES",
+        alternativeProvenance: "PRESERVED_PER_INTERPRETATION",
+        alternativeClaimStatus: "PRESERVED_PER_INTERPRETATION",
+      },
       userDecisionPosture: "user_decides",
       embryoMeaning: "UNKNOWN_OR_NULL",
     });
+    expect(specimen.interpretationBoundary).not.toHaveProperty("noSingleWinner");
   });
 });

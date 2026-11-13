@@ -89,7 +89,7 @@ describe(
 
         expect(
           screen.getByText(
-            /Interpretation remains with the user/i,
+            /The user decides how to interpret the evidence/i,
           ),
         ).toBeInTheDocument();
       },
@@ -164,11 +164,11 @@ describe(
         );
 
         expect(panel).toContain(
-          "vm.analysisStatusV0_1 ?? {",
+          "vm.analysisStatusV0_2 ?? {",
         );
 
         expect(adapter).toContain(
-          "analysisStatusV0_1: parseAnalysisStatusV0_1(payload)",
+          "analysisStatusV0_2: parseAnalysisStatusV0_2(payload)",
         );
 
         expect(card).not.toContain(

@@ -54,7 +54,7 @@ export function OriginClaimGatesCard({ gates }: Props) {
           Candidates: <span className="font-mono">{gates.candidateCount}</span>
         </div>
         <div className="mt-2 text-[11px] leading-5 text-[#7d8ea3]">
-          Boundary: diagnostics only; no origin proof; no forced answer.
+          Boundary: diagnostics only; no origin proof. Multiple interpretations may coexist; automatic selection is disabled; the user decides.
         </div>
       </div>
 

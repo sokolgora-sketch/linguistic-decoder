@@ -209,7 +209,7 @@ export function ReadoutCard({
       </div>
 
       <div className="mt-4 rounded-[10px] border border-[#27313d] bg-[#0d1117] p-3 text-[11px] leading-5 text-[#7d8ea3]">
-        Boundary: deterministic readout only; spoken/canonical and candidate paths are not word-specific functional evidence; no origin proof; no forced answer.
+        Boundary: deterministic readout only; spoken/canonical and candidate paths are not word-specific functional evidence; no origin proof; interpretations are not selected automatically.
       </div>
     </div>
   );

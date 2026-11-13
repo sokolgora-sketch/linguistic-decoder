@@ -23,7 +23,10 @@ const LEGACY_BOUNDARY_COPY_REPLACEMENTS_V0_1: readonly (readonly [RegExp, string
   [/\bno winner\b/giu, "interpretation remains with the user"],
 ];
 
-/** Converts known legacy claim-boundary copy at render time without changing stored payloads. */
+/**
+ * Compatibility-only copy handling for immutable V0.1 payloads. Mutable
+ * generators must emit the neutral interpretation policy directly.
+ */
 export function presentNeutralInterpretationBoundaryV0_1(value: string): string {
   const presented = LEGACY_BOUNDARY_COPY_REPLACEMENTS_V0_1.reduce(
     (text, [pattern, replacement]) => text.replace(pattern, replacement),

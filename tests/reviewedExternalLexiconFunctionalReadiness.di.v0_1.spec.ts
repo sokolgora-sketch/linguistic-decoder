@@ -47,6 +47,9 @@ describe("reviewed external lexicon functional readiness DI v0.1", () => {
     expect(
       readiness.items.filter((item) => !item.passed),
     ).toEqual([]);
+    expect(
+      readiness.items.find((item) => item.id === "winner_not_claimed")?.label,
+    ).toBe("No historical or linguistic interpretation is selected automatically.");
 
     expect(row).toEqual(
       expect.objectContaining({

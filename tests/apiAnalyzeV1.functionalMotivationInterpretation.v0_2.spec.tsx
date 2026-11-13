@@ -15,6 +15,72 @@ async function analyze(body: Record<string, unknown>) {
 }
 
 describe("analyze-v1 Functional Motivation Interpretation v0.2 boundary", () => {
+  it("emits neutral versioned contracts and keeps V0.2 only as a compatibility field", async () => {
+    const payload = await analyze({
+      word: "study",
+      mode: "strict",
+      alphabet: "auto",
+      providerExecution: "disabled",
+    });
+    const legacy = payload.functionalMotivationInterpretationV0_2;
+    const current = payload.functionalMotivationInterpretationV0_3;
+    const currentStatus = payload.analysisStatusV0_2;
+
+    expect(current.schemaVersion).toBe("open-instrument.functional-motivation-interpretation.v0_3");
+    expect(current.interpretationDecisionPolicy).toMatchObject({
+      multipleInterpretationsMayCoexist: true,
+      automaticInterpretationSelection: "DISABLED",
+      interpretationDecisionAuthority: "USER_DECIDES",
+      alternativeProvenance: "PRESERVED_PER_INTERPRETATION",
+      alternativeClaimStatus: "PRESERVED_PER_INTERPRETATION",
+    });
+    expect(current.candidates.map((item: { candidateId: string }) => item.candidateId)).toEqual(
+      legacy.candidates.map((item: { candidateId: string }) => item.candidateId),
+    );
+    expect(current.candidates[0]?.sourceFact).toEqual(legacy.candidates[0]?.sourceFact);
+    expect(current.candidates[0]?.hypothesis).toEqual(legacy.candidates[0]?.hypothesis);
+    expect(current).not.toHaveProperty("noSingleWinner");
+    expect(current.claimBoundary).not.toHaveProperty("winnerClaim");
+    expect(current.candidates.every((item: Record<string, unknown>) =>
+      !Object.prototype.hasOwnProperty.call(item, "noSingleWinner") &&
+      !Object.prototype.hasOwnProperty.call(item, "winnerClaim"),
+    )).toBe(true);
+
+    expect(payload.analysisStatusV0_1).toBeDefined();
+    expect(currentStatus).toMatchObject({
+      schemaVersion: "open-instrument.analysis-status.v0_2",
+      interpretationDecisionPolicy: {
+        multipleInterpretationsMayCoexist: true,
+        automaticInterpretationSelection: "DISABLED",
+        interpretationDecisionAuthority: "USER_DECIDES",
+      },
+    });
+    expect(currentStatus.claimBoundary).not.toHaveProperty("winnerClaim");
+    expect(currentStatus.summary).not.toMatch(/winner/i);
+  });
+
+  it("migrates legacy serialized fields when neutral versions are absent", async () => {
+    const payload = await analyze({
+      word: "study",
+      mode: "strict",
+      alphabet: "auto",
+      providerExecution: "disabled",
+    });
+    const legacyOnly = { ...payload };
+    delete legacyOnly.functionalMotivationInterpretationV0_3;
+    delete legacyOnly.analysisStatusV0_2;
+
+    const vm = adaptAnalysisToTelemetryVM(legacyOnly);
+    expect(vm.functionalMotivationInterpretationV0_3?.kind).toBe("present");
+    if (vm.functionalMotivationInterpretationV0_3?.kind !== "present") return;
+    expect(vm.functionalMotivationInterpretationV0_3.value.interpretationDecisionPolicy.automaticInterpretationSelection)
+      .toBe("DISABLED");
+    expect(vm.analysisStatusV0_2?.kind).toBe("present");
+    if (vm.analysisStatusV0_2?.kind !== "present") return;
+    expect(vm.analysisStatusV0_2.value.interpretationDecisionPolicy.interpretationDecisionAuthority)
+      .toBe("USER_DECIDES");
+  });
+
   it.each([
     ["damage", "reviewed.external.gheg-da.damage.candidate.v0_1"],
     ["study", "reviewed.external.di.knowledge.candidate.v0_1"],

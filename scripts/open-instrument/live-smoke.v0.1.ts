@@ -12,7 +12,7 @@
  *
  * It does not call external model providers.
  * It does not promote evidence.
- * It does not make origin, winner, or superiority claims.
+ * It does not make origin or superiority claims or select one interpretation automatically.
  */
 
 import { spawn, spawnSync, type ChildProcess } from "node:child_process";

@@ -3,6 +3,7 @@
 import type {
   FunctionalMotivationCandidateInterpretationV0_2VM,
   FunctionalMotivationInterpretationV0_2VM,
+  FunctionalMotivationInterpretationV0_3VM,
   MotivationDiscoveryCandidateV0_1VM,
   MotivationDiscoveryV0_1VM,
   PresentOrMissing,
@@ -176,7 +177,9 @@ function functionalSummary(candidate: MotivationDiscoveryCandidateV0_1VM): strin
 }
 
 function interpretationHypothesisSummary(
-  interpretation: FunctionalMotivationCandidateInterpretationV0_2VM,
+  interpretation:
+    | FunctionalMotivationCandidateInterpretationV0_2VM
+    | FunctionalMotivationInterpretationV0_3VM["candidates"][number],
 ): string {
   if (interpretation.hypothesis.statement) return interpretation.hypothesis.statement;
   return nullReasonSummary(interpretation.hypothesis.reason);
@@ -240,7 +243,9 @@ function Candidate({
   interpretation,
 }: {
   witness: MotivationDiscoveryPrimaryWitnessV0_1;
-  interpretation?: FunctionalMotivationCandidateInterpretationV0_2VM;
+  interpretation?:
+    | FunctionalMotivationCandidateInterpretationV0_2VM
+    | FunctionalMotivationInterpretationV0_3VM["candidates"][number];
 }) {
   const candidate = witness.representative;
   const records = witness.records;
@@ -514,7 +519,7 @@ export function MotivationDiscoveryCardV0_1({
   sourceRecordSelectionDisabled = false,
 }: {
   discovery: PresentOrMissing<MotivationDiscoveryV0_1VM> | undefined;
-  interpretation?: PresentOrMissing<FunctionalMotivationInterpretationV0_2VM>;
+  interpretation?: PresentOrMissing<FunctionalMotivationInterpretationV0_2VM | FunctionalMotivationInterpretationV0_3VM>;
   onAnalyzeAlbanianSourceRecord?: (sourceRecordId: string) => void;
   sourceRecordSelectionDisabled?: boolean;
 }) {
@@ -1638,7 +1643,7 @@ export function MotivationDiscoveryCardV0_1({
           data-testid="functional-motivation-interpretation-malformed"
           className="mt-3 rounded-lg border border-[#5b3434] bg-[#1a1111] p-3 text-xs text-[#f0c0c0]"
         >
-          Functional Motivation Interpretation v0.2 was emitted but malformed; the UI failed closed.
+          Functional Motivation Interpretation v0.3 was emitted but malformed; the UI failed closed.
         </div>
       ) : null}
 

@@ -46,7 +46,7 @@ export function RawJsonCard(props: {
           </summary>
 
           <div className="mt-3 rounded-[10px] border border-[#27313d] bg-[#0d1117] p-3 text-[11px] leading-5 text-[#7d8ea3]">
-            Boundary: raw audit payload only; readable cards remain the primary surface; no forced answer.
+            Boundary: raw audit payload only; readable cards remain the primary surface; the user decides how to interpret the evidence.
             <div className="mt-2">
               engine: <span className="font-mono text-[#d7dde7]">{engineLabel}</span>
             </div>

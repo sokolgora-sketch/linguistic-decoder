@@ -61,6 +61,10 @@ import {
 import {
   buildFunctionalMotivationInterpretationV0_2,
 } from "@/shared/openInstrument/functionalMotivationInterpretation.v0_2";
+import {
+  migrateFunctionalMotivationInterpretationV0_2ToV0_3,
+} from "@/shared/openInstrument/functionalMotivationInterpretation.v0_3";
+import { buildAnalysisStatusV0_2 } from "@/shared/analysisStatus.v0_2";
 
 const BodySchema = z
   .object({
@@ -1373,6 +1377,7 @@ async function runAnalyzeV1Orchestration(
       ...ensured,
       rootMap: (out as any).rootMap,
       analysisStatusV0_1: (out as any).analysisStatusV0_1,
+      analysisStatusV0_2: buildAnalysisStatusV0_2(out),
       originClaim: (out as any).originClaim,
       originClaimGates: { flag: "ocg", active: gatesOn },
       evidence: finalEvidence,
@@ -1473,6 +1478,7 @@ async function runAnalyzeV1Orchestration(
       (final as any).analysisStatusV0_1 = buildAnalysisStatusV0_1(
         final,
       );
+      (final as any).analysisStatusV0_2 = buildAnalysisStatusV0_2(final);
 
       try {
         toAnalyzeWordResultV1Contract(final);
@@ -1561,7 +1567,7 @@ async function runAnalyzeV1Orchestration(
         }
       }
       (final as any).motivationDiscoveryV0_1 = discoveryResult.discovery;
-      (final as any).functionalMotivationInterpretationV0_2 =
+      const functionalMotivationInterpretationV0_2 =
         buildFunctionalMotivationInterpretationV0_2({
           discovery: discoveryResult.discovery,
           targetSense: targetSenseId && targetSenseLabel
@@ -1573,6 +1579,12 @@ async function runAnalyzeV1Orchestration(
             : null,
           heart: heartInstrumentV1,
         });
+      (final as any).functionalMotivationInterpretationV0_2 =
+        functionalMotivationInterpretationV0_2;
+      (final as any).functionalMotivationInterpretationV0_3 =
+        migrateFunctionalMotivationInterpretationV0_2ToV0_3(
+          functionalMotivationInterpretationV0_2,
+        );
     }
 
     return NextResponse.json(final);

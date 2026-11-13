@@ -59,6 +59,7 @@ import type {
   MotivationDiscoveryV0_1VM,
   MotivationDiscoveryCandidateV0_1VM,
   FunctionalMotivationInterpretationV0_2VM,
+  FunctionalMotivationInterpretationV0_3VM,
 } from "../telemetry/types";
 import {
   DOCTRINE_READING_COMPOSITION_MODE_V1,
@@ -83,6 +84,7 @@ import { isSevenVoiceKey } from "@/shared/sevenVoiceOrderedViews.v0.1";
 import { analyzeStructuralInputV0_2 } from "@/shared/structuralHypothesisDiscovery.v0_2";
 import { SEVEN_PRINCIPLES, vowelToIndex1, vowelToRingIndex, vowelToColor, vowelToNote } from "@/shared/sevenPrinciples.v1";
 import type { AnalysisStatusV0_1VM } from "../telemetry/types";
+import type { AnalysisStatusV0_2 } from "@/shared/analysisStatus.v0_2";
 import {
   parseGenericFunctionalWitnessRuntimeProjectionV1,
 } from "@/shared/openInstrument/genericFunctionalWitnessRuntimeProjection.v1";
@@ -95,6 +97,15 @@ import {
   type FunctionalMotivationInterpretationV0_2,
   type ReviewedFunctionalEvidenceReferenceV0_2,
 } from "@/shared/openInstrument/functionalMotivationInterpretation.v0_2";
+import {
+  isFunctionalMotivationInterpretationV0_3,
+  migrateFunctionalMotivationInterpretationV0_2ToV0_3,
+  type FunctionalMotivationInterpretationV0_3,
+} from "@/shared/openInstrument/functionalMotivationInterpretation.v0_3";
+import {
+  isAnalysisStatusV0_2,
+  migrateAnalysisStatusV0_1ToV0_2,
+} from "@/shared/analysisStatus.v0_2";
 import {
   getReviewedExternalLexiconProductionSourceRowsV0_1,
 } from "@/shared/reviewedExternalLexiconSourceRowRegistry.v0_1";
@@ -3121,6 +3132,34 @@ function parseFunctionalMotivationInterpretationV0_2(
   return present(projectFunctionalMotivationInterpretationForUiV0_2(value));
 }
 
+function parseFunctionalMotivationInterpretationV0_3(
+  raw: unknown,
+): PresentOrMissing<FunctionalMotivationInterpretationV0_3VM> {
+  const value = getField(raw, "functionalMotivationInterpretationV0_3");
+  const emitted = isRecord(raw) && Object.prototype.hasOwnProperty.call(
+    raw,
+    "functionalMotivationInterpretationV0_3",
+  );
+  if (emitted) {
+    if (!isFunctionalMotivationInterpretationV0_3(value)) {
+      return missing("malformed", "functionalMotivationInterpretationV0_3 shape invalid");
+    }
+    return present(projectFunctionalMotivationInterpretationForUiV0_3(value));
+  }
+
+  // Read old saved/API payloads through the tested versioned migration.
+  const legacy = getField(raw, "functionalMotivationInterpretationV0_2");
+  if (legacy == null) {
+    return missing("not_emitted", "functionalMotivationInterpretationV0_3");
+  }
+  if (!isFunctionalMotivationInterpretationV0_2(legacy)) {
+    return missing("malformed", "legacy functional interpretation shape invalid");
+  }
+  const migrated = migrateFunctionalMotivationInterpretationV0_2ToV0_3(legacy);
+  if (!migrated) return missing("malformed", "legacy interpretation migration failed");
+  return present(projectFunctionalMotivationInterpretationForUiV0_3(migrated));
+}
+
 function reviewedSourceProvenanceForUi(
   sourceId: string,
 ): GenericFunctionalWitnessSourceProvenanceV1 | undefined {
@@ -3154,7 +3193,10 @@ function sourceProvenanceForUi(
 }
 
 function reviewedFunctionalEvidenceAdmittedForUiV0_2(
-  candidate: FunctionalMotivationInterpretationV0_2["candidates"][number] | undefined,
+  candidate:
+    | FunctionalMotivationInterpretationV0_2["candidates"][number]
+    | FunctionalMotivationInterpretationV0_3["candidates"][number]
+    | undefined,
   evidence: ReviewedFunctionalEvidenceReferenceV0_2,
 ): boolean {
   if (
@@ -3210,7 +3252,10 @@ function reviewedFunctionalEvidenceAdmittedForUiV0_2(
 }
 
 function reviewedFunctionalEvidenceForUiV0_2(
-  candidate: FunctionalMotivationInterpretationV0_2["candidates"][number] | undefined,
+  candidate:
+    | FunctionalMotivationInterpretationV0_2["candidates"][number]
+    | FunctionalMotivationInterpretationV0_3["candidates"][number]
+    | undefined,
   evidence: ReviewedFunctionalEvidenceReferenceV0_2,
 ): ReviewedFunctionalEvidenceReferenceV0_2 {
   if (
@@ -3231,6 +3276,18 @@ function reviewedFunctionalEvidenceForUiV0_2(
 function projectFunctionalMotivationInterpretationForUiV0_2(
   value: FunctionalMotivationInterpretationV0_2,
 ): FunctionalMotivationInterpretationV0_2VM {
+  return projectFunctionalMotivationInterpretationForUiShared(value);
+}
+
+function projectFunctionalMotivationInterpretationForUiV0_3(
+  value: FunctionalMotivationInterpretationV0_3,
+): FunctionalMotivationInterpretationV0_3VM {
+  return projectFunctionalMotivationInterpretationForUiShared(value);
+}
+
+function projectFunctionalMotivationInterpretationForUiShared<
+  T extends FunctionalMotivationInterpretationV0_2 | FunctionalMotivationInterpretationV0_3,
+>(value: T): T {
   const candidateForEvidence = (
     evidence: ReviewedFunctionalEvidenceReferenceV0_2,
   ) => {
@@ -3280,7 +3337,7 @@ function projectFunctionalMotivationInterpretationForUiV0_2(
         evidence,
       ),
     ),
-  };
+  } as T;
 }
 
 function projectGenericFunctionalWitnessRuntimeForUiV1(
@@ -3484,6 +3541,25 @@ function parseAnalysisStatusV0_1(
     userDecisionPosture: "user_decides",
   });
 }
+
+function parseAnalysisStatusV0_2(
+  payload: unknown,
+): PresentOrMissing<AnalysisStatusV0_2> {
+  if (!isRecord(payload)) return missing("malformed", "analysis status payload");
+  if (Object.prototype.hasOwnProperty.call(payload, "analysisStatusV0_2")) {
+    const value = payload["analysisStatusV0_2"];
+    return isAnalysisStatusV0_2(value)
+      ? present(value)
+      : missing("malformed", "analysisStatusV0_2 contract");
+  }
+
+  const legacy = parseAnalysisStatusV0_1(payload);
+  if (legacy.kind === "missing") return legacy;
+  const migrated = migrateAnalysisStatusV0_1ToV0_2(legacy.value);
+  return migrated
+    ? present(migrated)
+    : missing("malformed", "legacy analysis status migration failed");
+}
 // ----------------------- adapter -----------------------
 
 export function adaptAnalysisToTelemetryVM(raw: unknown): TelemetryViewModel {
@@ -3499,6 +3575,10 @@ export function adaptAnalysisToTelemetryVM(raw: unknown): TelemetryViewModel {
     parseFunctionalMotivationInterpretationV0_2(payload);
   const functionalMotivationInterpretationFieldEmitted =
     isRecord(payload) && Object.prototype.hasOwnProperty.call(payload, "functionalMotivationInterpretationV0_2");
+  const functionalMotivationInterpretationV0_3 =
+    parseFunctionalMotivationInterpretationV0_3(payload);
+  const functionalMotivationInterpretationV0_3FieldEmitted =
+    isRecord(payload) && Object.prototype.hasOwnProperty.call(payload, "functionalMotivationInterpretationV0_3");
 
   const vp = pickVoicePaths(payload);
 
@@ -4852,6 +4932,11 @@ const originClaimGates: OriginClaimGatesVM = {
       : functionalMotivationInterpretationV0_2.kind === "missing"
       ? {}
       : { functionalMotivationInterpretationV0_2 }),
+    ...(functionalMotivationInterpretationV0_3FieldEmitted
+      ? { functionalMotivationInterpretationV0_3 }
+      : functionalMotivationInterpretationV0_3.kind === "missing"
+      ? {}
+      : { functionalMotivationInterpretationV0_3 }),
     evidence: {
       normalizationSteps: pomStringListFromEvidenceField(evidence, "normalizationSteps"),
       ops: pomStringListFromEvidenceField(evidence, "ops"),
@@ -4869,6 +4954,7 @@ const originClaimGates: OriginClaimGatesVM = {
 
       resonanceProfileV1,
     analysisStatusV0_1: parseAnalysisStatusV0_1(payload),
+    analysisStatusV0_2: parseAnalysisStatusV0_2(payload),
     raw,
   };
 }

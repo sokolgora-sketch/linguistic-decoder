@@ -2,6 +2,7 @@
 
 import type {
   AnalysisStatusV0_1VM,
+  AnalysisStatusV0_2VM,
   MotivationDiscoveryV0_1VM,
   PresentOrMissing,
 } from "@/ui/telemetry/types";
@@ -20,7 +21,7 @@ export function PrimaryAlbanianReadingCardV0_1({
   analysisStatus,
 }: {
   discovery: PresentOrMissing<MotivationDiscoveryV0_1VM> | undefined;
-  analysisStatus: PresentOrMissing<AnalysisStatusV0_1VM> | undefined;
+  analysisStatus: PresentOrMissing<AnalysisStatusV0_1VM | AnalysisStatusV0_2VM> | undefined;
 }) {
   if (discovery?.kind !== "present") return null;
 

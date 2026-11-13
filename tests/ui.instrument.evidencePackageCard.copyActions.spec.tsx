@@ -31,7 +31,7 @@ describe("EvidencePackageCard copy actions", () => {
     expect(screen.getByText(/Boundary: VM-derived export actions only/i)).toBeInTheDocument();
     expect(screen.getByText(/raw engine JSON stays in Advanced/i)).toBeInTheDocument();
     expect(screen.getByText(/no origin proof/i)).toBeInTheDocument();
-    expect(screen.getByText(/no forced answer/i)).toBeInTheDocument();
+    expect(screen.getByText(/interpretations remain open for user review/i)).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole("button", { name: "Copy Evidence Summary" }));
     fireEvent.click(screen.getByRole("button", { name: "Copy Evidence Package" }));

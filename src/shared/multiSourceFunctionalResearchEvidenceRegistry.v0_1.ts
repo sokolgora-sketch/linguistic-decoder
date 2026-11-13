@@ -304,7 +304,7 @@ function researchBoundaryIsPreservedV0_1(
  *   that remains the generic multi-source discovery layer's job;
  * - execute source acquisition or a model/provider;
  * - review or promote evidence;
- * - claim historical origin, winner, language superiority,
+ * - claim historical origin, automatic interpretation selection, language superiority,
  *   or candidate truth.
  */
 export function buildMultiSourceFunctionalResearchInputsV0_1(

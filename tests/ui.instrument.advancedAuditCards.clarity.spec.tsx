@@ -21,7 +21,7 @@ describe("Open Instrument Advanced audit card clarity", () => {
     expect(screen.getByText(/Boundary: optional diagnostic only/i)).toBeInTheDocument();
     expect(screen.getByText(/does not change this readout/i)).toBeInTheDocument();
     expect(screen.getByText(/no automatic origin proof/i)).toBeInTheDocument();
-    expect(screen.getByText(/no forced answer/i)).toBeInTheDocument();
+    expect(screen.getByText(/interpretation remains with the user/i)).toBeInTheDocument();
   });
 
   it("labels raw JSON as collapsed audit payload, not the primary reading surface", () => {
@@ -41,7 +41,7 @@ describe("Open Instrument Advanced audit card clarity", () => {
     expect(screen.getByText("Open JSON inspector")).toBeInTheDocument();
     expect(screen.getByText(/Boundary: raw audit payload only/i)).toBeInTheDocument();
     expect(screen.getByText(/readable cards remain the primary surface/i)).toBeInTheDocument();
-    expect(screen.getByText(/no forced answer/i)).toBeInTheDocument();
+    expect(screen.getByText(/the user decides how to interpret the evidence/i)).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /Copy Full JSON/i })).toBeInTheDocument();
   });
 });

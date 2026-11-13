@@ -433,6 +433,12 @@ describe(
 
         expect(first).toEqual(second);
 
+        expect(first.summary).not.toMatch(/\b(?:winner|winning)\b/i);
+        if (status === "reviewed_functional_evidence") {
+          expect(first.summary).toContain("Multiple interpretations may coexist");
+          expect(first.summary).toContain("automatic interpretation selection is disabled");
+        }
+
         expect(first.schemaVersion).toBe(
           ANALYSIS_STATUS_SCHEMA_VERSION_V0_1,
         );

@@ -8,7 +8,7 @@
 // - carrierMatcher.v1
 // - protoRoots.v1 (curated truth table)
 //
-// No language-origin scoring and no winner claim. Selection remains deterministic and evidence-bounded.
+// No language-origin scoring or automatic interpretation selection. Ordering remains deterministic and evidence-bounded.
 
 import type { MinRootHypothesis } from "./deepRoot.minRoots.v1";
 import type {
@@ -1312,8 +1312,8 @@ basis: string;
   // 3. Otherwise retain stable source order.
   //
   // This does not promote candidate evidence into the authoritative Heart
-  // path. It only prevents an unsupported generic transformation from winning
-  // merely because it appears first.
+  // path. It only prevents an unsupported generic transformation from being
+  // preferred solely because it appears first.
 
   const heartTerm = lastVowelFromAnyPath(
     params.heartPrimaryPath,
