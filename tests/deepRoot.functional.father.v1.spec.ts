@@ -18,7 +18,7 @@ describe("DeepRoot functionalRoots v1.2 (father)", () => {
           vowelPath: "A→Ë",
           notes: [
             "surface → proto carrier",
-            "no winner; family-level functional root",
+            "interpretation remains open; family-level functional root",
             "Proto functional family (non-historical claim).",
             "Carrier across IE and Albanian.",
           ],

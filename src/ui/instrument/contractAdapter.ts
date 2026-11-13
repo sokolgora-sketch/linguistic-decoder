@@ -3579,6 +3579,8 @@ export function adaptAnalysisToTelemetryVM(raw: unknown): TelemetryViewModel {
     parseFunctionalMotivationInterpretationV0_3(payload);
   const functionalMotivationInterpretationV0_3FieldEmitted =
     isRecord(payload) && Object.prototype.hasOwnProperty.call(payload, "functionalMotivationInterpretationV0_3");
+  const analysisStatusV0_2FieldEmitted =
+    isRecord(payload) && Object.prototype.hasOwnProperty.call(payload, "analysisStatusV0_2");
 
   const vp = pickVoicePaths(payload);
 
@@ -4954,7 +4956,9 @@ const originClaimGates: OriginClaimGatesVM = {
 
       resonanceProfileV1,
     analysisStatusV0_1: parseAnalysisStatusV0_1(payload),
-    analysisStatusV0_2: parseAnalysisStatusV0_2(payload),
+    ...(analysisStatusV0_2FieldEmitted
+      ? { analysisStatusV0_2: parseAnalysisStatusV0_2(payload) }
+      : {}),
     raw,
   };
 }

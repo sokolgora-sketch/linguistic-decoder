@@ -125,7 +125,7 @@ exports[`Engine Contract v1 — capture engine output (goldens) damage (strict, 
           "english surface → sq carrier (short form)",
           "note: this is a minimal-root hypothesis, not a historical-chain claim",
           "Deterministic pilot hypothesis (v1.1).",
-          "No winner; functional carrier only."
+          "Multiple interpretations may coexist; functional carrier only."
         ],
         "opsUsed": [],
         "roots": [
@@ -333,7 +333,7 @@ exports[`Engine Contract v1 — capture engine output (goldens) father (strict, 
         "language": "proto",
         "notes": [
           "surface → proto carrier",
-          "no winner; family-level functional root",
+          "interpretation remains open; family-level functional root",
           "Proto functional family (non-historical claim).",
           "Carrier across IE and Albanian."
         ],
