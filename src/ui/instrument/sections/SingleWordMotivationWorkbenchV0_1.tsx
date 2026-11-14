@@ -26,6 +26,7 @@ import type { GenericFunctionalWitnessV1 } from "@/shared/openInstrument/generic
 import type { MotivationDiscoveryV0_2VM, PresentOrMissing } from "@/ui/telemetry/types";
 import { FjaloriCrossSourceEvidenceV0_1 } from "@/ui/instrument/sections/FjaloriCrossSourceEvidence.v0_1";
 import { CrossLanguageFunctionalMotivationWorkbenchV0_1 } from "@/ui/instrument/sections/CrossLanguageFunctionalMotivationWorkbenchV0_1";
+import { FunctionalMotivationMethodExamplesCardV0_1 } from "@/ui/instrument/sections/FunctionalMotivationMethodExamplesCardV0_1";
 
 type DraftSegment = SingleWordFunctionalMotivationSegmentInputV0_1;
 type DraftTransformation = SingleWordFunctionalMotivationTransformationInputV0_1;
@@ -1629,6 +1630,8 @@ export function SingleWordMotivationWorkbenchV0_1({
         draftTargetWord={targetWord}
         context={currentWordEvidence}
       />
+
+      <FunctionalMotivationMethodExamplesCardV0_1 />
 
       <div className="mt-3 grid gap-3 sm:grid-cols-2">
         <label className={labelClass}>
