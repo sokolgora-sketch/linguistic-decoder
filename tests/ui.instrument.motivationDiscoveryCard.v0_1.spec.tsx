@@ -259,6 +259,54 @@ describe("Motivation Discovery Lab presentation v0.1", () => {
     expect(screen.queryByTestId("albanian-reading-functional-bridge")).not.toBeInTheDocument();
   });
 
+  it("keeps conditional functional-interpretation layouts shrinkable", async () => {
+    const response = await GET(
+      new Request(
+        "http://localhost/api/analyze-v1?word=study&mode=strict&alphabet=auto&targetSenseId=user_sense_learning&targetSenseLabel=learning",
+      ),
+    );
+    const vm = adaptAnalysisToTelemetryVM(await response.json());
+    const discovery = vm.motivationDiscoveryV0_2;
+    const interpretation = vm.functionalMotivationInterpretationV0_3;
+
+    expect(discovery?.kind).toBe("present");
+    if (!discovery || discovery.kind !== "present") {
+      throw new Error("Expected the API response to include Motivation Discovery");
+    }
+    expect(interpretation?.kind).toBe("present");
+    if (!interpretation || interpretation.kind !== "present") {
+      throw new Error("Expected the API response to include functional interpretation v0.3");
+    }
+    expect(
+      interpretation.value.candidates.some((candidate) =>
+        discovery.value.candidates.some((witness) => witness.candidateId === candidate.candidateId),
+      ),
+    ).toBe(true);
+
+    render(
+      <MotivationDiscoveryCardV0_1
+        discovery={discovery}
+        interpretation={interpretation}
+      />,
+    );
+
+    const interpretationLayers = screen.getAllByTestId("functional-motivation-interpretation-layers");
+    expect(interpretationLayers.length).toBeGreaterThan(0);
+    expect(interpretationLayers[0]).toBeInTheDocument();
+    expect(interpretationLayers[0]).toHaveClass("min-w-0", "grid-cols-1");
+
+    const interpretationCard = screen.getByTestId("functional-motivation-interpretation");
+    expect(interpretationCard).toBeInTheDocument();
+    expect(interpretationCard).toHaveClass("min-w-0", "[overflow-wrap:anywhere]");
+
+    const nestedGrid = interpretationCard.querySelector(":scope > .mt-3.grid");
+    expect(nestedGrid).not.toBeNull();
+    if (!(nestedGrid instanceof HTMLElement)) {
+      throw new Error("Expected the nested functional interpretation grid to render");
+    }
+    expect(nestedGrid).toHaveClass("min-w-0", "grid-cols-1");
+  });
+
   it("offers an explicit action for an alternative Albanian source record with its identity and gloss", () => {
     const sourceSnapshot = {
       sourceFamilyId: "kaikki-albanian-jsonl-v0.1",
