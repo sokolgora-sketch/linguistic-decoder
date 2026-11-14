@@ -138,6 +138,7 @@ function realStudyShape(): any {
         "Bounded reviewed functional evidence is available for DI.",
       reviewedOperators: ["DI"],
       candidateOnlyOperators: [],
+      researchHypothesisEmbryos: [],
       structuralTokens: ["SHTU", "DI"],
       claimBoundary: {
         historicalOriginClaim: "not_claimed",

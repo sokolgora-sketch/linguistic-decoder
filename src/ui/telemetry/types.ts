@@ -521,7 +521,7 @@ export interface TelemetryViewModel {
   resonanceProfileV1: PresentOrMissing<ResonanceProfileV1VM>;
   raw: unknown;
 
-  analysisStatusV0_2?: PresentOrMissing<AnalysisStatusV0_2>;
+  analysisStatusV0_2: PresentOrMissing<AnalysisStatusV0_2>;
   motivationDiscoveryV0_2?: PresentOrMissing<MotivationDiscoveryV0_2VM>;
   functionalMotivationInterpretationV0_3?: PresentOrMissing<FunctionalMotivationInterpretationV0_3VM>;
 }

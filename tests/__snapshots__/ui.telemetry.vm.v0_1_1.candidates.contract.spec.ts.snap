@@ -2,10 +2,10 @@
 
 exports[`ui telemetry vm contract v0.1.1 (candidates evidence lists) adapts candidate ops/notes/signals when present (study strict fixture) 1`] = `
 {
-  "analysisStatusV0_1": {
+  "analysisStatusV0_2": {
     "kind": "missing",
     "missing": "not_emitted",
-    "note": "analysisStatusV0_1",
+    "note": "analysisStatusV0_2",
   },
   "candidates": [
     {
@@ -252,6 +252,14 @@ exports[`ui telemetry vm contract v0.1.1 (candidates evidence lists) adapts cand
           "status": "pass",
         },
       ],
+      "interpretationDecisionPolicy": {
+        "alternativeClaimStatus": "PRESERVED_PER_INTERPRETATION",
+        "alternativeProvenance": "PRESERVED_PER_INTERPRETATION",
+        "automaticInterpretationSelection": "DISABLED",
+        "interpretationDecisionAuthority": "USER_DECIDES",
+        "multipleInterpretationsMayCoexist": true,
+        "schemaVersion": "open-instrument.interpretation-decision-policy.v0_1",
+      },
       "meta": {
         "engineVersion": "0.2.0-symbolic",
         "generatedAt": "<generatedAt>",
@@ -261,7 +269,7 @@ exports[`ui telemetry vm contract v0.1.1 (candidates evidence lists) adapts cand
           "word": "study",
         },
       },
-      "policy": "no_single_winner",
+      "schemaVersion": "open-instrument.origin-claim.v0_2",
       "summary": {
         "confidence": "weak",
         "note": "Computed from candidate/deepRoot/voice-path/morphology signals. Passing: 2; strong: 0; medium: 0.",
@@ -274,7 +282,7 @@ exports[`ui telemetry vm contract v0.1.1 (candidates evidence lists) adapts cand
           "ref:heart.math7.primary",
         ],
       },
-      "version": "v1",
+      "userDecisionPosture": "user_decides",
     },
   },
   "originClaimGates": {

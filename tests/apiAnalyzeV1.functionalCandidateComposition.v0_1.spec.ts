@@ -7,6 +7,7 @@ import {
   enginePayloadToAnalysisResult,
   projectEmbryoFirstCandidateForAnalyzeV1,
 } from "../src/shared/analysisAdapter";
+import { toAnalyzeWordResultV2Contract } from "../src/shared/analyzeWordResult.v2.contract";
 import {
   runAnalysisDeterministic,
 } from "../src/lib/runAnalysisDeterministic";
@@ -268,10 +269,9 @@ describe(
       payload.sanitized =
         "study";
 
-      const body: any =
-        enginePayloadToAnalysisResult(
-          payload,
-        );
+      const body: any = toAnalyzeWordResultV2Contract(
+        enginePayloadToAnalysisResult(payload),
+      );
 
       expect(body?.word).toBe(
         "legacy-study",

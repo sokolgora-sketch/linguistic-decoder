@@ -1,27 +1,20 @@
-import {
-  analyzeWordV1,
-} from "@/engine/analyzeWordV1";
-
-import {
-  enginePayloadToAnalysisResult,
-} from "@/shared/analysisAdapter";
+import { GET } from "../app/api/analyze-v1/route";
+import { analyzeWordV1 } from "@/engine/analyzeWordV1";
+import { enginePayloadToAnalysisResult } from "@/shared/analysisAdapter";
 
 async function analyze(
   word: string,
 ): Promise<any> {
-  const payload =
-    await analyzeWordV1(
-      word,
-      {
-        mode: "strict",
-      } as any,
-    );
-
-  return (
-    enginePayloadToAnalysisResult(
-      payload as any,
-    ) as any
+  const response = await GET(
+    new Request(`http://localhost/api/analyze-v1?word=${encodeURIComponent(word)}&mode=strict`),
   );
+  expect(response.status).toBe(200);
+  return response.json();
+}
+
+async function analyzeInternal(word: string): Promise<any> {
+  const payload = await analyzeWordV1(word, { mode: "strict" } as any);
+  return enginePayloadToAnalysisResult(payload as any) as any;
 }
 
 describe(
@@ -159,7 +152,7 @@ describe(
 
     it("preserves father surface/functional path separation", async () => {
       const out =
-        await analyze("father");
+        await analyzeInternal("father");
 
       // This helper exercises analyzeWordV1 -> analysisAdapter
       // directly rather than the full analyze-v1 route. The direct

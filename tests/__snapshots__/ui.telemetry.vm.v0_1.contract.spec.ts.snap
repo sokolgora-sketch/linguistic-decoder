@@ -2,10 +2,10 @@
 
 exports[`ui telemetry vm contract v0.1 adapts analyze-v1 payload into stable Telemetry VM (study strict) 1`] = `
 {
-  "analysisStatusV0_1": {
+  "analysisStatusV0_2": {
     "kind": "missing",
     "missing": "not_emitted",
-    "note": "analysisStatusV0_1",
+    "note": "analysisStatusV0_2",
   },
   "candidates": [
     {

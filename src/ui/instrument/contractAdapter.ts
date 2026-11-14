@@ -901,12 +901,21 @@ function getField(obj: unknown, key: string): unknown {
 function parseMotivationDiscoveryV0_2(
   raw: unknown,
 ): PresentOrMissing<MotivationDiscoveryV0_2VM> {
-  const activeValue = getField(raw, "motivationDiscoveryV0_2");
-  const legacyValue = getField(raw, "motivationDiscoveryV0_1");
-  const value = activeValue ?? (isRecord(legacyValue)
-    ? toMotivationEngineDiscoveryV0_2(legacyValue)
-    : null);
-  if (value == null) return missing("not_emitted", "motivationDiscoveryV0_2");
+  const activeEmitted = isRecord(raw) && Object.prototype.hasOwnProperty.call(raw, "motivationDiscoveryV0_2");
+  const legacyEmitted = isRecord(raw) && Object.prototype.hasOwnProperty.call(raw, "motivationDiscoveryV0_1");
+  let value: unknown;
+  if (activeEmitted) {
+    value = getField(raw, "motivationDiscoveryV0_2");
+    if (value == null) return missing("not_emitted", "motivationDiscoveryV0_2");
+  } else if (legacyEmitted) {
+    const legacyValue = getField(raw, "motivationDiscoveryV0_1");
+    if (legacyValue == null) return missing("not_emitted", "motivationDiscoveryV0_2");
+    if (!isRecord(legacyValue)) return missing("malformed", "motivationDiscoveryV0_1 expected object");
+    value = toMotivationEngineDiscoveryV0_2(legacyValue);
+    if (value == null) return missing("malformed", "legacy motivation discovery migration failed");
+  } else {
+    return missing("not_emitted", "motivationDiscoveryV0_2");
+  }
   if (!isRecord(value) || !isMotivationEngineDiscoveryV0_2(value)) {
     return missing("malformed", "motivationDiscoveryV0_2 expected the neutral v0.2 contract");
   }
@@ -3462,7 +3471,11 @@ function parseAnalysisStatusV0_2(
   }
 
   const legacy = parseAnalysisStatusV0_1(payload);
-  if (legacy.kind === "missing") return legacy;
+  if (legacy.kind === "missing") {
+    return legacy.missing === "not_emitted"
+      ? missing("not_emitted", "analysisStatusV0_2")
+      : legacy;
+  }
   const migrated = migrateAnalysisStatusV0_1ToV0_2(legacy.value);
   return migrated
     ? present(migrated)
@@ -3532,16 +3545,19 @@ export function adaptAnalysisToTelemetryVM(raw: unknown): TelemetryViewModel {
   const wordSpecificFunctionalDepth = parseWordSpecificFunctionalDepthV0_2(
     getField(payload, "wordSpecificFunctionalDepth"),
   );
-  const motivationDiscoveryV0_2 = parseMotivationDiscoveryV0_2(payload);
+  const legacyMotivationDiscoveryWasEmitted =
+    isRecord(raw) && Object.prototype.hasOwnProperty.call(raw, "motivationDiscoveryV0_1");
+  const motivationDiscoveryV0_2 = parseMotivationDiscoveryV0_2(
+    legacyMotivationDiscoveryWasEmitted ? raw : payload,
+  );
   const motivationDiscoveryFieldEmitted =
-    isRecord(payload) && Object.prototype.hasOwnProperty.call(payload, "motivationDiscoveryV0_2");
+    (isRecord(payload) && Object.prototype.hasOwnProperty.call(payload, "motivationDiscoveryV0_2")) ||
+    legacyMotivationDiscoveryWasEmitted;
   const functionalMotivationInterpretationV0_3 =
     parseFunctionalMotivationInterpretationV0_3(payload);
   const functionalMotivationInterpretationV0_3FieldEmitted =
     isRecord(payload) && Object.prototype.hasOwnProperty.call(payload, "functionalMotivationInterpretationV0_3");
   const analysisStatusV0_2 = parseAnalysisStatusV0_2(payload);
-  const analysisStatusV0_2FieldEmitted =
-    isRecord(payload) && Object.prototype.hasOwnProperty.call(payload, "analysisStatusV0_2");
 
   const vp = pickVoicePaths(payload);
 
@@ -4911,9 +4927,7 @@ const originClaimGates: OriginClaimGatesVM = {
       soundRoots: adaptSoundRootsToVM(payload),
 
       resonanceProfileV1,
-    ...(analysisStatusV0_2FieldEmitted
-      ? { analysisStatusV0_2 }
-      : {}),
+    analysisStatusV0_2,
     raw: rawForView,
   };
 }
