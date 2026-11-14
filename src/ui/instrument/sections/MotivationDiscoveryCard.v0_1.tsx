@@ -259,7 +259,7 @@ function Candidate({
     <article
       data-testid="motivation-discovery-candidate"
       data-primary-witness="true"
-      className="rounded-lg border border-[#3e4b59] bg-[#0d1117] p-3"
+      className="min-w-0 rounded-lg border border-[#3e4b59] bg-[#0d1117] p-3 [overflow-wrap:anywhere]"
     >
       <div className="flex flex-wrap items-start justify-between gap-2">
         <div className="min-w-0">
@@ -284,7 +284,7 @@ function Candidate({
       {interpretation ? (
         <div
           data-testid="functional-motivation-interpretation-layers"
-          className="mt-3 grid gap-2 sm:grid-cols-3"
+          className="mt-3 grid min-w-0 grid-cols-1 gap-2 sm:grid-cols-3"
         >
           <div className="rounded border border-[#303843] bg-[#10161c] p-2 text-xs leading-5 text-[#c5ced8]">
             <div className="font-semibold uppercase tracking-[0.1em] text-[#8ea4ba]">CANDIDATE CORRESPONDENCE</div>
@@ -451,7 +451,7 @@ function Candidate({
 
           <div>
             <div className="font-semibold text-[#f0ddb0]">Structural details</div>
-            <dl className="mt-1 grid gap-x-3 gap-y-1 sm:grid-cols-2">
+            <dl className="mt-1 grid min-w-0 grid-cols-1 gap-x-3 gap-y-1 sm:grid-cols-2">
               <div><dt className="text-[#8ea4ba]">Matched embryo / query</dt><dd className="break-words font-mono">{comparison.matchedQuery}</dd></div>
               <div><dt className="text-[#8ea4ba]">Candidate status</dt><dd className="font-mono">{candidate.candidateStatus}</dd></div>
               <div><dt className="text-[#8ea4ba]">Input representation</dt><dd className="break-words font-mono">{comparison.inputRepresentationKind}</dd></div>
@@ -563,7 +563,7 @@ export function MotivationDiscoveryCardV0_1({
     <section
       aria-label="Multilingual source Discovery"
       data-testid="motivation-discovery-card"
-      className="rounded-[12px] border border-[#6b5b2f] bg-[#17140e] p-4 shadow-[0_12px_32px_rgba(0,0,0,0.16)]"
+      className="min-w-0 rounded-[12px] border border-[#6b5b2f] bg-[#17140e] p-4 shadow-[0_12px_32px_rgba(0,0,0,0.16)] [overflow-wrap:anywhere]"
     >
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
@@ -694,7 +694,7 @@ export function MotivationDiscoveryCardV0_1({
             <span aria-hidden="true" className="mr-2">▸</span>
             Derived structure details
           </summary>
-          <div className="mt-2 grid gap-2 border-t border-[#303843] pt-2 sm:grid-cols-3">
+          <div className="mt-2 grid min-w-0 grid-cols-1 gap-2 border-t border-[#303843] pt-2 sm:grid-cols-3">
             <div>
               <div className="text-[#8ea4ba]">Math7</div>
               <div className="break-words font-mono">{math.basis ?? "basis unavailable"} · total mod 7 {math.totalMod7 ?? "Null"}</div>
@@ -1324,7 +1324,7 @@ export function MotivationDiscoveryCardV0_1({
                 </div>
               </>
             ) : (
-              <div data-testid="albanian-functional-meaning-bridge-null" className="mt-2 text-sm">
+              <div data-testid="albanian-functional-meaning-bridge-null" className="mt-2 min-w-0 text-sm [overflow-wrap:anywhere]">
                 UNKNOWN_OR_NULL — no classified functional bridge was established. Reasons: {albanianLexicalReading.functionalMeaningBridge.reasonCodes.join(", ") || "not recorded"}.
               </div>
             )}
@@ -1599,7 +1599,7 @@ export function MotivationDiscoveryCardV0_1({
       {interpretation?.kind === "present" ? (
         <div
           data-testid="functional-motivation-interpretation"
-          className="mt-3 rounded-lg border border-[#4b3f2c] bg-[#18140e] p-3 text-xs leading-5 text-[#f0ddb0]"
+          className="mt-3 min-w-0 rounded-lg border border-[#4b3f2c] bg-[#18140e] p-3 text-xs leading-5 text-[#f0ddb0] [overflow-wrap:anywhere]"
         >
           <div className="font-semibold uppercase tracking-[0.12em]">FUNCTIONAL MOTIVATION INTERPRETATION v0.2</div>
           <div className="mt-1 text-sm">
@@ -1607,7 +1607,7 @@ export function MotivationDiscoveryCardV0_1({
               ? "A bounded hypothesis is available; it remains separate from source fact and derived structure."
               : "No supported functional interpretation is currently available; Null is valid."}
           </div>
-          <div className="mt-3 grid gap-2 sm:grid-cols-2">
+          <div className="mt-3 grid min-w-0 grid-cols-1 gap-2 sm:grid-cols-2">
             <div className="rounded border border-[#303843] bg-[#10161c] p-2 text-[#c5ced8]">
               <div className="font-semibold uppercase tracking-[0.1em] text-[#8ea4ba]">STRUCTURAL FACTS</div>
               <div className="mt-1 break-words font-mono">
