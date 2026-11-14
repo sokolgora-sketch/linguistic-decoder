@@ -1195,7 +1195,7 @@ function CurrentWordEvidenceSectionV0_1({
                     Whole-word functional bridge withheld: exact target record/query binding {functionalBridgeTargetBinding}. Functional operation UNKNOWN_OR_NULL for this displayed source record.
                   </div>
                 ) : (
-                  <div>Whole-word functional bridge: UNKNOWN_OR_NULL{lexicalReading?.functionalMeaningBridge?.reasonCodes.length ? ` · ${lexicalReading.functionalMeaningBridge.reasonCodes.join(", ")}` : " · no supported bridge emitted"}</div>
+                  <div data-testid="single-word-progressive-functional-bridge-null" className="min-w-0 [overflow-wrap:anywhere]">Whole-word functional bridge: UNKNOWN_OR_NULL{lexicalReading?.functionalMeaningBridge?.reasonCodes.length ? ` · ${lexicalReading.functionalMeaningBridge.reasonCodes.join(", ")}` : " · no supported bridge emitted"}</div>
                 )}
                 {lexicalReading?.interpretation.status === "EXPLORATORY_ZHEJI_READING" && functionalBridgeTargetBinding === "MATCH" ? (
                   <div className="mt-1 break-words">Existing product interpretation: EXPLORATORY · {lexicalReading.interpretation.statement ?? "UNKNOWN_OR_NULL"}</div>
