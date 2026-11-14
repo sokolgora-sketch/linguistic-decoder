@@ -80,7 +80,7 @@ export function DoctrineReadingCard({
             className="mt-2 text-xs leading-5 text-slate-600 dark:text-slate-400"
           >
             Doctrine inference only; not a lexical definition, historical origin claim,
-            candidate proof, or winner selection. User decides the final interpretation.
+            or candidate proof. No interpretation is selected automatically; the user decides.
           </div>
         </div>
       ) : null}
@@ -112,8 +112,8 @@ export function DoctrineReadingCard({
       </ol>
 
       <div className="mt-4 text-xs leading-5 text-slate-600 dark:text-slate-400">
-        This is not a lexical definition, historical origin claim, candidate proof, or winner selection.
-        User decides the final interpretation.
+        This is not a lexical definition, historical origin claim, or candidate proof.
+        No interpretation is selected automatically; the user decides.
       </div>
     </section>
   );

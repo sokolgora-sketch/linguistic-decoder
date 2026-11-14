@@ -16,7 +16,7 @@ describe("contractAdapter originClaimGates.active boundary", () => {
 
     expect(block).toContain('const originClaimGatesActiveRecord =');
     expect(block).toContain(
-      'isRecord(raw) && isRecord(raw["originClaimGates"]) ? raw["originClaimGates"] : null;'
+      'isRecord(payload) && isRecord(payload["originClaimGates"]) ? payload["originClaimGates"] : null;'
     );
     expect(block).toContain(
       'const a = originClaimGatesActiveRecord ? originClaimGatesActiveRecord["active"] : null;'

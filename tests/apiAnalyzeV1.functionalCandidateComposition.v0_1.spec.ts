@@ -7,6 +7,7 @@ import {
   enginePayloadToAnalysisResult,
   projectEmbryoFirstCandidateForAnalyzeV1,
 } from "../src/shared/analysisAdapter";
+import { toAnalyzeWordResultV2Contract } from "../src/shared/analyzeWordResult.v2.contract";
 import {
   runAnalysisDeterministic,
 } from "../src/lib/runAnalysisDeterministic";
@@ -187,17 +188,17 @@ describe(
       ).toBe("study!");
 
       expect(
-        body?.analysisStatusV0_1?.status,
+        body?.analysisStatusV0_2?.status,
       ).toBe(
         "reviewed_functional_evidence",
       );
 
       expect(
-        body?.analysisStatusV0_1?.reviewedOperators,
+        body?.analysisStatusV0_2?.reviewedOperators,
       ).toContain("DI");
 
       expect(
-        body?.analysisStatusV0_1?.candidateOnlyOperators,
+        body?.analysisStatusV0_2?.candidateOnlyOperators,
       ).not.toContain("DI");
 
       const reviewedDi =
@@ -268,10 +269,9 @@ describe(
       payload.sanitized =
         "study";
 
-      const body: any =
-        enginePayloadToAnalysisResult(
-          payload,
-        );
+      const body: any = toAnalyzeWordResultV2Contract(
+        enginePayloadToAnalysisResult(payload),
+      );
 
       expect(body?.word).toBe(
         "legacy-study",
@@ -288,13 +288,13 @@ describe(
       );
 
       expect(
-        body?.analysisStatusV0_1?.status,
+        body?.analysisStatusV0_2?.status,
       ).toBe(
         "reviewed_functional_evidence",
       );
 
       expect(
-        body?.analysisStatusV0_1
+        body?.analysisStatusV0_2
           ?.reviewedOperators,
       ).toContain("DI");
 

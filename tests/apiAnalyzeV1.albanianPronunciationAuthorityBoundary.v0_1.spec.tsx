@@ -36,7 +36,7 @@ describe("Albanian pronunciation authority boundary v0.1", () => {
   it("keeps Albanian source Null while preserving the orthographic surface path", async () => {
     const body = await analyze("mal", "albanian");
 
-    expect(body.motivationDiscoveryV0_1.exactLexicalSourceStatus).toMatchObject({
+    expect(body.motivationDiscoveryV0_2.exactLexicalSourceStatus).toMatchObject({
       status: "UNAVAILABLE",
       reasonCode: "ALBANIAN_SOURCE_PATH_NOT_CONFIGURED",
     });
@@ -50,7 +50,7 @@ describe("Albanian pronunciation authority boundary v0.1", () => {
     expect(body.heartInstrumentV1.spokenPronunciation).not.toHaveProperty(
       "variants.0.variant.sourcePronunciation",
     );
-    expect(body.motivationDiscoveryV0_1.derivedStructure).toMatchObject({
+    expect(body.motivationDiscoveryV0_2.derivedStructure).toMatchObject({
       voicePath: ["A"],
       voicePathSource: "albanian_profile",
     });
@@ -65,22 +65,23 @@ describe("Albanian pronunciation authority boundary v0.1", () => {
       reasonCode: "PRONUNCIATION_NOT_FOUND",
       canonicalSpokenVoicePath: null,
     });
-    expect(body.motivationDiscoveryV0_1.albanianLexicalReading.status).toBe("NULL");
-    expect(body.originClaim.policy).toBe("no_single_winner");
+    expect(body.motivationDiscoveryV0_2.albanianLexicalReading.status).toBe("NULL");
+    expect(body.originClaim.interpretationDecisionPolicy.automaticInterpretationSelection).toBe("DISABLED");
+    expect(body.originClaim).not.toHaveProperty("policy");
   });
 
   it("preserves the Albanian Y and E/Ë profile paths through Discovery", async () => {
     const yll = await analyze("yll", "albanian");
     expect(yll.heartInstrumentV1.surfaceVowels).toEqual(["Y"]);
     expect(yll.heartInstrumentV1.spokenPronunciation.status).toBe("null");
-    expect(yll.motivationDiscoveryV0_1.derivedStructure.voicePath).toEqual(["Y"]);
-    expect(yll.motivationDiscoveryV0_1.derivedStructure.voicePathSource).toBe("albanian_profile");
+    expect(yll.motivationDiscoveryV0_2.derivedStructure.voicePath).toEqual(["Y"]);
+    expect(yll.motivationDiscoveryV0_2.derivedStructure.voicePathSource).toBe("albanian_profile");
 
     const zemer = await analyze("zemër", "albanian");
     expect(zemer.heartInstrumentV1.surfaceVowels).toEqual(["E", "Ë"]);
     expect(zemer.heartInstrumentV1.spokenPronunciation.status).toBe("null");
-    expect(zemer.motivationDiscoveryV0_1.derivedStructure.voicePath).toEqual(["E", "Ë"]);
-    expect(zemer.motivationDiscoveryV0_1.derivedStructure.voicePathSource).toBe("albanian_profile");
+    expect(zemer.motivationDiscoveryV0_2.derivedStructure.voicePath).toEqual(["E", "Ë"]);
+    expect(zemer.motivationDiscoveryV0_2.derivedStructure.voicePathSource).toBe("albanian_profile");
   });
 
   it.each([
@@ -96,7 +97,7 @@ describe("Albanian pronunciation authority boundary v0.1", () => {
     positions,
   }) => {
     const body = await analyze(word, "albanian");
-    const derived = body.motivationDiscoveryV0_1.derivedStructure;
+    const derived = body.motivationDiscoveryV0_2.derivedStructure;
     const provenance = derived.voicePathProvenance;
 
     expect(derived.voicePathSource).toBe("albanian_profile");
@@ -134,8 +135,8 @@ describe("Albanian pronunciation authority boundary v0.1", () => {
   it("retains written events when the API structural hypothesis list is empty", async () => {
     const body = await analyze("AEIOUYË", "albanian");
 
-    expect(body.motivationDiscoveryV0_1.derivedStructure.structuralHypotheses).toEqual([]);
-    expect(body.motivationDiscoveryV0_1.derivedStructure.voicePathProvenance.writtenInput.voicePath)
+    expect(body.motivationDiscoveryV0_2.derivedStructure.structuralHypotheses).toEqual([]);
+    expect(body.motivationDiscoveryV0_2.derivedStructure.voicePathProvenance.writtenInput.voicePath)
       .toEqual(["A", "E", "I", "O", "U", "Y", "Ë"]);
   });
 
@@ -150,7 +151,7 @@ describe("Albanian pronunciation authority boundary v0.1", () => {
     expect(body.heartInstrumentV1.spokenPronunciation.variants[0].variant.sourcePronunciation)
       .toBe("M AE1 L");
     expect(body.primaryPath.voicePath).toEqual(["A"]);
-    expect(body.motivationDiscoveryV0_1.derivedStructure.voicePathProvenance).toBeUndefined();
+    expect(body.motivationDiscoveryV0_2.derivedStructure.voicePathProvenance).toBeUndefined();
   });
 
   it("keeps the API Null visible through the telemetry adapter and UI", async () => {
@@ -171,7 +172,7 @@ describe("Albanian pronunciation authority boundary v0.1", () => {
     expect(overview).not.toHaveTextContent("M AE1 L");
     expect(overview).toHaveTextContent("Orthographic vowel sequence: A");
 
-    expect(vm.motivationDiscoveryV0_1).toMatchObject({
+    expect(vm.motivationDiscoveryV0_2).toMatchObject({
       kind: "present",
       value: {
         derivedStructure: {
@@ -180,7 +181,7 @@ describe("Albanian pronunciation authority boundary v0.1", () => {
         },
       },
     });
-    render(<MotivationDiscoveryCardV0_1 discovery={vm.motivationDiscoveryV0_1} />);
+    render(<MotivationDiscoveryCardV0_1 discovery={vm.motivationDiscoveryV0_2} />);
     const discoveryCard = screen.getByTestId("motivation-discovery-card");
     expect(within(discoveryCard).getByTestId("motivation-written-voice-path")).toHaveTextContent("A");
     expect(within(discoveryCard).getByTestId("motivation-written-voice-path")).toHaveTextContent(

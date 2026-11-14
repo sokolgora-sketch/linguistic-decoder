@@ -38,7 +38,7 @@ describe("sense-grounded functional bridge arbitrary-sense baseline v0.1", () =>
       );
       expect(logicCandidates).toHaveLength(0);
       expect(genericCandidates).toHaveLength(1);
-      expect(body.analysisStatusV0_1.status).toBe("candidate_only");
+      expect(body.analysisStatusV0_2.status).toBe("candidate_only");
       expect(genericCandidates[0].targetSenseId).toBeUndefined();
       expect(genericCandidates[0].semanticAlignmentStatus).toBeUndefined();
       expect(genericCandidates[0].semanticBridge).toBeNull();
@@ -52,7 +52,7 @@ describe("sense-grounded functional bridge arbitrary-sense baseline v0.1", () =>
 
       results.push({
         targetSenseLabel,
-        status: body.analysisStatusV0_1.status,
+        status: body.analysisStatusV0_2.status,
         logicCandidateCount: logicCandidates.length,
         genericFunctionalHypothesisCount: genericCandidates.length,
         semanticBridge: null,

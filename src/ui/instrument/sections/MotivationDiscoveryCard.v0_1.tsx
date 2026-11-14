@@ -3,8 +3,9 @@
 import type {
   FunctionalMotivationCandidateInterpretationV0_2VM,
   FunctionalMotivationInterpretationV0_2VM,
-  MotivationDiscoveryCandidateV0_1VM,
-  MotivationDiscoveryV0_1VM,
+  FunctionalMotivationInterpretationV0_3VM,
+  MotivationDiscoveryCandidateV0_2VM,
+  MotivationDiscoveryV0_2VM,
   PresentOrMissing,
 } from "@/ui/telemetry/types";
 import type {
@@ -13,6 +14,7 @@ import type {
   AlbanianSourceLinkedComparisonV0_1,
   AlbanianSourceLinkedRecordV0_1,
 } from "@/shared/openInstrument/motivationEngineDiscoveryServerOnly.v0_1";
+import type { NeutralInterpretationSelectionV0_2 } from "@/shared/openInstrument/neutralInterpretationProjection.v0_2";
 import { FjaloriCrossSourceEvidenceV0_1 } from "@/ui/instrument/sections/FjaloriCrossSourceEvidence.v0_1";
 import {
   aggregateMotivationDiscoveryCandidatesV0_1,
@@ -102,7 +104,7 @@ function sourceLinkedComparisonSummaryV0_1(
 }
 
 function sourceLinkedComponentReadingSummaryV0_1(
-  reading: AlbanianSourceLinkedComponentReadingV0_1,
+  reading: NeutralInterpretationSelectionV0_2<AlbanianSourceLinkedComponentReadingV0_1>,
 ): string {
   return reading.status === "SUPPORTED"
     ? reading.exploratoryRelationship.statement ?? "Source-linked component relationship recorded."
@@ -133,7 +135,7 @@ function zcText(value: unknown): string {
 }
 
 function functionalStatusLabel(
-  status: MotivationDiscoveryCandidateV0_1VM["functionalInterpretation"]["status"],
+  status: MotivationDiscoveryCandidateV0_2VM["functionalInterpretation"]["status"],
 ): string {
   switch (status) {
     case "REVIEWED_HYPOTHESIS":
@@ -167,7 +169,7 @@ function nullReasonSummary(reason: string | null): string {
   return NULL_REASON_EXPLANATIONS[reason] ?? `Unclassified interpretation state: ${reason}`;
 }
 
-function functionalSummary(candidate: MotivationDiscoveryCandidateV0_1VM): string {
+function functionalSummary(candidate: MotivationDiscoveryCandidateV0_2VM): string {
   if (candidate.functionalInterpretation.statement) {
     return candidate.functionalInterpretation.statement;
   }
@@ -175,13 +177,15 @@ function functionalSummary(candidate: MotivationDiscoveryCandidateV0_1VM): strin
 }
 
 function interpretationHypothesisSummary(
-  interpretation: FunctionalMotivationCandidateInterpretationV0_2VM,
+  interpretation:
+    | FunctionalMotivationCandidateInterpretationV0_2VM
+    | FunctionalMotivationInterpretationV0_3VM["candidates"][number],
 ): string {
   if (interpretation.hypothesis.statement) return interpretation.hypothesis.statement;
   return nullReasonSummary(interpretation.hypothesis.reason);
 }
 
-function discoveryEntryCause(candidate: MotivationDiscoveryCandidateV0_1VM): string {
+function discoveryEntryCause(candidate: MotivationDiscoveryCandidateV0_2VM): string {
   const reason = candidate.structuralComparison.matchReason.trim();
   if (reason) {
     return `This candidate appears because the existing Discovery record says: ${reason}`;
@@ -203,7 +207,7 @@ function representationLabel(value: string): string {
 }
 
 function exactLexicalSourceStatusLabel(
-  status: NonNullable<MotivationDiscoveryV0_1VM["exactLexicalSourceStatus"]>["status"],
+  status: NonNullable<MotivationDiscoveryV0_2VM["exactLexicalSourceStatus"]>["status"],
 ): string {
   switch (status) {
     case "MATCHES_FOUND":
@@ -217,7 +221,7 @@ function exactLexicalSourceStatusLabel(
   }
 }
 
-function representationBoundary(candidate: MotivationDiscoveryCandidateV0_1VM): string | null {
+function representationBoundary(candidate: MotivationDiscoveryCandidateV0_2VM): string | null {
   const comparison = candidate.structuralComparison;
   if (
     comparison.candidateRepresentationKind !== "production_spoken" &&
@@ -239,7 +243,9 @@ function Candidate({
   interpretation,
 }: {
   witness: MotivationDiscoveryPrimaryWitnessV0_1;
-  interpretation?: FunctionalMotivationCandidateInterpretationV0_2VM;
+  interpretation?:
+    | FunctionalMotivationCandidateInterpretationV0_2VM
+    | FunctionalMotivationInterpretationV0_3VM["candidates"][number];
 }) {
   const candidate = witness.representative;
   const records = witness.records;
@@ -512,8 +518,8 @@ export function MotivationDiscoveryCardV0_1({
   onAnalyzeAlbanianSourceRecord,
   sourceRecordSelectionDisabled = false,
 }: {
-  discovery: PresentOrMissing<MotivationDiscoveryV0_1VM> | undefined;
-  interpretation?: PresentOrMissing<FunctionalMotivationInterpretationV0_2VM>;
+  discovery: PresentOrMissing<MotivationDiscoveryV0_2VM> | undefined;
+  interpretation?: PresentOrMissing<FunctionalMotivationInterpretationV0_2VM | FunctionalMotivationInterpretationV0_3VM>;
   onAnalyzeAlbanianSourceRecord?: (sourceRecordId: string) => void;
   sourceRecordSelectionDisabled?: boolean;
 }) {
@@ -974,7 +980,7 @@ export function MotivationDiscoveryCardV0_1({
             Alternatives: {albanianLexicalReading.fiveWindowsComparison.alternatives.join(" ")}
           </div>
           <div className="mt-2 text-[10px] text-[#aebbd5]">
-            {albanianLexicalReading.fiveWindowsComparison.claimBoundary}
+            {(albanianLexicalReading.fiveWindowsComparison.claimBoundary)}
           </div>
         </section>
       ) : null}
@@ -1076,7 +1082,7 @@ export function MotivationDiscoveryCardV0_1({
                 ) : null}
               </div>
               <div className="mt-2">Alternatives: {albanianLexicalReading.senseAlignedLexicalRole.alternatives.join(" ")}</div>
-              <div className="mt-1 text-[10px]">{albanianLexicalReading.senseAlignedLexicalRole.claimBoundary} No single winner; user decides.</div>
+              <div className="mt-1 text-[10px]">{(albanianLexicalReading.senseAlignedLexicalRole.claimBoundary)} Multiple interpretations may coexist; the user decides.</div>
             </section>
           ) : null}
           {albanianLexicalReading.sourceLinkedComparison ? (
@@ -1111,7 +1117,7 @@ export function MotivationDiscoveryCardV0_1({
               ) : (
                 <div className="mt-2 text-[#d5c28f]">{sourceLinkedComparisonSummaryV0_1(albanianLexicalReading.sourceLinkedComparison)}</div>
               )}
-              <div className="mt-2 text-[10px] text-[#91aebb]">{albanianLexicalReading.sourceLinkedComparison.claimBoundary}</div>
+              <div className="mt-2 text-[10px] text-[#91aebb]">{(albanianLexicalReading.sourceLinkedComparison.claimBoundary)}</div>
             </div>
           ) : null}
           {albanianLexicalReading.sourceLinkedComponentReading ? (
@@ -1195,7 +1201,7 @@ export function MotivationDiscoveryCardV0_1({
                         Evidence basis: {albanianLexicalReading.sourceLinkedComponentReading.functionalHypothesis.basis.join(" · ")}
                       </div>
                       <div className="mt-1 text-xs text-[#d5c28f]">
-                        Functional operation: none classified; no single sense winner; user decides. Composition and embryo function: Null.
+                        Functional operation: none classified; component-sense choice remains open; user decides. Composition and embryo function: Null.
                       </div>
                       <details className="mt-2 rounded border border-[#594a2b] bg-[#211c12] p-2 text-xs">
                         <summary className="cursor-pointer font-semibold">Retained source-sense alternatives</summary>
@@ -1223,12 +1229,12 @@ export function MotivationDiscoveryCardV0_1({
                     </div>
                   )}
                   <div className="mt-2 text-[10px] text-[#91aebb]">
-                    {albanianLexicalReading.sourceLinkedComponentReading.functionalHypothesis.claimBoundary}
+                    {(albanianLexicalReading.sourceLinkedComponentReading.functionalHypothesis.claimBoundary)}
                   </div>
                 </div>
               ) : null}
               <div className="mt-2 text-[10px] text-[#91aebb]">
-                {albanianLexicalReading.sourceLinkedComponentReading.claimBoundary}
+                {(albanianLexicalReading.sourceLinkedComponentReading.claimBoundary)}
                 {albanianLexicalReading.sourceLinkedComponentReading.reasonCodes.length
                   ? ` Reasons: ${albanianLexicalReading.sourceLinkedComponentReading.reasonCodes.join(", ")}.`
                   : ""}
@@ -1323,7 +1329,7 @@ export function MotivationDiscoveryCardV0_1({
               </div>
             )}
             <div className="mt-2 text-[10px] text-[#d5c28f]">
-              {albanianLexicalReading.functionalMeaningBridge.claimBoundary}
+              {(albanianLexicalReading.functionalMeaningBridge.claimBoundary)}
             </div>
           </div>
           {albanianLexicalReading.functionalFamilyReading ? (
@@ -1338,7 +1344,7 @@ export function MotivationDiscoveryCardV0_1({
                 ))}
               </ul>
               <p className="mt-2 text-[#9fbdb5]">Same frozen Kaikki source; no independent-source corroboration. {albanianLexicalReading.functionalFamilyReading.alternatives.join(" ")}</p>
-              <p className="mt-1 text-[10px] text-[#d5c28f]">{albanianLexicalReading.functionalFamilyReading.claimBoundary} No single winner; user decides.</p>
+              <p className="mt-1 text-[10px] text-[#d5c28f]">{(albanianLexicalReading.functionalFamilyReading.claimBoundary)} Multiple interpretations may coexist; the user decides.</p>
             </section>
           ) : null}
           {relatedCandidateEvaluations.length > 0 ? (
@@ -1437,7 +1443,7 @@ export function MotivationDiscoveryCardV0_1({
                           <div className="mt-1 break-words">
                             Functional reasons: {bridge.reasonCodes.join(", ") || "none recorded"}
                           </div>
-                          <div className="mt-1 text-[10px] text-[#d5c28f]">{bridge.claimBoundary}</div>
+                          <div className="mt-1 text-[10px] text-[#d5c28f]">{(bridge.claimBoundary)}</div>
                         </article>
                       );
                     })}
@@ -1512,13 +1518,13 @@ export function MotivationDiscoveryCardV0_1({
                         <br />Evidence refs: {candidate.researchHypothesis.evidenceRefs.join(", ") || "none"} · reasons: {candidate.researchHypothesis.reasonCodes.join(", ") || "none"}
                       </div>
                     ) : <div className="mt-2">SOURCE_FACT candidate only; no reviewed research hypothesis record is attached.</div>}
-                    <div className="mt-2 font-semibold">Functional operation: Null · production authorization: NOT_AUTHORIZED · embryo function: UNKNOWN_OR_NULL · historical relation: NOT_CLAIMED · noSingleWinner: true · user_decides</div>
-                    <div className="mt-1 text-[10px] text-[#d5c28f]">{candidate.claimBoundary}</div>
+                    <div className="mt-2 font-semibold">Functional operation: Null · production authorization: NOT_AUTHORIZED · embryo function: UNKNOWN_OR_NULL · historical relation: NOT_CLAIMED · no interpretation is selected automatically · user_decides</div>
+                    <div className="mt-1 text-[10px] text-[#d5c28f]">{(candidate.claimBoundary)}</div>
                     <div className="mt-1 break-words text-[10px] text-[#9fb1bf]">Reason codes: {candidate.reasonCodes.join(", ")}</div>
                   </article>
                 ))}
               </div>
-              <div className="mt-2 text-[10px] text-[#9fb1bf]">{occupationalRoleResearchCandidates.claimBoundary}</div>
+              <div className="mt-2 text-[10px] text-[#9fb1bf]">{(occupationalRoleResearchCandidates.claimBoundary)}</div>
             </details>
           ) : null}
           <div className="mt-3">
@@ -1546,7 +1552,7 @@ export function MotivationDiscoveryCardV0_1({
               {albanianLexicalReading.interpretation.statement ?? "UNKNOWN_OR_NULL — no integrated functional reading was emitted."}
             </div>
             <div className="mt-1 text-xs text-[#d5c28f]">
-              {albanianLexicalReading.interpretation.claimBoundary}
+              {(albanianLexicalReading.interpretation.claimBoundary)}
             </div>
             {albanianLexicalReading.interpretation.alternatives.length ? (
               <div className="mt-2 text-xs text-[#d5c28f]">
@@ -1575,7 +1581,7 @@ export function MotivationDiscoveryCardV0_1({
                 Alternatives: {albanianLexicalReading.composition.interpretation.alternatives.join(" ")}
               </div>
               <div className="mt-1 text-xs text-[#91aebb]">
-                {albanianLexicalReading.composition.interpretation.claimBoundary}
+                {(albanianLexicalReading.composition.interpretation.claimBoundary)}
               </div>
             </div>
           ) : (
@@ -1628,7 +1634,7 @@ export function MotivationDiscoveryCardV0_1({
                   </div>
                 </details>
               ) : null}
-              <div className="break-words text-[#9fb1bf]">No winner · user decides · historical relation not claimed</div>
+              <div className="break-words text-[#9fb1bf]">Interpretation remains with the user · historical relation not claimed</div>
             </div>
           </div>
         </div>
@@ -1637,7 +1643,7 @@ export function MotivationDiscoveryCardV0_1({
           data-testid="functional-motivation-interpretation-malformed"
           className="mt-3 rounded-lg border border-[#5b3434] bg-[#1a1111] p-3 text-xs text-[#f0c0c0]"
         >
-          Functional Motivation Interpretation v0.2 was emitted but malformed; the UI failed closed.
+          Functional Motivation Interpretation v0.3 was emitted but malformed; the UI failed closed.
         </div>
       ) : null}
 
@@ -1646,9 +1652,9 @@ export function MotivationDiscoveryCardV0_1({
           <div className="flex flex-wrap items-baseline justify-between gap-2">
             <div>
               <div className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#d8bb7a]">MOTIVATION DISCOVERY PRIMARY WITNESSES</div>
-              <p className="mt-1 text-xs text-[#c5ced8]">Each primary witness retains its underlying source records; order is not a ranking.</p>
+              <p className="mt-1 text-xs text-[#c5ced8]">Each primary witness retains its underlying source records; display order is deterministic and does not recommend an interpretation.</p>
             </div>
-            <div className="text-xs font-semibold text-[#f0ddb0]">No single winner · You decide</div>
+            <div className="text-xs font-semibold text-[#f0ddb0]">Multiple interpretations may coexist · You decide</div>
           </div>
           {primaryWitnesses.map((witness) => (
             <Candidate

@@ -178,7 +178,7 @@ export default function DeepRootCard({ deepRoot }: { deepRoot?: DeepRootLike | n
             <div className="flex flex-wrap items-center gap-2">
               <span className="font-semibold">Functional Roots</span>
               <span className="font-mono text-xs opacity-70">
-                micro-root hypotheses (no winner)
+                micro-root hypotheses; interpretation remains with the user
               </span>
             </div>
 

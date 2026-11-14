@@ -1650,7 +1650,7 @@ async function buildSourceLinkedComponentReadingV0_1(input: Readonly<{
         "Component phonetic and Voice comparison is not performed in this reading.",
         ...componentResolutions
           .filter((resolution) => resolution.status === "AMBIGUOUS")
-          .map((resolution) => `${resolution.sourceForm} resolves to multiple source records; every record and sense is retained without selecting a winner.`),
+          .map((resolution) => `${resolution.sourceForm} resolves to multiple source records; every record and sense is retained for user review.`),
       ]),
       claimBoundary: "Exploratory product relationship only; source-authored etymology remains attributed and no morphology, causation, or Voice semantics is asserted.",
     }),
@@ -3024,7 +3024,7 @@ function buildIntegratedFunctionalReadingInterpretationV0_1(
     statement: `Integrated source-bounded functional reading (exploratory): ${hypothesis.statement} The source-bounded bridge is presented alongside the source facts and descriptive structural observations; independent functional meaning for any structural embryo remains Unknown / Null.`,
     alternatives: Object.freeze([
       ...hypothesis.alternatives,
-      "Other evaluated source-linked candidates remain inspectable; no single winner is claimed.",
+      "Other evaluated source-linked candidates remain inspectable; interpretation remains with the user.",
     ]),
     basis: Object.freeze([
       "SOURCE_ATTESTED_FUNCTIONAL_BRIDGE",
@@ -3290,7 +3290,7 @@ function buildAlbanianFunctionalFamilyReadingV0_1(input: Readonly<{
       "Other source-linked forms may remain unresolved or support no functional operation.",
       "These observations come from one frozen source and do not establish independent corroboration or a shared embryo meaning.",
     ]),
-    claimBoundary: "A source-bounded family of existing exploratory AGENT bridges, not a new AGENT rule, a suffix law, historical proof, or a unique winner.",
+    claimBoundary: "A source-bounded family of existing exploratory AGENT bridges, not a new AGENT rule, a suffix law, historical proof, or a uniquely established interpretation.",
     noSingleWinner: true,
     userDecisionPosture: "user_decides" as const,
   });
@@ -3876,7 +3876,7 @@ async function buildAlbanianLexicalReadingV0_1(input: Readonly<{
             "SOURCE_DERIVED_IPA_VOICE_PATH",
             "PRIMARY_SOURCE_GLOSS_EVIDENCE",
           ]),
-          claimBoundary: "Exploratory product interpretation only; no historical-origin claim, semantic proof, or winner selection.",
+          claimBoundary: "Exploratory product interpretation only; no historical-origin claim, semantic proof, or automatic interpretation selection.",
         })
       : Object.freeze({
           status: "UNKNOWN_OR_NULL" as const,

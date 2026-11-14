@@ -113,7 +113,7 @@ function ancestorsOf(nodeId: string, parentById: Record<string, string | null>):
 }
 
 // v0.1 inputs: keep it forgiving.
-// We accept either the whole /api/analyze-v1 response OR a partial object.
+// We accept either the whole /api/analyze-v2 response OR a partial object.
 export function buildRootLightMapV01(input: any): RootLightMapV01 {
   const rawLights: RootLight[] = [];
 

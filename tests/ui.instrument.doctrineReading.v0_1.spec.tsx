@@ -58,7 +58,7 @@ describe("Open Instrument Seven-Voices doctrine reading UI v0.1", () => {
       "balanced mediation with harmonious resolution",
     );
     expect(within(card).getByTestId("doctrine-level3-reading-boundary")).toHaveTextContent(
-      /Doctrine inference only.*not a lexical definition.*historical origin claim.*candidate proof.*winner selection/i,
+      /Doctrine inference only.*not a lexical definition.*historical origin claim.*candidate proof.*No interpretation is selected automatically/i,
     );
   });
 
@@ -79,7 +79,7 @@ describe("Open Instrument Seven-Voices doctrine reading UI v0.1", () => {
     expect(adaptAnalysisToTelemetryVM({ word: "x", doctrineReading: "bad" }).doctrineReading).toEqual({
       kind: "missing",
       missing: "malformed",
-      note: "doctrineReading expected the public V1 shape",
+      note: "doctrineReading v2 contract",
     });
     expect(adaptAnalysisToTelemetryVM({ word: "123", doctrineReading: null }).doctrineReading).toEqual({
       kind: "present",
@@ -103,7 +103,7 @@ describe("Open Instrument Seven-Voices doctrine reading UI v0.1", () => {
     expect(adaptAnalysisToTelemetryVM(malformed).doctrineReading).toEqual({
       kind: "missing",
       missing: "malformed",
-      note: "doctrineReading expected the public V1 shape",
+      note: "doctrineReading v2 contract",
     });
   });
 
@@ -115,13 +115,13 @@ describe("Open Instrument Seven-Voices doctrine reading UI v0.1", () => {
     expect(adaptAnalysisToTelemetryVM(malformed).doctrineReading).toEqual({
       kind: "missing",
       missing: "malformed",
-      note: "doctrineReading expected the public V1 shape",
+      note: "doctrineReading v2 contract",
     });
   });
 
   it("keeps pronunciation Null distinct from Evidence Null for wind", async () => {
     const body = await analyze("wind");
-    expect(body.analysisStatusV0_1.status).toBe("null_no_supported_candidate");
+    expect(body.analysisStatusV0_2.status).toBe("null_no_supported_candidate");
     expect(body.candidates).toEqual([]);
     expect(body.doctrineReading).toBeNull();
 
@@ -158,11 +158,11 @@ describe("Open Instrument Seven-Voices doctrine reading UI v0.1", () => {
       "harmonious resolution with clear understanding",
     );
     expect(within(card).getByTestId("doctrine-level3-reading-boundary")).toHaveTextContent(
-      /Doctrine inference only.*not a lexical definition.*historical origin claim.*candidate proof.*winner selection/i,
+      /Doctrine inference only.*not a lexical definition.*historical origin claim.*candidate proof.*No interpretation is selected automatically/i,
     );
     expect(within(card).getByText("Completion/Unit")).toBeInTheDocument();
     expect(within(card).getByText("Direction/Focus")).toBeInTheDocument();
-    expect(within(card).getByText("This is not a lexical definition, historical origin claim, candidate proof, or winner selection. User decides the final interpretation.")).toBeInTheDocument();
+    expect(within(card).getByText("This is not a lexical definition, historical origin claim, or candidate proof. No interpretation is selected automatically; the user decides.")).toBeInTheDocument();
     expect(screen.getAllByText("Evidence: Reviewed lexical bridge · exploratory")).toHaveLength(2);
   });
 

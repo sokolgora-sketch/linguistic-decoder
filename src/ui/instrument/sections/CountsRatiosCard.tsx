@@ -120,7 +120,7 @@ export function CountsRatiosCard(props: { readout: unknown; engineVersion?: stri
       </div>
 
       <div className="mt-4 rounded-[10px] border border-[#27313d] bg-[#0d1117] p-3 text-[11px] leading-5 text-[#7d8ea3]">
-        Boundary: overview metrics only; no score order; no forced answer.
+        Boundary: overview metrics only; display order does not recommend an interpretation; automatic selection is disabled.
       </div>
     </section>
   );

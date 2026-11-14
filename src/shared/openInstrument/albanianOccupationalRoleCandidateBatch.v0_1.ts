@@ -482,7 +482,7 @@ export function buildAlbanianOccupationalRoleCandidateBatchV0_1(input: Readonly<
       noSingleWinner: true,
       userDecisionPosture: "user_decides",
       reasonCodes: Object.freeze(reasonCodes),
-      claimBoundary: "Suffixes are discovery filters only. Source category and lexical records are descriptive evidence; OEWN matches are English-ontology observations, not Albanian sense adjudication or functional authorization. No embryo meaning, historical relation, unique winner, or production operation is claimed.",
+      claimBoundary: "Suffixes are discovery filters only. Source category and lexical records are descriptive evidence; OEWN matches are English-ontology observations, not Albanian sense adjudication or functional authorization. The batch establishes no embryo meaning, historical relation, or production operation; Null remains available and the user decides.",
     });
   });
 
@@ -798,7 +798,7 @@ export function getAlbanianOccupationalRoleCandidatesForWordV0_1(
     scanSummary: frozenBatch.suffixScan,
     candidates: Object.freeze(candidates),
     reasonCodes: Object.freeze(candidates.length ? [] : ["NO_SOURCE_ROLE_CANDIDATE_IN_BOUNDED_BATCH"]),
-    claimBoundary: "Suffix endings are discovery filters only. Source category and lexical relations are descriptive facts; OEWN is independent English ontology observation, not Albanian sense adjudication. The batch never authorizes AGENT, embryo meaning, historical relation, or a unique winner; Null is preserved.",
+    claimBoundary: "Suffix endings are discovery filters only. Source category and lexical relations are descriptive facts; OEWN is independent English ontology observation, not Albanian sense adjudication. The batch does not authorize AGENT, embryo meaning, historical relation, or production operation; Null is preserved and interpretation remains with the user.",
   });
 }
 

@@ -55,7 +55,7 @@ describe("Zheji study003 replay runner scaffold v0.1", () => {
     });
 
     expect(plan.systemPrompt).toContain("Do not claim origin");
-    expect(plan.systemPrompt).toContain("Do not score, rank, choose a winner");
+    expect(plan.systemPrompt).toContain("Do not score or rank interpretations, select one automatically");
     expect(plan.systemPrompt).toContain("Inspect semantic/function motivation only");
     expect(plan.systemPrompt).toContain("Brain must not return transparencyContrast");
     expect(plan.systemPrompt).toContain("Brain must not return transparencyContrastNote");
@@ -141,7 +141,7 @@ describe("Zheji study003 replay runner scaffold v0.1", () => {
     expect(plan.systemPrompt).toContain("semanticTransparency.level must be exactly one of atomic, metaphorical, opaque.");
     expect(plan.systemPrompt).toContain("If semanticTransparency.level is uncertain for a non-null candidate, use opaque.");
     expect(plan.systemPrompt).toContain("Do not leave semanticTransparency.level empty or null.");
-    expect(plan.systemPrompt).toContain("Open Instrument is not an etymology task. Do not find origin. Do not choose a winner.");
+    expect(plan.systemPrompt).toContain("Open Instrument is not an etymology task. Do not find origin or select one interpretation automatically");
     expect(plan.systemPrompt).toContain("functional identity card");
     expect(plan.systemPrompt).toContain("free operators");
     expect(plan.systemPrompt).toContain("Code F");

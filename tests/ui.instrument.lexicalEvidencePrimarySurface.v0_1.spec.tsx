@@ -76,7 +76,7 @@ describe("Open Instrument lexical evidence primary surface v0.1", () => {
 
     render(<InstrumentPanel payload={body} />);
 
-    expect(body.analysisStatusV0_1.status).toBe("null_no_supported_candidate");
+    expect(body.analysisStatusV0_2.status).toBe("null_no_supported_candidate");
     expect(screen.getAllByTestId("functional-motivation-card")).toHaveLength(2);
 
     const lexical = screen.getByTestId("lexical-source-evidence-primary");
@@ -107,7 +107,7 @@ describe("Open Instrument lexical evidence primary surface v0.1", () => {
 
     renderCard(body);
 
-    expect(body.analysisStatusV0_1.status).toBe("structural_unreviewed");
+    expect(body.analysisStatusV0_2.status).toBe("structural_unreviewed");
     const lexical = screen.getByTestId("lexical-source-evidence-primary");
     expect(lexical).toHaveTextContent("Source form: det");
     expect(lexical).toHaveTextContent("Source form: mare");
@@ -125,7 +125,7 @@ describe("Open Instrument lexical evidence primary surface v0.1", () => {
 
     renderCard(body);
 
-    expect(body.analysisStatusV0_1.status).toBe("structural_unreviewed");
+    expect(body.analysisStatusV0_2.status).toBe("structural_unreviewed");
     const lexical = screen.getByTestId("lexical-source-evidence-primary");
     expect(lexical).toHaveTextContent("Source form: QIRI");
     expect(lexical).toHaveTextContent("Source form: candēla");
@@ -141,7 +141,7 @@ describe("Open Instrument lexical evidence primary surface v0.1", () => {
 
     renderCard(body);
 
-    expect(body.analysisStatusV0_1.status).toBe("null_no_supported_candidate");
+    expect(body.analysisStatusV0_2.status).toBe("null_no_supported_candidate");
     expect(screen.queryByTestId("lexical-source-evidence-primary")).not.toBeInTheDocument();
   });
 
@@ -154,7 +154,7 @@ describe("Open Instrument lexical evidence primary surface v0.1", () => {
 
     renderCard(body);
 
-    expect(body.analysisStatusV0_1.status).toBe("reviewed_functional_evidence");
+    expect(body.analysisStatusV0_2.status).toBe("reviewed_functional_evidence");
     expect(screen.getByText("Evidence: Reviewed lexical bridge · exploratory")).toBeInTheDocument();
     expect(screen.getByText("Exploratory functional bridge")).toBeInTheDocument();
     expect(screen.queryByTestId("lexical-source-evidence-primary")).not.toBeInTheDocument();

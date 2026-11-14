@@ -50,7 +50,7 @@ describe("analyze-v1 reviewed evidence operation wiring v0.1", () => {
       "historicalOriginClaim=not_claimed",
     );
     expect(evidence).toContain(
-      "winnerClaim=not_claimed",
+      "automaticInterpretationSelection=DISABLED",
     );
     expect(evidence).toContain(
       "languageSuperiorityClaim=not_claimed",

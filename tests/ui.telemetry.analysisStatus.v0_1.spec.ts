@@ -2,7 +2,7 @@ require("./helpers/whatwgGlobals.cjs");
 
 const {
   GET,
-} = require("../app/api/analyze-v1/route");
+} = require("../app/api/analyze-v2/route");
 
 const {
   adaptAnalysisToTelemetryVM,
@@ -11,7 +11,7 @@ const {
 );
 
 describe(
-  "Telemetry VM analysisStatusV0_1",
+  "Telemetry VM analysisStatusV0_2",
   () => {
     it.each([
       [
@@ -50,7 +50,7 @@ describe(
       ) => {
         const response = await GET({
           url:
-            "http://localhost:3000/api/analyze-v1?word=" +
+            "http://localhost:3000/api/analyze-v2?word=" +
             encodeURIComponent(word) +
             "&mode=strict",
         } as any);
@@ -64,15 +64,15 @@ describe(
           );
 
         expect(
-          vm.analysisStatusV0_1.kind,
+          vm.analysisStatusV0_2?.kind,
         ).toBe("present");
 
         if (
-          vm.analysisStatusV0_1.kind ===
+          vm.analysisStatusV0_2?.kind ===
           "present"
         ) {
           const value =
-            vm.analysisStatusV0_1.value;
+            vm.analysisStatusV0_2.value;
 
           expect(value.status).toBe(
             expectedStatus,
@@ -135,11 +135,11 @@ describe(
           });
 
         expect(
-          vm.analysisStatusV0_1,
+          vm.analysisStatusV0_2,
         ).toEqual({
           kind: "missing",
           missing: "not_emitted",
-          note: "analysisStatusV0_1",
+          note: "analysisStatusV0_2",
         });
       },
     );

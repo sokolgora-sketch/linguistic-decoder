@@ -54,14 +54,24 @@ describe("multilingual Discovery substrate v0.2 S4 persistence preflight", () =>
       body: JSON.stringify({ word: target?.input, mode: "strict", alphabet: "auto", language: "en", providerExecution: "automatic" }),
     }));
     expect(response.status).toBe(200);
-    const payload = await response.json() as { motivationDiscoveryV0_1?: { candidates?: Array<Record<string, unknown>> } };
-    const candidates = payload.motivationDiscoveryV0_1?.candidates ?? [];
+    const payload = await response.json() as {
+      motivationDiscoveryV0_2?: {
+        candidates?: Array<Record<string, unknown>>;
+        interpretationDecisionPolicy?: Record<string, unknown>;
+      };
+    };
+    const candidates = payload.motivationDiscoveryV0_2?.candidates ?? [];
     const liveEnglish = candidates.find((candidate) => candidate.candidateLanguage === "English" && candidate.candidateForm === english?.candidateForm);
     expect(liveEnglish).toBeDefined();
     expect(liveEnglish?.candidateVoicePath).toEqual([]);
     expect(liveEnglish?.historicalRelation).toBe("not_claimed");
     expect(liveEnglish?.userDecisionPosture).toBe("user_decides");
-    expect(liveEnglish?.noSingleWinner).toBe(true);
+    expect(payload.motivationDiscoveryV0_2?.interpretationDecisionPolicy).toMatchObject({
+      multipleInterpretationsMayCoexist: true,
+      automaticInterpretationSelection: "DISABLED",
+      interpretationDecisionAuthority: "USER_DECIDES",
+    });
+    expect(liveEnglish).not.toHaveProperty("noSingleWinner");
     expect(JSON.stringify(payload)).not.toContain(process.env.OPEN_INSTRUMENT_EXTERNAL_SOURCE_ROOT ?? "__unset__");
   }, 60_000);
 });

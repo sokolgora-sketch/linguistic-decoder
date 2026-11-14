@@ -181,7 +181,7 @@ export function RootMapCard(props: Props) {
           </div>
           <div className="mt-2 text-sm leading-6 text-[#f5f7fb]">{reading}</div>
           <div className="mt-3 text-[11px] leading-5 text-[#9fb1bf]">
-            Boundary: deterministic root-map reading; no forced answer; not a historical-chain claim.
+            Boundary: deterministic root-map reading; interpretations are not selected automatically; the user decides; not a historical-chain claim.
           </div>
         </div>
 

@@ -3,43 +3,43 @@
 import React from "react";
 import { downloadText } from "@/lib/downloadJson";
 import {
-  buildReproducibleRunBundleV0_1,
-  parseReproducibleRunBundleV0_1,
-  serializeReproducibleRunBundleV0_1,
-  type ReproducibleRunBundleV0_1,
-} from "@/shared/openInstrument/reproducibleRunBundle.v0_1";
+  buildReproducibleRunBundleV0_2,
+  parseReproducibleRunBundleV0_2,
+  serializeReproducibleRunBundleV0_2,
+  type ReproducibleRunBundleV0_2,
+} from "@/shared/openInstrument/reproducibleRunBundle.v0_2";
 import {
-  buildComparisonExportArtifactV0_1,
-  parseComparisonExportArtifactV0_1,
-  serializeComparisonExportArtifactV0_1,
-  type ComparisonExportArtifactV0_1,
-} from "@/ui/instrument/comparisonExportReproducibility.v0_1";
+  buildComparisonExportArtifactV0_2,
+  parseComparisonExportArtifactV0_2,
+  serializeComparisonExportArtifactV0_2,
+  type ComparisonExportArtifactV0_2,
+} from "@/ui/instrument/comparisonExportReproducibility.v0_2";
 
-export type ComparisonExportSideInputV0_1 = Readonly<{
-  bundle?: ReproducibleRunBundleV0_1 | null;
+export type ComparisonExportSideInputV0_2 = Readonly<{
+  bundle?: ReproducibleRunBundleV0_2 | null;
   payload?: unknown | null;
   ipa?: string;
   targetSenseLabel?: string;
 }>;
 
 type Props = Readonly<{
-  left: ComparisonExportSideInputV0_1 | null;
-  right: ComparisonExportSideInputV0_1 | null;
+  left: ComparisonExportSideInputV0_2 | null;
+  right: ComparisonExportSideInputV0_2 | null;
   disabled?: boolean;
-  onImport: (artifact: ComparisonExportArtifactV0_1) => void;
+  onImport: (artifact: ComparisonExportArtifactV0_2) => void;
 }>;
 
-function hasSource(side: ComparisonExportSideInputV0_1 | null): boolean {
+function hasSource(side: ComparisonExportSideInputV0_2 | null): boolean {
   return Boolean(side?.bundle) || (side?.payload !== undefined && side?.payload !== null);
 }
 
 async function materializeSourceBundle(
-  side: ComparisonExportSideInputV0_1,
+  side: ComparisonExportSideInputV0_2,
   label: "LEFT" | "RIGHT",
-): Promise<ReproducibleRunBundleV0_1> {
+): Promise<ReproducibleRunBundleV0_2> {
   if (side.bundle) {
-    const parsed = await parseReproducibleRunBundleV0_1(
-      serializeReproducibleRunBundleV0_1(side.bundle),
+    const parsed = await parseReproducibleRunBundleV0_2(
+      serializeReproducibleRunBundleV0_2(side.bundle),
     );
     if (!parsed.ok) throw new Error(`${label} source bundle is invalid`);
     return parsed.value;
@@ -47,7 +47,7 @@ async function materializeSourceBundle(
   if (side.payload === undefined || side.payload === null) {
     throw new Error(`${label} has no validated source result`);
   }
-  return buildReproducibleRunBundleV0_1({
+  return buildReproducibleRunBundleV0_2({
     result: side.payload,
     ...(side.ipa !== undefined ? { ipa: side.ipa } : {}),
     ...(side.targetSenseLabel !== undefined
@@ -56,7 +56,7 @@ async function materializeSourceBundle(
   });
 }
 
-export function ComparisonExportReproducibilityControlsV0_1({
+export function ComparisonExportReproducibilityControlsV0_2({
   left,
   right,
   disabled = false,
@@ -75,13 +75,13 @@ export function ComparisonExportReproducibilityControlsV0_1({
     setBusy(true);
     setError(null);
     try {
-      const artifact = await buildComparisonExportArtifactV0_1({
+      const artifact = await buildComparisonExportArtifactV0_2({
         left: await materializeSourceBundle(left, "LEFT"),
         right: await materializeSourceBundle(right, "RIGHT"),
       });
       downloadText(
-        "open-instrument-comparison-v0.1.json",
-        serializeComparisonExportArtifactV0_1(artifact),
+        "open-instrument-comparison-v0.2.json",
+        serializeComparisonExportArtifactV0_2(artifact),
       );
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : "Comparison export failed.");
@@ -97,7 +97,7 @@ export function ComparisonExportReproducibilityControlsV0_1({
     setBusy(true);
     setError(null);
     try {
-      const parsed = await parseComparisonExportArtifactV0_1(await file.text());
+      const parsed = await parseComparisonExportArtifactV0_2(await file.text());
       if (!parsed.ok) {
         setError(`Unable to open comparison: ${parsed.reason}`);
         return;

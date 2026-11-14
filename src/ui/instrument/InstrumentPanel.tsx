@@ -12,9 +12,9 @@ import { useToast } from '@/hooks/use-toast';
 import { toPrettyJson } from "@/ui/instrument/prettyJson";
 import { downloadText } from "@/lib/downloadJson";
 import {
-  buildEvidencePackageExportV0_1,
-  serializeEvidencePackageExportV0_1,
-} from "@/shared/openInstrument/evidencePackageExport.v0_1";
+  buildEvidencePackageExportV0_2,
+  serializeEvidencePackageExportV0_2,
+} from "@/shared/openInstrument/evidencePackageExport.v0_2";
 import { buildEvidencePackageFromVM } from "@/ui/telemetry/buildEvidencePackageFromVM";
 import { buildEvidenceSummaryTextFromVM } from "@/ui/telemetry/buildEvidenceSummaryTextFromVM";
 import type { MissingState, PresentOrMissing, ResonanceProfileV1VM, RootMapVM, SoundRootsVM, TelemetryViewModel, Vowel } from "@/ui/telemetry/types";
@@ -55,7 +55,7 @@ import { AlbanianStructuralEvidenceCardV0_1 } from "./sections/AlbanianStructura
 
 type Props =
   | {
-      /** Raw /api/analyze-v1 payload (unknown shape). We adapt it, never trust it. */
+      /** Raw /api/analyze-v2 payload (unknown shape). We adapt it, never trust it. */
       payload: unknown;
       vm?: never;
         wordForMask?: string;
@@ -276,18 +276,21 @@ export function InstrumentPanel(props: Props) {
     [structuralInput],
   );
 
+  const analysisStatusForUi = isValidVm
+    ? vm.analysisStatusV0_2
+    : undefined;
   const primaryNullStatus =
     isValidVm &&
-    vm.analysisStatusV0_1?.kind === "present" &&
-    vm.analysisStatusV0_1.value.status ===
+    analysisStatusForUi?.kind === "present" &&
+    analysisStatusForUi.value.status ===
       "null_no_supported_candidate"
-      ? vm.analysisStatusV0_1
+      ? analysisStatusForUi
       : null;
 
   const primaryAnalysisStatus =
     isValidVm &&
-    vm.analysisStatusV0_1?.kind === "present"
-      ? vm.analysisStatusV0_1
+    analysisStatusForUi?.kind === "present"
+      ? analysisStatusForUi
       : null;
 
   React.useEffect(() => {
@@ -352,7 +355,7 @@ export function InstrumentPanel(props: Props) {
   }
 
   function downloadEvidencePackage() {
-    const projected = buildEvidencePackageExportV0_1(vm, ledgerModel ?? undefined);
+    const projected = buildEvidencePackageExportV0_2(vm, ledgerModel ?? undefined);
     if (!projected.ok) {
       toast({
         title: "Download failed",
@@ -362,7 +365,7 @@ export function InstrumentPanel(props: Props) {
       return;
     }
 
-    const serialized = serializeEvidencePackageExportV0_1(projected.value);
+    const serialized = serializeEvidencePackageExportV0_2(projected.value);
     if (!serialized.ok) {
       toast({
         title: "Download failed",
@@ -557,8 +560,8 @@ export function InstrumentPanel(props: Props) {
                   </button>
                 ) : null}
                 <PrimaryAlbanianReadingCardV0_1
-                  discovery={vm.motivationDiscoveryV0_1}
-                  analysisStatus={vm.analysisStatusV0_1}
+                  discovery={vm.motivationDiscoveryV0_2}
+                  analysisStatus={analysisStatusForUi}
                 />
               </div>
 
@@ -567,8 +570,8 @@ export function InstrumentPanel(props: Props) {
               <SpokenResultCompositionSummaryV0_1 readout={vm.readout} />
 
               <MotivationDiscoveryCardV0_1
-                discovery={vm.motivationDiscoveryV0_1}
-                interpretation={vm.functionalMotivationInterpretationV0_2}
+                discovery={vm.motivationDiscoveryV0_2}
+                interpretation={vm.functionalMotivationInterpretationV0_3}
                 onAnalyzeAlbanianSourceRecord={props.onAnalyzeAlbanianSourceRecord}
                 sourceRecordSelectionDisabled={props.sourceRecordSelectionDisabled}
               />
@@ -644,7 +647,7 @@ export function InstrumentPanel(props: Props) {
                 currentWordEvidence={isValidVm
                   ? {
                       analyzedWord: vm.readout.word,
-                      discovery: vm.motivationDiscoveryV0_1,
+                      discovery: vm.motivationDiscoveryV0_2,
                       sourceWitnesses: crossLanguageSourceWitnesses,
                     }
                   : undefined}
@@ -758,10 +761,10 @@ export function InstrumentPanel(props: Props) {
                 {!primaryNullStatus ? (
                   <AnalysisStatusCardV0_1
                     status={
-                      vm.analysisStatusV0_1 ?? {
+                      analysisStatusForUi ?? {
                         kind: "missing",
                         missing: "not_emitted",
-                        note: "analysisStatusV0_1",
+                        note: "analysisStatusV0_2",
                       }
                     }
                   />

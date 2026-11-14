@@ -2,6 +2,7 @@ import { render, screen, within } from "@testing-library/react";
 import { POST } from "../app/api/analyze-v1/route";
 import { adaptAnalysisToTelemetryVM } from "@/ui/instrument/contractAdapter";
 import { MotivationDiscoveryCardV0_1 } from "@/ui/instrument/sections/MotivationDiscoveryCard.v0_1";
+import { hasLegacyInterpretationFieldsV2 } from "@/shared/analyzeWordResult.v2.contract";
 
 async function analyze(body: Record<string, unknown>) {
   const response = await POST(
@@ -14,7 +15,75 @@ async function analyze(body: Record<string, unknown>) {
   return response.json();
 }
 
-describe("analyze-v1 Functional Motivation Interpretation v0.2 boundary", () => {
+describe("active Analyze response contract v2", () => {
+  it("emits only neutral versioned fields while preserving alternatives and provenance", async () => {
+    const payload = await analyze({
+      word: "study",
+      mode: "strict",
+      alphabet: "auto",
+      providerExecution: "disabled",
+    });
+    const current = payload.functionalMotivationInterpretationV0_3;
+    const currentStatus = payload.analysisStatusV0_2;
+
+    expect(payload.responseContractVersion).toBe("open-instrument.analyze-word-result.v2");
+    expect(current.schemaVersion).toBe("open-instrument.functional-motivation-interpretation.v0_3");
+    expect(current.interpretationDecisionPolicy).toMatchObject({
+      multipleInterpretationsMayCoexist: true,
+      automaticInterpretationSelection: "DISABLED",
+      interpretationDecisionAuthority: "USER_DECIDES",
+      alternativeProvenance: "PRESERVED_PER_INTERPRETATION",
+      alternativeClaimStatus: "PRESERVED_PER_INTERPRETATION",
+    });
+    expect(current.candidates.length).toBeGreaterThan(1);
+    expect(payload.motivationDiscoveryV0_2.candidates.length).toBeGreaterThan(0);
+    expect(current.candidates[0]?.sourceFact.sourceId).toBeTruthy();
+    expect(current.candidates[0]?.hypothesis).toBeDefined();
+    expect(current).not.toHaveProperty("noSingleWinner");
+    expect(current.claimBoundary).not.toHaveProperty("winnerClaim");
+    expect(current.candidates.every((item: Record<string, unknown>) =>
+      !Object.prototype.hasOwnProperty.call(item, "noSingleWinner") &&
+      !Object.prototype.hasOwnProperty.call(item, "winnerClaim"),
+    )).toBe(true);
+
+    expect(payload).not.toHaveProperty("analysisStatusV0_1");
+    expect(payload).not.toHaveProperty("functionalMotivationInterpretationV0_2");
+    expect(payload).not.toHaveProperty("motivationDiscoveryV0_1");
+    expect(hasLegacyInterpretationFieldsV2(payload)).toBe(false);
+    expect(JSON.stringify(payload)).not.toContain("no_single_winner");
+    expect(JSON.stringify(payload)).not.toContain("winnerClaim");
+    expect(JSON.stringify(payload)).not.toContain("noSingleWinner");
+    expect(currentStatus).toMatchObject({
+      schemaVersion: "open-instrument.analysis-status.v0_2",
+      interpretationDecisionPolicy: {
+        multipleInterpretationsMayCoexist: true,
+        automaticInterpretationSelection: "DISABLED",
+        interpretationDecisionAuthority: "USER_DECIDES",
+      },
+    });
+    expect(currentStatus.claimBoundary).not.toHaveProperty("winnerClaim");
+    expect(currentStatus.summary).not.toMatch(/winner/i);
+  });
+
+  it("keeps the V2 response neutral at the UI input boundary", async () => {
+    const payload = await analyze({
+      word: "study",
+      mode: "strict",
+      alphabet: "auto",
+      providerExecution: "disabled",
+    });
+    const vm = adaptAnalysisToTelemetryVM(payload);
+    expect(vm.functionalMotivationInterpretationV0_3?.kind).toBe("present");
+    if (vm.functionalMotivationInterpretationV0_3?.kind !== "present") return;
+    expect(vm.functionalMotivationInterpretationV0_3.value.interpretationDecisionPolicy.automaticInterpretationSelection)
+      .toBe("DISABLED");
+    expect(vm.analysisStatusV0_2?.kind).toBe("present");
+    if (vm.analysisStatusV0_2?.kind !== "present") return;
+    expect(vm.analysisStatusV0_2.value.interpretationDecisionPolicy.interpretationDecisionAuthority)
+      .toBe("USER_DECIDES");
+    expect(vm.raw).toEqual(payload);
+  });
+
   it.each([
     ["damage", "reviewed.external.gheg-da.damage.candidate.v0_1"],
     ["study", "reviewed.external.di.knowledge.candidate.v0_1"],
@@ -26,7 +95,7 @@ describe("analyze-v1 Functional Motivation Interpretation v0.2 boundary", () => 
       alphabet: "auto",
       providerExecution: "disabled",
     });
-    const rawCandidates = payload.motivationDiscoveryV0_1.candidates.filter(
+    const rawCandidates = payload.motivationDiscoveryV0_2.candidates.filter(
       (candidate: { sourceFact: { sourceId: string } }) =>
         candidate.sourceFact.sourceId === sourceId,
     );
@@ -38,7 +107,7 @@ describe("analyze-v1 Functional Motivation Interpretation v0.2 boundary", () => 
     }) => candidate.candidateVoicePath.length === 0 &&
       candidate.structuralComparison.candidateVoicePath.length === 0)).toBe(true);
 
-    const visible = adaptAnalysisToTelemetryVM(payload).motivationDiscoveryV0_1;
+    const visible = adaptAnalysisToTelemetryVM(payload).motivationDiscoveryV0_2;
     expect(visible.kind).toBe("present");
     if (visible.kind !== "present") throw new Error("Expected UI discovery");
     const visibleCandidates = visible.value.candidates.filter(
@@ -58,7 +127,7 @@ describe("analyze-v1 Functional Motivation Interpretation v0.2 boundary", () => 
       alphabet: "auto",
       providerExecution: "disabled",
     });
-    const sourceCandidate = payload.motivationDiscoveryV0_1.candidates[0];
+    const sourceCandidate = payload.motivationDiscoveryV0_2.candidates[0];
     const forgedDiscoveryCandidate = {
       ...sourceCandidate,
       candidateVoicePath: ["I"],
@@ -76,7 +145,7 @@ describe("analyze-v1 Functional Motivation Interpretation v0.2 boundary", () => 
       },
     };
     const sourceInterpretationCandidate =
-      payload.functionalMotivationInterpretationV0_2.candidates.find(
+      payload.functionalMotivationInterpretationV0_3.candidates.find(
         (candidate: { candidateId: string }) =>
           candidate.candidateId === sourceCandidate.candidateId,
       );
@@ -99,18 +168,18 @@ describe("analyze-v1 Functional Motivation Interpretation v0.2 boundary", () => 
     };
     const forgedPayload = {
       ...payload,
-      motivationDiscoveryV0_1: {
-        ...payload.motivationDiscoveryV0_1,
+      motivationDiscoveryV0_2: {
+        ...payload.motivationDiscoveryV0_2,
         candidates: [forgedDiscoveryCandidate],
       },
-      functionalMotivationInterpretationV0_2: {
-        ...payload.functionalMotivationInterpretationV0_2,
+      functionalMotivationInterpretationV0_3: {
+        ...payload.functionalMotivationInterpretationV0_3,
         candidates: [forgedInterpretationCandidate],
       },
     };
 
     const visible = adaptAnalysisToTelemetryVM(forgedPayload);
-    const visibleDiscovery = visible.motivationDiscoveryV0_1;
+    const visibleDiscovery = visible.motivationDiscoveryV0_2;
     expect(visibleDiscovery.kind).toBe("present");
     if (visibleDiscovery.kind !== "present") throw new Error("Expected UI discovery");
     expect(visibleDiscovery.value.candidates[0]).toMatchObject({
@@ -123,7 +192,7 @@ describe("analyze-v1 Functional Motivation Interpretation v0.2 boundary", () => 
       },
     });
 
-    const visibleInterpretation = visible.functionalMotivationInterpretationV0_2;
+    const visibleInterpretation = visible.functionalMotivationInterpretationV0_3;
     expect(visibleInterpretation.kind).toBe("present");
     if (visibleInterpretation.kind !== "present") {
       throw new Error("Expected UI interpretation");
@@ -162,15 +231,15 @@ describe("analyze-v1 Functional Motivation Interpretation v0.2 boundary", () => 
       providerExecution: "disabled",
     });
 
-    expect(payload.motivationDiscoveryV0_1).toBeDefined();
-    expect(payload.functionalMotivationInterpretationV0_2).toMatchObject({
-      schemaVersion: "open-instrument.functional-motivation-interpretation.v0_2",
+    expect(payload.motivationDiscoveryV0_2).toBeDefined();
+    expect(payload.functionalMotivationInterpretationV0_3).toMatchObject({
+      schemaVersion: "open-instrument.functional-motivation-interpretation.v0_3",
       status: "NO_SUPPORTED_INTERPRETATION",
       input: { targetSense: null },
-      noSingleWinner: true,
+      interpretationDecisionPolicy: { automaticInterpretationSelection: "DISABLED" },
       userDecisionPosture: "user_decides",
     });
-    const di = payload.functionalMotivationInterpretationV0_2.candidates.find(
+    const di = payload.functionalMotivationInterpretationV0_3.candidates.find(
       (candidate: { candidateEmbryo: string }) => candidate.candidateEmbryo === "DI",
     );
     expect(di.hypothesis.reason).toBe("MISSING_TARGET_SENSE");
@@ -180,7 +249,7 @@ describe("analyze-v1 Functional Motivation Interpretation v0.2 boundary", () => 
       candidateRepresentationKind: "orthographic_profile_derived",
     });
     const visibleInterpretation = adaptAnalysisToTelemetryVM(payload)
-      .functionalMotivationInterpretationV0_2;
+      .functionalMotivationInterpretationV0_3;
     expect(visibleInterpretation.kind).toBe("present");
     if (visibleInterpretation.kind !== "present") throw new Error("Expected UI interpretation");
     const visibleDi = visibleInterpretation.value.candidates.find(
@@ -200,7 +269,7 @@ describe("analyze-v1 Functional Motivation Interpretation v0.2 boundary", () => 
           "Albanian standalone verb di; entry lists IPA /di/, aorist dita, participle ditur, and glosses the verb as to know.",
       },
     });
-    expect(payload.analysisStatusV0_1).toBeDefined();
+    expect(payload.analysisStatusV0_2).toBeDefined();
   });
 
   it("keeps a cross-representation candidate Null even with explicit target sense", async () => {
@@ -212,7 +281,7 @@ describe("analyze-v1 Functional Motivation Interpretation v0.2 boundary", () => 
       targetSenseId: "user_sense_learning",
       targetSenseLabel: "learning",
     });
-    const interpretation = payload.functionalMotivationInterpretationV0_2;
+    const interpretation = payload.functionalMotivationInterpretationV0_3;
     const di = interpretation.candidates.find(
       (candidate: { candidateEmbryo: string }) => candidate.candidateEmbryo === "DI",
     );
@@ -222,7 +291,7 @@ describe("analyze-v1 Functional Motivation Interpretation v0.2 boundary", () => 
     expect(di.hypothesis.reason).toBe("NO_AUTHORIZED_STRUCTURAL_RELATION");
     expect(di.reviewedFunctionalEvidence.authorityStatus).toBe("REVIEWED_ACCEPTED");
     expect(interpretation.candidates.length).toBeGreaterThan(1);
-    expect(interpretation.candidates.every((candidate: { noSingleWinner: boolean }) => candidate.noSingleWinner)).toBe(true);
+    expect(interpretation.interpretationDecisionPolicy.automaticInterpretationSelection).toBe("DISABLED");
     expect(interpretation.claimBoundary.languageSuperiorityClaim).toBe("not_claimed");
   });
 
@@ -235,7 +304,7 @@ describe("analyze-v1 Functional Motivation Interpretation v0.2 boundary", () => 
       targetSenseId: "user_sense_learning",
       targetSenseLabel: "learning",
     });
-    const raw = payload.functionalMotivationInterpretationV0_2;
+    const raw = payload.functionalMotivationInterpretationV0_3;
     const di = raw.candidates.find(
       (candidate: { candidateEmbryo: string }) => candidate.candidateEmbryo === "DI",
     );
@@ -254,7 +323,7 @@ describe("analyze-v1 Functional Motivation Interpretation v0.2 boundary", () => 
     );
 
     const vm = adaptAnalysisToTelemetryVM(payload);
-    const visible = vm.functionalMotivationInterpretationV0_2;
+    const visible = vm.functionalMotivationInterpretationV0_3;
     expect(visible.kind).toBe("present");
     if (visible.kind !== "present") throw new Error("Expected UI interpretation");
     const visibleDi = visible.value.candidates.find(
@@ -271,7 +340,7 @@ describe("analyze-v1 Functional Motivation Interpretation v0.2 boundary", () => 
 
     render(
       <MotivationDiscoveryCardV0_1
-        discovery={vm.motivationDiscoveryV0_1}
+        discovery={vm.motivationDiscoveryV0_2}
         interpretation={visible}
       />,
     );
@@ -296,12 +365,12 @@ describe("analyze-v1 Functional Motivation Interpretation v0.2 boundary", () => 
       alphabet: "auto",
       providerExecution: "disabled",
     });
-    const interpretation = payload.functionalMotivationInterpretationV0_2;
+    const interpretation = payload.functionalMotivationInterpretationV0_3;
     const da = interpretation.candidates.find(
       (candidate: { candidateEmbryo: string }) => candidate.candidateEmbryo === "DA",
     );
     const visibleInterpretation = adaptAnalysisToTelemetryVM(payload)
-      .functionalMotivationInterpretationV0_2;
+      .functionalMotivationInterpretationV0_3;
     expect(visibleInterpretation.kind).toBe("present");
     if (visibleInterpretation.kind !== "present") throw new Error("Expected UI interpretation");
     const visibleDa = visibleInterpretation.value.candidates.find(
@@ -359,11 +428,11 @@ describe("analyze-v1 Functional Motivation Interpretation v0.2 boundary", () => 
       alphabet: "auto",
       providerExecution: "disabled",
     });
-    const at = payload.functionalMotivationInterpretationV0_2.candidates.find(
+    const at = payload.functionalMotivationInterpretationV0_3.candidates.find(
       (candidate: { candidateEmbryo: string }) => candidate.candidateEmbryo === "AT",
     );
     const visibleInterpretation = adaptAnalysisToTelemetryVM(payload)
-      .functionalMotivationInterpretationV0_2;
+      .functionalMotivationInterpretationV0_3;
     expect(visibleInterpretation.kind).toBe("present");
     if (visibleInterpretation.kind !== "present") throw new Error("Expected UI interpretation");
     const visibleAt = visibleInterpretation.value.candidates.find(
@@ -396,8 +465,8 @@ describe("analyze-v1 Functional Motivation Interpretation v0.2 boundary", () => 
 
     render(
       <MotivationDiscoveryCardV0_1
-        discovery={vm.motivationDiscoveryV0_1}
-        interpretation={vm.functionalMotivationInterpretationV0_2}
+        discovery={vm.motivationDiscoveryV0_2}
+        interpretation={vm.functionalMotivationInterpretationV0_3}
       />,
     );
     expect(screen.getAllByText(/Candidate Voice path: NULL_UNAUTHORIZED/).length)
@@ -411,7 +480,7 @@ describe("analyze-v1 Functional Motivation Interpretation v0.2 boundary", () => 
       alphabet: "auto",
       providerExecution: "disabled",
     });
-    const interpretation = payload.functionalMotivationInterpretationV0_2;
+    const interpretation = payload.functionalMotivationInterpretationV0_3;
     const hypotheses = interpretation.input.derivedStructure.structuralHypotheses;
     expect(hypotheses.map((hypothesis: { embryo: string }) => hypothesis.embryo)).toEqual([
       "ER",
@@ -426,7 +495,7 @@ describe("analyze-v1 Functional Motivation Interpretation v0.2 boundary", () => 
       candidate.correspondence.candidateVoicePathStatus === "NULL_UNAUTHORIZED")).toBe(true);
 
     const vm = adaptAnalysisToTelemetryVM(payload);
-    const visible = vm.functionalMotivationInterpretationV0_2;
+    const visible = vm.functionalMotivationInterpretationV0_3;
     expect(visible.kind).toBe("present");
     if (visible.kind !== "present") throw new Error("Expected UI interpretation");
     expect(visible.value.candidates.every((candidate) =>
@@ -436,8 +505,8 @@ describe("analyze-v1 Functional Motivation Interpretation v0.2 boundary", () => 
 
     render(
       <MotivationDiscoveryCardV0_1
-        discovery={vm.motivationDiscoveryV0_1}
-        interpretation={vm.functionalMotivationInterpretationV0_2}
+        discovery={vm.motivationDiscoveryV0_2}
+        interpretation={vm.functionalMotivationInterpretationV0_3}
       />,
     );
     expect(screen.getByTestId("functional-motivation-interpretation")).toBeInTheDocument();
@@ -457,7 +526,7 @@ describe("analyze-v1 Functional Motivation Interpretation v0.2 boundary", () => 
       targetSenseLabel: "learning",
     });
     const vm = adaptAnalysisToTelemetryVM(payload);
-    const discovery = vm.motivationDiscoveryV0_1;
+    const discovery = vm.motivationDiscoveryV0_2;
     expect(discovery?.kind).toBe("present");
     if (discovery?.kind !== "present") throw new Error("Expected UI discovery");
     const displayedDi = discovery.value.candidates.find(
@@ -468,8 +537,8 @@ describe("analyze-v1 Functional Motivation Interpretation v0.2 boundary", () => 
 
     render(
       <MotivationDiscoveryCardV0_1
-        discovery={vm.motivationDiscoveryV0_1}
-        interpretation={vm.functionalMotivationInterpretationV0_2}
+        discovery={vm.motivationDiscoveryV0_2}
+        interpretation={vm.functionalMotivationInterpretationV0_3}
       />,
     );
 
@@ -483,7 +552,7 @@ describe("analyze-v1 Functional Motivation Interpretation v0.2 boundary", () => 
     expect(screen.getAllByText("ZË-RO FUNCTIONAL HYPOTHESIS").length).toBeGreaterThan(0);
     expect(screen.getAllByText("This candidate and input do not have an authorized structural relation for this comparison.").length).toBeGreaterThan(0);
     expect(screen.getAllByText(/Interpretation reason code: NO_AUTHORIZED_STRUCTURAL_RELATION/).length).toBeGreaterThan(0);
-    expect(screen.getByText(/No winner · user decides · historical relation not claimed/)).toBeInTheDocument();
+    expect(screen.getByText(/Interpretation remains with the user · historical relation not claimed/)).toBeInTheDocument();
   });
 
   it("renders the DA source note and explicit Null Voice authority", async () => {
@@ -497,8 +566,8 @@ describe("analyze-v1 Functional Motivation Interpretation v0.2 boundary", () => 
 
     render(
       <MotivationDiscoveryCardV0_1
-        discovery={vm.motivationDiscoveryV0_1}
-        interpretation={vm.functionalMotivationInterpretationV0_2}
+        discovery={vm.motivationDiscoveryV0_2}
+        interpretation={vm.functionalMotivationInterpretationV0_3}
       />,
     );
     expect(screen.getAllByText("Candidate Voice authority").length).toBeGreaterThan(0);
@@ -517,8 +586,8 @@ describe("analyze-v1 Functional Motivation Interpretation v0.2 boundary", () => 
 
     render(
       <MotivationDiscoveryCardV0_1
-        discovery={vm.motivationDiscoveryV0_1}
-        interpretation={vm.functionalMotivationInterpretationV0_2}
+        discovery={vm.motivationDiscoveryV0_2}
+        interpretation={vm.functionalMotivationInterpretationV0_3}
       />,
     );
 
@@ -529,10 +598,10 @@ describe("analyze-v1 Functional Motivation Interpretation v0.2 boundary", () => 
   it("fails closed when the optional interpretation field is present but malformed", () => {
     const vm = adaptAnalysisToTelemetryVM({
       word: "study",
-      functionalMotivationInterpretationV0_2: { schemaVersion: "wrong" },
+      functionalMotivationInterpretationV0_3: { schemaVersion: "wrong" },
     });
 
-    expect(vm.functionalMotivationInterpretationV0_2).toMatchObject({
+    expect(vm.functionalMotivationInterpretationV0_3).toMatchObject({
       kind: "missing",
       missing: "malformed",
     });

@@ -124,7 +124,7 @@ describe(
       expect(within(stackItem).getByText("SHTU", { exact: true })).toBeInTheDocument();
       expect(within(stackItem).getByText("DI", { exact: true })).toBeInTheDocument();
       expect(
-        screen.getByText("No single winner is selected. User decides."),
+        screen.getByText("No interpretation is selected automatically. User decides."),
       ).toBeInTheDocument();
       expect(
         primary.compareDocumentPosition(stack) &

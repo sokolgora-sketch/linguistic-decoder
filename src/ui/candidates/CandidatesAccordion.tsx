@@ -295,7 +295,7 @@ export function CandidatesAccordion({
                             <CandidateChip
                               title="Deterministic embryo-first ordering group."
                             >
-                              {`Rank group: ${c.rankGroup}`}
+                              {`Candidate group: ${c.rankGroup}`}
                             </CandidateChip>
                           ) : null}
                         </div>
@@ -385,7 +385,7 @@ export function CandidatesAccordion({
 
                         {c.claimBoundary ? (
                           <div className="break-words text-xs text-slate-400">
-                            {`Boundary: ${c.claimBoundary}`}
+                            {`Boundary: ${(c.claimBoundary)}`}
                           </div>
                         ) : null}
 

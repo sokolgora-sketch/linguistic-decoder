@@ -53,7 +53,7 @@ describe("analyze-v1 bounded reviewed DI runtime contract v0.1", () => {
     expect(evidence).toContain(
       "historicalOriginClaim=not_claimed",
     );
-    expect(evidence).toContain("winnerClaim=not_claimed");
+    expect(evidence).toContain("automaticInterpretationSelection=DISABLED");
     expect(evidence).toContain(
       "languageSuperiorityClaim=not_claimed",
     );

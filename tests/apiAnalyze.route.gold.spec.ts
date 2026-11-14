@@ -32,9 +32,10 @@ const { NextRequest } = require("next/server");
 
 // IMPORTANT: app/ is at repo root; @/ maps to src/, so use relative import.
 const { GET, POST } = require("../app/api/analyze/route");
+const { hasLegacyInterpretationFieldsV2 } = require("../src/shared/analyzeWordResult.v2.contract");
 
 /**
- * /api/analyze is a legacy shim to /api/analyze-v1.
+ * /api/analyze is an alias to the active neutral /api/analyze-v2 contract.
  * We test via direct handler invocation (no localhost server).
  */
 describe("/api/analyze (legacy shim)", () => {
@@ -43,12 +44,15 @@ describe("/api/analyze (legacy shim)", () => {
     const res = await GET(req);
 
     expect(res.status).toBe(200);
+    expect(res.headers.get("X-Analyze-Response-Contract")).toBe("open-instrument.analyze-word-result.v2");
     const ct = res.headers.get("content-type") || "";
     expect(ct).toContain("application/json");
 
     const json = await res.json();
     expect(json).toHaveProperty("word");
     expect(json).toHaveProperty("sanitized");
+    expect(json.responseContractVersion).toBe("open-instrument.analyze-word-result.v2");
+    expect(hasLegacyInterpretationFieldsV2(json)).toBe(false);
   });
 
   test("POST returns JSON and includes sanitized", async () => {
@@ -61,11 +65,14 @@ describe("/api/analyze (legacy shim)", () => {
     const res = await POST(req);
 
     expect(res.status).toBe(200);
+    expect(res.headers.get("X-Analyze-Response-Contract")).toBe("open-instrument.analyze-word-result.v2");
     const ct = res.headers.get("content-type") || "";
     expect(ct).toContain("application/json");
 
     const json = await res.json();
     expect(json).toHaveProperty("word");
     expect(json).toHaveProperty("sanitized");
+    expect(json.responseContractVersion).toBe("open-instrument.analyze-word-result.v2");
+    expect(hasLegacyInterpretationFieldsV2(json)).toBe(false);
   });
 });

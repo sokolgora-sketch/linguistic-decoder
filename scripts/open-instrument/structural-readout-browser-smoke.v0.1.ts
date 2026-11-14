@@ -853,7 +853,7 @@ async function main(): Promise<void> {
         const apiResponsePromise = page.waitForResponse((candidate) => {
           const candidateUrl = new URL(candidate.url());
           return candidateUrl.origin === localOrigin &&
-            candidateUrl.pathname === "/api/analyze-v1";
+            candidateUrl.pathname === "/api/analyze-v2";
         }, { timeout: PAGE_TIMEOUT_MS });
         report.analyzeInteractions += 1;
         currentInteraction = {

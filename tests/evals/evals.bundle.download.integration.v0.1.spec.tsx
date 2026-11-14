@@ -12,7 +12,7 @@ function getSourceEngineIdInput(): HTMLInputElement {
 }
 
 function getSourceEngineVersionInput(): HTMLInputElement {
-  return screen.getByPlaceholderText("e.g. analyze-v1") as HTMLInputElement;
+  return screen.getByPlaceholderText("e.g. v1.0.0") as HTMLInputElement;
 }
 
 function getSourceEngineBuildInput(): HTMLInputElement {
@@ -188,7 +188,7 @@ describe("Evals bundle download integration v0.1", () => {
         target: { value: "zero-api" },
       });
       fireEvent.change(getSourceEngineVersionInput(), {
-        target: { value: "analyze-v1" },
+        target: { value: "0.2.0-symbolic" },
       });
       fireEvent.change(getSourceEngineBuildInput(), {
         target: { value: "845bb5a" },
@@ -203,7 +203,7 @@ describe("Evals bundle download integration v0.1", () => {
 
       expect(bundle.meta).toEqual({
         sourceEngineId: "zero-api",
-        sourceEngineVersion: "analyze-v1",
+        sourceEngineVersion: "0.2.0-symbolic",
         sourceEngineBuild: "845bb5a",
       });
 

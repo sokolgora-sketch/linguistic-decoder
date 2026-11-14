@@ -213,10 +213,10 @@ describe("real Albanian source IPA and Seven-Voices regression v0.1", () => {
       )).toBe(true);
       expect(discovery.albanianLexicalReading?.interpretation.status).toBe("UNKNOWN_OR_NULL");
       const vm = adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: discovery });
-      expect(vm.motivationDiscoveryV0_1.kind).toBe("present");
-      if (vm.motivationDiscoveryV0_1.kind !== "present") continue;
-      expect(vm.motivationDiscoveryV0_1.value.albanianLexicalReading?.interpretation.status).toBe("UNKNOWN_OR_NULL");
-      expect(vm.motivationDiscoveryV0_1.value.sourceIpaSevenVoiceAnalyses).toEqual(discovery.sourceIpaSevenVoiceAnalyses);
+      expect(vm.motivationDiscoveryV0_2.kind).toBe("present");
+      if (vm.motivationDiscoveryV0_2.kind !== "present") continue;
+      expect(vm.motivationDiscoveryV0_2.value.albanianLexicalReading?.interpretation.status).toBe("UNKNOWN_OR_NULL");
+      expect(vm.motivationDiscoveryV0_2.value.sourceIpaSevenVoiceAnalyses).toEqual(discovery.sourceIpaSevenVoiceAnalyses);
     }
   });
 });

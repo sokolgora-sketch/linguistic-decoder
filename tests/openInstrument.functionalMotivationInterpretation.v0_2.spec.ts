@@ -5,6 +5,7 @@ import {
   buildFunctionalMotivationInterpretationV0_2,
   isFunctionalMotivationInterpretationV0_2,
 } from "@/shared/openInstrument/functionalMotivationInterpretation.v0_2";
+import { migrateFunctionalMotivationInterpretationV0_2ToV0_3 } from "@/shared/openInstrument/functionalMotivationInterpretation.v0_3";
 import { buildMotivationEngineDiscoveryV0_1 } from "@/shared/openInstrument/motivationEngineDiscovery.v0_1";
 import { createAlbanianLexicalSubstrateWitnessAdapterV0_1 } from "@/shared/openInstrument/albanianLexicalSubstrate.v0_1";
 import { createLatinLexicalSubstrateWitnessAdapterV0_1 } from "@/shared/openInstrument/latinLexicalSubstrate.v0_1";
@@ -367,8 +368,9 @@ describe("Functional Motivation Interpretation v0.2 projector", () => {
       heart.canonicalSpokenVoicePath,
     );
     const field = adaptAnalysisToTelemetryVM({
-      functionalMotivationInterpretationV0_2: result,
-    }).functionalMotivationInterpretationV0_2;
+      functionalMotivationInterpretationV0_3:
+        migrateFunctionalMotivationInterpretationV0_2ToV0_3(result),
+    }).functionalMotivationInterpretationV0_3;
 
     expect(rawDi?.correspondence.candidateVoicePath).toEqual([]);
     expect(rawDi?.correspondence.candidateVoicePathStatus).toBe("NULL_UNAUTHORIZED");
@@ -416,8 +418,9 @@ describe("Functional Motivation Interpretation v0.2 projector", () => {
     });
     const rawDi = result.candidates.find((candidate) => candidate.candidateEmbryo === "DI");
     const field = adaptAnalysisToTelemetryVM({
-      functionalMotivationInterpretationV0_2: result,
-    }).functionalMotivationInterpretationV0_2;
+      functionalMotivationInterpretationV0_3:
+        migrateFunctionalMotivationInterpretationV0_2ToV0_3(result),
+    }).functionalMotivationInterpretationV0_3;
 
     expect(rawDi?.correspondence.candidateRepresentationKind).toBe("production_spoken");
     expect(rawDi?.correspondence.candidateVoicePath).toEqual([]);

@@ -10,7 +10,8 @@ import {
 } from "@/shared/openInstrument/albanianKaikkiServerOnlyExactLexicalSource.v0_1";
 import { adaptAnalysisToTelemetryVM } from "@/ui/instrument/contractAdapter";
 import { PrimaryAlbanianReadingCardV0_1 } from "@/ui/instrument/sections/PrimaryAlbanianReadingCard.v0_1";
-import type { MotivationDiscoveryV0_1VM, PresentOrMissing } from "@/ui/telemetry/types";
+import { toMotivationEngineDiscoveryV0_2 } from "@/shared/openInstrument/motivationEngineDiscovery.v0_2";
+import type { MotivationDiscoveryV0_1VM, MotivationDiscoveryV0_2VM, PresentOrMissing } from "@/ui/telemetry/types";
 import { buildHeartInstrumentV1 } from "@/v1/heartInstrument.v1";
 
 afterEach(cleanup);
@@ -70,7 +71,7 @@ function sourceRecord(sourceForm: string, sourceRecordId: string, entryLocator: 
   };
 }
 
-function makeDiscovery(options: FixtureOptions = {}): PresentOrMissing<MotivationDiscoveryV0_1VM> {
+function makeDiscovery(options: FixtureOptions = {}): PresentOrMissing<MotivationDiscoveryV0_2VM> {
   const inputWord = options.inputWord ?? TARGET;
   const defaultTargetRecordId = inputWord === TARGET
     ? TARGET_RECORD_ID
@@ -252,7 +253,9 @@ function makeDiscovery(options: FixtureOptions = {}): PresentOrMissing<Motivatio
     noSingleWinner: true,
   } as unknown as MotivationDiscoveryV0_1VM;
 
-  return { kind: "present", value: discovery };
+  const neutral = toMotivationEngineDiscoveryV0_2(discovery as unknown as Record<string, unknown>);
+  if (!neutral) throw new Error("Synthetic discovery fixture failed neutral migration.");
+  return { kind: "present", value: neutral as MotivationDiscoveryV0_2VM };
 }
 
 describe("primary Albanian conditional component reading", () => {
@@ -268,6 +271,7 @@ describe("primary Albanian conditional component reading", () => {
     expect(componentHypothesis).toHaveTextContent("synthetic-zjarrfikës-sense");
     expect(componentHypothesis).toHaveTextContent("Functional operation: Null — none is classified by this hypothesis.");
     expect(componentHypothesis).toHaveTextContent("Canonical component-sense selection: UNKNOWN_OR_NULL");
+    expect(primary).not.toHaveTextContent(/\b(?:winner|winning|ranking|ranked)\b/i);
     expect(componentHypothesis).toHaveTextContent("Grammatical role: unclassified");
     expect(componentHypothesis).toHaveTextContent("do not establish independent morphology");
     const functionalReading = screen.getByTestId("primary-albanian-functional-reading");
@@ -420,9 +424,9 @@ describe("primary Albanian conditional component reading", () => {
     });
 
     const vm = adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: result.discovery });
-    expect(vm.motivationDiscoveryV0_1?.kind).toBe("present");
-    if (vm.motivationDiscoveryV0_1?.kind !== "present") throw new Error("Pinned-source discovery did not adapt to the UI model.");
-    render(<PrimaryAlbanianReadingCardV0_1 discovery={vm.motivationDiscoveryV0_1} analysisStatus={undefined} />);
+    expect(vm.motivationDiscoveryV0_2?.kind).toBe("present");
+    if (vm.motivationDiscoveryV0_2?.kind !== "present") throw new Error("Pinned-source discovery did not adapt to the UI model.");
+    render(<PrimaryAlbanianReadingCardV0_1 discovery={vm.motivationDiscoveryV0_2} analysisStatus={undefined} />);
 
     const componentHypothesis = screen.getByTestId("primary-albanian-source-component-hypothesis");
     expect(componentHypothesis).toHaveTextContent("Source-attributed component forms (source order): zjarr + fik + -ës");

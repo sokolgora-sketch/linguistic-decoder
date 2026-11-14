@@ -14,9 +14,11 @@ import type {
 } from "./resultShape.v1";
 import type { OriginClaimV1 as OriginClaimProtocolV1 } from "./originClaim.v1";
 import type { AnalysisStatusV0_1 } from "./analysisStatus.v0_1";
+import type { AnalysisStatusV0_2 } from "./analysisStatus.v0_2";
 import type { DoctrineReadingV1 } from "./openInstrument/doctrineReadingContract.v1";
 import type { WordSpecificFunctionalDepthV0_1 } from "./openInstrument/wordSpecificFunctionalDepth.v0_1";
 import type { FunctionalMotivationInterpretationV0_2 } from "./openInstrument/functionalMotivationInterpretation.v0_2";
+import type { FunctionalMotivationInterpretationV0_3 } from "./openInstrument/functionalMotivationInterpretation.v0_3";
 
 // -------------------- Canonical V1 enums --------------------
 
@@ -62,6 +64,11 @@ export type AnalyzeWordResultV1 = {
   // Additive, provider-independent interpretation projection. This never
   // changes the canonical candidate/status/pronunciation authority.
   functionalMotivationInterpretationV0_2?: FunctionalMotivationInterpretationV0_2;
+  /** Neutral successor; V0_2 remains emitted for existing Analyze V1 consumers. */
+  functionalMotivationInterpretationV0_3?: FunctionalMotivationInterpretationV0_3;
+
+  /** Neutral successor; V0_1 remains emitted for existing Analyze V1 consumers. */
+  analysisStatusV0_2?: AnalysisStatusV0_2;
 
   // Frontier alternatives (if present)
   frontier?: FrontierCandidate[];

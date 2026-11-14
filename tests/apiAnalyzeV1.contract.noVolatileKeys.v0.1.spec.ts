@@ -1,6 +1,9 @@
 import { NextRequest } from "next/server";
 import { GET } from "@/app/api/analyze-v1/route";
-import { toAnalyzeWordResultV1Contract } from "@/shared/analyzeWordResult.v1.contract";
+import {
+  hasLegacyInterpretationFieldsV2,
+  toAnalyzeWordResultV2Contract,
+} from "@/shared/analyzeWordResult.v2.contract";
 import { normalizeForSnapshotV0_1 } from "./_helpers/snapshotNormalize.v0.1";
 
 const CORPUS = [
@@ -89,7 +92,14 @@ describe("apiAnalyzeV1 — contract projection has no volatile keys (v0.1)", () 
       expect(res.status).toBe(200);
 
       const json = await res.json();
-      const contract = toAnalyzeWordResultV1Contract(json);
+      const contract = toAnalyzeWordResultV2Contract(json);
+      expect(contract.responseContractVersion).toBe("open-instrument.analyze-word-result.v2");
+      expect(hasLegacyInterpretationFieldsV2(contract)).toBe(false);
+      expect(contract.interpretationDecisionPolicyV0_1).toMatchObject({
+        multipleInterpretationsMayCoexist: true,
+        automaticInterpretationSelection: "DISABLED",
+        interpretationDecisionAuthority: "USER_DECIDES",
+      });
 
       // Apply doctrine: removes ONLY meta.created/meta.generatedAt.
       const stable = normalizeForSnapshotV0_1(contract);

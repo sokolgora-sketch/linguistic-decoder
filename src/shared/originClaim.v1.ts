@@ -35,7 +35,7 @@ export interface OriginClaimCandidateV1 {
   evidenceRefs: string[];
 }
 
-/** Summary is a stable UI readout; still no single winner. */
+/** Summary is a stable UI readout; interpretation remains with the user. */
 export interface OriginClaimSummaryV1 {
   confidence: OriginClaimConfidence;
   note: string; // 1–2 lines

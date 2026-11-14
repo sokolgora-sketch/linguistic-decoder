@@ -14,7 +14,7 @@ export type {
  * - Existing v1 study, damage, and father outputs remain stable.
  * - Whole-word records are owned by an explicit compatibility registry.
  * - This resolver does not authorize new words or reviewed evidence.
- * - No winner or historical-origin claim is created here.
+ * - No interpretation is selected automatically and no historical-origin claim is created here.
  */
 export function extractFunctionalRootsV1(params: {
   basis: {

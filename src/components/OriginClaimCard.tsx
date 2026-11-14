@@ -23,17 +23,19 @@ function toFlatText(v: unknown): string {
 
 function policySummary(policy: any): string {
   if (typeof policy === "string") {
-    if (policy === "no_single_winner") return "no forced answer";
-    return policy.replace(/_/g, " ");
+    return "Interpretation policy unavailable";
   }
   if (!policy || typeof policy !== "object") return toFlatText(policy);
+  if (policy.automaticInterpretationSelection === "DISABLED") {
+    return "multiple interpretations may coexist; no interpretation is selected automatically";
+  }
   if ("gatesActive" in policy) return `gatesActive=${Boolean(policy.gatesActive)}`;
   return "object";
 }
 
 export function OriginClaimCard(props: { originClaim?: any }) {
   const oc = props?.originClaim;
-  const policy = oc?.policy;
+  const policy = oc?.interpretationDecisionPolicy ?? oc?.policy;
 
   const gatesActive =
     policy && typeof policy === "object" && "gatesActive" in policy
@@ -75,7 +77,7 @@ return (
     <section className="rounded-xl border border-slate-700/80 bg-[#10151c] p-4 shadow-[0_16px_48px_rgba(0,0,0,0.28)]">
       <div className="text-sm font-semibold text-slate-100">Origin Claim</div>
       <div className="mt-2 text-xs leading-5 text-slate-400">
-        Observational claim summary for inspection only. No historical proof, no forced answer, and the final decision stays with the user.
+        Observational claim summary for inspection only. Multiple interpretations may coexist; no interpretation is selected automatically, and the user decides. No historical proof is claimed.
       </div>
 
       <div className="mt-3 text-xs leading-5 space-y-1 text-slate-300">
@@ -137,7 +139,7 @@ return (
       </div>
 
       <div className="mt-3 text-[11px] leading-5 text-[#7d8ea3]">
-        Boundary: observational summary only; no historical proof; no forced answer; user decides.
+        Boundary: observational summary only; no historical proof; no interpretation is selected automatically; the user decides.
       </div>
     </section>
   );

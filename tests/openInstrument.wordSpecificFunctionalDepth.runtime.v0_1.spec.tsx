@@ -49,7 +49,7 @@ describe("word-specific functional depth runtime v0.1", () => {
     expect(screen.getByTestId("word-specific-functional-depth")).toBeVisible();
     expect(screen.getByText("Reviewed lexical bridge evidence")).toBeVisible();
     expect(within(screen.getByTestId("word-specific-functional-depth")).getByText("di")).toBeVisible();
-    expect(screen.getByText(/No single candidate is selected\. User decides\./)).toBeVisible();
+    expect(screen.getByText(/Multiple candidate interpretations may coexist\. User decides\./)).toBeVisible();
   });
 
   it("aligns the explicitly authorized reviewed lexical father row with word-specific depth", async () => {
@@ -81,7 +81,7 @@ describe("word-specific functional depth runtime v0.1", () => {
       within(screen.getByTestId("word-specific-functional-depth")).getByText("at"),
     ).toBeVisible();
     expect(screen.queryByText("No supported word-specific functional motivation yet.")).toBeNull();
-    expect(screen.getByText(/No single candidate is selected\. User decides\./)).toBeVisible();
+    expect(screen.getByText(/Multiple candidate interpretations may coexist\. User decides\./)).toBeVisible();
   });
 
   it("emits a truthful Null depth for a structural Null without suppressing the existing analysis state", async () => {

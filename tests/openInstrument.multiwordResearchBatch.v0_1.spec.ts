@@ -165,7 +165,7 @@ describe("Open Instrument multiword research batch v0.1", () => {
       compiledByTarget.set(packet.targetWord, rows);
 
       const body = await analyzeV0_1(packet.targetWord);
-      const status = body.analysisStatusV0_1 as Record<string, unknown>;
+      const status = body.analysisStatusV0_2 as Record<string, unknown>;
       expect(status.status).toBe("structural_unreviewed");
       expect(body.candidates).toEqual(expect.arrayContaining([
         expect.objectContaining({ evidenceBasis: "lexical_equivalence" }),
@@ -195,7 +195,7 @@ describe("Open Instrument multiword research batch v0.1", () => {
 
     for (const word of PROTECTED_CONTROLS) {
       const body = await analyzeV0_1(word);
-      expect((body.analysisStatusV0_1 as Record<string, unknown>).status).toBe(
+      expect((body.analysisStatusV0_2 as Record<string, unknown>).status).toBe(
         "null_no_supported_candidate",
       );
     }

@@ -187,7 +187,7 @@ describe("Open Instrument primary reading orientation card v0.1", () => {
     expect(screen.getByTestId("doctrine-reading-card")).toBeVisible();
     expect(screen.getAllByTestId("functional-motivation-card").length).toBeGreaterThan(0);
     expect(within(orientation).getByTestId("orientation-boundary")).toHaveTextContent(
-      /No historical origin.*No single selection is made.*You decide/i,
+      /No historical origin.*Interpretation remains with you/i,
     );
   });
 

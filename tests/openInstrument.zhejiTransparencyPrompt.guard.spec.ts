@@ -26,7 +26,7 @@ describe("Zheji transparency prompt contract v0.1", () => {
     expect(result.section).toContain("semantic/function motivation");
     expect(result.section).toContain("Do not return transparencyContrast.");
     expect(result.section).toContain("Do not return transparencyContrastNote.");
-    expect(result.section).toContain("Do not score, rank, choose a winner, claim origin, or modify candidateType.");
+    expect(result.section).toContain("Do not score or order interpretations by preference, select one automatically, claim origin, or modify candidateType.");
     expect(result.section).toContain("SHTU + DI");
     expect(result.section).toContain("U → I");
   });

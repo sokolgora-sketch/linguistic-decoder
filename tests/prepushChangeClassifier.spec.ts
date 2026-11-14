@@ -325,6 +325,23 @@ describe("pre-push fast-path classifier", () => {
     commit(mode, "change docs mode");
     expect(classify(mode).tier).toBe("FULL");
 
+    const executable = makeFixture(true, (root) => {
+      const script = path.join(root, "scripts", "audit.sh");
+      fs.mkdirSync(path.dirname(script), { recursive: true });
+      fs.writeFileSync(script, "#!/bin/sh\necho before\n", { mode: 0o755 });
+    });
+    fixtures.push(executable);
+    fs.writeFileSync(
+      path.join(executable.root, "scripts", "audit.sh"),
+      "#!/bin/sh\necho after\n",
+      { mode: 0o755 },
+    );
+    commit(executable, "update executable script");
+    expect(classify(executable)).toMatchObject({
+      tier: "FULL",
+      changedPaths: ["scripts/audit.sh"],
+    });
+
     const symlink = fresh();
     fs.symlinkSync("dev-workflow.md", path.join(symlink.root, "docs/link.md"));
     commit(symlink, "add docs symlink");

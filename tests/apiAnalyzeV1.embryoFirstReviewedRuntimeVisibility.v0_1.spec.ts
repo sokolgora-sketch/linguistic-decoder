@@ -100,7 +100,7 @@ describe(
       expect(
         reviewedFunctionalEvidenceText(da),
       ).toContain(
-        "winnerClaim=not_claimed",
+        "automaticInterpretationSelection=DISABLED",
       );
     });
 
@@ -168,7 +168,7 @@ describe(
       expect(
         reviewedFunctionalEvidenceText(di),
       ).toContain(
-        "winnerClaim=not_claimed",
+        "automaticInterpretationSelection=DISABLED",
       );
     });
 
@@ -246,7 +246,7 @@ describe(
 
       expect(
         body
-          ?.analysisStatusV0_1
+          ?.analysisStatusV0_2
           ?.reviewedOperators,
       ).toContain(
         "AT",
@@ -254,7 +254,7 @@ describe(
 
       expect(
         body
-          ?.analysisStatusV0_1
+          ?.analysisStatusV0_2
           ?.status,
       ).toBe(
         "reviewed_functional_evidence",

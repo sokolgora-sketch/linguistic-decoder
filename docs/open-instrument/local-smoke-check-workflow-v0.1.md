@@ -22,7 +22,7 @@ This command is the durable version of the manual DF live-smoke rule. It checks:
 - `next start` on a local smoke port;
 - live `/chat`;
 - live `/`;
-- real `/api/analyze-v1` calls with lane-correct proof words;
+- real `/api/analyze-v2` calls with lane-correct proof words;
 - focused regression proof for the Open Instrument evidence lane.
 
 Current proof words:
@@ -180,7 +180,7 @@ Expected after analysis:
 Use this only as a local route check. It does not replace the browser smoke.
 
 ```bash
-curl -s "http://localhost:3001/api/analyze-v1?word=study&mode=strict" | jq '{
+curl -s "http://localhost:3001/api/analyze-v2?word=study&mode=strict" | jq '{
   word: .word,
   engineVersion: .engineVersion,
   heartPresent: (.heart != null),
@@ -369,7 +369,7 @@ Record enough information for a future operator to understand the smoke result:
 - route checked:
   - `/instrument-preview`
   - `/chat?debug=1`
-  - optional `/api/analyze-v1?word=study&mode=strict`
+- optional `/api/analyze-v2?word=study&mode=strict`
 - command outputs for:
   - `git status -sb`
   - `npm run gate:quick`

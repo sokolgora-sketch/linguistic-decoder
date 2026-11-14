@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`originClaim v1 — gold snapshots (originClaim block only) gold:damage 1`] = `
+exports[`neutral originClaim v0.2 — gold snapshots (originClaim block only) gold:damage 1`] = `
 {
   "candidates": [
     {
@@ -40,6 +40,14 @@ exports[`originClaim v1 — gold snapshots (originClaim block only) gold:damage 
       "status": "unknown",
     },
   ],
+  "interpretationDecisionPolicy": {
+    "alternativeClaimStatus": "PRESERVED_PER_INTERPRETATION",
+    "alternativeProvenance": "PRESERVED_PER_INTERPRETATION",
+    "automaticInterpretationSelection": "DISABLED",
+    "interpretationDecisionAuthority": "USER_DECIDES",
+    "multipleInterpretationsMayCoexist": true,
+    "schemaVersion": "open-instrument.interpretation-decision-policy.v0_1",
+  },
   "meta": {
     "engineVersion": "0.2.0-symbolic",
     "generatedAt": "<iso>",
@@ -85,7 +93,7 @@ exports[`originClaim v1 — gold snapshots (originClaim block only) gold:damage 
       "word": "damage",
     },
   },
-  "policy": "no_single_winner",
+  "schemaVersion": "open-instrument.origin-claim.v0_2",
   "summary": {
     "confidence": "insufficient_evidence",
     "note": "No passing candidates with sufficient computed support in the current result layers.",
@@ -98,11 +106,11 @@ exports[`originClaim v1 — gold snapshots (originClaim block only) gold:damage 
       "ref:heart.math7.primary",
     ],
   },
-  "version": "v1",
+  "userDecisionPosture": "user_decides",
 }
 `;
 
-exports[`originClaim v1 — gold snapshots (originClaim block only) gold:father 1`] = `
+exports[`neutral originClaim v0.2 — gold snapshots (originClaim block only) gold:father 1`] = `
 {
   "candidates": [
     {
@@ -142,6 +150,14 @@ exports[`originClaim v1 — gold snapshots (originClaim block only) gold:father 
       "status": "unknown",
     },
   ],
+  "interpretationDecisionPolicy": {
+    "alternativeClaimStatus": "PRESERVED_PER_INTERPRETATION",
+    "alternativeProvenance": "PRESERVED_PER_INTERPRETATION",
+    "automaticInterpretationSelection": "DISABLED",
+    "interpretationDecisionAuthority": "USER_DECIDES",
+    "multipleInterpretationsMayCoexist": true,
+    "schemaVersion": "open-instrument.interpretation-decision-policy.v0_1",
+  },
   "meta": {
     "engineVersion": "0.2.0-symbolic",
     "generatedAt": "<iso>",
@@ -187,7 +203,7 @@ exports[`originClaim v1 — gold snapshots (originClaim block only) gold:father 
       "word": "father",
     },
   },
-  "policy": "no_single_winner",
+  "schemaVersion": "open-instrument.origin-claim.v0_2",
   "summary": {
     "confidence": "insufficient_evidence",
     "note": "No passing candidates with sufficient computed support in the current result layers.",
@@ -200,13 +216,21 @@ exports[`originClaim v1 — gold snapshots (originClaim block only) gold:father 
       "ref:heart.math7.primary",
     ],
   },
-  "version": "v1",
+  "userDecisionPosture": "user_decides",
 }
 `;
 
-exports[`originClaim v1 — gold snapshots (originClaim block only) gold:hope 1`] = `
+exports[`neutral originClaim v0.2 — gold snapshots (originClaim block only) gold:hope 1`] = `
 {
   "candidates": [],
+  "interpretationDecisionPolicy": {
+    "alternativeClaimStatus": "PRESERVED_PER_INTERPRETATION",
+    "alternativeProvenance": "PRESERVED_PER_INTERPRETATION",
+    "automaticInterpretationSelection": "DISABLED",
+    "interpretationDecisionAuthority": "USER_DECIDES",
+    "multipleInterpretationsMayCoexist": true,
+    "schemaVersion": "open-instrument.interpretation-decision-policy.v0_1",
+  },
   "meta": {
     "engineVersion": "0.2.0-symbolic",
     "generatedAt": "<iso>",
@@ -216,7 +240,7 @@ exports[`originClaim v1 — gold snapshots (originClaim block only) gold:hope 1`
       "word": "hope",
     },
   },
-  "policy": "no_single_winner",
+  "schemaVersion": "open-instrument.origin-claim.v0_2",
   "summary": {
     "confidence": "insufficient_evidence",
     "note": "No passing candidates with sufficient computed support in the current result layers.",
@@ -227,11 +251,11 @@ exports[`originClaim v1 — gold snapshots (originClaim block only) gold:hope 1`
       "ref:heart.math7.primary",
     ],
   },
-  "version": "v1",
+  "userDecisionPosture": "user_decides",
 }
 `;
 
-exports[`originClaim v1 — gold snapshots (originClaim block only) gold:love 1`] = `
+exports[`neutral originClaim v0.2 — gold snapshots (originClaim block only) gold:love 1`] = `
 {
   "candidates": [
     {
@@ -271,6 +295,14 @@ exports[`originClaim v1 — gold snapshots (originClaim block only) gold:love 1`
       "status": "unknown",
     },
   ],
+  "interpretationDecisionPolicy": {
+    "alternativeClaimStatus": "PRESERVED_PER_INTERPRETATION",
+    "alternativeProvenance": "PRESERVED_PER_INTERPRETATION",
+    "automaticInterpretationSelection": "DISABLED",
+    "interpretationDecisionAuthority": "USER_DECIDES",
+    "multipleInterpretationsMayCoexist": true,
+    "schemaVersion": "open-instrument.interpretation-decision-policy.v0_1",
+  },
   "meta": {
     "engineVersion": "0.2.0-symbolic",
     "generatedAt": "<iso>",
@@ -316,7 +348,7 @@ exports[`originClaim v1 — gold snapshots (originClaim block only) gold:love 1`
       "word": "love",
     },
   },
-  "policy": "no_single_winner",
+  "schemaVersion": "open-instrument.origin-claim.v0_2",
   "summary": {
     "confidence": "insufficient_evidence",
     "note": "No passing candidates with sufficient computed support in the current result layers.",
@@ -329,11 +361,11 @@ exports[`originClaim v1 — gold snapshots (originClaim block only) gold:love 1`
       "ref:heart.math7.primary",
     ],
   },
-  "version": "v1",
+  "userDecisionPosture": "user_decides",
 }
 `;
 
-exports[`originClaim v1 — gold snapshots (originClaim block only) gold:study 1`] = `
+exports[`neutral originClaim v0.2 — gold snapshots (originClaim block only) gold:study 1`] = `
 {
   "candidates": [
     {
@@ -375,6 +407,14 @@ exports[`originClaim v1 — gold snapshots (originClaim block only) gold:study 1
       "status": "unknown",
     },
   ],
+  "interpretationDecisionPolicy": {
+    "alternativeClaimStatus": "PRESERVED_PER_INTERPRETATION",
+    "alternativeProvenance": "PRESERVED_PER_INTERPRETATION",
+    "automaticInterpretationSelection": "DISABLED",
+    "interpretationDecisionAuthority": "USER_DECIDES",
+    "multipleInterpretationsMayCoexist": true,
+    "schemaVersion": "open-instrument.interpretation-decision-policy.v0_1",
+  },
   "meta": {
     "engineVersion": "0.2.0-symbolic",
     "generatedAt": "<iso>",
@@ -420,7 +460,7 @@ exports[`originClaim v1 — gold snapshots (originClaim block only) gold:study 1
       "word": "study",
     },
   },
-  "policy": "no_single_winner",
+  "schemaVersion": "open-instrument.origin-claim.v0_2",
   "summary": {
     "confidence": "insufficient_evidence",
     "note": "No passing candidates with sufficient computed support in the current result layers.",
@@ -433,6 +473,6 @@ exports[`originClaim v1 — gold snapshots (originClaim block only) gold:study 1
       "ref:heart.math7.primary",
     ],
   },
-  "version": "v1",
+  "userDecisionPosture": "user_decides",
 }
 `;

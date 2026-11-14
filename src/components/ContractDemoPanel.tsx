@@ -23,7 +23,7 @@ export default function ContractDemoPanel() {
     setData(null);
 
     try {
-      const url = `/api/analyze-v1?word=${encodeURIComponent(word)}&mode=${mode}`;
+      const url = `/api/analyze-v2?word=${encodeURIComponent(word)}&mode=${mode}`;
       const res = await fetch(url, { method: "GET" });
       const json = await res.json().catch(() => null);
 
@@ -55,7 +55,7 @@ export default function ContractDemoPanel() {
         <div>
           <div className="text-sm font-semibold">Contract Demo (v1)</div>
           <div className="text-xs text-muted-foreground">
-            Canon runs against <span className="font-mono">/api/analyze-v1</span>.
+            Canon runs against <span className="font-mono">/api/analyze-v2</span>.
           </div>
         </div>
 

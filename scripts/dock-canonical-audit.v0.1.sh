@@ -88,11 +88,11 @@ HISTORICAL_HITS="$(
 )"
 
 if [ -n "$HISTORICAL_HITS" ]; then
-  echo "DRIFT: possible historical-origin/winner/superiority claim in runtime src:"
+  echo "DRIFT: possible historical-origin/automatic-selection/superiority claim in runtime src:"
   printf '%s\n' "$HISTORICAL_HITS"
   ERROR=1
 else
-  echo "OK: no obvious historical-origin/winner/superiority drift in runtime src"
+  echo "OK: no obvious historical-origin/automatic-selection/superiority drift in runtime src"
 fi
 
 

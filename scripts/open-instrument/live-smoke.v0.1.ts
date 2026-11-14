@@ -7,12 +7,12 @@
  * - builds the app;
  * - starts next start on a local port;
  * - checks /chat and /;
- * - derives real /api/analyze-v1 proof cases from canonical operator profiles;
+ * - derives real /api/analyze-v2 proof cases from canonical operator profiles;
  * - optionally runs focused regression tests.
  *
  * It does not call external model providers.
  * It does not promote evidence.
- * It does not make origin, winner, or superiority claims.
+ * It does not make origin or superiority claims or select one interpretation automatically.
  */
 
 import { spawn, spawnSync, type ChildProcess } from "node:child_process";
@@ -667,7 +667,7 @@ async function main(): Promise<void> {
 
     for (const word of words) {
       const url =
-        `${baseUrl}/api/analyze-v1` +
+        `${baseUrl}/api/analyze-v2` +
         `?word=${encodeURIComponent(word)}` +
         "&mode=strict&alphabet=auto";
 

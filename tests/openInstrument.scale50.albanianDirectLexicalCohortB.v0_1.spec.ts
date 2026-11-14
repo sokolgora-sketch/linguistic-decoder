@@ -99,14 +99,14 @@ describe(
           await analyze(word);
 
         expect(
-          body.analysisStatusV0_1,
+          body.analysisStatusV0_2,
         ).toEqual(
           expect.objectContaining({
             userDecisionPosture:
               "user_decides",
           }),
         );
-        expect((body.analysisStatusV0_1 as Record<string, unknown>).status).not.toBe("research_functional_hypothesis");
+        expect((body.analysisStatusV0_2 as Record<string, unknown>).status).not.toBe("research_functional_hypothesis");
 
         const candidates =
           Array.isArray(
@@ -150,8 +150,11 @@ describe(
               "not_claimed",
             historicalTransmissionClaim:
               "not_claimed",
-            winnerClaim:
-              "not_claimed",
+            interpretationDecisionPolicy: expect.objectContaining({
+              multipleInterpretationsMayCoexist: true,
+              automaticInterpretationSelection: "DISABLED",
+              interpretationDecisionAuthority: "USER_DECIDES",
+            }),
             languageSuperiorityClaim:
               "not_claimed",
             candidateTruthClaim:
@@ -162,7 +165,7 @@ describe(
         );
 
         const status =
-          body.analysisStatusV0_1;
+          body.analysisStatusV0_2;
 
         expect(isRecord(status)).toBe(true);
 
@@ -197,9 +200,12 @@ describe(
           boundary.historicalTransmissionClaim,
         ).toBe("not_claimed");
 
-        expect(
-          boundary.winnerClaim,
-        ).toBe("not_claimed");
+        expect(boundary).not.toHaveProperty("winnerClaim");
+        expect(status.interpretationDecisionPolicy).toMatchObject({
+          multipleInterpretationsMayCoexist: true,
+          automaticInterpretationSelection: "DISABLED",
+          interpretationDecisionAuthority: "USER_DECIDES",
+        });
 
         expect(
           boundary.candidateTruthClaim,
@@ -222,7 +228,7 @@ describe(
           await analyze(word);
 
         expect(
-          body.analysisStatusV0_1,
+          body.analysisStatusV0_2,
         ).toEqual(
           expect.objectContaining({
             status:

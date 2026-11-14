@@ -267,24 +267,24 @@ describe(
           );
 
         expect(
-          vm.analysisStatusV0_1
+          vm.analysisStatusV0_2
             ?.kind,
         ).toBe(
           "present",
         );
 
         if (
-          vm.analysisStatusV0_1
+          vm.analysisStatusV0_2
             ?.kind !==
           "present"
         ) {
           throw new Error(
-            "analysisStatusV0_1 missing",
+            "analysisStatusV0_2 missing",
           );
         }
 
         expect(
-          vm.analysisStatusV0_1
+          vm.analysisStatusV0_2
             .value
             .status,
         ).toBe(
@@ -292,7 +292,7 @@ describe(
         );
 
         expect(
-          vm.analysisStatusV0_1
+          vm.analysisStatusV0_2
             .value
             .researchHypothesisEmbryos,
         ).toEqual([
@@ -306,7 +306,7 @@ describe(
         render(
           <AnalysisStatusCardV0_1
             status={
-              vm.analysisStatusV0_1
+              vm.analysisStatusV0_2
             }
           />,
         );
@@ -408,7 +408,7 @@ describe(
           );
 
         if (
-          damage.analysisStatusV0_1
+          damage.analysisStatusV0_2
             ?.kind !== "present"
         ) {
           throw new Error(
@@ -420,7 +420,7 @@ describe(
           render(
             <AnalysisStatusCardV0_1
               status={
-                damage.analysisStatusV0_1
+                damage.analysisStatusV0_2
               }
             />,
           );
@@ -443,7 +443,7 @@ describe(
           );
 
         if (
-          nullResult.analysisStatusV0_1
+          nullResult.analysisStatusV0_2
             ?.kind !== "present"
         ) {
           throw new Error(
@@ -455,7 +455,7 @@ describe(
           <AnalysisStatusCardV0_1
             status={
               nullResult
-                .analysisStatusV0_1
+                .analysisStatusV0_2
             }
           />,
         );

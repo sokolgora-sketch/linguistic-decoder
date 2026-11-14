@@ -89,7 +89,7 @@ describe(
 
         expect(
           screen.getByText(
-            /User decides/i,
+            /The user decides how to interpret the evidence/i,
           ),
         ).toBeInTheDocument();
       },
@@ -163,12 +163,17 @@ describe(
           'import { AnalysisStatusCardV0_1 } from "./sections/AnalysisStatusCard.v0.1";',
         );
 
-        expect(panel).toContain(
-          "vm.analysisStatusV0_1 ?? {",
-        );
+        expect(panel).toContain("vm.analysisStatusV0_2");
+        expect(panel).not.toContain("vm.analysisStatusV0_1");
 
         expect(adapter).toContain(
-          "analysisStatusV0_1: parseAnalysisStatusV0_1(payload)",
+          "const analysisStatusV0_2 = parseAnalysisStatusV0_2(payload);",
+        );
+        expect(adapter).toContain(
+          "const legacy = parseAnalysisStatusV0_1(payload);",
+        );
+        expect(adapter).toContain(
+          "migrateAnalysisStatusV0_1ToV0_2(legacy.value)",
         );
 
         expect(card).not.toContain(

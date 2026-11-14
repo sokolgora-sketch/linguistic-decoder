@@ -95,7 +95,7 @@ export const legacyFunctionalRootCompatibilityRegistryV0_1: readonly LegacyFunct
           "english surface → sq carrier (short form)",
           "note: this is a minimal-root hypothesis, not a historical-chain claim",
           "Deterministic pilot hypothesis (v1.1).",
-          "No winner; functional carrier only.",
+          "Multiple interpretations may coexist; functional carrier only.",
         ],
       },
       compatibilityBoundary: compatibilityBoundaryV0_1,
@@ -119,7 +119,7 @@ export const legacyFunctionalRootCompatibilityRegistryV0_1: readonly LegacyFunct
         vowelPath: "A→Ë",
         notes: [
           "surface → proto carrier",
-          "no winner; family-level functional root",
+          "interpretation remains open; family-level functional root",
           "Proto functional family (non-historical claim).",
           "Carrier across IE and Albanian.",
         ],

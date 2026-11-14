@@ -111,7 +111,7 @@ describe("Analyze V1 internal 500 diagnostics", () => {
         error: "analyze-v1 contract failure",
         message: "enginePayloadToAnalysisResult produced an off-contract V1 payload",
         issues: expect.any(Array),
-        outPreview: "{}",
+        responseContractVersion: "open-instrument.analyze-word-result.v2",
       }),
     );
   });

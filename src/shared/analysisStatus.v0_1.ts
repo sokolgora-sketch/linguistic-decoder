@@ -373,9 +373,8 @@ export function isReviewedFunctionalEvidenceLineV0_1(
     normalized.includes(
       "historicaloriginclaim=not_claimed",
     ) &&
-    normalized.includes(
-      "winnerclaim=not_claimed",
-    ) &&
+    (normalized.includes("winnerclaim=not_claimed") ||
+      normalized.includes("automaticinterpretationselection=disabled")) &&
     normalized.includes(
       "languagesuperiorityclaim=not_claimed",
     ) &&
@@ -601,7 +600,7 @@ export function buildAnalysisStatusV0_1(resultValue: unknown): AnalysisStatusV0_
     summary =
       `Bounded reviewed functional evidence is available for ${reviewedOperators.join(
         ", ",
-      )}. This is functional evidence, not a historical-origin or winner claim.`;
+      )}. This is functional evidence, not historical-origin evidence. Multiple interpretations may coexist; automatic interpretation selection is disabled. The user decides.`;
   } else if (
     researchHypothesisEmbryos.length > 0
   ) {

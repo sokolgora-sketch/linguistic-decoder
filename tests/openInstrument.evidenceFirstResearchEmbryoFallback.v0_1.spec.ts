@@ -67,13 +67,13 @@ describe(
         ).toEqual([]);
 
         expect(
-          body.analysisStatusV0_1
+          body.analysisStatusV0_2
             .status,
         ).not.toBe("research_functional_hypothesis");
 
         expect(
           new Set(
-            body.analysisStatusV0_1
+            body.analysisStatusV0_2
               .researchHypothesisEmbryos,
           ),
         ).toEqual(
@@ -81,17 +81,17 @@ describe(
         );
 
         expect(
-          body.analysisStatusV0_1
+          body.analysisStatusV0_2
             .reviewedOperators,
         ).toEqual([]);
 
         expect(
-          body.analysisStatusV0_1
+          body.analysisStatusV0_2
             .candidateOnlyOperators,
         ).toEqual([]);
 
         expect(
-          body.analysisStatusV0_1
+          body.analysisStatusV0_2
             .structuralTokens,
         ).toEqual([]);
 
@@ -220,27 +220,27 @@ describe(
         ).toHaveLength(2);
 
         expect(
-          body.analysisStatusV0_1
+          body.analysisStatusV0_2
             .status,
         ).not.toBe("research_functional_hypothesis");
 
         expect(
-          body.analysisStatusV0_1
+          body.analysisStatusV0_2
             .researchHypothesisEmbryos,
         ).toEqual([]);
 
         expect(
-          body.analysisStatusV0_1
+          body.analysisStatusV0_2
             .reviewedOperators,
         ).toEqual([]);
 
         expect(
-          body.analysisStatusV0_1
+          body.analysisStatusV0_2
             .candidateOnlyOperators,
         ).toEqual([]);
 
         expect(
-          body.analysisStatusV0_1
+          body.analysisStatusV0_2
             .structuralTokens,
         ).toEqual([]);
 
@@ -280,11 +280,12 @@ describe(
             "not_claimed",
           );
 
-          expect(
-            candidate.winnerClaim,
-          ).toBe(
-            "not_claimed",
-          );
+          expect(candidate).not.toHaveProperty("winnerClaim");
+          expect(candidate.interpretationDecisionPolicy).toMatchObject({
+            multipleInterpretationsMayCoexist: true,
+            automaticInterpretationSelection: "DISABLED",
+            interpretationDecisionAuthority: "USER_DECIDES",
+          });
 
           expect(
             candidate.languageSuperiorityClaim,
@@ -332,7 +333,7 @@ describe(
           );
 
         expect(
-          body.analysisStatusV0_1
+          body.analysisStatusV0_2
             .status,
         ).toBe(
           expectedStatus,

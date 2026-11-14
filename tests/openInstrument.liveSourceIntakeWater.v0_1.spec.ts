@@ -171,7 +171,7 @@ describe("Open Instrument live source intake WATER pilot v0.1", () => {
 
   it("promotes only WATER at runtime and preserves the protected Null controls", async () => {
     const water = await analyzeV0_1("water");
-    const waterStatus = water.analysisStatusV0_1 as Record<string, unknown>;
+    const waterStatus = water.analysisStatusV0_2 as Record<string, unknown>;
     expect(waterStatus.status).toBe("structural_unreviewed");
     expect(
       (water.candidates as Array<Record<string, unknown>>).filter(
@@ -193,7 +193,7 @@ describe("Open Instrument live source intake WATER pilot v0.1", () => {
       "home",
     ]) {
       const body = await analyzeV0_1(word);
-      expect((body.analysisStatusV0_1 as Record<string, unknown>).status).toBe(
+      expect((body.analysisStatusV0_2 as Record<string, unknown>).status).toBe(
         "null_no_supported_candidate",
       );
     }

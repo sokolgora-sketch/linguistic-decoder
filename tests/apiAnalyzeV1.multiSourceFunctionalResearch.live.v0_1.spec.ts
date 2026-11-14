@@ -183,14 +183,14 @@ describe(
           );
 
         expect(
-          body.analysisStatusV0_1
+          body.analysisStatusV0_2
             .status,
         ).toBe(
           "research_functional_hypothesis",
         );
 
         expect(
-          body.analysisStatusV0_1
+          body.analysisStatusV0_2
             .researchHypothesisEmbryos,
         ).toEqual([
           "ER",
@@ -201,22 +201,22 @@ describe(
         ]);
 
         expect(
-          body.analysisStatusV0_1
+          body.analysisStatusV0_2
             .reviewedOperators,
         ).toEqual([]);
 
         expect(
-          body.analysisStatusV0_1
+          body.analysisStatusV0_2
             .candidateOnlyOperators,
         ).toEqual([]);
 
         expect(
-          body.analysisStatusV0_1
+          body.analysisStatusV0_2
             .structuralTokens,
         ).toEqual([]);
 
         expect(
-          body.analysisStatusV0_1
+          body.analysisStatusV0_2
             .claimBoundary
             .candidateTruthClaim,
         ).toBe(
@@ -224,7 +224,7 @@ describe(
         );
 
         expect(
-          body.analysisStatusV0_1
+          body.analysisStatusV0_2
             .userDecisionPosture,
         ).toBe(
           "user_decides",
@@ -342,14 +342,14 @@ describe(
         ).toEqual([]);
 
         expect(
-          body.analysisStatusV0_1
+          body.analysisStatusV0_2
             .status,
         ).toBe(
           "reviewed_functional_evidence",
         );
 
         expect(
-          body.analysisStatusV0_1
+          body.analysisStatusV0_2
             .reviewedOperators,
         ).toContain(
           "DI",

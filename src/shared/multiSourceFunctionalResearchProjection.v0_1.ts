@@ -119,7 +119,7 @@ export type MultiSourceFunctionalResearchProjectionV0_1 = {
  * - functional-bridge truth;
  * - research-only status;
  * - no reviewed-production promotion;
- * - no origin/winner/candidate-truth claims.
+ * - no origin/automatic-selection/candidate-truth claims.
  *
  * Runtime insertion is deliberately out of scope here.
  */

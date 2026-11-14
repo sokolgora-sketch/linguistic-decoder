@@ -229,7 +229,7 @@ describe(
 
         expect(
           body
-            .analysisStatusV0_1
+            .analysisStatusV0_2
             .status,
         ).toBe(
           "research_functional_hypothesis",
@@ -237,7 +237,7 @@ describe(
 
         expect(
           body
-            .analysisStatusV0_1
+            .analysisStatusV0_2
             .researchHypothesisEmbryos,
         ).toEqual([
           "ER",
@@ -249,7 +249,7 @@ describe(
 
         expect(
           body
-            .analysisStatusV0_1
+            .analysisStatusV0_2
             .structuralTokens,
         ).toEqual([]);
 

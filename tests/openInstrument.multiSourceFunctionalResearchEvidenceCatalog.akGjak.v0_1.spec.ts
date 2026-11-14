@@ -284,14 +284,14 @@ describe(
           );
 
         expect(
-          body?.analysisStatusV0_1
+          body?.analysisStatusV0_2
             ?.status,
         ).toBe(
           "research_functional_hypothesis",
         );
 
         expect(
-          body?.analysisStatusV0_1
+          body?.analysisStatusV0_2
             ?.researchHypothesisEmbryos,
         ).toEqual([
           "AK",
@@ -373,8 +373,11 @@ describe(
           historicalTransmissionClaim:
             "not_claimed",
 
-          winnerClaim:
-            "not_claimed",
+          interpretationDecisionPolicy: expect.objectContaining({
+            multipleInterpretationsMayCoexist: true,
+            automaticInterpretationSelection: "DISABLED",
+            interpretationDecisionAuthority: "USER_DECIDES",
+          }),
 
           languageSuperiorityClaim:
             "not_claimed",
@@ -404,14 +407,14 @@ describe(
           );
 
         expect(
-          body?.analysisStatusV0_1
+          body?.analysisStatusV0_2
             ?.status,
         ).toBe(
           "research_functional_hypothesis",
         );
 
         expect(
-          body?.analysisStatusV0_1
+          body?.analysisStatusV0_2
             ?.researchHypothesisEmbryos,
         ).toEqual([
           "ER",
@@ -501,7 +504,7 @@ describe(
         }
 
         expect(
-          terror?.analysisStatusV0_1
+          terror?.analysisStatusV0_2
             ?.status,
         ).toBe(
           "candidate_only",

@@ -20,7 +20,7 @@ describe("pinned BLETAR suffix-template API reading v0.1", () => {
 
     expect(response.status).toBe(200);
     const body = await response.json();
-    const reading = body.motivationDiscoveryV0_1?.albanianLexicalReading;
+    const reading = body.motivationDiscoveryV0_2?.albanianLexicalReading;
     expect(reading).toMatchObject({
       status: "SUPPORTED",
       primarySourceFact: {

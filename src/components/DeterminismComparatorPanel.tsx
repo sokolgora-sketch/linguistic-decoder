@@ -90,7 +90,7 @@ export default function DeterminismComparatorPanel() {
 
         for (let i = 0; i < runsPerWord; i++) {
           const t1 = performance.now();
-          const res = await fetch(`/api/analyze-v1?word=${encodeURIComponent(w)}&mode=strict`, {
+        const res = await fetch(`/api/analyze-v2?word=${encodeURIComponent(w)}&mode=strict`, {
             method: "GET",
             headers: { "Content-Type": "application/json" },
           });

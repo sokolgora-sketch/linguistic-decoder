@@ -174,7 +174,7 @@ export default function MeaningPanel({ vm }: Props) {
       </div>
 
       <div className="mt-3 text-[11px] leading-5 text-[#7d8ea3]">
-        Boundary: deterministic reading; functional / normalization paths and candidate / structural paths are separate from word-specific functional motivation; no forced answer; not a historical-chain claim.
+        Boundary: deterministic reading; functional / normalization paths and candidate / structural paths are separate from word-specific functional motivation; interpretations are not selected automatically; the user decides; not a historical-chain claim.
       </div>
     </div>
   );

@@ -19,7 +19,7 @@ describe("Open Instrument live smoke runbook v0.1", () => {
     );
 
     expect(script).toContain("production build");
-    expect(script).toContain("/api/analyze-v1");
+    expect(script).toContain("/api/analyze-v2");
     expect(script).toContain(
       "buildCanonicalOperatorLiveSmokeCasesV0_1",
     );
@@ -73,7 +73,7 @@ describe("Open Instrument live smoke runbook v0.1", () => {
     expect(workflow).toContain("npm run open-instrument:live-smoke");
     expect(workflow).toContain("production build");
     expect(workflow).toContain("live `/chat`");
-    expect(workflow).toContain("real `/api/analyze-v1` calls with lane-correct proof words");
+    expect(workflow).toContain("real `/api/analyze-v2` calls with lane-correct proof words");
     expect(workflow).toContain("`da`");
     expect(workflow).toContain("`dam`");
     expect(workflow).toContain("`study`");

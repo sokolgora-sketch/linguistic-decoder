@@ -4,29 +4,29 @@ import React from "react";
 import type { TelemetryViewModel } from "@/ui/telemetry/types";
 import type { RecentAnalysisResultV0_1 } from "@/ui/instrument/recentAnalysisResults.v0_1";
 import { adaptComparisonSourceResultToTelemetryVMV0_1 } from "@/ui/telemetry/contractAdapter";
-import type { ReproducibleRunBundleV0_1 } from "@/shared/openInstrument/reproducibleRunBundle.v0_1";
+import type { ReproducibleRunBundleV0_2 } from "@/shared/openInstrument/reproducibleRunBundle.v0_2";
 import {
   compareTelemetryViewModelsV0_1,
   type ComparisonProjectionV0_1,
   type ComparisonSideV0_1,
 } from "@/ui/instrument/wordToWordComparison.v0_1";
 import {
-  ComparisonExportReproducibilityControlsV0_1,
-  type ComparisonExportSideInputV0_1,
+  ComparisonExportReproducibilityControlsV0_2,
+  type ComparisonExportSideInputV0_2,
 } from "@/ui/instrument/ComparisonExportReproducibilityControls.v0_1";
-import type { ComparisonExportArtifactV0_1 } from "@/ui/instrument/comparisonExportReproducibility.v0_1";
+import type { ComparisonExportArtifactV0_2 } from "@/ui/instrument/comparisonExportReproducibility.v0_2";
 import { MT } from "@/ui/typography/marketingType.v0.1";
 
 type StoredResult = Readonly<{
   word: string;
   vm: TelemetryViewModel;
-  source: ComparisonExportSideInputV0_1;
+  source: ComparisonExportSideInputV0_2;
 }>;
 
 type Props = Readonly<{
   current: TelemetryViewModel | null;
   currentPayload?: unknown | null;
-  currentBundle?: ReproducibleRunBundleV0_1 | null;
+  currentBundle?: ReproducibleRunBundleV0_2 | null;
   currentInput?: Readonly<{ ipa?: string; targetSenseLabel?: string }>;
   recentResults?: readonly RecentAnalysisResultV0_1[];
 }>;
@@ -164,7 +164,7 @@ export function WordToWordStructuralAuthorityComparisonCard({
     else setRight(result);
   };
 
-  const handleImportedArtifact = (artifact: ComparisonExportArtifactV0_1) => {
+  const handleImportedArtifact = (artifact: ComparisonExportArtifactV0_2) => {
     setLeft({
       word: artifact.left.result.word,
       vm: adaptComparisonSourceResultToTelemetryVMV0_1(artifact.left.result),
@@ -188,7 +188,7 @@ export function WordToWordStructuralAuthorityComparisonCard({
           <div className={`${MT.sectionLabel} text-[#8ea4ba]`}>ZË-RO structural / authority comparison</div>
           <h2 className="mt-2 text-lg font-semibold text-[#f5f7fb]">Compare two established results</h2>
           <p className="mt-2 max-w-3xl text-sm leading-6 text-[#b8c3cf]">
-            This comparison reports established structural, authority, status, and provenance differences. It does not assign semantic meaning, historical origin, or a winner.
+            This comparison reports established structural, authority, status, and provenance differences. It does not assign semantic meaning, claim historical origin, or select an interpretation automatically.
           </p>
         </div>
         {current ? (
@@ -273,7 +273,7 @@ export function WordToWordStructuralAuthorityComparisonCard({
         </div>
       )}
 
-      <ComparisonExportReproducibilityControlsV0_1
+      <ComparisonExportReproducibilityControlsV0_2
         left={left?.source ?? null}
         right={right?.source ?? null}
         onImport={handleImportedArtifact}

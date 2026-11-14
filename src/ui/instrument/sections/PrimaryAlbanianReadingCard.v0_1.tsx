@@ -1,10 +1,11 @@
 "use client";
 
 import type {
-  AnalysisStatusV0_1VM,
-  MotivationDiscoveryV0_1VM,
+  AnalysisStatusV0_2VM,
+  MotivationDiscoveryV0_2VM,
   PresentOrMissing,
 } from "@/ui/telemetry/types";
+import { isInterpretationDecisionPolicyV0_1 } from "@/shared/openInstrument/interpretationDecisionPolicy.v0_1";
 
 const KAIKKI_ALBANIAN_URL =
   "https://kaikki.org/dictionary/Albanian/kaikki.org-dictionary-Albanian.jsonl";
@@ -18,8 +19,8 @@ export function PrimaryAlbanianReadingCardV0_1({
   discovery,
   analysisStatus,
 }: {
-  discovery: PresentOrMissing<MotivationDiscoveryV0_1VM> | undefined;
-  analysisStatus: PresentOrMissing<AnalysisStatusV0_1VM> | undefined;
+  discovery: PresentOrMissing<MotivationDiscoveryV0_2VM> | undefined;
+  analysisStatus: PresentOrMissing<AnalysisStatusV0_2VM> | undefined;
 }) {
   if (discovery?.kind !== "present") return null;
 
@@ -137,7 +138,7 @@ export function PrimaryAlbanianReadingCardV0_1({
     sourceComponentHypothesis.claimBoundary.trim().length > 0 &&
     sourceComponentReading.reasonCodes.length === 0 &&
     sourceComponentReading.claimBoundary.trim().length > 0 &&
-    sourceComponentHypothesis.noSingleWinner === true &&
+    isInterpretationDecisionPolicyV0_1(sourceComponentHypothesis.interpretationDecisionPolicy) &&
     sourceComponentHypothesis.userDecisionPosture === "user_decides";
   const sourceUnavailable = exactSourceStatus === "UNAVAILABLE";
 
@@ -281,7 +282,7 @@ export function PrimaryAlbanianReadingCardV0_1({
             <p className="mt-2 break-words">{sourceComponentHypothesis.statement}</p>
             <ul className="mt-2 list-disc space-y-1 pl-5 text-xs text-[#d5c28f]">
               <li>Grammatical role: unclassified by this component hypothesis.</li>
-              <li>Canonical component-sense selection: UNKNOWN_OR_NULL; no single sense winner, user decides.</li>
+              <li>Canonical component-sense selection: UNKNOWN_OR_NULL; multiple interpretations may coexist, and the user decides.</li>
               <li>Functional operation: Null — none is classified by this hypothesis.</li>
             </ul>
             {sourceComponentHypothesis.alternatives.length > 0 ? (
@@ -295,10 +296,10 @@ export function PrimaryAlbanianReadingCardV0_1({
                 .join(" | ")}
             </div>
             <p className="mt-2 break-words text-xs text-[#d5c28f]">
-              Source-linked reading boundary: {sourceComponentReading.claimBoundary}
+              Source-linked reading boundary: {(sourceComponentReading.claimBoundary)}
             </p>
             <p className="mt-1 break-words text-xs text-[#d5c28f]">
-              Functional hypothesis boundary: {sourceComponentHypothesis.claimBoundary}
+              Functional hypothesis boundary: {(sourceComponentHypothesis.claimBoundary)}
             </p>
             <p className="mt-1 text-xs text-[#aeb7c5]">
               Attributed source components do not independently prove morphology, derivation, historical origin, or embryo meaning.

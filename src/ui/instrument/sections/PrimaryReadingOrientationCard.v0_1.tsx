@@ -96,8 +96,8 @@ function buildOrientationState(vm: TelemetryViewModel): OrientationState {
   const hasLexicalEvidence = hasLexicalSourceEvidence(vm);
   const formattedPath = formatVoicePath(vm);
   const status =
-    vm.analysisStatusV0_1?.kind === "present"
-      ? vm.analysisStatusV0_1.value.status
+    vm.analysisStatusV0_2?.kind === "present"
+      ? vm.analysisStatusV0_2.value.status
       : undefined;
 
   return {
@@ -160,7 +160,7 @@ export function PrimaryReadingOrientationCardV0_1({
           or candidate truth is established. Null remains valid.
         </p>
         <p className="mt-1 font-semibold text-[#c6d0dc]">
-          No single selection is made. You decide the final interpretation.
+          Interpretation remains with you.
         </p>
       </div>
     </section>

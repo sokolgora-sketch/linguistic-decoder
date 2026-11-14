@@ -84,7 +84,7 @@ export function extractMath7BasisFromPayload(payload: any): { basis: string; vow
   const p = payload ?? {};
 
   // 0) Strongest: primaryPath.voicePath is already the chosen "truth path" for the UI/instrument.
-  // This is present in your /api/analyze-v1 output.
+  // This is present in the active /api/analyze-v2 output.
   const primaryPath =
     p?.primaryPath?.voicePath ??
     p?.raw?.primaryPath?.voicePath ??

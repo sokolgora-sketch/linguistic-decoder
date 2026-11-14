@@ -56,7 +56,7 @@ const CASES = [
 ] as const;
 
 describe(
-  "/api/analyze-v1 analysisStatusV0_1",
+  "/api/analyze-v1 analysisStatusV0_2",
   () => {
     it.each(CASES)(
       "emits $status for $word",
@@ -80,12 +80,12 @@ describe(
           await response.json();
 
         const actual =
-          json.analysisStatusV0_1;
+          json.analysisStatusV0_2;
 
         expect(actual).toBeTruthy();
 
         expect(actual.schemaVersion).toBe(
-          "open-instrument.analysis-status.v0_1",
+          "open-instrument.analysis-status.v0_2",
         );
 
         expect(actual.status).toBe(status);
@@ -115,8 +115,6 @@ describe(
             "not_claimed",
           historicalTransmissionClaim:
             "not_claimed",
-          winnerClaim:
-            "not_claimed",
           languageSuperiorityClaim:
             "not_claimed",
           linguisticOwnershipClaim:
@@ -127,6 +125,11 @@ describe(
             false,
           nullIsValid:
             true,
+        });
+        expect(actual.interpretationDecisionPolicy).toMatchObject({
+          multipleInterpretationsMayCoexist: true,
+          automaticInterpretationSelection: "DISABLED",
+          interpretationDecisionAuthority: "USER_DECIDES",
         });
       },
     );
@@ -150,7 +153,7 @@ describe(
           await response.json();
 
         expect(
-          json.analysisStatusV0_1
+          json.analysisStatusV0_2
             .reviewedOperators,
         ).toEqual([]);
       },

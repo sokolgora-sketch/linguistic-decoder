@@ -4,21 +4,21 @@ import React from "react";
 import { Button } from "@/components/ui/button";
 import { downloadText } from "@/lib/downloadJson";
 import {
-  buildReproducibleRunBundleV0_1,
-  parseReproducibleRunBundleV0_1,
-  projectAnalyzeV1ForReproducibleRunBundleV0_1,
-  serializeReproducibleRunBundleV0_1,
-  type ReproducibleRunBundleV0_1,
-} from "@/shared/openInstrument/reproducibleRunBundle.v0_1";
+  buildReproducibleRunBundleV0_2,
+  parseReproducibleRunBundleV0_2,
+  projectAnalyzeWordResultV2ForReproducibleRunBundleV0_2,
+  serializeReproducibleRunBundleV0_2,
+  type ReproducibleRunBundleV0_2,
+} from "@/shared/openInstrument/reproducibleRunBundle.v0_2";
 import { MT } from "@/ui/typography/marketingType.v0.1";
 
-export type ReproducibleRunBundleDisplaySourceV0_1 =
+export type ReproducibleRunBundleDisplaySourceV0_2 =
   | { kind: "current" }
   | {
       kind: "imported";
-      schemaVersion: ReproducibleRunBundleV0_1["schemaVersion"];
-      fingerprint: ReproducibleRunBundleV0_1["fingerprint"];
-      createdAt?: ReproducibleRunBundleV0_1["createdAt"];
+      schemaVersion: ReproducibleRunBundleV0_2["schemaVersion"];
+      fingerprint: ReproducibleRunBundleV0_2["fingerprint"];
+      createdAt?: ReproducibleRunBundleV0_2["createdAt"];
     };
 
 type Props = {
@@ -27,14 +27,14 @@ type Props = {
     ipa?: string;
     targetSenseLabel?: string;
   };
-  source: ReproducibleRunBundleDisplaySourceV0_1;
+  source: ReproducibleRunBundleDisplaySourceV0_2;
   disabled?: boolean;
-  onImport: (bundle: ReproducibleRunBundleV0_1) => void;
+  onImport: (bundle: ReproducibleRunBundleV0_2) => void;
 };
 
 function exportablePayload(payload: unknown): boolean {
   try {
-    projectAnalyzeV1ForReproducibleRunBundleV0_1(payload);
+    projectAnalyzeWordResultV2ForReproducibleRunBundleV0_2(payload);
     return true;
   } catch {
     return false;
@@ -76,11 +76,11 @@ export function ReproducibleRunBundleControls({
     setBusy(true);
     setError(null);
     try {
-      const bundle = await buildReproducibleRunBundleV0_1({
+      const bundle = await buildReproducibleRunBundleV0_2({
         result: payload,
         ...completedInput,
       });
-      const serialized = serializeReproducibleRunBundleV0_1(bundle);
+      const serialized = serializeReproducibleRunBundleV0_2(bundle);
       const safeWord = bundle.result.word.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "analysis";
       downloadText(`open-instrument-${safeWord}.json`, serialized);
     } catch {
@@ -98,7 +98,7 @@ export function ReproducibleRunBundleControls({
     setBusy(true);
     setError(null);
     try {
-      const parsed = await parseReproducibleRunBundleV0_1(await file.text());
+      const parsed = await parseReproducibleRunBundleV0_2(await file.text());
       if (!parsed.ok) {
         setError(importError(parsed.reason));
         return;

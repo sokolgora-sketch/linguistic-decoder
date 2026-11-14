@@ -31,7 +31,7 @@ export async function GET() {
   return NextResponse.json(
     {
       ok: true,
-      sourceEngineId: "analyze-v1",
+      sourceEngineId: "analyze-v2",
       sourceEngineVersion: ENGINE_VERSION_V1,
       sourceEngineBuild: resolveRuntimeGitShaV0_1(),
     },

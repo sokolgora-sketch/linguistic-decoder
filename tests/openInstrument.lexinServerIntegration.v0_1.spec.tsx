@@ -82,7 +82,7 @@ describe("Lexin server/API/UI integration v0.1", () => {
       );
       expect(response.status).toBe(200);
       const body = await response.json() as {
-        motivationDiscoveryV0_1?: {
+        motivationDiscoveryV0_2?: {
           candidates?: readonly Readonly<{
             candidateForm: string;
             candidateGloss: string;
@@ -95,7 +95,7 @@ describe("Lexin server/API/UI integration v0.1", () => {
           }>[];
         };
       };
-      const candidate = body.motivationDiscoveryV0_1?.candidates?.find(
+      const candidate = body.motivationDiscoveryV0_2?.candidates?.find(
         (item) => item.sourceFact.sourceFamilyId === LEXIN_SOURCE_FAMILY_ID_V0_1,
       );
       expect(candidate).toMatchObject({
@@ -116,7 +116,7 @@ describe("Lexin server/API/UI integration v0.1", () => {
       });
 
       const vm = adaptAnalysisToTelemetryVM(body);
-      render(<MotivationDiscoveryCardV0_1 discovery={vm.motivationDiscoveryV0_1} />);
+      render(<MotivationDiscoveryCardV0_1 discovery={vm.motivationDiscoveryV0_2} />);
       expect(screen.getAllByText("di").length).toBeGreaterThan(0);
       expect(screen.getAllByText(/Swedish headword: studera/).length).toBeGreaterThan(0);
       expect(screen.getByText(new RegExp(`Source family: ${LEXIN_SOURCE_FAMILY_ID_V0_1}`))).toBeInTheDocument();

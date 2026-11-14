@@ -34,6 +34,6 @@ describe("MeaningPanel boundary clarity", () => {
     ).toBeInTheDocument();
     expect(screen.getByText("Functional / normalization path: U → I.")).toBeInTheDocument();
     expect(screen.queryByText(/Candidate \/ structural path: U → I/)).not.toBeInTheDocument();
-    expect(screen.getByText(/Boundary: deterministic reading; functional \/ normalization paths and candidate \/ structural paths are separate from word-specific functional motivation; no forced answer; not a historical-chain claim\./i)).toBeInTheDocument();
+    expect(screen.getByText(/Boundary: deterministic reading; functional \/ normalization paths and candidate \/ structural paths are separate from word-specific functional motivation; interpretations are not selected automatically; the user decides; not a historical-chain claim\./i)).toBeInTheDocument();
   });
 });

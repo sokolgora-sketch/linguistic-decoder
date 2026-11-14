@@ -1,17 +1,29 @@
-# Engine Export API v1
+# Analyze API and Export Contracts
 
 This document describes the HTTP API for exporting analysis results.
 
 ## Endpoints
 
-### `GET /api/analyze`
+### Active Analyze response
 
-Performs a full analysis of a single word and returns the complete `AnalysisResult` payload. This is the main endpoint used by the primary UI.
+`GET` and `POST /api/analyze-v2` return the active, neutral
+`open-instrument.analyze-word-result.v2` response. First-party clients use this
+route. Successful responses expose versioned neutral status, interpretation,
+discovery, and origin-claim structures, with `interpretationDecisionPolicy`
+preserving alternatives and user decision authority.
 
-### Analyze V1 mode metadata
+`/api/analyze` remains an alias for `/api/analyze-v2`. `/api/analyze-v1` is a
+deprecated URL alias that returns the same V2 response and sets `Deprecation`
+and successor `Link` headers. Neither alias emits the legacy V1 selection
+fields. Older serialized V1 records remain readable only at explicit saved
+record and adapter input-migration boundaries; those internal compatibility
+views are not runtime response fields.
 
-`GET /api/analyze-v1` and `POST /api/analyze-v1` use the same canonical mode
-contract for successful analysis responses.
+### Analyze mode metadata
+
+`GET` and `POST /api/analyze-v2` use the same canonical mode contract for
+successful analysis responses. The deprecated `/api/analyze-v1` alias uses
+the same request behavior.
 
 - The top-level response `mode` is the effective execution mode used by the
   deterministic analysis.
@@ -22,7 +34,7 @@ contract for successful analysis responses.
 - A non-empty unsupported mode is invalid and returns HTTP `400`; it does not
   produce successful analysis metadata.
 
-For a successful Analyze V1 response, `meta.inputs.mode` records canonical
+For a successful Analyze V2 response, `meta.inputs.mode` records canonical
 effective-mode context. It is not a byte-for-byte mirror of the raw transport
 request. Consequently, omitted mode, empty mode, whitespace-only mode,
 explicit `strict`, and padded ` strict ` may all produce:
@@ -36,15 +48,19 @@ current response does not expose separate `requestedMode` and `effectiveMode`
 fields. A future need to preserve raw transport provenance requires a
 separately reviewed contract.
 
-The Reproducible Run Bundle uses the canonical top-level effective `mode` for
-its portable result and fingerprint; `response.meta.inputs.mode` is not a
-separate RRB identity field. Durable Evidence Package exports likewise use
-the canonical effective mode. Neither export surface preserves raw mode
-spelling under this contract.
+The Reproducible Run Bundle v0.2 uses the canonical top-level effective `mode`
+for its portable result and fingerprint; `response.meta.inputs.mode` is not a
+separate RRB identity field. Durable Evidence Package v0.2 exports likewise
+use the canonical effective mode. Neither export surface preserves raw mode
+spelling under this contract. Saved RRB v0.1 files may be imported and are
+upgraded to v0.2 before use or re-export. Comparison artifact v0.2 embeds only
+RRB v0.2 snapshots; older comparison artifacts are rebuilt at the import
+boundary. Evidence Package v0.1 remains a historical input/parser contract;
+the Workbench downloads v0.2.
 
-### Analyze V1 alphabet contract
+### Analyze alphabet contract
 
-`GET /api/analyze-v1` and `POST /api/analyze-v1` use the same canonical
+`GET` and `POST /api/analyze-v2` use the same canonical
 alphabet selector contract for successful analysis responses. The canonical
 values are:
 
@@ -66,7 +82,7 @@ auto | albanian | latin | sanskrit | ancient_greek | pie | turkish | german
   but it does not change the canonical Seven-Voices vowel set
   `A, E, I, O, U, Y, Ë`.
 
-### Analyze V1 word input and method metadata
+### Analyze word input and method metadata
 
 `word` is the core lexical selector. GET trims surrounding whitespace from the
 query value before orchestration. POST rejects missing, non-string, empty, and
@@ -76,8 +92,8 @@ does not define Unicode, case, lexical, or semantic normalization.
 
 Deterministic analysis uses the effective trimmed word. Consequently, outer
 padding does not change the Seven-Voices path, core candidates or ordering,
-status, evidence posture, `Null`, or the `no_single_winner` and `user_decides`
-boundaries.
+status, evidence posture, or `Null`. Multiple interpretations may coexist;
+automatic interpretation selection is disabled, and the user decides.
 
 The methods retain a compatibility distinction in selected request and
 provenance surfaces. GET has already trimmed the word before later metadata is
@@ -109,7 +125,7 @@ compatibility decision because it could affect response metadata, the legacy
 route, inline Evidence Package output, `heartInstrumentV1`, and complete RRB
 fingerprints.
 
-### Analyze V1 request extensions
+### Analyze request extensions
 
 Analyze V1 request inputs are grouped into the following surfaces:
 
@@ -124,8 +140,9 @@ Analyze V1 request inputs are grouped into the following surfaces:
 The target-sense fields are optional. String values are trimmed before semantic
 use. A label-only request derives a deterministic internal sense ID, while an
 explicit ID takes precedence. Target-sense context may affect semantic
-alignment and candidate projection, but it does not declare an etymological
-winner; the `no_single_winner` and `user_decides` boundaries remain unchanged.
+alignment and candidate projection, but it does not assert historical origin
+or select an interpretation automatically. The user retains decision
+authority.
 
 The named POST extensions are explicitly recognized by the route while
 retaining the existing compatibility behavior. Non-string target-sense values
@@ -146,8 +163,8 @@ raw supplied type and spelling are not preserved.
 When enabled, the fallback adds deterministic supplemental `Seed` candidate
 records from `seedLexicon.v0.1` to the OriginClaim side-channel when no valid
 upstream brain candidate is present. These records remain explicitly seed
-source data under the existing `no_single_winner` posture; the control does
-not promote them to reviewed, historical, Petro, or provider evidence.
+source data under the interpretation decision policy; the control does not
+promote them to reviewed, historical, Petro, or provider evidence.
 
 The query seed aliases are development/testing controls. Each enables seed
 fallback only when its first URL value is exactly `1`; other values, including

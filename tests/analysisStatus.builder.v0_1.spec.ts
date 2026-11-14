@@ -1,6 +1,7 @@
 import {
   ANALYSIS_STATUS_SCHEMA_VERSION_V0_1,
   buildAnalysisStatusV0_1,
+  isReviewedFunctionalEvidenceLineV0_1,
 } from "@/shared/analysisStatus.v0_1";
 
 function reviewedEvidenceLine(
@@ -10,11 +11,24 @@ function reviewedEvidenceLine(
     "reviewed functional free-operator evidence:",
     sourceLabel + ";",
     "historicalOriginClaim=not_claimed;",
-    "winnerClaim=not_claimed;",
+    "automaticInterpretationSelection=DISABLED;",
     "languageSuperiorityClaim=not_claimed;",
     "userDecisionPosture=user_decides",
   ].join(" ");
 }
+
+describe("reviewed functional evidence line compatibility", () => {
+  it("accepts neutral active lines and previously stored legacy lines", () => {
+    expect(isReviewedFunctionalEvidenceLineV0_1(reviewedEvidenceLine("bounded DA source"))).toBe(true);
+    expect(isReviewedFunctionalEvidenceLineV0_1([
+      "reviewed functional free-operator evidence: bounded DA source;",
+      "historicalOriginClaim=not_claimed;",
+      "winnerClaim=not_claimed;",
+      "languageSuperiorityClaim=not_claimed;",
+      "userDecisionPosture=user_decides",
+    ].join(" "))).toBe(true);
+  });
+});
 
 const POSITIVE_CASES = [
   {
@@ -432,6 +446,12 @@ describe(
           );
 
         expect(first).toEqual(second);
+
+        expect(first.summary).not.toMatch(/\b(?:winner|winning)\b/i);
+        if (status === "reviewed_functional_evidence") {
+          expect(first.summary).toContain("Multiple interpretations may coexist");
+          expect(first.summary).toContain("automatic interpretation selection is disabled");
+        }
 
         expect(first.schemaVersion).toBe(
           ANALYSIS_STATUS_SCHEMA_VERSION_V0_1,

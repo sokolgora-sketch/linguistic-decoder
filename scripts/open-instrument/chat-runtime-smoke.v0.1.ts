@@ -6,10 +6,9 @@ import { tmpdir } from "node:os";
 import { basename, join } from "node:path";
 import { chromium, type Browser } from "playwright";
 import {
-  serializeEvidencePackageExportV0_1,
-  validateEvidencePackageExportV0_1,
-} from "../../src/shared/openInstrument/evidencePackageExport.v0_1";
-import { parseReproducibleRunBundleV0_1 } from "../../src/shared/openInstrument/reproducibleRunBundle.v0_1";
+  serializeEvidencePackageExportV0_2,
+} from "../../src/shared/openInstrument/evidencePackageExport.v0_2";
+import { parseReproducibleRunBundleV0_2 } from "../../src/shared/openInstrument/reproducibleRunBundle.v0_2";
 import { startNextServer } from "../../tests/helpers/ownedNextServer";
 
 const PAGE_TIMEOUT_MS = 30_000;
@@ -72,7 +71,7 @@ async function main(): Promise<void> {
       ) {
         externalRequests.add(request.url());
       }
-      if (requestUrl.hostname === baseUrl.hostname && requestUrl.port === baseUrl.port && requestUrl.pathname === "/api/analyze-v1") {
+      if (requestUrl.hostname === baseUrl.hostname && requestUrl.port === baseUrl.port && requestUrl.pathname === "/api/analyze-v2") {
         analyzeRequests += 1;
       }
     });
@@ -106,7 +105,7 @@ async function main(): Promise<void> {
       await page.getByTestId("multilingual-discovery-role").first().waitFor({ state: "visible" });
       await page.getByText("WORD-SPECIFIC READING", { exact: true }).first().waitFor({ state: "visible" });
       await page.getByTestId("word-specific-reading-role").first().waitFor({ state: "visible" });
-      await page.getByText(/No single winner.*(?:You decide|User decides)/i).first().waitFor({ state: "visible" });
+      await page.getByText(/Multiple interpretations may coexist.*(?:You decide|user decides)/i).first().waitFor({ state: "visible" });
       console.log(`${viewportLabel}_VISUAL_AUTHORITY_HIERARCHY=PASS`);
     };
 
@@ -162,16 +161,35 @@ async function main(): Promise<void> {
     } catch {
       throw new Error("Evidence Package download was not valid JSON.");
     }
-    assert(validateEvidencePackageExportV0_1(evidenceValue).ok, "Downloaded Evidence Package failed durable validation.");
-    const canonicalEvidence = serializeEvidencePackageExportV0_1(evidenceValue as Parameters<typeof serializeEvidencePackageExportV0_1>[0]);
-    assert(canonicalEvidence.ok && canonicalEvidence.value === evidenceText, "Downloaded Evidence Package bytes were not canonical.");
+    const canonicalEvidence = serializeEvidencePackageExportV0_2(
+      evidenceValue as Parameters<typeof serializeEvidencePackageExportV0_2>[0],
+    );
+    assert(
+      canonicalEvidence.ok,
+      canonicalEvidence.ok
+        ? "Downloaded Evidence Package failed durable validation."
+        : `Downloaded Evidence Package failed durable validation: ${canonicalEvidence.reason}`,
+    );
+    assert(canonicalEvidence.value === evidenceText, "Downloaded Evidence Package bytes were not canonical.");
     assert(
       typeof evidenceValue === "object" && evidenceValue !== null && !Array.isArray(evidenceValue),
       "Downloaded Evidence Package was not an object.",
     );
-    const evidenceRecord = evidenceValue as { schemaVersion?: unknown; input?: { word?: unknown } };
-    assert(evidenceRecord.schemaVersion === "open-instrument.evidence-package-export.v0.1", "Evidence Package schema was unexpected.");
+    const evidenceRecord = evidenceValue as {
+      schemaVersion?: unknown;
+      input?: { word?: unknown };
+      interpretationDecisionPolicy?: {
+        automaticInterpretationSelection?: unknown;
+        interpretationDecisionAuthority?: unknown;
+      };
+    };
+    assert(evidenceRecord.schemaVersion === "open-instrument.evidence-package-export.v0.2", "Evidence Package schema was unexpected.");
     assert(evidenceRecord.input?.word === "study", "Evidence Package input did not contain study.");
+    assert(
+      evidenceRecord.interpretationDecisionPolicy?.automaticInterpretationSelection === "DISABLED" &&
+        evidenceRecord.interpretationDecisionPolicy.interpretationDecisionAuthority === "USER_DECIDES",
+      "Evidence Package did not preserve the neutral user-decision policy.",
+    );
     for (const forbiddenKey of ["raw", "debug", "providerOutput", "providerRequest", "providerResponse", "runtime", "researchRows"]) {
       assert(!evidenceText.includes(`"${forbiddenKey}"`), `Evidence Package contained forbidden field ${forbiddenKey}.`);
     }
@@ -195,11 +213,11 @@ async function main(): Promise<void> {
     assert(downloadedBytes.length > 0, "Downloaded file contained no bytes.");
     console.log("DOWNLOADED_BYTES_READ=PASS");
 
-    const parsed = await parseReproducibleRunBundleV0_1(downloadedBytes.toString("utf8"));
+    const parsed = await parseReproducibleRunBundleV0_2(downloadedBytes.toString("utf8"));
     if (!parsed.ok) {
       throw new Error(`Downloaded bundle failed production parsing: ${parsed.reason}`);
     }
-    assert(parsed.value.schemaVersion === "open-instrument.reproducible-run-bundle.v0.1", "Downloaded bundle schema was unexpected.");
+    assert(parsed.value.schemaVersion === "open-instrument.reproducible-run-bundle.v0.2", "Downloaded bundle schema was unexpected.");
     assert(parsed.value.fingerprint.algorithm === "sha256", "Downloaded bundle fingerprint algorithm was unexpected.");
     assert(parsed.value.fingerprint.value.length > 0, "Downloaded bundle fingerprint was empty.");
     assert(parsed.value.result.word === "study", "Downloaded bundle result did not contain study.");

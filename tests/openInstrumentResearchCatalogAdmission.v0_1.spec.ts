@@ -168,7 +168,7 @@ describe("Open Instrument research catalog admission v0.1", () => {
     const response = await analyze("break");
     expect(response.status).toBe(200);
     const body = (await response.json()) as Record<string, unknown>;
-    expect((body.analysisStatusV0_1 as Record<string, unknown>).status).toBe(
+    expect((body.analysisStatusV0_2 as Record<string, unknown>).status).toBe(
       "structural_unreviewed",
     );
     const candidates = body.candidates as Array<Record<string, unknown>>;
@@ -254,7 +254,7 @@ describe("Open Instrument research catalog admission v0.1", () => {
       const response = await analyze(word);
       expect(response.status).toBe(200);
       const body = (await response.json()) as Record<string, unknown>;
-      expect((body.analysisStatusV0_1 as Record<string, unknown>).status).toBe(
+      expect((body.analysisStatusV0_2 as Record<string, unknown>).status).toBe(
         "candidate_only",
       );
     }
@@ -263,7 +263,7 @@ describe("Open Instrument research catalog admission v0.1", () => {
       const response = await analyze(word);
       expect(response.status).toBe(200);
       const body = (await response.json()) as Record<string, unknown>;
-      expect((body.analysisStatusV0_1 as Record<string, unknown>).status).toBe(
+      expect((body.analysisStatusV0_2 as Record<string, unknown>).status).toBe(
         "null_no_supported_candidate",
       );
     }

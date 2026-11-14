@@ -13,7 +13,7 @@ import { normalizeToAllowedOpId } from "./ops/allowedOps.v0.1";
  * This layer must NOT:
  * - modify deterministic structural discovery;
  * - declare historical origin;
- * - declare a single winner;
+ * - automatically select one interpretation;
  * - promote a research witness into reviewed production truth;
  * - collapse lexical attestation and functional interpretation
  *   into one confidence value;
@@ -380,7 +380,7 @@ function isAdmissibleEvidenceRecordV0_1(
  *   functional-bridge truth;
  * - phonetic or semantic resemblance can survive only as an
  *   explicitly labelled research relation and is not promoted;
- * - no witness emitted here claims historical origin, winner,
+ * - no witness emitted here claims historical origin or selects an interpretation,
  *   language superiority, or candidate truth;
  * - this function does not review, authorize, rank, or promote
  *   witnesses into production evidence.

@@ -22,7 +22,7 @@ type Scale50Case = Readonly<{
  *
  * Purpose:
  * - measure generalization beyond the small canonical/research proving set;
- * - use the real analyze-v1 route and aggregate analysisStatusV0_1;
+ * - use the real analyze-v1 route and aggregate analysisStatusV0_2;
  * - preserve Null as a valid result;
  * - make no historical-origin, winner, ownership, or candidate-truth claim.
  *
@@ -198,7 +198,7 @@ describe(
           }
 
           const rawStatus =
-            body.analysisStatusV0_1;
+            body.analysisStatusV0_2;
 
           expect(
             isRecord(rawStatus),
@@ -206,7 +206,7 @@ describe(
 
           if (!isRecord(rawStatus)) {
             throw new Error(
-              `Missing analysisStatusV0_1 for ${scaleCase.word}`,
+              `Missing analysisStatusV0_2 for ${scaleCase.word}`,
             );
           }
 
@@ -258,9 +258,12 @@ describe(
             claimBoundary.historicalTransmissionClaim,
           ).toBe("not_claimed");
 
-          expect(
-            claimBoundary.winnerClaim,
-          ).toBe("not_claimed");
+          expect(claimBoundary).not.toHaveProperty("winnerClaim");
+          expect(rawStatus.interpretationDecisionPolicy).toMatchObject({
+            multipleInterpretationsMayCoexist: true,
+            automaticInterpretationSelection: "DISABLED",
+            interpretationDecisionAuthority: "USER_DECIDES",
+          });
 
           expect(
             claimBoundary.languageSuperiorityClaim,

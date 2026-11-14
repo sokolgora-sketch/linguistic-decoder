@@ -2,7 +2,7 @@
 
 import type {
   AnalysisStatusCodeV0_1,
-  AnalysisStatusV0_1VM,
+  AnalysisStatusV0_2VM,
   PresentOrMissing,
 } from "@/ui/telemetry/types";
 
@@ -23,9 +23,10 @@ function joinOrNone(values: readonly string[]): string {
 function StatusBoundaryNoticeV0_1() {
   return (
     <div className="mt-4 rounded-[8px] border border-[#33423a] bg-[#111a16] p-3 text-xs leading-5 text-[#b7d8c1]">
-      No historical-origin, transmission, winner, superiority, ownership, or
-      candidate-truth claim is made. Structural output is not candidate truth.
-      Null remains valid. User decides.
+      Multiple interpretations may coexist; automatic interpretation selection
+      is disabled. The user decides how to interpret the evidence. No claim is
+      made about historical origin, transmission, superiority, ownership, or
+      candidate truth. Structural output is not candidate truth. Null remains valid.
     </div>
   );
 }
@@ -35,7 +36,7 @@ export function AnalysisStatusCardV0_1({
   variant = "full",
   scopeLabel = "Analysis status",
 }: {
-  status: PresentOrMissing<AnalysisStatusV0_1VM>;
+  status: PresentOrMissing<AnalysisStatusV0_2VM>;
   variant?: AnalysisStatusCardVariantV0_1;
   scopeLabel?: string;
 }) {
@@ -71,7 +72,7 @@ export function AnalysisStatusCardV0_1({
           {STATUS_LABELS[value.status]}
         </h2>
         <p className="mt-3 text-sm leading-6 text-[#c5ced8]">
-          {value.summary}
+          {(value.summary)}
         </p>
         <StatusBoundaryNoticeV0_1 />
       </section>
@@ -99,7 +100,7 @@ export function AnalysisStatusCardV0_1({
       </div>
 
       <p className="mt-3 text-sm leading-6 text-[#c5ced8]">
-        {value.summary}
+        {(value.summary)}
       </p>
 
       <dl className="mt-4 grid gap-2 text-sm sm:grid-cols-3">

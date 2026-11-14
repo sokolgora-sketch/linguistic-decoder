@@ -526,8 +526,8 @@ async function analyzeDritareV0_1(): Promise<any> {
 function renderPrimaryAlbanianReadingCard(payload: unknown): string {
   const vm = adaptAnalysisToTelemetryVM(payload);
   return renderToStaticMarkup(createElement(PrimaryAlbanianReadingCardV0_1, {
-    discovery: vm.motivationDiscoveryV0_1,
-    analysisStatus: vm.analysisStatusV0_1,
+    discovery: vm.motivationDiscoveryV0_2,
+    analysisStatus: vm.analysisStatusV0_2,
   }));
 }
 
@@ -614,7 +614,7 @@ describe("analyze-v1 Albanian lexical reading reachability", () => {
 
     const ordinaryKryeResponse = await makePost("krye");
     const ordinaryKrye = await ordinaryKryeResponse.json();
-    const ordinaryKryeReading = ordinaryKrye.motivationDiscoveryV0_1.albanianLexicalReading;
+    const ordinaryKryeReading = ordinaryKrye.motivationDiscoveryV0_2.albanianLexicalReading;
     expect(ordinaryKryeResponse.status).toBe(200);
     expect(ordinaryKryeReading.primarySourceFact).toMatchObject({
       sourceRecordId: "kaikki-albanian-jsonl:word=krye:ordinal=0",
@@ -624,7 +624,7 @@ describe("analyze-v1 Albanian lexical reading reachability", () => {
 
     const selectedKryeResponse = await makePost("krye", "kaikki-albanian-jsonl:word=krye:ordinal=1");
     const selectedKrye = await selectedKryeResponse.json();
-    const selectedKryeReading = selectedKrye.motivationDiscoveryV0_1.albanianLexicalReading;
+    const selectedKryeReading = selectedKrye.motivationDiscoveryV0_2.albanianLexicalReading;
     expect(selectedKryeResponse.status).toBe(200);
     expect(selectedKryeReading.primarySourceFact).toMatchObject({
       sourceRecordId: "kaikki-albanian-jsonl:word=krye:ordinal=1",
@@ -644,7 +644,7 @@ describe("analyze-v1 Albanian lexical reading reachability", () => {
 
     const selectedShtrazeResponse = await makePost("shtrazë", "kaikki-albanian-jsonl:word=shtraz%C3%AB:ordinal=1");
     const selectedShtraze = await selectedShtrazeResponse.json();
-    const selectedShtrazeReading = selectedShtraze.motivationDiscoveryV0_1.albanianLexicalReading;
+    const selectedShtrazeReading = selectedShtraze.motivationDiscoveryV0_2.albanianLexicalReading;
     expect(selectedShtrazeResponse.status).toBe(200);
     expect(selectedShtrazeReading.primarySourceFact).toMatchObject({
       sourceRecordId: "kaikki-albanian-jsonl:word=shtraz%C3%AB:ordinal=1",
@@ -679,8 +679,8 @@ describe("analyze-v1 Albanian lexical reading reachability", () => {
     const selected = await selectedResponse.json();
 
     expect(selectedResponse.status).toBe(200);
-    expect(selected.motivationDiscoveryV0_1.albanianLexicalReading).toEqual(
-      ordinary.body.motivationDiscoveryV0_1.albanianLexicalReading,
+    expect(selected.motivationDiscoveryV0_2.albanianLexicalReading).toEqual(
+      ordinary.body.motivationDiscoveryV0_2.albanianLexicalReading,
     );
   });
 
@@ -694,7 +694,7 @@ describe("analyze-v1 Albanian lexical reading reachability", () => {
     const getResponse = await GET(new Request(url));
     const getBody = await getResponse.json();
     expect(getResponse.status).toBe(200);
-    expect(getBody.motivationDiscoveryV0_1.albanianLexicalReading.primarySourceFact.sourceRecordId)
+    expect(getBody.motivationDiscoveryV0_2.albanianLexicalReading.primarySourceFact.sourceRecordId)
       .toBe("kaikki-albanian-jsonl:word=shtraz%C3%AB:ordinal=1");
 
     const wrongWordResponse = await POST(new Request("http://localhost/api/analyze-v1", {
@@ -710,7 +710,7 @@ describe("analyze-v1 Albanian lexical reading reachability", () => {
     }));
     const wrongWord = await wrongWordResponse.json();
     expect(wrongWordResponse.status).toBe(200);
-    expect(wrongWord.motivationDiscoveryV0_1.albanianLexicalReading).toMatchObject({
+    expect(wrongWord.motivationDiscoveryV0_2.albanianLexicalReading).toMatchObject({
       status: "NULL",
       primarySourceFact: null,
       functionalMeaningBridge: {
@@ -806,8 +806,8 @@ describe("analyze-v1 Albanian lexical reading reachability", () => {
 
     const result = await analyzeDriteV0_1();
     expect(result.status).toBe(200);
-    expect(result.body.motivationDiscoveryV0_1.exactLexicalSourceStatus.status).toBe("MATCHES_FOUND");
-    expect(result.body.motivationDiscoveryV0_1.albanianLexicalReading).toMatchObject({
+    expect(result.body.motivationDiscoveryV0_2.exactLexicalSourceStatus.status).toBe("MATCHES_FOUND");
+    expect(result.body.motivationDiscoveryV0_2.albanianLexicalReading).toMatchObject({
       status: "SUPPORTED",
       primarySourceFact: { form: "dritë", etymologyText: null },
       relatedForms: [{
@@ -849,7 +849,7 @@ describe("analyze-v1 Albanian lexical reading reachability", () => {
         sourceRelation: { status: "SOURCE_RELATION_NOT_VERIFIED" },
       },
     });
-    const interpretation = result.body.motivationDiscoveryV0_1.albanianLexicalReading.interpretation;
+    const interpretation = result.body.motivationDiscoveryV0_2.albanianLexicalReading.interpretation;
     expect(interpretation.statement).toEqual(expect.stringContaining("Integrated source-bounded functional reading"));
     expect(interpretation.statement).toEqual(expect.stringContaining("dritare"));
     expect(interpretation.statement).toEqual(expect.stringContaining("light through"));
@@ -863,7 +863,7 @@ describe("analyze-v1 Albanian lexical reading reachability", () => {
   it("projects direct dritare as the primary input with the existing directional passage bridge", async () => {
     const result = await analyzeDritareV0_1();
     expect(result.status).toBe(200);
-    expect(result.body.motivationDiscoveryV0_1.albanianLexicalReading).toMatchObject({
+    expect(result.body.motivationDiscoveryV0_2.albanianLexicalReading).toMatchObject({
       status: "SUPPORTED",
       primarySourceFact: {
         sourceRecordId: "kaikki-albanian-jsonl:word=dritare:ordinal=0",
@@ -911,7 +911,7 @@ describe("analyze-v1 Albanian lexical reading reachability", () => {
       composition: { status: "NULL" },
     });
 
-    const reading = result.body.motivationDiscoveryV0_1.albanianLexicalReading;
+    const reading = result.body.motivationDiscoveryV0_2.albanianLexicalReading;
     const card = renderPrimaryAlbanianReadingCard(result.body);
     expect(card).toContain("Functional role: ENABLE_PASSAGE · exploratory");
     expect(card).toContain(`Word-specific explanation: ${reading.functionalMeaningBridge.functionalHypothesis.statement}`);
@@ -920,26 +920,26 @@ describe("analyze-v1 Albanian lexical reading reachability", () => {
 
   const directDritareBindingMismatches: readonly [string, (payload: any) => void][] = [
     ["related source-record ID mismatch", (payload) => {
-      payload.motivationDiscoveryV0_1.albanianLexicalReading.functionalMeaningBridge.sourceFacts.related.sourceRecordId =
+      payload.motivationDiscoveryV0_2.albanianLexicalReading.functionalMeaningBridge.sourceFacts.related.sourceRecordId =
         "kaikki-albanian-jsonl:word=other:ordinal=0";
     }],
     ["related entry-locator mismatch", (payload) => {
-      payload.motivationDiscoveryV0_1.albanianLexicalReading.functionalMeaningBridge.sourceFacts.related.entryLocator =
+      payload.motivationDiscoveryV0_2.albanianLexicalReading.functionalMeaningBridge.sourceFacts.related.entryLocator =
         "jsonl://word/other/match/0";
     }],
     ["related form mismatch", (payload) => {
-      payload.motivationDiscoveryV0_1.albanianLexicalReading.functionalMeaningBridge.sourceFacts.related.form = "dritari";
+      payload.motivationDiscoveryV0_2.albanianLexicalReading.functionalMeaningBridge.sourceFacts.related.form = "dritari";
     }],
     ["source-relation direction mismatch", (payload) => {
-      payload.motivationDiscoveryV0_1.albanianLexicalReading.relatedCandidateEvaluations[0]
+      payload.motivationDiscoveryV0_2.albanianLexicalReading.relatedCandidateEvaluations[0]
         .sourceLinkedComparison.relation.direction = "PRIMARY_TO_RELATED_FORM";
     }],
     ["unsupported target source identity", (payload) => {
-      payload.motivationDiscoveryV0_1.albanianLexicalReading.primarySourceFact.sourceRecordId =
+      payload.motivationDiscoveryV0_2.albanianLexicalReading.primarySourceFact.sourceRecordId =
         "kaikki-albanian-jsonl:word=other:ordinal=0";
     }],
     ["ambiguous target source identity", (payload) => {
-      const facts = payload.motivationDiscoveryV0_1.exactLexicalSourceFacts;
+      const facts = payload.motivationDiscoveryV0_2.exactLexicalSourceFacts;
       const target = facts.find((fact: any) => fact.sourceRecordId === "kaikki-albanian-jsonl:word=dritare:ordinal=0");
       facts.push(JSON.parse(JSON.stringify(target)));
     }],
@@ -959,7 +959,7 @@ describe("analyze-v1 Albanian lexical reading reachability", () => {
   it("projects direct malor as the queried adjective with the base-attested entity-property bridge", async () => {
     const result = await analyzeMalorV0_1();
     expect(result.status).toBe(200);
-    const reading = result.body.motivationDiscoveryV0_1.albanianLexicalReading;
+    const reading = result.body.motivationDiscoveryV0_2.albanianLexicalReading;
     expect(reading.status).toBe("SUPPORTED");
     expect(reading.primarySourceFact).toMatchObject({
       sourceRecordId: "kaikki-albanian-jsonl:word=malor:ordinal=0",
@@ -1007,7 +1007,7 @@ describe("analyze-v1 Albanian lexical reading reachability", () => {
   it("preserves direct mal's existing entity-property bridge and all attested base senses", async () => {
     const result = await analyzeMalV0_1();
     expect(result.status).toBe(200);
-    const reading = result.body.motivationDiscoveryV0_1.albanianLexicalReading;
+    const reading = result.body.motivationDiscoveryV0_2.albanianLexicalReading;
     expect(reading.primarySourceFact).toMatchObject({
       sourceRecordId: "kaikki-albanian-jsonl:word=mal:ordinal=0",
       form: "mal",
@@ -1036,7 +1036,7 @@ describe("analyze-v1 Albanian lexical reading reachability", () => {
   it("projects an integrated source-bounded AGENT reading through the API", async () => {
     const result = await analyzePeshkV0_1();
     expect(result.status).toBe(200);
-    expect(result.body.motivationDiscoveryV0_1.albanianLexicalReading).toMatchObject({
+    expect(result.body.motivationDiscoveryV0_2.albanianLexicalReading).toMatchObject({
       status: "SUPPORTED",
       functionalMeaningBridge: {
         status: "SUPPORTED",
@@ -1057,7 +1057,7 @@ describe("analyze-v1 Albanian lexical reading reachability", () => {
   it("projects the source-bounded pelar AGENT reading while keeping research authorization disabled", async () => {
     const result = await analyzePeleV0_1();
     expect(result.status).toBe(200);
-    const reading = result.body.motivationDiscoveryV0_1.albanianLexicalReading;
+    const reading = result.body.motivationDiscoveryV0_2.albanianLexicalReading;
     expect(reading.relatedCandidateEvaluations).toEqual(expect.arrayContaining([
       expect.objectContaining({
         relatedForm: "pelar",
@@ -1118,7 +1118,7 @@ describe("analyze-v1 Albanian lexical reading reachability", () => {
   it("projects direct qymyrtar input through the API as target-authored, source-bounded AGENT evidence", async () => {
     const result = await analyzeQymyrtarV0_1();
     expect(result.status).toBe(200);
-    const reading = result.body.motivationDiscoveryV0_1.albanianLexicalReading;
+    const reading = result.body.motivationDiscoveryV0_2.albanianLexicalReading;
     expect(reading).toMatchObject({
       status: "SUPPORTED",
       primarySourceFact: {
@@ -1176,7 +1176,7 @@ describe("analyze-v1 Albanian lexical reading reachability", () => {
   it("projects the three-component source hypothesis through the API without AGENT authorization", async () => {
     const result = await analyzeZjarrfikesV0_1();
     expect(result.status).toBe(200);
-    const reading = result.body.motivationDiscoveryV0_1.albanianLexicalReading;
+    const reading = result.body.motivationDiscoveryV0_2.albanianLexicalReading;
     expect(reading).toMatchObject({
       status: "SUPPORTED",
       primarySourceFact: {

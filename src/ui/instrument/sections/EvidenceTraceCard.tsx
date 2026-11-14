@@ -123,7 +123,7 @@ export function EvidenceTraceCard({
       </div>
 
       <div className="mt-4 rounded-[10px] border border-[#27313d] bg-[#0d1117] p-3 text-[11px] leading-5 text-[#7d8ea3]">
-        Boundary: VM field trace only; functional / normalization paths and candidate / structural paths are separate from word-specific functional motivation; not a proof chain; no forced answer.
+        Boundary: VM field trace only; functional / normalization paths and candidate / structural paths are separate from word-specific functional motivation; not a proof chain; interpretations are not selected automatically.
       </div>
     </section>
   );

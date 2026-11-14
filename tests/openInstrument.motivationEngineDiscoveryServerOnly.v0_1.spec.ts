@@ -272,10 +272,10 @@ describe("server-only English Kaikki Discovery integration v0.1", () => {
 
     const vm = adaptAnalysisToTelemetryVM(routeLikePayload);
     expect(vm.readout.word).toBe(word);
-    expect(vm.motivationDiscoveryV0_1?.kind).toBe("present");
-    if (vm.motivationDiscoveryV0_1?.kind === "present") {
-      expect(vm.motivationDiscoveryV0_1.value.candidates).toHaveLength(3);
-      expect(vm.motivationDiscoveryV0_1.value.candidates[0]?.candidateLanguage).toBe("English");
+    expect(vm.motivationDiscoveryV0_2?.kind).toBe("present");
+    if (vm.motivationDiscoveryV0_2?.kind === "present") {
+      expect(vm.motivationDiscoveryV0_2.value.candidates).toHaveLength(3);
+      expect(vm.motivationDiscoveryV0_2.value.candidates[0]?.candidateLanguage).toBe("English");
     }
   });
 });

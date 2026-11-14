@@ -134,7 +134,7 @@ async function main(): Promise<void> {
     browser = await chromium.launch({ headless: true });
     const context = await browser.newContext({ viewport: { width: 390, height: 844 } });
     if (replayPayloads.size > 0) {
-      await context.route("**/api/analyze-v1?*", async (route) => {
+      await context.route("**/api/analyze-v2?*", async (route) => {
         const requestedWord = new URL(route.request().url()).searchParams.get("word") ?? "";
         const body = replayPayloads.get(requestedWord);
         if (!body) {
@@ -165,7 +165,7 @@ async function main(): Promise<void> {
     });
     context.on("request", (request) => {
       const url = new URL(request.url());
-      if (url.origin === server?.base && url.pathname === "/api/analyze-v1") {
+      if (url.origin === server?.base && url.pathname === "/api/analyze-v2") {
         analyzeRequests += 1;
         analyzeRequestProfiles.push({
           word: url.searchParams.get("word"),
@@ -358,7 +358,7 @@ async function main(): Promise<void> {
     const autoRequestPromise = desktopPage.waitForRequest((request) => {
       const requestUrl = new URL(request.url());
       return requestUrl.origin === server?.base &&
-        requestUrl.pathname === "/api/analyze-v1" &&
+        requestUrl.pathname === "/api/analyze-v2" &&
         requestUrl.searchParams.get("word") === "study";
     });
     await desktopAnalyzeButton.click();

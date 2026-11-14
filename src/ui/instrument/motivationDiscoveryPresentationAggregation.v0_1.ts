@@ -1,4 +1,4 @@
-import type { MotivationDiscoveryCandidateV0_1VM } from "@/ui/telemetry/types";
+import type { MotivationDiscoveryCandidateV0_2VM } from "@/ui/telemetry/types";
 
 export const MOTIVATION_DISCOVERY_PRESENTATION_AGGREGATION_SCHEMA_V0_1 =
   "open-instrument.motivation-discovery-presentation-aggregation.v0_1" as const;
@@ -6,7 +6,7 @@ export const MOTIVATION_DISCOVERY_PRESENTATION_AGGREGATION_SCHEMA_V0_1 =
 export type MotivationDiscoveryAggregationKeyV0_1 = Readonly<{
   sourceFamilyId: string;
   normalizedSourceForm: string;
-  candidateStatus: MotivationDiscoveryCandidateV0_1VM["candidateStatus"];
+  candidateStatus: MotivationDiscoveryCandidateV0_2VM["candidateStatus"];
   sourceStatus: string;
   entryReason: string;
   structuralRelation: Readonly<{
@@ -36,9 +36,9 @@ export type MotivationDiscoveryAggregationKeyV0_1 = Readonly<{
 export type MotivationDiscoveryPrimaryWitnessV0_1 = Readonly<{
   schemaVersion: typeof MOTIVATION_DISCOVERY_PRESENTATION_AGGREGATION_SCHEMA_V0_1;
   primaryWitnessId: string;
-  representative: MotivationDiscoveryCandidateV0_1VM;
+  representative: MotivationDiscoveryCandidateV0_2VM;
   aggregationKey: MotivationDiscoveryAggregationKeyV0_1;
-  records: readonly MotivationDiscoveryCandidateV0_1VM[];
+  records: readonly MotivationDiscoveryCandidateV0_2VM[];
 }>;
 
 export type MotivationDiscoveryAggregationMetricsV0_1 = Readonly<{
@@ -55,7 +55,7 @@ function normalizeSourceFormV0_1(value: string): string {
   return value.normalize("NFC").trim().toLocaleLowerCase("en-US");
 }
 function sourceFamilyForKeyV0_1(
-  candidate: MotivationDiscoveryCandidateV0_1VM,
+  candidate: MotivationDiscoveryCandidateV0_2VM,
 ): string {
   // Missing source-family metadata must never cause unrelated records to
   // over-merge. Production projections carry sourceTraditionId here; the
@@ -64,7 +64,7 @@ function sourceFamilyForKeyV0_1(
 }
 
 function buildAggregationKeyV0_1(
-  candidate: MotivationDiscoveryCandidateV0_1VM,
+  candidate: MotivationDiscoveryCandidateV0_2VM,
 ): MotivationDiscoveryAggregationKeyV0_1 {
   const comparison = candidate.structuralComparison;
   const interpretation = candidate.functionalInterpretation;
@@ -112,13 +112,13 @@ function primaryWitnessIdV0_1(
 }
 
 export function aggregateMotivationDiscoveryCandidatesV0_1(
-  candidates: readonly MotivationDiscoveryCandidateV0_1VM[],
+  candidates: readonly MotivationDiscoveryCandidateV0_2VM[],
 ): readonly MotivationDiscoveryPrimaryWitnessV0_1[] {
   const groups = new Map<
     string,
     {
       key: MotivationDiscoveryAggregationKeyV0_1;
-      records: MotivationDiscoveryCandidateV0_1VM[];
+      records: MotivationDiscoveryCandidateV0_2VM[];
     }
   >();
 
@@ -147,7 +147,7 @@ export function aggregateMotivationDiscoveryCandidatesV0_1(
 }
 
 export function measureMotivationDiscoveryAggregationV0_1(
-  candidates: readonly MotivationDiscoveryCandidateV0_1VM[],
+  candidates: readonly MotivationDiscoveryCandidateV0_2VM[],
   primaryWitnesses: readonly MotivationDiscoveryPrimaryWitnessV0_1[] =
     aggregateMotivationDiscoveryCandidatesV0_1(candidates),
 ): MotivationDiscoveryAggregationMetricsV0_1 {
