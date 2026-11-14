@@ -1385,6 +1385,66 @@ describe("Single-word motivation workbench v0.1", () => {
     expect(screen.getByLabelText("Component 1 exact spelling")).toHaveValue("");
   });
 
+  it("wraps long progressive bridge reason codes without promoting Null evidence", () => {
+    const reasonCodes = [
+      "SOURCE_LINKED_RELATION_NOT_SUPPORTED",
+      "DERIVED_STRUCTURE_NOT_SUPPORTED_FOR_BOTH_RECORDS",
+    ];
+    const lexicalReading = makeProgressiveLexicalReading({
+      targetForm: "TRETJE",
+      baseForm: "TRET",
+      suffixForm: "JE",
+      targetSenses: [{ senseId: "tretje-digestion", gloss: "digestion" }],
+      baseSenses: [{ senseId: "tret-digest", gloss: "digest" }],
+      suffixSenses: [{ senseId: "je-action-noun", gloss: "action noun suffix" }],
+    });
+    lexicalReading.functionalMeaningBridge.reasonCodes = reasonCodes;
+
+    render(
+      <SingleWordMotivationWorkbenchV0_1
+        initialTargetWord="TRETJE"
+        currentWordEvidence={makeCurrentWordEvidence("TRETJE", {
+          status: "MATCHES_FOUND",
+          voices: ["E", "E"],
+          positions: [2, 5],
+          facts: [{
+            sourceRecordId: "fixture:kaikki:TRETJE:target",
+            entryLocator: "fixture-entry:TRETJE",
+            physicalRecordOrdinal: 0,
+            language: "Albanian",
+            languageCode: "sq",
+            form: "TRETJE",
+            partOfSpeech: "noun",
+            senses: [{ senseId: "tretje-digestion", glosses: ["digestion"] }],
+            ipaObservations: [],
+            sourceStatus: "observed_external_snapshot",
+            attestationTruth: "fact",
+            pronunciationAuthority: "fixture source only",
+            sourceSnapshot: {
+              sourceFamilyId: "fixture-kaikki-albanian",
+              sourceUrl: "https://example.invalid/fixture.jsonl",
+              sha256: "b".repeat(64),
+              bytes: 1,
+            },
+          }],
+          albanianLexicalReading: lexicalReading,
+        })}
+      />,
+    );
+
+    const expectedText = `Whole-word functional bridge: UNKNOWN_OR_NULL · ${reasonCodes.join(", ")}`;
+    const bridgeLine = screen.getByText(expectedText, { exact: true });
+    expect(bridgeLine.textContent).toBe(expectedText);
+    expect(bridgeLine).toHaveClass("min-w-0", "[overflow-wrap:anywhere]");
+    expect(bridgeLine).not.toHaveClass("truncate", "overflow-hidden", "whitespace-nowrap");
+    expect(bridgeLine).toBeVisible();
+
+    expect(screen.getByTestId("single-word-current-source-evidence")).toHaveTextContent("MATCHES_FOUND");
+    expect(screen.getByTestId("single-word-progressive-source-relationships")).toHaveTextContent("SOURCE_AUTHORED_SUFFIX_TEMPLATE");
+    expect(screen.getByTestId("single-word-progressive-functional-reading")).toHaveTextContent("Structural embryo meaning/function: UNKNOWN_OR_NULL");
+    expect(screen.queryByTestId("single-word-progressive-source-motivated-explanation")).not.toBeInTheDocument();
+  });
+
   it("keeps the KANDIL source-sense proposal separate from explicit mechanical replay", () => {
     render(<SingleWordMotivationWorkbenchV0_1 initialTargetWord="KANDIL" />);
     fireEvent.change(screen.getByLabelText("Target language"), { target: { value: "Albanian" } });
