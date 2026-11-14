@@ -8,6 +8,7 @@ import {
 } from "@/ui/instrument/motivationDiscoveryPresentationAggregation.v0_1";
 import { analyzeStructuralInputV0_2 } from "@/shared/structuralHypothesisDiscovery.v0_2";
 import type { MotivationDiscoveryV0_1VM } from "@/ui/telemetry/types";
+import type { AlbanianLexicalReadingV0_1 } from "@/shared/openInstrument/motivationEngineDiscoveryServerOnly.v0_1";
 
 function model(overrides: Partial<MotivationDiscoveryV0_1VM> = {}): MotivationDiscoveryV0_1VM {
   const writtenAnalysis = analyzeStructuralInputV0_2("study");
@@ -132,6 +133,132 @@ function model(overrides: Partial<MotivationDiscoveryV0_1VM> = {}): MotivationDi
 }
 
 describe("Motivation Discovery Lab presentation v0.1", () => {
+  it("wraps Overview Null bridge reasons while preserving source evidence and Null posture", () => {
+    const sourceRecordId = "kaikki-albanian-jsonl:word=zjarrfikës:ordinal=0";
+    const sourceSnapshot = {
+      sourceFamilyId: "kaikki-albanian-jsonl-v0.1",
+      sourceUrl: "https://kaikki.org/dictionary/Albanian/kaikki.org-dictionary-Albanian.jsonl",
+      sha256: "7a84eca776ebfac752e7251bb0822edc9cd1701d1d58060d4f8ef4b76a208fcc",
+      bytes: 67438537,
+    };
+    const exactSourceFact = {
+      sourceRecordId,
+      entryLocator: "jsonl://word/zjarrfikës/match/0",
+      physicalRecordOrdinal: 0,
+      language: "Albanian" as const,
+      languageCode: "sq" as const,
+      form: "zjarrfikës",
+      partOfSpeech: "noun",
+      senses: [{ senseId: "zjarrfikës-test-sense", glosses: ["firefighter"] }],
+      ipaObservations: [],
+      sourceStatus: "observed_external_snapshot" as const,
+      attestationTruth: "fact" as const,
+      pronunciationAuthority: "CURRENT_KAIKKI_RECORD_ONLY_UNBOUND_TO_FROZEN_PROFILE" as const,
+      sourceSnapshot,
+    };
+    const claimBoundary =
+      "Source facts and derived structure remain separate from functional meaning; no morphology, etymology, causation, or Voice semantics is asserted.";
+    const reading: AlbanianLexicalReadingV0_1 = {
+      status: "SUPPORTED",
+      primarySourceFact: {
+        sourceRecordId,
+        entryLocator: exactSourceFact.entryLocator,
+        form: exactSourceFact.form,
+        partOfSpeech: exactSourceFact.partOfSpeech,
+        meaningGlosses: ["firefighter"],
+        etymologyText: null,
+      },
+      sourcePronunciation: null,
+      relatedForms: [],
+      relatedCandidateEvaluations: [],
+      functionalFamilyReading: null,
+      sourceLinkedComponentReading: null,
+      sourceLinkedComparison: null,
+      functionalMeaningBridge: {
+        status: "NULL",
+        truthLayers: ["UNKNOWN_OR_NULL"],
+        relatedForm: null,
+        sourceFacts: null,
+        derivedStructure: null,
+        functionalHypothesis: {
+          status: "UNKNOWN_OR_NULL",
+          functionalOperation: null,
+          statement: null,
+          alternatives: [],
+          basis: [],
+          claimBoundary,
+        },
+        reasonCodes: [
+          "SOURCE_LINKED_RELATION_NOT_SUPPORTED",
+          "DERIVED_STRUCTURE_NOT_SUPPORTED_FOR_BOTH_RECORDS",
+        ],
+        claimBoundary,
+      },
+      composition: {
+        status: "NULL",
+        relatedForm: null,
+        sourceRelation: {
+          status: "SOURCE_RELATION_NOT_VERIFIED",
+          sourceRecordId: null,
+          entryLocator: null,
+          evidenceText: null,
+        },
+        primaryStructure: null,
+        relatedStructure: null,
+        interpretation: {
+          status: "UNKNOWN_OR_NULL",
+          statement: null,
+          alternatives: [],
+          basis: [],
+          claimBoundary,
+        },
+      },
+      interpretation: {
+        status: "UNKNOWN_OR_NULL",
+        statement: null,
+        alternatives: [],
+        basis: [],
+        claimBoundary,
+      },
+    };
+    const value = model({
+      inputWord: "zjarrfikës",
+      inputLanguage: "sq",
+      inputProfile: "albanian",
+      exactLexicalSourceStatus: {
+        status: "MATCHES_FOUND",
+        queryForm: "zjarrfikës",
+        reasonCode: null,
+      },
+      exactLexicalSourceFacts: [exactSourceFact],
+      albanianLexicalReading: reading,
+    });
+
+    render(<MotivationDiscoveryCardV0_1 discovery={{ kind: "present", value }} />);
+
+    const discoveryCard = screen.getByTestId("motivation-discovery-card");
+    expect(discoveryCard).toHaveClass("min-w-0", "[overflow-wrap:anywhere]");
+    const candidateCard = screen.getAllByTestId("motivation-discovery-candidate")[0];
+    expect(candidateCard).toHaveClass("min-w-0", "[overflow-wrap:anywhere]");
+    expect(candidateCard.querySelector("dl")).toHaveClass("min-w-0", "grid-cols-1");
+    expect(
+      discoveryCard.querySelector('[data-testid="motivation-derived-structure-details"] > .mt-2.grid'),
+    ).toHaveClass("min-w-0", "grid-cols-1");
+
+    const bridge = screen.getByTestId("albanian-functional-meaning-bridge-null");
+    expect(bridge.textContent).toBe(
+      "UNKNOWN_OR_NULL — no classified functional bridge was established. Reasons: SOURCE_LINKED_RELATION_NOT_SUPPORTED, DERIVED_STRUCTURE_NOT_SUPPORTED_FOR_BOTH_RECORDS.",
+    );
+    expect(bridge).toHaveClass("min-w-0", "[overflow-wrap:anywhere]");
+    expect(bridge).not.toHaveClass("truncate", "overflow-hidden");
+    expect(screen.getByTestId("albanian-reading-meaning")).toHaveTextContent("firefighter");
+    expect(screen.getByText("SELECTED PRIMARY SOURCE RECORD")).toBeVisible();
+    expect(screen.getByText("Source record: " + sourceRecordId + " · " + exactSourceFact.entryLocator)).toBeVisible();
+    expect(reading.functionalMeaningBridge.status).toBe("NULL");
+    expect(reading.interpretation.status).toBe("UNKNOWN_OR_NULL");
+    expect(screen.queryByTestId("albanian-reading-functional-bridge")).not.toBeInTheDocument();
+  });
+
   it("offers an explicit action for an alternative Albanian source record with its identity and gloss", () => {
     const sourceSnapshot = {
       sourceFamilyId: "kaikki-albanian-jsonl-v0.1",
