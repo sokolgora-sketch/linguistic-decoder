@@ -10,6 +10,10 @@ import {
 export const ANALYSIS_STATUS_SCHEMA_VERSION_V0_2 =
   "open-instrument.analysis-status.v0_2" as const;
 
+function hasLegacySelectionPolicyText(value: string): boolean {
+  return /\b(?:no single winner|no winner|winner claims? remain unclaimed|winner claim)\b|no_single_winner/i.test(value);
+}
+
 export type AnalysisStatusV0_2 = Omit<
   AnalysisStatusV0_1,
   "schemaVersion" | "claimBoundary"
@@ -61,10 +65,7 @@ export function migrateAnalysisStatusV0_1ToV0_2(
     boundary as AnalysisStatusV0_1["claimBoundary"];
   const migrated: AnalysisStatusV0_2 = {
     ...rest,
-    summary: (legacy.summary as string).replace(
-      "This is functional evidence, not a historical-origin or winner claim.",
-      "This is functional evidence, not historical-origin evidence. Multiple interpretations may coexist; automatic interpretation selection is disabled. User decides.",
-    ),
+    summary: legacy.summary as string,
     schemaVersion: ANALYSIS_STATUS_SCHEMA_VERSION_V0_2,
     claimBoundary,
     interpretationDecisionPolicy: INTERPRETATION_DECISION_POLICY_V0_1,
@@ -120,7 +121,7 @@ export function isAnalysisStatusV0_2(value: unknown): value is AnalysisStatusV0_
   return (
     status.schemaVersion === ANALYSIS_STATUS_SCHEMA_VERSION_V0_2 &&
     typeof status.status === "string" && allowedStatuses.has(status.status) &&
-    typeof status.summary === "string" &&
+    typeof status.summary === "string" && !hasLegacySelectionPolicyText(status.summary) &&
     Array.isArray(status.reviewedOperators) &&
     status.reviewedOperators.every((item) => typeof item === "string") &&
     Array.isArray(status.candidateOnlyOperators) &&

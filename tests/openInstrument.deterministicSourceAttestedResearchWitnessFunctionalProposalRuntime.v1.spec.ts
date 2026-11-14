@@ -60,7 +60,7 @@ describe(
       for (const word of ["study", "damage", "father"]) {
         const body = await analyze(word);
         expect(sourceAttestedCandidates(body)).toEqual([]);
-        expect(body.analysisStatusV0_1.status).toBe(
+        expect(body.analysisStatusV0_2.status).toBe(
           "reviewed_functional_evidence",
         );
       }

@@ -211,7 +211,7 @@ describe("Open Instrument real evidence-packet compiler pilot v0.1", () => {
     for (const target of PILOT_TARGETS_V0_1) {
       expect(PRE_PILOT_NULL_TARGETS_V0_1.has(target.targetWord)).toBe(true);
       const body = await analyzeV0_1(target.targetWord);
-      const status = (body.analysisStatusV0_1 as Record<string, unknown>).status;
+      const status = (body.analysisStatusV0_2 as Record<string, unknown>).status;
       expect(status as AnalysisStatusCodeV0_1).toBe(
         target.targetWord === "order"
           ? "null_no_supported_candidate"
@@ -238,7 +238,7 @@ describe("Open Instrument real evidence-packet compiler pilot v0.1", () => {
     for (const word of controls) {
       const body = await analyzeV0_1(word);
       expect(
-        (body.analysisStatusV0_1 as Record<string, unknown>).status,
+        (body.analysisStatusV0_2 as Record<string, unknown>).status,
       ).toBe("null_no_supported_candidate");
       expect(researchCandidatesV0_1(body)).toEqual([]);
     }
@@ -246,7 +246,7 @@ describe("Open Instrument real evidence-packet compiler pilot v0.1", () => {
     for (const word of ["justice", "drink", "stone"]) {
       const body = await analyzeV0_1(word);
       expect(
-        (body.analysisStatusV0_1 as Record<string, unknown>).status,
+        (body.analysisStatusV0_2 as Record<string, unknown>).status,
       ).toBe("candidate_only");
       expect(researchCandidatesV0_1(body)).toEqual([]);
     }

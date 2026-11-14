@@ -9,6 +9,7 @@ import {
   isInterpretationDecisionPolicyV0_1,
 } from "@/shared/openInstrument/interpretationDecisionPolicy.v0_1";
 import { hasLegacyInterpretationFieldsV2, projectNeutralInterpretationNodeV2 } from "@/shared/analyzeWordResult.v2.contract";
+import { migrateLegacyInterpretationTextAtInputV0_1 } from "@/shared/openInstrument/neutralInterpretationInputMigration.v0_1";
 import {
   buildEvidencePackageExportV0_1,
 } from "@/shared/openInstrument/evidencePackageExport.v0_1";
@@ -88,7 +89,10 @@ export function buildEvidencePackageExportV0_2(
       !Array.isArray(legacyStatus) && (legacyStatus as Record<string, unknown>).kind === "present"
       ? (legacyStatus as Record<string, unknown>).value
       : undefined;
-    const migrated = migrateLegacyStatus(oldValue);
+    const migratedInput = migrateLegacyInterpretationTextAtInputV0_1({
+      analysisStatusV0_1: oldValue,
+    }) as Record<string, unknown>;
+    const migrated = migrateLegacyStatus(migratedInput.analysisStatusV0_1);
     if (migrated) output.analysisStatusV0_2 = migrated;
   }
 

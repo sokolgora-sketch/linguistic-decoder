@@ -287,7 +287,7 @@ describe("Motivation Discovery Lab presentation v0.1", () => {
     );
     const vm = adaptAnalysisToTelemetryVM(await response.json());
 
-    render(<MotivationDiscoveryCardV0_1 discovery={vm.motivationDiscoveryV0_1} />);
+    render(<MotivationDiscoveryCardV0_1 discovery={vm.motivationDiscoveryV0_2} />);
 
     expect(screen.getByText("amo")).toBeInTheDocument();
     expect(screen.getByText("Latin")).toBeInTheDocument();
@@ -552,7 +552,7 @@ describe("Motivation Discovery Lab presentation v0.1", () => {
     delete math7.principlesPath;
 
     const vm = adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: malformed });
-    expect(vm.motivationDiscoveryV0_1).toMatchObject({
+    expect(vm.motivationDiscoveryV0_2).toMatchObject({
       kind: "missing",
       missing: "malformed",
     });
@@ -565,7 +565,7 @@ describe("Motivation Discovery Lab presentation v0.1", () => {
     comparison.candidateConsonantalStructure = "malformed";
 
     const vm = adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: malformed });
-    expect(vm.motivationDiscoveryV0_1).toMatchObject({
+    expect(vm.motivationDiscoveryV0_2).toMatchObject({
       kind: "missing",
       missing: "malformed",
     });
@@ -580,7 +580,7 @@ describe("Motivation Discovery Lab presentation v0.1", () => {
     events[0]!.sourcePosition = 99;
 
     const vm = adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: malformed });
-    expect(vm.motivationDiscoveryV0_1).toMatchObject({
+    expect(vm.motivationDiscoveryV0_2).toMatchObject({
       kind: "missing",
       missing: "malformed",
     });
@@ -592,8 +592,8 @@ describe("Motivation Discovery Lab presentation v0.1", () => {
     delete derived.voicePathProvenance;
     const vm = adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: legacy });
 
-    expect(vm.motivationDiscoveryV0_1.kind).toBe("present");
-    render(<MotivationDiscoveryCardV0_1 discovery={vm.motivationDiscoveryV0_1} />);
+    expect(vm.motivationDiscoveryV0_2.kind).toBe("present");
+    render(<MotivationDiscoveryCardV0_1 discovery={vm.motivationDiscoveryV0_2} />);
     expect(screen.getByTestId("motivation-written-voice-path")).toHaveTextContent(
       "Written sequence unavailable in this payload.",
     );
@@ -695,18 +695,18 @@ describe("Motivation Discovery Lab presentation v0.1", () => {
         new Request(`http://localhost/api/analyze-v1?word=${encodeURIComponent(word)}&mode=strict&alphabet=auto`),
       );
       const vm = adaptAnalysisToTelemetryVM(await response.json());
-      if (vm.motivationDiscoveryV0_1.kind !== "present") {
+      if (vm.motivationDiscoveryV0_2.kind !== "present") {
         throw new Error(`missing Discovery VM for ${word}`);
       }
-      expect(vm.motivationDiscoveryV0_1.value.candidates.every(
+      expect(vm.motivationDiscoveryV0_2.value.candidates.every(
         (candidate) => typeof candidate.sourceFact.sourceFamilyId === "string",
       )).toBe(true);
 
       const primaryWitnesses = aggregateMotivationDiscoveryCandidatesV0_1(
-        vm.motivationDiscoveryV0_1.value.candidates,
+        vm.motivationDiscoveryV0_2.value.candidates,
       );
       const metrics = measureMotivationDiscoveryAggregationV0_1(
-        vm.motivationDiscoveryV0_1.value.candidates,
+        vm.motivationDiscoveryV0_2.value.candidates,
         primaryWitnesses,
       );
       console.info("DISCOVERY_AGGREGATION_REGRESSION", word, metrics);

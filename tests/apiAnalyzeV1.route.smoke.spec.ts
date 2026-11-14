@@ -24,6 +24,65 @@ import {
   buildMotivationEngineDiscoveryServerOnlyV0_1,
   type EnglishKaikkiServerOnlyExactIndexProviderV0_1,
 } from "@/shared/openInstrument/motivationEngineDiscoveryServerOnly.v0_1";
+import { adaptAnalysisToTelemetryVM } from "@/ui/instrument/contractAdapter";
+import { isInterpretationDecisionPolicyV0_1 } from "@/shared/openInstrument/interpretationDecisionPolicy.v0_1";
+
+const LEGACY_SELECTION_KEYS = new Set([
+  "analysisStatusV0_1",
+  "functionalMotivationInterpretationV0_2",
+  "motivationDiscoveryV0_1",
+  "winnerClaim",
+  "noSingleWinner",
+  "candidateWinnerIndependent",
+]);
+
+function legacySelectionPaths(value: unknown, path: string[] = []): string[] {
+  if (Array.isArray(value)) {
+    return value.flatMap((item, index) => legacySelectionPaths(item, [...path, String(index)]));
+  }
+  if (value === null || typeof value !== "object") return [];
+  return Object.entries(value).flatMap(([key, child]) => {
+    const current = [...path, key];
+    const keyIsLegacy = LEGACY_SELECTION_KEYS.has(key) ||
+      ((key === "policy" || key === "mode") && child === "no_single_winner");
+    return [
+      ...(keyIsLegacy ? [current.join(".")] : []),
+      ...legacySelectionPaths(child, current),
+    ];
+  });
+}
+
+function legacyInterpretationTextPaths(value: unknown, path: string[] = []): string[] {
+  if (Array.isArray(value)) {
+    return value.flatMap((item, index) => legacyInterpretationTextPaths(item, [...path, String(index)]));
+  }
+  if (typeof value === "string") {
+    return /\b(?:winner|no_single_winner)\b/i.test(value) ? [path.join(".")] : [];
+  }
+  if (value === null || typeof value !== "object") return [];
+  return Object.entries(value).flatMap(([key, child]) =>
+    legacyInterpretationTextPaths(child, [...path, key]),
+  );
+}
+
+function expectNeutralActiveResponse(payload: any) {
+  expect(payload.responseContractVersion).toBe("open-instrument.analyze-word-result.v2");
+  expect(legacySelectionPaths(payload)).toEqual([]);
+  expect(legacyInterpretationTextPaths(payload)).toEqual([]);
+  expect(isInterpretationDecisionPolicyV0_1(payload.interpretationDecisionPolicyV0_1)).toBe(true);
+  expect(isInterpretationDecisionPolicyV0_1(payload.analysisStatusV0_2.interpretationDecisionPolicy)).toBe(true);
+  if (payload.motivationDiscoveryV0_2) {
+    expect(payload.motivationDiscoveryV0_2.schemaVersion).toBe("open-instrument.motivation-engine-discovery.v0_2");
+    expect(isInterpretationDecisionPolicyV0_1(payload.motivationDiscoveryV0_2.interpretationDecisionPolicy)).toBe(true);
+    expect(Array.isArray(payload.motivationDiscoveryV0_2.candidates)).toBe(true);
+  }
+  if (payload.functionalMotivationInterpretationV0_3) {
+    expect(isInterpretationDecisionPolicyV0_1(
+      payload.functionalMotivationInterpretationV0_3.interpretationDecisionPolicy,
+    )).toBe(true);
+    expect(Array.isArray(payload.functionalMotivationInterpretationV0_3.candidates)).toBe(true);
+  }
+}
 
 const buildDiscoveryMock = jest.mocked(
   buildMotivationEngineDiscoveryServerOnlyV0_1,
@@ -77,6 +136,7 @@ describe("/api/analyze-v1 (adapter) — smoke", () => {
     expect(json.responseContractVersion).toBe("open-instrument.analyze-word-result.v2");
     expect(json).not.toHaveProperty("analysisStatusV0_1");
     expect(json).not.toHaveProperty("functionalMotivationInterpretationV0_2");
+    expectNeutralActiveResponse(json);
     expect(res.headers.get("X-Analyze-Response-Contract")).toBe("open-instrument.analyze-word-result.v2");
     expect(res.headers.get("Deprecation")).toBe("true");
     expect(res.headers.get("Link")).toBe("</api/analyze-v2>; rel=\"successor-version\"");
@@ -93,6 +153,16 @@ describe("/api/analyze-v1 (adapter) — smoke", () => {
     expect(payload.analysisStatusV0_2).toBeDefined();
     expect(payload).not.toHaveProperty("analysisStatusV0_1");
     expect(payload).not.toHaveProperty("functionalMotivationInterpretationV0_2");
+    expectNeutralActiveResponse(payload);
+    const vm = adaptAnalysisToTelemetryVM(payload);
+    expect(vm).not.toHaveProperty("analysisStatusV0_1");
+    expect(vm).not.toHaveProperty("motivationDiscoveryV0_1");
+    expect(vm).not.toHaveProperty("functionalMotivationInterpretationV0_2");
+    expect(vm.raw).toEqual(expect.not.objectContaining({ analysisStatusV0_1: expect.anything() }));
+    expect(legacySelectionPaths(vm.raw)).toEqual([]);
+    expect(vm.analysisStatusV0_2?.kind).toBe("present");
+    expect(vm.motivationDiscoveryV0_2?.kind).toBe("present");
+    expect(vm.functionalMotivationInterpretationV0_3?.kind).toBe("present");
     expect(response.headers.get("Deprecation")).toBeNull();
     expect(response.headers.get("Link")).toBeNull();
     expect(response.headers.get("X-Analyze-Response-Contract")).toBe("open-instrument.analyze-word-result.v2");

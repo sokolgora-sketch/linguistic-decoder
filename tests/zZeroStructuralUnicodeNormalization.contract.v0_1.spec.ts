@@ -80,7 +80,7 @@ describe(
 
         expect(
           body
-            .analysisStatusV0_1
+            .analysisStatusV0_2
             .status,
         ).toBe(
           "null_no_supported_candidate",
@@ -88,7 +88,7 @@ describe(
 
         expect(
           body
-            .analysisStatusV0_1
+            .analysisStatusV0_2
             .structuralTokens,
         ).toEqual([]);
 
@@ -129,7 +129,7 @@ describe(
 
         expect(
           body
-            .analysisStatusV0_1
+            .analysisStatusV0_2
             .status,
         ).toBe(
           "reviewed_functional_evidence",
@@ -137,7 +137,7 @@ describe(
 
         expect(
           body
-            .analysisStatusV0_1
+            .analysisStatusV0_2
             .reviewedOperators,
         ).toContain("DI");
       },

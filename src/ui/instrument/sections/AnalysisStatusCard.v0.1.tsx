@@ -2,7 +2,6 @@
 
 import type {
   AnalysisStatusCodeV0_1,
-  AnalysisStatusV0_1VM,
   AnalysisStatusV0_2VM,
   PresentOrMissing,
 } from "@/ui/telemetry/types";
@@ -37,7 +36,7 @@ export function AnalysisStatusCardV0_1({
   variant = "full",
   scopeLabel = "Analysis status",
 }: {
-  status: PresentOrMissing<AnalysisStatusV0_1VM | AnalysisStatusV0_2VM>;
+  status: PresentOrMissing<AnalysisStatusV0_2VM>;
   variant?: AnalysisStatusCardVariantV0_1;
   scopeLabel?: string;
 }) {

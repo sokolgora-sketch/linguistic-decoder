@@ -160,7 +160,7 @@ describe("Open Instrument SCALE-50 Cohort G v0.1", () => {
       }
 
       const body = await analyzeV0_1(target.targetWord);
-      const status = (body.analysisStatusV0_1 as Record<string, unknown>).status;
+      const status = (body.analysisStatusV0_2 as Record<string, unknown>).status;
       expect(status as AnalysisStatusCodeV0_1).not.toBe("research_functional_hypothesis");
 
       const candidates = researchCandidatesV0_1(body);
@@ -180,14 +180,14 @@ describe("Open Instrument SCALE-50 Cohort G v0.1", () => {
   it("keeps justice out of research and preserves true Null controls", async () => {
     const justice = await analyzeV0_1("justice");
     expect(
-      (justice.analysisStatusV0_1 as Record<string, unknown>).status,
+      (justice.analysisStatusV0_2 as Record<string, unknown>).status,
     ).toBe("candidate_only");
     expect(researchCandidatesV0_1(justice)).toEqual([]);
 
     for (const word of ["wind"]) {
       const body = await analyzeV0_1(word);
       expect(
-        (body.analysisStatusV0_1 as Record<string, unknown>).status,
+        (body.analysisStatusV0_2 as Record<string, unknown>).status,
       ).toBe("null_no_supported_candidate");
       expect(researchCandidatesV0_1(body)).toEqual([]);
     }

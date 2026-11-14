@@ -79,7 +79,7 @@ describe("Open Instrument Seven-Voices doctrine reading UI v0.1", () => {
     expect(adaptAnalysisToTelemetryVM({ word: "x", doctrineReading: "bad" }).doctrineReading).toEqual({
       kind: "missing",
       missing: "malformed",
-      note: "doctrineReading expected the public V1 shape",
+      note: "doctrineReading v2 contract",
     });
     expect(adaptAnalysisToTelemetryVM({ word: "123", doctrineReading: null }).doctrineReading).toEqual({
       kind: "present",
@@ -103,7 +103,7 @@ describe("Open Instrument Seven-Voices doctrine reading UI v0.1", () => {
     expect(adaptAnalysisToTelemetryVM(malformed).doctrineReading).toEqual({
       kind: "missing",
       missing: "malformed",
-      note: "doctrineReading expected the public V1 shape",
+      note: "doctrineReading v2 contract",
     });
   });
 
@@ -115,13 +115,13 @@ describe("Open Instrument Seven-Voices doctrine reading UI v0.1", () => {
     expect(adaptAnalysisToTelemetryVM(malformed).doctrineReading).toEqual({
       kind: "missing",
       missing: "malformed",
-      note: "doctrineReading expected the public V1 shape",
+      note: "doctrineReading v2 contract",
     });
   });
 
   it("keeps pronunciation Null distinct from Evidence Null for wind", async () => {
     const body = await analyze("wind");
-    expect(body.analysisStatusV0_1.status).toBe("null_no_supported_candidate");
+    expect(body.analysisStatusV0_2.status).toBe("null_no_supported_candidate");
     expect(body.candidates).toEqual([]);
     expect(body.doctrineReading).toBeNull();
 

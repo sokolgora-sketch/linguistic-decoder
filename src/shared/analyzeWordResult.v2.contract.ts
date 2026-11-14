@@ -17,10 +17,19 @@ import {
   isInterpretationDecisionPolicyV0_1,
 } from "./openInstrument/interpretationDecisionPolicy.v0_1";
 import { migrateOriginClaimV1ToV0_2, isOriginClaimV0_2 } from "./originClaim.v2";
+import { migrateLegacyInterpretationTextAtInputV0_1 } from "./openInstrument/neutralInterpretationInputMigration.v0_1";
 import {
-  migrateLegacyInterpretationTextAtInputV0_1,
-  migrateLegacyReviewedEvidenceLineAtInputV0_1,
-} from "./openInstrument/neutralInterpretationInputMigration.v0_1";
+  isMotivationEngineDiscoveryV0_2,
+  toMotivationEngineDiscoveryV0_2,
+} from "./openInstrument/motivationEngineDiscovery.v0_2";
+import {
+  isWordSpecificFunctionalDepthV0_2,
+  toWordSpecificFunctionalDepthV0_2,
+} from "./openInstrument/wordSpecificFunctionalDepth.v0_2";
+import {
+  isDoctrineReadingV2,
+  toDoctrineReadingV2,
+} from "./openInstrument/doctrineReadingContract.v2";
 
 export const ANALYZE_WORD_RESULT_SCHEMA_VERSION_V2 =
   "open-instrument.analyze-word-result.v2" as const;
@@ -76,6 +85,7 @@ const neutralResultBase = AnalyzeWordResultV1ContractSchema.omit({
   functionalMotivationInterpretationV0_2: true,
   originClaim: true,
   wordSpecificFunctionalDepth: true,
+  doctrineReading: true,
 }).extend({
   responseContractVersion: z.literal(ANALYZE_WORD_RESULT_SCHEMA_VERSION_V2),
   analysisStatusV0_2: z.unknown().refine(
@@ -94,13 +104,23 @@ const neutralResultBase = AnalyzeWordResultV1ContractSchema.omit({
     (value) => value === undefined || isOriginClaimV0_2(value),
     "origin claim v0.2 contract invalid",
   ).optional(),
-  wordSpecificFunctionalDepth: z.unknown().nullable().optional(),
-  motivationDiscoveryV0_2: z.unknown().optional(),
+  wordSpecificFunctionalDepth: z.unknown().nullable().optional().refine(
+    (value) => value === undefined || value === null || isWordSpecificFunctionalDepthV0_2(value),
+    "word-specific functional depth v0.2 contract invalid",
+  ),
+  doctrineReading: z.unknown().nullable().optional().refine(
+    (value) => value === undefined || value === null || isDoctrineReadingV2(value),
+    "doctrine reading v2 contract invalid",
+  ),
   evidencePackage: z.unknown().optional(),
   automaticCarrierPronunciationV0_1: z.unknown().optional(),
   frontier: z.array(z.unknown()).optional(),
   history: z.unknown().optional(),
   engineMeta: z.unknown().optional(),
+  motivationDiscoveryV0_2: z.unknown().optional().refine(
+    (value) => value === undefined || isMotivationEngineDiscoveryV0_2(value),
+    "motivation discovery v0.2 contract invalid",
+  ),
 }).passthrough();
 
 export const AnalyzeWordResultV2ContractSchema = neutralResultBase.superRefine(
@@ -121,31 +141,25 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 }
 
 function projectNeutralNode(value: unknown, path: readonly string[] = []): unknown {
-  if (Array.isArray(value)) return value.map((item) => projectNeutralNode(item, path));
+  if (Array.isArray(value)) {
+    let projectedItems: unknown[] | null = null;
+    for (let index = 0; index < value.length; index += 1) {
+      const original = value[index];
+      const projected = projectNeutralNode(original, path);
+      if (projected !== original) {
+        projectedItems ??= value.slice();
+        projectedItems[index] = projected;
+      }
+    }
+    return projectedItems ?? value;
+  }
   if (typeof value === "string") {
-    const parentKey = path[path.length - 1];
-    const ownerKey = path[path.length - 2];
-    // Only known generated policy fields are migrated. Target spellings,
-    // source identifiers, citations, glosses and user claims remain exact.
-    if (
-      (parentKey === "summary" && ownerKey === "analysisStatusV0_1") ||
-      (parentKey === "claimBoundary" && path.includes("candidates")) ||
-      ((parentKey === "gloss" || parentKey === "notes") &&
-        path.includes("deepRoot") && path.includes("functionalRoots"))
-    ) {
-      return migrateLegacyInterpretationTextAtInputV0_1(value);
-    }
-    if (
-      parentKey === "evidenceText" &&
-      value.toLocaleLowerCase("en-US").startsWith("reviewed functional free-operator evidence:")
-    ) {
-      return migrateLegacyReviewedEvidenceLineAtInputV0_1(value);
-    }
     return value;
   }
   if (!isRecord(value)) return value;
 
-  const output: Record<string, unknown> = {};
+  let output: Record<string, unknown> | null = null;
+  const ensureOutput = () => (output ??= { ...value });
   let replacedSelectionGuard = false;
   for (const [key, child] of Object.entries(value)) {
     if (
@@ -156,40 +170,50 @@ function projectNeutralNode(value: unknown, path: readonly string[] = []): unkno
       key === "candidateWinnerIndependent"
     ) {
       replacedSelectionGuard = true;
+      delete ensureOutput()[key];
       continue;
     }
     if ((key === "policy" || key === "mode") && child === "no_single_winner") {
       replacedSelectionGuard = true;
+      delete ensureOutput()[key];
       continue;
     }
-    if (key === "motivationDiscoveryV0_1" && isRecord(child)) {
-      const projected = projectNeutralNode(child, [...path, key]) as Record<string, unknown>;
-      projected.schemaVersion = "open-instrument.motivation-engine-discovery.v0_2";
-      output.motivationDiscoveryV0_2 = projected;
+    if (key === "motivationDiscoveryV0_1") {
+      const versioned = isRecord(child) ? toMotivationEngineDiscoveryV0_2(child) : null;
+      const target = ensureOutput();
+      delete target[key];
+      if (versioned) target.motivationDiscoveryV0_2 = versioned;
       continue;
     }
-    output[key] = projectNeutralNode(child, [...path, key]);
+    if (key === "wordSpecificFunctionalDepth" && child !== null) {
+      const versioned = toWordSpecificFunctionalDepthV0_2(child);
+      if (versioned) ensureOutput()[key] = versioned;
+      else ensureOutput()[key] = projectNeutralNode(child, [...path, key]);
+      continue;
+    }
+    if (key === "doctrineReading" && child !== null) {
+      const versioned = toDoctrineReadingV2(child);
+      if (versioned) ensureOutput()[key] = versioned;
+      else ensureOutput()[key] = projectNeutralNode(child, [...path, key]);
+      continue;
+    }
+    const projected = projectNeutralNode(child, [...path, key]);
+    if (projected !== child) ensureOutput()[key] = projected;
   }
 
   const parentKey = path[path.length - 1];
   if (parentKey === "originClaim" || value.policy === "no_single_winner") {
     const migrated = migrateOriginClaimV1ToV0_2({
-      ...output,
+      ...(output ?? value),
       version: value.version,
       policy: value.policy,
     });
     if (migrated) return migrated;
   }
-  if (parentKey === "wordSpecificFunctionalDepth" && typeof output.schemaVersion === "string") {
-    output.schemaVersion = "open-instrument.word-specific-functional-depth.v0_2";
-  }
-  if (parentKey === "doctrineReading" && typeof output.schemaVersion === "string") {
-    output.schemaVersion = "open-instrument.doctrine-reading.v2";
-  }
   if (replacedSelectionGuard) {
-    output.interpretationDecisionPolicy = INTERPRETATION_DECISION_POLICY_V0_1;
+    ensureOutput().interpretationDecisionPolicy = INTERPRETATION_DECISION_POLICY_V0_1;
   }
-  return output;
+  return output ?? value;
 }
 
 /** Versioned neutral projection for legacy input records and export adapters. */
@@ -239,9 +263,32 @@ export function toAnalyzeWordResultV2Contract(input: unknown): AnalyzeWordResult
   if (isFunctionalMotivationInterpretationV0_3(interpretation)) {
     projected.functionalMotivationInterpretationV0_3 = interpretation;
   }
+  if (isRecord(input.motivationDiscoveryV0_2)) {
+    const discovery = toMotivationEngineDiscoveryV0_2(input.motivationDiscoveryV0_2);
+    if (discovery) projected.motivationDiscoveryV0_2 = discovery;
+  }
   if (originClaim) projected.originClaim = originClaim;
 
   return AnalyzeWordResultV2ContractSchema.parse(projected);
+}
+
+/**
+ * Migrate a previously stored V1 Analyze record at its explicit input boundary.
+ * Active engine output must use toAnalyzeWordResultV2Contract directly so
+ * generated policy text is validated, not rewritten during response building.
+ */
+export function migrateLegacyAnalyzeWordResultInputV2(
+  input: unknown,
+): AnalyzeWordResultV2Contract {
+  if (
+    isRecord(input) &&
+    input.responseContractVersion === ANALYZE_WORD_RESULT_SCHEMA_VERSION_V2
+  ) {
+    return toAnalyzeWordResultV2Contract(input);
+  }
+  return toAnalyzeWordResultV2Contract(
+    migrateLegacyInterpretationTextAtInputV0_1(input),
+  );
 }
 
 export function hasLegacyInterpretationFieldsV2(value: unknown): boolean {

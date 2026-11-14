@@ -4,11 +4,38 @@ import React from "react";
 import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 
 import ZroChatPage from "@/components/ZroChatPage";
+import { INTERPRETATION_DECISION_POLICY_V0_1 } from "@/shared/openInstrument/interpretationDecisionPolicy.v0_1";
+
+function statusValue(status: "candidate_only" | "null_no_supported_candidate") {
+  return {
+    schemaVersion: "open-instrument.analysis-status.v0_2",
+    status,
+    summary: status === "null_no_supported_candidate"
+      ? "No supported canonical candidate is available. Null is a valid result."
+      : "Status remains bounded to its existing contract.",
+    reviewedOperators: [],
+    candidateOnlyOperators: [],
+    researchHypothesisEmbryos: [],
+    structuralTokens: [],
+    claimBoundary: {
+      historicalOriginClaim: "not_claimed",
+      historicalTransmissionClaim: "not_claimed",
+      languageSuperiorityClaim: "not_claimed",
+      linguisticOwnershipClaim: "not_claimed",
+      candidateTruthClaim: "not_claimed",
+      structuralOutputIsCandidateTruth: false,
+      nullIsValid: true,
+    },
+    userDecisionPosture: "user_decides",
+    interpretationDecisionPolicy: INTERPRETATION_DECISION_POLICY_V0_1,
+  } as const;
+}
 
 const fetchMock = jest.fn();
 global.fetch = fetchMock as unknown as typeof fetch;
 
 const SUCCESS_RESULT = {
+  responseContractVersion: "open-instrument.analyze-word-result.v2",
   word: "candle",
   mode: "strict",
   alphabet: "auto",
@@ -22,41 +49,18 @@ const SUCCESS_RESULT = {
   evidence: {},
   candidates: [],
   rootMap: { tokens: [], keys: [], carriers: [], spans: [], composedMeaning: "" },
-  originClaim: {
-    policy: "no_single_winner",
-    gatesActive: false,
-    summary: { confidence: "weak", note: "request-context test payload" },
-    candidates: [],
-  },
+  analysisStatusV0_2: statusValue("candidate_only"),
+  interpretationDecisionPolicyV0_1: INTERPRETATION_DECISION_POLICY_V0_1,
 };
 
 const NULL_RESULT = {
   ...SUCCESS_RESULT,
-  analysisStatusV0_1: {
-    schemaVersion: "open-instrument.analysis-status.v0_1",
-    status: "null_no_supported_candidate",
-    summary: "No supported canonical candidate is available. Null is a valid result.",
-    reviewedOperators: [],
-    candidateOnlyOperators: [],
-    researchHypothesisEmbryos: [],
-    structuralTokens: [],
-    claimBoundary: {
-      historicalOriginClaim: "not_claimed",
-      historicalTransmissionClaim: "not_claimed",
-      winnerClaim: "not_claimed",
-      languageSuperiorityClaim: "not_claimed",
-      linguisticOwnershipClaim: "not_claimed",
-      candidateTruthClaim: "not_claimed",
-      structuralOutputIsCandidateTruth: false,
-      nullIsValid: true,
-    },
-    userDecisionPosture: "user_decides",
-  },
+  analysisStatusV0_2: statusValue("null_no_supported_candidate"),
 };
 
 function mockSuccessfulFetch(result = SUCCESS_RESULT) {
   (global.fetch as jest.Mock).mockImplementation((input: RequestInfo | URL) => {
-    if (String(input).includes("/api/analyze-v1?")) {
+    if (String(input).includes("/api/analyze-v2?")) {
       return Promise.resolve({
         ok: true,
         status: 200,
@@ -158,7 +162,7 @@ describe("Open Instrument target-sense result context v0.1", () => {
   it("does not pair a failed new request with the previous successful context", async () => {
     let analyzeCalls = 0;
     (global.fetch as jest.Mock).mockImplementation((input: RequestInfo | URL) => {
-      if (!String(input).includes("/api/analyze-v1?")) {
+      if (!String(input).includes("/api/analyze-v2?")) {
         return Promise.resolve({ ok: false, status: 404, json: async () => ({}) } as Response);
       }
 

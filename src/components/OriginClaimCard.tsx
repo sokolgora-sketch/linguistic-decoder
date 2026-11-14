@@ -23,7 +23,7 @@ function toFlatText(v: unknown): string {
 
 function policySummary(policy: any): string {
   if (typeof policy === "string") {
-    return policy.replace(/_/g, " ");
+    return "Interpretation policy unavailable";
   }
   if (!policy || typeof policy !== "object") return toFlatText(policy);
   if (policy.automaticInterpretationSelection === "DISABLED") {

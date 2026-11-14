@@ -3,8 +3,9 @@ export type Mode = "strict" | "open";
 import type { RootMapV1 } from "@/shared/deepRoot.rootMap.v1";
 import type { DeepRootHeartGateV01 } from "@/shared/deepRootHeartGate.v0.1";
 import type { GenericFunctionalWitnessRuntimeProjectionV1 } from "@/shared/openInstrument/genericFunctionalWitnessRuntimeProjection.v1";
-import type { WordSpecificFunctionalDepthV0_1 } from "@/shared/openInstrument/wordSpecificFunctionalDepth.v0_1";
-import type { DoctrineReadingV1 } from "@/shared/openInstrument/doctrineReadingContract.v1";
+import type { WordSpecificFunctionalDepthV0_2 } from "@/shared/openInstrument/wordSpecificFunctionalDepth.v0_2";
+import type { DoctrineReadingV2 } from "@/shared/openInstrument/doctrineReadingContract.v2";
+import type { NeutralInterpretationSelectionV0_2 } from "@/shared/openInstrument/neutralInterpretationProjection.v0_2";
 import type {
   FunctionalMotivationCandidateInterpretationV0_2,
   FunctionalMotivationInterpretationV0_2,
@@ -45,7 +46,7 @@ export type PresentOrMissing<T> =
   | { kind: "missing"; missing: MissingState; note?: string };
 
 export type RootMapVM = RootMapV1;
-export type DoctrineReadingVM = DoctrineReadingV1;
+export type DoctrineReadingVM = DoctrineReadingV2;
 export type FunctionalMotivationInterpretationV0_2VM = FunctionalMotivationInterpretationV0_2;
 export type FunctionalMotivationInterpretationV0_3VM = FunctionalMotivationInterpretationV0_3;
 export type AnalysisStatusV0_2VM = AnalysisStatusV0_2;
@@ -494,10 +495,21 @@ export type MotivationDiscoveryV0_1VM = Readonly<{
   userDecisionPosture: "user_decides";
   noSingleWinner: true;
 }>;
+
+export type MotivationDiscoveryCandidateV0_2VM =
+  NeutralInterpretationSelectionV0_2<MotivationDiscoveryCandidateV0_1VM>;
+
+export type MotivationDiscoveryV0_2VM = Omit<
+  NeutralInterpretationSelectionV0_2<MotivationDiscoveryV0_1VM>,
+  "schemaVersion" | "candidates"
+> & Readonly<{
+  schemaVersion: "open-instrument.motivation-engine-discovery.v0_2";
+  candidates: MotivationDiscoveryCandidateV0_2VM[];
+}>;
 export interface TelemetryViewModel {
   readout: TelemetryReadout;
   doctrineReading: PresentOrMissing<DoctrineReadingVM | null>;
-  wordSpecificFunctionalDepth?: PresentOrMissing<WordSpecificFunctionalDepthV0_1 | null>;
+  wordSpecificFunctionalDepth?: PresentOrMissing<WordSpecificFunctionalDepthV0_2 | null>;
   evidence: EvidenceLedger;
   candidates: CandidateRowVM[];
   math: PresentOrMissing<MathTelemetryVM>;
@@ -509,9 +521,7 @@ export interface TelemetryViewModel {
   resonanceProfileV1: PresentOrMissing<ResonanceProfileV1VM>;
   raw: unknown;
 
-  analysisStatusV0_1?: PresentOrMissing<AnalysisStatusV0_1VM>;
   analysisStatusV0_2?: PresentOrMissing<AnalysisStatusV0_2>;
-  motivationDiscoveryV0_1?: PresentOrMissing<MotivationDiscoveryV0_1VM>;
-  functionalMotivationInterpretationV0_2?: PresentOrMissing<FunctionalMotivationInterpretationV0_2VM>;
+  motivationDiscoveryV0_2?: PresentOrMissing<MotivationDiscoveryV0_2VM>;
   functionalMotivationInterpretationV0_3?: PresentOrMissing<FunctionalMotivationInterpretationV0_3VM>;
 }

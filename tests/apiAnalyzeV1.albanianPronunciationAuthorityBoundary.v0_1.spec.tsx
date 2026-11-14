@@ -172,7 +172,7 @@ describe("Albanian pronunciation authority boundary v0.1", () => {
     expect(overview).not.toHaveTextContent("M AE1 L");
     expect(overview).toHaveTextContent("Orthographic vowel sequence: A");
 
-    expect(vm.motivationDiscoveryV0_1).toMatchObject({
+    expect(vm.motivationDiscoveryV0_2).toMatchObject({
       kind: "present",
       value: {
         derivedStructure: {
@@ -181,7 +181,7 @@ describe("Albanian pronunciation authority boundary v0.1", () => {
         },
       },
     });
-    render(<MotivationDiscoveryCardV0_1 discovery={vm.motivationDiscoveryV0_1} />);
+    render(<MotivationDiscoveryCardV0_1 discovery={vm.motivationDiscoveryV0_2} />);
     const discoveryCard = screen.getByTestId("motivation-discovery-card");
     expect(within(discoveryCard).getByTestId("motivation-written-voice-path")).toHaveTextContent("A");
     expect(within(discoveryCard).getByTestId("motivation-written-voice-path")).toHaveTextContent(

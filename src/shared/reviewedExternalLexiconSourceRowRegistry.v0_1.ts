@@ -28,7 +28,7 @@ export const reviewedExternalLexiconSourceRowCandidateRegistryV0_1 = [
     isolatedStandaloneForm: "di",
     plainStandaloneGloss: "know / knowledge",
     sourceNote:
-      "Reviewed production row for bounded functional lexical projection: Albanian di as a free operator meaning know/knowledge can functionally motivate study/learning. Historical origin, transmission, winner, language-superiority, publication-evidence, scientific-evidence and candidate-truth claims remain disabled; the user decides.",
+      "Reviewed production row for bounded functional lexical projection: Albanian di as a free operator meaning know/knowledge can functionally motivate study/learning. This evidence does not establish historical origin or transmission, language superiority, publication or scientific claims, or candidate truth. The user decides how to interpret it.",
     semanticBridge:
       "knowledge can motivate study and learning functionally without making a historical-origin claim",
     originClaim: false,
@@ -75,7 +75,7 @@ export const reviewedExternalLexiconSourceRowCandidateRegistryV0_1 = [
     isolatedStandaloneForm: "at",
     plainStandaloneGloss: "father",
     sourceNote:
-      "Reviewed bounded Albanian lexical row: at is attested as father in the Albanian inherited lexicon. This row supports AT as a functional father embryo only on explicitly authorized proof targets. It does not claim historical origin, transmission, winner, ownership, language superiority, publication evidence, scientific evidence, or unrestricted interpretation of the homographic modern at 'horse'.",
+      "Reviewed bounded Albanian lexical row: at is attested as father in the Albanian inherited lexicon. This row supports AT as a functional father embryo only on explicitly authorized proof targets. It does not establish historical origin or transmission, ownership, language superiority, publication evidence, scientific evidence, or unrestricted interpretation of the homographic modern at 'horse'. The user decides how to interpret it.",
     semanticBridge:
       "Albanian at meaning father directly motivates the father function without making a historical-origin claim",
     originClaim: false,

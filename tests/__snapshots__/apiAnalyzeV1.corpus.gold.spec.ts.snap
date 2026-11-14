@@ -370,7 +370,7 @@ exports[`active Analyze API — corpus gold (V2 contract projection) strict corp
       "inputWord": "123",
       "interpretation": {
         "layer": "ZË-RO_INTERPRETATION_OR_HYPOTHESIS",
-        "note": "No qualifying generic source witness was found for the derived structure; Null is valid.",
+        "note": "No qualifying source witness was found for this structure; Null is valid. Multiple interpretations may coexist; the user decides.",
         "status": "UNKNOWN_OR_NULL",
       },
       "interpretationDecisionPolicy": {
@@ -2226,7 +2226,7 @@ exports[`active Analyze API — corpus gold (V2 contract projection) strict corp
       "inputWord": "O'Neill",
       "interpretation": {
         "layer": "ZË-RO_INTERPRETATION_OR_HYPOTHESIS",
-        "note": "No qualifying generic source witness was found for the derived structure; Null is valid.",
+        "note": "No qualifying source witness was found for this structure; Null is valid. Multiple interpretations may coexist; the user decides.",
         "status": "UNKNOWN_OR_NULL",
       },
       "interpretationDecisionPolicy": {
@@ -4067,7 +4067,7 @@ exports[`active Analyze API — corpus gold (V2 contract projection) strict corp
       "inputWord": "co-operate",
       "interpretation": {
         "layer": "ZË-RO_INTERPRETATION_OR_HYPOTHESIS",
-        "note": "No qualifying generic source witness was found for the derived structure; Null is valid.",
+        "note": "No qualifying source witness was found for this structure; Null is valid. Multiple interpretations may coexist; the user decides.",
         "status": "UNKNOWN_OR_NULL",
       },
       "interpretationDecisionPolicy": {
@@ -7313,7 +7313,7 @@ exports[`active Analyze API — corpus gold (V2 contract projection) strict corp
       "inputWord": "damage",
       "interpretation": {
         "layer": "ZË-RO_INTERPRETATION_OR_HYPOTHESIS",
-        "note": "Source facts and deterministic structure may support a functional motivation hypothesis; historical relation and winner claims remain unclaimed.",
+        "note": "Multiple interpretations may coexist. Automatic interpretation selection is disabled; the user decides.",
         "status": "hypothesis",
       },
       "interpretationDecisionPolicy": {
@@ -9802,7 +9802,7 @@ exports[`active Analyze API — corpus gold (V2 contract projection) strict corp
       "inputWord": "diet",
       "interpretation": {
         "layer": "ZË-RO_INTERPRETATION_OR_HYPOTHESIS",
-        "note": "No qualifying generic source witness was found for the derived structure; Null is valid.",
+        "note": "No qualifying source witness was found for this structure; Null is valid. Multiple interpretations may coexist; the user decides.",
         "status": "UNKNOWN_OR_NULL",
       },
       "interpretationDecisionPolicy": {
@@ -10436,7 +10436,7 @@ exports[`active Analyze API — corpus gold (V2 contract projection) strict corp
         "semanticBridge": "Albanian at meaning father directly motivates the father function without making a historical-origin claim",
         "sourceId": "reviewed.external.albanian-at.father.candidate.v0_1",
         "sourceKind": "reviewed_lexical_source",
-        "sourceNote": "Reviewed bounded Albanian lexical row: at is attested as father in the Albanian inherited lexicon. This row supports AT as a functional father embryo only on explicitly authorized proof targets. It does not claim historical origin, transmission, winner, ownership, language superiority, publication evidence, scientific evidence, or unrestricted interpretation of the homographic modern at 'horse'.",
+        "sourceNote": "Reviewed bounded Albanian lexical row: at is attested as father in the Albanian inherited lexicon. This row supports AT as a functional father embryo only on explicitly authorized proof targets. It does not establish historical origin or transmission, ownership, language superiority, publication evidence, scientific evidence, or unrestricted interpretation of the homographic modern at 'horse'. The user decides how to interpret it.",
         "sourceStatus": "reviewed_accepted",
         "status": "experimental",
         "userDecisionPosture": "user_decides",
@@ -11967,7 +11967,7 @@ exports[`active Analyze API — corpus gold (V2 contract projection) strict corp
       "inputWord": "father",
       "interpretation": {
         "layer": "ZË-RO_INTERPRETATION_OR_HYPOTHESIS",
-        "note": "Source facts and deterministic structure may support a functional motivation hypothesis; historical relation and winner claims remain unclaimed.",
+        "note": "Multiple interpretations may coexist. Automatic interpretation selection is disabled; the user decides.",
         "status": "hypothesis",
       },
       "interpretationDecisionPolicy": {
@@ -12175,7 +12175,7 @@ exports[`active Analyze API — corpus gold (V2 contract projection) strict corp
           "semanticBridge": "Albanian at meaning father directly motivates the father function without making a historical-origin claim",
           "sourceId": "reviewed.external.albanian-at.father.candidate.v0_1",
           "sourceKind": "reviewed_lexical_source",
-          "sourceNote": "Reviewed bounded Albanian lexical row: at is attested as father in the Albanian inherited lexicon. This row supports AT as a functional father embryo only on explicitly authorized proof targets. It does not claim historical origin, transmission, winner, ownership, language superiority, publication evidence, scientific evidence, or unrestricted interpretation of the homographic modern at 'horse'.",
+          "sourceNote": "Reviewed bounded Albanian lexical row: at is attested as father in the Albanian inherited lexicon. This row supports AT as a functional father embryo only on explicitly authorized proof targets. It does not establish historical origin or transmission, ownership, language superiority, publication evidence, scientific evidence, or unrestricted interpretation of the homographic modern at 'horse'. The user decides how to interpret it.",
           "sourceStatus": "reviewed_accepted",
           "status": "experimental",
           "userDecisionPosture": "user_decides",
@@ -14037,7 +14037,7 @@ exports[`active Analyze API — corpus gold (V2 contract projection) strict corp
       "inputWord": "gjak",
       "interpretation": {
         "layer": "ZË-RO_INTERPRETATION_OR_HYPOTHESIS",
-        "note": "Source facts and deterministic structure may support a functional motivation hypothesis; historical relation and winner claims remain unclaimed.",
+        "note": "Multiple interpretations may coexist. Automatic interpretation selection is disabled; the user decides.",
         "status": "hypothesis",
       },
       "interpretationDecisionPolicy": {
@@ -16000,7 +16000,7 @@ exports[`active Analyze API — corpus gold (V2 contract projection) strict corp
       "inputWord": "internet",
       "interpretation": {
         "layer": "ZË-RO_INTERPRETATION_OR_HYPOTHESIS",
-        "note": "No qualifying generic source witness was found for the derived structure; Null is valid.",
+        "note": "No qualifying source witness was found for this structure; Null is valid. Multiple interpretations may coexist; the user decides.",
         "status": "UNKNOWN_OR_NULL",
       },
       "interpretationDecisionPolicy": {
@@ -17939,7 +17939,7 @@ exports[`active Analyze API — corpus gold (V2 contract projection) strict corp
       "inputWord": "language",
       "interpretation": {
         "layer": "ZË-RO_INTERPRETATION_OR_HYPOTHESIS",
-        "note": "No qualifying generic source witness was found for the derived structure; Null is valid.",
+        "note": "No qualifying source witness was found for this structure; Null is valid. Multiple interpretations may coexist; the user decides.",
         "status": "UNKNOWN_OR_NULL",
       },
       "interpretationDecisionPolicy": {
@@ -20487,7 +20487,7 @@ exports[`active Analyze API — corpus gold (V2 contract projection) strict corp
       "inputWord": "love",
       "interpretation": {
         "layer": "ZË-RO_INTERPRETATION_OR_HYPOTHESIS",
-        "note": "No qualifying generic source witness was found for the derived structure; Null is valid.",
+        "note": "No qualifying source witness was found for this structure; Null is valid. Multiple interpretations may coexist; the user decides.",
         "status": "UNKNOWN_OR_NULL",
       },
       "interpretationDecisionPolicy": {
@@ -23150,7 +23150,7 @@ exports[`active Analyze API — corpus gold (V2 contract projection) strict corp
       "inputWord": "mathematics",
       "interpretation": {
         "layer": "ZË-RO_INTERPRETATION_OR_HYPOTHESIS",
-        "note": "No qualifying generic source witness was found for the derived structure; Null is valid.",
+        "note": "No qualifying source witness was found for this structure; Null is valid. Multiple interpretations may coexist; the user decides.",
         "status": "UNKNOWN_OR_NULL",
       },
       "interpretationDecisionPolicy": {
@@ -24434,7 +24434,7 @@ exports[`active Analyze API — corpus gold (V2 contract projection) strict corp
       "inputWord": "naïve",
       "interpretation": {
         "layer": "ZË-RO_INTERPRETATION_OR_HYPOTHESIS",
-        "note": "No qualifying generic source witness was found for the derived structure; Null is valid.",
+        "note": "No qualifying source witness was found for this structure; Null is valid. Multiple interpretations may coexist; the user decides.",
         "status": "UNKNOWN_OR_NULL",
       },
       "interpretationDecisionPolicy": {
@@ -28261,7 +28261,7 @@ exports[`active Analyze API — corpus gold (V2 contract projection) strict corp
       "inputWord": "philosophy",
       "interpretation": {
         "layer": "ZË-RO_INTERPRETATION_OR_HYPOTHESIS",
-        "note": "No qualifying generic source witness was found for the derived structure; Null is valid.",
+        "note": "No qualifying source witness was found for this structure; Null is valid. Multiple interpretations may coexist; the user decides.",
         "status": "UNKNOWN_OR_NULL",
       },
       "interpretationDecisionPolicy": {
@@ -32877,7 +32877,7 @@ exports[`active Analyze API — corpus gold (V2 contract projection) strict corp
       "inputWord": "résumé",
       "interpretation": {
         "layer": "ZË-RO_INTERPRETATION_OR_HYPOTHESIS",
-        "note": "No qualifying generic source witness was found for the derived structure; Null is valid.",
+        "note": "No qualifying source witness was found for this structure; Null is valid. Multiple interpretations may coexist; the user decides.",
         "status": "UNKNOWN_OR_NULL",
       },
       "interpretationDecisionPolicy": {
@@ -35090,7 +35090,7 @@ exports[`active Analyze API — corpus gold (V2 contract projection) strict corp
       "inputWord": "sterile",
       "interpretation": {
         "layer": "ZË-RO_INTERPRETATION_OR_HYPOTHESIS",
-        "note": "No qualifying generic source witness was found for the derived structure; Null is valid.",
+        "note": "No qualifying source witness was found for this structure; Null is valid. Multiple interpretations may coexist; the user decides.",
         "status": "UNKNOWN_OR_NULL",
       },
       "interpretationDecisionPolicy": {
@@ -36502,7 +36502,7 @@ exports[`active Analyze API — corpus gold (V2 contract projection) strict corp
         "semanticBridge": "knowledge can motivate study and learning functionally without making a historical-origin claim",
         "sourceId": "reviewed.external.di.knowledge.candidate.v0_1",
         "sourceKind": "reviewed_dictionary_source",
-        "sourceNote": "Reviewed production row for bounded functional lexical projection: Albanian di as a free operator meaning know/knowledge can functionally motivate study/learning. Historical origin, transmission, winner, language-superiority, publication-evidence, scientific-evidence and candidate-truth claims remain disabled; the user decides.",
+        "sourceNote": "Reviewed production row for bounded functional lexical projection: Albanian di as a free operator meaning know/knowledge can functionally motivate study/learning. This evidence does not establish historical origin or transmission, language superiority, publication or scientific claims, or candidate truth. The user decides how to interpret it.",
         "sourceStatus": "reviewed_accepted",
         "status": "experimental",
         "userDecisionPosture": "user_decides",
@@ -38544,7 +38544,7 @@ exports[`active Analyze API — corpus gold (V2 contract projection) strict corp
       "inputWord": "study",
       "interpretation": {
         "layer": "ZË-RO_INTERPRETATION_OR_HYPOTHESIS",
-        "note": "Source facts and deterministic structure may support a functional motivation hypothesis; historical relation and winner claims remain unclaimed.",
+        "note": "Multiple interpretations may coexist. Automatic interpretation selection is disabled; the user decides.",
         "status": "hypothesis",
       },
       "interpretationDecisionPolicy": {
@@ -38754,7 +38754,7 @@ exports[`active Analyze API — corpus gold (V2 contract projection) strict corp
           "semanticBridge": "knowledge can motivate study and learning functionally without making a historical-origin claim",
           "sourceId": "reviewed.external.di.knowledge.candidate.v0_1",
           "sourceKind": "reviewed_dictionary_source",
-          "sourceNote": "Reviewed production row for bounded functional lexical projection: Albanian di as a free operator meaning know/knowledge can functionally motivate study/learning. Historical origin, transmission, winner, language-superiority, publication-evidence, scientific-evidence and candidate-truth claims remain disabled; the user decides.",
+          "sourceNote": "Reviewed production row for bounded functional lexical projection: Albanian di as a free operator meaning know/knowledge can functionally motivate study/learning. This evidence does not establish historical origin or transmission, language superiority, publication or scientific claims, or candidate truth. The user decides how to interpret it.",
           "sourceStatus": "reviewed_accepted",
           "status": "experimental",
           "userDecisionPosture": "user_decides",
@@ -41234,7 +41234,7 @@ exports[`active Analyze API — corpus gold (V2 contract projection) strict corp
       "inputWord": "y",
       "interpretation": {
         "layer": "ZË-RO_INTERPRETATION_OR_HYPOTHESIS",
-        "note": "No qualifying generic source witness was found for the derived structure; Null is valid.",
+        "note": "No qualifying source witness was found for this structure; Null is valid. Multiple interpretations may coexist; the user decides.",
         "status": "UNKNOWN_OR_NULL",
       },
       "interpretationDecisionPolicy": {
@@ -42141,7 +42141,7 @@ exports[`active Analyze API — corpus gold (V2 contract projection) strict corp
       "inputWord": "ë",
       "interpretation": {
         "layer": "ZË-RO_INTERPRETATION_OR_HYPOTHESIS",
-        "note": "No qualifying generic source witness was found for the derived structure; Null is valid.",
+        "note": "No qualifying source witness was found for this structure; Null is valid. Multiple interpretations may coexist; the user decides.",
         "status": "UNKNOWN_OR_NULL",
       },
       "interpretationDecisionPolicy": {

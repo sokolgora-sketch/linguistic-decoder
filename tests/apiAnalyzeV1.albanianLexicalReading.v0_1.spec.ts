@@ -526,7 +526,7 @@ async function analyzeDritareV0_1(): Promise<any> {
 function renderPrimaryAlbanianReadingCard(payload: unknown): string {
   const vm = adaptAnalysisToTelemetryVM(payload);
   return renderToStaticMarkup(createElement(PrimaryAlbanianReadingCardV0_1, {
-    discovery: vm.motivationDiscoveryV0_1,
+    discovery: vm.motivationDiscoveryV0_2,
     analysisStatus: vm.analysisStatusV0_2,
   }));
 }

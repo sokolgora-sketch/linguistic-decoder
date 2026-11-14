@@ -5,6 +5,7 @@ import { fireEvent, render, screen, within } from "@testing-library/react";
 
 import { InstrumentPanel } from "@/ui/instrument/InstrumentPanel";
 import type { TelemetryViewModel } from "@/ui/telemetry/types";
+import { INTERPRETATION_DECISION_POLICY_V0_1 } from "@/shared/openInstrument/interpretationDecisionPolicy.v0_1";
 
 jest.mock("@/hooks/use-toast", () => ({
   useToast: () => ({ toast: jest.fn() }),
@@ -18,7 +19,6 @@ const missing = {
 const claimBoundary = {
   historicalOriginClaim: "not_claimed" as const,
   historicalTransmissionClaim: "not_claimed" as const,
-  winnerClaim: "not_claimed" as const,
   languageSuperiorityClaim: "not_claimed" as const,
   linguisticOwnershipClaim: "not_claimed" as const,
   candidateTruthClaim: "not_claimed" as const,
@@ -37,7 +37,7 @@ function statusValue(
   return {
     kind: "present" as const,
     value: {
-      schemaVersion: "open-instrument.analysis-status.v0_1" as const,
+      schemaVersion: "open-instrument.analysis-status.v0_2" as const,
       status,
       summary:
         status === "null_no_supported_candidate"
@@ -48,6 +48,7 @@ function statusValue(
       researchHypothesisEmbryos: [],
       structuralTokens: [],
       claimBoundary,
+      interpretationDecisionPolicy: INTERPRETATION_DECISION_POLICY_V0_1,
       userDecisionPosture: "user_decides" as const,
     },
   };
@@ -126,7 +127,7 @@ describe("Open Instrument canonical Null primary readout v0.1", () => {
   it("shows canonical Null prominently in Overview with its existing boundary copy", () => {
     render(
       <InstrumentPanel
-        vm={vmFixture({ analysisStatusV0_1: statusValue("null_no_supported_candidate") })}
+        vm={vmFixture({ analysisStatusV0_2: statusValue("null_no_supported_candidate") })}
       />,
     );
 
@@ -154,7 +155,7 @@ describe("Open Instrument canonical Null primary readout v0.1", () => {
     "candidate_only",
     "structural_unreviewed",
   ] as const)("does not present %s as analytical Null", (status) => {
-    render(<InstrumentPanel vm={vmFixture({ analysisStatusV0_1: statusValue(status) })} />);
+    render(<InstrumentPanel vm={vmFixture({ analysisStatusV0_2: statusValue(status) })} />);
 
     expect(
       within(visibleOverview()).queryByRole("heading", {
@@ -166,7 +167,7 @@ describe("Open Instrument canonical Null primary readout v0.1", () => {
   it("keeps structural-only status in the hypothesis-only boundary", () => {
     render(
       <InstrumentPanel
-        vm={vmFixture({ analysisStatusV0_1: statusValue("structural_unreviewed") })}
+        vm={vmFixture({ analysisStatusV0_2: statusValue("structural_unreviewed") })}
       />,
     );
 
@@ -185,7 +186,7 @@ describe("Open Instrument canonical Null primary readout v0.1", () => {
   it("exposes candidate-only status in the primary hierarchy without promotion", () => {
     render(
       <InstrumentPanel
-        vm={vmFixture({ analysisStatusV0_1: statusValue("candidate_only") })}
+        vm={vmFixture({ analysisStatusV0_2: statusValue("candidate_only") })}
       />,
     );
 
@@ -201,8 +202,8 @@ describe("Open Instrument canonical Null primary readout v0.1", () => {
   it.each([
     { kind: "missing" as const, missing: "not_emitted" as const },
     { kind: "missing" as const, missing: "malformed" as const },
-  ])("does not convert $missing analysis status into Null", (analysisStatusV0_1) => {
-    render(<InstrumentPanel vm={vmFixture({ analysisStatusV0_1 })} />);
+  ])("does not convert $missing analysis status into Null", (analysisStatusV0_2) => {
+    render(<InstrumentPanel vm={vmFixture({ analysisStatusV0_2 })} />);
 
     expect(
       within(visibleOverview()).queryByTestId("primary-analysis-status"),
@@ -220,7 +221,7 @@ describe("Open Instrument canonical Null primary readout v0.1", () => {
 
   it("does not infer analytical Null from candidate unknown or readout none", () => {
     const vm = vmFixture({
-      analysisStatusV0_1: statusValue("candidate_only"),
+      analysisStatusV0_2: statusValue("candidate_only"),
       candidates: [unknownCandidate()],
     });
     vm.readout.status = "none";
@@ -235,7 +236,7 @@ describe("Open Instrument canonical Null primary readout v0.1", () => {
   });
 
   it("returns to Overview when a canonical Null arrives while Advanced is open", () => {
-    const initial = vmFixture({ analysisStatusV0_1: statusValue("candidate_only") });
+    const initial = vmFixture({ analysisStatusV0_2: statusValue("candidate_only") });
     const { rerender } = render(<InstrumentPanel vm={initial} />);
 
     fireEvent.click(screen.getByRole("tab", { name: "Advanced" }));
@@ -246,7 +247,7 @@ describe("Open Instrument canonical Null primary readout v0.1", () => {
 
     rerender(
       <InstrumentPanel
-        vm={vmFixture({ analysisStatusV0_1: statusValue("null_no_supported_candidate") })}
+        vm={vmFixture({ analysisStatusV0_2: statusValue("null_no_supported_candidate") })}
       />,
     );
 

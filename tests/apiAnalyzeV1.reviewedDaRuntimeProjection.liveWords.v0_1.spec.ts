@@ -24,7 +24,7 @@ describe("analyze-v1 reviewed DA runtime projection live words v0.1", () => {
     expect(evidence).toContain("Example (4), page 3; footnote 1");
     expect(evidence).toContain("10.3765/plsa.v8i1.5501");
     expect(evidence).toContain("historicalOriginClaim=not_claimed");
-    expect(evidence).toContain("winnerClaim=not_claimed");
+    expect(evidence).toContain("automaticInterpretationSelection=DISABLED");
     expect(evidence).toContain("languageSuperiorityClaim=not_claimed");
     expect(evidence).toContain("userDecisionPosture=user_decides");
   });
@@ -40,7 +40,7 @@ describe("analyze-v1 reviewed DA runtime projection live words v0.1", () => {
     expect(evidence).toContain("reviewed functional free-operator evidence");
     expect(evidence).toContain("Dedvukaj & Ndoci 2023 PLSA");
     expect(evidence).toContain("historicalOriginClaim=not_claimed");
-    expect(evidence).toContain("winnerClaim=not_claimed");
+    expect(evidence).toContain("automaticInterpretationSelection=DISABLED");
     expect(evidence).toContain("languageSuperiorityClaim=not_claimed");
     expect(evidence).toContain("userDecisionPosture=user_decides");
   });
@@ -72,7 +72,7 @@ describe("analyze-v1 reviewed DA runtime projection live words v0.1", () => {
       "historicalOriginClaim=not_claimed",
     );
     expect(evidence).toContain(
-      "winnerClaim=not_claimed",
+      "automaticInterpretationSelection=DISABLED",
     );
     expect(evidence).toContain(
       "languageSuperiorityClaim=not_claimed",

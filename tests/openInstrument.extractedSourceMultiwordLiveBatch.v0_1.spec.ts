@@ -224,7 +224,7 @@ describe("Open Instrument extracted-source multiword live batch v0.1", () => {
       const response = await analyze(item.packet.targetWord);
       expect(response.status).toBe(200);
       const body = (await response.json()) as Record<string, unknown>;
-      const status = body.analysisStatusV0_1 as Record<string, unknown>;
+      const status = body.analysisStatusV0_2 as Record<string, unknown>;
       expect(status.status).toBe(item.beforeStatus);
       expect(body.candidates).toEqual(expect.arrayContaining([
         expect.objectContaining({ evidenceBasis: "lexical_equivalence" }),
@@ -269,7 +269,7 @@ describe("Open Instrument extracted-source multiword live batch v0.1", () => {
       const response = await analyze(word);
       expect(response.status).toBe(200);
       const body = (await response.json()) as Record<string, unknown>;
-      expect((body.analysisStatusV0_1 as Record<string, unknown>).status).toBe(
+      expect((body.analysisStatusV0_2 as Record<string, unknown>).status).toBe(
         "null_no_supported_candidate",
       );
     }

@@ -50,18 +50,22 @@ describe("logic-first fresh-word generalization v0.1", () => {
 
       rows.push({
         word,
-        status: body.analysisStatusV0_1?.status,
+        status: body.analysisStatusV0_2?.status,
         logicCount,
       });
 
-      expect(body.analysisStatusV0_1?.claimBoundary).toMatchObject({
+      expect(body.analysisStatusV0_2?.claimBoundary).toMatchObject({
         historicalOriginClaim: "not_claimed",
         historicalTransmissionClaim: "not_claimed",
-        winnerClaim: "not_claimed",
         languageSuperiorityClaim: "not_claimed",
         candidateTruthClaim: "not_claimed",
         structuralOutputIsCandidateTruth: false,
         nullIsValid: true,
+      });
+      expect(body.analysisStatusV0_2?.interpretationDecisionPolicy).toMatchObject({
+        multipleInterpretationsMayCoexist: true,
+        automaticInterpretationSelection: "DISABLED",
+        interpretationDecisionAuthority: "USER_DECIDES",
       });
     }
 
@@ -88,7 +92,7 @@ describe("logic-first fresh-word generalization v0.1", () => {
     const body = await analyze("sterile", true);
     const candidates = Array.isArray(body.candidates) ? body.candidates : [];
 
-    expect(body.analysisStatusV0_1?.status).toBe(
+    expect(body.analysisStatusV0_2?.status).toBe(
       "research_functional_hypothesis",
     );
     expect(
@@ -124,7 +128,7 @@ describe("logic-first fresh-word generalization v0.1", () => {
           candidate.sourceKind === "logic_derived_functional_hypothesis",
       );
 
-      expect(body.analysisStatusV0_1?.status).toBe("candidate_only");
+      expect(body.analysisStatusV0_2?.status).toBe("candidate_only");
       expect(logicCandidate?.targetWord).toBe(word);
       expect(logicCandidate?.functionalBridgeTruth).toBe("hypothesis");
       expect(logicCandidate?.expansionChain?.at(-1)).toBe(word.toUpperCase());
@@ -132,7 +136,7 @@ describe("logic-first fresh-word generalization v0.1", () => {
 
     for (const word of heldOutNull) {
       const body = await analyze(word, true);
-      expect(body.analysisStatusV0_1?.status).toBe("null_no_supported_candidate");
+      expect(body.analysisStatusV0_2?.status).toBe("null_no_supported_candidate");
       expect(
         (body.candidates ?? []).some(
           (candidate: any) =>

@@ -890,9 +890,9 @@ describe("real Albanian exact lexical source integration v0.1", () => {
           sourceIpaSevenVoiceAnalyses: undefined,
         },
       });
-      expect(vm.motivationDiscoveryV0_1).toMatchObject({ kind: "present" });
-      if (vm.motivationDiscoveryV0_1?.kind === "present") {
-        render(createElement(MotivationDiscoveryCardV0_1, { discovery: vm.motivationDiscoveryV0_1 }));
+      expect(vm.motivationDiscoveryV0_2).toMatchObject({ kind: "present" });
+      if (vm.motivationDiscoveryV0_2?.kind === "present") {
+        render(createElement(MotivationDiscoveryCardV0_1, { discovery: vm.motivationDiscoveryV0_2 }));
         expect(screen.getByTestId("albanian-reading-related-form")).toHaveTextContent("peshkatar");
         expect(screen.getByTestId("albanian-reading-functional-bridge")).toHaveTextContent("Source-bounded functional operation AGENT");
         expect(screen.getByTestId("albanian-reading-functional-bridge-operation")).toHaveTextContent("Functional operation: AGENT");
@@ -1108,9 +1108,9 @@ describe("real Albanian exact lexical source integration v0.1", () => {
           sourceIpaSevenVoiceAnalyses: undefined,
         },
       });
-      expect(vm.motivationDiscoveryV0_1).toMatchObject({ kind: "present" });
-      if (vm.motivationDiscoveryV0_1?.kind === "present") {
-        render(createElement(MotivationDiscoveryCardV0_1, { discovery: vm.motivationDiscoveryV0_1 }));
+      expect(vm.motivationDiscoveryV0_2).toMatchObject({ kind: "present" });
+      if (vm.motivationDiscoveryV0_2?.kind === "present") {
+        render(createElement(MotivationDiscoveryCardV0_1, { discovery: vm.motivationDiscoveryV0_2 }));
         expect(screen.getByTestId("albanian-reading-related-form")).toHaveTextContent("këngëtar");
         expect(screen.getByTestId("albanian-reading-functional-bridge-operation")).toHaveTextContent("Functional operation: AGENT");
         expect(screen.getByTestId("albanian-reading-interpretation")).toHaveTextContent("Integrated source-bounded functional reading");
@@ -1281,9 +1281,9 @@ describe("real Albanian exact lexical source integration v0.1", () => {
           sourceIpaSevenVoiceAnalyses: undefined,
         },
       });
-      expect(vm.motivationDiscoveryV0_1).toMatchObject({ kind: "present" });
-      if (vm.motivationDiscoveryV0_1?.kind === "present") {
-        render(createElement(MotivationDiscoveryCardV0_1, { discovery: vm.motivationDiscoveryV0_1 }));
+      expect(vm.motivationDiscoveryV0_2).toMatchObject({ kind: "present" });
+      if (vm.motivationDiscoveryV0_2?.kind === "present") {
+        render(createElement(MotivationDiscoveryCardV0_1, { discovery: vm.motivationDiscoveryV0_2 }));
         expect(screen.getByTestId("albanian-reading-functional-bridge")).toHaveTextContent("gjuetar");
         expect(screen.getByTestId("albanian-reading-functional-bridge-operation")).toHaveTextContent("Functional operation: AGENT");
         expect(screen.getByTestId("albanian-reading-functional-bridge")).toHaveTextContent("does not assign an entity, resource, or other semantic role to the primary word");
@@ -1362,13 +1362,13 @@ describe("real Albanian exact lexical source integration v0.1", () => {
     expect(candidate?.sourceLinkedComparison.related?.pronunciationVariants).toEqual([]);
 
     const vm = adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: discovery });
-    expect(vm.motivationDiscoveryV0_1).toMatchObject({ kind: "present" });
-    if (vm.motivationDiscoveryV0_1?.kind !== "present") throw new Error("Expected target-first reading in the existing UI adapter");
+    expect(vm.motivationDiscoveryV0_2).toMatchObject({ kind: "present" });
+    if (vm.motivationDiscoveryV0_2?.kind !== "present") throw new Error("Expected target-first reading in the existing UI adapter");
     const fjaloriFetch = jest.spyOn(globalThis, "fetch").mockRejectedValue(
       new Error("external FjaloriShqip access is disabled in this synthetic-source integration test"),
     );
     try {
-      render(createElement(MotivationDiscoveryCardV0_1, { discovery: vm.motivationDiscoveryV0_1 }));
+      render(createElement(MotivationDiscoveryCardV0_1, { discovery: vm.motivationDiscoveryV0_2 }));
       expect(screen.getByTestId("albanian-reading-functional-bridge")).toHaveTextContent("qymyrtar");
       expect(screen.getByTestId("albanian-reading-functional-bridge-operation")).toHaveTextContent("Functional operation: AGENT");
       expect(screen.getByTestId("albanian-reading-related-candidate-evaluations")).toHaveTextContent("TARGET_AUTHORED_ETYMOLOGY_REFERENCE");
@@ -1397,7 +1397,7 @@ describe("real Albanian exact lexical source integration v0.1", () => {
     delete (legacyCandidateComparison.relation as Record<string, unknown>).sourceRelationAssertion;
     const legacySelectedComparison = legacyReading.sourceLinkedComparison as Record<string, unknown>;
     delete (legacySelectedComparison.relation as Record<string, unknown>).sourceRelationAssertion;
-    expect(adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: legacyPayload }).motivationDiscoveryV0_1).toMatchObject({
+    expect(adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: legacyPayload }).motivationDiscoveryV0_2).toMatchObject({
       kind: "present",
     });
 
@@ -1414,7 +1414,7 @@ describe("real Albanian exact lexical source integration v0.1", () => {
       sourceAssertionOrdinal: 0,
       reasonCodes: [],
     };
-    expect(adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: forgedLegacyPayload }).motivationDiscoveryV0_1).toMatchObject({
+    expect(adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: forgedLegacyPayload }).motivationDiscoveryV0_2).toMatchObject({
       kind: "missing",
       missing: "malformed",
     });
@@ -1522,19 +1522,19 @@ describe("real Albanian exact lexical source integration v0.1", () => {
       .toEqual([]);
 
     const vm = adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: discovery });
-    expect(vm.motivationDiscoveryV0_1?.kind).toBe("present");
-    if (vm.motivationDiscoveryV0_1?.kind !== "present") throw new Error("Expected direct target-role reading in the UI adapter");
+    expect(vm.motivationDiscoveryV0_2?.kind).toBe("present");
+    if (vm.motivationDiscoveryV0_2?.kind !== "present") throw new Error("Expected direct target-role reading in the UI adapter");
     const tamperedDiscovery = {
       ...discovery,
       exactLexicalSourceFacts: discovery.exactLexicalSourceFacts?.map((fact) => fact.form === "orëndreqës"
         ? { ...fact, senses: fact.senses.map((sense) => ({ ...sense, categories: [] })) }
         : fact),
     };
-    expect(adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: tamperedDiscovery }).motivationDiscoveryV0_1)
+    expect(adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: tamperedDiscovery }).motivationDiscoveryV0_2)
       .toMatchObject({ kind: "missing", missing: "malformed" });
     const fetchSpy = jest.spyOn(globalThis, "fetch").mockRejectedValue(new Error("external source disabled in synthetic test"));
     try {
-      render(createElement(MotivationDiscoveryCardV0_1, { discovery: vm.motivationDiscoveryV0_1 }));
+      render(createElement(MotivationDiscoveryCardV0_1, { discovery: vm.motivationDiscoveryV0_2 }));
       expect(screen.getByTestId("albanian-reading-functional-bridge")).toHaveTextContent("clockmaker, watchmaker");
       expect(screen.getByTestId("albanian-reading-functional-bridge-operation")).toHaveTextContent("Functional operation: AGENT");
       expect(screen.getByTestId("albanian-reading-functional-bridge")).toHaveTextContent("do not create a base-side SOURCE_DERIVED_FORM assertion or select a component sense");
@@ -1719,9 +1719,9 @@ describe("real Albanian exact lexical source integration v0.1", () => {
     const vm = adaptAnalysisToTelemetryVM({
       motivationDiscoveryV0_1: { ...discovery, exactLexicalSourceFacts: undefined, sourceIpaSevenVoiceAnalyses: undefined },
     });
-    expect(vm.motivationDiscoveryV0_1).toMatchObject({ kind: "present" });
-    if (vm.motivationDiscoveryV0_1?.kind === "present") {
-      render(createElement(MotivationDiscoveryCardV0_1, { discovery: vm.motivationDiscoveryV0_1 }));
+    expect(vm.motivationDiscoveryV0_2).toMatchObject({ kind: "present" });
+    if (vm.motivationDiscoveryV0_2?.kind === "present") {
+      render(createElement(MotivationDiscoveryCardV0_1, { discovery: vm.motivationDiscoveryV0_2 }));
       expect(screen.getByTestId("albanian-reading-meaning")).toHaveTextContent("window");
       expect(screen.getByTestId("albanian-reading-voice-path")).toHaveTextContent("I → A → E");
       expect(screen.getByTestId("albanian-reading-functional-bridge-operation")).toHaveTextContent("Functional operation: ENABLE_PASSAGE");
@@ -2134,10 +2134,10 @@ describe("real Albanian exact lexical source integration v0.1", () => {
       candidates: [],
       motivationDiscoveryV0_1: result.discovery,
     });
-    expect(vm.motivationDiscoveryV0_1).toMatchObject({ kind: "present" });
-    if (vm.motivationDiscoveryV0_1?.kind === "present") {
-      expect(vm.motivationDiscoveryV0_1.value.albanianLexicalReading?.sourcePronunciation?.voicePath).toEqual(["I", "Ë"]);
-      render(createElement(MotivationDiscoveryCardV0_1, { discovery: vm.motivationDiscoveryV0_1 }));
+    expect(vm.motivationDiscoveryV0_2).toMatchObject({ kind: "present" });
+    if (vm.motivationDiscoveryV0_2?.kind === "present") {
+      expect(vm.motivationDiscoveryV0_2.value.albanianLexicalReading?.sourcePronunciation?.voicePath).toEqual(["I", "Ë"]);
+      render(createElement(MotivationDiscoveryCardV0_1, { discovery: vm.motivationDiscoveryV0_2 }));
       expect(screen.getByTestId("albanian-reading-related-form")).toHaveTextContent("source-authored etymology (attributed): From dritë");
       expect(screen.getByTestId("albanian-source-linked-comparison")).toHaveTextContent("dritë#Albanian");
       expect(screen.getByTestId("albanian-source-linked-comparison")).toHaveTextContent("SHARED_INITIAL_VOICE_DIFFERENT_LATER_PATH");
@@ -2487,9 +2487,9 @@ describe("real Albanian exact lexical source integration v0.1", () => {
     expect(reading?.relatedCandidateEvaluations[1]?.sourceLinkedComparison.relation.sourceRelationAssertion).toEqual(sourceSenseAssertion);
 
     const vm = adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: discovery });
-    expect(vm.motivationDiscoveryV0_1).toMatchObject({ kind: "present" });
-    if (vm.motivationDiscoveryV0_1?.kind === "present") {
-      render(createElement(MotivationDiscoveryCardV0_1, { discovery: vm.motivationDiscoveryV0_1 }));
+    expect(vm.motivationDiscoveryV0_2).toMatchObject({ kind: "present" });
+    if (vm.motivationDiscoveryV0_2?.kind === "present") {
+      render(createElement(MotivationDiscoveryCardV0_1, { discovery: vm.motivationDiscoveryV0_2 }));
       const ownerLines = screen.getAllByTestId("albanian-source-relation-owner");
       expect(ownerLines[0]).toHaveTextContent("Assertion scope: SOURCE_RECORD");
       expect(ownerLines[0]).toHaveTextContent("no owning source sense is claimed");
@@ -2505,7 +2505,7 @@ describe("real Albanian exact lexical source integration v0.1", () => {
     const forgedRelated = forgedReading.relatedForms as Record<string, unknown>[];
     const forgedAssertion = forgedRelated[1]?.sourceRelationAssertion as Record<string, unknown>;
     forgedAssertion.sourceSenseOrdinal = 0;
-    expect(adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: forgedOwnerPayload }).motivationDiscoveryV0_1).toMatchObject({
+    expect(adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: forgedOwnerPayload }).motivationDiscoveryV0_2).toMatchObject({
       kind: "missing",
       missing: "malformed",
     });
@@ -2516,7 +2516,7 @@ describe("real Albanian exact lexical source integration v0.1", () => {
     const missingOwnerComparison = missingOwnerCandidates[1]?.sourceLinkedComparison as Record<string, unknown>;
     const missingOwnerPrimary = missingOwnerComparison.primary as Record<string, unknown>;
     delete missingOwnerPrimary.sourceSenses;
-    expect(adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: missingOwnerSensePayload }).motivationDiscoveryV0_1).toMatchObject({
+    expect(adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: missingOwnerSensePayload }).motivationDiscoveryV0_2).toMatchObject({
       kind: "missing",
       missing: "malformed",
     });
@@ -2527,7 +2527,7 @@ describe("real Albanian exact lexical source integration v0.1", () => {
     const wrongOwnerComparison = wrongOwnerCandidates[1]?.sourceLinkedComparison as Record<string, unknown>;
     const wrongOwnerPrimary = wrongOwnerComparison.primary as Record<string, unknown>;
     wrongOwnerPrimary.sourceRecordId = "kaikki-albanian-jsonl:word=other-record:ordinal=0";
-    expect(adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: wrongOwnerRecordPayload }).motivationDiscoveryV0_1).toMatchObject({
+    expect(adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: wrongOwnerRecordPayload }).motivationDiscoveryV0_2).toMatchObject({
       kind: "missing",
       missing: "malformed",
     });
@@ -2539,7 +2539,7 @@ describe("real Albanian exact lexical source integration v0.1", () => {
     const secondComparison = secondCandidate?.sourceLinkedComparison as Record<string, unknown>;
     const secondRelation = secondComparison.relation as Record<string, unknown>;
     secondRelation.relation = "SOURCE_DERIVED_FORM";
-    expect(adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: mismatchedRelationPayload }).motivationDiscoveryV0_1).toMatchObject({
+    expect(adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: mismatchedRelationPayload }).motivationDiscoveryV0_2).toMatchObject({
       kind: "missing",
       missing: "malformed",
     });
@@ -2547,7 +2547,7 @@ describe("real Albanian exact lexical source integration v0.1", () => {
     const reorderedLinksPayload = JSON.parse(JSON.stringify(discovery)) as Record<string, unknown>;
     const reorderedLinks = (reorderedLinksPayload.exactLexicalSourceFacts as Record<string, unknown>[])[0]?.relatedForms as unknown[];
     reorderedLinks.reverse();
-    expect(adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: reorderedLinksPayload }).motivationDiscoveryV0_1).toMatchObject({
+    expect(adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: reorderedLinksPayload }).motivationDiscoveryV0_2).toMatchObject({
       kind: "missing",
       missing: "malformed",
     });
@@ -2555,7 +2555,7 @@ describe("real Albanian exact lexical source integration v0.1", () => {
     const reorderedSensesPayload = JSON.parse(JSON.stringify(discovery)) as Record<string, unknown>;
     const reorderedSenses = (reorderedSensesPayload.exactLexicalSourceFacts as Record<string, unknown>[])[0]?.senses as unknown[];
     reorderedSenses.reverse();
-    expect(adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: reorderedSensesPayload }).motivationDiscoveryV0_1).toMatchObject({
+    expect(adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: reorderedSensesPayload }).motivationDiscoveryV0_2).toMatchObject({
       kind: "missing",
       missing: "malformed",
     });
@@ -2564,7 +2564,7 @@ describe("real Albanian exact lexical source integration v0.1", () => {
     const alteredExactFacts = alteredExactRelationPayload.exactLexicalSourceFacts as Record<string, unknown>[];
     const alteredExactEdges = alteredExactFacts[0]?.relatedForms as Record<string, unknown>[];
     if (alteredExactEdges[1]) alteredExactEdges[1].relation = "SOURCE_DERIVED_FORM";
-    expect(adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: alteredExactRelationPayload }).motivationDiscoveryV0_1).toMatchObject({
+    expect(adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: alteredExactRelationPayload }).motivationDiscoveryV0_2).toMatchObject({
       kind: "missing",
       missing: "malformed",
     });
@@ -2580,7 +2580,7 @@ describe("real Albanian exact lexical source integration v0.1", () => {
     );
     expect(adaptAnalysisToTelemetryVM({
       motivationDiscoveryV0_1: legacyPayloadWithoutSenseOwnershipV0_1(targetFirstDiscovery),
-    }).motivationDiscoveryV0_1).toMatchObject({ kind: "present" });
+    }).motivationDiscoveryV0_2).toMatchObject({ kind: "present" });
 
     const recordAssertion = (sourceAssertionOrdinal: number): AlbanianKaikkiSourceRelationAssertionV0_1 => ({
       assertionScope: "SOURCE_RECORD",
@@ -2605,7 +2605,7 @@ describe("real Albanian exact lexical source integration v0.1", () => {
     expect(duplicateBaseDiscovery.albanianLexicalReading?.sourceLinkedComparison?.relation.relation).toBe("SOURCE_DERIVED_FORM");
     expect(adaptAnalysisToTelemetryVM({
       motivationDiscoveryV0_1: duplicateBaseDiscovery,
-    }).motivationDiscoveryV0_1).toMatchObject({ kind: "present" });
+    }).motivationDiscoveryV0_2).toMatchObject({ kind: "present" });
 
     const legacyDuplicateDiscovery = legacyPayloadWithoutSenseOwnershipV0_1(duplicateBaseDiscovery);
     const legacyReading = legacyDuplicateDiscovery.albanianLexicalReading;
@@ -2613,7 +2613,7 @@ describe("real Albanian exact lexical source integration v0.1", () => {
     expect(legacyReading?.sourceLinkedComparison?.relation.sourceRelationAssertion).toBeUndefined();
     expect(adaptAnalysisToTelemetryVM({
       motivationDiscoveryV0_1: legacyDuplicateDiscovery,
-    }).motivationDiscoveryV0_1).toMatchObject({ kind: "present" });
+    }).motivationDiscoveryV0_2).toMatchObject({ kind: "present" });
   });
 
   it("keeps duplicate and missing source-sense identities explicitly Unknown/Null at the adapter", async () => {
@@ -2666,7 +2666,7 @@ describe("real Albanian exact lexical source integration v0.1", () => {
     expect(discovery.albanianLexicalReading?.relatedCandidateEvaluations.every((candidate) =>
       candidate.functionalMeaningBridge.status === "NULL",
     )).toBe(true);
-    expect(adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: discovery }).motivationDiscoveryV0_1).toMatchObject({
+    expect(adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: discovery }).motivationDiscoveryV0_2).toMatchObject({
       kind: "present",
     });
   });
@@ -3031,9 +3031,9 @@ describe("real Albanian exact lexical source integration v0.1", () => {
       }),
     ]));
     const vm = adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: peleDiscovery });
-    expect(vm.motivationDiscoveryV0_1).toMatchObject({ kind: "present" });
-    if (vm.motivationDiscoveryV0_1?.kind === "present") {
-      render(createElement(MotivationDiscoveryCardV0_1, { discovery: vm.motivationDiscoveryV0_1 }));
+    expect(vm.motivationDiscoveryV0_2).toMatchObject({ kind: "present" });
+    if (vm.motivationDiscoveryV0_2?.kind === "present") {
+      render(createElement(MotivationDiscoveryCardV0_1, { discovery: vm.motivationDiscoveryV0_2 }));
       expect(screen.getByTestId("albanian-reading-related-form")).toHaveTextContent("pelar");
       expect(screen.getByTestId("albanian-reading-voice-path")).toHaveTextContent("E");
       expect(screen.getByTestId("albanian-reading-functional-bridge")).toHaveTextContent("Source-bounded functional operation AGENT");
@@ -3068,10 +3068,10 @@ describe("real Albanian exact lexical source integration v0.1", () => {
       resolvedSourceRows: [],
     });
     const foreignReferenceVm = adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: foreignReferenceDiscovery });
-    expect(foreignReferenceVm.motivationDiscoveryV0_1).toMatchObject({ kind: "present" });
+    expect(foreignReferenceVm.motivationDiscoveryV0_2).toMatchObject({ kind: "present" });
     cleanup();
-    if (foreignReferenceVm.motivationDiscoveryV0_1?.kind === "present") {
-      render(createElement(MotivationDiscoveryCardV0_1, { discovery: foreignReferenceVm.motivationDiscoveryV0_1 }));
+    if (foreignReferenceVm.motivationDiscoveryV0_2?.kind === "present") {
+      render(createElement(MotivationDiscoveryCardV0_1, { discovery: foreignReferenceVm.motivationDiscoveryV0_2 }));
       expect(screen.getByTestId("albanian-occupational-role-research-candidates"))
         .toHaveTextContent("REFERENCE_LANGUAGE_NOT_EXPLICITLY_ALBANIAN");
     }
@@ -3086,7 +3086,7 @@ describe("real Albanian exact lexical source integration v0.1", () => {
     const tamperedPelar = tampered.albanianLexicalReading.occupationalRoleResearchCandidates.candidates
       .find((candidate) => candidate.sourceRecord.lemma === "pelar");
     if (tamperedPelar) tamperedPelar.functionalOperation = "AGENT";
-    expect(adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: tampered }).motivationDiscoveryV0_1).toMatchObject({
+    expect(adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: tampered }).motivationDiscoveryV0_2).toMatchObject({
       kind: "missing",
       missing: "malformed",
     });
@@ -3138,9 +3138,9 @@ describe("real Albanian exact lexical source integration v0.1", () => {
     });
 
     const vm = adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: discovery });
-    expect(vm.motivationDiscoveryV0_1).toMatchObject({ kind: "present" });
-    if (vm.motivationDiscoveryV0_1?.kind === "present") {
-      render(createElement(MotivationDiscoveryCardV0_1, { discovery: vm.motivationDiscoveryV0_1 }));
+    expect(vm.motivationDiscoveryV0_2).toMatchObject({ kind: "present" });
+    if (vm.motivationDiscoveryV0_2?.kind === "present") {
+      render(createElement(MotivationDiscoveryCardV0_1, { discovery: vm.motivationDiscoveryV0_2 }));
       expect(screen.getByTestId("albanian-reading-functional-bridge")).toHaveTextContent("entity → attributed property");
       expect(screen.getByTestId("albanian-reading-functional-bridge-derived-structure-null")).toHaveTextContent("Null");
       expect(screen.getByTestId("albanian-reading-functional-bridge-derived-structure-null")).toHaveTextContent("no Voice or phonological semantic relation is claimed");
@@ -3195,9 +3195,9 @@ describe("real Albanian exact lexical source integration v0.1", () => {
     expect(reading?.functionalMeaningBridge.functionalHypothesis.statement).toContain("mountainous");
 
     const vm = adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: discovery });
-    expect(vm.motivationDiscoveryV0_1).toMatchObject({ kind: "present" });
-    if (vm.motivationDiscoveryV0_1?.kind === "present") {
-      render(createElement(MotivationDiscoveryCardV0_1, { discovery: vm.motivationDiscoveryV0_1 }));
+    expect(vm.motivationDiscoveryV0_2).toMatchObject({ kind: "present" });
+    if (vm.motivationDiscoveryV0_2?.kind === "present") {
+      render(createElement(MotivationDiscoveryCardV0_1, { discovery: vm.motivationDiscoveryV0_2 }));
       expect(screen.getByTestId("albanian-lexical-reading")).toHaveTextContent("malor");
       expect(screen.getByTestId("albanian-reading-meaning")).toHaveTextContent("mountainous");
       expect(screen.getByTestId("albanian-reading-functional-bridge")).toHaveTextContent("entity → attributed property");
@@ -3545,9 +3545,9 @@ describe("real Albanian exact lexical source integration v0.1", () => {
       candidates: [],
       motivationDiscoveryV0_1: mandatoryComparison,
     });
-    expect(vm.motivationDiscoveryV0_1).toMatchObject({ kind: "present" });
-    if (vm.motivationDiscoveryV0_1?.kind === "present") {
-      render(createElement(MotivationDiscoveryCardV0_1, { discovery: vm.motivationDiscoveryV0_1 }));
+    expect(vm.motivationDiscoveryV0_2).toMatchObject({ kind: "present" });
+    if (vm.motivationDiscoveryV0_2?.kind === "present") {
+      render(createElement(MotivationDiscoveryCardV0_1, { discovery: vm.motivationDiscoveryV0_2 }));
       expect(screen.getByTestId("albanian-source-linked-comparison")).toHaveTextContent("l (optional)");
     }
   });
@@ -3864,9 +3864,9 @@ describe("real Albanian exact lexical source integration v0.1", () => {
     expect(reading?.interpretation.statement).toContain("AGENT");
 
     const vm = adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: discovery });
-    expect(vm.motivationDiscoveryV0_1).toMatchObject({ kind: "present" });
-    if (vm.motivationDiscoveryV0_1?.kind !== "present") throw new Error("Expected the additive API adapter projection");
-    render(createElement(MotivationDiscoveryCardV0_1, { discovery: vm.motivationDiscoveryV0_1 }));
+    expect(vm.motivationDiscoveryV0_2).toMatchObject({ kind: "present" });
+    if (vm.motivationDiscoveryV0_2?.kind !== "present") throw new Error("Expected the additive API adapter projection");
+    render(createElement(MotivationDiscoveryCardV0_1, { discovery: vm.motivationDiscoveryV0_2 }));
     expect(screen.getByTestId("albanian-reading-functional-bridge")).toHaveTextContent("AGENT");
     expect(screen.getByTestId("albanian-reading-functional-bridge-operation")).toHaveTextContent("Functional operation: AGENT");
     expect(screen.getByTestId("albanian-reading-functional-bridge")).toHaveTextContent("SOURCE_RELATED_FORM");
@@ -4273,9 +4273,9 @@ describe("real Albanian exact lexical source integration v0.1", () => {
           sourceIpaSevenVoiceAnalyses: undefined,
         },
       });
-      expect(vm.motivationDiscoveryV0_1).toMatchObject({ kind: "present" });
-      if (vm.motivationDiscoveryV0_1?.kind === "present") {
-        render(createElement(MotivationDiscoveryCardV0_1, { discovery: vm.motivationDiscoveryV0_1 }));
+      expect(vm.motivationDiscoveryV0_2).toMatchObject({ kind: "present" });
+      if (vm.motivationDiscoveryV0_2?.kind === "present") {
+        render(createElement(MotivationDiscoveryCardV0_1, { discovery: vm.motivationDiscoveryV0_2 }));
         expect(screen.getByTestId("albanian-reading-related-candidate-evaluations")).toHaveTextContent("3 bounded functional relationships shown");
         expect(screen.getByTestId("albanian-reading-related-candidate-evaluations")).toHaveTextContent("1 other evaluated link remain Null");
         expect(screen.getAllByTestId("albanian-reading-related-candidate")).toHaveLength(3);
@@ -4335,9 +4335,9 @@ describe("real Albanian exact lexical source integration v0.1", () => {
       exactLexicalSourceFacts: undefined,
       sourceIpaSevenVoiceAnalyses: undefined,
     } });
-    expect(vm.motivationDiscoveryV0_1).toMatchObject({ kind: "present" });
-    if (vm.motivationDiscoveryV0_1?.kind === "present") {
-      render(createElement(MotivationDiscoveryCardV0_1, { discovery: vm.motivationDiscoveryV0_1 }));
+    expect(vm.motivationDiscoveryV0_2).toMatchObject({ kind: "present" });
+    if (vm.motivationDiscoveryV0_2?.kind === "present") {
+      render(createElement(MotivationDiscoveryCardV0_1, { discovery: vm.motivationDiscoveryV0_2 }));
       const section = screen.getByTestId("albanian-functional-family-reading");
       expect(section).toHaveTextContent("shitës");
       expect(section).toHaveTextContent("flower seller");
@@ -4358,12 +4358,12 @@ describe("real Albanian exact lexical source integration v0.1", () => {
 
     const capitalizationVariant = cloneDiscovery();
     candidatesOf(capitalizationVariant).find((candidate) => candidate.relatedForm === "luleshitës")!.relatedForm = "LULESHITËS";
-    expect(adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: capitalizationVariant }).motivationDiscoveryV0_1)
+    expect(adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: capitalizationVariant }).motivationDiscoveryV0_2)
       .toMatchObject({ kind: "present" });
 
     const unicodeVariant = cloneDiscovery();
     candidatesOf(unicodeVariant).find((candidate) => candidate.relatedForm === "luleshitës")!.relatedForm = "luleshitës".normalize("NFD");
-    expect(adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: unicodeVariant }).motivationDiscoveryV0_1)
+    expect(adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: unicodeVariant }).motivationDiscoveryV0_2)
       .toMatchObject({ kind: "present" });
 
     const normalizedDuplicate = cloneDiscovery();
@@ -4371,7 +4371,7 @@ describe("real Albanian exact lexical source integration v0.1", () => {
       ...familyMembersOf(normalizedDuplicate)[0]!,
       form: "LULESHITËS".normalize("NFD"),
     });
-    expect(adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: normalizedDuplicate }).motivationDiscoveryV0_1)
+    expect(adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: normalizedDuplicate }).motivationDiscoveryV0_2)
       .toMatchObject({ kind: "missing", missing: "malformed" });
   });
 
@@ -4958,9 +4958,9 @@ describe("real Albanian exact lexical source integration v0.1", () => {
       ipaObservations: [{ soundIndex: 0, ipa: "/ujə/", tags: [] }],
     }));
 
-    expect(adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: neneDiscovery }).motivationDiscoveryV0_1).toMatchObject({ kind: "present" });
-    expect(adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: yDiscovery }).motivationDiscoveryV0_1).toMatchObject({ kind: "present" });
-    expect(adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: nullDiscovery }).motivationDiscoveryV0_1).toMatchObject({ kind: "present" });
+    expect(adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: neneDiscovery }).motivationDiscoveryV0_2).toMatchObject({ kind: "present" });
+    expect(adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: yDiscovery }).motivationDiscoveryV0_2).toMatchObject({ kind: "present" });
+    expect(adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: nullDiscovery }).motivationDiscoveryV0_2).toMatchObject({ kind: "present" });
 
     const yAnalysis = yDiscovery.sourceIpaSevenVoiceAnalyses?.[0];
     const neneAnalysis = neneDiscovery.sourceIpaSevenVoiceAnalyses?.[0];
@@ -4974,7 +4974,7 @@ describe("real Albanian exact lexical source integration v0.1", () => {
         voicePath: ["X"],
       })),
     };
-    expect(adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: invalidVoicePath }).motivationDiscoveryV0_1).toMatchObject({
+    expect(adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: invalidVoicePath }).motivationDiscoveryV0_2).toMatchObject({
       kind: "missing",
       missing: "malformed",
     });
@@ -4986,7 +4986,7 @@ describe("real Albanian exact lexical source integration v0.1", () => {
         nuclei: analysis.nuclei.map((nucleus) => ({ ...nucleus, voice: "X" })),
       })),
     };
-    expect(adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: invalidNucleusVoice }).motivationDiscoveryV0_1).toMatchObject({
+    expect(adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: invalidNucleusVoice }).motivationDiscoveryV0_2).toMatchObject({
       kind: "missing",
       missing: "malformed",
     });
@@ -5001,7 +5001,7 @@ describe("real Albanian exact lexical source integration v0.1", () => {
         })),
       })),
     };
-    expect(adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: invalidCategoryVoicePair }).motivationDiscoveryV0_1).toMatchObject({
+    expect(adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: invalidCategoryVoicePair }).motivationDiscoveryV0_2).toMatchObject({
       kind: "missing",
       missing: "malformed",
     });
@@ -5016,7 +5016,7 @@ describe("real Albanian exact lexical source integration v0.1", () => {
         })),
       })),
     };
-    expect(adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: invalidNucleusCategory }).motivationDiscoveryV0_1).toMatchObject({
+    expect(adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: invalidNucleusCategory }).motivationDiscoveryV0_2).toMatchObject({
       kind: "missing",
       missing: "malformed",
     });
@@ -5064,7 +5064,7 @@ describe("real Albanian exact lexical source integration v0.1", () => {
       noSingleWinner: true as const,
     };
     const vm = adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: discovery });
-    render(createElement(MotivationDiscoveryCardV0_1, { discovery: vm.motivationDiscoveryV0_1 }));
+    render(createElement(MotivationDiscoveryCardV0_1, { discovery: vm.motivationDiscoveryV0_2 }));
 
     expect(screen.getByTestId("albanian-exact-lexical-source-facts")).toBeInTheDocument();
     expect(screen.getAllByText("nënë").length).toBeGreaterThanOrEqual(2);
@@ -5134,7 +5134,7 @@ describe("real Albanian exact lexical source integration v0.1", () => {
     expect(discovery.albanianLexicalReading?.functionalMeaningBridge.status).toBe("NULL");
 
     const vm = adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: discovery });
-    render(createElement(MotivationDiscoveryCardV0_1, { discovery: vm.motivationDiscoveryV0_1 }));
+    render(createElement(MotivationDiscoveryCardV0_1, { discovery: vm.motivationDiscoveryV0_2 }));
 
     const exactFacts = screen.getByTestId("albanian-exact-lexical-source-facts");
     expect(exactFacts).toHaveTextContent("SELECTED PRIMARY SOURCE RECORD");
@@ -5248,9 +5248,9 @@ describe("real Albanian exact lexical source integration v0.1", () => {
     });
 
     const vm = adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: discovery });
-    expect(vm.motivationDiscoveryV0_1).toMatchObject({ kind: "present" });
-    if (vm.motivationDiscoveryV0_1?.kind === "present") {
-      render(createElement(MotivationDiscoveryCardV0_1, { discovery: vm.motivationDiscoveryV0_1 }));
+    expect(vm.motivationDiscoveryV0_2).toMatchObject({ kind: "present" });
+    if (vm.motivationDiscoveryV0_2?.kind === "present") {
+      render(createElement(MotivationDiscoveryCardV0_1, { discovery: vm.motivationDiscoveryV0_2 }));
       const card = screen.getByTestId("albanian-source-linked-component-reading");
       expect(card).toHaveTextContent("photograph");
       expect(card).toHaveTextContent("dritë");
@@ -5431,9 +5431,9 @@ describe("real Albanian exact lexical source integration v0.1", () => {
     ]));
 
     const vm = adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: discovery });
-    expect(vm.motivationDiscoveryV0_1).toMatchObject({ kind: "present" });
-    if (vm.motivationDiscoveryV0_1?.kind === "present") {
-      render(createElement(MotivationDiscoveryCardV0_1, { discovery: vm.motivationDiscoveryV0_1 }));
+    expect(vm.motivationDiscoveryV0_2).toMatchObject({ kind: "present" });
+    if (vm.motivationDiscoveryV0_2?.kind === "present") {
+      render(createElement(MotivationDiscoveryCardV0_1, { discovery: vm.motivationDiscoveryV0_2 }));
       const card = screen.getByTestId("albanian-source-linked-component-reading");
       const hypothesisCard = screen.getByTestId("albanian-source-linked-functional-hypothesis");
       expect(card).toHaveTextContent("zjarr → zjarr#Albanian");
@@ -5487,9 +5487,9 @@ describe("real Albanian exact lexical source integration v0.1", () => {
     });
 
     const vm = adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: discovery });
-    expect(vm.motivationDiscoveryV0_1).toMatchObject({ kind: "present" });
-    if (vm.motivationDiscoveryV0_1?.kind === "present") {
-      render(createElement(MotivationDiscoveryCardV0_1, { discovery: vm.motivationDiscoveryV0_1 }));
+    expect(vm.motivationDiscoveryV0_2).toMatchObject({ kind: "present" });
+    if (vm.motivationDiscoveryV0_2?.kind === "present") {
+      render(createElement(MotivationDiscoveryCardV0_1, { discovery: vm.motivationDiscoveryV0_2 }));
       const componentHypothesis = screen.getByTestId("albanian-source-linked-functional-hypothesis");
       expect(componentHypothesis).toHaveTextContent("UNKNOWN_OR_NULL");
       expect(componentHypothesis).toHaveTextContent("SOURCE_COMPONENT_GLOSS_TEXT_OVERLAP_NOT_EXPLICIT");
@@ -5828,7 +5828,7 @@ describe("real Albanian exact lexical source integration v0.1", () => {
       });
       expect(reading?.relation.references).toHaveLength(form === "kalimtar" ? 3 : 1);
 
-      const vm = adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: discovery }).motivationDiscoveryV0_1;
+      const vm = adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: discovery }).motivationDiscoveryV0_2;
       expect(vm).toMatchObject({ kind: "present" });
       if (vm?.kind !== "present") throw new Error("Expected source facts with bounded AF Null to remain visible");
       expect(vm.value.albanianLexicalReading?.sourceLinkedComponentReading).toMatchObject({
@@ -5887,7 +5887,7 @@ describe("real Albanian exact lexical source integration v0.1", () => {
     const malformed = JSON.parse(JSON.stringify(discovery)) as Record<string, unknown>;
     const reading = (malformed.albanianLexicalReading as Record<string, unknown>);
     mutate(reading);
-    expect(adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: malformed }).motivationDiscoveryV0_1)
+    expect(adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: malformed }).motivationDiscoveryV0_2)
       .toMatchObject({ kind: "missing", missing: "malformed" });
   });
 
@@ -5951,14 +5951,14 @@ describe("real Albanian exact lexical source integration v0.1", () => {
     expect(discovery.albanianLexicalReading?.composition.status).toBe("NULL");
 
     const vm = adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: discovery });
-    expect(vm.motivationDiscoveryV0_1).toMatchObject({ kind: "present" });
-    if (vm.motivationDiscoveryV0_1?.kind === "present") {
-      expect(vm.motivationDiscoveryV0_1.value.albanianLexicalReading?.sourceLinkedComponentReading).toMatchObject({
+    expect(vm.motivationDiscoveryV0_2).toMatchObject({ kind: "present" });
+    if (vm.motivationDiscoveryV0_2?.kind === "present") {
+      expect(vm.motivationDiscoveryV0_2.value.albanianLexicalReading?.sourceLinkedComponentReading).toMatchObject({
         status: "NULL",
         reasonCodes: expect.arrayContaining(["SOURCE_COMPOUND_ARITY_UNSUPPORTED"]),
         relation: { relation: "SOURCE_COMPOUND_ARITY_UNSUPPORTED" },
       });
-      render(createElement(MotivationDiscoveryCardV0_1, { discovery: vm.motivationDiscoveryV0_1 }));
+      render(createElement(MotivationDiscoveryCardV0_1, { discovery: vm.motivationDiscoveryV0_2 }));
       const card = screen.getByTestId("albanian-source-linked-component-reading");
       expect(card).toHaveTextContent("Null — SOURCE_COMPOUND_ARITY_UNSUPPORTED.");
       expect(card).toHaveTextContent("alpha → alpha#Albanian");
@@ -5973,7 +5973,7 @@ describe("real Albanian exact lexical source integration v0.1", () => {
     const malformedSupportedReading = (malformedSupported.albanianLexicalReading as Record<string, unknown>)
       .sourceLinkedComponentReading as Record<string, unknown>;
     malformedSupportedReading.status = "SUPPORTED";
-    expect(adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: malformedSupported }).motivationDiscoveryV0_1).toMatchObject({
+    expect(adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: malformedSupported }).motivationDiscoveryV0_2).toMatchObject({
       kind: "missing",
       missing: "malformed",
     });
@@ -5982,7 +5982,7 @@ describe("real Albanian exact lexical source integration v0.1", () => {
     const malformedRelationReading = (malformedRelation.albanianLexicalReading as Record<string, unknown>)
       .sourceLinkedComponentReading as Record<string, unknown>;
     (malformedRelationReading.relation as Record<string, unknown>).relation = "SOURCE_EXPLICIT_TWO_COMPONENT_COMPOUND";
-    expect(adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: malformedRelation }).motivationDiscoveryV0_1).toMatchObject({
+    expect(adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: malformedRelation }).motivationDiscoveryV0_2).toMatchObject({
       kind: "missing",
       missing: "malformed",
     });
@@ -6142,9 +6142,9 @@ describe("real Albanian exact lexical source integration v0.1", () => {
       candidates: [],
       motivationDiscoveryV0_1: result.discovery,
     });
-    expect(vm.motivationDiscoveryV0_1).toMatchObject({ kind: "present" });
-    if (vm.motivationDiscoveryV0_1?.kind === "present") {
-      render(createElement(MotivationDiscoveryCardV0_1, { discovery: vm.motivationDiscoveryV0_1 }));
+    expect(vm.motivationDiscoveryV0_2).toMatchObject({ kind: "present" });
+    if (vm.motivationDiscoveryV0_2?.kind === "present") {
+      render(createElement(MotivationDiscoveryCardV0_1, { discovery: vm.motivationDiscoveryV0_2 }));
       expect(screen.getByTestId("albanian-five-windows-comparison")).toHaveTextContent("FIVE WINDOWS — ALBANIAN WORD COMPARISON");
       expect(screen.getAllByTestId("albanian-five-windows-member")).toHaveLength(5);
       expect(screen.getByTestId("albanian-five-windows-comparison")).toHaveTextContent("fënjeshtër");
@@ -6159,7 +6159,7 @@ describe("real Albanian exact lexical source integration v0.1", () => {
       expect(screen.getByTestId("albanian-five-windows-comparison")).toHaveTextContent("Source sound tags: Southern, Gheg");
       expect(screen.getByTestId("albanian-five-windows-comparison")).toHaveTextContent("Source sound tags: not provided");
       expect(screen.getAllByTestId("albanian-five-windows-ipa-analysis")).toHaveLength(5);
-      const vmComparison = vm.motivationDiscoveryV0_1.value.albanianLexicalReading?.fiveWindowsComparison;
+      const vmComparison = vm.motivationDiscoveryV0_2.value.albanianLexicalReading?.fiveWindowsComparison;
       expect(vmComparison?.members[0]?.records[0]?.sourceIpaSevenVoiceAnalyses[0]).toMatchObject({
         sourceRecordId: "kaikki-albanian-jsonl:word=dritare:ordinal=0",
         soundIndex: 0,
@@ -6207,7 +6207,7 @@ describe("real Albanian exact lexical source integration v0.1", () => {
         },
       },
     };
-    expect(adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: malformed }).motivationDiscoveryV0_1).toMatchObject({
+    expect(adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: malformed }).motivationDiscoveryV0_2).toMatchObject({
       kind: "missing",
       missing: "malformed",
     });
@@ -6285,9 +6285,9 @@ describe("real Albanian exact lexical source integration v0.1", () => {
     expect(comparison?.members.every((member) => member.reasonCodes.includes("ALBANIAN_SOURCE_PATH_NOT_CONFIGURED"))).toBe(true);
 
     const unavailableVm = adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: unavailable.discovery });
-    expect(unavailableVm.motivationDiscoveryV0_1).toMatchObject({ kind: "present" });
-    if (unavailableVm.motivationDiscoveryV0_1?.kind === "present") {
-      render(createElement(MotivationDiscoveryCardV0_1, { discovery: unavailableVm.motivationDiscoveryV0_1 }));
+    expect(unavailableVm.motivationDiscoveryV0_2).toMatchObject({ kind: "present" });
+    if (unavailableVm.motivationDiscoveryV0_2?.kind === "present") {
+      render(createElement(MotivationDiscoveryCardV0_1, { discovery: unavailableVm.motivationDiscoveryV0_2 }));
       expect(screen.queryByTestId("albanian-lexical-reading")).toBeNull();
       expect(screen.getByTestId("albanian-five-windows-comparison")).toHaveTextContent("FIVE WINDOWS — ALBANIAN WORD COMPARISON");
       expect(screen.getAllByTestId("albanian-five-windows-member")).toHaveLength(5);
@@ -6405,9 +6405,9 @@ describe("pinned Albanian three-component functional composition v0.1", () => {
     expect(reading?.composition).toMatchObject({ status: "NULL", interpretation: { status: "UNKNOWN_OR_NULL", statement: null } });
 
     const vm = adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: discovery });
-    expect(vm.motivationDiscoveryV0_1).toMatchObject({ kind: "present" });
-    if (vm.motivationDiscoveryV0_1?.kind !== "present") throw new Error("Expected actual source-backed discovery to project");
-    render(createElement(MotivationDiscoveryCardV0_1, { discovery: vm.motivationDiscoveryV0_1 }));
+    expect(vm.motivationDiscoveryV0_2).toMatchObject({ kind: "present" });
+    if (vm.motivationDiscoveryV0_2?.kind !== "present") throw new Error("Expected actual source-backed discovery to project");
+    render(createElement(MotivationDiscoveryCardV0_1, { discovery: vm.motivationDiscoveryV0_2 }));
     expect(screen.getByTestId("albanian-source-linked-functional-hypothesis")).toHaveTextContent("conditionally compatible with an agent reading");
     expect(screen.getByTestId("albanian-source-linked-functional-hypothesis")).toHaveTextContent("firefighter");
     expect(screen.getByTestId("albanian-source-linked-functional-hypothesis")).toHaveTextContent("fireman");
@@ -6593,9 +6593,9 @@ describe("pinned Albanian exact source-record selection v0.1", () => {
     expect(selectedShtrazeOrdinal0.albanianLexicalReading?.functionalMeaningBridge.status).toBe("NULL");
 
     const selectedVm = adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: selectedKrye });
-    expect(selectedVm.motivationDiscoveryV0_1.kind).toBe("present");
-    if (selectedVm.motivationDiscoveryV0_1.kind === "present") {
-      render(createElement(MotivationDiscoveryCardV0_1, { discovery: selectedVm.motivationDiscoveryV0_1 }));
+    expect(selectedVm.motivationDiscoveryV0_2.kind).toBe("present");
+    if (selectedVm.motivationDiscoveryV0_2.kind === "present") {
+      render(createElement(MotivationDiscoveryCardV0_1, { discovery: selectedVm.motivationDiscoveryV0_2 }));
       expect(screen.getByText("SELECTED PRIMARY SOURCE RECORD")).toBeInTheDocument();
       expect(screen.getByText("ALTERNATIVE SOURCE RECORD — NOT EVALUATED AS THE SELECTED PRIMARY READING")).toBeInTheDocument();
       expect(screen.getAllByText(/kryegjahtar/).length).toBeGreaterThan(0);
@@ -6654,9 +6654,9 @@ describe("pinned Albanian sense-owned source relation provenance v0.3", () => {
     expect(relatedCandidates[0]?.functionalMeaningBridge.status).toBe("NULL");
 
     const vm = adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: discovery });
-    expect(vm.motivationDiscoveryV0_1).toMatchObject({ kind: "present" });
-    if (vm.motivationDiscoveryV0_1?.kind === "present") {
-      render(createElement(MotivationDiscoveryCardV0_1, { discovery: vm.motivationDiscoveryV0_1 }));
+    expect(vm.motivationDiscoveryV0_2).toMatchObject({ kind: "present" });
+    if (vm.motivationDiscoveryV0_2?.kind === "present") {
+      render(createElement(MotivationDiscoveryCardV0_1, { discovery: vm.motivationDiscoveryV0_2 }));
       const ownerLine = screen.getAllByTestId("albanian-source-relation-owner").find((line) =>
         line.textContent?.includes(sourceSenseId),
       );
@@ -7089,11 +7089,11 @@ describe("pinned BLETAR source-authored suffix template v0.1", () => {
       );
 
       const vm = adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: discovery });
-      expect(vm.motivationDiscoveryV0_1).toMatchObject({ kind: "present" });
-      if (vm.motivationDiscoveryV0_1?.kind !== "present") {
+      expect(vm.motivationDiscoveryV0_2).toMatchObject({ kind: "present" });
+      if (vm.motivationDiscoveryV0_2?.kind !== "present") {
         throw new Error("Expected the existing source-backed BLETAR UI projection");
       }
-      render(createElement(MotivationDiscoveryCardV0_1, { discovery: vm.motivationDiscoveryV0_1 }));
+      render(createElement(MotivationDiscoveryCardV0_1, { discovery: vm.motivationDiscoveryV0_2 }));
       expect(screen.getByTestId("albanian-lexical-reading")).toHaveTextContent("bletar");
       expect(screen.getByTestId("albanian-reading-meaning")).toHaveTextContent("beekeeper");
       expect(screen.getByTestId("albanian-reading-functional-bridge")).toHaveTextContent("AGENT");
@@ -7119,7 +7119,7 @@ describe("pinned BLETAR source-authored suffix template v0.1", () => {
         initialTargetWord: "bletar",
         currentWordEvidence: {
           analyzedWord: "bletar",
-          discovery: vm.motivationDiscoveryV0_1,
+          discovery: vm.motivationDiscoveryV0_2,
         },
       }));
       const structuralAlignment = screen.getByTestId("single-word-structural-source-component-alignment");

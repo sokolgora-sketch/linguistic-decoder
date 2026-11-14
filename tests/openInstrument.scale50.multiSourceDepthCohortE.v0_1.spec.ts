@@ -121,7 +121,7 @@ describe(
           await analyze(word);
 
         expect(
-          body.analysisStatusV0_1,
+          body.analysisStatusV0_2,
         ).toEqual(
           expect.objectContaining({
             reviewedOperators: [],
@@ -130,7 +130,7 @@ describe(
               "user_decides",
           }),
         );
-        expect((body.analysisStatusV0_1 as Record<string, unknown>).status).not.toBe("research_functional_hypothesis");
+        expect((body.analysisStatusV0_2 as Record<string, unknown>).status).not.toBe("research_functional_hypothesis");
 
         const research =
           candidateRows(body)
@@ -175,8 +175,11 @@ describe(
               "not_claimed",
             historicalOriginClaim:
               "not_claimed",
-            winnerClaim:
-              "not_claimed",
+            interpretationDecisionPolicy: expect.objectContaining({
+              multipleInterpretationsMayCoexist: true,
+              automaticInterpretationSelection: "DISABLED",
+              interpretationDecisionAuthority: "USER_DECIDES",
+            }),
           }),
         );
 
@@ -199,8 +202,11 @@ describe(
               "not_claimed",
             historicalOriginClaim:
               "not_claimed",
-            winnerClaim:
-              "not_claimed",
+            interpretationDecisionPolicy: expect.objectContaining({
+              multipleInterpretationsMayCoexist: true,
+              automaticInterpretationSelection: "DISABLED",
+              interpretationDecisionAuthority: "USER_DECIDES",
+            }),
           }),
         );
 

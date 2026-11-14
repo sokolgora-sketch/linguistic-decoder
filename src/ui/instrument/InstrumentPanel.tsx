@@ -560,7 +560,7 @@ export function InstrumentPanel(props: Props) {
                   </button>
                 ) : null}
                 <PrimaryAlbanianReadingCardV0_1
-                  discovery={vm.motivationDiscoveryV0_1}
+                  discovery={vm.motivationDiscoveryV0_2}
                   analysisStatus={analysisStatusForUi}
                 />
               </div>
@@ -570,7 +570,7 @@ export function InstrumentPanel(props: Props) {
               <SpokenResultCompositionSummaryV0_1 readout={vm.readout} />
 
               <MotivationDiscoveryCardV0_1
-                discovery={vm.motivationDiscoveryV0_1}
+                discovery={vm.motivationDiscoveryV0_2}
                 interpretation={vm.functionalMotivationInterpretationV0_3}
                 onAnalyzeAlbanianSourceRecord={props.onAnalyzeAlbanianSourceRecord}
                 sourceRecordSelectionDisabled={props.sourceRecordSelectionDisabled}
@@ -647,7 +647,7 @@ export function InstrumentPanel(props: Props) {
                 currentWordEvidence={isValidVm
                   ? {
                       analyzedWord: vm.readout.word,
-                      discovery: vm.motivationDiscoveryV0_1,
+                      discovery: vm.motivationDiscoveryV0_2,
                       sourceWitnesses: crossLanguageSourceWitnesses,
                     }
                   : undefined}

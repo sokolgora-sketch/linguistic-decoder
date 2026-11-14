@@ -1,5 +1,4 @@
 import { webcrypto } from "node:crypto";
-import { toAnalyzeWordResultV2Contract } from "@/shared/analyzeWordResult.v2.contract";
 import {
   buildReproducibleRunBundleV0_1,
   serializeReproducibleRunBundleV0_1,
@@ -56,7 +55,7 @@ function result(word: string) {
 }
 
 async function bundle(word: string) {
-  return buildReproducibleRunBundleV0_2({ result: toAnalyzeWordResultV2Contract(result(word)), createdAt: "2026-11-13T00:00:00.000Z" });
+  return buildReproducibleRunBundleV0_2({ result: result(word), createdAt: "2026-11-13T00:00:00.000Z" });
 }
 
 describe("neutral comparison export v0.2", () => {

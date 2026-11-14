@@ -198,9 +198,9 @@ describe("sense-aligned Albanian lexical role evidence v0.1", () => {
     expect(role.claimBoundary).toContain("does not authorize the existing AGENT operation");
 
     const vm = adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: discovery });
-    expect(vm.motivationDiscoveryV0_1?.kind).toBe("present");
-    if (vm.motivationDiscoveryV0_1?.kind === "present") {
-      render(createElement(MotivationDiscoveryCardV0_1, { discovery: vm.motivationDiscoveryV0_1 }));
+    expect(vm.motivationDiscoveryV0_2?.kind).toBe("present");
+    if (vm.motivationDiscoveryV0_2?.kind === "present") {
+      render(createElement(MotivationDiscoveryCardV0_1, { discovery: vm.motivationDiscoveryV0_2 }));
       expect(screen.getByTestId("albanian-sense-aligned-lexical-role")).toHaveTextContent("HUMAN_ROLE");
       expect(screen.getByTestId("albanian-sense-aligned-lexical-role")).toHaveTextContent("sense 1");
       expect(screen.getByTestId("albanian-sense-aligned-lexical-role")).toHaveTextContent("Functional operation: Null");
@@ -221,7 +221,7 @@ describe("sense-aligned Albanian lexical role evidence v0.1", () => {
         },
       },
     };
-    expect(adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: forgedDiscovery }).motivationDiscoveryV0_1)
+    expect(adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: forgedDiscovery }).motivationDiscoveryV0_2)
       .toMatchObject({ kind: "missing" });
 
     const duplicateSenseIdDiscovery = {
@@ -233,7 +233,7 @@ describe("sense-aligned Albanian lexical role evidence v0.1", () => {
           : sense),
       })),
     };
-    expect(adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: duplicateSenseIdDiscovery }).motivationDiscoveryV0_1)
+    expect(adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: duplicateSenseIdDiscovery }).motivationDiscoveryV0_2)
       .toMatchObject({ kind: "missing" });
 
     const forgedClaimBoundary = {
@@ -243,7 +243,7 @@ describe("sense-aligned Albanian lexical role evidence v0.1", () => {
         senseAlignedLexicalRole: { ...role, claimBoundary: "This proves the productive -çi suffix is an AGENT operation." },
       },
     };
-    expect(adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: forgedClaimBoundary }).motivationDiscoveryV0_1)
+    expect(adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: forgedClaimBoundary }).motivationDiscoveryV0_2)
       .toMatchObject({ kind: "missing" });
 
     const forgedStatement = {
@@ -258,7 +258,7 @@ describe("sense-aligned Albanian lexical role evidence v0.1", () => {
         },
       },
     };
-    expect(adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: forgedStatement }).motivationDiscoveryV0_1)
+    expect(adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: forgedStatement }).motivationDiscoveryV0_2)
       .toMatchObject({ kind: "missing" });
   });
 

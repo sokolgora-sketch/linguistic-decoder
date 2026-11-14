@@ -170,7 +170,10 @@ describe(
           "const analysisStatusV0_2 = parseAnalysisStatusV0_2(payload);",
         );
         expect(adapter).toContain(
-          "analysisStatusV0_2FieldEmitted || analysisStatusV0_1.kind === \"present\"",
+          "const legacy = parseAnalysisStatusV0_1(payload);",
+        );
+        expect(adapter).toContain(
+          "migrateAnalysisStatusV0_1ToV0_2(legacy.value)",
         );
 
         expect(card).not.toContain(

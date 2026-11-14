@@ -8,7 +8,7 @@ import type {
   Vowel,
 } from "@/ui/telemetry/types";
 import type { GenericFunctionalWitnessRuntimeProjectionV1 } from "@/shared/openInstrument/genericFunctionalWitnessRuntimeProjection.v1";
-import type { WordSpecificFunctionalDepthV0_1 } from "@/shared/openInstrument/wordSpecificFunctionalDepth.v0_1";
+import type { WordSpecificFunctionalDepthV0_2 } from "@/shared/openInstrument/wordSpecificFunctionalDepth.v0_2";
 import { getReviewedExternalLexiconProductionSourceRowsV0_1 } from "@/shared/reviewedExternalLexiconSourceRowRegistry.v0_1";
 
 import { buildCandidateRowsFromVM } from "@/ui/candidates/candidateModel";
@@ -813,7 +813,7 @@ function NoSupportedFunctionalCandidate({
 function WordSpecificFunctionalDepthSummaryV0_1({
   value,
 }: {
-  value: WordSpecificFunctionalDepthV0_1 | undefined;
+  value: WordSpecificFunctionalDepthV0_2 | undefined;
 }) {
   if (value === undefined) return null;
 
@@ -871,7 +871,7 @@ function WordSpecificFunctionalDepthSummaryV0_1({
       </div>
 
       <div className="mt-3 text-xs leading-5 text-slate-600 dark:text-slate-400">
-        No single candidate is selected. User decides. Historical origin and candidate truth are not claimed.
+        Multiple candidate interpretations may coexist. User decides. Historical origin and candidate truth are not claimed.
       </div>
     </section>
   );
@@ -994,7 +994,7 @@ function GenericFunctionalWitnesses({
           </div>
 
           <div className="mt-3 text-xs leading-5 text-slate-600 dark:text-slate-400">
-            No single witness is selected. User decides.
+            Multiple witnesses may coexist. User decides.
           </div>
         </>
       )}

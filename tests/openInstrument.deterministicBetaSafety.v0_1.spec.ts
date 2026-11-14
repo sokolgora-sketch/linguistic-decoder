@@ -290,7 +290,7 @@ describe("Open Instrument deterministic-only public beta boundary v0.1", () => {
       providerExecution: "automatic",
     })));
     expect(nullCase.status).toBe(200);
-    expect(nullCase.json.analysisStatusV0_1.status).toBe("null_no_supported_candidate");
+    expect(nullCase.json.analysisStatusV0_2.status).toBe("null_no_supported_candidate");
     expect(fetchMock).not.toHaveBeenCalled();
   });
 
@@ -317,13 +317,13 @@ describe("Open Instrument deterministic-only public beta boundary v0.1", () => {
         status: "UNAVAILABLE",
         failureReasonCodes: ["PROVIDER_CONFIGURATION_FAILURE"],
       });
-      expect(response.json.motivationDiscoveryV0_1.candidates.filter(
+      expect(response.json.motivationDiscoveryV0_2.candidates.filter(
         (candidate: any) => candidate.candidateLanguage === "English",
       )).toEqual([]);
-      expect(response.json.motivationDiscoveryV0_1.candidates.some(
+      expect(response.json.motivationDiscoveryV0_2.candidates.some(
         (candidate: any) => candidate.sourceFact.sourceId === "reviewed.external.di.knowledge.candidate.v0_1",
       )).toBe(true);
-      expect(JSON.stringify(response.json.motivationDiscoveryV0_1)).not.toContain(
+      expect(JSON.stringify(response.json.motivationDiscoveryV0_2)).not.toContain(
         "LEXICAL_SENSE_SOURCE_NOT_FOUND",
       );
       expect(fetchMock).not.toHaveBeenCalled();
@@ -374,13 +374,13 @@ describe("Open Instrument deterministic-only public beta boundary v0.1", () => {
     expect(manualIpa.status).toBe(200);
     expect(manualIpa.json.automaticCarrierPronunciationV0_1.status).toBe("manual_ipa");
     expect(banana.status).toBe(200);
-    expect(banana.json.motivationDiscoveryV0_1.candidates.some((candidate: any) =>
+    expect(banana.json.motivationDiscoveryV0_2.candidates.some((candidate: any) =>
       candidate.candidateLanguage === "English",
     )).toBe(true);
     expect(candle.status).toBe(200);
     expect(candle.json.word).toBe("candle");
     expect(nullCase.status).toBe(200);
-    expect(nullCase.json.analysisStatusV0_1.status).toBe("null_no_supported_candidate");
+    expect(nullCase.json.analysisStatusV0_2.status).toBe("null_no_supported_candidate");
     expect(fetchMock).not.toHaveBeenCalled();
   });
 

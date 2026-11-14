@@ -11,7 +11,7 @@ import { TextEncoder, TextDecoder } from "node:util";
 import { normalizeForSnapshotV0_1 } from "./_helpers/snapshotNormalize.v0.1";
 import { ReadableStream, TransformStream, WritableStream } from "node:stream/web";
 import { MessageChannel, MessagePort } from "node:worker_threads";
-import { buildOriginClaimV1 } from "../src/shared/originClaim.builder.v1";
+import { hasLegacyInterpretationFieldsV2 } from "../src/shared/analyzeWordResult.v2.contract";
 
 // ---- polyfills (must exist before importing undici / route module) ----
 (globalThis as any).TextEncoder = TextEncoder;
@@ -88,16 +88,22 @@ function normalizeOriginClaimSnapshot(out: any) {
   return { ...oc, meta };
 }
 
-describe("originClaim v1 — gold snapshots (originClaim block only)", () => {
+describe("neutral originClaim v0.2 — gold snapshots (originClaim block only)", () => {
   const words = ["study", "father", "damage", "love", "hope"] as const;
 
   for (const w of words) {
     test(`gold:${w}`, async () => {
       const out = await getResult(w, "strict");
 
-      // Defensive: builder should align with emitted block
-      const built = buildOriginClaimV1(out);
-      expect(out.originClaim?.policy ?? null).toBe(built?.policy ?? null);
+      expect(out.responseContractVersion).toBe("open-instrument.analyze-word-result.v2");
+      if (out.originClaim && typeof out.originClaim === "object") {
+        expect(out.originClaim?.interpretationDecisionPolicy).toMatchObject({
+          multipleInterpretationsMayCoexist: true,
+          automaticInterpretationSelection: "DISABLED",
+          interpretationDecisionAuthority: "USER_DECIDES",
+        });
+      }
+      expect(hasLegacyInterpretationFieldsV2(out)).toBe(false);
 
       expect(normalizeOriginClaimSnapshot(out)).toMatchSnapshot();
     });

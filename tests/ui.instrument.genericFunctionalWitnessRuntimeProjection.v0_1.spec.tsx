@@ -144,7 +144,7 @@ describe("Lane 4 witness presentation", () => {
       screen.getAllByText(/Functional correspondence: Unknown \/ unresolved/),
     ).toHaveLength(2);
     expect(screen.getAllByText(/Historical relation: Not claimed\./)).toHaveLength(2);
-    expect(screen.getByText("No single witness is selected. User decides.")).toBeInTheDocument();
+    expect(screen.getByText("Multiple witnesses may coexist. User decides.")).toBeInTheDocument();
     expect(screen.queryByText(/comes from|proves|true root/i)).not.toBeInTheDocument();
   });
 
@@ -245,7 +245,7 @@ describe("Lane 4 witness presentation", () => {
       "Functional correspondence: Unknown / unresolved",
     );
     expect(secondary).toHaveTextContent("Historical relation: Not claimed.");
-    expect(secondary).toHaveTextContent("No single witness is selected. User decides.");
+    expect(secondary).toHaveTextContent("Multiple witnesses may coexist. User decides.");
 
     const primary = screen.getByTestId("functional-motivation-card");
     expect(primary).toHaveTextContent("Candidate");

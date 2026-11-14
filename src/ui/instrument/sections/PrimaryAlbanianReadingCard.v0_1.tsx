@@ -1,11 +1,11 @@
 "use client";
 
 import type {
-  AnalysisStatusV0_1VM,
   AnalysisStatusV0_2VM,
-  MotivationDiscoveryV0_1VM,
+  MotivationDiscoveryV0_2VM,
   PresentOrMissing,
 } from "@/ui/telemetry/types";
+import { isInterpretationDecisionPolicyV0_1 } from "@/shared/openInstrument/interpretationDecisionPolicy.v0_1";
 
 const KAIKKI_ALBANIAN_URL =
   "https://kaikki.org/dictionary/Albanian/kaikki.org-dictionary-Albanian.jsonl";
@@ -19,8 +19,8 @@ export function PrimaryAlbanianReadingCardV0_1({
   discovery,
   analysisStatus,
 }: {
-  discovery: PresentOrMissing<MotivationDiscoveryV0_1VM> | undefined;
-  analysisStatus: PresentOrMissing<AnalysisStatusV0_1VM | AnalysisStatusV0_2VM> | undefined;
+  discovery: PresentOrMissing<MotivationDiscoveryV0_2VM> | undefined;
+  analysisStatus: PresentOrMissing<AnalysisStatusV0_2VM> | undefined;
 }) {
   if (discovery?.kind !== "present") return null;
 
@@ -138,7 +138,7 @@ export function PrimaryAlbanianReadingCardV0_1({
     sourceComponentHypothesis.claimBoundary.trim().length > 0 &&
     sourceComponentReading.reasonCodes.length === 0 &&
     sourceComponentReading.claimBoundary.trim().length > 0 &&
-    sourceComponentHypothesis.noSingleWinner === true &&
+    isInterpretationDecisionPolicyV0_1(sourceComponentHypothesis.interpretationDecisionPolicy) &&
     sourceComponentHypothesis.userDecisionPosture === "user_decides";
   const sourceUnavailable = exactSourceStatus === "UNAVAILABLE";
 

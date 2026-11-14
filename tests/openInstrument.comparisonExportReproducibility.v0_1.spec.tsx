@@ -6,15 +6,15 @@ import { webcrypto } from "node:crypto";
 import { GET } from "../app/api/analyze-v1/route";
 import { stableStringify } from "../src/shared/engineContract.v1";
 import {
-  buildReproducibleRunBundleV0_1,
-  serializeReproducibleRunBundleV0_1,
-} from "../src/shared/openInstrument/reproducibleRunBundle.v0_1";
+  buildReproducibleRunBundleV0_2,
+  serializeReproducibleRunBundleV0_2,
+} from "../src/shared/openInstrument/reproducibleRunBundle.v0_2";
 import { adaptAnalysisToTelemetryVM } from "../src/ui/instrument/contractAdapter";
 import {
-  buildComparisonExportArtifactV0_1,
-  parseComparisonExportArtifactV0_1,
-  serializeComparisonExportArtifactV0_1,
-} from "../src/ui/instrument/comparisonExportReproducibility.v0_1";
+  buildComparisonExportArtifactV0_2,
+  parseComparisonExportArtifactV0_2,
+  serializeComparisonExportArtifactV0_2,
+} from "../src/ui/instrument/comparisonExportReproducibility.v0_2";
 import { projectRecentAnalysisResultsV0_1 } from "../src/ui/instrument/recentAnalysisResults.v0_1";
 import { WordToWordStructuralAuthorityComparisonCard } from "../src/ui/instrument/sections/WordToWordStructuralAuthorityComparisonCard.v0_1";
 import { downloadText } from "@/lib/downloadJson";
@@ -41,14 +41,14 @@ async function analyze(word: string): Promise<Record<string, unknown>> {
 }
 
 async function bundle(result: Record<string, unknown>) {
-  return buildReproducibleRunBundleV0_1({
+  return buildReproducibleRunBundleV0_2({
     result,
     createdAt: "2026-10-04T00:00:00.000Z",
   });
 }
 
 async function artifactWithRecomputedFingerprint(
-  artifact: Awaited<ReturnType<typeof buildComparisonExportArtifactV0_1>>,
+  artifact: Awaited<ReturnType<typeof buildComparisonExportArtifactV0_2>>,
 ) {
   const body = {
     artifactKind: artifact.artifactKind,
@@ -90,17 +90,17 @@ function fileFrom(text: string): File {
   } as unknown as File;
 }
 
-describe("comparison export / reproducibility v0.1", () => {
+describe("comparison export / reproducibility v0.2", () => {
   test("round-trips ordered source bundles and recomputes through the trusted comparison path", async () => {
     const study = await bundle(await analyze("study"));
     const stone = await bundle(await analyze("stone"));
-    const artifact = await buildComparisonExportArtifactV0_1({
+    const artifact = await buildComparisonExportArtifactV0_2({
       left: study,
       right: stone,
     });
 
-    const parsed = await parseComparisonExportArtifactV0_1(
-      serializeComparisonExportArtifactV0_1(artifact),
+    const parsed = await parseComparisonExportArtifactV0_2(
+      serializeComparisonExportArtifactV0_2(artifact),
     );
 
     expect(parsed.ok).toBe(true);
@@ -116,8 +116,10 @@ describe("comparison export / reproducibility v0.1", () => {
     const functionalStatus = parsed.value.comparison.rows.find(
       (row) => row.id === "functionalStatus",
     );
-    expect(functionalStatus?.left.state).toBe("MISSING");
-    expect(functionalStatus?.right.state).toBe("MISSING");
+    expect([functionalStatus?.left.state, functionalStatus?.right.state]).toEqual([
+      "VALUE",
+      "NULL",
+    ]);
 
     const liveComparison = (await import("../src/ui/instrument/wordToWordComparison.v0_1"))
       .compareTelemetryViewModelsV0_1(
@@ -132,21 +134,21 @@ describe("comparison export / reproducibility v0.1", () => {
   test("keeps LEFT/RIGHT order and rejects integrity or stored-projection tampering", async () => {
     const stone = await bundle(await analyze("stone"));
     const home = await bundle(await analyze("home"));
-    const artifact = await buildComparisonExportArtifactV0_1({
+    const artifact = await buildComparisonExportArtifactV0_2({
       left: stone,
       right: home,
     });
 
-    const reversed = await buildComparisonExportArtifactV0_1({
+    const reversed = await buildComparisonExportArtifactV0_2({
       left: home,
       right: stone,
     });
     expect(reversed.left.result.word).toBe("home");
     expect(reversed.right.result.word).toBe("stone");
 
-    const tamperedSource = JSON.parse(serializeComparisonExportArtifactV0_1(artifact));
+    const tamperedSource = JSON.parse(serializeComparisonExportArtifactV0_2(artifact));
     tamperedSource.left.result.word = "changed";
-    await expect(parseComparisonExportArtifactV0_1(tamperedSource)).resolves.toEqual({
+    await expect(parseComparisonExportArtifactV0_2(tamperedSource)).resolves.toEqual({
       ok: false,
       reason: "INVALID_LEFT_SOURCE_BUNDLE",
     });
@@ -166,13 +168,13 @@ describe("comparison export / reproducibility v0.1", () => {
       tamperedProjection,
     );
     await expect(
-      parseComparisonExportArtifactV0_1(tamperedProjectionWithValidHash),
+      parseComparisonExportArtifactV0_2(tamperedProjectionWithValidHash),
     ).resolves.toEqual({
       ok: false,
       reason: "STORED_PROJECTION_MISMATCH",
     });
 
-    await expect(parseComparisonExportArtifactV0_1("not-json")).resolves.toEqual({
+    await expect(parseComparisonExportArtifactV0_2("not-json")).resolves.toEqual({
       ok: false,
       reason: "MALFORMED_JSON",
     });
@@ -204,7 +206,7 @@ describe("comparison export / reproducibility v0.1", () => {
     await waitFor(() => expect(mockedDownloadText).toHaveBeenCalledTimes(1));
     const serialized = mockedDownloadText.mock.calls[0]?.[1];
     expect(serialized).toEqual(expect.any(String));
-    expect(serialized).toContain("open-instrument.comparison-export-reproducibility");
+    expect(serialized).toContain("open-instrument.comparison-export-reproducibility.v0.2");
     expect(global.fetch).not.toHaveBeenCalled();
 
     view.unmount();

@@ -23,7 +23,7 @@ import {
 } from "@/shared/openInstrument/singleWordMechanicalExaminer.v0_1";
 import { analyzeStructuralInputV0_2 } from "@/shared/structuralHypothesisDiscovery.v0_2";
 import type { GenericFunctionalWitnessV1 } from "@/shared/openInstrument/genericFunctionalWitnessDiscovery.v1";
-import type { MotivationDiscoveryV0_1VM, PresentOrMissing } from "@/ui/telemetry/types";
+import type { MotivationDiscoveryV0_2VM, PresentOrMissing } from "@/ui/telemetry/types";
 import { FjaloriCrossSourceEvidenceV0_1 } from "@/ui/instrument/sections/FjaloriCrossSourceEvidence.v0_1";
 import { CrossLanguageFunctionalMotivationWorkbenchV0_1 } from "@/ui/instrument/sections/CrossLanguageFunctionalMotivationWorkbenchV0_1";
 
@@ -39,7 +39,7 @@ type ExaminedMechanicalDraft = Readonly<{
 
 export type SingleWordCurrentWordEvidenceContextV0_1 = Readonly<{
   analyzedWord: string;
-  discovery?: PresentOrMissing<MotivationDiscoveryV0_1VM>;
+  discovery?: PresentOrMissing<MotivationDiscoveryV0_2VM>;
   sourceWitnesses?: readonly GenericFunctionalWitnessV1[];
 }>;
 
@@ -218,7 +218,7 @@ function glossContainsSourceAnnotationV0_1(annotation: string, gloss: string): b
   return annotationTokens.length > 0 && annotationTokens.every((token) => glossTokens.has(token));
 }
 
-function isAlbanianSourceContextV0_1(discovery: MotivationDiscoveryV0_1VM): boolean {
+function isAlbanianSourceContextV0_1(discovery: MotivationDiscoveryV0_2VM): boolean {
   const languageValues = [discovery.inputLanguage, discovery.sourceFact.language]
     .map((value) => value.normalize("NFC").trim().toLocaleLowerCase("en-US"))
     .filter((value) => value.length > 0 && value !== "unknown");

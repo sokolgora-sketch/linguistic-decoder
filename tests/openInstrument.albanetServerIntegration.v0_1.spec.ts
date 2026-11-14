@@ -192,7 +192,7 @@ describe("AlbaNet server-only Discovery integration v0.1", () => {
       );
       expect(response.status).toBe(200);
       const body = await response.json() as {
-        motivationDiscoveryV0_1?: {
+        motivationDiscoveryV0_2?: {
           candidates?: readonly Readonly<{
             candidateForm: string;
             functionalInterpretation: Readonly<{ status: string }>;
@@ -203,7 +203,7 @@ describe("AlbaNet server-only Discovery integration v0.1", () => {
           }>[];
         };
       };
-      const albaNetCandidate = body.motivationDiscoveryV0_1?.candidates?.find(
+      const albaNetCandidate = body.motivationDiscoveryV0_2?.candidates?.find(
         (candidate) => candidate.sourceFact.sourceFamilyId === "albanet-omw-sq-v0.1",
       );
       expect(albaNetCandidate).toMatchObject({
@@ -277,7 +277,7 @@ describe("AlbaNet server-only Discovery integration v0.1", () => {
       ));
       expect(response.status).toBe(200);
       const body = await response.json() as {
-        motivationDiscoveryV0_1?: {
+        motivationDiscoveryV0_2?: {
           albanianLexicalReading?: {
             senseAlignedLexicalRole?: {
               status: string;
@@ -291,7 +291,7 @@ describe("AlbaNet server-only Discovery integration v0.1", () => {
           };
         };
       };
-      const discovery = body.motivationDiscoveryV0_1;
+      const discovery = body.motivationDiscoveryV0_2;
       const role = discovery?.albanianLexicalReading?.senseAlignedLexicalRole;
       expect(role).toMatchObject({ status: "SUPPORTED", functionalOperation: null });
       expect(role?.candidates).toEqual(expect.arrayContaining([
@@ -307,9 +307,9 @@ describe("AlbaNet server-only Discovery integration v0.1", () => {
       ]));
 
       const vm = adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: discovery });
-      expect(vm.motivationDiscoveryV0_1?.kind).toBe("present");
-      if (vm.motivationDiscoveryV0_1?.kind === "present") {
-        render(createElement(MotivationDiscoveryCardV0_1, { discovery: vm.motivationDiscoveryV0_1 }));
+      expect(vm.motivationDiscoveryV0_2?.kind).toBe("present");
+      if (vm.motivationDiscoveryV0_2?.kind === "present") {
+        render(createElement(MotivationDiscoveryCardV0_1, { discovery: vm.motivationDiscoveryV0_2 }));
         expect(screen.getByTestId("albanian-sense-aligned-lexical-role")).toHaveTextContent("HUMAN_ROLE");
         expect(screen.getByTestId("albanian-sense-aligned-lexical-role")).toHaveTextContent("Functional operation: Null");
       }

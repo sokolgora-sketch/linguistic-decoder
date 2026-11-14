@@ -5,10 +5,11 @@ import {
 } from "../engineContract.v1";
 import {
   hasLegacyInterpretationFieldsV2,
+  migrateLegacyAnalyzeWordResultInputV2,
   projectNeutralInterpretationNodeV2,
-  toAnalyzeWordResultV2Contract,
 } from "../analyzeWordResult.v2.contract";
 import { isAnalysisStatusV0_2, migrateAnalysisStatusV0_1ToV0_2 } from "../analysisStatus.v0_2";
+import { migrateLegacyInterpretationTextAtInputV0_1 } from "./neutralInterpretationInputMigration.v0_1";
 import { INTERPRETATION_DECISION_POLICY_V0_1 } from "./interpretationDecisionPolicy.v0_1";
 import {
   parseReproducibleRunBundleV0_1,
@@ -132,7 +133,7 @@ function resultV2(value: unknown): ReproducibleRunBundleResultV0_2 {
   if (!isRecord(value)) throw new Error("invalid reproducible result");
   const neutral = value.responseContractVersion === "open-instrument.analyze-word-result.v2"
     ? value
-    : toAnalyzeWordResultV2Contract(value);
+    : migrateLegacyAnalyzeWordResultInputV2(value);
   if (!isRecord(neutral) || !Array.isArray(neutral.candidates) || !isRecord(neutral.analysisStatusV0_2)) {
     throw new Error("neutral Analyze V2 result is incomplete");
   }
@@ -257,7 +258,11 @@ async function migrateV0_1Bundle(value: unknown): Promise<ReproducibleRunBundleV
   const parsed = await parseReproducibleRunBundleV0_1(value);
   if (!parsed.ok) return null;
   const source = parsed.value;
-  const migratedStatus = migrateAnalysisStatusV0_1ToV0_2(source.result.analysisStatusV0_1);
+  const migratedLegacyRecord = migrateLegacyInterpretationTextAtInputV0_1(source.result);
+  const legacyStatus = isRecord(migratedLegacyRecord)
+    ? migratedLegacyRecord.analysisStatusV0_1
+    : source.result.analysisStatusV0_1;
+  const migratedStatus = migrateAnalysisStatusV0_1ToV0_2(legacyStatus);
   const status = projectNeutralInterpretationNodeV2(migratedStatus, ["analysisStatusV0_1"]);
   if (!migratedStatus || !isAnalysisStatusV0_2(status)) return null;
   const result = removeForbidden(projectNeutralInterpretationNodeV2(source.result));

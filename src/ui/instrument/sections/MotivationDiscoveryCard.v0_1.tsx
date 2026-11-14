@@ -4,8 +4,8 @@ import type {
   FunctionalMotivationCandidateInterpretationV0_2VM,
   FunctionalMotivationInterpretationV0_2VM,
   FunctionalMotivationInterpretationV0_3VM,
-  MotivationDiscoveryCandidateV0_1VM,
-  MotivationDiscoveryV0_1VM,
+  MotivationDiscoveryCandidateV0_2VM,
+  MotivationDiscoveryV0_2VM,
   PresentOrMissing,
 } from "@/ui/telemetry/types";
 import type {
@@ -14,6 +14,7 @@ import type {
   AlbanianSourceLinkedComparisonV0_1,
   AlbanianSourceLinkedRecordV0_1,
 } from "@/shared/openInstrument/motivationEngineDiscoveryServerOnly.v0_1";
+import type { NeutralInterpretationSelectionV0_2 } from "@/shared/openInstrument/neutralInterpretationProjection.v0_2";
 import { FjaloriCrossSourceEvidenceV0_1 } from "@/ui/instrument/sections/FjaloriCrossSourceEvidence.v0_1";
 import {
   aggregateMotivationDiscoveryCandidatesV0_1,
@@ -103,7 +104,7 @@ function sourceLinkedComparisonSummaryV0_1(
 }
 
 function sourceLinkedComponentReadingSummaryV0_1(
-  reading: AlbanianSourceLinkedComponentReadingV0_1,
+  reading: NeutralInterpretationSelectionV0_2<AlbanianSourceLinkedComponentReadingV0_1>,
 ): string {
   return reading.status === "SUPPORTED"
     ? reading.exploratoryRelationship.statement ?? "Source-linked component relationship recorded."
@@ -134,7 +135,7 @@ function zcText(value: unknown): string {
 }
 
 function functionalStatusLabel(
-  status: MotivationDiscoveryCandidateV0_1VM["functionalInterpretation"]["status"],
+  status: MotivationDiscoveryCandidateV0_2VM["functionalInterpretation"]["status"],
 ): string {
   switch (status) {
     case "REVIEWED_HYPOTHESIS":
@@ -168,7 +169,7 @@ function nullReasonSummary(reason: string | null): string {
   return NULL_REASON_EXPLANATIONS[reason] ?? `Unclassified interpretation state: ${reason}`;
 }
 
-function functionalSummary(candidate: MotivationDiscoveryCandidateV0_1VM): string {
+function functionalSummary(candidate: MotivationDiscoveryCandidateV0_2VM): string {
   if (candidate.functionalInterpretation.statement) {
     return candidate.functionalInterpretation.statement;
   }
@@ -184,7 +185,7 @@ function interpretationHypothesisSummary(
   return nullReasonSummary(interpretation.hypothesis.reason);
 }
 
-function discoveryEntryCause(candidate: MotivationDiscoveryCandidateV0_1VM): string {
+function discoveryEntryCause(candidate: MotivationDiscoveryCandidateV0_2VM): string {
   const reason = candidate.structuralComparison.matchReason.trim();
   if (reason) {
     return `This candidate appears because the existing Discovery record says: ${reason}`;
@@ -206,7 +207,7 @@ function representationLabel(value: string): string {
 }
 
 function exactLexicalSourceStatusLabel(
-  status: NonNullable<MotivationDiscoveryV0_1VM["exactLexicalSourceStatus"]>["status"],
+  status: NonNullable<MotivationDiscoveryV0_2VM["exactLexicalSourceStatus"]>["status"],
 ): string {
   switch (status) {
     case "MATCHES_FOUND":
@@ -220,7 +221,7 @@ function exactLexicalSourceStatusLabel(
   }
 }
 
-function representationBoundary(candidate: MotivationDiscoveryCandidateV0_1VM): string | null {
+function representationBoundary(candidate: MotivationDiscoveryCandidateV0_2VM): string | null {
   const comparison = candidate.structuralComparison;
   if (
     comparison.candidateRepresentationKind !== "production_spoken" &&
@@ -517,7 +518,7 @@ export function MotivationDiscoveryCardV0_1({
   onAnalyzeAlbanianSourceRecord,
   sourceRecordSelectionDisabled = false,
 }: {
-  discovery: PresentOrMissing<MotivationDiscoveryV0_1VM> | undefined;
+  discovery: PresentOrMissing<MotivationDiscoveryV0_2VM> | undefined;
   interpretation?: PresentOrMissing<FunctionalMotivationInterpretationV0_2VM | FunctionalMotivationInterpretationV0_3VM>;
   onAnalyzeAlbanianSourceRecord?: (sourceRecordId: string) => void;
   sourceRecordSelectionDisabled?: boolean;

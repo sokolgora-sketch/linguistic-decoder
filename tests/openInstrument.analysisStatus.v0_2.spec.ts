@@ -68,6 +68,18 @@ describe("analysis status v0.2 migration", () => {
     expect(isAnalysisStatusV0_2(withUnknownBoundaryField)).toBe(false);
   });
 
+  it("rejects legacy selection policy text from an active V2 status", () => {
+    const stale = {
+      ...buildAnalysisStatusV0_2({}),
+      summary: "No single winner is selected; preserve the evidence and uncertainty.",
+    };
+    expect(isAnalysisStatusV0_2(stale)).toBe(false);
+    expect(migrateAnalysisStatusV0_1ToV0_2({
+      ...buildAnalysisStatusV0_1({}),
+      summary: stale.summary,
+    })).toBeNull();
+  });
+
   it("generates neutral source text directly", () => {
     const status = buildAnalysisStatusV0_2({
       word: "study",

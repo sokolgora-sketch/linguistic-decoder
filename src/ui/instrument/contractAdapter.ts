@@ -57,28 +57,12 @@ import type {
   SpokenPronunciationVariantV0_1VM,
   ZeroConsonantalStructuralCompositionV0_1VM,
   ResonanceProfileV1VM,
-  MotivationDiscoveryV0_1VM,
+  DoctrineReadingVM,
+  MotivationDiscoveryV0_2VM,
   MotivationDiscoveryCandidateV0_1VM,
-  FunctionalMotivationInterpretationV0_2VM,
   FunctionalMotivationInterpretationV0_3VM,
+  FunctionalMotivationInterpretationV0_2VM,
 } from "../telemetry/types";
-import {
-  DOCTRINE_READING_COMPOSITION_MODE_V1,
-  DOCTRINE_READING_CONTRACT_SCHEMA_V1,
-  DOCTRINE_READING_PATH_COMPOSITION_V1,
-  DOCTRINE_READING_PROVENANCE_V1,
-  type DoctrineReadingV1,
-} from "@/shared/openInstrument/doctrineReadingContract.v1";
-import {
-  DOCTRINE_FUNCTIONAL_PROFILE_COMPLETENESS_V0_1,
-  DOCTRINE_FUNCTIONAL_PROFILE_ENGINE_AUTHORITY_V0_1,
-  DOCTRINE_FUNCTIONAL_PROFILE_NORMALIZATION_STATUS_V0_1,
-  DOCTRINE_FUNCTIONAL_PROFILE_SCHEMA_V0_1,
-  DOCTRINE_FUNCTIONAL_PROFILE_TRUTH_CLASSIFICATION_V0_1,
-  getSevenVoiceDoctrineFunctionalProfileV0_1,
-} from "@/shared/openInstrument/doctrineFunctionalProfile.v0_1";
-import { isDoctrineLevel3ProofPairReadingV0_1 } from
-  "@/shared/openInstrument/doctrineLevel3ProofPair.v0_1";
 import type { RootMapV1 } from "@/shared/deepRoot.rootMap.v1";
 import { computeDeepRootHeartGateV01 } from "@/shared/deepRootHeartGate.v0.1.compute";
 import { isSevenVoiceKey } from "@/shared/sevenVoiceOrderedViews.v0.1";
@@ -89,10 +73,7 @@ import type { AnalysisStatusV0_2 } from "@/shared/analysisStatus.v0_2";
 import {
   parseGenericFunctionalWitnessRuntimeProjectionV1,
 } from "@/shared/openInstrument/genericFunctionalWitnessRuntimeProjection.v1";
-import {
-  isWordSpecificFunctionalDepthV0_1,
-} from "@/shared/openInstrument/wordSpecificFunctionalDepth.v0_1";
-import type { WordSpecificFunctionalDepthV0_1 } from "@/shared/openInstrument/wordSpecificFunctionalDepth.v0_1";
+import type { WordSpecificFunctionalDepthV0_2 } from "@/shared/openInstrument/wordSpecificFunctionalDepth.v0_2";
 import {
   isFunctionalMotivationInterpretationV0_2,
   type FunctionalMotivationInterpretationV0_2,
@@ -116,11 +97,28 @@ import type {
 import type {
   GenericFunctionalWitnessSourceProvenanceV1,
 } from "@/shared/openInstrument/genericFunctionalWitnessDiscovery.v1";
-import { isInterpretationDecisionPolicyV0_1 } from "@/shared/openInstrument/interpretationDecisionPolicy.v0_1";
 import {
-  toAnalyzeWordResultV2Contract,
+  INTERPRETATION_DECISION_POLICY_V0_1,
+  isInterpretationDecisionPolicyV0_1,
+} from "@/shared/openInstrument/interpretationDecisionPolicy.v0_1";
+import { projectNeutralInterpretationSelectionV0_2 } from "@/shared/openInstrument/neutralInterpretationProjection.v0_2";
+import {
+  isMotivationEngineDiscoveryV0_2,
+  toMotivationEngineDiscoveryV0_2,
+} from "@/shared/openInstrument/motivationEngineDiscovery.v0_2";
+import {
+  isWordSpecificFunctionalDepthV0_2,
+  toWordSpecificFunctionalDepthV0_2,
+} from "@/shared/openInstrument/wordSpecificFunctionalDepth.v0_2";
+import {
+  isDoctrineReadingV2,
+  toDoctrineReadingV2,
+} from "@/shared/openInstrument/doctrineReadingContract.v2";
+import {
+  migrateLegacyAnalyzeWordResultInputV2,
   projectNeutralInterpretationNodeV2,
 } from "@/shared/analyzeWordResult.v2.contract";
+import { migrateLegacyInterpretationTextAtInputV0_1 } from "@/shared/openInstrument/neutralInterpretationInputMigration.v0_1";
 import { migrateOriginClaimV1ToV0_2 } from "@/shared/originClaim.v2";
 
 type ParseRootMapResult = { ok: true; value: RootMapV1 } | { ok: false; reason: string };
@@ -421,22 +419,11 @@ function isRecord(v: unknown): v is Record<string, unknown> {
   return !!v && typeof v === "object" && !Array.isArray(v);
 }
 
-function materializeLegacyInternalView(value: unknown): unknown {
-  if (Array.isArray(value)) return value.map(materializeLegacyInternalView);
-  if (!isRecord(value)) return value;
-
-  const output: Record<string, unknown> = {};
-  for (const [key, child] of Object.entries(value)) {
-    if (key !== "interpretationDecisionPolicy") output[key] = materializeLegacyInternalView(child);
-  }
-  if (isRecord(value.interpretationDecisionPolicy)) {
-    if (typeof value.userDecisionPosture === "string") output.noSingleWinner = true;
-    const outputBoundary = output.claimBoundary;
-    if (isRecord(value.claimBoundary) && isRecord(outputBoundary) && !("winnerClaim" in outputBoundary)) {
-      output.claimBoundary = { ...outputBoundary, winnerClaim: "not_claimed" };
-    }
-  }
-  return output;
+function hasNeutralOrLegacyInterpretationPolicy(value: unknown): boolean {
+  return isRecord(value) && (
+    value.noSingleWinner === true ||
+    isInterpretationDecisionPolicyV0_1(value.interpretationDecisionPolicy)
+  );
 }
 
 type ZeroConsonantalStructuralCompositionParseV0_1 =
@@ -618,143 +605,28 @@ function asString(v: unknown): string | null {
   return typeof v === "string" ? v : null;
 }
 
-function isDoctrineReadingV1(value: unknown): value is DoctrineReadingV1 {
-  if (!isRecord(value)) return false;
-  if (value.schemaVersion !== DOCTRINE_READING_CONTRACT_SCHEMA_V1) return false;
-  if (value.compositionMode !== DOCTRINE_READING_COMPOSITION_MODE_V1) return false;
-  if (value.pathComposition !== DOCTRINE_READING_PATH_COMPOSITION_V1) return false;
-  if (value.providerIndependent !== true) return false;
-  if (value.externalEvidenceIndependent !== true) return false;
-  if (value.candidateWinnerIndependent !== true) return false;
-  if (value.userDecisionPosture !== "user_decides") return false;
-  if (value.noSingleWinner !== true) return false;
-  if (
-    value.level3WholePathReading !== undefined &&
-    value.level3WholePathReading !== null &&
-    !isDoctrineLevel3ProofPairReadingV0_1(value.level3WholePathReading)
-  ) {
-    return false;
-  }
-
-  const analyzedVoicePath = value.analyzedVoicePath;
-  const entries = value.entries;
-  if (!Array.isArray(analyzedVoicePath) || !analyzedVoicePath.every(isSevenVoiceKey)) {
-    return false;
-  }
-  if (!Array.isArray(entries) || entries.length !== analyzedVoicePath.length) return false;
-
-  const roleSet = new Set<string>(Object.values(SEVEN_PRINCIPLES).map((principle) => principle.role));
-  for (const [index, entryValue] of entries.entries()) {
-    if (!isRecord(entryValue)) return false;
-    if (entryValue.pathIndex !== index) return false;
-    if (
-      typeof entryValue.voice !== "string" ||
-      !isSevenVoiceKey(entryValue.voice) ||
-      entryValue.voice !== analyzedVoicePath[index]
-    ) {
-      return false;
-    }
-    if (typeof entryValue.doctrineRole !== "string" || !roleSet.has(entryValue.doctrineRole)) {
-      return false;
-    }
-    if (entryValue.profileSchemaVersion !== DOCTRINE_FUNCTIONAL_PROFILE_SCHEMA_V0_1) return false;
-    if (entryValue.profileEngineAuthority !== DOCTRINE_FUNCTIONAL_PROFILE_ENGINE_AUTHORITY_V0_1) return false;
-    if (entryValue.profileNormalizationStatus !== DOCTRINE_FUNCTIONAL_PROFILE_NORMALIZATION_STATUS_V0_1) return false;
-    if (entryValue.profileCompleteness !== DOCTRINE_FUNCTIONAL_PROFILE_COMPLETENESS_V0_1) return false;
-    if (entryValue.profileTruthClassification !== DOCTRINE_FUNCTIONAL_PROFILE_TRUTH_CLASSIFICATION_V0_1) return false;
-
-    const canonicalProfile = getSevenVoiceDoctrineFunctionalProfileV0_1(entryValue.voice);
-    if (!canonicalProfile) return false;
-    if (!Array.isArray(entryValue.functionalProperties)) return false;
-    for (const property of entryValue.functionalProperties) {
-      if (!isRecord(property)) return false;
-      if (typeof property.id !== "string" || property.id.trim().length === 0) return false;
-      if (!canonicalProfile.functionalProperties.some((expected) => expected.id === property.id)) {
-        return false;
-      }
-      if (property.sourceClass !== "EXPLICIT_DOCTRINE" && property.sourceClass !== "FUNCTIONAL_INTERPRETATION") {
-        return false;
-      }
-      if (property.normalizationStatus !== DOCTRINE_FUNCTIONAL_PROFILE_NORMALIZATION_STATUS_V0_1) {
-        return false;
-      }
-      if (!Array.isArray(property.sourceRefs)) return false;
-      if (
-        !property.sourceRefs.every(
-          (sourceRef) =>
-            isRecord(sourceRef) &&
-            typeof sourceRef.sourceId === "string" &&
-            typeof sourceRef.locator === "string" &&
-            sourceRef.sourceKind === "AUTHOR_PRIMARY_DOCTRINE_SOURCE" &&
-            sourceRef.sourceStatus === "VERBATIM" &&
-            sourceRef.engineAuthority === "NOT_EXECUTABLE_DIRECTLY",
-        )
-      ) {
-        return false;
-      }
-    }
-  }
-
-  const claimBoundary = value.claimBoundary;
-  if (
-    !isRecord(claimBoundary) ||
-    claimBoundary.historicalOriginClaim !== "not_claimed" ||
-    claimBoundary.historicalTransmissionClaim !== "not_claimed" ||
-    claimBoundary.winnerClaim !== "not_claimed" ||
-    claimBoundary.languageSuperiorityClaim !== "not_claimed" ||
-    claimBoundary.candidateTruthClaim !== "not_claimed" ||
-    claimBoundary.lexicalMeaningClaim !== "not_claimed"
-  ) {
-    return false;
-  }
-
-  const provenance = value.provenance;
-  return (
-    isRecord(provenance) &&
-    provenance.doctrineProjectionSchema === DOCTRINE_READING_PROVENANCE_V1.doctrineProjectionSchema &&
-    provenance.orderedViewsSchema === DOCTRINE_READING_PROVENANCE_V1.orderedViewsSchema &&
-    provenance.doctrineAuthority === DOCTRINE_READING_PROVENANCE_V1.doctrineAuthority &&
-    provenance.roleVocabularyAuthority === DOCTRINE_READING_PROVENANCE_V1.roleVocabularyAuthority &&
-    provenance.functionalProfileSchema === DOCTRINE_READING_PROVENANCE_V1.functionalProfileSchema &&
-    provenance.functionalProfileAuthority === DOCTRINE_READING_PROVENANCE_V1.functionalProfileAuthority
-  );
-}
-
 function parseDoctrineReading(
   value: unknown,
-): PresentOrMissing<DoctrineReadingV1 | null> {
+): PresentOrMissing<DoctrineReadingVM | null> {
   if (value === undefined) return missing("not_emitted", "doctrineReading");
   if (value === null) return present(null);
-  if (
-    isRecord(value) &&
-    value.schemaVersion === "open-instrument.doctrine-reading.v2" &&
-    isInterpretationDecisionPolicyV0_1(value.interpretationDecisionPolicy)
-  ) {
-    const internal = materializeLegacyInternalView(value);
-    if (isRecord(internal)) {
-      internal.schemaVersion = "open-instrument.doctrine-reading.v1";
-      internal.candidateWinnerIndependent = true;
-      internal.noSingleWinner = true;
-      return isDoctrineReadingV1(internal)
-        ? present(internal)
-        : missing("malformed", "doctrineReading v2 compatibility projection invalid");
-    }
-  }
-  return isDoctrineReadingV1(value)
-    ? present(value)
-    : missing("malformed", "doctrineReading expected the public V1 shape");
+  const projected = toDoctrineReadingV2(value);
+  return projected && isDoctrineReadingV2(projected)
+    ? present(projected)
+    : missing("malformed", "doctrineReading v2 contract");
 }
 
-function parseWordSpecificFunctionalDepthV0_1(
+function parseWordSpecificFunctionalDepthV0_2(
   value: unknown,
-): PresentOrMissing<WordSpecificFunctionalDepthV0_1 | null> {
+): PresentOrMissing<WordSpecificFunctionalDepthV0_2 | null> {
   if (value === undefined) {
     return missing("not_emitted", "wordSpecificFunctionalDepth");
   }
   if (value === null) return present(null);
-  return isWordSpecificFunctionalDepthV0_1(value)
-    ? present(value)
-    : missing("malformed", "wordSpecificFunctionalDepth contract");
+  const projected = toWordSpecificFunctionalDepthV0_2(value);
+  return projected && isWordSpecificFunctionalDepthV0_2(projected)
+    ? present(projected)
+    : missing("malformed", "word-specific functional depth v0.2 contract");
 }
 
 type CandidateStatus = "pass" | "fail" | "experimental" | "unknown";
@@ -1026,15 +898,21 @@ function getField(obj: unknown, key: string): unknown {
   return isRecord(obj) ? obj[key] : undefined;
 }
 
-function parseMotivationDiscoveryV0_1(
+function parseMotivationDiscoveryV0_2(
   raw: unknown,
-): PresentOrMissing<MotivationDiscoveryV0_1VM> {
-  const value = getField(raw, "motivationDiscoveryV0_1");
-  if (value == null) return missing("not_emitted", "motivationDiscoveryV0_1");
-  if (!isRecord(value)) return missing("malformed", "motivationDiscoveryV0_1 expected object");
+): PresentOrMissing<MotivationDiscoveryV0_2VM> {
+  const activeValue = getField(raw, "motivationDiscoveryV0_2");
+  const legacyValue = getField(raw, "motivationDiscoveryV0_1");
+  const value = activeValue ?? (isRecord(legacyValue)
+    ? toMotivationEngineDiscoveryV0_2(legacyValue)
+    : null);
+  if (value == null) return missing("not_emitted", "motivationDiscoveryV0_2");
+  if (!isRecord(value) || !isMotivationEngineDiscoveryV0_2(value)) {
+    return missing("malformed", "motivationDiscoveryV0_2 expected the neutral v0.2 contract");
+  }
 
   if (
-    value.schemaVersion !== "open-instrument.motivation-engine-discovery.v0_1" ||
+    value.schemaVersion !== "open-instrument.motivation-engine-discovery.v0_2" ||
     (value.status !== "MATCHES_FOUND" && value.status !== "NO_MATCHES") ||
     typeof value.inputWord !== "string" ||
     typeof value.inputLanguage !== "string" ||
@@ -1045,7 +923,7 @@ function parseMotivationDiscoveryV0_1(
     !isRecord(value.interpretation) ||
     !isRecord(value.unknownOrNull) ||
     value.userDecisionPosture !== "user_decides" ||
-    value.noSingleWinner !== true
+    !hasNeutralOrLegacyInterpretationPolicy(value)
   ) {
     return missing("malformed", "motivationDiscoveryV0_1 shape invalid");
   }
@@ -1618,7 +1496,7 @@ function parseMotivationDiscoveryV0_1(
         !value.alternatives.every((alternative, index) =>
           alternative === ALBANIAN_SENSE_ALIGNED_LEXICAL_ROLE_ALTERNATIVES_V0_1[index]) ||
         value.lineageIndependence !== ALBANIAN_SENSE_ALIGNED_LEXICAL_ROLE_LINEAGE_STATUS_V0_1 ||
-        value.functionalOperation !== null || value.noSingleWinner !== true ||
+        value.functionalOperation !== null || !hasNeutralOrLegacyInterpretationPolicy(value) ||
         value.userDecisionPosture !== "user_decides" ||
         value.claimBoundary !== ALBANIAN_SENSE_ALIGNED_LEXICAL_ROLE_CLAIM_BOUNDARY_V0_1) return false;
 
@@ -2060,7 +1938,7 @@ function parseMotivationDiscoveryV0_1(
           !isStringArray(functionalHypothesis.alternatives) ||
           !isStringArray(functionalHypothesis.reasonCodes) ||
           typeof functionalHypothesis.claimBoundary !== "string" ||
-          functionalHypothesis.noSingleWinner !== true ||
+          !hasNeutralOrLegacyInterpretationPolicy(functionalHypothesis) ||
           functionalHypothesis.userDecisionPosture !== "user_decides" ||
           !Array.isArray(functionalHypothesis.evidenceRefs)) return false;
         if (!Array.isArray(sourceLinkedComponentReading.components)) return false;
@@ -2801,7 +2679,7 @@ function parseMotivationDiscoveryV0_1(
         !Array.isArray(family.members) || family.members.length < 2 ||
         typeof family.statement !== "string" || !isStringArray(family.alternatives) ||
         typeof family.claimBoundary !== "string" ||
-        family.noSingleWinner !== true || family.userDecisionPosture !== "user_decides" ||
+        !hasNeutralOrLegacyInterpretationPolicy(family) || family.userDecisionPosture !== "user_decides" ||
         !Array.isArray(relatedCandidateEvaluations)) return false;
       const normalizeAlbanianForm = (form: string): string =>
         form.normalize("NFC").trim().toLocaleLowerCase("sq-AL");
@@ -2887,7 +2765,7 @@ function parseMotivationDiscoveryV0_1(
           candidate.productionAuthorization !== "NOT_AUTHORIZED" ||
           candidate.embryoFunction !== "UNKNOWN_OR_NULL" ||
           candidate.historicalRelation !== "NOT_CLAIMED" ||
-          candidate.noSingleWinner !== true ||
+          !hasNeutralOrLegacyInterpretationPolicy(candidate) ||
           candidate.userDecisionPosture !== "user_decides" ||
           !isStringArray(candidate.reasonCodes) ||
           typeof candidate.claimBoundary !== "string") return false;
@@ -2935,7 +2813,7 @@ function parseMotivationDiscoveryV0_1(
           hypothesis.hypothesisStatus === "PROPOSED_NOT_REVIEWED" && hypothesis.reviewTrack === "NONE" &&
           hypothesis.reviewCandidate === null && hypothesis.ownerApproval === null && hypothesis.functionalOperation === null &&
           hypothesis.productionAuthorization === "NOT_AUTHORIZED" && hypothesis.embryoFunction === "UNKNOWN_OR_NULL" &&
-          hypothesis.historicalRelation === "NOT_CLAIMED" && hypothesis.noSingleWinner === true && hypothesis.userDecisionPosture === "user_decides" &&
+          hypothesis.historicalRelation === "NOT_CLAIMED" && hasNeutralOrLegacyInterpretationPolicy(hypothesis) && hypothesis.userDecisionPosture === "user_decides" &&
           isStringArray(hypothesis.evidenceRefs) && isStringArray(hypothesis.reasonCodes));
       };
       return batch.candidates.every(validCandidate) &&
@@ -3008,7 +2886,7 @@ function parseMotivationDiscoveryV0_1(
     return missing("malformed", "motivationDiscoveryV0_1 derived structure invalid");
   }
 
-  const candidates: MotivationDiscoveryCandidateV0_1VM[] = [];
+  const candidates: Record<string, unknown>[] = [];
   for (const candidate of value.candidates) {
     if (!isRecord(candidate) || !isRecord(candidate.sourceFact) || !isRecord(candidate.derivedStructure) || !isRecord(candidate.structuralComparison) || !isRecord(candidate.functionalInterpretation)) {
       return missing("malformed", "motivationDiscoveryV0_1 candidate invalid");
@@ -3118,7 +2996,7 @@ function parseMotivationDiscoveryV0_1(
       candidate.candidateStatus !== "experimental" ||
       candidate.historicalRelation !== "not_claimed" ||
       candidate.userDecisionPosture !== "user_decides" ||
-      candidate.noSingleWinner !== true
+      !hasNeutralOrLegacyInterpretationPolicy(candidate)
     ) {
       return missing("malformed", "motivationDiscoveryV0_1 candidate fields invalid");
     }
@@ -3153,23 +3031,13 @@ function parseMotivationDiscoveryV0_1(
     });
   }
 
-  return present({
+  const neutralValue = projectNeutralInterpretationSelectionV0_2({
     ...value,
+    schemaVersion: "open-instrument.motivation-engine-discovery.v0_2",
+    interpretationDecisionPolicy: INTERPRETATION_DECISION_POLICY_V0_1,
     candidates,
-  } as unknown as MotivationDiscoveryV0_1VM);
-}
-
-function parseFunctionalMotivationInterpretationV0_2(
-  raw: unknown,
-): PresentOrMissing<FunctionalMotivationInterpretationV0_2VM> {
-  const value = getField(raw, "functionalMotivationInterpretationV0_2");
-  if (value == null) {
-    return missing("not_emitted", "functionalMotivationInterpretationV0_2");
-  }
-  if (!isFunctionalMotivationInterpretationV0_2(value)) {
-    return missing("malformed", "functionalMotivationInterpretationV0_2 shape invalid");
-  }
-  return present(projectFunctionalMotivationInterpretationForUiV0_2(value));
+  });
+  return present(neutralValue as unknown as MotivationDiscoveryV0_2VM);
 }
 
 function parseFunctionalMotivationInterpretationV0_3(
@@ -3602,51 +3470,58 @@ function parseAnalysisStatusV0_2(
 }
 // ----------------------- adapter -----------------------
 
-/**
- * Lift the active neutral API contract into the adapter's established VM
- * shapes. This is an input-only compatibility boundary: `raw` remains the
- * neutral V2 payload and is never serialized from these in-memory aliases.
- */
-function adaptAnalyzeV2ForInternalView(raw: unknown): unknown {
-  if (!isRecord(raw) || raw.responseContractVersion !== "open-instrument.analyze-word-result.v2") {
-    return raw;
-  }
+/** Convert partial stored/source records only at the UI input boundary. */
+function normalizeAnalyzeInputForView(raw: unknown): unknown {
+  if (
+    isRecord(raw) &&
+    raw.responseContractVersion === "open-instrument.analyze-word-result.v2"
+  ) return raw;
 
-  const payload: Record<string, unknown> = { ...raw };
-  const discovery = payload.motivationDiscoveryV0_2;
-  if (isRecord(discovery)) {
-    payload.motivationDiscoveryV0_1 = {
-      ...materializeLegacyInternalView(discovery) as Record<string, unknown>,
-      schemaVersion: "open-instrument.motivation-engine-discovery.v0_1",
-    };
-    delete payload.motivationDiscoveryV0_2;
-  }
+  try {
+    return migrateLegacyAnalyzeWordResultInputV2(raw);
+  } catch {
+    const source = migrateLegacyInterpretationTextAtInputV0_1(raw);
+    const projected = projectNeutralInterpretationNodeV2(source);
+    if (!isRecord(source) || !isRecord(projected)) return projected;
 
-  const depth = payload.wordSpecificFunctionalDepth;
-  if (isRecord(depth)) {
-    payload.wordSpecificFunctionalDepth = {
-      ...materializeLegacyInternalView(depth) as Record<string, unknown>,
-      schemaVersion: "open-instrument.word-specific-functional-depth.v0_1",
+    const output: Record<string, unknown> = {
+      ...projected,
+      responseContractVersion: "open-instrument.analyze-word-result.v2",
+      interpretationDecisionPolicyV0_1: INTERPRETATION_DECISION_POLICY_V0_1,
     };
+    const legacyStatus = migrateAnalysisStatusV0_1ToV0_2(source.analysisStatusV0_1);
+    if (!isAnalysisStatusV0_2(output.analysisStatusV0_2) && legacyStatus) {
+      output.analysisStatusV0_2 = legacyStatus;
+    }
+    const legacyFunctionalInterpretation = migrateFunctionalMotivationInterpretationV0_2ToV0_3(
+      source.functionalMotivationInterpretationV0_2,
+    );
+    if (!isFunctionalMotivationInterpretationV0_3(output.functionalMotivationInterpretationV0_3) &&
+      legacyFunctionalInterpretation) {
+      output.functionalMotivationInterpretationV0_3 = legacyFunctionalInterpretation;
+    }
+    const legacyDiscovery = isRecord(source.motivationDiscoveryV0_1)
+      ? toMotivationEngineDiscoveryV0_2(source.motivationDiscoveryV0_1)
+      : null;
+    if (!isMotivationEngineDiscoveryV0_2(output.motivationDiscoveryV0_2) && legacyDiscovery) {
+      output.motivationDiscoveryV0_2 = legacyDiscovery;
+    }
+    const depth = toWordSpecificFunctionalDepthV0_2(source.wordSpecificFunctionalDepth);
+    if (depth) output.wordSpecificFunctionalDepth = depth;
+    const doctrine = toDoctrineReadingV2(source.doctrineReading);
+    if (doctrine) output.doctrineReading = doctrine;
+
+    delete output.analysisStatusV0_1;
+    delete output.functionalMotivationInterpretationV0_2;
+    delete output.motivationDiscoveryV0_1;
+    return output;
   }
-  return payload;
 }
 
 export function adaptAnalysisToTelemetryVM(raw: unknown): TelemetryViewModel {
-  let normalizedInput = raw;
-  if (
-    !isRecord(raw) ||
-    raw.responseContractVersion !== "open-instrument.analyze-word-result.v2"
-  ) {
-    try {
-      normalizedInput = toAnalyzeWordResultV2Contract(raw);
-    } catch {
-      // Older focused/source projections may be partial records rather than a
-      // complete persisted Analyze response. They remain input-only fallbacks.
-    }
-  }
+  const normalizedInput = normalizeAnalyzeInputForView(raw);
   const rawForView = projectNeutralInterpretationNodeV2(normalizedInput);
-  let payload = adaptAnalyzeV2ForInternalView(normalizedInput);
+  let payload = normalizedInput;
   if (isRecord(payload) && isRecord(payload.originClaim)) {
     const migratedOriginClaim = migrateOriginClaimV1ToV0_2(payload.originClaim);
     if (migratedOriginClaim) {
@@ -3654,26 +3529,19 @@ export function adaptAnalysisToTelemetryVM(raw: unknown): TelemetryViewModel {
     }
   }
   const doctrineReading = parseDoctrineReading(getField(payload, "doctrineReading"));
-  const wordSpecificFunctionalDepth = parseWordSpecificFunctionalDepthV0_1(
+  const wordSpecificFunctionalDepth = parseWordSpecificFunctionalDepthV0_2(
     getField(payload, "wordSpecificFunctionalDepth"),
   );
-  const motivationDiscoveryV0_1 = parseMotivationDiscoveryV0_1(payload);
+  const motivationDiscoveryV0_2 = parseMotivationDiscoveryV0_2(payload);
   const motivationDiscoveryFieldEmitted =
-    isRecord(payload) && Object.prototype.hasOwnProperty.call(payload, "motivationDiscoveryV0_1");
-  const functionalMotivationInterpretationV0_2 =
-    parseFunctionalMotivationInterpretationV0_2(payload);
-  const functionalMotivationInterpretationFieldEmitted =
-    isRecord(payload) && Object.prototype.hasOwnProperty.call(payload, "functionalMotivationInterpretationV0_2");
+    isRecord(payload) && Object.prototype.hasOwnProperty.call(payload, "motivationDiscoveryV0_2");
   const functionalMotivationInterpretationV0_3 =
     parseFunctionalMotivationInterpretationV0_3(payload);
   const functionalMotivationInterpretationV0_3FieldEmitted =
     isRecord(payload) && Object.prototype.hasOwnProperty.call(payload, "functionalMotivationInterpretationV0_3");
-  const analysisStatusV0_1 = parseAnalysisStatusV0_1(payload);
   const analysisStatusV0_2 = parseAnalysisStatusV0_2(payload);
   const analysisStatusV0_2FieldEmitted =
     isRecord(payload) && Object.prototype.hasOwnProperty.call(payload, "analysisStatusV0_2");
-  const analysisStatusV0_2Available =
-    analysisStatusV0_2FieldEmitted || analysisStatusV0_1.kind === "present";
 
   const vp = pickVoicePaths(payload);
 
@@ -5018,15 +4886,10 @@ const originClaimGates: OriginClaimGatesVM = {
       ? {}
       : { wordSpecificFunctionalDepth }),
     ...(motivationDiscoveryFieldEmitted
-      ? { motivationDiscoveryV0_1 }
-      : motivationDiscoveryV0_1.kind === "missing"
+      ? { motivationDiscoveryV0_2 }
+      : motivationDiscoveryV0_2.kind === "missing"
       ? {}
-      : { motivationDiscoveryV0_1 }),
-    ...(functionalMotivationInterpretationFieldEmitted
-      ? { functionalMotivationInterpretationV0_2 }
-      : functionalMotivationInterpretationV0_2.kind === "missing"
-      ? {}
-      : { functionalMotivationInterpretationV0_2 }),
+      : { motivationDiscoveryV0_2 }),
     ...(functionalMotivationInterpretationV0_3FieldEmitted
       ? { functionalMotivationInterpretationV0_3 }
       : functionalMotivationInterpretationV0_3.kind === "missing"
@@ -5048,8 +4911,7 @@ const originClaimGates: OriginClaimGatesVM = {
       soundRoots: adaptSoundRootsToVM(payload),
 
       resonanceProfileV1,
-    analysisStatusV0_1,
-    ...(analysisStatusV0_2Available
+    ...(analysisStatusV0_2FieldEmitted
       ? { analysisStatusV0_2 }
       : {}),
     raw: rawForView,

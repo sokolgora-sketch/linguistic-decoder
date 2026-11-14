@@ -16,9 +16,9 @@ import {
   adaptAnalysisToTelemetryVM,
 } from "../src/ui/instrument/contractAdapter";
 import {
-  buildReproducibleRunBundleV0_1,
-  serializeReproducibleRunBundleV0_1,
-} from "../src/shared/openInstrument/reproducibleRunBundle.v0_1";
+  buildReproducibleRunBundleV0_2,
+  serializeReproducibleRunBundleV0_2,
+} from "../src/shared/openInstrument/reproducibleRunBundle.v0_2";
 import {
   InstrumentPanel,
 } from "../src/ui/instrument/InstrumentPanel";
@@ -184,8 +184,8 @@ describe("Open Instrument primary candidate navigation affordance v0.1", () => {
   it("does not expose navigation for a canonical Null result", async () => {
     const payload = await analyze("study");
     payload.candidates = [];
-    payload.analysisStatusV0_1 = {
-      ...payload.analysisStatusV0_1,
+    payload.analysisStatusV0_2 = {
+      ...payload.analysisStatusV0_2,
       status: "null_no_supported_candidate",
       summary: "No supported candidate.",
       candidateOnlyOperators: [],
@@ -231,8 +231,8 @@ describe("Open Instrument primary candidate navigation affordance v0.1", () => {
 
   it("keeps imported-run navigation aligned with fresh navigation and performs no reanalysis", async () => {
     const payload = makePrimarySelectionFixture(await analyze("study")).payload;
-    const bundle = await buildReproducibleRunBundleV0_1({ result: payload });
-    const serialized = serializeReproducibleRunBundleV0_1(bundle);
+    const bundle = await buildReproducibleRunBundleV0_2({ result: payload });
+    const serialized = serializeReproducibleRunBundleV0_2(bundle);
     const fetchMock = jest.fn();
     global.fetch = fetchMock;
 

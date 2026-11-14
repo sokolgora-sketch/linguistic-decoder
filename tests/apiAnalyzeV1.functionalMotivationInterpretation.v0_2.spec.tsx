@@ -107,7 +107,7 @@ describe("active Analyze response contract v2", () => {
     }) => candidate.candidateVoicePath.length === 0 &&
       candidate.structuralComparison.candidateVoicePath.length === 0)).toBe(true);
 
-    const visible = adaptAnalysisToTelemetryVM(payload).motivationDiscoveryV0_1;
+    const visible = adaptAnalysisToTelemetryVM(payload).motivationDiscoveryV0_2;
     expect(visible.kind).toBe("present");
     if (visible.kind !== "present") throw new Error("Expected UI discovery");
     const visibleCandidates = visible.value.candidates.filter(
@@ -179,7 +179,7 @@ describe("active Analyze response contract v2", () => {
     };
 
     const visible = adaptAnalysisToTelemetryVM(forgedPayload);
-    const visibleDiscovery = visible.motivationDiscoveryV0_1;
+    const visibleDiscovery = visible.motivationDiscoveryV0_2;
     expect(visibleDiscovery.kind).toBe("present");
     if (visibleDiscovery.kind !== "present") throw new Error("Expected UI discovery");
     expect(visibleDiscovery.value.candidates[0]).toMatchObject({
@@ -340,7 +340,7 @@ describe("active Analyze response contract v2", () => {
 
     render(
       <MotivationDiscoveryCardV0_1
-        discovery={vm.motivationDiscoveryV0_1}
+        discovery={vm.motivationDiscoveryV0_2}
         interpretation={visible}
       />,
     );
@@ -465,7 +465,7 @@ describe("active Analyze response contract v2", () => {
 
     render(
       <MotivationDiscoveryCardV0_1
-        discovery={vm.motivationDiscoveryV0_1}
+        discovery={vm.motivationDiscoveryV0_2}
         interpretation={vm.functionalMotivationInterpretationV0_3}
       />,
     );
@@ -505,7 +505,7 @@ describe("active Analyze response contract v2", () => {
 
     render(
       <MotivationDiscoveryCardV0_1
-        discovery={vm.motivationDiscoveryV0_1}
+        discovery={vm.motivationDiscoveryV0_2}
         interpretation={vm.functionalMotivationInterpretationV0_3}
       />,
     );
@@ -526,7 +526,7 @@ describe("active Analyze response contract v2", () => {
       targetSenseLabel: "learning",
     });
     const vm = adaptAnalysisToTelemetryVM(payload);
-    const discovery = vm.motivationDiscoveryV0_1;
+    const discovery = vm.motivationDiscoveryV0_2;
     expect(discovery?.kind).toBe("present");
     if (discovery?.kind !== "present") throw new Error("Expected UI discovery");
     const displayedDi = discovery.value.candidates.find(
@@ -537,7 +537,7 @@ describe("active Analyze response contract v2", () => {
 
     render(
       <MotivationDiscoveryCardV0_1
-        discovery={vm.motivationDiscoveryV0_1}
+        discovery={vm.motivationDiscoveryV0_2}
         interpretation={vm.functionalMotivationInterpretationV0_3}
       />,
     );
@@ -566,7 +566,7 @@ describe("active Analyze response contract v2", () => {
 
     render(
       <MotivationDiscoveryCardV0_1
-        discovery={vm.motivationDiscoveryV0_1}
+        discovery={vm.motivationDiscoveryV0_2}
         interpretation={vm.functionalMotivationInterpretationV0_3}
       />,
     );
@@ -586,7 +586,7 @@ describe("active Analyze response contract v2", () => {
 
     render(
       <MotivationDiscoveryCardV0_1
-        discovery={vm.motivationDiscoveryV0_1}
+        discovery={vm.motivationDiscoveryV0_2}
         interpretation={vm.functionalMotivationInterpretationV0_3}
       />,
     );
