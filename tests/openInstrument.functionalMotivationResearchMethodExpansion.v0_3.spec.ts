@@ -212,6 +212,8 @@ describe("STUDIM / STUDY and GJITHË method expansion v0.3", () => {
 
   it("keeps the GJITHË-family spellings and scholarly reports distinct", () => {
     const [gjithmone, gjithnje, gjithekombetar] = extension.familyContrasts;
+    expect(sources.find(({ sourceId }) => sourceId === "myrta-2014-elbasanishtja")?.locator)
+      .toBe("Myrta 2014, section 2.3.1.2, ‘Drejtshkrimi i zanores ë paratheksore’, printed page 102, compound table: gjithë + çka → gjithçka; gjithë + një → gjithnjë; gjithë + mo(t)në → gjithmonë; gjithë + kombëtar → gjithëkombëtar. The table is discussed in relation to Kolec Topalli (2011), printed page 272; this source record is Myrta’s report, not a direct Topalli source record.");
     expect(gjithmone?.target.exactSpelling).toBe("GJITHMONË");
     expect(gjithmone?.sourceReportedFormation.exactNotation).toBe("gjithë + mo(t)në → gjithmonë");
     expect(gjithmone?.mechanicalAuditInput).toBeNull();

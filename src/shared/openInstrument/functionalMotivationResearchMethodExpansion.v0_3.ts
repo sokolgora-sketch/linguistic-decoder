@@ -129,7 +129,7 @@ export const FUNCTIONAL_MOTIVATION_RESEARCH_METHOD_EXPANSION_SOURCES_V0_3 = [
     title: "Në gjurmë të elbasanishtes letrare",
     author: "Manola Myrta",
     publicationDate: "2014",
-    locator: "Section 2.3.1.1, Drejtshkrimi i zanores ë, printed page 99 onward; table lists gjithë + çka → gjithçka, gjithë + një → gjithnjë, gjithë + mo(t)në → gjithmonë, and gjithë + kombëtar → gjithëkombëtar.",
+    locator: "Myrta 2014, section 2.3.1.2, ‘Drejtshkrimi i zanores ë paratheksore’, printed page 102, compound table: gjithë + çka → gjithçka; gjithë + një → gjithnjë; gjithë + mo(t)në → gjithmonë; gjithë + kombëtar → gjithëkombëtar. The table is discussed in relation to Kolec Topalli (2011), printed page 272; this source record is Myrta’s report, not a direct Topalli source record.",
     url: "https://unitir.edu.al/wp-content/uploads/2015/03/Dokturatura-Manola-Myrta-Fakulteti-i-Histori-Filologjise-Departamenti-i-Gjuhesise.pdf",
     accessStatus: "ACCESSED",
     citationStatus: "CITATION_ENTERED_UNVERIFIED",
