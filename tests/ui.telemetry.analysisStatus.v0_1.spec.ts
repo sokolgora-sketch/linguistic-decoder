@@ -136,7 +136,11 @@ describe(
 
         expect(
           vm.analysisStatusV0_2,
-        ).toBeUndefined();
+        ).toEqual({
+          kind: "missing",
+          missing: "not_emitted",
+          note: "analysisStatusV0_2",
+        });
       },
     );
   },

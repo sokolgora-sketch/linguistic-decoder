@@ -160,7 +160,7 @@ export function PrimaryReadingOrientationCardV0_1({
           or candidate truth is established. Null remains valid.
         </p>
         <p className="mt-1 font-semibold text-[#c6d0dc]">
-          Multiple interpretations may coexist. You decide the final interpretation.
+          Interpretation remains with you.
         </p>
       </div>
     </section>

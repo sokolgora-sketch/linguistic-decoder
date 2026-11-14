@@ -3,23 +3,56 @@ import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import ZroChatPage from "@/components/ZroChatPage";
 
 const SUCCESS_PAYLOAD = {
+  responseContractVersion: "open-instrument.analyze-word-result.v2",
   word: "study",
+  sanitized: "study",
   engineVersion: "0.2.0-symbolic",
+  mode: "strict",
+  alphabet: "auto",
   primaryPath: { voicePath: ["U", "I"], ringPath: [1, 1], levelPath: [], ops: [] },
   evidence: {},
   candidates: [],
   rootMap: { tokens: [], keys: [], carriers: [], spans: [], composedMeaning: "" },
-  originClaim: {
-    policy: "no_single_winner",
-    gatesActive: false,
-    summary: { confidence: "weak", note: "test payload" },
-    candidates: [],
+  analysisStatusV0_2: {
+    schemaVersion: "open-instrument.analysis-status.v0_2",
+    status: "null_no_supported_candidate",
+    summary: "No supported candidate is available. Null remains valid.",
+    reviewedOperators: [],
+    candidateOnlyOperators: [],
+    researchHypothesisEmbryos: [],
+    structuralTokens: [],
+    claimBoundary: {
+      historicalOriginClaim: "not_claimed",
+      historicalTransmissionClaim: "not_claimed",
+      languageSuperiorityClaim: "not_claimed",
+      linguisticOwnershipClaim: "not_claimed",
+      candidateTruthClaim: "not_claimed",
+      structuralOutputIsCandidateTruth: false,
+      nullIsValid: true,
+    },
+    interpretationDecisionPolicy: {
+      schemaVersion: "open-instrument.interpretation-decision-policy.v0_1",
+      multipleInterpretationsMayCoexist: true,
+      automaticInterpretationSelection: "DISABLED",
+      interpretationDecisionAuthority: "USER_DECIDES",
+      alternativeProvenance: "PRESERVED_PER_INTERPRETATION",
+      alternativeClaimStatus: "PRESERVED_PER_INTERPRETATION",
+    },
+    userDecisionPosture: "user_decides",
+  },
+  interpretationDecisionPolicyV0_1: {
+    schemaVersion: "open-instrument.interpretation-decision-policy.v0_1",
+    multipleInterpretationsMayCoexist: true,
+    automaticInterpretationSelection: "DISABLED",
+    interpretationDecisionAuthority: "USER_DECIDES",
+    alternativeProvenance: "PRESERVED_PER_INTERPRETATION",
+    alternativeClaimStatus: "PRESERVED_PER_INTERPRETATION",
   },
 };
 
-function countAnalyzeV1Fetches(): number {
+function countAnalyzeV2Fetches(): number {
   return (global.fetch as jest.Mock).mock.calls.filter(
-    ([input]) => String(input).includes("/api/analyze-v1?")
+    ([input]) => String(input).includes("/api/analyze-v2?")
   ).length;
 }
 
@@ -63,7 +96,7 @@ describe("/chat retry-after-error contract", () => {
     expect(screen.queryByText("Engine error.")).not.toBeInTheDocument();
     expect(screen.queryByText("Open Instrument ready")).not.toBeInTheDocument();
 
-    expect(countAnalyzeV1Fetches()).toBe(2);
+    expect(countAnalyzeV2Fetches()).toBe(2);
   });
 
   it("clears the visible error banner and renders result state when a retry succeeds after a thrown network failure", async () => {
@@ -95,7 +128,7 @@ describe("/chat retry-after-error contract", () => {
     expect(screen.queryByText("Network error.")).not.toBeInTheDocument();
     expect(screen.queryByText("Open Instrument ready")).not.toBeInTheDocument();
 
-    expect(countAnalyzeV1Fetches()).toBe(2);
+    expect(countAnalyzeV2Fetches()).toBe(2);
   });
 
   it("does not keep an earlier analysis visible after a later HTTP failure", async () => {
