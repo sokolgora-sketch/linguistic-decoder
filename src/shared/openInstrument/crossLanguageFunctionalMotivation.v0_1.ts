@@ -3,10 +3,24 @@ import {
   type StructuralVoiceEventV0_2,
 } from "@/shared/structuralHypothesisDiscovery.v0_2";
 import type { GenericFunctionalWitnessV1 } from "@/shared/openInstrument/genericFunctionalWitnessDiscovery.v1";
+import {
+  isInterpretationDecisionPolicyV0_1,
+  type InterpretationDecisionPolicyV0_1,
+} from "@/shared/openInstrument/interpretationDecisionPolicy.v0_1";
 import type {
   SingleWordFunctionalMotivationBuildResultV0_1,
   SingleWordFunctionalMotivationProposalV0_1,
 } from "@/shared/openInstrument/singleWordFunctionalMotivation.v0_1";
+
+export type NeutralGenericFunctionalWitnessContextV2 = Readonly<
+  Omit<GenericFunctionalWitnessV1, "winnerClaim" | "noSingleWinner"> & {
+    interpretationDecisionPolicy: InterpretationDecisionPolicyV0_1;
+  }
+>;
+
+export type CrossLanguageGenericFunctionalWitnessContextV0_1 =
+  | GenericFunctionalWitnessV1
+  | NeutralGenericFunctionalWitnessContextV2;
 
 export const CROSS_LANGUAGE_FUNCTIONAL_MOTIVATION_SCHEMA_V0_1 =
   "open-instrument.cross-language-functional-motivation.v0_1" as const;
@@ -126,7 +140,7 @@ export type CrossLanguageFunctionalMotivationInputV0_1 = Readonly<{
   proposedSynthesis: string;
   unresolvedMaterial: readonly string[];
   functionalParallel: FunctionalArchitectureParallelInputV0_1 | null;
-  sourceWitnesses: readonly GenericFunctionalWitnessV1[];
+  sourceWitnesses: readonly CrossLanguageGenericFunctionalWitnessContextV0_1[];
   boundaryOperationWitness?: CrossLanguageBoundaryOperationWitnessInputV0_1 | null;
 }>;
 
@@ -746,9 +760,20 @@ function validateSourceWitnessContext(value: unknown): string[] {
     }
     if (witness.sourceAttestation !== "SOURCE_RECORD_ONLY") reasons.push(`${prefix}_SOURCE_ATTESTATION_UNSUPPORTED`);
     if (witness.functionalCorrespondence !== "NOT_EVALUATED") reasons.push(`${prefix}_FUNCTIONAL_CORRESPONDENCE_ALREADY_EVALUATED`);
+    const hasNeutralPolicy = Object.prototype.hasOwnProperty.call(
+      witness,
+      "interpretationDecisionPolicy",
+    );
+    const hasLegacyPolicyFields =
+      Object.prototype.hasOwnProperty.call(witness, "winnerClaim") ||
+      Object.prototype.hasOwnProperty.call(witness, "noSingleWinner");
+    const decisionBoundaryIsValid = hasNeutralPolicy
+      ? !hasLegacyPolicyFields &&
+        isInterpretationDecisionPolicyV0_1(witness.interpretationDecisionPolicy)
+      : witness.winnerClaim === "NOT_CLAIMED" && witness.noSingleWinner === true;
     if (witness.targetMeaning !== "NOT_CLAIMED" || witness.historicalRelation !== "NOT_CLAIMED" ||
-      witness.winnerClaim !== "NOT_CLAIMED" || witness.languageSuperiorityClaim !== "NOT_CLAIMED" ||
-      witness.userDecisionPosture !== "user_decides" || witness.noSingleWinner !== true) {
+      witness.languageSuperiorityClaim !== "NOT_CLAIMED" ||
+      witness.userDecisionPosture !== "user_decides" || !decisionBoundaryIsValid) {
       reasons.push(`${prefix}_GENERIC_WITNESS_CLAIM_BOUNDARY_INVALID`);
     }
   }
