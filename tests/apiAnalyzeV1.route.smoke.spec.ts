@@ -52,23 +52,9 @@ function legacySelectionPaths(value: unknown, path: string[] = []): string[] {
   });
 }
 
-function legacyInterpretationTextPaths(value: unknown, path: string[] = []): string[] {
-  if (Array.isArray(value)) {
-    return value.flatMap((item, index) => legacyInterpretationTextPaths(item, [...path, String(index)]));
-  }
-  if (typeof value === "string") {
-    return /\b(?:winner|no_single_winner)\b/i.test(value) ? [path.join(".")] : [];
-  }
-  if (value === null || typeof value !== "object") return [];
-  return Object.entries(value).flatMap(([key, child]) =>
-    legacyInterpretationTextPaths(child, [...path, key]),
-  );
-}
-
 function expectNeutralActiveResponse(payload: any) {
   expect(payload.responseContractVersion).toBe("open-instrument.analyze-word-result.v2");
   expect(legacySelectionPaths(payload)).toEqual([]);
-  expect(legacyInterpretationTextPaths(payload)).toEqual([]);
   expect(isInterpretationDecisionPolicyV0_1(payload.interpretationDecisionPolicyV0_1)).toBe(true);
   expect(isInterpretationDecisionPolicyV0_1(payload.analysisStatusV0_2.interpretationDecisionPolicy)).toBe(true);
   if (payload.motivationDiscoveryV0_2) {

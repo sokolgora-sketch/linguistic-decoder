@@ -240,7 +240,7 @@
         "totalRefs": 1,
         "unresolvedRefs": 0
       },
-      "fingerprint": "2c79c350b965761ea322bc3f2d9a8a54d34772c79767a6d8f68e5a3a8da28798",
+      "fingerprint": "23f4995fadfc04cad660769185a5468c9643683ac7d0da5ea7fb5631bc4d22d9",
       "invariants": {
         "claimBoundaryPreserved": true,
         "failures": [],
@@ -281,7 +281,7 @@
       },
       "repeatability": {
         "checked": true,
-        "repeatedFingerprint": "2c79c350b965761ea322bc3f2d9a8a54d34772c79767a6d8f68e5a3a8da28798",
+        "repeatedFingerprint": "23f4995fadfc04cad660769185a5468c9643683ac7d0da5ea7fb5631bc4d22d9",
         "stable": true
       },
       "request": {
