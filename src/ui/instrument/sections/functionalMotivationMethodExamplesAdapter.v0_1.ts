@@ -88,6 +88,10 @@ function formatEvents(events: readonly Readonly<{ voice: string; position: numbe
   return events.map(({ voice, position }) => `${voice}@${position}`);
 }
 
+function presentUnknownText(text: string): string {
+  return text.replace(/\bunresolved\b/giu, "not established");
+}
+
 function projectV0_3Form(
   form: ResearchFormV0_3,
 ): FunctionalMotivationMethodFormVMV0_1 {
@@ -203,7 +207,7 @@ function componentSpan(
     const view = {
       spelling: component.exactSpelling,
       span: { start, end },
-      function: component.proposedRole ?? "Function unresolved",
+      function: component.proposedRole ?? "Function not established",
       claimLayer: component.claimLayer,
       status: component.unresolved ? "UNKNOWN_OR_NULL" : component.claimLayer,
     } satisfies FunctionalMotivationMethodComponentVMV0_1;
@@ -244,7 +248,7 @@ function allGjithckaSources(): FunctionalMotivationMethodSourceVMV0_1[] {
 const studimExample: FunctionalMotivationMethodExampleVMV0_1 = {
   id: "STUDIM",
   title: "STUDIM · proposed two-root reading",
-  summary: "A method specimen that keeps a functional proposal, exact spelling reconstruction, ordinary morphology and unresolved material separate.",
+  summary: "A method specimen that keeps a functional proposal, exact spelling reconstruction, ordinary morphology and unknown material separate.",
   forms: [projectStudimForm()],
   components: componentSpan(specimen.exactSegmentation.components),
   functionalReading: {
@@ -268,7 +272,7 @@ const studimExample: FunctionalMotivationMethodExampleVMV0_1 = {
     claimLayer: contrast.claimLayer,
     status: contrast.claimLayer,
   })),
-  unresolved: specimen.unresolvedClaims.map(({ text }) => text),
+  unresolved: specimen.unresolvedClaims.map(({ text }) => presentUnknownText(text)),
   notes: [
     "SHTOJ is cited as lexical context for add/increase; it does not attest SHTU as a component of STUDIM.",
     "STU + DI + M is the exact target spelling split. Final M remains UNKNOWN_OR_NULL.",
@@ -341,7 +345,7 @@ const gjithckaExample: FunctionalMotivationMethodExampleVMV0_1 = {
     claimLayer: contrast.sourceReportedFormation.claimLayer,
     status: contrast.sourceReportedFormation.evidenceStatus,
   })),
-  unresolved: gjithcka.unresolvedClaims.map(({ text }) => text),
+  unresolved: gjithcka.unresolvedClaims.map(({ text }) => presentUnknownText(text)),
   notes: [
     "The cited Myrta passage records the component notation; it does not make OMIT an executable linguistic rule.",
     methodExpansion.orthographicGeneralization.reason,

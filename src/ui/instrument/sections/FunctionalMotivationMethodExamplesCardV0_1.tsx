@@ -137,8 +137,8 @@ function MethodExampleDetails({ example }: { example: FunctionalMotivationMethod
       ) : null}
 
       {example.unresolved.length > 0 ? (
-        <section className={panelClass} aria-label="Unresolved claims">
-          <h4 className={labelClass}>Unresolved</h4>
+        <section className={panelClass} aria-label="Open questions">
+          <h4 className={labelClass}>Open questions · UNKNOWN_OR_NULL</h4>
           <ul className="mt-2 list-inside list-disc space-y-1">
             {example.unresolved.map((claim) => <li key={claim} className="break-words">{claim}</li>)}
           </ul>
@@ -186,7 +186,7 @@ export function FunctionalMotivationMethodExamplesCardV0_1() {
     >
       <h3 className="text-sm font-semibold text-white">How a functional reading is built</h3>
       <p id="functional-method-examples-help" className="mt-1 max-w-3xl break-words text-xs leading-5 text-[#aeb7c5]">
-        Inspect the source meaning, proposed components, exact spelling operations, written Voices, alternatives and unresolved claims in these existing research examples.
+        Inspect the source meaning, proposed components, exact spelling operations, written Voices, alternatives and claims without a supported answer in these existing research examples.
       </p>
       <label htmlFor="functional-method-example-select" className="mt-3 block text-xs font-medium text-[#c5ced8]">
         Choose a read-only method example
