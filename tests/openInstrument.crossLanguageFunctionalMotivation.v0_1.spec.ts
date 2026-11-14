@@ -1,3 +1,9 @@
+import { GET } from "../app/api/analyze-v2/route";
+import {
+  hasLegacyInterpretationFieldsV2,
+  projectNeutralInterpretationNodeV2,
+} from "../src/shared/analyzeWordResult.v2.contract";
+import { adaptAnalysisToTelemetryVM } from "../src/ui/instrument/contractAdapter";
 import {
   buildCrossLanguageFunctionalMotivationV0_1,
   CROSS_LANGUAGE_OPERATION_DEFINITIONS_V0_1,
@@ -694,6 +700,122 @@ describe("cross-language functional motivation v0.1", () => {
     expect(fakeSourceReference).toMatchObject({ status: "INVALID", reasonCodes: expect.arrayContaining(["WITNESS_1_SOURCE_RECORD_NOT_AVAILABLE"]) });
   });
 
+  it("accepts a neutral generic witness from the active V2 response in the cross-language workbench", async () => {
+    const response = await GET(new Request(
+      "http://localhost/api/analyze-v2?word=pater&mode=strict&alphabet=auto",
+    ));
+    expect(response.status).toBe(200);
+    const body: any = await response.json();
+
+    expect(body.responseContractVersion).toBe("open-instrument.analyze-word-result.v2");
+    expect(hasLegacyInterpretationFieldsV2(body)).toBe(false);
+    const neutralMatch = body.candidates
+      .flatMap((candidate: any) => candidate?.genericFunctionalWitnessRuntimeProjectionV1?.discovery?.matches ?? [])
+      .find((match: any) => match.sourceId === "reviewed.external.albanian-at.father.candidate.v0_1");
+    expect(neutralMatch).toMatchObject({
+      sourceId: "reviewed.external.albanian-at.father.candidate.v0_1",
+      sourceStatus: "reviewed_candidate",
+      sourceAuthorityStatus: "reviewed_accepted",
+      sourceForm: "at",
+      citationRefs: ["reviewed.external.albanian-at.father.citation.v0_1"],
+      sourceProvenance: {
+        sourceRecordId: "reviewed.external.albanian-at.father.candidate.v0_1",
+      },
+      sourceAttestation: "SOURCE_RECORD_ONLY",
+      functionalCorrespondence: "NOT_EVALUATED",
+      interpretationDecisionPolicy: {
+        multipleInterpretationsMayCoexist: true,
+        automaticInterpretationSelection: "DISABLED",
+        interpretationDecisionAuthority: "USER_DECIDES",
+      },
+    });
+    expect(neutralMatch).not.toHaveProperty("winnerClaim");
+    expect(neutralMatch).not.toHaveProperty("noSingleWinner");
+
+    const vm = adaptAnalysisToTelemetryVM(body);
+    const sourceWitnesses = vm.candidates.flatMap((candidate) => {
+      const projection = candidate.genericFunctionalWitnessRuntimeProjectionV1;
+      if (projection?.kind !== "present" || projection.value.targetWord !== vm.readout.word) return [];
+      return projection.value.discovery.matches;
+    });
+    const sourceWitness = sourceWitnesses.find((match) => match.sourceId === neutralMatch.sourceId);
+    expect(sourceWitness).toBeDefined();
+    if (!sourceWitness) return;
+    expect(sourceWitness.sourceId).toBe(neutralMatch.sourceId);
+    expect(sourceWitness.sourceStatus).toBe(neutralMatch.sourceStatus);
+    expect(sourceWitness.citationRefs).toEqual(neutralMatch.citationRefs);
+    expect(sourceWitness.sourceProvenance?.sourceRecordId).toBe(neutralMatch.sourceId);
+
+    const parent = buildSingleWordFunctionalMotivationProposalV0_1({
+      targetWord: "pater",
+      targetLanguage: "Latin",
+      targetDialect: "",
+      segments: ["p", "at", "er"].map((exactSpelling) => ({
+        exactSpelling,
+        proposedMeaning: "",
+        proposedGrammaticalRole: "",
+        language: "Latin",
+        dialect: "",
+        evidenceStatus: "UNKNOWN_OR_NULL" as const,
+        evidenceReference: "",
+        unresolved: true,
+      })),
+      unresolvedConnectingMaterial: "The fixture components carry no semantic claim.",
+      transformations: [],
+      functionalExplanation: "Compatibility regression fixture only.",
+      transparency: "UNKNOWN_OR_NULL",
+    });
+    expect(parent.status).toBe("READY");
+
+    const result = buildCrossLanguageFunctionalMotivationV0_1(parent, {
+      ...dietaInput,
+      witnesses: [{
+        kind: "EXISTING_GENERIC_SOURCE_WITNESS",
+        witnessId: "selected-v2-at",
+        genericWitnessId: sourceWitness.witnessId,
+      }],
+      correspondences: [{
+        relationId: "at-exact-source-witness",
+        targetComponentIndex: 1,
+        witnessId: "selected-v2-at",
+        proposedRelationship: "User-declared exact-form comparison for compatibility coverage.",
+        applications: [],
+      }],
+      proposedSynthesis: "Compatibility fixture; no functional claim is asserted.",
+      sourceWitnesses: [sourceWitness],
+    });
+
+    expect(result).toMatchObject({ status: "READY" });
+    if (result.status !== "READY") return;
+    expect(result.proposal.witnesses[0]).toMatchObject({
+      exactForm: "at",
+      language: "sq",
+      evidenceStatus: "SOURCE_RECORD_ONLY",
+      sourceRecord: {
+        sourceId: "reviewed.external.albanian-at.father.candidate.v0_1",
+        sourceStatus: "reviewed_candidate",
+        attestationTruth: "fact",
+        citationRefs: ["reviewed.external.albanian-at.father.citation.v0_1"],
+        functionalCorrespondence: "NOT_EVALUATED",
+        sourceAttestation: "SOURCE_RECORD_ONLY",
+      },
+      writtenVoices: { status: "COMPLETE", path: ["A"] },
+    });
+    expect(result.proposal.correspondences[0]).toMatchObject({
+      input: "at",
+      output: "at",
+      exactFormMatch: true,
+      formStatus: "EXACT_MATCH",
+      operationCount: 0,
+      totalCost: 0,
+      authority: "USER_DECLARED_UNVERIFIED",
+      linguisticValidity: "NOT_ASSESSED",
+      voiceConservation: "PRESERVED",
+    });
+    expect(result.proposal.sourceAuthorityPromotion).toBe("NONE");
+    expect(result.proposal.selection.userDecisionPosture).toBe("user_decides");
+  });
+
   it("reuses a generic witness only from the supplied source context without evaluating its function", () => {
     const result = buildCrossLanguageFunctionalMotivationV0_1(
       buildSingleWordFunctionalMotivationProposalV0_1(dietaProposalInput),
@@ -742,6 +864,29 @@ describe("cross-language functional motivation v0.1", () => {
       },
     );
     expect(result).toMatchObject({ status: "INVALID", reasonCodes: expect.arrayContaining(["SOURCE_WITNESS_1_FUNCTIONAL_CORRESPONDENCE_ALREADY_EVALUATED"]) });
+  });
+
+  it("rejects malformed neutral decision policy on generic source context", () => {
+    const neutralWitness = projectNeutralInterpretationNodeV2(genericSourceWitness) as Record<string, any>;
+    const result = buildCrossLanguageFunctionalMotivationV0_1(
+      buildSingleWordFunctionalMotivationProposalV0_1(dietaProposalInput),
+      {
+        ...dietaInput,
+        witnesses: [],
+        correspondences: [],
+        sourceWitnesses: [{
+          ...neutralWitness,
+          interpretationDecisionPolicy: {
+            ...neutralWitness.interpretationDecisionPolicy,
+            automaticInterpretationSelection: "ENABLED",
+          },
+        }],
+      },
+    );
+    expect(result).toMatchObject({
+      status: "INVALID",
+      reasonCodes: expect.arrayContaining(["SOURCE_WITNESS_1_GENERIC_WITNESS_CLAIM_BOUNDARY_INVALID"]),
+    });
   });
 
   it("retains existing KANDIL mismatch and strict Null behavior without changing the parent contract", () => {
