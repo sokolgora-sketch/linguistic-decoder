@@ -40,7 +40,7 @@ describe("functional-motivation method examples in the Single Word workbench", (
     expect(screen.getByTestId("functional-method-operation")).toHaveTextContent("exact removed text “H”");
     expect(screen.getByTestId("functional-method-operation")).toHaveTextContent("Inverse replay: SHTU · EXACT_MATCH");
     expect(screen.getByTestId("functional-method-operation")).toHaveTextContent("linguistic applicability NOT_ASSESSED");
-    expect(screen.getByText(/Final M remains UNKNOWN_OR_NULL/)).toBeInTheDocument();
+    expect(screen.getAllByTestId("functional-method-component").at(-1)).toHaveTextContent("UNKNOWN_OR_NULL");
     expect(screen.getByText(/ordinary STUDIOJ \/ -IM lexical-morphological account/)).toBeInTheDocument();
     expect(screen.getByText(/SHTIM: Retain as the existing contrast/)).toBeInTheDocument();
     expect(screen.getAllByText(/CITATION_ENTERED_UNVERIFIED/).length).toBeGreaterThan(0);
@@ -56,11 +56,11 @@ describe("functional-motivation method examples in the Single Word workbench", (
     const trace = screen.getByTestId("functional-method-reasoning-trace");
     const equation = screen.getByTestId("functional-motivation-equation");
     expect(equation).toHaveTextContent("SHTU (proposed increase function) + DI (know / knowledge) → Increasing or acquiring knowledge → STUDIM (the activity of studying)");
-    expect(equation).toHaveTextContent("USER_PROPOSED · PETRO_ZHEJI_INSPIRED_RECONSTRUCTION");
+    expect(equation).toHaveTextContent("LOGICAL_INFERENCE · USER_PROPOSED");
     expect(equation).toHaveTextContent("free_operator_attested");
     expect(equation).toHaveTextContent("No Zheji operator status is asserted");
     expect(equation).toHaveTextContent("M: UNKNOWN_OR_NULL");
-    expect(equation).toHaveTextContent("citation entered unverified");
+    expect(equation).toHaveTextContent("CITATION_ENTERED_UNVERIFIED");
     expect(equation.compareDocumentPosition(trace) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     const steps = screen.getAllByTestId("functional-method-reasoning-step");
     expect(steps).toHaveLength(9);
@@ -139,6 +139,14 @@ describe("functional-motivation method examples in the Single Word workbench", (
     expect(screen.getByText(/no shared semantic root or historical relationship is claimed/)).toBeInTheDocument();
 
     fireEvent.change(selector, { target: { value: "GJITHÇKA" } });
+    const gjithckaEquation = screen.getByTestId("functional-motivation-equation");
+    expect(gjithckaEquation).toHaveTextContent(
+      "GJITHË (all / whole) + ÇKA (what / that which) → everything → GJITHÇKA (all things; everything)",
+    );
+    expect(gjithckaEquation).toHaveTextContent("LOGICAL_INFERENCE · USER_PROPOSED");
+    expect(gjithckaEquation).toHaveTextContent("Source-authority promotion: NONE");
+    expect(screen.getByTestId("functional-method-reasoning-trace")).toHaveTextContent("Myrta 2014 reports the notation");
+    expect(screen.getByTestId("functional-method-reasoning-trace")).toHaveTextContent(/alternatives may coexist/i);
     expect(screen.getByTestId("functional-method-code-points-GJITHÇKA")).toHaveTextContent(
       "G@0 · J@1 · I@2 · T@3 · H@4 · Ç@5 · K@6 · A@7",
     );
