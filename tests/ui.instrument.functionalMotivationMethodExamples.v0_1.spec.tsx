@@ -47,6 +47,76 @@ describe("functional-motivation method examples in the Single Word workbench", (
     expect(screen.getAllByText(/licensing NOT_ASSESSED/).length).toBeGreaterThan(0);
   });
 
+  it("connects STUDIM evidence to a conditional embryo-to-whole reading without source promotion", () => {
+    render(<SingleWordMotivationWorkbenchV0_1 initialTargetWord="STUDIM" />);
+    fireEvent.change(screen.getByRole("combobox", { name: "Choose a read-only method example" }), {
+      target: { value: "STUDIM" },
+    });
+
+    const trace = screen.getByTestId("functional-method-reasoning-trace");
+    const steps = screen.getAllByTestId("functional-method-reasoning-step");
+    expect(steps).toHaveLength(9);
+    expect(steps.map((step) => step.getAttribute("data-trace-step-id"))).toEqual([
+      "whole-word-sense",
+      "di-target-span",
+      "di-lexical-function",
+      "shtoj-context",
+      "shtu-stu-correspondence",
+      "component-interaction",
+      "surface-reconstruction",
+      "ordinary-morphology-alternative",
+      "unresolved-material",
+    ]);
+    expect(steps[0]).toHaveTextContent("STUDIM");
+    expect(steps[0]).toHaveTextContent("studying; acquiring knowledge");
+    expect(steps[0]).toHaveTextContent("CITATION_ENTERED_UNVERIFIED");
+
+    expect(steps[1]).toHaveTextContent("STUDIM code-point span [3,5): DI");
+    expect(steps[1]).toHaveTextContent("DERIVED_STRUCTURE");
+    expect(steps[1]).toHaveTextContent("does not by itself establish a morpheme boundary");
+
+    const diStep = steps.find((step) => step.textContent?.includes("DI lexical embryo candidate"));
+    expect(diStep).toHaveTextContent("DI");
+    expect(diStep).toHaveTextContent("know / knowledge");
+    expect(diStep).toHaveTextContent("FJALË · DI");
+    expect(diStep).toHaveTextContent("no more specific locator is supplied here");
+    expect(diStep).toHaveTextContent("does not prove that DI is a historical or grammatical component");
+
+    const increaseContext = steps.find((step) => step.textContent?.includes("Expansion context for the proposed increase function"));
+    expect(increaseContext).toHaveTextContent("SHTOJ");
+    expect(increaseContext).toHaveTextContent("does not attest SHTU as a component");
+
+    const spellingOperation = screen.getByTestId("functional-method-trace-operation-shtu-stu-correspondence");
+    expect(spellingOperation).toHaveTextContent("SHTU → STU");
+    expect(spellingOperation).toHaveTextContent("OMIT H at zero-based code-point position 1");
+    expect(spellingOperation).toHaveTextContent("cost 1");
+    expect(spellingOperation).toHaveTextContent("inverse SHTU (EXACT_MATCH)");
+    expect(steps[4]).toHaveTextContent("USER_DECLARED_UNVERIFIED");
+    expect(steps[4]).toHaveTextContent("linguistic applicability NOT_ASSESSED");
+
+    const synthesis = steps.find((step) => step.textContent?.includes("Conditional component interaction"));
+    expect(synthesis).toHaveTextContent("Increasing or acquiring knowledge through study");
+    expect(synthesis).toHaveTextContent("LOGICAL_INFERENCE · USER_PROPOSED");
+    expect(synthesis).toHaveTextContent("Neither entry source-establishes the SHTU + DI segmentation");
+
+    const reconstruction = steps.find((step) => step.textContent?.includes("Target-side spelling reconstruction"));
+    expect(reconstruction).toHaveTextContent("STU + DI + M = STUDIM");
+    expect(reconstruction).toHaveTextContent("EXACT_MATCH");
+    expect(reconstruction).toHaveTextContent("final M remains UNKNOWN_OR_NULL");
+
+    const alternative = steps.find((step) => step.textContent?.includes("Separate lexical-morphological alternative"));
+    expect(alternative).toHaveTextContent("STUDIOJ");
+    expect(alternative).toHaveTextContent("specific -IM derivation is not independently verified");
+    expect(screen.getByTestId("functional-method-source-fidelity")).toHaveTextContent("PETRO_ZHEJI_SOURCE_REPORTED");
+    expect(screen.getByTestId("functional-method-source-fidelity")).toHaveTextContent("PETRO_ZHEJI_INSPIRED_RECONSTRUCTION");
+    expect(screen.getByTestId("functional-method-source-fidelity")).toHaveTextContent("ZERO_ORIGINAL_DOCTRINE");
+    expect(screen.getByTestId("functional-method-source-fidelity")).toHaveTextContent("OPEN_INSTRUMENT_ENGINEERING");
+    expect(screen.getByTestId("functional-method-source-fidelity")).toHaveTextContent("grant no source or production authority");
+    expect(screen.getByTestId("functional-method-source-fidelity")).toHaveTextContent("UNKNOWN");
+    expect(trace).toHaveTextContent("Source reference: none entered for this relationship.");
+    expect(screen.getByText(/alternatives may coexist, and interpretation remains with the user/)).toBeInTheDocument();
+  });
+
   it("keeps STUDY orthographic-only and renders the GJITHÇKA omission and family contrast", () => {
     render(<SingleWordMotivationWorkbenchV0_1 initialTargetWord="STUDY" />);
     const selector = screen.getByRole("combobox", { name: "Choose a read-only method example" });
