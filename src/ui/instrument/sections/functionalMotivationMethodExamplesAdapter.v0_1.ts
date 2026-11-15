@@ -2,6 +2,7 @@ import {
   buildCrossLanguageOperationLedgerV0_2,
   type CrossLanguageOperationLedgerInputV0_2,
 } from "@/shared/openInstrument/crossLanguageOperationLedger.v0_2";
+import { DI_FREE_OPERATOR_PROFILE_V0_1 } from "@/shared/freeOperatorProfile.v0_1";
 import {
   STUDIM_FUNCTIONAL_MOTIVATION_REFERENCE_V0_2,
   type FunctionalMotivationResearchClaimLayerV0_2,
@@ -68,6 +69,30 @@ export type FunctionalMotivationMethodOperationVMV0_1 = Readonly<{
   linguisticApplicability: string;
 }>;
 
+export type FunctionalMotivationMethodTraceStepVMV0_1 = Readonly<{
+  id: string;
+  title: string;
+  from: string;
+  relationshipType: string;
+  to: string;
+  claimLayer: FunctionalMotivationResearchClaimLayerV0_2;
+  status: string;
+  sources: readonly FunctionalMotivationMethodSourceVMV0_1[];
+  evidenceNote: string;
+  supportBoundary: string;
+  exactOperation: string | null;
+}>;
+
+export type FunctionalMotivationMethodSourceFidelityVMV0_1 = Readonly<{
+  classification:
+    | "PETRO_ZHEJI_SOURCE_REPORTED"
+    | "PETRO_ZHEJI_INSPIRED_RECONSTRUCTION"
+    | "ZERO_ORIGINAL_DOCTRINE"
+    | "OPEN_INSTRUMENT_ENGINEERING"
+    | "UNKNOWN";
+  statement: string;
+}>;
+
 export type FunctionalMotivationMethodExampleVMV0_1 = Readonly<{
   id: FunctionalMotivationMethodExampleIdV0_1;
   title: string;
@@ -82,6 +107,9 @@ export type FunctionalMotivationMethodExampleVMV0_1 = Readonly<{
   unresolved: readonly string[];
   notes: readonly string[];
   sources: readonly FunctionalMotivationMethodSourceVMV0_1[];
+  reasoningTrace?: readonly FunctionalMotivationMethodTraceStepVMV0_1[];
+  sourceFidelity?: readonly FunctionalMotivationMethodSourceFidelityVMV0_1[];
+  motivationEquation?: Readonly<{ equation: string; roles: readonly string[] }>;
 }>;
 
 function formatEvents(events: readonly Readonly<{ voice: string; position: number }>[]): string[] {
@@ -235,6 +263,163 @@ function allStudimSources(): FunctionalMotivationMethodSourceVMV0_1[] {
   return uniqueSources(urls);
 }
 
+function studimFactSources(claimId: string): FunctionalMotivationMethodSourceVMV0_1[] {
+  const claim = specimen.sourceFacts.find((item) => item.claimId === claimId);
+  return claim ? uniqueSources(claim.sourceReferences) : [];
+}
+
+function buildStudimReasoningTrace(): FunctionalMotivationMethodTraceStepVMV0_1[] {
+  const selectedMeaningSources = uniqueSources(specimen.target.selectedMeaning.sourceReferences);
+  const diSources = studimFactSources("di-lexical-function");
+  const shtojSources = studimFactSources("shtoj-lexical-function");
+  const omission = studimOperation;
+
+  return [
+    {
+      id: "whole-word-sense",
+      title: "Whole-word function",
+      from: specimen.target.exactSpelling,
+      relationshipType: "selected lexical sense",
+      to: specimen.target.selectedMeaning.text,
+      claimLayer: "SOURCE_FACT",
+      status: specimen.target.selectedMeaning.evidenceStatus,
+      sources: selectedMeaningSources,
+      evidenceNote: "The cited STUDIM and STUDIOJ entries provide the selected learning/studying context; both citations remain unverified.",
+      supportBoundary: "The selected sense supplies the whole-word context. It does not establish the proposed component segmentation.",
+      exactOperation: null,
+    },
+    {
+      id: "di-target-span",
+      title: "Observed candidate embryo in the target",
+      from: "STUDIM code-point span [3,5): DI",
+      relationshipType: "exact orthographic substring",
+      to: "DI",
+      claimLayer: "DERIVED_STRUCTURE",
+      status: "OBSERVED_IN_TARGET_SPELLING",
+      sources: [],
+      evidenceNote: "The substring and zero-based code-point span are derived from the exact target spelling.",
+      supportBoundary: "An observed substring does not by itself establish a morpheme boundary or independent component function.",
+      exactOperation: null,
+    },
+    {
+      id: "di-lexical-function",
+      title: "DI lexical embryo candidate",
+      from: "DI",
+      relationshipType: "independently cited lexical function",
+      to: "know / knowledge",
+      claimLayer: "SOURCE_FACT",
+      status: "CITATION_ENTERED_UNVERIFIED",
+      sources: diSources,
+      evidenceNote: "FJALË's DI entry is recorded as lexical evidence; its citation status is unverified.",
+      supportBoundary: "The DI entry supports this lexical function, but does not prove that DI is a historical or grammatical component of STUDIM.",
+      exactOperation: null,
+    },
+    {
+      id: "shtoj-context",
+      title: "Expansion context for the proposed increase function",
+      from: "SHTOJ",
+      relationshipType: "cited lexical context for a proposed form",
+      to: "add / increase",
+      claimLayer: "SOURCE_FACT",
+      status: "CITATION_ENTERED_UNVERIFIED",
+      sources: shtojSources,
+      evidenceNote: "FJALË's SHTOJ entry is source context; its citation status is unverified.",
+      supportBoundary: "SHTOJ does not attest SHTU as a component of STUDIM. The SHTU spelling and its proposed function remain USER_PROPOSAL.",
+      exactOperation: null,
+    },
+    {
+      id: "shtu-stu-correspondence",
+      title: "Proposed spelling correspondence",
+      from: "SHTU",
+      relationshipType: "user-declared target-side form correspondence",
+      to: "STU",
+      claimLayer: "USER_PROPOSAL",
+      status: "USER_DECLARED_UNVERIFIED · linguistic applicability NOT_ASSESSED",
+      sources: [],
+      evidenceNote: "The existing operation ledger verifies only an exact mechanical replay; no linguistic source for this omission is entered.",
+      supportBoundary: "Mechanical replay and inverse reconstruction do not establish that H omission is linguistically applicable.",
+      exactOperation: omission
+        ? `${omission.before} → ${omission.after}; OMIT H at zero-based code-point position ${omission.position}; cost ${omission.cost}; inverse ${omission.inverseForm} (${omission.inverseStatus}).`
+        : "No operation ledger is available.",
+    },
+    {
+      id: "component-interaction",
+      title: "Conditional component interaction",
+      from: "SHTU (proposed add / increase) + DI (know / knowledge)",
+      relationshipType: "exploratory functional synthesis",
+      to: specimen.functionalProposal.synthesis.text,
+      claimLayer: specimen.functionalProposal.synthesis.claimLayer,
+      status: specimen.functionalProposal.synthesis.proposalStatus,
+      sources: [...shtojSources, ...diSources],
+      evidenceNote: "The cited SHTOJ and DI lexical entries are contextual evidence only; both citations remain unverified.",
+      supportBoundary: "Neither entry source-establishes the SHTU + DI segmentation or this synthesis. Treat it as a conditional ZË-RO proposal, not a source-reported meaning or historical derivation.",
+      exactOperation: null,
+    },
+    {
+      id: "surface-reconstruction",
+      title: "Target-side spelling reconstruction",
+      from: specimen.exactSegmentation.components.map((component) => component.exactSpelling).join(" + "),
+      relationshipType: "exact concatenation",
+      to: specimen.exactSegmentation.targetSpelling,
+      claimLayer: "DERIVED_STRUCTURE",
+      status: specimen.exactSegmentation.expectedComparison,
+      sources: [],
+      evidenceNote: "Computed directly from the recorded component strings and target spelling.",
+      supportBoundary: "An exact surface match accounts for spelling; it does not validate the segmentation, morphology, or functional interpretation.",
+      exactOperation: "STU + DI + M = STUDIM; the function of final M remains UNKNOWN_OR_NULL.",
+    },
+    {
+      id: "ordinary-morphology-alternative",
+      title: "Separate lexical-morphological alternative",
+      from: "STUDIM",
+      relationshipType: "separate lexical context",
+      to: "STUDIOJ; the specific -IM derivation is not established here",
+      claimLayer: specimen.alternativeReadings[0]!.claimLayer,
+      status: specimen.alternativeReadings[0]!.evidenceStatus,
+      sources: uniqueSources(specimen.alternativeReadings[0]!.sourceReferences),
+      evidenceNote: "The STUDIM and STUDIOJ entries are cited as the basis for keeping this alternative visible; citation status is unverified.",
+      supportBoundary: "The specific -IM derivation is not independently verified here and remains separate from the proposed STU + DI + M analysis.",
+      exactOperation: null,
+    },
+    {
+      id: "unresolved-material",
+      title: "Unresolved material",
+      from: "M at target position 5",
+      relationshipType: "component function",
+      to: "UNKNOWN_OR_NULL",
+      claimLayer: "UNKNOWN_OR_NULL",
+      status: "NOT_ESTABLISHED",
+      sources: [],
+      evidenceNote: "No supporting source or component function is recorded for M in the specimen.",
+      supportBoundary: "Do not infer an autonomous meaning for M or treat the whole-word reading as structurally complete at the component-function level.",
+      exactOperation: null,
+    },
+  ];
+}
+
+const studimSourceFidelity: FunctionalMotivationMethodSourceFidelityVMV0_1[] = [
+  {
+    classification: "PETRO_ZHEJI_SOURCE_REPORTED",
+    statement: "No claim in this trace is classified as directly reported from a Petro Zheji source.",
+  },
+  {
+    classification: "PETRO_ZHEJI_INSPIRED_RECONSTRUCTION",
+    statement: "Only the stepwise presentation is locally described as Zheji-inspired; this is not an implementation of the complete historical Symbolic Algorithm.",
+  },
+  {
+    classification: "ZERO_ORIGINAL_DOCTRINE",
+    statement: "The SHTU + DI reading and its conditional functional synthesis remain a ZË-RO user proposal, not an attributed doctrine claim.",
+  },
+  {
+    classification: "OPEN_INSTRUMENT_ENGINEERING",
+    statement: "The trace view model, evidence links, and UI rendering are Open Instrument engineering; they grant no source or production authority.",
+  },
+  {
+    classification: "UNKNOWN",
+    statement: "Whether this trace corresponds to any complete historical Zheji algorithm remains unknown.",
+  },
+];
+
 function allGjithckaSources(): FunctionalMotivationMethodSourceVMV0_1[] {
   const ids: string[] = [
     ...gjithcka.target.sourceReferenceIds,
@@ -250,6 +435,15 @@ const studimExample: FunctionalMotivationMethodExampleVMV0_1 = {
   title: "STUDIM · proposed two-root reading",
   summary: "A method specimen that keeps a functional proposal, exact spelling reconstruction, ordinary morphology and unknown material separate.",
   forms: [projectStudimForm()],
+  motivationEquation: {
+    equation: "SHTU (proposed increase function) + DI (know / knowledge) → Increasing or acquiring knowledge → STUDIM (the activity of studying)",
+    roles: [
+      `DI: independent lexical form; existing profile classification ${DI_FREE_OPERATOR_PROFILE_V0_1.directFreeOperator.categories.join(", ")}; knowledge / knowing. Proposed membership in STUDIM remains unverified.`,
+      "SHTOJ: cited lexical reference for add / increase; citation entered unverified. No Zheji operator status is asserted.",
+      "SHTU: proposed function-bearing form associated with SHTOJ; its form and membership in STUDIM are not established as an allomorph.",
+      "STU: target-side written component. M: UNKNOWN_OR_NULL.",
+    ],
+  },
   components: componentSpan(specimen.exactSegmentation.components),
   functionalReading: {
     text: `${specimen.functionalProposal.roots.map((root) => `${root.proposedSpelling} (${root.proposedFunction})`).join(" + ")} → ${specimen.functionalProposal.synthesis.text}`,
@@ -280,6 +474,8 @@ const studimExample: FunctionalMotivationMethodExampleVMV0_1 = {
     "Strict embryo meaning is UNKNOWN_OR_NULL. Source authority promotion: NONE. Historical origin: NOT CLAIMED.",
   ],
   sources: allStudimSources(),
+  reasoningTrace: buildStudimReasoningTrace(),
+  sourceFidelity: studimSourceFidelity,
 };
 
 const studyExample: FunctionalMotivationMethodExampleVMV0_1 = {

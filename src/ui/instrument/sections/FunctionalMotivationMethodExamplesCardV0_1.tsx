@@ -40,6 +40,18 @@ function MethodExampleDetails({ example }: { example: FunctionalMotivationMethod
         </div>
       </section>
 
+      {example.motivationEquation ? (
+        <section className={`${panelClass} [overflow-wrap:anywhere]`} aria-label="Functional motivation" data-testid="functional-motivation-equation">
+          <h4 className={labelClass}>FUNCTIONAL MOTIVATION</h4>
+          <p className="mt-2 text-base font-semibold text-white">{example.motivationEquation.equation}</p>
+          <p className="mt-1 text-xs">USER_PROPOSED · PETRO_ZHEJI_INSPIRED_RECONSTRUCTION</p>
+          <p className="mt-1 text-xs text-[#aeb7c5]">This is a proposed interpretation; it does not attribute this equation to Zheji or establish historical morphology.</p>
+          <h5 className={`${labelClass} mt-3`}>Functional roles and source context</h5>
+          <ul className="mt-1 space-y-1">{example.motivationEquation.roles.map((role) => <li key={role}>{role}</li>)}</ul>
+          <p className="mt-2 text-xs">ACTION: increase · PATIENT: knowledge · RESULT: acquisition of knowledge · WHOLE-WORD FUNCTION: studying. This is a ZË-RO interpretation framework.</p>
+        </section>
+      ) : null}
+
       {example.components.length > 0 ? (
         <section className={panelClass} aria-label="Proposed components">
           <h4 className={labelClass}>Component contributions</h4>
@@ -73,6 +85,66 @@ function MethodExampleDetails({ example }: { example: FunctionalMotivationMethod
         </p>
         <p className="mt-1 break-words text-xs text-[#aeb7c5]">{example.reconstruction.note}</p>
       </section>
+
+      {example.reasoningTrace?.length ? (
+        <section className={panelClass} aria-label="Embryo-to-whole functional reasoning trace" data-testid="functional-method-reasoning-trace">
+          <h4 className={labelClass}>Embryo-to-whole reasoning trace</h4>
+          <p className="mt-1 break-words text-xs text-[#aeb7c5]">
+            A source-aware account of how this conditional reading is assembled. Each step keeps its evidence class and limits visible.
+          </p>
+          <ol className="mt-2 space-y-3">
+            {example.reasoningTrace.map((step, index) => (
+              <li key={step.id} className="min-w-0 border-t border-[#303a45] pt-2 first:border-0 first:pt-0" data-testid="functional-method-reasoning-step" data-trace-step-id={step.id}>
+                <h5 className="break-words font-semibold text-white">{index + 1}. {step.title}</h5>
+                <p className="mt-1 break-words">
+                  <strong>Connected forms or concepts:</strong> {step.from} · {step.relationshipType} · {step.to}
+                </p>
+                <p className="break-words text-xs text-[#c5ced8]">
+                  <strong>Claim:</strong> {step.claimLayer} · {step.status}
+                </p>
+                <p className="break-words text-xs text-[#c5ced8]">
+                  <strong>Evidence:</strong> {step.evidenceNote}
+                </p>
+                {step.sources.length === 0 ? (
+                  <p className="break-words text-xs text-[#c5ced8]">Source reference: none entered for this relationship.</p>
+                ) : null}
+                {step.sources.length > 0 ? (
+                  <ul className="mt-1 space-y-1 text-xs">
+                    {step.sources.map((source) => (
+                      <li key={source.url} className="min-w-0 break-words">
+                        <a className="break-all text-[#a9d2ff] underline underline-offset-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#d8bb7a]" href={source.url} target="_blank" rel="noreferrer">
+                          {source.label}
+                        </a>
+                        {` · ${source.locator} · ${source.citationStatus}`}
+                      </li>
+                    ))}
+                  </ul>
+                ) : null}
+                <p className="mt-1 break-words text-xs text-[#aeb7c5]"><strong>Support boundary:</strong> {step.supportBoundary}</p>
+                {step.exactOperation ? (
+                  <p className="mt-1 break-words font-mono text-xs text-[#d7dde7]" data-testid={`functional-method-trace-operation-${step.id}`}>
+                    <strong className="font-sans">Exact structure or operation:</strong> {step.exactOperation}
+                  </p>
+                ) : null}
+              </li>
+            ))}
+          </ol>
+        </section>
+      ) : null}
+
+      {example.sourceFidelity?.length ? (
+        <section className={panelClass} aria-label="Zheji source-fidelity classification" data-testid="functional-method-source-fidelity">
+          <h4 className={labelClass}>Source-fidelity boundary</h4>
+          <p className="mt-1 break-words text-xs text-[#aeb7c5]">These are local classifications for this example, not source-authority findings.</p>
+          <ul className="mt-2 space-y-1">
+            {example.sourceFidelity.map((item) => (
+              <li key={item.classification} className="break-words" data-testid="functional-method-source-fidelity-item">
+                <strong>{item.classification}:</strong> {item.statement}
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
 
       <section className={panelClass} aria-label="Declared mechanical operations">
         <h4 className={labelClass}>Declared operation ledger</h4>
