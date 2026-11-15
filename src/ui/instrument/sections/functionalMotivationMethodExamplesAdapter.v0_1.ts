@@ -2,6 +2,7 @@ import {
   buildCrossLanguageOperationLedgerV0_2,
   type CrossLanguageOperationLedgerInputV0_2,
 } from "@/shared/openInstrument/crossLanguageOperationLedger.v0_2";
+import { DI_FREE_OPERATOR_PROFILE_V0_1 } from "@/shared/freeOperatorProfile.v0_1";
 import {
   STUDIM_FUNCTIONAL_MOTIVATION_REFERENCE_V0_2,
   type FunctionalMotivationResearchClaimLayerV0_2,
@@ -108,6 +109,7 @@ export type FunctionalMotivationMethodExampleVMV0_1 = Readonly<{
   sources: readonly FunctionalMotivationMethodSourceVMV0_1[];
   reasoningTrace?: readonly FunctionalMotivationMethodTraceStepVMV0_1[];
   sourceFidelity?: readonly FunctionalMotivationMethodSourceFidelityVMV0_1[];
+  motivationEquation?: Readonly<{ equation: string; roles: readonly string[] }>;
 }>;
 
 function formatEvents(events: readonly Readonly<{ voice: string; position: number }>[]): string[] {
@@ -433,6 +435,15 @@ const studimExample: FunctionalMotivationMethodExampleVMV0_1 = {
   title: "STUDIM · proposed two-root reading",
   summary: "A method specimen that keeps a functional proposal, exact spelling reconstruction, ordinary morphology and unknown material separate.",
   forms: [projectStudimForm()],
+  motivationEquation: {
+    equation: "SHTU (proposed increase function) + DI (know / knowledge) → Increasing or acquiring knowledge → STUDIM (the activity of studying)",
+    roles: [
+      `DI: independent lexical form; existing profile classification ${DI_FREE_OPERATOR_PROFILE_V0_1.directFreeOperator.categories.join(", ")}; knowledge / knowing. Proposed membership in STUDIM remains unverified.`,
+      "SHTOJ: cited lexical reference for add / increase; citation entered unverified. No Zheji operator status is asserted.",
+      "SHTU: proposed function-bearing form associated with SHTOJ; its form and membership in STUDIM are not established as an allomorph.",
+      "STU: target-side written component. M: UNKNOWN_OR_NULL.",
+    ],
+  },
   components: componentSpan(specimen.exactSegmentation.components),
   functionalReading: {
     text: `${specimen.functionalProposal.roots.map((root) => `${root.proposedSpelling} (${root.proposedFunction})`).join(" + ")} → ${specimen.functionalProposal.synthesis.text}`,

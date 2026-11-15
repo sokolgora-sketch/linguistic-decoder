@@ -40,6 +40,18 @@ function MethodExampleDetails({ example }: { example: FunctionalMotivationMethod
         </div>
       </section>
 
+      {example.motivationEquation ? (
+        <section className={`${panelClass} [overflow-wrap:anywhere]`} aria-label="Functional motivation" data-testid="functional-motivation-equation">
+          <h4 className={labelClass}>FUNCTIONAL MOTIVATION</h4>
+          <p className="mt-2 text-base font-semibold text-white">{example.motivationEquation.equation}</p>
+          <p className="mt-1 text-xs">USER_PROPOSED · PETRO_ZHEJI_INSPIRED_RECONSTRUCTION</p>
+          <p className="mt-1 text-xs text-[#aeb7c5]">This is a proposed interpretation; it does not attribute this equation to Zheji or establish historical morphology.</p>
+          <h5 className={`${labelClass} mt-3`}>Functional roles and source context</h5>
+          <ul className="mt-1 space-y-1">{example.motivationEquation.roles.map((role) => <li key={role}>{role}</li>)}</ul>
+          <p className="mt-2 text-xs">ACTION: increase · PATIENT: knowledge · RESULT: acquisition of knowledge · WHOLE-WORD FUNCTION: studying. This is a ZË-RO interpretation framework.</p>
+        </section>
+      ) : null}
+
       {example.components.length > 0 ? (
         <section className={panelClass} aria-label="Proposed components">
           <h4 className={labelClass}>Component contributions</h4>

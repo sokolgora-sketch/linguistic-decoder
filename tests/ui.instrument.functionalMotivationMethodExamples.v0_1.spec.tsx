@@ -54,6 +54,14 @@ describe("functional-motivation method examples in the Single Word workbench", (
     });
 
     const trace = screen.getByTestId("functional-method-reasoning-trace");
+    const equation = screen.getByTestId("functional-motivation-equation");
+    expect(equation).toHaveTextContent("SHTU (proposed increase function) + DI (know / knowledge) → Increasing or acquiring knowledge → STUDIM (the activity of studying)");
+    expect(equation).toHaveTextContent("USER_PROPOSED · PETRO_ZHEJI_INSPIRED_RECONSTRUCTION");
+    expect(equation).toHaveTextContent("free_operator_attested");
+    expect(equation).toHaveTextContent("No Zheji operator status is asserted");
+    expect(equation).toHaveTextContent("M: UNKNOWN_OR_NULL");
+    expect(equation).toHaveTextContent("citation entered unverified");
+    expect(equation.compareDocumentPosition(trace) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     const steps = screen.getAllByTestId("functional-method-reasoning-step");
     expect(steps).toHaveLength(9);
     expect(steps.map((step) => step.getAttribute("data-trace-step-id"))).toEqual([
