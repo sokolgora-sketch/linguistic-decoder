@@ -58,7 +58,7 @@ function MethodExampleDetails({ example }: { example: FunctionalMotivationMethod
             {example.components.map((component, index) => (
               <li key={`${component.spelling}:${index}`} className="break-words" data-testid="functional-method-component">
                 <span className="font-mono text-white">{component.spelling}</span>
-                {component.span ? ` · code-point span [${component.span.start},${component.span.end})` : ""}
+                {component.span ? ` · component-concatenation code-point span [${component.span.start},${component.span.end})` : ""}
                 {` — ${component.function} · ${component.claimLayer} · ${component.status}`}
               </li>
             ))}

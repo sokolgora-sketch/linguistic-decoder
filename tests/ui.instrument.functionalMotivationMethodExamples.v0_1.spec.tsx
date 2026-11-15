@@ -147,6 +147,9 @@ describe("functional-motivation method examples in the Single Word workbench", (
     expect(gjithckaEquation).toHaveTextContent("Source-authority promotion: NONE");
     expect(screen.getByTestId("functional-method-reasoning-trace")).toHaveTextContent("Myrta 2014 reports the notation");
     expect(screen.getByTestId("functional-method-reasoning-trace")).toHaveTextContent(/alternatives may coexist/i);
+    const components = screen.getAllByTestId("functional-method-component");
+    expect(components[0]).toHaveTextContent("component-concatenation code-point span [0,6)");
+    expect(components[1]).toHaveTextContent("component-concatenation code-point span [6,9)");
     expect(screen.getByTestId("functional-method-code-points-GJITHÇKA")).toHaveTextContent(
       "G@0 · J@1 · I@2 · T@3 · H@4 · Ç@5 · K@6 · A@7",
     );
