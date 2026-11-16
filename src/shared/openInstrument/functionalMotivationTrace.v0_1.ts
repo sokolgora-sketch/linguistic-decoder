@@ -75,6 +75,13 @@ export type FunctionalMotivationTraceClaimV0_1 = Readonly<{
   sourceIds: readonly string[];
 }>;
 
+export type FunctionalMotivationTraceExplanationPatternV0_1 = Readonly<{
+  action: FunctionalMotivationTraceClaimV0_1;
+  patient: FunctionalMotivationTraceClaimV0_1;
+  result: FunctionalMotivationTraceClaimV0_1;
+  wholeWordFunction: FunctionalMotivationTraceClaimV0_1;
+}>;
+
 export type FunctionalMotivationTraceSourceFidelityV0_1 = Readonly<{
   classification:
     | "PETRO_ZHEJI_SOURCE_REPORTED"
@@ -96,6 +103,8 @@ export type FunctionalMotivationTraceInputV0_1 = Readonly<{
     claimLayer: FunctionalMotivationResearchClaimLayerV0_2;
     status: string;
     sourceIds: readonly string[];
+    attribution?: FunctionalMotivationTraceClaimV0_1;
+    explanationPattern?: FunctionalMotivationTraceExplanationPatternV0_1;
   }>;
   functionalReading: FunctionalMotivationTraceClaimV0_1;
   surfaceReconstruction: Readonly<{
@@ -103,6 +112,7 @@ export type FunctionalMotivationTraceInputV0_1 = Readonly<{
     expectedStatus: "EXACT_MATCH" | "MISMATCH";
     note: string;
     sourceIds: readonly string[];
+    reconciliationOperationId?: string;
   }>;
   operations: readonly Readonly<{
     id: string;
@@ -166,6 +176,8 @@ export type FunctionalMotivationTraceProjectionV0_1 = Readonly<{
     roles: readonly string[];
     claimLayer: FunctionalMotivationResearchClaimLayerV0_2;
     status: string;
+    attribution?: FunctionalMotivationTraceClaimV0_1;
+    explanationPattern?: FunctionalMotivationTraceExplanationPatternV0_1;
     sourceAuthorityPromotion: "NONE";
   }>;
   components: readonly Readonly<{
@@ -181,6 +193,16 @@ export type FunctionalMotivationTraceProjectionV0_1 = Readonly<{
     status: string;
   }>;
   reconstruction: Readonly<{ text: string; status: "EXACT_MATCH" | "MISMATCH"; note: string }>;
+  surfaceReconciliation?: Readonly<{
+    operationLedgerId: string;
+    status: "EXACT_MATCH";
+    initialForm: string;
+    finalForm: string;
+    operationCount: number;
+    cost: number;
+    inverseStatus: "EXACT_MATCH";
+    inverseForm: string;
+  }>;
   operations: readonly FunctionalMotivationTraceOperationV0_1[];
   alternatives: readonly FunctionalMotivationTraceClaimV0_1[];
   contrasts: readonly FunctionalMotivationTraceClaimV0_1[];
@@ -284,6 +306,11 @@ export function projectFunctionalMotivationTraceV0_1(
   for (const [field, ids] of [
     ["target", input.target.sourceIds],
     ["equation", input.equation.sourceIds],
+    ...(input.equation.attribution ? [["equation:attribution", input.equation.attribution.sourceIds] as const] : []),
+    ...(["action", "patient", "result", "wholeWordFunction"] as const).flatMap((role) => {
+      const claim = input.equation.explanationPattern?.[role];
+      return claim ? [[`equation:explanationPattern:${role}`, claim.sourceIds] as const] : [];
+    }),
     ["surfaceReconstruction", input.surfaceReconstruction.sourceIds],
     ...input.terms.map((term) => [`term:${term.id}`, term.sourceIds] as const),
     ...input.alternatives.map((claim, index) => [`alternative:${index}`, claim.sourceIds] as const),
@@ -302,6 +329,7 @@ export function projectFunctionalMotivationTraceV0_1(
   }
 
   const operationIds = new Set<string>();
+  const rawConcatenation = input.surfaceReconstruction.components.map(({ spelling }) => spelling).join("");
   for (const item of input.operations) {
     if (!item.id || operationIds.has(item.id)) {
       reasons.push("OPERATION_LEDGER_IDS_MUST_BE_NONEMPTY_AND_UNIQUE");
@@ -311,6 +339,34 @@ export function projectFunctionalMotivationTraceV0_1(
     const projection = operationProjection(item.id, item.input);
     if (!projection) reasons.push(`OPERATION_LEDGER_NOT_READY:${item.id}`);
     else operationMap.set(item.id, projection);
+  }
+  const reconciliationOperationId = input.surfaceReconstruction.reconciliationOperationId;
+  const reconciliationLinkSupplied = reconciliationOperationId !== undefined;
+  const reconciliation = reconciliationLinkSupplied && reconciliationOperationId
+    ? operationMap.get(reconciliationOperationId)
+    : undefined;
+  if (reconciliationLinkSupplied) {
+    if (!reconciliationOperationId) {
+      reasons.push("SURFACE_RECONCILIATION_OPERATION_ID_MUST_BE_NONEMPTY");
+    } else if (!operationIds.has(reconciliationOperationId)) {
+      reasons.push(`UNKNOWN_SURFACE_RECONCILIATION_OPERATION:${reconciliationOperationId}`);
+    } else if (!reconciliation) {
+      reasons.push(`SURFACE_RECONCILIATION_OPERATION_NOT_READY:${reconciliationOperationId}`);
+    } else {
+      const ledger = reconciliation.ledger;
+      if (ledger.initialForm !== rawConcatenation) {
+        reasons.push(`SURFACE_RECONCILIATION_INITIAL_FORM_MISMATCH:${reconciliationOperationId}`);
+      }
+      if (ledger.declaredFinalForm !== input.target.exactSpelling ||
+          ledger.replayedFinalForm !== input.target.exactSpelling ||
+          ledger.mechanicalReconstructionStatus !== "EXACT_MATCH") {
+        reasons.push(`SURFACE_RECONCILIATION_FINAL_FORM_MISMATCH:${reconciliationOperationId}`);
+      }
+      if (ledger.inverseReplay.status !== "EXACT_MATCH" ||
+          ledger.inverseReplay.reconstructedInitialForm !== rawConcatenation) {
+        reasons.push(`SURFACE_RECONCILIATION_INVERSE_MISMATCH:${reconciliationOperationId}`);
+      }
+    }
   }
   for (const step of input.reasoningSteps) {
     if (step.operationLedgerId && !operationIds.has(step.operationLedgerId)) {
@@ -331,7 +387,6 @@ export function projectFunctionalMotivationTraceV0_1(
     reasons.push("TARGET_WRITTEN_VOICE_LEDGER_DOES_NOT_MATCH_EXACT_SPELLING");
   }
 
-  const rawConcatenation = input.surfaceReconstruction.components.map(({ spelling }) => spelling).join("");
   const reconstructionStatus = rawConcatenation === input.target.exactSpelling ? "EXACT_MATCH" : "MISMATCH";
   if (reconstructionStatus !== input.surfaceReconstruction.expectedStatus) {
     reasons.push("RECONSTRUCTION_EXPECTATION_CONFLICTS_WITH_EXACT_STRINGS");
@@ -404,6 +459,8 @@ export function projectFunctionalMotivationTraceV0_1(
         roles,
         claimLayer: input.equation.claimLayer,
         status: input.equation.status,
+        ...(input.equation.attribution ? { attribution: input.equation.attribution } : {}),
+        ...(input.equation.explanationPattern ? { explanationPattern: input.equation.explanationPattern } : {}),
         sourceAuthorityPromotion: "NONE",
       },
       components,
@@ -417,6 +474,18 @@ export function projectFunctionalMotivationTraceV0_1(
         status: reconstructionStatus,
         note: input.surfaceReconstruction.note,
       },
+      ...(reconciliation ? {
+        surfaceReconciliation: {
+          operationLedgerId: reconciliation.id,
+          status: "EXACT_MATCH",
+          initialForm: reconciliation.ledger.initialForm,
+          finalForm: reconciliation.ledger.replayedFinalForm,
+          operationCount: reconciliation.ledger.operationCount,
+          cost: reconciliation.ledger.totalCost,
+          inverseStatus: "EXACT_MATCH" as const,
+          inverseForm: rawConcatenation,
+        },
+      } : {}),
       operations,
       alternatives: input.alternatives,
       contrasts: input.contrasts,

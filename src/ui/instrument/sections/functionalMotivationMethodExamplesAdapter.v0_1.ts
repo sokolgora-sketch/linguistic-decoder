@@ -35,6 +35,13 @@ export type FunctionalMotivationMethodClaimVMV0_1 = Readonly<{
   status: string;
 }>;
 
+export type FunctionalMotivationMethodPatternVMV0_1 = Readonly<{
+  action: FunctionalMotivationMethodClaimVMV0_1;
+  patient: FunctionalMotivationMethodClaimVMV0_1;
+  result: FunctionalMotivationMethodClaimVMV0_1;
+  wholeWordFunction: FunctionalMotivationMethodClaimVMV0_1;
+}>;
+
 export type FunctionalMotivationMethodComponentVMV0_1 = Readonly<{
   spelling: string;
   span: Readonly<{ start: number; end: number }> | null;
@@ -110,7 +117,19 @@ export type FunctionalMotivationMethodExampleVMV0_1 = Readonly<{
     roles: readonly string[];
     claimLayer: FunctionalMotivationResearchClaimLayerV0_2;
     status: string;
+    attribution?: FunctionalMotivationMethodClaimVMV0_1;
+    explanationPattern?: FunctionalMotivationMethodPatternVMV0_1;
     sourceAuthorityPromotion: "NONE";
+  }>;
+  surfaceReconciliation?: Readonly<{
+    operationLedgerId: string;
+    status: "EXACT_MATCH";
+    initialForm: string;
+    finalForm: string;
+    operationCount: number;
+    cost: number;
+    inverseStatus: "EXACT_MATCH";
+    inverseForm: string;
   }>;
 }>;
 
@@ -418,6 +437,38 @@ const studimTraceInput: FunctionalMotivationTraceInputV0_1 = {
       ...studimFactSources("shtoj-lexical-function").map(({ url }) => url),
       ...studimFactSources("di-lexical-function").map(({ url }) => url),
     ]),
+    attribution: {
+      text: "PETRO_ZHEJI_INSPIRED_RECONSTRUCTION · local ZË-RO explanatory framework; not a universal formula authored by Zheji or a historical attribution.",
+      claimLayer: "USER_PROPOSAL",
+      status: "USER_PROPOSED",
+      sourceIds: [],
+    },
+    explanationPattern: {
+      action: {
+        text: "increase",
+        claimLayer: "USER_PROPOSAL",
+        status: "USER_PROPOSED",
+        sourceIds: [],
+      },
+      patient: {
+        text: "knowledge",
+        claimLayer: "SOURCE_FACT",
+        status: "CITATION_ENTERED_UNVERIFIED",
+        sourceIds: sourceIdsForUrls(studimFactSources("di-lexical-function").map(({ url }) => url)),
+      },
+      result: {
+        text: "acquisition of knowledge",
+        claimLayer: "LOGICAL_INFERENCE",
+        status: "USER_PROPOSED",
+        sourceIds: [],
+      },
+      wholeWordFunction: {
+        text: "studying",
+        claimLayer: "SOURCE_FACT",
+        status: "CITATION_ENTERED_UNVERIFIED",
+        sourceIds: sourceIdsForUrls(specimen.target.selectedMeaning.sourceReferences),
+      },
+    },
   },
   functionalReading: {
     text: `${specimen.functionalProposal.roots.map((root) => `${root.proposedSpelling} (${root.proposedFunction})`).join(" + ")} → ${specimen.functionalProposal.synthesis.text}`,
@@ -504,6 +555,15 @@ const gjithckaTraceInput: FunctionalMotivationTraceInputV0_1 = {
       const source = methodExpansion.sourceReferences.find((reference) => reference.sourceId === id);
       return source ? [source.url] : [];
     })),
+    attribution: {
+      text: "Source-reported compound notation: Myrta (2014) reports Topalli (2011), GJITHË + ÇKA → GJITHÇKA. This notation is separate from the functional inference below.",
+      claimLayer: "SOURCE_FACT",
+      status: "CITATION_ENTERED_UNVERIFIED",
+      sourceIds: sourceIdsForUrls(gjithcka.sourceReportedFormation.sourceReferenceIds.flatMap((id) => {
+        const source = methodExpansion.sourceReferences.find((reference) => reference.sourceId === id);
+        return source ? [source.url] : [];
+      })),
+    },
   },
   functionalReading: {
     text: gjithcka.functionalReading.text,
@@ -527,6 +587,7 @@ const gjithckaTraceInput: FunctionalMotivationTraceInputV0_1 = {
       const source = methodExpansion.sourceReferences.find((reference) => reference.sourceId === id);
       return source ? [source.url] : [];
     })),
+    reconciliationOperationId: "gjithcka-boundary-e-omission",
   },
   operations: [{ id: "gjithcka-boundary-e-omission", input: gjithcka.operationLedgerInput }],
   alternatives: gjithcka.alternativeReadings.map((claim) => ({
@@ -729,6 +790,7 @@ function projectTraceExample(
     sources: projection.sources,
     reasoningTrace: projection.reasoningTrace,
     sourceFidelity: projection.sourceFidelity,
+    surfaceReconciliation: projection.surfaceReconciliation,
   };
 }
 

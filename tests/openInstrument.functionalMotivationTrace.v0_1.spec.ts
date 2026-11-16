@@ -118,6 +118,18 @@ describe("functional-motivation trace specimen boundaries", () => {
     expect(projection.alternatives.some((claim) => claim.text.includes("STUDIOJ"))).toBe(true);
     expect(projection.contrasts.some((claim) => claim.text.startsWith("SHTIM:"))).toBe(true);
     expect(projection.reasoningTrace.map((step) => step.id)).toHaveLength(9);
+    expect(projection.surfaceReconciliation).toBeUndefined();
+    expect(projection.motivationEquation.attribution).toMatchObject({
+      text: expect.stringContaining("PETRO_ZHEJI_INSPIRED_RECONSTRUCTION"),
+      claimLayer: "USER_PROPOSAL",
+      status: "USER_PROPOSED",
+    });
+    expect(projection.motivationEquation.explanationPattern).toMatchObject({
+      action: { text: "increase", claimLayer: "USER_PROPOSAL", status: "USER_PROPOSED" },
+      patient: { text: "knowledge", claimLayer: "SOURCE_FACT", status: "CITATION_ENTERED_UNVERIFIED" },
+      result: { text: "acquisition of knowledge", claimLayer: "LOGICAL_INFERENCE", status: "USER_PROPOSED" },
+      wholeWordFunction: { text: "studying", claimLayer: "SOURCE_FACT", status: "CITATION_ENTERED_UNVERIFIED" },
+    });
   });
 
   it("keeps GJITHÇKA raw concatenation mismatch distinct from replayed omission", () => {
@@ -127,11 +139,94 @@ describe("functional-motivation trace specimen boundaries", () => {
 
     const { projection } = result;
     expect(projection.reconstruction.status).toBe("MISMATCH");
+    expect(projection.surfaceReconciliation).toEqual({
+      operationLedgerId: "gjithcka-boundary-e-omission",
+      status: "EXACT_MATCH",
+      initialForm: "GJITHËÇKA",
+      finalForm: "GJITHÇKA",
+      operationCount: 1,
+      cost: 1,
+      inverseStatus: "EXACT_MATCH",
+      inverseForm: "GJITHËÇKA",
+    });
     expect(projection.operations[0]?.after).toBe("GJITHÇKA");
     expect(projection.operations[0]?.omittedVoices).toEqual(["Ë@5"]);
     expect(projection.reasoningTrace.find((step) => step.id === "reported-component-notation")?.sources[0]?.citationStatus)
       .toBe("CITATION_ENTERED_UNVERIFIED");
     expect(projection.unresolved.some((claim) => claim.claimLayer === "UNKNOWN_OR_NULL")).toBe(true);
+    expect(projection.motivationEquation.attribution).toMatchObject({
+      text: expect.stringContaining("Myrta (2014) reports Topalli (2011)"),
+      claimLayer: "SOURCE_FACT",
+      status: "CITATION_ENTERED_UNVERIFIED",
+    });
+    expect(projection.motivationEquation.explanationPattern).toBeUndefined();
+    expect(projection.motivationEquation.status).toBe("USER_PROPOSED");
+  });
+
+  it("rejects a valid but unrelated ledger when it is claimed as surface reconciliation", () => {
+    const input = FUNCTIONAL_MOTIVATION_TRACE_EXAMPLE_INPUTS_V0_1.GJITHÇKA;
+    const linkedInput = {
+      ...input,
+      operations: [
+        ...input.operations,
+        ...FUNCTIONAL_MOTIVATION_TRACE_EXAMPLE_INPUTS_V0_1.STUDIM.operations,
+      ],
+      surfaceReconstruction: {
+        ...input.surfaceReconstruction,
+        reconciliationOperationId: "shtu-stu-h-omission",
+      },
+    };
+    const result = projectFunctionalMotivationTraceV0_1(linkedInput);
+    expect(result.status).toBe("REJECTED");
+    if (result.status !== "REJECTED") return;
+    expect(result.reasonCodes).toContain(
+      "SURFACE_RECONCILIATION_INITIAL_FORM_MISMATCH:shtu-stu-h-omission",
+    );
+    expect(projectFunctionalMotivationTraceV0_1(linkedInput)).toEqual(result);
+  });
+
+  it("rejects a missing reconciliation ledger instead of returning READY", () => {
+    const input = FUNCTIONAL_MOTIVATION_TRACE_EXAMPLE_INPUTS_V0_1.GJITHÇKA;
+    expect(projectFunctionalMotivationTraceV0_1({
+      ...input,
+      surfaceReconstruction: {
+        ...input.surfaceReconstruction,
+        reconciliationOperationId: "missing-ledger",
+      },
+    })).toEqual({
+      status: "REJECTED",
+      reasonCodes: ["UNKNOWN_SURFACE_RECONCILIATION_OPERATION:missing-ledger"],
+    });
+  });
+
+  it("rejects an explicitly supplied empty reconciliation identifier", () => {
+    const input = FUNCTIONAL_MOTIVATION_TRACE_EXAMPLE_INPUTS_V0_1.GJITHÇKA;
+    expect(projectFunctionalMotivationTraceV0_1({
+      ...input,
+      surfaceReconstruction: {
+        ...input.surfaceReconstruction,
+        reconciliationOperationId: "",
+      },
+    })).toEqual({
+      status: "REJECTED",
+      reasonCodes: ["SURFACE_RECONCILIATION_OPERATION_ID_MUST_BE_NONEMPTY"],
+    });
+  });
+
+  it("rejects a linked ledger that fails its own validation", () => {
+    const input = FUNCTIONAL_MOTIVATION_TRACE_EXAMPLE_INPUTS_V0_1.GJITHÇKA;
+    const linkedInput = {
+      ...input,
+      operations: input.operations.map((operation) => ({
+        ...operation,
+        input: { ...operation.input, initialForm: "" },
+      })),
+    };
+    const result = projectFunctionalMotivationTraceV0_1(linkedInput);
+    expect(result.status).toBe("REJECTED");
+    if (result.status !== "REJECTED") return;
+    expect(result.reasonCodes).toContain("OPERATION_LEDGER_NOT_READY:gjithcka-boundary-e-omission");
+    expect(result.reasonCodes).toContain("SURFACE_RECONCILIATION_OPERATION_NOT_READY:gjithcka-boundary-e-omission");
   });
 
   it("rejects an expected Voice ledger that does not match the target spelling", () => {
