@@ -15,6 +15,9 @@ import type { SevenVoiceKey } from "@/shared/sevenVoiceOrderedViews.v0.1";
 export const SYMBOLIC_FUNCTIONAL_OPERATION_PLAN_SCHEMA_V0_1 =
   "open-instrument.symbolic-functional-operation-plan.v0_1" as const;
 
+export const SYMBOLIC_GRAPH_MEANING_BRIDGE_SCHEMA_V0_1 =
+  "open-instrument.symbolic-graph-meaning-bridge.v0_1" as const;
+
 export type SymbolicFunctionalPlanNodeReferenceV0_1 = Readonly<
   | { kind: "SPECTRUM_SELECTION"; selectionId: string }
   | { kind: "VOICE_BINDING"; bindingId: string }
@@ -27,6 +30,7 @@ export type SymbolicFunctionalBridgeV0_1 = Readonly<{
 } & (
   | {
       status: "USER_PROPOSED";
+      /** Kept as a user paraphrase; this text alone cannot complete the typed graph-to-meaning bridge. */
       text: string;
       claimLayer: "USER_PROPOSAL";
       evidenceStatus: "USER_PROPOSED";
@@ -40,6 +44,25 @@ export type SymbolicFunctionalBridgeV0_1 = Readonly<{
       sourceIds: readonly [];
     }
 )>;
+
+export type SymbolicFunctionalRoleMappingV0_1 = Readonly<{
+  mappingId: string;
+  bridgeId: string;
+  /** Must name a symbol produced by the evaluated operation graph. */
+  symbolOutputId: string;
+  selectedSenseId: string;
+  functionCandidateId: string;
+  /** Must name the source-function relation that binds the candidate to the selected sense. */
+  compositionOperationId: string;
+  functionalRole: Readonly<{
+    roleId: string;
+    label: string;
+    claimLayer: "USER_PROPOSAL";
+    evidenceStatus: "USER_PROPOSED";
+    sourceIds: readonly [];
+  }>;
+  relationType: "PROPOSED_CONTRIBUTES_TO_SELECTED_LEXICAL_FUNCTION";
+}>;
 
 export type SymbolicFunctionalOperationPlanInputV0_1 = Readonly<{
   target: Readonly<{
@@ -73,6 +96,8 @@ export type SymbolicFunctionalOperationPlanInputV0_1 = Readonly<{
   }>[];
   transformationLabel: string;
   functionalBridges: readonly SymbolicFunctionalBridgeV0_1[];
+  /** Optional for existing callers; omission conservatively leaves the meaning bridge partial. */
+  functionalRoleMappings?: readonly SymbolicFunctionalRoleMappingV0_1[];
   unresolvedParts: readonly Readonly<{
     claimId: string;
     text: string;
@@ -95,6 +120,7 @@ export type SymbolicFunctionalOperationPlanSuccessV0_1 = Readonly<{
   evaluation: SymbolicFunctionalCompositionResultV0_3;
   sourceFunctionLayer: SymbolicFunctionalContentSuccessV0_1["content"];
   sourceReferences: SymbolicFunctionalContentInputV0_1["sources"];
+  graphMeaningBridge: SymbolicGraphMeaningBridgeV0_1;
   functionalMotivation: Readonly<{
     status: "COMPLETE_PROPOSED" | "MULTIPLE_PROPOSED" | "PARTIAL_NULL";
     selectedSenseId: string;
@@ -116,6 +142,77 @@ export type SymbolicFunctionalOperationPlanSuccessV0_1 = Readonly<{
   }>;
 }>;
 
+export type SymbolicGraphMeaningBridgeV0_1 = Readonly<{
+  schemaVersion: typeof SYMBOLIC_GRAPH_MEANING_BRIDGE_SCHEMA_V0_1;
+  status: "COMPLETE_PROPOSED" | "MULTIPLE_PROPOSED" | "PARTIAL_NULL";
+  selectedLexicalSense: Readonly<{
+    senseId: string;
+    label: string;
+    definition: string;
+    claimLayer: "SOURCE_FACT" | "USER_PROPOSAL";
+    evidenceStatus: "CITATION_ENTERED_UNVERIFIED" | "USER_PROPOSED";
+    sourceIds: readonly string[];
+  }>;
+  mappings: readonly Readonly<{
+    mappingId: string;
+    bridgeId: string;
+    graphOutput: Readonly<{
+      symbolId: string;
+      symbolKind: "SPECTRUM_ASSOCIATION" | "VOICE_TRANSFORM";
+      text: string;
+      producerOperationId: string;
+      claimLayer: "EXPLORATORY_HYPOTHESIS";
+      evidenceStatus: "USER_PROPOSED";
+      sourceIds: readonly string[];
+    }>;
+    functionalRole: SymbolicFunctionalRoleMappingV0_1["functionalRole"];
+    selectedLexicalFunction: Readonly<{
+      candidateId: string;
+      exactForm: string;
+      sourceSenseId: string;
+      functionText: string;
+      claimLayer: SymbolicFunctionalContentInputV0_1["functionCandidates"][number]["claimLayer"];
+      evidenceStatus: SymbolicFunctionalContentInputV0_1["functionCandidates"][number]["evidenceStatus"];
+      sourceIds: readonly string[];
+      compositionOperationId: string;
+      compositionStatus: SymbolicFunctionalContentSuccessV0_1["content"]["compositions"][number]["status"];
+      compositionClaimLayer: SymbolicFunctionalContentSuccessV0_1["content"]["compositions"][number]["provenance"]["relation"]["claimLayer"];
+      compositionEvidenceStatus: SymbolicFunctionalContentSuccessV0_1["content"]["compositions"][number]["evidenceStatus"];
+      compositionSourceIds: readonly string[];
+      linguisticApplicability: "NOT_ASSESSED";
+    }>;
+    relationType: SymbolicFunctionalRoleMappingV0_1["relationType"];
+    generatedContribution: string;
+    claimLayer: "USER_PROPOSAL";
+    evidenceStatus: "USER_PROPOSED";
+    sourceIds: readonly [];
+  }> [];
+  wholeWordExplanations: readonly Readonly<{
+    bridgeId: string;
+    bridgeRole: "PRIMARY" | "ALTERNATIVE";
+    text: string;
+    claimLayer: "USER_PROPOSAL";
+    evidenceStatus: "USER_PROPOSED";
+    sourceIds: readonly [];
+  }> [];
+  unresolvedMappings: readonly Readonly<{
+    mappingId: string;
+    bridgeId: string;
+    reasonCodes: readonly string[];
+  }> [];
+  reasonCodes: readonly string[];
+  claimLayer: "EXPLORATORY_HYPOTHESIS";
+  evidenceStatus: "USER_PROPOSED";
+  sourceIds: readonly [];
+  sourceAuthorityPromotion: "NONE";
+  historicalOrigin: "NOT_CLAIMED";
+  interpretationSelection: Readonly<{
+    mode: "no_single_winner";
+    selectedCandidateId: null;
+    userDecisionPosture: "user_decides";
+  }>;
+}>;
+
 export type SymbolicFunctionalOperationPlanResultV0_1 =
   | SymbolicFunctionalOperationPlanFailureV0_1
   | SymbolicFunctionalOperationPlanSuccessV0_1;
@@ -126,6 +223,200 @@ function unique(values: readonly string[]): boolean {
 
 function sortedUnique(values: readonly string[]): string[] {
   return [...new Set(values)].sort((left, right) => left.localeCompare(right));
+}
+
+function buildGraphMeaningBridge(
+  input: SymbolicFunctionalOperationPlanInputV0_1,
+  sourceLayer: SymbolicFunctionalContentSuccessV0_1["content"],
+  evaluation: SymbolicFunctionalCompositionResultV0_3,
+  validBridges: readonly Extract<SymbolicFunctionalBridgeV0_1, { status: "USER_PROPOSED" }>[],
+): SymbolicGraphMeaningBridgeV0_1 {
+  const reasons: string[] = [];
+  const mappingInputs = input.functionalRoleMappings ?? [];
+  const mappingIdCounts = new Map<string, number>();
+  for (const mapping of mappingInputs) {
+    mappingIdCounts.set(mapping.mappingId, (mappingIdCounts.get(mapping.mappingId) ?? 0) + 1);
+  }
+
+  const bridgeById = new Map(validBridges.map((bridge) => [bridge.bridgeId, bridge]));
+  const mappings: SymbolicGraphMeaningBridgeV0_1["mappings"][number][] = [];
+  const unresolvedMappings: SymbolicGraphMeaningBridgeV0_1["unresolvedMappings"][number][] = [];
+  const failedBridgeIds = new Set<string>();
+  const resolvedMappingIdsByBridge = new Map<string, string[]>();
+  const transformationComputed = evaluation.ok &&
+    evaluation.symbolicComposition.status !== "PARTIAL_NULL" &&
+    evaluation.symbolicComposition.transformationText !== null &&
+    evaluation.operationTrace.some(({ kind, status }) =>
+      kind === "REPRESENT_SYMBOLIC_TRANSFORMATION" && status === "COMPUTED",
+    );
+
+  if (validBridges.length === 0) reasons.push("GRAPH_MEANING_BRIDGE_MISSING_OR_UNRESOLVED");
+  if (input.functionalBridges.length !== validBridges.length) {
+    reasons.push("GRAPH_MEANING_BRIDGE_NOT_VALID_FOR_SELECTED_SENSE");
+  }
+  if (!transformationComputed) reasons.push("GRAPH_MEANING_REQUIRES_COMPUTED_TRANSFORMATION");
+
+  for (const mapping of mappingInputs) {
+    const mappingReasons: string[] = [];
+    const bridge = bridgeById.get(mapping.bridgeId);
+    if ((mappingIdCounts.get(mapping.mappingId) ?? 0) !== 1 || !mapping.mappingId.trim()) {
+      mappingReasons.push(`GRAPH_MEANING_MAPPING_ID_MUST_BE_NONEMPTY_AND_UNIQUE:${mapping.mappingId}`);
+    }
+    if (!bridge) mappingReasons.push(`GRAPH_MEANING_MAPPING_BRIDGE_NOT_FOUND:${mapping.bridgeId}`);
+    if (mapping.selectedSenseId !== sourceLayer.target.selectedSense.senseId) {
+      mappingReasons.push(`GRAPH_MEANING_MAPPING_SELECTED_SENSE_MISMATCH:${mapping.mappingId}`);
+    }
+    if (!mapping.functionalRole.roleId.trim() || !mapping.functionalRole.label.trim()) {
+      mappingReasons.push(`GRAPH_MEANING_MAPPING_ROLE_REQUIRED:${mapping.mappingId}`);
+    }
+    if (mapping.functionalRole.claimLayer !== "USER_PROPOSAL" ||
+        mapping.functionalRole.evidenceStatus !== "USER_PROPOSED" ||
+        mapping.functionalRole.sourceIds.length !== 0 ||
+        mapping.relationType !== "PROPOSED_CONTRIBUTES_TO_SELECTED_LEXICAL_FUNCTION") {
+      mappingReasons.push(`GRAPH_MEANING_MAPPING_AUTHORITY_OR_RELATION_INVALID:${mapping.mappingId}`);
+    }
+
+    const candidate = input.sourceFunctionInput.functionCandidates.find(
+      ({ candidateId }) => candidateId === mapping.functionCandidateId,
+    );
+    const candidateFunctionText = candidate?.functionText;
+    if (!candidate || !candidateFunctionText?.trim() ||
+        candidate.claimLayer === "UNKNOWN_OR_NULL" || candidate.evidenceStatus === "UNKNOWN_OR_NULL") {
+      mappingReasons.push(`GRAPH_MEANING_MAPPING_LEXICAL_FUNCTION_NOT_FOUND:${mapping.mappingId}`);
+    }
+    const composition = sourceLayer.compositions.find((item) =>
+      item.operationId === mapping.compositionOperationId &&
+      item.targetSenseId === sourceLayer.target.selectedSense.senseId &&
+      item.functionCandidateId === mapping.functionCandidateId &&
+      item.status !== "UNKNOWN_OR_NULL" &&
+      (!candidate || item.sourceFunctionSenseId === candidate.sourceSenseId),
+    );
+    if (!composition) {
+      mappingReasons.push(`GRAPH_MEANING_MAPPING_SELECTED_FUNCTION_RELATION_NOT_FOUND:${mapping.mappingId}`);
+    }
+
+    const symbol = evaluation.ok
+      ? evaluation.symbols.find(({ symbolId }) => symbolId === mapping.symbolOutputId)
+      : undefined;
+    if (!symbol) {
+      mappingReasons.push(`GRAPH_MEANING_MAPPING_GRAPH_OUTPUT_NOT_FOUND:${mapping.mappingId}`);
+    }
+    const producerTrace = evaluation.ok
+      ? evaluation.operationTrace.find(({ outputSymbolId, status }) =>
+        outputSymbolId === mapping.symbolOutputId && status === "COMPUTED",
+      )
+      : undefined;
+    if (!producerTrace || !symbol ||
+        (producerTrace.kind !== "SELECT_SPECTRUM_CANDIDATE" && producerTrace.kind !== "APPLY_VOICE_OPERATOR")) {
+      mappingReasons.push(`GRAPH_MEANING_MAPPING_GRAPH_OUTPUT_NOT_COMPUTED:${mapping.mappingId}`);
+    }
+    if (!transformationComputed) {
+      mappingReasons.push(`GRAPH_MEANING_MAPPING_NOT_IN_COMPUTED_TRANSFORMATION:${mapping.mappingId}`);
+    }
+
+    const uniqueMappingReasons = sortedUnique(mappingReasons);
+    if (uniqueMappingReasons.length > 0 || !candidate || !candidateFunctionText || !composition || !symbol || !producerTrace) {
+      failedBridgeIds.add(mapping.bridgeId);
+      unresolvedMappings.push({
+        mappingId: mapping.mappingId,
+        bridgeId: mapping.bridgeId,
+        reasonCodes: uniqueMappingReasons,
+      });
+      reasons.push(...uniqueMappingReasons);
+      continue;
+    }
+
+    const generatedContribution =
+      `For ${input.target.exactSpelling} (${sourceLayer.target.selectedSense.label}: ${sourceLayer.target.selectedSense.definition}), computed graph output “${symbol.text}” is proposed as the functional role “${mapping.functionalRole.label}” and as contributing to the selected lexical function ${candidate.exactForm}: “${candidateFunctionText}”.`;
+    mappings.push({
+      mappingId: mapping.mappingId,
+      bridgeId: mapping.bridgeId,
+      graphOutput: {
+        symbolId: symbol.symbolId,
+        symbolKind: symbol.symbolKind,
+        text: symbol.text,
+        producerOperationId: producerTrace.operationId,
+        claimLayer: symbol.provenance.claimLayer,
+        evidenceStatus: symbol.provenance.evidenceStatus,
+        sourceIds: symbol.provenance.sourceIds,
+      },
+      functionalRole: mapping.functionalRole,
+      selectedLexicalFunction: {
+        candidateId: candidate.candidateId,
+        exactForm: candidate.exactForm,
+        sourceSenseId: candidate.sourceSenseId,
+        functionText: candidateFunctionText,
+        claimLayer: candidate.claimLayer,
+        evidenceStatus: candidate.evidenceStatus,
+        sourceIds: candidate.sourceIds,
+        compositionOperationId: composition.operationId,
+        compositionStatus: composition.status,
+        compositionClaimLayer: composition.provenance.relation.claimLayer,
+        compositionEvidenceStatus: composition.evidenceStatus,
+        compositionSourceIds: composition.provenance.relation.sourceIds,
+        linguisticApplicability: composition.linguisticApplicability,
+      },
+      relationType: mapping.relationType,
+      generatedContribution,
+      claimLayer: "USER_PROPOSAL",
+      evidenceStatus: "USER_PROPOSED",
+      sourceIds: [],
+    });
+    resolvedMappingIdsByBridge.set(mapping.bridgeId, [
+      ...(resolvedMappingIdsByBridge.get(mapping.bridgeId) ?? []),
+      mapping.mappingId,
+    ]);
+  }
+
+  const wholeWordExplanations: SymbolicGraphMeaningBridgeV0_1["wholeWordExplanations"][number][] = [];
+  for (const bridge of validBridges) {
+    const bridgeMappingIds = resolvedMappingIdsByBridge.get(bridge.bridgeId) ?? [];
+    if (bridgeMappingIds.length === 0) {
+      failedBridgeIds.add(bridge.bridgeId);
+      reasons.push(`GRAPH_MEANING_MAPPING_REQUIRED_FOR_BRIDGE:${bridge.bridgeId}`);
+    }
+    if (failedBridgeIds.has(bridge.bridgeId) || bridgeMappingIds.length === 0) continue;
+    const contributions = mappings
+      .filter(({ bridgeId }) => bridgeId === bridge.bridgeId)
+      .map(({ generatedContribution }) => generatedContribution);
+    wholeWordExplanations.push({
+      bridgeId: bridge.bridgeId,
+      bridgeRole: bridge.role,
+      text: contributions.join(" "),
+      claimLayer: "USER_PROPOSAL",
+      evidenceStatus: "USER_PROPOSED",
+      sourceIds: [],
+    });
+  }
+
+  return {
+    schemaVersion: SYMBOLIC_GRAPH_MEANING_BRIDGE_SCHEMA_V0_1,
+    status: reasons.length > 0
+      ? "PARTIAL_NULL"
+      : validBridges.length > 1 ? "MULTIPLE_PROPOSED" : "COMPLETE_PROPOSED",
+    selectedLexicalSense: {
+      senseId: sourceLayer.target.selectedSense.senseId,
+      label: sourceLayer.target.selectedSense.label,
+      definition: sourceLayer.target.selectedSense.definition,
+      claimLayer: sourceLayer.target.selectedSense.claimLayer,
+      evidenceStatus: sourceLayer.target.selectedSense.evidenceStatus,
+      sourceIds: sourceLayer.target.selectedSense.sourceIds,
+    },
+    mappings,
+    wholeWordExplanations,
+    unresolvedMappings,
+    reasonCodes: sortedUnique(reasons),
+    claimLayer: "EXPLORATORY_HYPOTHESIS",
+    evidenceStatus: "USER_PROPOSED",
+    sourceIds: [],
+    sourceAuthorityPromotion: "NONE",
+    historicalOrigin: "NOT_CLAIMED",
+    interpretationSelection: {
+      mode: "no_single_winner",
+      selectedCandidateId: null,
+      userDecisionPosture: "user_decides",
+    },
+  };
 }
 
 function nodeKey(reference: SymbolicFunctionalPlanNodeReferenceV0_1): string {
@@ -332,10 +623,12 @@ export function buildSymbolicFunctionalOperationPlanV0_1(
     sourceFunctionLayer: sourceResult,
   });
 
+  const graphMeaningBridge = buildGraphMeaningBridge(input, sourceResult.content, evaluation, validBridges);
   const evaluatorStatus = evaluation.ok ? evaluation.symbolicComposition.status : "PARTIAL_NULL";
-  const motivationStatus = evaluatorStatus === "PARTIAL_NULL" || validBridges.length === 0 || reasons.length > 0
+  const motivationStatus = evaluatorStatus === "PARTIAL_NULL" ||
+    graphMeaningBridge.status === "PARTIAL_NULL" || validBridges.length === 0 || reasons.length > 0
     ? "PARTIAL_NULL" as const
-    : evaluatorStatus === "MULTIPLE_PROPOSED" || validBridges.length > 1
+    : graphMeaningBridge.status === "MULTIPLE_PROPOSED" || evaluatorStatus === "MULTIPLE_PROPOSED"
       ? "MULTIPLE_PROPOSED" as const
       : "COMPLETE_PROPOSED" as const;
   const evaluatorReasons = evaluation.ok ? evaluation.symbolicComposition.reasonCodes : evaluation.reasonCodes;
@@ -347,13 +640,14 @@ export function buildSymbolicFunctionalOperationPlanV0_1(
     evaluation,
     sourceFunctionLayer: sourceResult.content,
     sourceReferences: input.sourceFunctionInput.sources,
+    graphMeaningBridge,
     functionalMotivation: {
       status: motivationStatus,
       selectedSenseId: selectedSense.senseId,
       bridges: input.functionalBridges,
       alternativeReadings: sourceResult.content.alternativeReadings,
       unresolvedParts: input.unresolvedParts,
-      reasonCodes: sortedUnique([...reasons, ...evaluatorReasons]),
+      reasonCodes: sortedUnique([...reasons, ...evaluatorReasons, ...graphMeaningBridge.reasonCodes]),
       claimLayer: "EXPLORATORY_HYPOTHESIS",
       evidenceStatus: "USER_PROPOSED",
       sourceIds: [],
