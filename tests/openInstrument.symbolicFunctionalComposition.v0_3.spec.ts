@@ -8,12 +8,13 @@ import {
   getEmbriomorphemeAssociationV0_1,
 } from "@/shared/openInstrument/embriomorphemeSpectrum.v0_1";
 import {
-  SYMBOLIC_VOICE_OPERATOR_PROFILE_V0_1,
-  buildSymbolicFunctionalCompositionV0_2,
-  spectrumOccurrenceIdV0_2,
-  type SymbolicCompositionOperationV0_2,
-  type SymbolicFunctionalCompositionInputV0_2,
-} from "@/shared/openInstrument/symbolicFunctionalComposition.v0_2";
+  SYMBOLIC_VOICE_OPERATOR_PROFILE_V0_3,
+  buildSymbolicFunctionalCompositionV0_3,
+  spectrumOccurrenceIdV0_3,
+  voiceEventIdV0_3,
+  type SymbolicCompositionOperationV0_3,
+  type SymbolicFunctionalCompositionInputV0_3,
+} from "@/shared/openInstrument/symbolicFunctionalComposition.v0_3";
 
 function associationId(unit: string, association: string): string {
   const candidate = [
@@ -25,7 +26,7 @@ function associationId(unit: string, association: string): string {
 }
 
 function voiceOperatorId(voice: string): string {
-  const candidate = SYMBOLIC_VOICE_OPERATOR_PROFILE_V0_1.find((entry) => entry.voice === voice);
+  const candidate = SYMBOLIC_VOICE_OPERATOR_PROFILE_V0_3.find((entry) => entry.voice === voice);
   if (!candidate) throw new Error(`Missing fixture Voice operator: ${voice}`);
   return candidate.candidateId;
 }
@@ -107,13 +108,13 @@ function selectSpectrum(
   position: number,
   association: string,
   outputSymbolId: string,
-): SymbolicCompositionOperationV0_2 {
+): SymbolicCompositionOperationV0_3 {
   const end = position + Array.from(unit).length;
   return {
     operationId,
     kind: "SELECT_SPECTRUM_CANDIDATE",
     dependsOn: [],
-    occurrenceId: spectrumOccurrenceIdV0_2(unit, position, end),
+    occurrenceId: spectrumOccurrenceIdV0_3(unit, position, end),
     associationCandidateId: associationId(unit, association),
     outputSymbolId,
   };
@@ -123,15 +124,19 @@ function applyVoice(
   operationId: string,
   voice: "A" | "E" | "I" | "O" | "U" | "Y" | "Ë",
   position: number,
+  inputSymbolId: string,
+  inputProducer: string,
   outputSymbolId: string,
-): SymbolicCompositionOperationV0_2 {
+): SymbolicCompositionOperationV0_3 {
   return {
     operationId,
     kind: "APPLY_VOICE_OPERATOR",
-    dependsOn: [],
+    dependsOn: [inputProducer],
     voice,
     position,
+    voiceEventId: voiceEventIdV0_3(voice, position),
     operatorCandidateId: voiceOperatorId(voice),
+    inputSymbolId,
     outputSymbolId,
   };
 }
@@ -139,16 +144,16 @@ function applyVoice(
 function ndrIçimInput(
   dAssociation = "light",
   includeM = true,
-): SymbolicFunctionalCompositionInputV0_2 {
-  const operations: SymbolicCompositionOperationV0_2[] = [
+): SymbolicFunctionalCompositionInputV0_3 {
+  const operations: SymbolicCompositionOperationV0_3[] = [
     selectSpectrum("select-n-enclosure", "N", 0, "enclosure", "n-enclosure"),
     selectSpectrum("select-n-inside", "N", 0, "inside", "n-inside"),
     selectSpectrum("select-d", "D", 1, dAssociation, "d-value"),
     selectSpectrum("select-r", "R", 2, "cycle", "r-cycle"),
-    applyVoice("apply-i-3", "I", 3, "i-focus-3"),
+    applyVoice("apply-i-3", "I", 3, "d-value", "select-d", "i-focused-light"),
     selectSpectrum("select-ç-release", "Ç", 4, "release", "ç-release"),
     selectSpectrum("select-ç-emit", "Ç", 4, "emit", "ç-emit"),
-    applyVoice("apply-i-5", "I", 5, "i-focus-5"),
+    applyVoice("apply-i-5", "I", 5, "ç-emit", "select-ç-emit", "i-focused-emit"),
   ];
   if (includeM) operations.push(selectSpectrum("select-m", "M", 6, "result", "m-result"));
 
@@ -156,11 +161,11 @@ function ndrIçimInput(
     ["n-enclosure", "n-inside", "select-n-enclosure", "select-n-inside"],
     ["n-inside", "d-value", "select-n-inside", "select-d"],
     ["d-value", "r-cycle", "select-d", "select-r"],
-    ["r-cycle", "i-focus-3", "select-r", "apply-i-3"],
-    ["i-focus-3", "ç-release", "apply-i-3", "select-ç-release"],
+    ["r-cycle", "i-focused-light", "select-r", "apply-i-3"],
+    ["i-focused-light", "ç-release", "apply-i-3", "select-ç-release"],
     ["ç-release", "ç-emit", "select-ç-release", "select-ç-emit"],
-    ["ç-emit", "i-focus-5", "select-ç-emit", "apply-i-5"],
-    ["i-focus-5", "m-result", "apply-i-5", "select-m"],
+    ["ç-emit", "i-focused-emit", "select-ç-emit", "apply-i-5"],
+    ["i-focused-emit", "m-result", "apply-i-5", "select-m"],
   ] as const;
   const connectionOperations = links.map(([leftSymbolId, rightSymbolId, leftProducer, rightProducer], index) => ({
     operationId: `connect-${index + 1}`,
@@ -189,29 +194,7 @@ function ndrIçimInput(
     ],
     transformationId: "ndricim-symbolic-chain",
     outputExpressionId: "ndricim-proposed-reading",
-    template: [
-      { kind: "literal", text: "Within " },
-      { kind: "symbol", symbolId: "n-enclosure" },
-      { kind: "literal", text: " / " },
-      { kind: "symbol", symbolId: "n-inside" },
-      { kind: "literal", text: ", " },
-      { kind: "symbol", symbolId: "d-value" },
-      { kind: "literal", text: " follows a " },
-      { kind: "symbol", symbolId: "r-cycle" },
-      { kind: "literal", text: " shaped by " },
-      { kind: "symbol", symbolId: "i-focus-3" },
-      { kind: "literal", text: " and " },
-      { kind: "symbol", symbolId: "i-focus-5" },
-      { kind: "literal", text: "; " },
-      { kind: "symbol", symbolId: "ç-release" },
-      { kind: "literal", text: " / " },
-      { kind: "symbol", symbolId: "ç-emit" },
-      { kind: "literal", text: " contributes toward " },
-      { kind: "symbol", symbolId: "m-result" },
-      { kind: "literal", text: " as a proposed reading of " },
-      { kind: "target_concept" },
-      { kind: "literal", text: "." },
-    ],
+    userProposedParaphrase: "In enclosure, focused light cycles and emits toward a result.",
   });
 
   return {
@@ -226,11 +209,11 @@ function ndrIçimInput(
   };
 }
 
-function syntheticShGjYInput(): SymbolicFunctionalCompositionInputV0_2 {
-  const operations: SymbolicCompositionOperationV0_2[] = [
+function syntheticShGjYInput(): SymbolicFunctionalCompositionInputV0_3 {
+  const operations: SymbolicCompositionOperationV0_3[] = [
     selectSpectrum("select-sh", "SH", 0, "sharpness", "sh-sharpness"),
     selectSpectrum("select-gj", "GJ", 2, "gathering", "gj-gathering"),
-    applyVoice("apply-y-4", "Y", 4, "y-reflect"),
+    applyVoice("apply-y-4", "Y", 4, "gj-gathering", "select-gj", "y-reflected-gathering"),
     {
       operationId: "connect-sh-gj",
       kind: "CONNECT_SYMBOLS",
@@ -245,7 +228,7 @@ function syntheticShGjYInput(): SymbolicFunctionalCompositionInputV0_2 {
       kind: "CONNECT_SYMBOLS",
       dependsOn: ["select-gj", "apply-y-4"],
       leftSymbolId: "gj-gathering",
-      rightSymbolId: "y-reflect",
+      rightSymbolId: "y-reflected-gathering",
       relationText: "is viewed through",
       outputRelationId: "gj-y-relation",
     },
@@ -263,16 +246,7 @@ function syntheticShGjYInput(): SymbolicFunctionalCompositionInputV0_2 {
       dependsOn: ["represent-synthetic-chain", "select-sh", "select-gj", "apply-y-4"],
       transformationId: "synthetic-chain",
       outputExpressionId: "synthetic-expression",
-      template: [
-        { kind: "symbol", symbolId: "sh-sharpness" },
-        { kind: "literal", text: " and " },
-        { kind: "symbol", symbolId: "gj-gathering" },
-        { kind: "literal", text: " are considered with " },
-        { kind: "symbol", symbolId: "y-reflect" },
-        { kind: "literal", text: " for " },
-        { kind: "target_concept" },
-        { kind: "literal", text: "." },
-      ],
+      userProposedParaphrase: "A synthetic note, not a linguistic claim.",
     },
   ];
   return {
@@ -281,7 +255,7 @@ function syntheticShGjYInput(): SymbolicFunctionalCompositionInputV0_2 {
   };
 }
 
-describe("symbolic functional composition v0.2", () => {
+describe("symbolic functional composition v0.3", () => {
   it("keeps the fifteen-unit hypotheses and Ç target-local values explicitly proposed and source-free", () => {
     expect(EMBRIOMORPHEME_SPECTRUM_V0_1).toHaveLength(15);
     expect(Object.fromEntries(EMBRIOMORPHEME_SPECTRUM_V0_1.map(({ unit, associations }) => [
@@ -325,7 +299,7 @@ describe("symbolic functional composition v0.2", () => {
   });
 
   it("retains independent I@3 and I@5 events with canonical, trait-table, and proposed operator labels separated", () => {
-    const result = buildSymbolicFunctionalCompositionV0_2(ndrIçimInput());
+    const result = buildSymbolicFunctionalCompositionV0_3(ndrIçimInput());
     expect(result.ok).toBe(true);
     if (!result.ok) return;
 
@@ -344,7 +318,7 @@ describe("symbolic functional composition v0.2", () => {
 
   it("computes the full ordered NDRIÇIM trace and keeps source lexical output separate", () => {
     const input = ndrIçimInput();
-    const result = buildSymbolicFunctionalCompositionV0_2(input);
+    const result = buildSymbolicFunctionalCompositionV0_3(input);
     expect(result.ok).toBe(true);
     if (!result.ok) return;
 
@@ -371,19 +345,113 @@ describe("symbolic functional composition v0.2", () => {
       { unit: "Ç", span: { start: 4, end: 5 }, selectedAssociationIds: ["ç:release", "ç:emit"], status: "SELECTED_HYPOTHESIS" },
       { unit: "M", span: { start: 6, end: 7 }, selectedAssociationIds: ["m:result"], status: "SELECTED_HYPOTHESIS" },
     ]);
+    expect(result.operationTrace.filter(({ kind }) => kind === "APPLY_VOICE_OPERATOR").map((entry) => ({
+      operationId: entry.operationId,
+      inputSymbolId: entry.inputSymbolId,
+      outputSymbolId: entry.outputSymbolId,
+      targetVoiceEventId: entry.targetVoiceEventId,
+      operatorCandidateId: entry.operatorCandidateId,
+      operatorText: entry.operatorProvenance?.operatorText,
+      applicationPattern: entry.operatorProvenance?.applicationPattern,
+      contribution: entry.contribution,
+      operandAssociationIds: entry.operandProvenance?.spectrumCandidateIds,
+      operatorClaim: entry.operatorProvenance?.claimLayer,
+      operatorProvenanceClass: entry.operatorProvenance?.provenanceClass,
+      operatorEvidenceStatus: entry.operatorProvenance?.evidenceStatus,
+      operatorSourceIds: entry.operatorProvenance?.sourceIds,
+      operatorCitationStatus: entry.operatorProvenance?.citationStatus,
+      operatorHistoricalStatus: entry.operatorProvenance?.historicalStatus,
+    }))).toEqual([
+      {
+        operationId: "apply-i-3",
+        inputSymbolId: "d-value",
+        outputSymbolId: "i-focused-light",
+        targetVoiceEventId: "voice:I@3",
+        operatorCandidateId: "voice-i:specify-focus",
+        operatorText: "SPECIFY / FOCUS",
+        applicationPattern: "focused({operand})",
+        contribution: "SPECIFY / FOCUS(light) → focused(light)",
+        operandAssociationIds: ["d:light"],
+        operatorClaim: "EXPLORATORY_HYPOTHESIS",
+        operatorProvenanceClass: "OWNER_SUPPLIED_PROVISIONAL_VOICE_OPERATOR_HYPOTHESIS",
+        operatorEvidenceStatus: "USER_PROPOSED",
+        operatorSourceIds: [],
+        operatorCitationStatus: "NO_CITATION_ENTERED",
+        operatorHistoricalStatus: "NOT_CLAIMED",
+      },
+      {
+        operationId: "apply-i-5",
+        inputSymbolId: "ç-emit",
+        outputSymbolId: "i-focused-emit",
+        targetVoiceEventId: "voice:I@5",
+        operatorCandidateId: "voice-i:specify-focus",
+        operatorText: "SPECIFY / FOCUS",
+        applicationPattern: "focused({operand})",
+        contribution: "SPECIFY / FOCUS(emit) → focused(emit)",
+        operandAssociationIds: ["ç:emit"],
+        operatorClaim: "EXPLORATORY_HYPOTHESIS",
+        operatorProvenanceClass: "OWNER_SUPPLIED_PROVISIONAL_VOICE_OPERATOR_HYPOTHESIS",
+        operatorEvidenceStatus: "USER_PROPOSED",
+        operatorSourceIds: [],
+        operatorCitationStatus: "NO_CITATION_ENTERED",
+        operatorHistoricalStatus: "NOT_CLAIMED",
+      },
+    ]);
+    expect(result.symbols.filter(({ symbolKind }) => symbolKind === "VOICE_TRANSFORM").map(({ symbolId, text, provenance }) => ({
+      symbolId,
+      text,
+      application: provenance.voiceApplications[0],
+    }))).toEqual([
+      {
+        symbolId: "i-focused-light",
+        text: "focused(light)",
+        application: {
+          operatorCandidateId: "voice-i:specify-focus",
+          voiceEventId: "voice:I@3",
+          inputSymbolId: "d-value",
+          inputText: "light",
+          operatorText: "SPECIFY / FOCUS",
+          applicationPattern: "focused({operand})",
+          provenanceClass: "OWNER_SUPPLIED_PROVISIONAL_VOICE_OPERATOR_HYPOTHESIS",
+          claimLayer: "EXPLORATORY_HYPOTHESIS",
+          evidenceStatus: "USER_PROPOSED",
+          sourceIds: [],
+          citationStatus: "NO_CITATION_ENTERED",
+          historicalStatus: "NOT_CLAIMED",
+        },
+      },
+      {
+        symbolId: "i-focused-emit",
+        text: "focused(emit)",
+        application: {
+          operatorCandidateId: "voice-i:specify-focus",
+          voiceEventId: "voice:I@5",
+          inputSymbolId: "ç-emit",
+          inputText: "emit",
+          operatorText: "SPECIFY / FOCUS",
+          applicationPattern: "focused({operand})",
+          provenanceClass: "OWNER_SUPPLIED_PROVISIONAL_VOICE_OPERATOR_HYPOTHESIS",
+          claimLayer: "EXPLORATORY_HYPOTHESIS",
+          evidenceStatus: "USER_PROPOSED",
+          sourceIds: [],
+          citationStatus: "NO_CITATION_ENTERED",
+          historicalStatus: "NOT_CLAIMED",
+        },
+      },
+    ]);
     expect(result.operationTrace.filter(({ kind }) => kind === "CONNECT_SYMBOLS").map(({ contribution }) => contribution)).toEqual([
       "enclosure contributes to inside",
       "inside contributes to light",
       "light contributes to cycle",
-      "cycle contributes to SPECIFY / FOCUS",
-      "SPECIFY / FOCUS contributes to release",
+      "cycle contributes to focused(light)",
+      "focused(light) contributes to release",
       "release contributes to emit",
-      "emit contributes to SPECIFY / FOCUS",
-      "SPECIFY / FOCUS contributes to result",
+      "emit contributes to focused(emit)",
+      "focused(emit) contributes to result",
     ]);
     expect(result.symbolicComposition.transformationText).toContain("enclosure contributes to inside → inside contributes to light → light contributes to cycle");
     expect(result.symbolicComposition.expression).toBe(
-      "Within enclosure / inside, light follows a cycle shaped by SPECIFY / FOCUS and SPECIFY / FOCUS; release / emit contributes toward result as a proposed reading of illuminating.",
+      "enclosure contributes to inside → inside contributes to light → light contributes to cycle → cycle contributes to focused(light) → focused(light) contributes to release → release contributes to emit → emit contributes to focused(emit) → focused(emit) contributes to result; proposed target concept: “illuminating”.",
     );
     expect(result.symbolicComposition).toMatchObject({
       claimLayer: "EXPLORATORY_HYPOTHESIS",
@@ -406,20 +474,116 @@ describe("symbolic functional composition v0.2", () => {
   });
 
   it("changes the computed expression when the selected D association changes", () => {
-    const light = buildSymbolicFunctionalCompositionV0_2(ndrIçimInput("light"));
-    const direction = buildSymbolicFunctionalCompositionV0_2(ndrIçimInput("direction"));
+    const light = buildSymbolicFunctionalCompositionV0_3(ndrIçimInput("light"));
+    const direction = buildSymbolicFunctionalCompositionV0_3(ndrIçimInput("direction"));
     expect(light.ok && direction.ok).toBe(true);
     if (!light.ok || !direction.ok) return;
-    expect(light.symbolicComposition.expression).toContain("inside, light follows");
-    expect(direction.symbolicComposition.expression).toContain("inside, direction follows");
+    expect(light.symbols.find(({ symbolId }) => symbolId === "i-focused-light")?.text).toBe("focused(light)");
+    expect(direction.symbols.find(({ symbolId }) => symbolId === "i-focused-light")?.text).toBe("focused(direction)");
+    expect(light.symbolicComposition.expression).toContain("inside contributes to light");
+    expect(direction.symbolicComposition.expression).toContain("inside contributes to direction");
     expect(direction.symbolicComposition.expression).not.toBe(light.symbolicComposition.expression);
+  });
+
+  it("returns Null when an applied Voice operand is missing", () => {
+    const input = ndrIçimInput();
+    const result = buildSymbolicFunctionalCompositionV0_3({
+      ...input,
+      operations: input.operations.map((operation) => operation.operationId === "apply-i-3" && operation.kind === "APPLY_VOICE_OPERATOR"
+        ? { ...operation, inputSymbolId: "missing-operand" }
+        : operation),
+    });
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.symbolicComposition.status).toBe("PARTIAL_NULL");
+    expect(result.symbolicComposition.expression).toBeNull();
+    expect(result.operationTrace.find(({ operationId }) => operationId === "apply-i-3")).toMatchObject({
+      status: "PARTIAL_NULL",
+      inputSymbolId: "missing-operand",
+      targetVoiceEventId: "voice:I@3",
+      reasonCodes: ["VOICE_OPERATOR_INPUT_SYMBOL_UNAVAILABLE:missing-operand"],
+    });
+  });
+
+  it("rejects an applied Voice operation that omits its operand producer dependency", () => {
+    const input = ndrIçimInput();
+    const result = buildSymbolicFunctionalCompositionV0_3({
+      ...input,
+      operations: input.operations.map((operation) => operation.operationId === "apply-i-3" && operation.kind === "APPLY_VOICE_OPERATOR"
+        ? { ...operation, dependsOn: [] }
+        : operation),
+    });
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.symbolicComposition.status).toBe("PARTIAL_NULL");
+    expect(result.operationTrace.find(({ operationId }) => operationId === "apply-i-3")?.reasonCodes).toContain(
+      "SYMBOL_PRODUCER_DEPENDENCY_REQUIRED:apply-i-3:select-d",
+    );
+  });
+
+  it("does not apply an operator to a different target Voice event", () => {
+    const input = ndrIçimInput();
+    const result = buildSymbolicFunctionalCompositionV0_3({
+      ...input,
+      operations: input.operations.map((operation) => operation.operationId === "apply-i-3" && operation.kind === "APPLY_VOICE_OPERATOR"
+        ? { ...operation, voiceEventId: "voice:I@5" }
+        : operation),
+    });
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.symbolicComposition.status).toBe("PARTIAL_NULL");
+    expect(result.operationTrace.find(({ operationId }) => operationId === "apply-i-3")?.reasonCodes).toContain(
+      "VOICE_OPERATOR_NOT_BOUND_TO_TARGET_EVENT:I@3:voice:I@5",
+    );
+  });
+
+  it("does not complete a disconnected symbolic transformation graph", () => {
+    const input = ndrIçimInput();
+    const result = buildSymbolicFunctionalCompositionV0_3({
+      ...input,
+      operations: input.operations.map((operation) => operation.operationId === "connect-4" && operation.kind === "CONNECT_SYMBOLS"
+        ? { ...operation, rightSymbolId: "n-inside", dependsOn: [...operation.dependsOn, "select-n-inside"] }
+        : operation),
+    });
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.symbolicComposition.status).toBe("PARTIAL_NULL");
+    expect(result.symbolicComposition.expression).toBeNull();
+    expect(result.symbolicComposition.reasonCodes).toContain("TRANSFORMATION_GRAPH_DISCONNECTED:represent-chain:4");
+  });
+
+  it("keeps literal prose as a separate USER_PROPOSED_PARAPHRASE and never treats it as computed output", () => {
+    const result = buildSymbolicFunctionalCompositionV0_3({
+      target: { exactSpelling: "NDRIÇIM", language: "Albanian", variety: "Standard", wholeWordConcept: "illuminating" },
+      operations: [{
+        operationId: "literal-only",
+        kind: "EXPRESS_RESULT",
+        dependsOn: [],
+        transformationId: "no-graph",
+        outputExpressionId: "literal-proposal",
+        userProposedParaphrase: "This prose is a proposal, not a computed graph result.",
+      }],
+    });
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.symbolicComposition.status).toBe("PARTIAL_NULL");
+    expect(result.symbolicComposition.expression).toBeNull();
+    expect(result.symbolicComposition.proposedExpressions).toEqual([]);
+    expect(result.symbolicComposition.userProposedParaphrases).toEqual([{
+      expressionId: "literal-proposal",
+      text: "This prose is a proposal, not a computed graph result.",
+      claimLayer: "USER_PROPOSED_PARAPHRASE",
+      evidenceStatus: "USER_PROPOSED",
+      sourceIds: [],
+    }]);
+    expect(result.symbolicComposition.reasonCodes).toContain("RESULT_TRANSFORMATION_UNAVAILABLE:no-graph");
   });
 
   it("keeps multiple explicitly expressed readings available without selecting one", () => {
     const input = ndrIçimInput();
     const expressionOperation = input.operations.find((operation) => operation.kind === "EXPRESS_RESULT");
     if (!expressionOperation || expressionOperation.kind !== "EXPRESS_RESULT") throw new Error("Missing expression fixture");
-    const result = buildSymbolicFunctionalCompositionV0_2({
+    const result = buildSymbolicFunctionalCompositionV0_3({
       ...input,
       operations: [
         ...input.operations,
@@ -427,7 +591,7 @@ describe("symbolic functional composition v0.2", () => {
           ...expressionOperation,
           operationId: "express-alternative-reading",
           outputExpressionId: "ndricim-alternative-expression",
-          template: [{ kind: "literal" as const, text: "Alternative proposal: " }, ...expressionOperation.template],
+          userProposedParaphrase: "An alternate user-written summary of this graph.",
         },
       ],
     });
@@ -437,12 +601,19 @@ describe("symbolic functional composition v0.2", () => {
     expect(result.symbolicComposition.status).toBe("MULTIPLE_PROPOSED");
     expect(result.symbolicComposition.expression).toBeNull();
     expect(result.symbolicComposition.proposedExpressions).toHaveLength(2);
-    expect(result.symbolicComposition.proposedExpressions[1]?.text).toMatch(/^Alternative proposal: /);
+    expect(result.symbolicComposition.proposedExpressions[1]?.text).toBe(result.symbolicComposition.proposedExpressions[0]?.text);
+    expect(result.symbolicComposition.userProposedParaphrases).toContainEqual({
+      expressionId: "ndricim-alternative-expression",
+      text: "An alternate user-written summary of this graph.",
+      claimLayer: "USER_PROPOSED_PARAPHRASE",
+      evidenceStatus: "USER_PROPOSED",
+      sourceIds: [],
+    });
     expect(result.interpretationSelection).toEqual({ mode: "no_single_winner", selectedCandidateId: null, userDecisionPosture: "user_decides" });
   });
 
   it("returns explicit partial/Null content when a required selected association is absent", () => {
-    const result = buildSymbolicFunctionalCompositionV0_2(ndrIçimInput("light", false));
+    const result = buildSymbolicFunctionalCompositionV0_3(ndrIçimInput("light", false));
     expect(result.ok).toBe(true);
     if (!result.ok) return;
 
@@ -457,7 +628,7 @@ describe("symbolic functional composition v0.2", () => {
   });
 
   it("uses the same engine for SH/GJ longest-match spans and a canonical Y event", () => {
-    const result = buildSymbolicFunctionalCompositionV0_2(syntheticShGjYInput());
+    const result = buildSymbolicFunctionalCompositionV0_3(syntheticShGjYInput());
     expect(result.ok).toBe(true);
     if (!result.ok) return;
 
@@ -471,30 +642,30 @@ describe("symbolic functional composition v0.2", () => {
     }))).toEqual([{ canonicalIdentity: "Y", position: 4, operator: "PROBE / REFLECT" }]);
     expect(result.symbolicComposition.status).toBe("COMPLETE_PROPOSED");
     expect(result.symbolicComposition.expression).toBe(
-      "sharpness and gathering are considered with PROBE / REFLECT for a synthetic target concept.",
+      "sharpness is paired with gathering → gathering is viewed through reflected(gathering); proposed target concept: “a synthetic target concept”.",
     );
   });
 
   it("does not attach source authority to provisional spectra or Voice operators", () => {
-    expect(SYMBOLIC_VOICE_OPERATOR_PROFILE_V0_1.map(({ voice, operatorText }) => [voice, operatorText])).toEqual([
-      ["A", "INITIATE / GROUND"],
-      ["E", "EXPAND / OUTWARD"],
-      ["I", "SPECIFY / FOCUS"],
-      ["O", "CONTAIN / ENCLOSE"],
-      ["U", "DEEPEN / NOURISH"],
-      ["Y", "PROBE / REFLECT"],
-      ["Ë", "CLOSE / NEUTRALIZE"],
+    expect(SYMBOLIC_VOICE_OPERATOR_PROFILE_V0_3.map(({ voice, operatorText, applicationPattern }) => [voice, operatorText, applicationPattern])).toEqual([
+      ["A", "INITIATE / GROUND", "initiated({operand})"],
+      ["E", "EXPAND / OUTWARD", "expanded({operand})"],
+      ["I", "SPECIFY / FOCUS", "focused({operand})"],
+      ["O", "CONTAIN / ENCLOSE", "contained({operand})"],
+      ["U", "DEEPEN / NOURISH", "deepened({operand})"],
+      ["Y", "PROBE / REFLECT", "reflected({operand})"],
+      ["Ë", "CLOSE / NEUTRALIZE", "closed({operand})"],
     ]);
     const candidates = [
       ...EMBRIOMORPHEME_SPECTRUM_V0_1.flatMap(({ associations }) => associations),
       ...TARGET_LOCAL_SPECTRUM_ASSOCIATIONS_V0_1,
-      ...SYMBOLIC_VOICE_OPERATOR_PROFILE_V0_1,
+      ...SYMBOLIC_VOICE_OPERATOR_PROFILE_V0_3,
     ];
     expect(candidates.every(({ claimLayer, evidenceStatus, sourceIds, citationStatus }) =>
       claimLayer === "EXPLORATORY_HYPOTHESIS" && evidenceStatus === "USER_PROPOSED" &&
       sourceIds.length === 0 && citationStatus === "NO_CITATION_ENTERED",
     )).toBe(true);
-    const result = buildSymbolicFunctionalCompositionV0_2(ndrIçimInput());
+    const result = buildSymbolicFunctionalCompositionV0_3(ndrIçimInput());
     expect(result.ok).toBe(true);
     if (result.ok) {
       expect(result.directPetroZhejiFidelity).toBe("NOT_ESTABLISHED");
