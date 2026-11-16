@@ -40,7 +40,7 @@ describe("functional-motivation method examples in the Single Word workbench", (
     expect(screen.getByTestId("functional-method-operation")).toHaveTextContent("exact removed text “H”");
     expect(screen.getByTestId("functional-method-operation")).toHaveTextContent("Inverse replay: SHTU · EXACT_MATCH");
     expect(screen.getByTestId("functional-method-operation")).toHaveTextContent("linguistic applicability NOT_ASSESSED");
-    expect(screen.getByText(/Final M remains UNKNOWN_OR_NULL/)).toBeInTheDocument();
+    expect(screen.getAllByTestId("functional-method-component").at(-1)).toHaveTextContent("UNKNOWN_OR_NULL");
     expect(screen.getByText(/ordinary STUDIOJ \/ -IM lexical-morphological account/)).toBeInTheDocument();
     expect(screen.getByText(/SHTIM: Retain as the existing contrast/)).toBeInTheDocument();
     expect(screen.getAllByText(/CITATION_ENTERED_UNVERIFIED/).length).toBeGreaterThan(0);
@@ -56,11 +56,22 @@ describe("functional-motivation method examples in the Single Word workbench", (
     const trace = screen.getByTestId("functional-method-reasoning-trace");
     const equation = screen.getByTestId("functional-motivation-equation");
     expect(equation).toHaveTextContent("SHTU (proposed increase function) + DI (know / knowledge) → Increasing or acquiring knowledge → STUDIM (the activity of studying)");
-    expect(equation).toHaveTextContent("USER_PROPOSED · PETRO_ZHEJI_INSPIRED_RECONSTRUCTION");
+    expect(equation).toHaveTextContent("LOGICAL_INFERENCE · USER_PROPOSED");
     expect(equation).toHaveTextContent("free_operator_attested");
     expect(equation).toHaveTextContent("No Zheji operator status is asserted");
     expect(equation).toHaveTextContent("M: UNKNOWN_OR_NULL");
-    expect(equation).toHaveTextContent("citation entered unverified");
+    expect(equation).toHaveTextContent("CITATION_ENTERED_UNVERIFIED");
+    expect(screen.getByTestId("functional-method-equation-attribution")).toHaveTextContent(
+      "PETRO_ZHEJI_INSPIRED_RECONSTRUCTION",
+    );
+    expect(screen.getByTestId("functional-method-equation-attribution")).toHaveTextContent(
+      "local ZË-RO explanatory framework; not a universal formula authored by Zheji or a historical attribution",
+    );
+    expect(screen.getByTestId("functional-method-pattern-action")).toHaveTextContent("ACTION: increase");
+    expect(screen.getByTestId("functional-method-pattern-patient")).toHaveTextContent("PATIENT: knowledge");
+    expect(screen.getByTestId("functional-method-pattern-result")).toHaveTextContent("RESULT: acquisition of knowledge");
+    expect(screen.getByTestId("functional-method-pattern-whole-word-function")).toHaveTextContent("WHOLE-WORD FUNCTION: studying");
+    expect(screen.getByTestId("functional-method-explanation-pattern")).toBeInTheDocument();
     expect(equation.compareDocumentPosition(trace) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     const steps = screen.getAllByTestId("functional-method-reasoning-step");
     expect(steps).toHaveLength(9);
@@ -139,11 +150,34 @@ describe("functional-motivation method examples in the Single Word workbench", (
     expect(screen.getByText(/no shared semantic root or historical relationship is claimed/)).toBeInTheDocument();
 
     fireEvent.change(selector, { target: { value: "GJITHÇKA" } });
+    const gjithckaEquation = screen.getByTestId("functional-motivation-equation");
+    expect(gjithckaEquation).toHaveTextContent(
+      "GJITHË (all / whole) + ÇKA (what / that which) → everything → GJITHÇKA (all things; everything)",
+    );
+    expect(gjithckaEquation).toHaveTextContent("LOGICAL_INFERENCE · USER_PROPOSED");
+    expect(gjithckaEquation).toHaveTextContent("Source-authority promotion: NONE");
+    expect(screen.getByTestId("functional-method-equation-attribution")).toHaveTextContent(
+      "Source-reported compound notation: Myrta (2014) reports Topalli (2011)",
+    );
+    expect(screen.getByTestId("functional-method-equation-attribution")).toHaveTextContent("SOURCE_FACT · CITATION_ENTERED_UNVERIFIED");
+    expect(screen.getByTestId("functional-method-equation-attribution")).not.toHaveTextContent(
+      "PETRO_ZHEJI_INSPIRED_RECONSTRUCTION",
+    );
+    expect(screen.queryByTestId("functional-method-explanation-pattern")).not.toBeInTheDocument();
+    expect(screen.getByTestId("functional-method-reasoning-trace")).toHaveTextContent("Myrta 2014 reports the notation");
+    expect(screen.getByTestId("functional-method-reasoning-trace")).toHaveTextContent(/alternatives may coexist/i);
+    const components = screen.getAllByTestId("functional-method-component");
+    expect(components[0]).toHaveTextContent("component-concatenation code-point span [0,6)");
+    expect(components[1]).toHaveTextContent("component-concatenation code-point span [6,9)");
     expect(screen.getByTestId("functional-method-code-points-GJITHÇKA")).toHaveTextContent(
       "G@0 · J@1 · I@2 · T@3 · H@4 · Ç@5 · K@6 · A@7",
     );
     expect(screen.getByTestId("functional-method-written-voices-GJITHÇKA")).toHaveTextContent("I@2 → A@7");
     expect(screen.getByTestId("functional-method-reconstruction")).toHaveTextContent("MISMATCH");
+    expect(screen.getByTestId("functional-method-surface-reconciliation")).toHaveTextContent(
+      "Exact surface reconciliation EXACT_MATCH via gjithcka-boundary-e-omission: GJITHËÇKA → GJITHÇKA",
+    );
+    expect(screen.getByTestId("functional-method-surface-reconciliation")).toHaveTextContent("cost 1 · inverse GJITHËÇKA (EXACT_MATCH)");
     expect(screen.getByTestId("functional-method-operation")).toHaveTextContent("GJITHËÇKA → GJITHÇKA");
     expect(screen.getByTestId("functional-method-operation")).toHaveTextContent("Position 5");
     expect(screen.getByTestId("functional-method-operation")).toHaveTextContent("removed span [5,6)");

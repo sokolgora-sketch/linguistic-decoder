@@ -44,11 +44,32 @@ function MethodExampleDetails({ example }: { example: FunctionalMotivationMethod
         <section className={`${panelClass} [overflow-wrap:anywhere]`} aria-label="Functional motivation" data-testid="functional-motivation-equation">
           <h4 className={labelClass}>FUNCTIONAL MOTIVATION</h4>
           <p className="mt-2 text-base font-semibold text-white">{example.motivationEquation.equation}</p>
-          <p className="mt-1 text-xs">USER_PROPOSED · PETRO_ZHEJI_INSPIRED_RECONSTRUCTION</p>
-          <p className="mt-1 text-xs text-[#aeb7c5]">This is a proposed interpretation; it does not attribute this equation to Zheji or establish historical morphology.</p>
+          <p className="mt-1 text-xs">{example.motivationEquation.claimLayer} · {example.motivationEquation.status}</p>
+          {example.motivationEquation.attribution ? (
+            <p className="mt-2 break-words text-xs text-[#c5ced8]" data-testid="functional-method-equation-attribution">
+              <strong>Attribution:</strong> {example.motivationEquation.attribution.text}
+              {" · "}{example.motivationEquation.attribution.claimLayer}
+              {" · "}{example.motivationEquation.attribution.status}
+            </p>
+          ) : null}
+          <p className="mt-1 text-xs text-[#aeb7c5]">This research interpretation establishes neither a linguistic rule nor historical origin. Source-authority promotion: {example.motivationEquation.sourceAuthorityPromotion}; no interpretation is selected automatically; interpretation remains with the user.</p>
+          {example.motivationEquation.explanationPattern ? (
+            <div className="mt-3 rounded border border-[#303a45] p-2" data-testid="functional-method-explanation-pattern">
+              <h5 className={labelClass}>Functional explanation pattern</h5>
+              {([
+                ["ACTION", example.motivationEquation.explanationPattern.action],
+                ["PATIENT", example.motivationEquation.explanationPattern.patient],
+                ["RESULT", example.motivationEquation.explanationPattern.result],
+                ["WHOLE-WORD FUNCTION", example.motivationEquation.explanationPattern.wholeWordFunction],
+              ] as const).map(([role, claim]) => (
+                <p key={role} className="mt-1 break-words text-xs" data-testid={`functional-method-pattern-${role.toLowerCase().replaceAll(" ", "-")}`}>
+                  <strong>{role}:</strong> {claim.text} · {claim.claimLayer} · {claim.status}
+                </p>
+              ))}
+            </div>
+          ) : null}
           <h5 className={`${labelClass} mt-3`}>Functional roles and source context</h5>
           <ul className="mt-1 space-y-1">{example.motivationEquation.roles.map((role) => <li key={role}>{role}</li>)}</ul>
-          <p className="mt-2 text-xs">ACTION: increase · PATIENT: knowledge · RESULT: acquisition of knowledge · WHOLE-WORD FUNCTION: studying. This is a ZË-RO interpretation framework.</p>
         </section>
       ) : null}
 
@@ -59,7 +80,7 @@ function MethodExampleDetails({ example }: { example: FunctionalMotivationMethod
             {example.components.map((component, index) => (
               <li key={`${component.spelling}:${index}`} className="break-words" data-testid="functional-method-component">
                 <span className="font-mono text-white">{component.spelling}</span>
-                {component.span ? ` · code-point span [${component.span.start},${component.span.end})` : ""}
+                {component.span ? ` · component-concatenation code-point span [${component.span.start},${component.span.end})` : ""}
                 {` — ${component.function} · ${component.claimLayer} · ${component.status}`}
               </li>
             ))}
@@ -84,6 +105,11 @@ function MethodExampleDetails({ example }: { example: FunctionalMotivationMethod
           {" · "}<strong>{example.reconstruction.status}</strong>
         </p>
         <p className="mt-1 break-words text-xs text-[#aeb7c5]">{example.reconstruction.note}</p>
+        {example.surfaceReconciliation ? (
+          <p className="mt-2 break-words text-xs text-[#c5ced8]" data-testid="functional-method-surface-reconciliation">
+            Exact surface reconciliation {example.surfaceReconciliation.status} via {example.surfaceReconciliation.operationLedgerId}: {example.surfaceReconciliation.initialForm} → {example.surfaceReconciliation.finalForm} · {example.surfaceReconciliation.operationCount} operation · cost {example.surfaceReconciliation.cost} · inverse {example.surfaceReconciliation.inverseForm} ({example.surfaceReconciliation.inverseStatus}).
+          </p>
+        ) : null}
       </section>
 
       {example.reasoningTrace?.length ? (

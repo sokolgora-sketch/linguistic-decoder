@@ -1,12 +1,14 @@
-import {
-  buildCrossLanguageOperationLedgerV0_2,
-  type CrossLanguageOperationLedgerInputV0_2,
-} from "@/shared/openInstrument/crossLanguageOperationLedger.v0_2";
 import { DI_FREE_OPERATOR_PROFILE_V0_1 } from "@/shared/freeOperatorProfile.v0_1";
 import {
   STUDIM_FUNCTIONAL_MOTIVATION_REFERENCE_V0_2,
   type FunctionalMotivationResearchClaimLayerV0_2,
 } from "@/shared/openInstrument/functionalMotivationResearchReference.v0_2";
+import {
+  projectFunctionalMotivationTraceV0_1,
+  type FunctionalMotivationTraceInputV0_1,
+  type FunctionalMotivationTraceOperationV0_1,
+  type FunctionalMotivationTraceSourceV0_1,
+} from "@/shared/openInstrument/functionalMotivationTrace.v0_1";
 import {
   FUNCTIONAL_MOTIVATION_RESEARCH_METHOD_EXPANSION_V0_3 as methodExpansion,
   type ResearchFormV0_3,
@@ -14,13 +16,7 @@ import {
 
 export type FunctionalMotivationMethodExampleIdV0_1 = "STUDIM" | "STUDY" | "GJITHÇKA";
 
-export type FunctionalMotivationMethodSourceVMV0_1 = Readonly<{
-  label: string;
-  url: string;
-  locator: string;
-  citationStatus: "CITATION_ENTERED_UNVERIFIED";
-  licensingStatus: "NOT_ASSESSED";
-}>;
+export type FunctionalMotivationMethodSourceVMV0_1 = FunctionalMotivationTraceSourceV0_1;
 
 export type FunctionalMotivationMethodFormVMV0_1 = Readonly<{
   exactSpelling: string;
@@ -37,6 +33,13 @@ export type FunctionalMotivationMethodClaimVMV0_1 = Readonly<{
   text: string;
   claimLayer: FunctionalMotivationResearchClaimLayerV0_2;
   status: string;
+}>;
+
+export type FunctionalMotivationMethodPatternVMV0_1 = Readonly<{
+  action: FunctionalMotivationMethodClaimVMV0_1;
+  patient: FunctionalMotivationMethodClaimVMV0_1;
+  result: FunctionalMotivationMethodClaimVMV0_1;
+  wholeWordFunction: FunctionalMotivationMethodClaimVMV0_1;
 }>;
 
 export type FunctionalMotivationMethodComponentVMV0_1 = Readonly<{
@@ -109,7 +112,25 @@ export type FunctionalMotivationMethodExampleVMV0_1 = Readonly<{
   sources: readonly FunctionalMotivationMethodSourceVMV0_1[];
   reasoningTrace?: readonly FunctionalMotivationMethodTraceStepVMV0_1[];
   sourceFidelity?: readonly FunctionalMotivationMethodSourceFidelityVMV0_1[];
-  motivationEquation?: Readonly<{ equation: string; roles: readonly string[] }>;
+  motivationEquation?: Readonly<{
+    equation: string;
+    roles: readonly string[];
+    claimLayer: FunctionalMotivationResearchClaimLayerV0_2;
+    status: string;
+    attribution?: FunctionalMotivationMethodClaimVMV0_1;
+    explanationPattern?: FunctionalMotivationMethodPatternVMV0_1;
+    sourceAuthorityPromotion: "NONE";
+  }>;
+  surfaceReconciliation?: Readonly<{
+    operationLedgerId: string;
+    status: "EXACT_MATCH";
+    initialForm: string;
+    finalForm: string;
+    operationCount: number;
+    cost: number;
+    inverseStatus: "EXACT_MATCH";
+    inverseForm: string;
+  }>;
 }>;
 
 function formatEvents(events: readonly Readonly<{ voice: string; position: number }>[]): string[] {
@@ -135,21 +156,6 @@ function projectV0_3Form(
   };
 }
 
-function projectStudimForm(): FunctionalMotivationMethodFormVMV0_1 {
-  const target = STUDIM_FUNCTIONAL_MOTIVATION_REFERENCE_V0_2.target;
-  const structure = STUDIM_FUNCTIONAL_MOTIVATION_REFERENCE_V0_2.writtenStructure;
-  return {
-    exactSpelling: target.exactSpelling,
-    language: target.language,
-    variety: target.variety,
-    grammaticalCategory: "noun",
-    selectedSense: target.selectedMeaning.text,
-    codePoints: structure.exactCodePoints.map(({ character, position }) => `${character}@${position}`),
-    writtenVoices: formatEvents(structure.writtenVoices),
-    evidenceStatus: target.selectedMeaning.evidenceStatus,
-  };
-}
-
 function sourceLabel(url: string): string {
   try {
     const parsed = new URL(url);
@@ -166,6 +172,7 @@ function sourceLabel(url: string): string {
 function sourceForUrl(url: string): FunctionalMotivationMethodSourceVMV0_1 {
   const source = methodExpansion.sourceReferences.find((item) => item.url === url);
   return {
+    sourceId: source?.sourceId ?? url,
     label: source ? `${source.sourceName} · ${source.title}` : sourceLabel(url),
     url,
     locator: source?.locator ?? "Reference recorded in the STUDIM v0.2 specimen; no more specific locator is supplied here.",
@@ -186,73 +193,13 @@ function sourcesForIds(ids: readonly string[]): FunctionalMotivationMethodSource
   return uniqueSources(urls);
 }
 
-function projectOperation(
-  input: CrossLanguageOperationLedgerInputV0_2,
-): FunctionalMotivationMethodOperationVMV0_1 | null {
-  const result = buildCrossLanguageOperationLedgerV0_2(input);
-  if (result.status !== "READY") return null;
-
-  const ledger = result.ledger;
-  const application = ledger.operations[0];
-  if (!application || application.status !== "APPLIED" || !application.after) return null;
-
-  return {
-    before: application.before,
-    after: application.after,
-    operationId: application.operationId,
-    kind: application.kind,
-    operationCount: ledger.operationCount,
-    cost: ledger.totalCost,
-    position: application.positions[0] ?? null,
-    positionUnit: ledger.positionUnit,
-    removedText: application.removedText,
-    removedSpan: application.removedSpan,
-    voicesBefore: formatEvents(ledger.initialWrittenVoices.events),
-    voicesAfter: formatEvents(ledger.finalWrittenVoices.events),
-    omittedVoices: ledger.omittedVoiceEvents.map(({ voice, position }) => `${voice}@${position}`),
-    inverseStatus: ledger.inverseReplay.status,
-    inverseForm: ledger.inverseReplay.reconstructedInitialForm,
-    mechanicalStatus: ledger.mechanicalReconstructionStatus,
-    authority: ledger.relationship.authority,
-    evidenceStatus: ledger.relationship.evidenceStatus,
-    linguisticApplicability: ledger.relationship.linguisticApplicabilityStatus,
-  };
+function sourceIdsForUrls(urls: readonly string[]): string[] {
+  return [...new Set(urls)].map((url) => sourceForUrl(url).sourceId);
 }
 
 const specimen = STUDIM_FUNCTIONAL_MOTIVATION_REFERENCE_V0_2;
 const study = methodExpansion.studyComparison;
 const gjithcka = methodExpansion.gjithckaCase;
-
-const studimOperation = projectOperation(specimen.operationLedgers[0]!.operationLedgerInput);
-const gjitheOperation = projectOperation(gjithcka.operationLedgerInput);
-
-function componentSpan(
-  components: typeof specimen.exactSegmentation.components,
-): FunctionalMotivationMethodComponentVMV0_1[] {
-  let start = 0;
-  return components.map((component) => {
-    const end = start + Array.from(component.exactSpelling).length;
-    const view = {
-      spelling: component.exactSpelling,
-      span: { start, end },
-      function: component.proposedRole ?? "Function not established",
-      claimLayer: component.claimLayer,
-      status: component.unresolved ? "UNKNOWN_OR_NULL" : component.claimLayer,
-    } satisfies FunctionalMotivationMethodComponentVMV0_1;
-    start = end;
-    return view;
-  });
-}
-
-function projectGJITHEComponents(): FunctionalMotivationMethodComponentVMV0_1[] {
-  return gjithcka.components.map((component) => ({
-    spelling: component.exactSpelling,
-    span: component.codePointSpan,
-    function: component.proposedFunction,
-    claimLayer: component.claimLayer,
-    status: component.evidenceStatus,
-  }));
-}
 
 function allStudimSources(): FunctionalMotivationMethodSourceVMV0_1[] {
   const urls = [
@@ -268,12 +215,10 @@ function studimFactSources(claimId: string): FunctionalMotivationMethodSourceVMV
   return claim ? uniqueSources(claim.sourceReferences) : [];
 }
 
-function buildStudimReasoningTrace(): FunctionalMotivationMethodTraceStepVMV0_1[] {
-  const selectedMeaningSources = uniqueSources(specimen.target.selectedMeaning.sourceReferences);
-  const diSources = studimFactSources("di-lexical-function");
-  const shtojSources = studimFactSources("shtoj-lexical-function");
-  const omission = studimOperation;
-
+function buildStudimReasoningSteps(): FunctionalMotivationTraceInputV0_1["reasoningSteps"] {
+  const selectedMeaningSources = sourceIdsForUrls(specimen.target.selectedMeaning.sourceReferences);
+  const diSources = sourceIdsForUrls(studimFactSources("di-lexical-function").map(({ url }) => url));
+  const shtojSources = sourceIdsForUrls(studimFactSources("shtoj-lexical-function").map(({ url }) => url));
   return [
     {
       id: "whole-word-sense",
@@ -283,10 +228,9 @@ function buildStudimReasoningTrace(): FunctionalMotivationMethodTraceStepVMV0_1[
       to: specimen.target.selectedMeaning.text,
       claimLayer: "SOURCE_FACT",
       status: specimen.target.selectedMeaning.evidenceStatus,
-      sources: selectedMeaningSources,
+      sourceIds: selectedMeaningSources,
       evidenceNote: "The cited STUDIM and STUDIOJ entries provide the selected learning/studying context; both citations remain unverified.",
       supportBoundary: "The selected sense supplies the whole-word context. It does not establish the proposed component segmentation.",
-      exactOperation: null,
     },
     {
       id: "di-target-span",
@@ -296,10 +240,9 @@ function buildStudimReasoningTrace(): FunctionalMotivationMethodTraceStepVMV0_1[
       to: "DI",
       claimLayer: "DERIVED_STRUCTURE",
       status: "OBSERVED_IN_TARGET_SPELLING",
-      sources: [],
+      sourceIds: [],
       evidenceNote: "The substring and zero-based code-point span are derived from the exact target spelling.",
       supportBoundary: "An observed substring does not by itself establish a morpheme boundary or independent component function.",
-      exactOperation: null,
     },
     {
       id: "di-lexical-function",
@@ -309,10 +252,9 @@ function buildStudimReasoningTrace(): FunctionalMotivationMethodTraceStepVMV0_1[
       to: "know / knowledge",
       claimLayer: "SOURCE_FACT",
       status: "CITATION_ENTERED_UNVERIFIED",
-      sources: diSources,
+      sourceIds: diSources,
       evidenceNote: "FJALË's DI entry is recorded as lexical evidence; its citation status is unverified.",
       supportBoundary: "The DI entry supports this lexical function, but does not prove that DI is a historical or grammatical component of STUDIM.",
-      exactOperation: null,
     },
     {
       id: "shtoj-context",
@@ -322,10 +264,9 @@ function buildStudimReasoningTrace(): FunctionalMotivationMethodTraceStepVMV0_1[
       to: "add / increase",
       claimLayer: "SOURCE_FACT",
       status: "CITATION_ENTERED_UNVERIFIED",
-      sources: shtojSources,
+      sourceIds: shtojSources,
       evidenceNote: "FJALË's SHTOJ entry is source context; its citation status is unverified.",
       supportBoundary: "SHTOJ does not attest SHTU as a component of STUDIM. The SHTU spelling and its proposed function remain USER_PROPOSAL.",
-      exactOperation: null,
     },
     {
       id: "shtu-stu-correspondence",
@@ -335,12 +276,10 @@ function buildStudimReasoningTrace(): FunctionalMotivationMethodTraceStepVMV0_1[
       to: "STU",
       claimLayer: "USER_PROPOSAL",
       status: "USER_DECLARED_UNVERIFIED · linguistic applicability NOT_ASSESSED",
-      sources: [],
+      sourceIds: [],
       evidenceNote: "The existing operation ledger verifies only an exact mechanical replay; no linguistic source for this omission is entered.",
       supportBoundary: "Mechanical replay and inverse reconstruction do not establish that H omission is linguistically applicable.",
-      exactOperation: omission
-        ? `${omission.before} → ${omission.after}; OMIT H at zero-based code-point position ${omission.position}; cost ${omission.cost}; inverse ${omission.inverseForm} (${omission.inverseStatus}).`
-        : "No operation ledger is available.",
+      operationLedgerId: "shtu-stu-h-omission",
     },
     {
       id: "component-interaction",
@@ -350,10 +289,9 @@ function buildStudimReasoningTrace(): FunctionalMotivationMethodTraceStepVMV0_1[
       to: specimen.functionalProposal.synthesis.text,
       claimLayer: specimen.functionalProposal.synthesis.claimLayer,
       status: specimen.functionalProposal.synthesis.proposalStatus,
-      sources: [...shtojSources, ...diSources],
+      sourceIds: [...shtojSources, ...diSources],
       evidenceNote: "The cited SHTOJ and DI lexical entries are contextual evidence only; both citations remain unverified.",
       supportBoundary: "Neither entry source-establishes the SHTU + DI segmentation or this synthesis. Treat it as a conditional ZË-RO proposal, not a source-reported meaning or historical derivation.",
-      exactOperation: null,
     },
     {
       id: "surface-reconstruction",
@@ -363,10 +301,10 @@ function buildStudimReasoningTrace(): FunctionalMotivationMethodTraceStepVMV0_1[
       to: specimen.exactSegmentation.targetSpelling,
       claimLayer: "DERIVED_STRUCTURE",
       status: specimen.exactSegmentation.expectedComparison,
-      sources: [],
+      sourceIds: [],
       evidenceNote: "Computed directly from the recorded component strings and target spelling.",
       supportBoundary: "An exact surface match accounts for spelling; it does not validate the segmentation, morphology, or functional interpretation.",
-      exactOperation: "STU + DI + M = STUDIM; the function of final M remains UNKNOWN_OR_NULL.",
+      reconstructsSurface: true,
     },
     {
       id: "ordinary-morphology-alternative",
@@ -376,10 +314,9 @@ function buildStudimReasoningTrace(): FunctionalMotivationMethodTraceStepVMV0_1[
       to: "STUDIOJ; the specific -IM derivation is not established here",
       claimLayer: specimen.alternativeReadings[0]!.claimLayer,
       status: specimen.alternativeReadings[0]!.evidenceStatus,
-      sources: uniqueSources(specimen.alternativeReadings[0]!.sourceReferences),
+      sourceIds: sourceIdsForUrls(specimen.alternativeReadings[0]!.sourceReferences),
       evidenceNote: "The STUDIM and STUDIOJ entries are cited as the basis for keeping this alternative visible; citation status is unverified.",
       supportBoundary: "The specific -IM derivation is not independently verified here and remains separate from the proposed STU + DI + M analysis.",
-      exactOperation: null,
     },
     {
       id: "unresolved-material",
@@ -389,10 +326,9 @@ function buildStudimReasoningTrace(): FunctionalMotivationMethodTraceStepVMV0_1[
       to: "UNKNOWN_OR_NULL",
       claimLayer: "UNKNOWN_OR_NULL",
       status: "NOT_ESTABLISHED",
-      sources: [],
+      sourceIds: [],
       evidenceNote: "No supporting source or component function is recorded for M in the specimen.",
       supportBoundary: "Do not infer an autonomous meaning for M or treat the whole-word reading as structurally complete at the component-function level.",
-      exactOperation: null,
     },
   ];
 }
@@ -430,53 +366,440 @@ function allGjithckaSources(): FunctionalMotivationMethodSourceVMV0_1[] {
   return sourcesForIds(ids);
 }
 
-const studimExample: FunctionalMotivationMethodExampleVMV0_1 = {
-  id: "STUDIM",
-  title: "STUDIM · proposed two-root reading",
-  summary: "A method specimen that keeps a functional proposal, exact spelling reconstruction, ordinary morphology and unknown material separate.",
-  forms: [projectStudimForm()],
-  motivationEquation: {
-    equation: "SHTU (proposed increase function) + DI (know / knowledge) → Increasing or acquiring knowledge → STUDIM (the activity of studying)",
-    roles: [
-      `DI: independent lexical form; existing profile classification ${DI_FREE_OPERATOR_PROFILE_V0_1.directFreeOperator.categories.join(", ")}; knowledge / knowing. Proposed membership in STUDIM remains unverified.`,
-      "SHTOJ: cited lexical reference for add / increase; citation entered unverified. No Zheji operator status is asserted.",
-      "SHTU: proposed function-bearing form associated with SHTOJ; its form and membership in STUDIM are not established as an allomorph.",
-      "STU: target-side written component. M: UNKNOWN_OR_NULL.",
-    ],
+const studimTraceInput: FunctionalMotivationTraceInputV0_1 = {
+  target: {
+    exactSpelling: specimen.target.exactSpelling,
+    language: specimen.target.language,
+    variety: specimen.target.variety,
+    grammaticalCategory: "noun",
+    selectedSense: specimen.target.selectedMeaning.text,
+    evidenceStatus: specimen.target.selectedMeaning.evidenceStatus,
+    sourceIds: sourceIdsForUrls(specimen.target.selectedMeaning.sourceReferences),
+    expectedCodePoints: specimen.writtenStructure.exactCodePoints,
+    expectedWrittenVoices: specimen.writtenStructure.writtenVoices as FunctionalMotivationTraceInputV0_1["target"]["expectedWrittenVoices"],
   },
-  components: componentSpan(specimen.exactSegmentation.components),
+  sources: allStudimSources(),
+  terms: [
+    {
+      id: "shtu",
+      spelling: "SHTU",
+      functionText: "proposed increase function",
+      claimLayer: "USER_PROPOSAL",
+      status: "USER_PROPOSED",
+      sourceIds: [],
+      roleNote: "A proposed function-bearing form associated with SHTOJ; its form and membership in STUDIM are not established as an allomorph.",
+    },
+    {
+      id: "di",
+      spelling: "DI",
+      functionText: "know / knowledge",
+      claimLayer: "SOURCE_FACT",
+      status: "CITATION_ENTERED_UNVERIFIED",
+      sourceIds: sourceIdsForUrls(studimFactSources("di-lexical-function").map(({ url }) => url)),
+      roleNote: "Independent Albanian lexical form; proposed membership in STUDIM remains unverified.",
+      freeOperatorClassification: DI_FREE_OPERATOR_PROFILE_V0_1.directFreeOperator.categories.join(", "),
+    },
+    {
+      id: "shtoj",
+      spelling: "SHTOJ",
+      functionText: "add / increase",
+      claimLayer: "SOURCE_FACT",
+      status: "CITATION_ENTERED_UNVERIFIED",
+      sourceIds: sourceIdsForUrls(studimFactSources("shtoj-lexical-function").map(({ url }) => url)),
+      roleNote: "Cited lexical context only; it does not attest SHTU as a STUDIM component. No Zheji operator status is asserted; no SHTOJ free-operator profile is asserted.",
+    },
+    {
+      id: "stu",
+      spelling: "STU",
+      functionText: "target-side spelling used for the proposed SHTU root realization",
+      claimLayer: "USER_PROPOSAL",
+      status: "USER_PROPOSED",
+      sourceIds: [],
+      roleNote: "Actual target-side written component; its relation to proposed SHTU remains unverified.",
+    },
+    {
+      id: "m",
+      spelling: "M",
+      functionText: "UNKNOWN_OR_NULL",
+      claimLayer: "UNKNOWN_OR_NULL",
+      status: "UNKNOWN_OR_NULL",
+      sourceIds: [],
+      roleNote: "UNKNOWN_OR_NULL; final target-side material; no function or autonomous meaning is established.",
+    },
+  ],
+  equation: {
+    contributorTermIds: ["shtu", "di"],
+    resultText: "Increasing or acquiring knowledge",
+    targetDescription: "the activity of studying",
+    claimLayer: specimen.functionalProposal.synthesis.claimLayer,
+    status: specimen.functionalProposal.synthesis.proposalStatus,
+    sourceIds: sourceIdsForUrls([
+      ...studimFactSources("shtoj-lexical-function").map(({ url }) => url),
+      ...studimFactSources("di-lexical-function").map(({ url }) => url),
+    ]),
+    attribution: {
+      text: "PETRO_ZHEJI_INSPIRED_RECONSTRUCTION · local ZË-RO explanatory framework; not a universal formula authored by Zheji or a historical attribution.",
+      claimLayer: "USER_PROPOSAL",
+      status: "USER_PROPOSED",
+      sourceIds: [],
+    },
+    explanationPattern: {
+      action: {
+        text: "increase",
+        claimLayer: "USER_PROPOSAL",
+        status: "USER_PROPOSED",
+        sourceIds: [],
+      },
+      patient: {
+        text: "knowledge",
+        claimLayer: "SOURCE_FACT",
+        status: "CITATION_ENTERED_UNVERIFIED",
+        sourceIds: sourceIdsForUrls(studimFactSources("di-lexical-function").map(({ url }) => url)),
+      },
+      result: {
+        text: "acquisition of knowledge",
+        claimLayer: "LOGICAL_INFERENCE",
+        status: "USER_PROPOSED",
+        sourceIds: [],
+      },
+      wholeWordFunction: {
+        text: "studying",
+        claimLayer: "SOURCE_FACT",
+        status: "CITATION_ENTERED_UNVERIFIED",
+        sourceIds: sourceIdsForUrls(specimen.target.selectedMeaning.sourceReferences),
+      },
+    },
+  },
   functionalReading: {
     text: `${specimen.functionalProposal.roots.map((root) => `${root.proposedSpelling} (${root.proposedFunction})`).join(" + ")} → ${specimen.functionalProposal.synthesis.text}`,
     claimLayer: specimen.functionalProposal.synthesis.claimLayer,
     status: specimen.functionalProposal.synthesis.proposalStatus,
+    sourceIds: sourceIdsForUrls([
+      ...studimFactSources("shtoj-lexical-function").map(({ url }) => url),
+      ...studimFactSources("di-lexical-function").map(({ url }) => url),
+    ]),
   },
-  reconstruction: {
-    text: `${specimen.exactSegmentation.components.map(({ exactSpelling }) => exactSpelling).join(" + ")} = ${specimen.exactSegmentation.targetSpelling}`,
-    status: specimen.exactSegmentation.expectedComparison,
-    note: "Exact concatenation is spelling accounting; it does not settle the morphology or etymology.",
+  surfaceReconstruction: {
+    components: specimen.exactSegmentation.components.map((component) => ({
+      spelling: component.exactSpelling,
+      functionText: component.proposedRole ?? "Function not established",
+      claimLayer: component.claimLayer,
+      status: component.unresolved ? "UNKNOWN_OR_NULL" : component.claimLayer,
+      unresolved: component.unresolved,
+    })),
+    expectedStatus: specimen.exactSegmentation.expectedComparison,
+    note: "Exact concatenation is spelling accounting; it does not settle the morphology or etymology. The function of final M remains UNKNOWN_OR_NULL.",
+    sourceIds: [],
   },
-  operations: studimOperation ? [studimOperation] : [],
+  operations: [{ id: "shtu-stu-h-omission", input: specimen.operationLedgers[0]!.operationLedgerInput }],
   alternatives: specimen.alternativeReadings.map((claim) => ({
     text: claim.description,
     claimLayer: claim.claimLayer,
     status: claim.evidenceStatus,
+    sourceIds: sourceIdsForUrls(claim.sourceReferences),
   })),
   contrasts: specimen.contrastCases.map((contrast) => ({
     text: `${contrast.exactForm}: ${contrast.statedContribution}`,
     claimLayer: contrast.claimLayer,
     status: contrast.claimLayer,
+    sourceIds: [],
   })),
-  unresolved: specimen.unresolvedClaims.map(({ text }) => presentUnknownText(text)),
+  unresolved: specimen.unresolvedClaims.map(({ text, claimLayer }) => ({
+    text: presentUnknownText(text), claimLayer, status: "UNKNOWN_OR_NULL", sourceIds: [],
+  })),
   notes: [
     "SHTOJ is cited as lexical context for add/increase; it does not attest SHTU as a component of STUDIM.",
     "STU + DI + M is the exact target spelling split. Final M remains UNKNOWN_OR_NULL.",
     "The H omission is a replayable user-declared operation; linguistic applicability remains NOT_ASSESSED.",
     "Strict embryo meaning is UNKNOWN_OR_NULL. Source authority promotion: NONE. Historical origin: NOT CLAIMED.",
   ],
-  sources: allStudimSources(),
-  reasoningTrace: buildStudimReasoningTrace(),
+  reasoningSteps: buildStudimReasoningSteps(),
   sourceFidelity: studimSourceFidelity,
 };
+
+const gjithckaTraceInput: FunctionalMotivationTraceInputV0_1 = {
+  target: {
+    exactSpelling: gjithcka.target.exactSpelling,
+    language: gjithcka.target.language,
+    variety: gjithcka.target.variety,
+    grammaticalCategory: gjithcka.target.grammaticalCategory,
+    selectedSense: gjithcka.target.selectedSense,
+    evidenceStatus: "CITATION_ENTERED_UNVERIFIED",
+    sourceIds: sourceIdsForUrls(gjithcka.target.sourceReferenceIds.flatMap((id) => {
+      const source = methodExpansion.sourceReferences.find((reference) => reference.sourceId === id);
+      return source ? [source.url] : [];
+    })),
+    expectedCodePoints: gjithcka.target.exactCodePoints,
+    expectedWrittenVoices: gjithcka.target.writtenVoiceEvents,
+  },
+  sources: allGjithckaSources(),
+  terms: gjithcka.components.map((component, index) => ({
+    id: index === 0 ? "gjithe" : "cka",
+    spelling: component.exactSpelling,
+    functionText: component.proposedFunction,
+    claimLayer: component.claimLayer,
+    status: component.evidenceStatus,
+    sourceIds: sourceIdsForUrls(component.sourceReferenceIds.flatMap((id) => {
+      const source = methodExpansion.sourceReferences.find((reference) => reference.sourceId === id);
+      return source ? [source.url] : [];
+    })),
+    roleNote: `Source-linked lexical function: ${component.proposedFunction}. This supports the recorded lexical function, not a historical derivation by itself.`,
+  })),
+  equation: {
+    contributorTermIds: ["gjithe", "cka"],
+    resultText: "everything",
+    targetDescription: "all things; everything",
+    claimLayer: gjithcka.functionalReading.claimLayer,
+    status: gjithcka.functionalReading.interpretationStatus,
+    sourceIds: sourceIdsForUrls(gjithcka.components.flatMap((component) => component.sourceReferenceIds).flatMap((id) => {
+      const source = methodExpansion.sourceReferences.find((reference) => reference.sourceId === id);
+      return source ? [source.url] : [];
+    })),
+    attribution: {
+      text: "Source-reported compound notation: Myrta (2014) reports Topalli (2011), GJITHË + ÇKA → GJITHÇKA. This notation is separate from the functional inference below.",
+      claimLayer: "SOURCE_FACT",
+      status: "CITATION_ENTERED_UNVERIFIED",
+      sourceIds: sourceIdsForUrls(gjithcka.sourceReportedFormation.sourceReferenceIds.flatMap((id) => {
+        const source = methodExpansion.sourceReferences.find((reference) => reference.sourceId === id);
+        return source ? [source.url] : [];
+      })),
+    },
+  },
+  functionalReading: {
+    text: gjithcka.functionalReading.text,
+    claimLayer: gjithcka.functionalReading.claimLayer,
+    status: gjithcka.functionalReading.interpretationStatus,
+    sourceIds: sourceIdsForUrls(gjithcka.components.flatMap((component) => component.sourceReferenceIds).flatMap((id) => {
+      const source = methodExpansion.sourceReferences.find((reference) => reference.sourceId === id);
+      return source ? [source.url] : [];
+    })),
+  },
+  surfaceReconstruction: {
+    components: gjithcka.components.map((component) => ({
+      spelling: component.exactSpelling,
+      functionText: component.proposedFunction,
+      claimLayer: component.claimLayer,
+      status: component.evidenceStatus,
+    })),
+    expectedStatus: gjithcka.rawConcatenationComparison,
+    note: "The source-reported component notation concatenates to GJITHËÇKA; the recorded OMIT ledger separately replays the declared Ë omission to the exact target spelling.",
+    sourceIds: sourceIdsForUrls(gjithcka.sourceReportedFormation.sourceReferenceIds.flatMap((id) => {
+      const source = methodExpansion.sourceReferences.find((reference) => reference.sourceId === id);
+      return source ? [source.url] : [];
+    })),
+    reconciliationOperationId: "gjithcka-boundary-e-omission",
+  },
+  operations: [{ id: "gjithcka-boundary-e-omission", input: gjithcka.operationLedgerInput }],
+  alternatives: gjithcka.alternativeReadings.map((claim) => ({
+    text: claim.description,
+    claimLayer: claim.claimLayer,
+    status: "evidenceStatus" in claim ? claim.evidenceStatus : claim.claimLayer,
+    sourceIds: claim.claimLayer === "SOURCE_FACT"
+      ? sourceIdsForUrls(gjithcka.sourceReportedFormation.sourceReferenceIds.flatMap((id) => {
+          const source = methodExpansion.sourceReferences.find((reference) => reference.sourceId === id);
+          return source ? [source.url] : [];
+        }))
+      : [],
+  })),
+  contrasts: methodExpansion.familyContrasts.map((contrast) => ({
+    text: `${contrast.target.exactSpelling}: ${contrast.sourceReportedFormation.exactNotation}; boundary Ë ${contrast.sourceReportsUnstressedEStatus === "RETAINED_IN_LISTED_FORM" ? "retained in the listed form" : "reported lost"}.`,
+    claimLayer: contrast.sourceReportedFormation.claimLayer,
+    status: contrast.sourceReportedFormation.evidenceStatus,
+    sourceIds: sourceIdsForUrls(contrast.sourceReportedFormation.sourceReferenceIds.flatMap((id) => {
+      const source = methodExpansion.sourceReferences.find((reference) => reference.sourceId === id);
+      return source ? [source.url] : [];
+    })),
+  })),
+  unresolved: gjithcka.unresolvedClaims.map(({ text, claimLayer }) => ({
+    text: presentUnknownText(text), claimLayer, status: claimLayer, sourceIds: [],
+  })),
+  notes: [
+    "The cited Myrta passage records the component notation; it does not make OMIT an executable linguistic rule.",
+    methodExpansion.orthographicGeneralization.reason,
+    "Source authority promotion: NONE. Historical origin: NOT CLAIMED.",
+  ],
+  reasoningSteps: [
+    {
+      id: "whole-word-sense", title: "Whole-word sense", from: gjithcka.target.exactSpelling,
+      relationshipType: "selected lexical sense", to: gjithcka.target.selectedSense,
+      claimLayer: "SOURCE_FACT", status: "CITATION_ENTERED_UNVERIFIED",
+      sourceIds: sourceIdsForUrls(gjithcka.target.sourceReferenceIds.flatMap((id) => {
+        const source = methodExpansion.sourceReferences.find((reference) => reference.sourceId === id);
+        return source ? [source.url] : [];
+      })),
+      evidenceNote: "The selected FJALË sense is the whole-word functional context; citation remains unverified.",
+      supportBoundary: "The whole-word meaning does not by itself establish component boundaries or a functional derivation.",
+    },
+    {
+      id: "gjithe-lexical-function", title: "GJITHË lexical contribution", from: "GJITHË",
+      relationshipType: "source-linked lexical function", to: "all / whole",
+      claimLayer: "SOURCE_FACT", status: "CITATION_ENTERED_UNVERIFIED",
+      sourceIds: sourceIdsForUrls(gjithcka.components[0]!.sourceReferenceIds.flatMap((id) => {
+        const source = methodExpansion.sourceReferences.find((reference) => reference.sourceId === id);
+        return source ? [source.url] : [];
+      })),
+      evidenceNote: "FJALË records an all/whole lexical meaning for GJITHË.",
+      supportBoundary: "This is source-reported lexical evidence, not by itself proof of the target formation.",
+    },
+    {
+      id: "cka-lexical-function", title: "ÇKA lexical contribution", from: "ÇKA",
+      relationshipType: "source-linked lexical function", to: "what / that which",
+      claimLayer: "SOURCE_FACT", status: "CITATION_ENTERED_UNVERIFIED",
+      sourceIds: sourceIdsForUrls(gjithcka.components[1]!.sourceReferenceIds.flatMap((id) => {
+        const source = methodExpansion.sourceReferences.find((reference) => reference.sourceId === id);
+        return source ? [source.url] : [];
+      })),
+      evidenceNote: "FJALË records interrogative and relative readings for ÇKA.",
+      supportBoundary: "This is source-reported lexical evidence, not by itself proof of the target formation.",
+    },
+    {
+      id: "reported-component-notation", title: "Reported compound notation",
+      from: gjithcka.sourceReportedFormation.exactNotation,
+      relationshipType: "source-reported structural notation", to: gjithcka.targetSpelling,
+      claimLayer: gjithcka.sourceReportedFormation.claimLayer,
+      status: gjithcka.sourceReportedFormation.evidenceStatus,
+      sourceIds: sourceIdsForUrls(gjithcka.sourceReportedFormation.sourceReferenceIds.flatMap((id) => {
+        const source = methodExpansion.sourceReferences.find((reference) => reference.sourceId === id);
+        return source ? [source.url] : [];
+      })),
+      evidenceNote: "Myrta 2014 reports the notation; the citation and licensing remain unverified/not assessed.",
+      supportBoundary: "The source report is not promoted to an executable engine rule or a historical-origin claim.",
+      exactStructure: "Reported notation is GJITHË + ÇKA → GJITHÇKA; raw uppercase concatenation remains GJITHËÇKA.",
+    },
+    {
+      id: "functional-component-interaction", title: "Proposed functional interaction",
+      from: "GJITHË (all / whole) + ÇKA (what / that which)",
+      relationshipType: "functional composition", to: "all + what/that which → everything",
+      claimLayer: "LOGICAL_INFERENCE", status: "USER_PROPOSED",
+      sourceIds: sourceIdsForUrls(gjithcka.components.flatMap((component) => component.sourceReferenceIds).flatMap((id) => {
+        const source = methodExpansion.sourceReferences.find((reference) => reference.sourceId === id);
+        return source ? [source.url] : [];
+      })),
+      evidenceNote: "The lexical functions are separately cited; the component interaction is the proposed functional reading.",
+      supportBoundary: "The inference does not establish historical origin or a universal boundary operation.",
+    },
+    {
+      id: "surface-reconstruction", title: "Exact component concatenation",
+      from: "GJITHË + ÇKA", relationshipType: "raw concatenation", to: "GJITHËÇKA versus GJITHÇKA",
+      claimLayer: "DERIVED_STRUCTURE", status: "MISMATCH",
+      sourceIds: [], evidenceNote: "The exact component strings concatenate without deleting Ë.",
+      supportBoundary: "Mechanical spelling mismatch is retained and is not treated as proof for or against linguistic applicability.",
+      reconstructsSurface: true,
+    },
+    {
+      id: "boundary-e-omission", title: "Declared reversible spelling operation",
+      from: "GJITHËÇKA", relationshipType: "user-declared mechanical replay", to: "GJITHÇKA",
+      claimLayer: "DERIVED_STRUCTURE", status: "USER_DECLARED_UNVERIFIED · linguistic applicability NOT_ASSESSED",
+      sourceIds: sourceIdsForUrls(gjithcka.sourceReportedFormation.sourceReferenceIds.flatMap((id) => {
+        const source = methodExpansion.sourceReferences.find((reference) => reference.sourceId === id);
+        return source ? [source.url] : [];
+      })),
+      evidenceNote: "The existing OMIT ledger replays the declared boundary Ë deletion; its inverse reconstructs the exact input spelling.",
+      supportBoundary: "A successful reversible replay does not authorize an automatic linguistic rule or promote the Myrta citation.",
+      operationLedgerId: "gjithcka-boundary-e-omission",
+    },
+    ...gjithcka.alternativeReadings.map((claim, index) => ({
+      id: `alternative-${index + 1}`, title: "Alternative interpretation",
+      from: "GJITHÇKA", relationshipType: "coexisting interpretation", to: claim.description,
+      claimLayer: claim.claimLayer,
+      status: "evidenceStatus" in claim ? claim.evidenceStatus : claim.claimLayer,
+      sourceIds: claim.claimLayer === "SOURCE_FACT"
+        ? sourceIdsForUrls(gjithcka.sourceReportedFormation.sourceReferenceIds.flatMap((id) => {
+            const source = methodExpansion.sourceReferences.find((reference) => reference.sourceId === id);
+            return source ? [source.url] : [];
+          }))
+        : [],
+      evidenceNote: "The alternative remains separately classified; selection is left to the user.",
+      supportBoundary: "Alternatives may coexist; this display does not select a historical winner.",
+    })),
+    ...gjithcka.unresolvedClaims.map((claim) => ({
+      id: claim.claimId, title: "Unresolved claim", from: "GJITHÇKA",
+      relationshipType: "authority boundary", to: claim.text,
+      claimLayer: claim.claimLayer, status: claim.claimLayer,
+      sourceIds: [], evidenceNote: "No additional authority is recorded for this claim.",
+      supportBoundary: "Keep this question UNKNOWN_OR_NULL; no product rule or historical origin is asserted.",
+    })),
+  ],
+};
+
+export const FUNCTIONAL_MOTIVATION_TRACE_EXAMPLE_INPUTS_V0_1 = {
+  STUDIM: studimTraceInput,
+  GJITHÇKA: gjithckaTraceInput,
+} as const;
+
+function projectTraceOperationForCard(
+  operation: FunctionalMotivationTraceOperationV0_1,
+): FunctionalMotivationMethodOperationVMV0_1 {
+  return {
+    before: operation.before,
+    after: operation.after,
+    operationId: operation.operationId,
+    kind: operation.kind,
+    operationCount: operation.operationCount,
+    cost: operation.cost,
+    position: operation.position,
+    positionUnit: operation.positionUnit,
+    removedText: operation.removedText,
+    removedSpan: operation.removedSpan,
+    voicesBefore: operation.voicesBefore,
+    voicesAfter: operation.voicesAfter,
+    omittedVoices: operation.omittedVoices,
+    inverseStatus: operation.inverseStatus,
+    inverseForm: operation.inverseForm,
+    mechanicalStatus: operation.mechanicalStatus,
+    authority: operation.authority,
+    evidenceStatus: operation.evidenceStatus,
+    linguisticApplicability: operation.linguisticApplicability,
+  };
+}
+
+function projectTraceExample(
+  id: FunctionalMotivationMethodExampleIdV0_1,
+  title: string,
+  summary: string,
+  input: FunctionalMotivationTraceInputV0_1,
+): FunctionalMotivationMethodExampleVMV0_1 {
+  const result = projectFunctionalMotivationTraceV0_1(input);
+  if (result.status !== "READY") {
+    throw new Error(`Functional motivation trace projection rejected: ${result.reasonCodes.join(",")}`);
+  }
+  const projection = result.projection;
+  return {
+    id,
+    title,
+    summary,
+    forms: [{
+      exactSpelling: projection.target.exactSpelling,
+      language: projection.target.language,
+      variety: projection.target.variety,
+      grammaticalCategory: projection.target.grammaticalCategory,
+      selectedSense: projection.target.selectedSense,
+      codePoints: projection.target.codePoints,
+      writtenVoices: projection.target.writtenVoices,
+      evidenceStatus: projection.target.evidenceStatus,
+    }],
+    motivationEquation: projection.motivationEquation,
+    components: projection.components,
+    functionalReading: projection.functionalReading,
+    reconstruction: projection.reconstruction,
+    operations: projection.operations.map(projectTraceOperationForCard),
+    alternatives: projection.alternatives.map(({ text, claimLayer, status }) => ({ text, claimLayer, status })),
+    contrasts: projection.contrasts.map(({ text, claimLayer, status }) => ({ text, claimLayer, status })),
+    unresolved: projection.unresolved.map(({ text }) => text),
+    notes: projection.notes,
+    sources: projection.sources,
+    reasoningTrace: projection.reasoningTrace,
+    sourceFidelity: projection.sourceFidelity,
+    surfaceReconciliation: projection.surfaceReconciliation,
+  };
+}
+
+const studimExample = projectTraceExample(
+  "STUDIM",
+  "STUDIM · proposed two-root reading",
+  "A method specimen that keeps a functional proposal, exact spelling reconstruction, ordinary morphology and unknown material separate.",
+  FUNCTIONAL_MOTIVATION_TRACE_EXAMPLE_INPUTS_V0_1.STUDIM,
+);
 
 const studyExample: FunctionalMotivationMethodExampleVMV0_1 = {
   id: "STUDY",
@@ -514,41 +837,12 @@ const studyExample: FunctionalMotivationMethodExampleVMV0_1 = {
   sources: sourcesForIds([...study.english.sourceReferenceIds, ...study.albanian.sourceReferenceIds]),
 };
 
-const gjithckaExample: FunctionalMotivationMethodExampleVMV0_1 = {
-  id: "GJITHÇKA",
-  title: "GJITHÇKA · boundary omission example",
-  summary: "A source-reported component notation shown beside its exact concatenation mismatch and reversible mechanical replay.",
-  forms: [projectV0_3Form(gjithcka.target)],
-  components: projectGJITHEComponents(),
-  functionalReading: {
-    text: gjithcka.functionalReading.text,
-    claimLayer: gjithcka.functionalReading.claimLayer,
-    status: gjithcka.functionalReading.interpretationStatus,
-  },
-  reconstruction: {
-    text: `${gjithcka.components.map(({ exactSpelling }) => exactSpelling).join(" + ")} = ${gjithcka.rawConcatenation} · target ${gjithcka.targetSpelling}`,
-    status: gjithcka.rawConcatenationComparison,
-    note: "The operation ledger separately replays the declared Ë omission to the exact target spelling.",
-  },
-  operations: gjitheOperation ? [gjitheOperation] : [],
-  alternatives: gjithcka.alternativeReadings.map((claim) => ({
-    text: claim.description,
-    claimLayer: claim.claimLayer,
-    status: "evidenceStatus" in claim ? claim.evidenceStatus : claim.claimLayer,
-  })),
-  contrasts: methodExpansion.familyContrasts.map((contrast) => ({
-    text: `${contrast.target.exactSpelling}: ${contrast.sourceReportedFormation.exactNotation}; boundary Ë ${contrast.sourceReportsUnstressedEStatus === "RETAINED_IN_LISTED_FORM" ? "retained in the listed form" : "reported lost"}.`,
-    claimLayer: contrast.sourceReportedFormation.claimLayer,
-    status: contrast.sourceReportedFormation.evidenceStatus,
-  })),
-  unresolved: gjithcka.unresolvedClaims.map(({ text }) => presentUnknownText(text)),
-  notes: [
-    "The cited Myrta passage records the component notation; it does not make OMIT an executable linguistic rule.",
-    methodExpansion.orthographicGeneralization.reason,
-    "Source authority promotion: NONE. Historical origin: NOT CLAIMED.",
-  ],
-  sources: allGjithckaSources(),
-};
+const gjithckaExample = projectTraceExample(
+  "GJITHÇKA",
+  "GJITHÇKA · boundary omission example",
+  "A source-reported component notation shown beside its exact concatenation mismatch and reversible mechanical replay.",
+  FUNCTIONAL_MOTIVATION_TRACE_EXAMPLE_INPUTS_V0_1.GJITHÇKA,
+);
 
 export const FUNCTIONAL_MOTIVATION_METHOD_EXAMPLES_V0_1: readonly FunctionalMotivationMethodExampleVMV0_1[] = [
   studimExample,
