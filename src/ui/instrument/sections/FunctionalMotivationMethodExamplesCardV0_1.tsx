@@ -299,9 +299,9 @@ export function FunctionalMotivationMethodExamplesCardV0_1() {
         onChange={(event) => setSelectedId(event.target.value as FunctionalMotivationMethodExampleIdV0_1 | "")}
       >
         <option value="">Select an example</option>
-        <option value="STUDIM">STUDIM · proposed two-root reading</option>
-        <option value="STUDY">STUDY · selected-sense comparison</option>
-        <option value="GJITHÇKA">GJITHÇKA · boundary omission example</option>
+        <option value="STUDIM">STUDIM · proposed</option>
+        <option value="STUDY">STUDY · comparison</option>
+        <option value="GJITHÇKA">GJITHÇKA · omission</option>
       </select>
       <div aria-live="polite">
         {example ? <MethodExampleDetails example={example} /> : (

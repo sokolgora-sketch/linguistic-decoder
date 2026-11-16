@@ -20,6 +20,28 @@ describe("functional-motivation method examples in the Single Word workbench", (
     );
   });
 
+  it("keeps native selector labels readable at mobile widths while retaining full example titles", () => {
+    render(<SingleWordMotivationWorkbenchV0_1 initialTargetWord="ARBITRARY" />);
+
+    const selector = screen.getByRole("combobox", { name: "Choose a read-only method example" });
+    expect(Array.from(selector.querySelectorAll("option")).map((option) => option.textContent?.trim())).toEqual([
+      "Select an example",
+      "STUDIM · proposed",
+      "STUDY · comparison",
+      "GJITHÇKA · omission",
+    ]);
+
+    for (const [value, title] of [
+      ["STUDIM", "STUDIM · proposed two-root reading"],
+      ["STUDY", "STUDY · selected-sense comparison"],
+      ["GJITHÇKA", "GJITHÇKA · boundary omission example"],
+    ]) {
+      fireEvent.change(selector, { target: { value } });
+      expect(screen.getByTestId("functional-method-example-details").querySelector("h3")).toHaveTextContent(title);
+      expect(screen.getByLabelText("Exact target word")).toHaveValue("ARBITRARY");
+    }
+  });
+
   it("exposes the STUDIM method layers, exact spelling, reversible H omission, alternatives and Null", () => {
     render(<SingleWordMotivationWorkbenchV0_1 initialTargetWord="STUDIM" />);
     fireEvent.change(screen.getByRole("combobox", { name: "Choose a read-only method example" }), {
