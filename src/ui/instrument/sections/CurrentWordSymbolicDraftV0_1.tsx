@@ -7,6 +7,9 @@ import {
   type SymbolicFunctionalCompositionResultV0_3,
   type SymbolicFunctionalCompositionSuccessV0_3,
 } from "@/shared/openInstrument/symbolicFunctionalComposition.v0_3";
+import { CurrentWordSymbolicGraphMeaningV0_1 } from "@/ui/instrument/sections/CurrentWordSymbolicGraphMeaningV0_1";
+import type { SymbolicFunctionalOperationPlanInputV0_1 } from "@/shared/openInstrument/symbolicFunctionalOperationPlanBuilder.v0_1";
+import { sameAlbanianSourceForm } from "@/ui/instrument/albanianSourceFormIdentity.v0_1";
 import type { SingleWordCurrentWordEvidenceContextV0_1 } from "@/ui/instrument/sections/SingleWordMotivationWorkbenchV0_1";
 
 export type CurrentWordSymbolicVoiceDraftV0_1 = Readonly<{
@@ -142,7 +145,7 @@ function sourceFactsForWord(
   if (!discovery || !sourceIdentityMatchesDraft(discovery, targetLanguage, targetDialect) ||
       !discoveryIdentifiesAlbanian(discovery) || discovery.exactLexicalSourceStatus?.status !== "MATCHES_FOUND") return [];
   return (discovery.exactLexicalSourceFacts ?? []).filter((fact) =>
-    fact.languageCode === "sq" && fact.form === analyzedWord && fact.attestationTruth === "fact",
+    fact.languageCode === "sq" && sameAlbanianSourceForm(fact.form, analyzedWord) && fact.attestationTruth === "fact",
   );
 }
 
@@ -183,6 +186,32 @@ export function CurrentWordSymbolicDraftV0_1({
   const evaluationFailureReasonCodes = evaluation.ok ? null : evaluation.reasonCodes;
   const selectedOccurrenceOptions = structure.ok
     ? structure.spectrumOccurrences.filter((occurrence) => Boolean(selectedAssociations[occurrence.occurrenceId]))
+    : [];
+  const graphSpectrumSelections: SymbolicFunctionalOperationPlanInputV0_1["spectrumSelections"] = structure.ok
+    ? structure.spectrumOccurrences.flatMap((occurrence) => {
+        const associationCandidateId = selectedAssociations[occurrence.occurrenceId];
+        return associationCandidateId ? [{
+          selectionId: occurrence.occurrenceId,
+          unit: occurrence.unit,
+          start: occurrence.span.start,
+          end: occurrence.span.end,
+          associationCandidateId,
+        }] : [];
+      })
+    : [];
+  const graphVoiceBindings: SymbolicFunctionalOperationPlanInputV0_1["voiceBindings"] = structure.ok
+    ? structure.voiceEvents.flatMap((voiceEvent) => {
+        const selection = voiceDrafts[voiceEvent.eventId];
+        return selection?.operatorCandidateId && selection.operandOccurrenceId
+          ? [{
+              bindingId: voiceEvent.eventId,
+              voice: voiceEvent.canonicalIdentity,
+              position: voiceEvent.position,
+              operatorCandidateId: selection.operatorCandidateId,
+              input: { kind: "SPECTRUM_SELECTION" as const, selectionId: selection.operandOccurrenceId },
+            }]
+          : [];
+      })
     : [];
 
   return (
@@ -331,8 +360,7 @@ export function CurrentWordSymbolicDraftV0_1({
                 </div>
               )) : <p>UNKNOWN_OR_NULL · no operations selected.</p>}
             </div>
-            <p className="mt-2" data-testid="current-word-symbolic-whole-word-status">Whole-word functional motivation: UNKNOWN_OR_NULL · not mapped.</p>
-            <p data-testid="current-word-symbolic-graph-status">Graph-to-meaning: PARTIAL_NULL · NOT_YET_MAPPED · {evaluation.symbolicComposition.reasonCodes.join(" · ")}</p>
+            <p className="mt-2">Whole-word functional motivation and graph-to-meaning status are shown in the explicit current-word bridge section below.</p>
             <p>Source-authority promotion: {evaluation.sourceAuthorityPromotion} · historical origin: {evaluation.historicalOrigin}</p>
             <p data-testid="current-word-symbolic-decision">No interpretation is selected automatically · {evaluation.interpretationSelection.userDecisionPosture}</p>
           </>
@@ -340,6 +368,26 @@ export function CurrentWordSymbolicDraftV0_1({
           <p>UNKNOWN_OR_NULL · {evaluationFailureReasonCodes?.join(" · ") ?? "UNKNOWN_OR_NULL"}</p>
         ) : null}
       </div>
+
+      <CurrentWordSymbolicGraphMeaningV0_1
+        key={JSON.stringify([
+          analyzedWord,
+          draftTargetWord,
+          language,
+          variety,
+          facts.map(({ sourceRecordId, sourceSnapshot }) => [sourceRecordId, sourceSnapshot.sha256]),
+        ])}
+        analyzedWord={analyzedWord}
+        draftTargetWord={draftTargetWord}
+        language={language}
+        variety={variety}
+        identityMatches={identityMatches}
+        exactSourceFacts={facts}
+        spectrumSelections={graphSpectrumSelections}
+        voiceBindings={graphVoiceBindings}
+        operations={projection.operations}
+        evaluation={evaluation}
+      />
     </section>
   );
 }
