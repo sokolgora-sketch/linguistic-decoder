@@ -27,6 +27,7 @@ import type { MotivationDiscoveryV0_2VM, PresentOrMissing } from "@/ui/telemetry
 import { FjaloriCrossSourceEvidenceV0_1 } from "@/ui/instrument/sections/FjaloriCrossSourceEvidence.v0_1";
 import { CrossLanguageFunctionalMotivationWorkbenchV0_1 } from "@/ui/instrument/sections/CrossLanguageFunctionalMotivationWorkbenchV0_1";
 import { FunctionalMotivationMethodExamplesCardV0_1 } from "@/ui/instrument/sections/FunctionalMotivationMethodExamplesCardV0_1";
+import { CurrentWordSymbolicDraftV0_1 } from "@/ui/instrument/sections/CurrentWordSymbolicDraftV0_1";
 
 type DraftSegment = SingleWordFunctionalMotivationSegmentInputV0_1;
 type DraftTransformation = SingleWordFunctionalMotivationTransformationInputV0_1;
@@ -1629,6 +1630,28 @@ export function SingleWordMotivationWorkbenchV0_1({
         analyzedWord={initialTargetWord}
         draftTargetWord={targetWord}
         context={currentWordEvidence}
+      />
+
+      <CurrentWordSymbolicDraftV0_1
+        key={JSON.stringify([
+          initialTargetWord,
+          targetWord,
+          targetLanguage,
+          targetDialect,
+          currentWordEvidence?.analyzedWord,
+          currentWordEvidence?.discovery?.kind === "present"
+            ? [
+                currentWordEvidence.discovery.value.inputWord,
+                currentWordEvidence.discovery.value.inputLanguage,
+                currentWordEvidence.discovery.value.inputProfile,
+              ]
+            : null,
+        ])}
+        analyzedWord={initialTargetWord}
+        draftTargetWord={targetWord}
+        targetLanguage={targetLanguage}
+        targetDialect={targetDialect}
+        currentWordEvidence={currentWordEvidence}
       />
 
       <FunctionalMotivationMethodExamplesCardV0_1 />
