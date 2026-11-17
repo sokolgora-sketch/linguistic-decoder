@@ -221,6 +221,9 @@ describe("current-word symbolic draft v0.1", () => {
     expect(screen.getByTestId("current-word-graph-provenance")).toHaveTextContent(/source-authority promotion: NONE/i);
     expect(screen.getByTestId("current-word-graph-decision")).toHaveTextContent("Interpretation remains with the user");
     expect(screen.getByTestId("current-word-graph-decision")).toHaveTextContent("none is chosen automatically");
+    expect(screen.getByTestId("current-word-graph-decision")).toHaveAttribute("data-interpretation-selection-mode", "no_single_winner");
+    expect(screen.getByTestId("current-word-graph-decision")).toHaveAttribute("data-selected-candidate-id", "null");
+    expect(screen.getByTestId("current-word-graph-decision")).toHaveAttribute("data-user-decision-posture", "user_decides");
     expect(screen.getByTestId("current-word-graph-summary")).not.toHaveTextContent(/winner|rank/i);
     expect(screen.getByTestId("current-word-symbolic-result")).not.toHaveTextContent("initiated(");
     expect(screen.getByTestId("current-word-symbolic-result")).toHaveTextContent("Source-authority promotion: NONE");
@@ -450,8 +453,8 @@ describe("current-word symbolic draft v0.1", () => {
 
     fireEvent.click(screen.getByText("View detailed analysis and evidence"));
     expect(details).toHaveAttribute("open");
-    expect(details).toHaveTextContent("no_single_winner");
-    expect(details).toHaveTextContent("user_decides");
+    expect(screen.getByTestId("current-word-graph-decision")).toHaveAttribute("data-interpretation-selection-mode", "no_single_winner");
+    expect(screen.getByTestId("current-word-graph-decision")).toHaveAttribute("data-user-decision-posture", "user_decides");
     expect(details).toHaveTextContent("Source-authority promotion: NONE");
     expect(details).toHaveTextContent("The selected graph is a user-proposed reading of distinguishing.");
     expect(details).toHaveTextContent("INITIATE / GROUND(division) → initiated(division)");

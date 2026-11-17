@@ -432,8 +432,13 @@ export function CurrentWordSymbolicGraphMeaningV0_1({
               <p data-testid="current-word-graph-provenance">
                 Claim layer: EXPLORATORY_HYPOTHESIS · authored lexical function, graph edges, role mappings and bridges: USER_PROPOSED · Linguistic applicability: NOT_ASSESSED · Source-authority promotion: NONE · Production authority: NONE · Historical origin: NOT_CLAIMED
               </p>
-              <p data-testid="current-word-graph-decision">
-                Interpretation remains with the user; none is chosen automatically · no_single_winner · selected candidate: null · user_decides
+              <p
+                data-testid="current-word-graph-decision"
+                data-interpretation-selection-mode={plan?.ok ? plan.functionalMotivation.interpretationSelection.mode : "no_single_winner"}
+                data-selected-candidate-id={plan?.ok ? plan.functionalMotivation.interpretationSelection.selectedCandidateId ?? "null" : "null"}
+                data-user-decision-posture={plan?.ok ? plan.functionalMotivation.interpretationSelection.userDecisionPosture : "user_decides"}
+              >
+                Interpretation remains with the user; none is chosen automatically.
               </p>
               <p className="text-[#aeb7c5]">A mechanically complete symbolic proposal is not independent linguistic or etymological verification.</p>
               {selectedSense ? (
@@ -520,7 +525,7 @@ export function CurrentWordSymbolicGraphMeaningV0_1({
                   ? plan.sourceFunctionLayer.alternativeReadings.map(({ readingId, text, claimLayer, evidenceStatus, sourceIds }) => `${readingId} · ${claimLayer} · ${evidenceStatus} · source IDs: ${sourceIds.join(", ") || "none"} · ${text}`).join(" | ")
                   : "UNKNOWN_OR_NULL · no alternative reading entered or available."}
               </div>
-              <h6 className="mt-2 font-semibold text-[#f5f7fb]">Reason codes and unresolved claims</h6>
+              <h6 className="mt-2 font-semibold text-[#f5f7fb]">Open claims and reason codes</h6>
               <div className="mt-1" data-testid="current-word-graph-unresolved">
                 {plan?.ok
                   ? plan.functionalMotivation.unresolvedParts.map(({ claimId, text, claimLayer, evidenceStatus, sourceIds }) => `${claimId} · ${claimLayer} / ${evidenceStatus} · source IDs: ${sourceIds.join(", ") || "none"} · ${text}`).join(" | ") || "UNKNOWN_OR_NULL"
