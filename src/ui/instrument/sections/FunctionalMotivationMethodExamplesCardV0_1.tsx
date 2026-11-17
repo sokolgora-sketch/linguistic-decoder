@@ -4,13 +4,137 @@ import { useState } from "react";
 import {
   getFunctionalMotivationMethodExampleV0_1,
   type FunctionalMotivationMethodExampleIdV0_1,
+  type FunctionalMotivationMethodSymbolicVMV0_1,
   type FunctionalMotivationMethodExampleVMV0_1,
 } from "@/ui/instrument/sections/functionalMotivationMethodExamplesAdapter.v0_1";
 
 const panelClass = "min-w-0 rounded-lg border border-[#303a45] bg-[#0d1117] p-3";
 const labelClass = "text-[11px] font-semibold uppercase tracking-wide text-[#9fb1bf]";
 
-function MethodExampleDetails({ example }: { example: FunctionalMotivationMethodExampleVMV0_1 }) {
+function SymbolicMethodDetails({ symbolic, exampleId }: {
+  symbolic: FunctionalMotivationMethodSymbolicVMV0_1;
+  exampleId: string;
+}) {
+  return (
+    <section className={`${panelClass} mt-3 space-y-4 [overflow-wrap:anywhere]`} aria-label="Computed symbolic functional example" data-testid={`functional-method-symbolic-${exampleId}`}>
+      <div data-testid="functional-method-symbolic-summary">
+        <h4 className={labelClass}>Proposed whole-word functional reading</h4>
+        {symbolic.wholeWordExplanations.length > 0 ? (
+          <ol className="mt-2 list-inside list-decimal space-y-2">
+            {symbolic.wholeWordExplanations.map((explanation, index) => (
+              <li key={`${index}:${explanation.text}`} data-testid="functional-method-symbolic-explanation">
+                {explanation.text} · {explanation.claimLayer} · {explanation.status}
+              </li>
+            ))}
+          </ol>
+        ) : (
+          <p className="mt-2" data-testid="functional-method-symbolic-explanation-null">
+            No typed graph-to-meaning explanation is supplied. · {symbolic.graphMeaningStatus} · UNKNOWN_OR_NULL
+          </p>
+        )}
+        {symbolic.proposedParaphrases.map((paraphrase, index) => (
+          <p key={`${index}:${paraphrase.text}`} className="mt-2" data-testid="functional-method-symbolic-paraphrase">
+            User-proposed paraphrase: {paraphrase.text} · {paraphrase.status}
+          </p>
+        ))}
+        <p className="mt-2 text-xs text-[#c5ced8]" data-testid="functional-method-symbolic-selected-sense">
+          Selected lexical sense: {symbolic.selectedSenseLabel} — {symbolic.selectedSenseDefinition} · {symbolic.selectedSenseClaimLayer} · {symbolic.selectedSenseEvidenceStatus} · sense ID {symbolic.selectedSenseId}
+        </p>
+        <p className="mt-2" data-testid="functional-method-symbolic-bridge-status">
+          Graph-to-meaning bridge: <strong>{symbolic.graphMeaningStatus}</strong>
+          {` · selected sense ${symbolic.graphMeaningSelectedSenseId ?? "UNKNOWN_OR_NULL"}`}
+          {symbolic.graphMeaningReasonCodes.length > 0 ? ` · ${symbolic.graphMeaningReasonCodes.join(" · ")}` : ""}
+        </p>
+        <p className="mt-2 text-xs text-[#aeb7c5]" data-testid="functional-method-no-winner">
+          Interpretation status: {symbolic.interpretationSelection.mode} · {symbolic.interpretationSelection.userDecisionPosture} · source-authority promotion {symbolic.sourceAuthorityPromotion} · production authority {symbolic.productionAuthority} · historical origin {symbolic.historicalOrigin}.
+        </p>
+      </div>
+
+      <div data-testid="functional-method-symbolic-computed-output">
+        <h4 className={labelClass}>Computed symbolic transformation</h4>
+        <p className="mt-2 text-xs">Evaluator status: {symbolic.evaluatorStatus} · computed output, not a linguistic fact</p>
+        {symbolic.transformationText ? (
+          <p className="mt-1 whitespace-normal font-mono text-xs [overflow-wrap:anywhere]">{symbolic.transformationText}</p>
+        ) : <p className="mt-1">Transformation text: UNKNOWN_OR_NULL</p>}
+        {symbolic.expression ? (
+          <p className="mt-2 whitespace-normal font-mono text-xs [overflow-wrap:anywhere]" data-testid="functional-method-symbolic-expression">{symbolic.expression}</p>
+        ) : null}
+        <ul className="mt-2 space-y-1">
+          {symbolic.voiceApplications.map((application) => (
+            <li key={application.voiceEventId} className="break-words" data-testid="functional-method-symbolic-voice-application" data-voice-event={application.voiceEventId}>
+              <span className="font-mono text-white">{application.voiceEventId}</span>: {application.contribution} · output <span className="font-mono">{application.outputText}</span> · {application.claimLayer} · {application.evidenceStatus}
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      {symbolic.morphologyProposals.length > 0 ? (
+        <div data-testid="functional-method-symbolic-morphology">
+          <h4 className={labelClass}>Separate morphology proposal</h4>
+          <ul className="mt-2 space-y-1">
+            {symbolic.morphologyProposals.map((proposal, index) => (
+              <li key={`${index}:${proposal.reconstruction}`} className="break-words">
+                {proposal.components.join(" + ")} = {proposal.reconstruction} · {proposal.status} · {proposal.claimLayer}; this is separate from the symbolic spectrum and does not establish a function for IM.
+              </li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
+
+      {symbolic.graphMappings.length > 0 ? (
+        <div data-testid="functional-method-symbolic-graph-mappings">
+          <h4 className={labelClass}>Proposed graph-to-meaning mappings</h4>
+          <ol className="mt-2 list-inside list-decimal space-y-2">
+            {symbolic.graphMappings.map((mapping) => (
+              <li key={mapping.graphOutputId} className="break-words" data-testid="functional-method-symbolic-graph-mapping">
+                <span className="font-mono">{mapping.graphOutput}</span> from {mapping.producerOperationId} → role “{mapping.functionalRole}” → {mapping.selectedFunction}; selected sense {mapping.selectedSenseId}; applicability {mapping.linguisticApplicability}. {mapping.generatedContribution} · {mapping.functionalRoleClaimLayer}/{mapping.functionalRoleEvidenceStatus} · {mapping.selectedFunctionClaimLayer}/{mapping.selectedFunctionEvidenceStatus} · bridge {mapping.claimLayer}/{mapping.evidenceStatus}
+              </li>
+            ))}
+          </ol>
+        </div>
+      ) : null}
+
+      <div data-testid="functional-method-symbolic-selected-spectra">
+        <h4 className={labelClass}>Selected symbolic spectra</h4>
+        <ul className="mt-2 space-y-1">
+          {symbolic.selectedSpectra.map((spectrum, index) => (
+            <li key={`${spectrum.candidateId}:${spectrum.span.start}:${index}`} className="break-words" data-testid="functional-method-symbolic-spectrum" data-unit={spectrum.unit} data-span-start={spectrum.span.start}>
+              <span className="font-mono">{spectrum.unit}@{spectrum.span.start} [{spectrum.span.start},{spectrum.span.end})</span> → {spectrum.association} · {spectrum.claimLayer}/{spectrum.evidenceStatus} · sources {spectrum.sourceIds.join(", ") || "none"}
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <div data-testid="functional-method-symbolic-operation-trace">
+        <h4 className={labelClass}>Ordered evaluated operation trace</h4>
+        <p className="mt-1 text-xs text-[#aeb7c5]">This is evaluation order, not a reordered spelling claim; exact written order and code-point positions are listed above.</p>
+        <ol className="mt-2 list-inside list-decimal space-y-1">
+          {symbolic.operationTrace.map((operation) => (
+            <li key={operation.operationId} className="break-words" data-testid="functional-method-symbolic-operation" data-operation-id={operation.operationId}>
+              <span className="font-mono">{operation.operationId}</span> · {operation.kind} · {operation.status} · {operation.contribution ?? "UNKNOWN_OR_NULL"} · {operation.claimLayer}/{operation.evidenceStatus}
+              {operation.reasonCodes.length > 0 ? ` · ${operation.reasonCodes.join(" · ")}` : ""}
+            </li>
+          ))}
+        </ol>
+      </div>
+
+      {symbolic.lexicalAlternatives.length > 0 ? (
+        <div data-testid="functional-method-symbolic-lexical-alternatives">
+          <h4 className={labelClass}>Other source-listed lexical senses</h4>
+          <ul className="mt-2 list-inside list-disc space-y-1">
+            {symbolic.lexicalAlternatives.map((alternative) => (
+              <li key={alternative.text} className="break-words">{alternative.text} · {alternative.claimLayer} · {alternative.status}</li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
+    </section>
+  );
+}
+
+export function FunctionalMotivationMethodExampleDetailsV0_1({ example }: {
+  example: FunctionalMotivationMethodExampleVMV0_1;
+}) {
   return (
     <article data-testid="functional-method-example-details" className="mt-3 min-w-0 space-y-3 text-sm leading-6 text-[#d7dde7]">
       <header className={panelClass}>
@@ -39,6 +163,8 @@ function MethodExampleDetails({ example }: { example: FunctionalMotivationMethod
           ))}
         </div>
       </section>
+
+      {example.symbolic ? <SymbolicMethodDetails symbolic={example.symbolic} exampleId={example.id} /> : null}
 
       {example.motivationEquation ? (
         <section className={`${panelClass} [overflow-wrap:anywhere]`} aria-label="Functional motivation" data-testid="functional-motivation-equation">
@@ -86,11 +212,11 @@ function MethodExampleDetails({ example }: { example: FunctionalMotivationMethod
             ))}
           </ol>
         </section>
-      ) : (
+      ) : !example.symbolic ? (
         <p className={panelClass} data-testid="functional-method-no-components">
           No component decomposition is proposed for English STUDY.
         </p>
-      )}
+      ) : null}
 
       <section className={panelClass} aria-label="Functional reading and reconstruction">
         <h4 className={labelClass}>Functional reading</h4>
@@ -172,7 +298,7 @@ function MethodExampleDetails({ example }: { example: FunctionalMotivationMethod
         </section>
       ) : null}
 
-      <section className={panelClass} aria-label="Declared mechanical operations">
+      {!example.symbolic ? <section className={panelClass} aria-label="Declared mechanical operations">
         <h4 className={labelClass}>Declared operation ledger</h4>
         {example.operations.length === 0 ? (
           <p className="mt-2 break-words" data-testid="functional-method-no-operations">
@@ -206,7 +332,7 @@ function MethodExampleDetails({ example }: { example: FunctionalMotivationMethod
             </p>
           </div>
         ))}
-      </section>
+      </section> : null}
 
       {example.alternatives.length > 0 ? (
         <section className={panelClass} aria-label="Alternative interpretations">
@@ -302,9 +428,11 @@ export function FunctionalMotivationMethodExamplesCardV0_1() {
         <option value="STUDIM">STUDIM · proposed</option>
         <option value="STUDY">STUDY · comparison</option>
         <option value="GJITHÇKA">GJITHÇKA · omission</option>
+        <option value="NDRIÇIM">NDRIÇIM · symbolic</option>
+        <option value="DALLIM">DALLIM · symbolic</option>
       </select>
       <div aria-live="polite">
-        {example ? <MethodExampleDetails example={example} /> : (
+        {example ? <FunctionalMotivationMethodExampleDetailsV0_1 example={example} /> : (
           <p className="mt-3 rounded border border-[#303a45] bg-[#0d1117] p-3 text-xs leading-5 text-[#aeb7c5]" data-testid="functional-method-example-empty">
             No example is selected. The examples are not defaults for the current word or interpretation.
           </p>
