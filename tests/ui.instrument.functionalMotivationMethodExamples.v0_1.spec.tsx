@@ -1,5 +1,7 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import { SingleWordMotivationWorkbenchV0_1 } from "@/ui/instrument/sections/SingleWordMotivationWorkbenchV0_1";
+import { FunctionalMotivationMethodExampleDetailsV0_1 } from "@/ui/instrument/sections/FunctionalMotivationMethodExamplesCardV0_1";
+import { getFunctionalMotivationMethodExampleV0_1 } from "@/ui/instrument/sections/functionalMotivationMethodExamplesAdapter.v0_1";
 
 describe("functional-motivation method examples in the Single Word workbench", () => {
   it("starts without a selected example and keeps the current proposal untouched", () => {
@@ -11,13 +13,24 @@ describe("functional-motivation method examples in the Single Word workbench", (
       "The examples are not defaults for the current word or interpretation.",
     );
     expect(screen.getByLabelText("Exact target word")).toHaveValue("ARBITRARY");
+    expect(screen.getByTestId("single-word-evidence-context-unavailable")).toHaveTextContent("Analysis context was not supplied.");
+    fireEvent.change(screen.getByLabelText("Component 1 exact spelling"), { target: { value: "AR" } });
+    fireEvent.change(screen.getByLabelText("Component 1 proposed meaning"), { target: { value: "draft meaning" } });
 
     fireEvent.change(selector, { target: { value: "STUDIM" } });
 
     expect(screen.getByLabelText("Exact target word")).toHaveValue("ARBITRARY");
+    expect(screen.getByLabelText("Component 1 exact spelling")).toHaveValue("AR");
+    expect(screen.getByLabelText("Component 1 proposed meaning")).toHaveValue("draft meaning");
     expect(screen.getByTestId("functional-method-reconstruction")).toHaveTextContent(
       "STU + DI + M = STUDIM",
     );
+
+    fireEvent.change(selector, { target: { value: "NDRIÇIM" } });
+    expect(screen.getByLabelText("Exact target word")).toHaveValue("ARBITRARY");
+    expect(screen.getByLabelText("Component 1 exact spelling")).toHaveValue("AR");
+    expect(screen.getByLabelText("Component 1 proposed meaning")).toHaveValue("draft meaning");
+    expect(screen.getByTestId("single-word-evidence-context-unavailable")).toHaveTextContent("Analysis context was not supplied.");
   });
 
   it("keeps native selector labels readable at mobile widths while retaining full example titles", () => {
@@ -29,17 +42,108 @@ describe("functional-motivation method examples in the Single Word workbench", (
       "STUDIM · proposed",
       "STUDY · comparison",
       "GJITHÇKA · omission",
+      "NDRIÇIM · symbolic",
+      "DALLIM · symbolic",
     ]);
 
     for (const [value, title] of [
       ["STUDIM", "STUDIM · proposed two-root reading"],
       ["STUDY", "STUDY · selected-sense comparison"],
       ["GJITHÇKA", "GJITHÇKA · boundary omission example"],
+      ["NDRIÇIM", "NDRIÇIM · symbolic composition"],
+      ["DALLIM", "DALLIM · symbolic composition"],
     ]) {
       fireEvent.change(selector, { target: { value } });
       expect(screen.getByTestId("functional-method-example-details").querySelector("h3")).toHaveTextContent(title);
       expect(screen.getByLabelText("Exact target word")).toHaveValue("ARBITRARY");
     }
+  });
+
+  it("renders NDRIÇIM's computed Voice outputs while keeping its graph-to-meaning result partial Null", () => {
+    render(<SingleWordMotivationWorkbenchV0_1 initialTargetWord="ARBITRARY" />);
+    const selector = screen.getByRole("combobox", { name: "Choose a read-only method example" });
+    fireEvent.change(selector, { target: { value: "NDRIÇIM" } });
+
+    expect(screen.getByLabelText("Exact target word")).toHaveValue("ARBITRARY");
+    expect(screen.getByTestId("functional-method-code-points-NDRIÇIM")).toHaveTextContent(
+      "N@0 · D@1 · R@2 · I@3 · Ç@4 · I@5 · M@6",
+    );
+    expect(screen.getByTestId("functional-method-written-voices-NDRIÇIM")).toHaveTextContent("I@3 → I@5");
+    expect(screen.getByTestId("functional-method-symbolic-NDRIÇIM")).toHaveTextContent("Action according to the meanings of NDRIÇOJ / NDRIÇOHEM");
+    expect(screen.getByTestId("functional-method-symbolic-selected-sense")).toHaveTextContent("SOURCE_FACT · CITATION_ENTERED_UNVERIFIED");
+    expect(screen.getAllByTestId("functional-method-symbolic-voice-application")[0]).toHaveTextContent("focused(light)");
+    expect(screen.getAllByTestId("functional-method-symbolic-voice-application")[1]).toHaveTextContent("focused(emit)");
+    expect(screen.getAllByTestId("functional-method-symbolic-voice-application").map((node) => node.getAttribute("data-voice-event"))).toEqual([
+      "voice:I@3",
+      "voice:I@5",
+    ]);
+    expect(screen.getByTestId("functional-method-symbolic-bridge-status")).toHaveTextContent(
+      "PARTIAL_NULL · selected sense UNKNOWN_OR_NULL · GRAPH_MEANING_MAPPING_NOT_PROVIDED",
+    );
+    expect(screen.getByTestId("functional-method-symbolic-explanation-null")).toHaveTextContent("UNKNOWN_OR_NULL");
+    expect(screen.getByTestId("functional-method-symbolic-paraphrase")).toHaveTextContent("USER_PROPOSED_PARAPHRASE");
+    expect(screen.getByTestId("functional-method-symbolic-morphology")).toHaveTextContent(
+      "NDRIÇ + IM = NDRIÇIM · EXACT_MATCH · USER_PROPOSAL",
+    );
+    expect(screen.getByTestId("functional-method-no-winner")).toHaveTextContent("no_single_winner");
+    expect(screen.getByTestId("functional-method-symbolic-operation-trace")).toBeInTheDocument();
+    expect(screen.getByTestId("functional-method-symbolic-selected-spectra")).toBeInTheDocument();
+    expect(screen.getAllByText(/Source-authority promotion: NONE/).length).toBeGreaterThan(0);
+  });
+
+  it("renders DALLIM's distinct A/I applications, repeated L occurrences and typed proposed mappings", () => {
+    render(<SingleWordMotivationWorkbenchV0_1 initialTargetWord="ARBITRARY" />);
+    const selector = screen.getByRole("combobox", { name: "Choose a read-only method example" });
+    fireEvent.change(selector, { target: { value: "DALLIM" } });
+
+    expect(screen.getByLabelText("Exact target word")).toHaveValue("ARBITRARY");
+    expect(screen.getByTestId("functional-method-code-points-DALLIM")).toHaveTextContent(
+      "D@0 · A@1 · L@2 · L@3 · I@4 · M@5",
+    );
+    expect(screen.getByTestId("functional-method-written-voices-DALLIM")).toHaveTextContent("A@1 → I@4");
+    expect(screen.getAllByTestId("functional-method-symbolic-voice-application")).toHaveLength(2);
+    expect(screen.getAllByTestId("functional-method-symbolic-voice-application")[0]).toHaveTextContent("initiated(division)");
+    expect(screen.getAllByTestId("functional-method-symbolic-voice-application")[1]).toHaveTextContent("focused(linear flow)");
+    expect(screen.getAllByTestId("functional-method-symbolic-voice-application").map((node) => node.getAttribute("data-voice-event"))).toEqual([
+      "voice:A@1",
+      "voice:I@4",
+    ]);
+    const lSelections = screen.getAllByTestId("functional-method-symbolic-spectrum")
+      .filter((node) => node.getAttribute("data-unit") === "L");
+    expect(lSelections.map((node) => node.getAttribute("data-span-start"))).toEqual(["2", "3"]);
+    expect(lSelections[0]).toHaveTextContent("spreading");
+    expect(lSelections[1]).toHaveTextContent("linear flow");
+    expect(screen.getByTestId("functional-method-symbolic-graph-mappings")).toBeInTheDocument();
+    expect(screen.getAllByTestId("functional-method-symbolic-graph-mapping")).toHaveLength(2);
+    expect(screen.getAllByTestId("functional-method-symbolic-graph-mapping")[0]).toHaveTextContent(
+      "selected sense dallim.action-of-distinguishing",
+    );
+    expect(screen.getByTestId("functional-method-symbolic-bridge-status")).toHaveTextContent("MULTIPLE_PROPOSED");
+    expect(screen.getAllByTestId("functional-method-symbolic-explanation")).toHaveLength(2);
+    expect(screen.getByTestId("functional-method-symbolic-morphology")).toHaveTextContent(
+      "DALL + IM = DALLIM · EXACT_MATCH · USER_PROPOSAL",
+    );
+    expect(screen.getByTestId("functional-method-symbolic-morphology")).toHaveTextContent("does not establish a function for IM");
+    expect(screen.getByTestId("functional-method-symbolic-selected-sense")).toHaveTextContent("CITATION_ENTERED_UNVERIFIED");
+    expect(screen.getByTestId("functional-method-no-winner")).toHaveTextContent("user_decides");
+    expect(screen.getByTestId("functional-method-symbolic-operation-trace")).toBeInTheDocument();
+  });
+
+  it("changes rendered computed NDRIÇIM output when the selected spectrum input changes", () => {
+    const light = getFunctionalMotivationMethodExampleV0_1("NDRIÇIM");
+    const direction = getFunctionalMotivationMethodExampleV0_1("NDRIÇIM", { dAssociation: "direction" });
+    expect(light?.symbolic?.evaluatorStatus).toBe("COMPLETE_PROPOSED");
+    expect(direction?.symbolic?.evaluatorStatus).toBe("COMPLETE_PROPOSED");
+    if (!light || !direction) return;
+
+    const view = render(<FunctionalMotivationMethodExampleDetailsV0_1 example={light} />);
+    expect(screen.getByTestId("functional-method-symbolic-computed-output")).toHaveTextContent("focused(light)");
+    expect(screen.getByTestId("functional-method-symbolic-summary")).toHaveTextContent("PARTIAL_NULL");
+
+    view.rerender(<FunctionalMotivationMethodExampleDetailsV0_1 example={direction} />);
+    expect(screen.getByTestId("functional-method-symbolic-computed-output")).toHaveTextContent("focused(direction)");
+    expect(screen.getByTestId("functional-method-symbolic-computed-output")).not.toHaveTextContent("focused(light)");
+    expect(screen.getByTestId("functional-method-symbolic-selected-spectra")).toHaveTextContent("D@1 [1,2) → direction");
   });
 
   it("exposes the STUDIM method layers, exact spelling, reversible H omission, alternatives and Null", () => {

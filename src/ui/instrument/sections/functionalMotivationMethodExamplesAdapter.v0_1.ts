@@ -13,8 +13,43 @@ import {
   FUNCTIONAL_MOTIVATION_RESEARCH_METHOD_EXPANSION_V0_3 as methodExpansion,
   type ResearchFormV0_3,
 } from "@/shared/openInstrument/functionalMotivationResearchMethodExpansion.v0_3";
+import {
+  EMBRIOMORPHEME_SPECTRUM_V0_1,
+  TARGET_LOCAL_SPECTRUM_ASSOCIATIONS_V0_1,
+  getEmbriomorphemeAssociationV0_1,
+} from "@/shared/openInstrument/embriomorphemeSpectrum.v0_1";
+import {
+  buildSymbolicFunctionalCompositionV0_3,
+  spectrumOccurrenceIdV0_3,
+  SYMBOLIC_VOICE_OPERATOR_PROFILE_V0_3,
+  voiceEventIdV0_3,
+  type SymbolicCompositionOperationV0_3,
+  type SymbolicFunctionalCompositionInputV0_3,
+  type SymbolicFunctionalCompositionResultV0_3,
+} from "@/shared/openInstrument/symbolicFunctionalComposition.v0_3";
+import {
+  buildSymbolicFunctionalOperationPlanV0_1,
+  type SymbolicFunctionalOperationPlanInputV0_1,
+  type SymbolicFunctionalOperationPlanSuccessV0_1,
+} from "@/shared/openInstrument/symbolicFunctionalOperationPlanBuilder.v0_1";
+import {
+  buildSymbolicFunctionalContentV0_1,
+  type SymbolicFunctionalContentInputV0_1,
+  type SymbolicFunctionalContentSuccessV0_1,
+} from "@/shared/openInstrument/symbolicFunctionalContentEngine.v0_1";
 
-export type FunctionalMotivationMethodExampleIdV0_1 = "STUDIM" | "STUDY" | "GJITHÇKA";
+export type FunctionalMotivationMethodExampleIdV0_1 =
+  | "STUDIM"
+  | "STUDY"
+  | "GJITHÇKA"
+  | "NDRIÇIM"
+  | "DALLIM";
+
+export type FunctionalMotivationMethodDAssociationV0_1 = "division" | "direction" | "light" | "cut";
+
+export type FunctionalMotivationMethodExampleProjectionOptionsV0_1 = Readonly<{
+  dAssociation?: FunctionalMotivationMethodDAssociationV0_1;
+}>;
 
 export type FunctionalMotivationMethodSourceVMV0_1 = FunctionalMotivationTraceSourceV0_1;
 
@@ -96,6 +131,91 @@ export type FunctionalMotivationMethodSourceFidelityVMV0_1 = Readonly<{
   statement: string;
 }>;
 
+export type FunctionalMotivationMethodSymbolicTraceVMV0_1 = Readonly<{
+  operationId: string;
+  kind: string;
+  status: string;
+  contribution: string | null;
+  reasonCodes: readonly string[];
+  claimLayer: string;
+  evidenceStatus: string;
+}>;
+
+export type FunctionalMotivationMethodSymbolicSpectrumVMV0_1 = Readonly<{
+  unit: string;
+  span: Readonly<{ start: number; end: number }>;
+  association: string;
+  candidateId: string;
+  claimLayer: string;
+  evidenceStatus: string;
+  sourceIds: readonly string[];
+}>;
+
+export type FunctionalMotivationMethodSymbolicVoiceApplicationVMV0_1 = Readonly<{
+  voiceEventId: string;
+  inputSymbolId: string;
+  outputSymbolId: string;
+  inputText: string;
+  outputText: string;
+  operatorText: string;
+  contribution: string;
+  claimLayer: string;
+  evidenceStatus: string;
+}>;
+
+export type FunctionalMotivationMethodSymbolicMappingVMV0_1 = Readonly<{
+  graphOutputId: string;
+  graphOutput: string;
+  producerOperationId: string;
+  functionalRole: string;
+  functionalRoleClaimLayer: string;
+  functionalRoleEvidenceStatus: string;
+  selectedSenseId: string;
+  selectedFunction: string;
+  selectedFunctionClaimLayer: string;
+  selectedFunctionEvidenceStatus: string;
+  linguisticApplicability: string;
+  generatedContribution: string;
+  claimLayer: string;
+  evidenceStatus: string;
+}>;
+
+export type FunctionalMotivationMethodSymbolicVMV0_1 = Readonly<{
+  selectedSenseId: string;
+  selectedSenseLabel: string;
+  selectedSenseDefinition: string;
+  selectedSenseClaimLayer: string;
+  selectedSenseEvidenceStatus: string;
+  evaluatorStatus: string;
+  transformationText: string | null;
+  expression: string | null;
+  operationTrace: readonly FunctionalMotivationMethodSymbolicTraceVMV0_1[];
+  selectedSpectra: readonly FunctionalMotivationMethodSymbolicSpectrumVMV0_1[];
+  voiceApplications: readonly FunctionalMotivationMethodSymbolicVoiceApplicationVMV0_1[];
+  graphMeaningStatus: "COMPLETE_PROPOSED" | "MULTIPLE_PROPOSED" | "PARTIAL_NULL";
+  graphMeaningReasonCodes: readonly string[];
+  graphMeaningSelectedSenseId: string | null;
+  graphMappings: readonly FunctionalMotivationMethodSymbolicMappingVMV0_1[];
+  wholeWordExplanations: readonly FunctionalMotivationMethodClaimVMV0_1[];
+  proposedParaphrases: readonly FunctionalMotivationMethodClaimVMV0_1[];
+  unresolvedParts: readonly string[];
+  lexicalAlternatives: readonly FunctionalMotivationMethodClaimVMV0_1[];
+  morphologyProposals: readonly Readonly<{
+    components: readonly string[];
+    reconstruction: string;
+    status: string;
+    claimLayer: string;
+  }>[];
+  sourceAuthorityPromotion: "NONE";
+  productionAuthority: "NONE";
+  historicalOrigin: "NOT_CLAIMED";
+  interpretationSelection: Readonly<{
+    mode: "no_single_winner";
+    selectedCandidateId: null;
+    userDecisionPosture: "user_decides";
+  }>;
+}>;
+
 export type FunctionalMotivationMethodExampleVMV0_1 = Readonly<{
   id: FunctionalMotivationMethodExampleIdV0_1;
   title: string;
@@ -131,6 +251,7 @@ export type FunctionalMotivationMethodExampleVMV0_1 = Readonly<{
     inverseStatus: "EXACT_MATCH";
     inverseForm: string;
   }>;
+  symbolic?: FunctionalMotivationMethodSymbolicVMV0_1;
 }>;
 
 function formatEvents(events: readonly Readonly<{ voice: string; position: number }>[]): string[] {
@@ -794,6 +915,425 @@ function projectTraceExample(
   };
 }
 
+function symbolicAssociationId(unit: string, association: string): string {
+  const candidate = EMBRIOMORPHEME_SPECTRUM_V0_1
+    .flatMap(({ associations }) => associations)
+    .concat([...TARGET_LOCAL_SPECTRUM_ASSOCIATIONS_V0_1])
+    .find((entry) => entry.unit === unit && entry.association === association);
+  if (!candidate) throw new Error(`Missing symbolic research association: ${unit} ${association}`);
+  return candidate.candidateId;
+}
+
+function symbolicOperatorId(voice: "A" | "I"): string {
+  const candidate = SYMBOLIC_VOICE_OPERATOR_PROFILE_V0_3.find((entry) => entry.voice === voice);
+  if (!candidate) throw new Error(`Missing symbolic Voice operator: ${voice}`);
+  return candidate.candidateId;
+}
+
+function ndrIçimSourceInput(): SymbolicFunctionalContentInputV0_1 {
+  return {
+    target: {
+      exactSpelling: "NDRIÇIM",
+      language: "Albanian",
+      variety: "Standard Albanian",
+      selectedSense: {
+        senseId: "ndricim.action-of-verb",
+        label: "Action according to the meanings of NDRIÇOJ / NDRIÇOHEM",
+        definition: "The action according to the meanings of the verbs NDRIÇOJ and NDRIÇOHEM.",
+        claimLayer: "SOURCE_FACT",
+        evidenceStatus: "CITATION_ENTERED_UNVERIFIED",
+        sourceIds: ["fjale-ndricim"],
+        functionalFrame: "ACTION_OF_VERB_FUNCTION",
+      },
+      alternativeSenses: [],
+    },
+    sources: [{
+      sourceId: "fjale-ndricim",
+      label: "FJALË — NDRIÇIM",
+      url: "https://fjale.al/ndri%C3%A7im",
+      locator: "action sense defined by reference to NDRIÇOJ / NDRIÇOHEM",
+      citationStatus: "CITATION_ENTERED_UNVERIFIED",
+      licensingStatus: "NOT_ASSESSED",
+    }],
+    segmentationCandidates: [{
+      candidateId: "proposed-ndriç-im",
+      components: [
+        { componentId: "proposed-stem", exactSpelling: "NDRIÇ" },
+        { componentId: "unresolved-im", exactSpelling: "IM" },
+      ],
+      claimLayer: "USER_PROPOSAL",
+      evidenceStatus: "USER_PROPOSED",
+      sourceIds: [],
+    }],
+    functionCandidates: [{
+      candidateId: "ndricoj-light",
+      exactForm: "NDRIÇOJ",
+      sourceSenseId: "ndricoj-sense-1",
+      functionText: "gives light or makes something have light",
+      claimLayer: "SOURCE_FACT",
+      evidenceStatus: "CITATION_ENTERED_UNVERIFIED",
+      sourceIds: ["fjale-ndricim"],
+    }],
+    componentFunctionBindings: [{
+      bindingId: "proposed-stem-to-light-function",
+      segmentationCandidateId: "proposed-ndriç-im",
+      componentId: "proposed-stem",
+      functionCandidateId: "ndricoj-light",
+      claimLayer: "USER_PROPOSAL",
+      evidenceStatus: "USER_PROPOSED",
+      sourceIds: [],
+    }],
+    voiceRoleCandidates: [],
+    consonantAssociationCandidates: [],
+    compositionOperations: [{
+      operationId: "source-action-of-verb",
+      operationType: "ACTION_OF_VERB_FUNCTION",
+      candidateLabel: "source-reported action sense",
+      targetSenseId: "ndricim.action-of-verb",
+      functionCandidateId: "ndricoj-light",
+      componentFunctionBindingId: "proposed-stem-to-light-function",
+      operationStatus: "SOURCE_REPORTED_UNVERIFIED",
+      evidenceStatus: "CITATION_ENTERED_UNVERIFIED",
+      relationSourceIds: ["fjale-ndricim"],
+    }],
+    alternativeReadings: [],
+    unresolvedClaims: [{ claimId: "suffix-im", text: "The proposed IM component remains unresolved.", sourceIds: [] }],
+  };
+}
+
+function selectCompositionSpectrum(
+  operationId: string,
+  unit: string,
+  position: number,
+  association: string,
+  outputSymbolId: string,
+): SymbolicCompositionOperationV0_3 {
+  return {
+    operationId,
+    kind: "SELECT_SPECTRUM_CANDIDATE",
+    dependsOn: [],
+    occurrenceId: spectrumOccurrenceIdV0_3(unit, position, position + Array.from(unit).length),
+    associationCandidateId: symbolicAssociationId(unit, association),
+    outputSymbolId,
+  };
+}
+
+function applyCompositionVoice(
+  operationId: string,
+  voice: "I",
+  position: number,
+  inputSymbolId: string,
+  inputProducer: string,
+  outputSymbolId: string,
+): SymbolicCompositionOperationV0_3 {
+  return {
+    operationId,
+    kind: "APPLY_VOICE_OPERATOR",
+    dependsOn: [inputProducer],
+    voice,
+    position,
+    voiceEventId: voiceEventIdV0_3(voice, position),
+    operatorCandidateId: symbolicOperatorId(voice),
+    inputSymbolId,
+    outputSymbolId,
+  };
+}
+
+function createNdrIçimCompositionInput(
+  dAssociation: FunctionalMotivationMethodDAssociationV0_1 = "light",
+): SymbolicFunctionalCompositionInputV0_3 {
+  const operations: SymbolicCompositionOperationV0_3[] = [
+    selectCompositionSpectrum("select-n-enclosure", "N", 0, "enclosure", "n-enclosure"),
+    selectCompositionSpectrum("select-n-inside", "N", 0, "inside", "n-inside"),
+    selectCompositionSpectrum("select-d", "D", 1, dAssociation, "d-value"),
+    selectCompositionSpectrum("select-r", "R", 2, "cycle", "r-cycle"),
+    applyCompositionVoice("apply-i-3", "I", 3, "d-value", "select-d", "i-focused-light"),
+    selectCompositionSpectrum("select-ç-release", "Ç", 4, "release", "ç-release"),
+    selectCompositionSpectrum("select-ç-emit", "Ç", 4, "emit", "ç-emit"),
+    applyCompositionVoice("apply-i-5", "I", 5, "ç-emit", "select-ç-emit", "i-focused-emit"),
+    selectCompositionSpectrum("select-m", "M", 6, "result", "m-result"),
+  ];
+  const links = [
+    ["n-enclosure", "n-inside", "select-n-enclosure", "select-n-inside"],
+    ["n-inside", "d-value", "select-n-inside", "select-d"],
+    ["d-value", "r-cycle", "select-d", "select-r"],
+    ["r-cycle", "i-focused-light", "select-r", "apply-i-3"],
+    ["i-focused-light", "ç-release", "apply-i-3", "select-ç-release"],
+    ["ç-release", "ç-emit", "select-ç-release", "select-ç-emit"],
+    ["ç-emit", "i-focused-emit", "select-ç-emit", "apply-i-5"],
+    ["i-focused-emit", "m-result", "apply-i-5", "select-m"],
+  ] as const;
+  const connectionOperations = links.map(([leftSymbolId, rightSymbolId, leftProducer, rightProducer], index) => ({
+    operationId: `connect-${index + 1}`,
+    kind: "CONNECT_SYMBOLS" as const,
+    dependsOn: [leftProducer, rightProducer],
+    leftSymbolId,
+    rightSymbolId,
+    relationText: "contributes to",
+    outputRelationId: `relation-${index + 1}`,
+  }));
+  operations.push(...connectionOperations);
+  operations.push({
+    operationId: "represent-chain",
+    kind: "REPRESENT_SYMBOLIC_TRANSFORMATION",
+    dependsOn: connectionOperations.map(({ operationId }) => operationId),
+    relationIds: connectionOperations.map(({ outputRelationId }) => outputRelationId),
+    transformationLabel: "ordered provisional symbolic contributions",
+    outputTransformationId: "ndricim-symbolic-chain",
+  });
+  operations.push({
+    operationId: "express-reading",
+    kind: "EXPRESS_RESULT",
+    dependsOn: [
+      "represent-chain", "select-n-enclosure", "select-n-inside", "select-d", "select-r", "apply-i-3",
+      "select-ç-release", "select-ç-emit", "apply-i-5", "select-m",
+    ],
+    transformationId: "ndricim-symbolic-chain",
+    outputExpressionId: "ndricim-proposed-reading",
+    userProposedParaphrase: "In enclosure, focused light cycles and emits toward a result.",
+  });
+
+  return {
+    target: {
+      exactSpelling: "NDRIÇIM",
+      language: "Albanian",
+      variety: "Standard Albanian",
+      wholeWordConcept: "illuminating",
+    },
+    operations,
+    sourceFunctionLayer: buildSymbolicFunctionalContentV0_1(ndrIçimSourceInput()),
+  };
+}
+
+function dallimSourceInput(): SymbolicFunctionalContentInputV0_1 {
+  const dallimSourceId = "fjale-dallim";
+  const dallojSourceId = "fjale-dalloj";
+  return {
+    target: {
+      exactSpelling: "DALLIM",
+      language: "Albanian",
+      variety: "Standard Albanian",
+      selectedSense: {
+        senseId: "dallim.action-of-distinguishing",
+        label: "Act of distinguishing",
+        definition: "The action according to the meanings of DALLOJ and DALLOHEM.",
+        claimLayer: "SOURCE_FACT",
+        evidenceStatus: "CITATION_ENTERED_UNVERIFIED",
+        sourceIds: [dallimSourceId],
+        functionalFrame: "ACTION_OF_VERB_FUNCTION",
+      },
+      alternativeSenses: [
+        {
+          senseId: "dallim.distinguishing-feature-or-difference",
+          label: "Distinguishing feature or difference",
+          definition: "A feature that makes one person or thing distinguishable from another; a difference.",
+          claimLayer: "SOURCE_FACT",
+          evidenceStatus: "CITATION_ENTERED_UNVERIFIED",
+          sourceIds: [dallimSourceId],
+          functionalFrame: "OTHER",
+        },
+        {
+          senseId: "dallim.unequal-treatment",
+          label: "Unequal treatment",
+          definition: "Unequal treatment that favors or evaluates people or things by differing criteria.",
+          claimLayer: "SOURCE_FACT",
+          evidenceStatus: "CITATION_ENTERED_UNVERIFIED",
+          sourceIds: [dallimSourceId],
+          functionalFrame: "OTHER",
+        },
+      ],
+    },
+    sources: [
+      {
+        sourceId: dallimSourceId,
+        label: "FJALË — DALLIM",
+        url: "https://fjale.al/index.php/dallim",
+        locator: "sense 1, action according to DALLOJ and DALLOHEM; senses 2–3 retained separately",
+        citationStatus: "CITATION_ENTERED_UNVERIFIED",
+        licensingStatus: "NOT_ASSESSED",
+      },
+      {
+        sourceId: dallojSourceId,
+        label: "FJALË — DALLOJ",
+        url: "https://fjale.al/index.php/dalloj",
+        locator: "transitive sense 1, distinguishing or recognizing one from another",
+        citationStatus: "CITATION_ENTERED_UNVERIFIED",
+        licensingStatus: "NOT_ASSESSED",
+      },
+    ],
+    segmentationCandidates: [{
+      candidateId: "user-proposed-dall-plus-im",
+      components: [
+        { componentId: "dall", exactSpelling: "DALL" },
+        { componentId: "im", exactSpelling: "IM" },
+      ],
+      claimLayer: "USER_PROPOSAL",
+      evidenceStatus: "USER_PROPOSED",
+      sourceIds: [],
+    }],
+    functionCandidates: [{
+      candidateId: "dalloj.distinguish-or-recognize",
+      exactForm: "DALLOJ",
+      sourceSenseId: "dalloj.transitive-sense-1",
+      functionText: "Perceive or mentally recognize a person, thing, or phenomenon as distinct from another; notice and know it rather than confuse it with another.",
+      claimLayer: "SOURCE_FACT",
+      evidenceStatus: "CITATION_ENTERED_UNVERIFIED",
+      sourceIds: [dallojSourceId],
+    }],
+    componentFunctionBindings: [],
+    voiceRoleCandidates: [],
+    consonantAssociationCandidates: [],
+    compositionOperations: [{
+      operationId: "source-reported-dallim-action-link",
+      operationType: "ACTION_OF_VERB_FUNCTION",
+      candidateLabel: "Dictionary-defined action relation to DALLOJ / DALLOHEM",
+      targetSenseId: "dallim.action-of-distinguishing",
+      functionCandidateId: "dalloj.distinguish-or-recognize",
+      operationStatus: "SOURCE_REPORTED_UNVERIFIED",
+      evidenceStatus: "CITATION_ENTERED_UNVERIFIED",
+      relationSourceIds: [dallimSourceId],
+    }],
+    alternativeReadings: [],
+    unresolvedClaims: [{
+      claimId: "dallim-im-morphology",
+      text: "DALL + IM is a separate user-proposed segmentation; the role and morphological status of IM are not established here.",
+      sourceIds: [],
+    }],
+  };
+}
+
+function createDallimOperationPlanInput(
+  dAssociation: FunctionalMotivationMethodDAssociationV0_1 = "division",
+): SymbolicFunctionalOperationPlanInputV0_1 {
+  const selectedSenseId = "dallim.action-of-distinguishing";
+  const spectrumSelections = [
+    { selectionId: "d", unit: "D", start: 0, end: 1, associationCandidateId: symbolicAssociationId("D", dAssociation) },
+    { selectionId: "l-first", unit: "L", start: 2, end: 3, associationCandidateId: symbolicAssociationId("L", "spreading") },
+    { selectionId: "l-second", unit: "L", start: 3, end: 4, associationCandidateId: symbolicAssociationId("L", "linear flow") },
+    { selectionId: "m", unit: "M", start: 5, end: 6, associationCandidateId: symbolicAssociationId("M", "result") },
+  ] as const;
+  const voiceBindings = [
+    {
+      bindingId: "a-initiates-d",
+      voice: "A" as const,
+      position: 1,
+      operatorCandidateId: symbolicOperatorId("A"),
+      input: { kind: "SPECTRUM_SELECTION" as const, selectionId: "d" },
+    },
+    {
+      bindingId: "i-focuses-second-l",
+      voice: "I" as const,
+      position: 4,
+      operatorCandidateId: symbolicOperatorId("I"),
+      input: { kind: "SPECTRUM_SELECTION" as const, selectionId: "l-second" },
+    },
+  ];
+  const functionalEdges = [
+    {
+      edgeId: "division-initiation",
+      left: { kind: "SPECTRUM_SELECTION" as const, selectionId: "d" },
+      right: { kind: "VOICE_BINDING" as const, bindingId: "a-initiates-d" },
+      relationText: "produces",
+    },
+    {
+      edgeId: "initiation-spread",
+      left: { kind: "VOICE_BINDING" as const, bindingId: "a-initiates-d" },
+      right: { kind: "SPECTRUM_SELECTION" as const, selectionId: "l-first" },
+      relationText: "separates within",
+    },
+    {
+      edgeId: "spread-linear-flow",
+      left: { kind: "SPECTRUM_SELECTION" as const, selectionId: "l-first" },
+      right: { kind: "SPECTRUM_SELECTION" as const, selectionId: "l-second" },
+      relationText: "is traced across",
+    },
+    {
+      edgeId: "flow-focus",
+      left: { kind: "SPECTRUM_SELECTION" as const, selectionId: "l-second" },
+      right: { kind: "VOICE_BINDING" as const, bindingId: "i-focuses-second-l" },
+      relationText: "is focused as",
+    },
+    {
+      edgeId: "focus-result",
+      left: { kind: "VOICE_BINDING" as const, bindingId: "i-focuses-second-l" },
+      right: { kind: "SPECTRUM_SELECTION" as const, selectionId: "m" },
+      relationText: "yields",
+    },
+  ] as const;
+
+  return {
+    target: { exactSpelling: "DALLIM", language: "Albanian", variety: "Standard Albanian" },
+    sourceFunctionInput: dallimSourceInput(),
+    spectrumSelections,
+    voiceBindings,
+    functionalEdges,
+    transformationLabel: "user-proposed embryo-first distinction chain",
+    functionalBridges: [
+      {
+        bridgeId: "focused-distinction",
+        targetSenseId: selectedSenseId,
+        role: "PRIMARY",
+        status: "USER_PROPOSED",
+        text: "The act of distinguishing is provisionally read as initiating a division within a spread of items, tracing a difference, and focusing the result.",
+        claimLayer: "USER_PROPOSAL",
+        evidenceStatus: "USER_PROPOSED",
+        sourceIds: [],
+      },
+      {
+        bridgeId: "attentive-separation-alternative",
+        targetSenseId: selectedSenseId,
+        role: "ALTERNATIVE",
+        status: "USER_PROPOSED",
+        text: "Alternatively, distinguishing is provisionally read as directing attention along a separating line to identify one result among others.",
+        claimLayer: "USER_PROPOSAL",
+        evidenceStatus: "USER_PROPOSED",
+        sourceIds: [],
+      },
+    ],
+    functionalRoleMappings: [
+      {
+        mappingId: "focused-division-contribution",
+        bridgeId: "focused-distinction",
+        symbolOutputId: "symbol:voice:a-initiates-d",
+        selectedSenseId,
+        functionCandidateId: "dalloj.distinguish-or-recognize",
+        compositionOperationId: "source-reported-dallim-action-link",
+        functionalRole: {
+          roleId: "initiated-separation",
+          label: "an initiated separation process",
+          claimLayer: "USER_PROPOSAL",
+          evidenceStatus: "USER_PROPOSED",
+          sourceIds: [],
+        },
+        relationType: "PROPOSED_CONTRIBUTES_TO_SELECTED_LEXICAL_FUNCTION",
+      },
+      {
+        mappingId: "alternative-focused-flow-contribution",
+        bridgeId: "attentive-separation-alternative",
+        symbolOutputId: "symbol:voice:i-focuses-second-l",
+        selectedSenseId,
+        functionCandidateId: "dalloj.distinguish-or-recognize",
+        compositionOperationId: "source-reported-dallim-action-link",
+        functionalRole: {
+          roleId: "focused-distinguishing-result",
+          label: "a focused distinguishing result",
+          claimLayer: "USER_PROPOSAL",
+          evidenceStatus: "USER_PROPOSED",
+          sourceIds: [],
+        },
+        relationType: "PROPOSED_CONTRIBUTES_TO_SELECTED_LEXICAL_FUNCTION",
+      },
+    ],
+    unresolvedParts: [{
+      claimId: "im-role-unresolved",
+      text: "The proposed DALL + IM segmentation does not establish a suffix function; the selected M=result consonant association does not explain IM.",
+      claimLayer: "UNKNOWN_OR_NULL",
+      evidenceStatus: "UNKNOWN_OR_NULL",
+      sourceIds: [],
+    }],
+  };
+}
+
 const studimExample = projectTraceExample(
   "STUDIM",
   "STUDIM · proposed two-root reading",
@@ -844,14 +1384,229 @@ const gjithckaExample = projectTraceExample(
   FUNCTIONAL_MOTIVATION_TRACE_EXAMPLE_INPUTS_V0_1.GJITHÇKA,
 );
 
+type SymbolicCompositionSuccessV0_1 = Extract<SymbolicFunctionalCompositionResultV0_3, { ok: true }>;
+type SymbolicContentV0_1 = SymbolicFunctionalContentSuccessV0_1["content"];
+
+function projectSymbolicMethodExample(
+  id: "NDRIÇIM" | "DALLIM",
+  title: string,
+  summary: string,
+  evaluation: SymbolicCompositionSuccessV0_1,
+  sourceContent: SymbolicContentV0_1,
+  sources: SymbolicFunctionalContentInputV0_1["sources"],
+  graphMeaningBridge: SymbolicFunctionalOperationPlanSuccessV0_1["graphMeaningBridge"] | null,
+  unresolvedParts: readonly string[],
+  sourceAuthorityPromotion: "NONE",
+  productionAuthority: "NONE",
+  historicalOrigin: "NOT_CLAIMED",
+  interpretationSelection: SymbolicContentV0_1["selection"],
+): FunctionalMotivationMethodExampleVMV0_1 {
+  const target = evaluation.target;
+  const selectedSense = sourceContent.target.selectedSense;
+  const form: FunctionalMotivationMethodFormVMV0_1 = {
+    exactSpelling: target.exactSpelling,
+    language: target.language,
+    variety: target.variety,
+    grammaticalCategory: "Selected lexical target",
+    selectedSense: `${selectedSense.label}: ${selectedSense.definition}`,
+    codePoints: target.codePoints.map(({ character, position }) => `${character}@${position}`),
+    writtenVoices: formatEvents(target.writtenVoices),
+    evidenceStatus: "CITATION_ENTERED_UNVERIFIED",
+  };
+  const symbolic: FunctionalMotivationMethodSymbolicVMV0_1 = {
+    selectedSenseId: selectedSense.senseId,
+    selectedSenseLabel: selectedSense.label,
+    selectedSenseDefinition: selectedSense.definition,
+    selectedSenseClaimLayer: selectedSense.claimLayer,
+    selectedSenseEvidenceStatus: selectedSense.evidenceStatus,
+    evaluatorStatus: evaluation.symbolicComposition.status,
+    transformationText: evaluation.symbolicComposition.transformationText,
+    expression: evaluation.symbolicComposition.expression,
+    operationTrace: evaluation.operationTrace.map((operation) => ({
+      operationId: operation.operationId,
+      kind: operation.kind,
+      status: operation.status,
+      contribution: operation.contribution,
+      reasonCodes: operation.reasonCodes,
+      claimLayer: operation.claimLayer,
+      evidenceStatus: operation.evidenceStatus,
+    })),
+    selectedSpectra: evaluation.spectrumOccurrences.flatMap((occurrence) =>
+      occurrence.selectedAssociationIds.flatMap((candidateId) => {
+        const association = getEmbriomorphemeAssociationV0_1(candidateId);
+        return association ? [{
+          unit: occurrence.unit,
+          span: occurrence.span,
+          association: association.association,
+          candidateId,
+          claimLayer: association.claimLayer,
+          evidenceStatus: association.evidenceStatus,
+          sourceIds: association.sourceIds,
+        }] : [];
+      }),
+    ),
+    voiceApplications: evaluation.operationTrace
+      .filter((operation) => operation.kind === "APPLY_VOICE_OPERATOR")
+      .map((operation) => {
+        const inputSymbol = evaluation.symbols.find(({ symbolId }) => symbolId === operation.inputSymbolId);
+        const outputSymbol = evaluation.symbols.find(({ symbolId }) => symbolId === operation.outputSymbolId);
+        return {
+          voiceEventId: operation.targetVoiceEventId ?? "UNKNOWN_OR_NULL",
+          inputSymbolId: operation.inputSymbolId ?? "UNKNOWN_OR_NULL",
+          outputSymbolId: operation.outputSymbolId ?? "UNKNOWN_OR_NULL",
+          inputText: inputSymbol?.text ?? "UNKNOWN_OR_NULL",
+          outputText: outputSymbol?.text ?? "UNKNOWN_OR_NULL",
+          operatorText: operation.operatorProvenance?.operatorText ?? "UNKNOWN_OR_NULL",
+          contribution: operation.contribution ?? "PARTIAL_NULL",
+          claimLayer: operation.claimLayer,
+          evidenceStatus: operation.evidenceStatus,
+        };
+      }),
+    graphMeaningStatus: graphMeaningBridge?.status ?? "PARTIAL_NULL",
+    graphMeaningReasonCodes: graphMeaningBridge?.reasonCodes ?? ["GRAPH_MEANING_MAPPING_NOT_PROVIDED"],
+    graphMeaningSelectedSenseId: graphMeaningBridge?.selectedLexicalSense.senseId ?? null,
+    graphMappings: graphMeaningBridge?.mappings.map((mapping) => ({
+      graphOutputId: mapping.graphOutput.symbolId,
+      graphOutput: mapping.graphOutput.text,
+      producerOperationId: mapping.graphOutput.producerOperationId,
+      functionalRole: mapping.functionalRole.label,
+      functionalRoleClaimLayer: mapping.functionalRole.claimLayer,
+      functionalRoleEvidenceStatus: mapping.functionalRole.evidenceStatus,
+      selectedSenseId: graphMeaningBridge?.selectedLexicalSense.senseId ?? selectedSense.senseId,
+      selectedFunction: `${mapping.selectedLexicalFunction.exactForm}: ${mapping.selectedLexicalFunction.functionText}`,
+      selectedFunctionClaimLayer: mapping.selectedLexicalFunction.claimLayer,
+      selectedFunctionEvidenceStatus: mapping.selectedLexicalFunction.evidenceStatus,
+      linguisticApplicability: mapping.selectedLexicalFunction.linguisticApplicability,
+      generatedContribution: mapping.generatedContribution,
+      claimLayer: mapping.claimLayer,
+      evidenceStatus: mapping.evidenceStatus,
+    })) ?? [],
+    wholeWordExplanations: graphMeaningBridge?.wholeWordExplanations.map((explanation) => ({
+      text: `${explanation.bridgeRole}: ${explanation.text}`,
+      claimLayer: explanation.claimLayer,
+      status: explanation.evidenceStatus,
+    })) ?? [],
+    proposedParaphrases: evaluation.symbolicComposition.userProposedParaphrases.map((paraphrase) => ({
+      text: paraphrase.text,
+      claimLayer: "USER_PROPOSAL",
+      status: "USER_PROPOSED_PARAPHRASE · USER_PROPOSED",
+    })),
+    unresolvedParts,
+    lexicalAlternatives: sourceContent.target.alternativeSenses.map((sense) => ({
+      text: `${sense.label}: ${sense.definition}`,
+      claimLayer: sense.claimLayer,
+      status: sense.evidenceStatus,
+    })),
+    morphologyProposals: sourceContent.segmentations.map((segmentation) => ({
+      components: segmentation.components.map(({ exactSpelling }) => exactSpelling),
+      reconstruction: segmentation.rawReconstruction,
+      status: segmentation.reconstructionStatus,
+      claimLayer: segmentation.claimLayer,
+    })),
+    sourceAuthorityPromotion,
+    productionAuthority,
+    historicalOrigin,
+    interpretationSelection,
+  };
+  const readingText = symbolic.wholeWordExplanations.map(({ text }) => text).join(" ");
+  return {
+    id,
+    title,
+    summary,
+    forms: [form],
+    components: [],
+    functionalReading: readingText
+      ? { text: readingText, claimLayer: "USER_PROPOSAL", status: graphMeaningBridge?.status ?? "PARTIAL_NULL" }
+      : {
+          text: "No typed graph-to-meaning explanation is available for this computed trace.",
+          claimLayer: "UNKNOWN_OR_NULL",
+          status: "PARTIAL_NULL",
+        },
+    reconstruction: {
+      text: `${target.exactSpelling} is preserved as the evaluated target form; no spelling-reconstruction operation is asserted.`,
+      status: "NOT_A_SPELLING_RECONSTRUCTION",
+      note: "Symbolic composition and morphological proposals are displayed separately.",
+    },
+    operations: [],
+    alternatives: [],
+    contrasts: [],
+    unresolved: symbolic.unresolvedParts,
+    notes: [
+      "Spectrum associations and Voice applications are computed from explicitly selected USER_PROPOSED inputs; they are exploratory hypotheses, not source-established linguistic meanings.",
+      "No interpretation is selected automatically. Alternatives may coexist; no_single_winner and user_decides.",
+      `Source-authority promotion: ${symbolic.sourceAuthorityPromotion}; production authority: ${symbolic.productionAuthority}; historical origin: ${symbolic.historicalOrigin}.`,
+    ],
+    sources: sources.map((source) => ({ ...source })),
+    symbolic,
+  };
+}
+
+function buildNdrIçimExample(
+  dAssociation: FunctionalMotivationMethodDAssociationV0_1 = "light",
+): FunctionalMotivationMethodExampleVMV0_1 {
+  const input = createNdrIçimCompositionInput(dAssociation);
+  const evaluation = buildSymbolicFunctionalCompositionV0_3(input);
+  if (!evaluation.ok) throw new Error(`NDRIÇIM symbolic example rejected: ${evaluation.reasonCodes.join(",")}`);
+  const sourceResult = input.sourceFunctionLayer;
+  if (!sourceResult?.ok) throw new Error("NDRIÇIM source-function example did not validate");
+  return projectSymbolicMethodExample(
+    "NDRIÇIM",
+    "NDRIÇIM · symbolic composition",
+    "Evaluated exploratory spectrum and Voice-operation trace; the lexical source layer remains distinct and no complete graph-to-meaning mapping is supplied.",
+    evaluation,
+    sourceResult.content,
+    ndrIçimSourceInput().sources,
+    null,
+    [
+      ...sourceResult.content.unresolved.map(({ text }) => text),
+      "The computed symbolic graph has no typed mapping to the selected source-linked lexical function.",
+    ],
+    evaluation.sourceAuthorityPromotion,
+    evaluation.productionAuthority,
+    evaluation.historicalOrigin,
+    sourceResult.content.selection,
+  );
+}
+
+function buildDallimExample(
+  dAssociation: FunctionalMotivationMethodDAssociationV0_1 = "division",
+): FunctionalMotivationMethodExampleVMV0_1 {
+  const result = buildSymbolicFunctionalOperationPlanV0_1(createDallimOperationPlanInput(dAssociation));
+  if (!result.ok) throw new Error(`DALLIM symbolic example rejected: ${result.reasonCodes.join(",")}`);
+  if (!result.evaluation.ok) throw new Error(`DALLIM symbolic evaluator returned Null: ${result.evaluation.reasonCodes.join(",")}`);
+  return projectSymbolicMethodExample(
+    "DALLIM",
+    "DALLIM · symbolic composition",
+    "The existing operation-plan builder evaluates the selected symbolic graph and its explicitly proposed mappings to the selected lexical function.",
+    result.evaluation,
+    result.sourceFunctionLayer,
+    result.sourceReferences,
+    result.graphMeaningBridge,
+    result.functionalMotivation.unresolvedParts.map(({ text }) => text),
+    result.functionalMotivation.sourceAuthorityPromotion,
+    result.functionalMotivation.productionAuthority,
+    result.functionalMotivation.historicalOrigin,
+    result.functionalMotivation.interpretationSelection,
+  );
+}
+
 export const FUNCTIONAL_MOTIVATION_METHOD_EXAMPLES_V0_1: readonly FunctionalMotivationMethodExampleVMV0_1[] = [
   studimExample,
   studyExample,
   gjithckaExample,
+  buildNdrIçimExample(),
+  buildDallimExample(),
 ];
 
 export function getFunctionalMotivationMethodExampleV0_1(
   id: FunctionalMotivationMethodExampleIdV0_1 | "",
+  options: FunctionalMotivationMethodExampleProjectionOptionsV0_1 = {},
 ): FunctionalMotivationMethodExampleVMV0_1 | null {
+  if (id === "NDRIÇIM" && options.dAssociation && options.dAssociation !== "light") {
+    return buildNdrIçimExample(options.dAssociation);
+  }
+  if (id === "DALLIM" && options.dAssociation && options.dAssociation !== "division") {
+    return buildDallimExample(options.dAssociation);
+  }
   return id ? FUNCTIONAL_MOTIVATION_METHOD_EXAMPLES_V0_1.find((example) => example.id === id) ?? null : null;
 }
