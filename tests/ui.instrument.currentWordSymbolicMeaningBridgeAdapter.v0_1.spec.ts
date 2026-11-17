@@ -1,5 +1,6 @@
 import {
   buildCurrentWordGraphMeaningProjectionV0_1,
+  currentWordGraphMeaningSummaryV0_1,
   currentWordGraphMeaningNodesV0_1,
   currentWordGraphMeaningSourceSensesV0_1,
   type CurrentWordGraphMeaningEdgeDraftV0_1,
@@ -185,6 +186,64 @@ describe("current-word graph meaning adapter v0.1", () => {
       historicalOrigin: "NOT_CLAIMED",
       interpretationSelection: { mode: "no_single_winner", selectedCandidateId: null, userDecisionPosture: "user_decides" },
     });
+  });
+
+  it("projects one concise reading from computed mappings and keeps source alternatives unverified", () => {
+    const projection = build();
+    const sourceAlternative = {
+      optionId: "source-sense:kaikki:fixture:dallim:sense:difference:2",
+      sense: {
+        senseId: "source.dallim.difference",
+        label: "Sense 2 · noun",
+        definition: "difference",
+        claimLayer: "SOURCE_FACT" as const,
+        evidenceStatus: "CITATION_ENTERED_UNVERIFIED" as const,
+        sourceIds: ["kaikki:fixture:dallim"],
+        functionalFrame: "OTHER" as const,
+      },
+      source: {
+        sourceId: "kaikki:fixture:dallim",
+        label: "Albanian Kaikki snapshot · fixture",
+        url: "https://example.invalid/dallim",
+        locator: "dallim#Albanian",
+        citationStatus: "CITATION_ENTERED_UNVERIFIED" as const,
+        licensingStatus: "NOT_ASSESSED" as const,
+      },
+      sourceRecordId: "fixture:dallim",
+      entryLocator: "dallim#Albanian",
+      sourceSnapshotId: `fixture · SHA-256 ${"a".repeat(64)}`,
+    };
+    const summary = currentWordGraphMeaningSummaryV0_1({
+      targetWord: "DALLIM",
+      selectedSense: sense,
+      sourceAlternatives: [sourceAlternative],
+      projection,
+    });
+
+    expect(summary.meaning).toEqual({
+      kind: "USER_PROPOSAL",
+      text: "Act of distinguishing",
+      label: "Act of distinguishing",
+      definition: "The act of distinguishing things.",
+      evidenceStatus: "USER_PROPOSED",
+    });
+    expect(summary.contributions).toEqual([
+      { mappingId: "mapping-a", computedOutput: "initiated(division)", proposedRole: "an initiated distinction", evidenceStatus: "USER_PROPOSED" },
+      { mappingId: "mapping-i", computedOutput: "focused(linear flow)", proposedRole: "a focused distinction", evidenceStatus: "USER_PROPOSED" },
+    ]);
+    expect(summary.sourceMeanings).toEqual([{ text: "difference", citationStatus: "CITATION_ENTERED_UNVERIFIED" }]);
+    expect(summary.statusLabel).toBe("Proposal complete — not verified");
+    expect(summary).not.toHaveProperty("wholeWordExplanations");
+
+    const partial = build("d:division", { edges: [] });
+    const partialSummary = currentWordGraphMeaningSummaryV0_1({
+      targetWord: "DALLIM",
+      selectedSense: sense,
+      sourceAlternatives: [],
+      projection: partial,
+    });
+    expect(partialSummary.statusLabel).toBe("Explanation incomplete");
+    expect(partialSummary.missingDescription).toMatch(/relationship links/);
   });
 
   it("recomputes meaning when the selected spectrum operand changes", () => {
