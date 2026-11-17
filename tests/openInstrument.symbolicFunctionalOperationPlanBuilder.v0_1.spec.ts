@@ -218,6 +218,40 @@ function dallimInput(
         sourceIds: [],
       },
     ],
+    functionalRoleMappings: [
+      {
+        mappingId: "focused-division-contribution",
+        bridgeId: "focused-distinction",
+        symbolOutputId: "symbol:voice:a-initiates-d",
+        selectedSenseId,
+        functionCandidateId: "dalloj.distinguish-or-recognize",
+        compositionOperationId: "source-reported-dallim-action-link",
+        functionalRole: {
+          roleId: "initiated-separation",
+          label: "an initiated separation process",
+          claimLayer: "USER_PROPOSAL",
+          evidenceStatus: "USER_PROPOSED",
+          sourceIds: [],
+        },
+        relationType: "PROPOSED_CONTRIBUTES_TO_SELECTED_LEXICAL_FUNCTION",
+      },
+      {
+        mappingId: "alternative-focused-flow-contribution",
+        bridgeId: "attentive-separation-alternative",
+        symbolOutputId: "symbol:voice:i-focuses-second-l",
+        selectedSenseId,
+        functionCandidateId: "dalloj.distinguish-or-recognize",
+        compositionOperationId: "source-reported-dallim-action-link",
+        functionalRole: {
+          roleId: "focused-distinguishing-result",
+          label: "a focused distinguishing result",
+          claimLayer: "USER_PROPOSAL",
+          evidenceStatus: "USER_PROPOSED",
+          sourceIds: [],
+        },
+        relationType: "PROPOSED_CONTRIBUTES_TO_SELECTED_LEXICAL_FUNCTION",
+      },
+    ],
     unresolvedParts: [
       {
         claimId: "im-role-unresolved",
@@ -249,11 +283,32 @@ function syntheticNonDallimInput(): SymbolicFunctionalOperationPlanInputV0_1 {
     },
     sources: [],
     segmentationCandidates: [],
-    functionCandidates: [],
+    functionCandidates: [
+      {
+        candidateId: "synthetic.blu.function",
+        exactForm: "BLU",
+        sourceSenseId: "synthetic.blu.function-sense",
+        functionText: "a test-only synthetic function",
+        claimLayer: "USER_PROPOSAL",
+        evidenceStatus: "USER_PROPOSED",
+        sourceIds: [],
+      },
+    ],
     componentFunctionBindings: [],
     voiceRoleCandidates: [],
     consonantAssociationCandidates: [],
-    compositionOperations: [],
+    compositionOperations: [
+      {
+        operationId: "synthetic.blu.sense-function",
+        operationType: "ACTION_OF_VERB_FUNCTION",
+        candidateLabel: "Synthetic test relation",
+        targetSenseId: "synthetic.blu.sense",
+        functionCandidateId: "synthetic.blu.function",
+        operationStatus: "USER_PROPOSED",
+        evidenceStatus: "USER_PROPOSED",
+        relationSourceIds: [],
+      },
+    ],
     alternativeReadings: [],
     unresolvedClaims: [],
   };
@@ -298,6 +353,24 @@ function syntheticNonDallimInput(): SymbolicFunctionalOperationPlanInputV0_1 {
         claimLayer: "USER_PROPOSAL",
         evidenceStatus: "USER_PROPOSED",
         sourceIds: [],
+      },
+    ],
+    functionalRoleMappings: [
+      {
+        mappingId: "synthetic-growth-contribution",
+        bridgeId: "synthetic-bridge",
+        symbolOutputId: "symbol:voice:u-deepens-b",
+        selectedSenseId: "synthetic.blu.sense",
+        functionCandidateId: "synthetic.blu.function",
+        compositionOperationId: "synthetic.blu.sense-function",
+        functionalRole: {
+          roleId: "synthetic-transformed-growth",
+          label: "a transformed growth result",
+          claimLayer: "USER_PROPOSAL",
+          evidenceStatus: "USER_PROPOSED",
+          sourceIds: [],
+        },
+        relationType: "PROPOSED_CONTRIBUTES_TO_SELECTED_LEXICAL_FUNCTION",
       },
     ],
     unresolvedParts: [],
@@ -357,6 +430,48 @@ describe("symbolic functional operation plan builder v0.1", () => {
       ["PRIMARY", "USER_PROPOSED"],
       ["ALTERNATIVE", "USER_PROPOSED"],
     ]);
+    expect(result.functionalMotivation.status).toBe("MULTIPLE_PROPOSED");
+    expect(result.graphMeaningBridge).toMatchObject({
+      status: "MULTIPLE_PROPOSED",
+      selectedLexicalSense: {
+        senseId: "dallim.action-of-distinguishing",
+        evidenceStatus: "CITATION_ENTERED_UNVERIFIED",
+      },
+      interpretationSelection: { mode: "no_single_winner", selectedCandidateId: null, userDecisionPosture: "user_decides" },
+      sourceAuthorityPromotion: "NONE",
+    });
+    expect(result.graphMeaningBridge.mappings.map(({ graphOutput, selectedLexicalFunction, generatedContribution }) => ({
+      symbol: graphOutput.text,
+      functionCandidateId: selectedLexicalFunction.candidateId,
+      functionEvidence: selectedLexicalFunction.evidenceStatus,
+      relationClaimLayer: selectedLexicalFunction.compositionClaimLayer,
+      compositionEvidence: selectedLexicalFunction.compositionEvidenceStatus,
+      applicability: selectedLexicalFunction.linguisticApplicability,
+      generatedContribution,
+    }))).toEqual([
+      {
+        symbol: "initiated(division)",
+        functionCandidateId: "dalloj.distinguish-or-recognize",
+        functionEvidence: "CITATION_ENTERED_UNVERIFIED",
+        relationClaimLayer: "SOURCE_FACT",
+        compositionEvidence: "CITATION_ENTERED_UNVERIFIED",
+        applicability: "NOT_ASSESSED",
+        generatedContribution: expect.stringContaining("initiated(division)"),
+      },
+      {
+        symbol: "focused(linear flow)",
+        functionCandidateId: "dalloj.distinguish-or-recognize",
+        functionEvidence: "CITATION_ENTERED_UNVERIFIED",
+        relationClaimLayer: "SOURCE_FACT",
+        compositionEvidence: "CITATION_ENTERED_UNVERIFIED",
+        applicability: "NOT_ASSESSED",
+        generatedContribution: expect.stringContaining("focused(linear flow)"),
+      },
+    ]);
+    expect(result.graphMeaningBridge.wholeWordExplanations).toHaveLength(2);
+    expect(result.graphMeaningBridge.wholeWordExplanations.every(({ claimLayer, evidenceStatus, sourceIds }) =>
+      claimLayer === "USER_PROPOSAL" && evidenceStatus === "USER_PROPOSED" && sourceIds.length === 0,
+    )).toBe(true);
     expect(result.functionalMotivation.unresolvedParts[0]?.text).toContain("does not explain IM");
 
     const proposedSegmentation = result.sourceFunctionLayer.segmentations.find(({ candidateId }) => candidateId === "user-proposed-dall-plus-im");
@@ -407,6 +522,8 @@ describe("symbolic functional operation plan builder v0.1", () => {
     expect(division.evaluation.symbolicComposition.transformationText).toContain("division");
     expect(direction.evaluation.symbolicComposition.transformationText).toContain("direction");
     expect(direction.evaluation.symbolicComposition.transformationText).not.toBe(division.evaluation.symbolicComposition.transformationText);
+    expect(division.ok && division.graphMeaningBridge.wholeWordExplanations[0]?.text).toContain("initiated(division)");
+    expect(direction.ok && direction.graphMeaningBridge.wholeWordExplanations[0]?.text).toContain("initiated(direction)");
   });
 
   it("returns partial Null when an explicitly bound Voice event has no operand", () => {
@@ -419,6 +536,7 @@ describe("symbolic functional operation plan builder v0.1", () => {
     if (!result.ok || !result.evaluation.ok) return;
 
     expect(result.functionalMotivation.status).toBe("PARTIAL_NULL");
+    expect(result.graphMeaningBridge.status).toBe("PARTIAL_NULL");
     expect(result.evaluation.symbolicComposition.status).toBe("PARTIAL_NULL");
     expect(result.evaluation.symbolicComposition.reasonCodes).toContain(
       "VOICE_OPERATOR_INPUT_SYMBOL_UNAVAILABLE:symbol:selection:missing-operand",
@@ -434,6 +552,66 @@ describe("symbolic functional operation plan builder v0.1", () => {
     expect(result.functionalMotivation.reasonCodes).toContain("FUNCTIONAL_BRIDGE_MISSING_OR_UNRESOLVED");
     expect(result.evaluation.symbolicComposition.status).toBe("PARTIAL_NULL");
     expect(result.evaluation.symbolicComposition.expression).toBeNull();
+  });
+
+  it("does not treat bridge prose alone as a graph-to-meaning explanation", () => {
+    const result = buildSymbolicFunctionalOperationPlanV0_1({
+      ...dallimInput(),
+      functionalRoleMappings: [],
+    });
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+
+    expect(result.evaluation.ok && result.evaluation.symbolicComposition.status).toBe("MULTIPLE_PROPOSED");
+    expect(result.graphMeaningBridge.status).toBe("PARTIAL_NULL");
+    expect(result.graphMeaningBridge.wholeWordExplanations).toHaveLength(0);
+    expect(result.graphMeaningBridge.reasonCodes).toContain(
+      "GRAPH_MEANING_MAPPING_REQUIRED_FOR_BRIDGE:focused-distinction",
+    );
+    expect(result.functionalMotivation.status).toBe("PARTIAL_NULL");
+  });
+
+  it("returns partial Null for a role mapping that is disconnected from an evaluated graph output", () => {
+    const input = dallimInput();
+    const functionalRoleMappings = input.functionalRoleMappings?.map((mapping) =>
+      mapping.mappingId === "focused-division-contribution"
+        ? { ...mapping, symbolOutputId: "symbol:voice:missing-output" }
+        : mapping,
+    );
+    const result = buildSymbolicFunctionalOperationPlanV0_1({ ...input, functionalRoleMappings });
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+
+    expect(result.graphMeaningBridge.status).toBe("PARTIAL_NULL");
+    expect(result.graphMeaningBridge.unresolvedMappings).toContainEqual(expect.objectContaining({
+      mappingId: "focused-division-contribution",
+      reasonCodes: expect.arrayContaining([
+        "GRAPH_MEANING_MAPPING_GRAPH_OUTPUT_NOT_FOUND:focused-division-contribution",
+      ]),
+    }));
+    expect(result.functionalMotivation.status).toBe("PARTIAL_NULL");
+  });
+
+  it("requires the mapping to reference the selected lexical function relation", () => {
+    const input = dallimInput();
+    const functionalRoleMappings = input.functionalRoleMappings?.map((mapping) =>
+      mapping.mappingId === "focused-division-contribution"
+        ? { ...mapping, functionCandidateId: "unselected.lexical-function" }
+        : mapping,
+    );
+    const result = buildSymbolicFunctionalOperationPlanV0_1({ ...input, functionalRoleMappings });
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+
+    expect(result.graphMeaningBridge.status).toBe("PARTIAL_NULL");
+    expect(result.graphMeaningBridge.unresolvedMappings).toContainEqual(expect.objectContaining({
+      mappingId: "focused-division-contribution",
+      reasonCodes: expect.arrayContaining([
+        "GRAPH_MEANING_MAPPING_LEXICAL_FUNCTION_NOT_FOUND:focused-division-contribution",
+        "GRAPH_MEANING_MAPPING_SELECTED_FUNCTION_RELATION_NOT_FOUND:focused-division-contribution",
+      ]),
+    }));
+    expect(result.functionalMotivation.status).toBe("PARTIAL_NULL");
   });
 
   it("compiles a non-DALLIM synthetic input without a word-specific branch", () => {
@@ -453,6 +631,15 @@ describe("symbolic functional operation plan builder v0.1", () => {
     );
     expect(result.evaluation.historicalOrigin).toBe("NOT_CLAIMED");
     expect(result.evaluation.sourceAuthorityPromotion).toBe("NONE");
+    expect(result.graphMeaningBridge.status).toBe("COMPLETE_PROPOSED");
+    expect(result.graphMeaningBridge.wholeWordExplanations[0]?.text).toContain("deepened(growth)");
+    expect(result.graphMeaningBridge.mappings[0]?.selectedLexicalFunction).toMatchObject({
+      candidateId: "synthetic.blu.function",
+      evidenceStatus: "USER_PROPOSED",
+      compositionClaimLayer: "USER_PROPOSAL",
+      compositionEvidenceStatus: "USER_PROPOSED",
+      linguisticApplicability: "NOT_ASSESSED",
+    });
   });
 
   it("rejects a source-function layer whose target identity differs from the exact target", () => {
