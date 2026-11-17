@@ -12,6 +12,7 @@ import type {
   SymbolicCompositionOperationV0_3,
   SymbolicFunctionalCompositionResultV0_3,
 } from "@/shared/openInstrument/symbolicFunctionalComposition.v0_3";
+import { sameAlbanianSourceForm } from "@/ui/instrument/albanianSourceFormIdentity.v0_1";
 
 export type CurrentWordGraphMeaningNodeV0_1 = Readonly<{
   nodeId: string;
@@ -68,14 +69,14 @@ export function currentWordGraphMeaningNodeIdV0_1(
     : `voice:${reference.bindingId}`;
 }
 
-/** Only exact-form, source-attested Albanian records can populate the source-sense selector. */
+/** Only NFC/Albanian-locale exact-form, source-attested records can populate the source-sense selector. */
 export function currentWordGraphMeaningSourceSensesV0_1(
   exactSpelling: string,
   facts: readonly AlbanianKaikkiExactLexicalSourceFactV0_1[],
 ): CurrentWordGraphMeaningSourceSenseV0_1[] {
   const result: CurrentWordGraphMeaningSourceSenseV0_1[] = [];
   for (const fact of facts) {
-    if (fact.languageCode !== "sq" || fact.form !== exactSpelling || fact.attestationTruth !== "fact") continue;
+    if (fact.languageCode !== "sq" || !sameAlbanianSourceForm(fact.form, exactSpelling) || fact.attestationTruth !== "fact") continue;
     const sourceId = `kaikki:${fact.sourceRecordId}`;
     const source = {
       sourceId,

@@ -28,6 +28,7 @@ import { FjaloriCrossSourceEvidenceV0_1 } from "@/ui/instrument/sections/Fjalori
 import { CrossLanguageFunctionalMotivationWorkbenchV0_1 } from "@/ui/instrument/sections/CrossLanguageFunctionalMotivationWorkbenchV0_1";
 import { FunctionalMotivationMethodExamplesCardV0_1 } from "@/ui/instrument/sections/FunctionalMotivationMethodExamplesCardV0_1";
 import { CurrentWordSymbolicDraftV0_1 } from "@/ui/instrument/sections/CurrentWordSymbolicDraftV0_1";
+import { sameAlbanianSourceForm } from "@/ui/instrument/albanianSourceFormIdentity.v0_1";
 
 type DraftSegment = SingleWordFunctionalMotivationSegmentInputV0_1;
 type DraftTransformation = SingleWordFunctionalMotivationTransformationInputV0_1;
@@ -95,11 +96,6 @@ function transparencyLabel(value: SingleWordTransparencyV0_1): string {
 
 function displayVoicePath(path: readonly string[]): string {
   return path.length ? path.join(" → ") : "∅";
-}
-
-function sameAlbanianSourceForm(left: string, right: string): boolean {
-  return left.normalize("NFC").trim().toLocaleLowerCase("sq-AL") ===
-    right.normalize("NFC").trim().toLocaleLowerCase("sq-AL");
 }
 
 function isExactAlbanianEtymologyLinkV0_1(link: { sourceForm: string; reference: string }): boolean {

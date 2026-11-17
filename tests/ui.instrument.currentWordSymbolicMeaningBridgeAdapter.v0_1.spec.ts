@@ -101,7 +101,7 @@ describe("current-word graph meaning adapter v0.1", () => {
       physicalRecordOrdinal: 1,
       language: "Albanian",
       languageCode: "sq",
-      form: "DALLIM",
+      form: "dallim",
       partOfSpeech: "noun",
       senses: [{ senseId: "fixture.sense.1", glosses: ["act of distinguishing"] }],
       ipaObservations: [],
@@ -111,8 +111,13 @@ describe("current-word graph meaning adapter v0.1", () => {
       sourceSnapshot: { sourceFamilyId: "fixture", sourceUrl: "https://example.invalid/dallim", sha256: "a".repeat(64), bytes: 1 },
     }] as unknown as AlbanianKaikkiExactLexicalSourceFactV0_1[];
     const choices = currentWordGraphMeaningSourceSensesV0_1("DALLIM", facts);
+    const baseFact = facts[0]!;
 
     expect(currentWordGraphMeaningSourceSensesV0_1("DALLOJ", facts)).toEqual([]);
+    expect(currentWordGraphMeaningSourceSensesV0_1("DALLIM", [{ ...baseFact, form: "DALLOJ" }])).toEqual([]);
+    expect(currentWordGraphMeaningSourceSensesV0_1("GJITHÇKA", [{ ...baseFact, form: "GJITHC\u0327KA" }])).toHaveLength(1);
+    expect(currentWordGraphMeaningSourceSensesV0_1("DALLIM", [{ ...baseFact, languageCode: "en" } as unknown as AlbanianKaikkiExactLexicalSourceFactV0_1])).toEqual([]);
+    expect(currentWordGraphMeaningSourceSensesV0_1("DALLIM", [{ ...baseFact, attestationTruth: "candidate" } as unknown as AlbanianKaikkiExactLexicalSourceFactV0_1])).toEqual([]);
     expect(choices).toHaveLength(1);
     expect(choices[0]?.sense).toMatchObject({
       claimLayer: "SOURCE_FACT",
@@ -123,6 +128,11 @@ describe("current-word graph meaning adapter v0.1", () => {
     expect(choices[0]?.source).toMatchObject({
       citationStatus: "CITATION_ENTERED_UNVERIFIED",
       licensingStatus: "NOT_ASSESSED",
+    });
+    expect(choices[0]).toMatchObject({
+      sourceRecordId: "fixture:dallim",
+      entryLocator: "dallim#Albanian",
+      sourceSnapshotId: expect.stringContaining(`fixture · SHA-256 ${"a".repeat(64)}`),
     });
   });
 

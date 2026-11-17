@@ -15,6 +15,48 @@ function select(label: string, value: string) {
   fireEvent.change(screen.getByLabelText(label), { target: { value } });
 }
 
+function makeCurrentWordEvidence(options: Partial<{
+  analyzedWord: string;
+  sourceForm: string;
+  languageCode: string;
+  attestationTruth: string;
+  sourceLookupStatus: string;
+  inputLanguage: string;
+  inputProfile: string;
+}> = {}): SingleWordCurrentWordEvidenceContextV0_1 {
+  const analyzedWord = options.analyzedWord ?? "DALLIM";
+  const sourceForm = options.sourceForm ?? "dallim";
+  const normalizedSourceForm = sourceForm.normalize("NFC").trim().toLocaleLowerCase("sq-AL");
+  return {
+    analyzedWord,
+    discovery: {
+      kind: "present",
+      value: {
+        inputWord: analyzedWord,
+        inputLanguage: options.inputLanguage ?? "sq",
+        inputProfile: options.inputProfile ?? "albanian",
+        sourceFact: { language: "Albanian" },
+        exactLexicalSourceStatus: { status: options.sourceLookupStatus ?? "MATCHES_FOUND" },
+        exactLexicalSourceFacts: [{
+          languageCode: options.languageCode ?? "sq",
+          form: sourceForm,
+          attestationTruth: options.attestationTruth ?? "fact",
+          sourceStatus: "observed_external_snapshot",
+          sourceRecordId: `fixture:${normalizedSourceForm}`,
+          entryLocator: `${normalizedSourceForm}#Albanian`,
+          senses: [{ glosses: ["act of distinguishing"] }],
+          sourceSnapshot: {
+            sourceFamilyId: "fixture-source-family",
+            sourceUrl: "https://example.invalid/fixture.jsonl",
+            sha256: "a".repeat(64),
+            bytes: 1,
+          },
+        }],
+      },
+    },
+  } as unknown as SingleWordCurrentWordEvidenceContextV0_1;
+}
+
 function renderDraft(overrides: Partial<Parameters<typeof CurrentWordSymbolicDraftV0_1>[0]> = {}) {
   return render(
     <CurrentWordSymbolicDraftV0_1
@@ -230,37 +272,14 @@ describe("current-word symbolic draft v0.1", () => {
   });
 
   it("shows matching source meaning separately without using it as an operator or promoting authority", () => {
-    const currentWordEvidence = {
-      analyzedWord: "DALLIM",
-      discovery: {
-        kind: "present",
-        value: {
-          inputWord: "DALLIM",
-          inputLanguage: "sq",
-          inputProfile: "albanian",
-          sourceFact: { language: "Albanian" },
-          exactLexicalSourceStatus: { status: "MATCHES_FOUND" },
-          exactLexicalSourceFacts: [{
-            languageCode: "sq",
-            form: "DALLIM",
-            attestationTruth: "fact",
-            sourceStatus: "observed_external_snapshot",
-            sourceRecordId: "fixture:dallim",
-            entryLocator: "dallim#Albanian",
-            senses: [{ glosses: ["act of distinguishing"] }],
-            sourceSnapshot: {
-              sourceFamilyId: "fixture-source-family",
-              sourceUrl: "https://example.invalid/fixture.jsonl",
-              sha256: "a".repeat(64),
-              bytes: 1,
-            },
-          }],
-        },
-      },
-    } as unknown as SingleWordCurrentWordEvidenceContextV0_1;
+    const currentWordEvidence = makeCurrentWordEvidence();
     const { rerender } = renderDraft({ currentWordEvidence });
 
     expect(screen.getByTestId("current-word-symbolic-source-meaning")).toHaveTextContent("SOURCE_FACT");
+    expect(screen.getByTestId("current-word-symbolic-source-meaning")).toHaveTextContent("exact source form dallim");
+    expect(screen.getByTestId("current-word-symbolic-source-meaning")).toHaveTextContent("fixture:dallim");
+    expect(screen.getByTestId("current-word-symbolic-source-meaning")).toHaveTextContent("dallim#Albanian");
+    expect(screen.getByTestId("current-word-symbolic-source-meaning")).toHaveTextContent(`SHA-256 ${"a".repeat(64)}`);
     expect(screen.getByTestId("current-word-symbolic-source-meaning")).toHaveTextContent("act of distinguishing");
     const senseSelector = screen.getByLabelText("Lexical sense for current-word graph meaning");
     expect(senseSelector).toHaveValue("");
@@ -272,6 +291,9 @@ describe("current-word symbolic draft v0.1", () => {
 
     fireEvent.change(senseSelector, { target: { value: sourceSenseOption } });
     expect(screen.getByTestId("current-word-graph-selected-sense")).toHaveTextContent("SOURCE_FACT · CITATION_ENTERED_UNVERIFIED");
+    expect(screen.getByTestId("current-word-graph-selected-sense")).toHaveTextContent("fixture:dallim");
+    expect(screen.getByTestId("current-word-graph-selected-sense")).toHaveTextContent("dallim#Albanian");
+    expect(screen.getByTestId("current-word-graph-selected-sense")).toHaveTextContent(`fixture-source-family · SHA-256 ${"a".repeat(64)}`);
     expect(screen.getByTestId("current-word-graph-selected-sense")).toHaveTextContent("licensing NOT_ASSESSED");
     expect(screen.getByLabelText("Proposed functional form or function")).toHaveValue("");
 
@@ -289,6 +311,53 @@ describe("current-word symbolic draft v0.1", () => {
     expect(screen.getByLabelText("Lexical sense for current-word graph meaning")).toHaveValue("");
     expect(screen.queryByRole("option", { name: /Sense 1 .*act of distinguishing/ })).not.toBeInTheDocument();
     expect(screen.getByTestId("current-word-graph-selected-sense-null")).toHaveTextContent("UNKNOWN_OR_NULL");
+  });
+
+  it("accepts NFC-equivalent Albanian source spelling without changing its source record", () => {
+    const analyzedWord = "GJITHÇKA";
+    const currentWordEvidence = makeCurrentWordEvidence({
+      analyzedWord,
+      sourceForm: "GJITHC\u0327KA",
+    });
+    render(
+      <CurrentWordSymbolicDraftV0_1
+        analyzedWord={analyzedWord}
+        draftTargetWord={analyzedWord}
+        targetLanguage=""
+        targetDialect=""
+        currentWordEvidence={currentWordEvidence}
+      />,
+    );
+
+    expect(screen.getByTestId("current-word-symbolic-source-meaning")).toHaveTextContent("SOURCE_FACT");
+    expect(screen.getByTestId("current-word-symbolic-source-meaning")).toHaveTextContent("GJITHC\u0327KA");
+    expect(screen.getByTestId("current-word-symbolic-source-meaning")).toHaveTextContent("act of distinguishing");
+    expect(screen.getByTestId("current-word-symbolic-source-meaning")).toHaveTextContent("fixture:gjithçka");
+  });
+
+  it("withholds unrelated, non-fact, non-Albanian, nonmatching-status, and identity-mismatched source records", () => {
+    const { rerender } = renderDraft({ currentWordEvidence: makeCurrentWordEvidence({ sourceForm: "DALLOJ" }) });
+    const sourceMeaning = () => screen.getByTestId("current-word-symbolic-source-meaning");
+    const sourceSenseOption = () => screen.queryByRole("option", { name: /Sense 1 .*act of distinguishing/ });
+
+    expect(sourceMeaning()).not.toHaveTextContent("SOURCE_FACT");
+    expect(sourceSenseOption()).not.toBeInTheDocument();
+
+    rerender(<CurrentWordSymbolicDraftV0_1 analyzedWord="DALLIM" draftTargetWord="DALLIM" targetLanguage="" targetDialect="" currentWordEvidence={makeCurrentWordEvidence({ sourceLookupStatus: "SOURCE_NOT_FOUND" })} />);
+    expect(sourceMeaning()).not.toHaveTextContent("SOURCE_FACT");
+    expect(sourceSenseOption()).not.toBeInTheDocument();
+
+    rerender(<CurrentWordSymbolicDraftV0_1 analyzedWord="DALLIM" draftTargetWord="DALLIM" targetLanguage="" targetDialect="" currentWordEvidence={makeCurrentWordEvidence({ attestationTruth: "candidate" })} />);
+    expect(sourceMeaning()).not.toHaveTextContent("SOURCE_FACT");
+    expect(sourceSenseOption()).not.toBeInTheDocument();
+
+    rerender(<CurrentWordSymbolicDraftV0_1 analyzedWord="DALLIM" draftTargetWord="DALLIM" targetLanguage="English" targetDialect="" currentWordEvidence={makeCurrentWordEvidence()} />);
+    expect(sourceMeaning()).toHaveTextContent("source evidence withheld");
+    expect(sourceSenseOption()).not.toBeInTheDocument();
+
+    rerender(<CurrentWordSymbolicDraftV0_1 analyzedWord="DALLIM" draftTargetWord="DALLIM" targetLanguage="sq" targetDialect="Tosk" currentWordEvidence={makeCurrentWordEvidence()} />);
+    expect(sourceMeaning()).toHaveTextContent("source evidence withheld");
+    expect(sourceSenseOption()).not.toBeInTheDocument();
   });
 
   it("clears selections when the parent workbench word, language, or dialect identity changes", () => {

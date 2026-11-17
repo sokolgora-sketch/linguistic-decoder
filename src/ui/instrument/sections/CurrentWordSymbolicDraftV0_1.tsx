@@ -9,6 +9,7 @@ import {
 } from "@/shared/openInstrument/symbolicFunctionalComposition.v0_3";
 import { CurrentWordSymbolicGraphMeaningV0_1 } from "@/ui/instrument/sections/CurrentWordSymbolicGraphMeaningV0_1";
 import type { SymbolicFunctionalOperationPlanInputV0_1 } from "@/shared/openInstrument/symbolicFunctionalOperationPlanBuilder.v0_1";
+import { sameAlbanianSourceForm } from "@/ui/instrument/albanianSourceFormIdentity.v0_1";
 import type { SingleWordCurrentWordEvidenceContextV0_1 } from "@/ui/instrument/sections/SingleWordMotivationWorkbenchV0_1";
 
 export type CurrentWordSymbolicVoiceDraftV0_1 = Readonly<{
@@ -144,7 +145,7 @@ function sourceFactsForWord(
   if (!discovery || !sourceIdentityMatchesDraft(discovery, targetLanguage, targetDialect) ||
       !discoveryIdentifiesAlbanian(discovery) || discovery.exactLexicalSourceStatus?.status !== "MATCHES_FOUND") return [];
   return (discovery.exactLexicalSourceFacts ?? []).filter((fact) =>
-    fact.languageCode === "sq" && fact.form === analyzedWord && fact.attestationTruth === "fact",
+    fact.languageCode === "sq" && sameAlbanianSourceForm(fact.form, analyzedWord) && fact.attestationTruth === "fact",
   );
 }
 
