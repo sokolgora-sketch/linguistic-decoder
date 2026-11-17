@@ -23,6 +23,7 @@ function makeCurrentWordEvidence(options: Partial<{
   sourceLookupStatus: string;
   inputLanguage: string;
   inputProfile: string;
+  sourceSenses: string[];
 }> = {}): SingleWordCurrentWordEvidenceContextV0_1 {
   const analyzedWord = options.analyzedWord ?? "DALLIM";
   const sourceForm = options.sourceForm ?? "dallim";
@@ -44,7 +45,7 @@ function makeCurrentWordEvidence(options: Partial<{
           sourceStatus: "observed_external_snapshot",
           sourceRecordId: `fixture:${normalizedSourceForm}`,
           entryLocator: `${normalizedSourceForm}#Albanian`,
-          senses: [{ glosses: ["act of distinguishing"] }],
+          senses: (options.sourceSenses ?? ["act of distinguishing"]).map((gloss) => ({ glosses: [gloss] })),
           sourceSnapshot: {
             sourceFamilyId: "fixture-source-family",
             sourceUrl: "https://example.invalid/fixture.jsonl",
@@ -220,7 +221,7 @@ describe("current-word symbolic draft v0.1", () => {
     expect(screen.getByTestId("current-word-graph-provenance")).toHaveTextContent(/source-authority promotion: NONE/i);
     expect(screen.getByTestId("current-word-graph-decision")).toHaveTextContent("Interpretation remains with the user");
     expect(screen.getByTestId("current-word-graph-decision")).toHaveTextContent("none is chosen automatically");
-    expect(screen.getByTestId("current-word-graph-decision")).not.toHaveTextContent(/winner|rank/i);
+    expect(screen.getByTestId("current-word-graph-summary")).not.toHaveTextContent(/winner|rank/i);
     expect(screen.getByTestId("current-word-symbolic-result")).not.toHaveTextContent("initiated(");
     expect(screen.getByTestId("current-word-symbolic-result")).toHaveTextContent("Source-authority promotion: NONE");
   });
@@ -284,17 +285,23 @@ describe("current-word symbolic draft v0.1", () => {
     const senseSelector = screen.getByLabelText("Lexical sense for current-word graph meaning");
     expect(senseSelector).toHaveValue("");
     const sourceSenseOption = "source-sense:kaikki:fixture:dallim:sense:ordinal-1:1";
-    expect(screen.getByRole("option", { name: /Sense 1 .*act of distinguishing .*CITATION_ENTERED_UNVERIFIED/ })).toBeInTheDocument();
+    expect(screen.getByRole("option", { name: /Source-reported .*act of distinguishing .*Source citation not independently verified/ })).toBeInTheDocument();
     expect(screen.getByTestId("current-word-symbolic-result")).toHaveTextContent("Source-authority promotion: NONE");
     expect(screen.getByTestId("current-word-symbolic-whole-word-status")).toHaveTextContent("UNKNOWN_OR_NULL");
     expect(screen.getByTestId("current-word-symbolic-result")).not.toHaveTextContent("act of distinguishing");
 
     fireEvent.change(senseSelector, { target: { value: sourceSenseOption } });
+    expect(screen.getByTestId("current-word-graph-summary-meaning")).toHaveTextContent("Source-reported meaning: act of distinguishing");
+    expect(screen.getByTestId("current-word-graph-summary-meaning")).toHaveTextContent("Source citation not independently verified");
+    const evidenceDetails = screen.getByTestId("current-word-graph-details");
+    expect(evidenceDetails).not.toHaveAttribute("open");
+    fireEvent.click(screen.getByText("View detailed analysis and evidence"));
     expect(screen.getByTestId("current-word-graph-selected-sense")).toHaveTextContent("SOURCE_FACT · CITATION_ENTERED_UNVERIFIED");
     expect(screen.getByTestId("current-word-graph-selected-sense")).toHaveTextContent("fixture:dallim");
-    expect(screen.getByTestId("current-word-graph-selected-sense")).toHaveTextContent("dallim#Albanian");
-    expect(screen.getByTestId("current-word-graph-selected-sense")).toHaveTextContent(`fixture-source-family · SHA-256 ${"a".repeat(64)}`);
-    expect(screen.getByTestId("current-word-graph-selected-sense")).toHaveTextContent("licensing NOT_ASSESSED");
+    expect(screen.getByTestId("current-word-graph-source-record")).toHaveTextContent("dallim#Albanian");
+    expect(screen.getByTestId("current-word-graph-source-record")).toHaveTextContent(`fixture-source-family · SHA-256 ${"a".repeat(64)}`);
+    expect(screen.getByTestId("current-word-graph-source-record")).toHaveTextContent("licensing: NOT_ASSESSED");
+    expect(screen.getByTestId("current-word-graph-source-record")).toHaveTextContent("CITATION_ENTERED_UNVERIFIED");
     expect(screen.getByLabelText("Proposed functional form or function")).toHaveValue("");
 
     rerender(
@@ -311,6 +318,19 @@ describe("current-word symbolic draft v0.1", () => {
     expect(screen.getByLabelText("Lexical sense for current-word graph meaning")).toHaveValue("");
     expect(screen.queryByRole("option", { name: /Sense 1 .*act of distinguishing/ })).not.toBeInTheDocument();
     expect(screen.getByTestId("current-word-graph-selected-sense-null")).toHaveTextContent("UNKNOWN_OR_NULL");
+  });
+
+  it("keeps an unverified source alternative distinct beside a user-proposed reading", () => {
+    renderDraft({ currentWordEvidence: makeCurrentWordEvidence({ sourceSenses: ["act of distinguishing", "difference"] }) });
+    select("Lexical sense for current-word graph meaning", "USER_PROPOSED");
+    fireEvent.change(screen.getByLabelText("Proposed lexical sense label"), { target: { value: "Act of distinguishing" } });
+    fireEvent.change(screen.getByLabelText("Proposed sense definition"), { target: { value: "The act of distinguishing things." } });
+
+    const summary = screen.getByTestId("current-word-graph-summary");
+    expect(summary).toHaveTextContent("Your proposed reading: Act of distinguishing");
+    expect(summary).toHaveTextContent("Source also records: difference");
+    expect(summary).toHaveTextContent("Source citation not independently verified");
+    expect(summary).not.toHaveTextContent("SOURCE_FACT");
   });
 
   it("accepts NFC-equivalent Albanian source spelling without changing its source record", () => {
@@ -405,18 +425,40 @@ describe("current-word symbolic draft v0.1", () => {
     completeDallimGraphMeaningDraft();
 
     expect(screen.getAllByTestId("current-word-symbolic-computed-output")[0]).toHaveTextContent("initiated(division)");
+    const summary = screen.getByTestId("current-word-graph-summary");
+    const details = screen.getByTestId("current-word-graph-details");
+    expect(details).not.toHaveAttribute("open");
+    expect(summary).toHaveTextContent("DALLIM");
+    expect(summary).toHaveTextContent("Your proposed reading: Act of distinguishing");
+    expect(summary).toHaveTextContent("initiated(division) → an initiated distinction");
+    expect(summary).toHaveTextContent("focused(linear flow) → a focused distinction");
+    expect(summary).toHaveTextContent("Proposal complete — not verified");
+    expect(summary).toHaveTextContent("No interpretation is selected automatically");
+    expect(summary.querySelectorAll('[data-testid="current-word-graph-summary-contribution"]')).toHaveLength(2);
+    expect(summary).not.toHaveTextContent("GENERATED CONTRIBUTION");
+    expect(summary).not.toHaveTextContent("whole-word explanatory bridge");
+
     expect(screen.getAllByTestId("current-word-graph-generated-contribution")).toHaveLength(2);
     expect(screen.getByTestId("current-word-symbolic-whole-word-status")).toHaveTextContent("COMPLETE_PROPOSED");
     expect(screen.getByTestId("current-word-symbolic-graph-status")).toHaveTextContent("COMPLETE_PROPOSED");
-    expect(screen.getByTestId("current-word-graph-whole-word-explanation")).toHaveTextContent("initiated(division)");
-    expect(screen.getByTestId("current-word-graph-whole-word-explanation")).toHaveTextContent("focused(linear flow)");
+    expect(screen.getByTestId("current-word-graph-whole-word-explanation")).toHaveTextContent("composed from the unique generated contributions");
     expect(screen.getByTestId("current-word-graph-selected-sense")).toHaveTextContent("USER_PROPOSAL · USER_PROPOSED");
     expect(screen.getByTestId("current-word-graph-provenance")).toHaveTextContent("Linguistic applicability: NOT_ASSESSED");
     expect(screen.getByTestId("current-word-graph-provenance")).toHaveTextContent("Source-authority promotion: NONE");
     expect(screen.getByTestId("current-word-graph-decision")).toHaveTextContent("Interpretation remains with the user");
     expect(screen.getByTestId("current-word-graph-decision")).toHaveTextContent("none is chosen automatically");
 
+    fireEvent.click(screen.getByText("View detailed analysis and evidence"));
+    expect(details).toHaveAttribute("open");
+    expect(details).toHaveTextContent("no_single_winner");
+    expect(details).toHaveTextContent("user_decides");
+    expect(details).toHaveTextContent("Source-authority promotion: NONE");
+    expect(details).toHaveTextContent("The selected graph is a user-proposed reading of distinguishing.");
+    expect(details).toHaveTextContent("INITIATE / GROUND(division) → initiated(division)");
+
     select("Spectrum association for D at position 0", LIGHT);
+    expect(screen.getByTestId("current-word-graph-summary")).toHaveTextContent("initiated(light) → an initiated distinction");
+    expect(screen.getByTestId("current-word-graph-summary")).not.toHaveTextContent("initiated(division)");
     expect(screen.getAllByTestId("current-word-graph-generated-contribution")[0]).toHaveTextContent("initiated(light)");
     expect(screen.getAllByTestId("current-word-graph-generated-contribution").map(({ textContent }) => textContent).join(" "))
       .not.toContain("initiated(division)");
@@ -436,6 +478,8 @@ describe("current-word symbolic draft v0.1", () => {
     fireEvent.change(screen.getByLabelText("Whole-word explanatory bridge 1"), { target: { value: "Free text does not complete the graph." } });
 
     expect(screen.getByTestId("current-word-symbolic-graph-status")).toHaveTextContent("PARTIAL_NULL");
+    expect(screen.getByTestId("current-word-graph-plain-status")).toHaveTextContent("Explanation incomplete");
+    expect(screen.getByTestId("current-word-graph-summary-missing")).toHaveTextContent("relationship links");
     expect(screen.getByTestId("current-word-graph-whole-word-null")).toBeInTheDocument();
     expect(screen.getByTestId("current-word-graph-user-bridge-text")).toHaveTextContent("USER_PROPOSED");
     expect(screen.queryByTestId("current-word-graph-whole-word-explanation")).not.toBeInTheDocument();
@@ -449,6 +493,7 @@ describe("current-word symbolic draft v0.1", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "Remove relationship 2" }));
     expect(screen.getByTestId("current-word-symbolic-graph-status")).toHaveTextContent("PARTIAL_NULL");
+    expect(screen.getByTestId("current-word-graph-plain-status")).toHaveTextContent("Explanation incomplete");
     expect(screen.queryByTestId("current-word-graph-whole-word-explanation")).not.toBeInTheDocument();
   });
 
@@ -458,11 +503,14 @@ describe("current-word symbolic draft v0.1", () => {
     completeDallimGraphMeaningDraft();
     fireEvent.click(screen.getByRole("button", { name: "Remove role mapping 1" }));
     expect(screen.getAllByTestId("current-word-graph-generated-contribution")).toHaveLength(1);
+    expect(screen.getAllByTestId("current-word-graph-summary-contribution")).toHaveLength(1);
     expect(screen.getAllByTestId("current-word-graph-generated-contribution").map(({ textContent }) => textContent).join(" "))
       .not.toContain("initiated(division)");
 
     fireEvent.click(screen.getByRole("button", { name: "Remove role mapping 1" }));
     expect(screen.getByTestId("current-word-symbolic-graph-status")).toHaveTextContent("PARTIAL_NULL");
+    expect(screen.getByTestId("current-word-graph-summary-contribution-null")).toHaveTextContent("Not established — no valid computed contribution is available.");
+    expect(screen.getByTestId("current-word-graph-contribution-null")).toHaveTextContent("UNKNOWN_OR_NULL · no valid computed contribution.");
     expect(screen.queryByTestId("current-word-graph-whole-word-explanation")).not.toBeInTheDocument();
   });
 
@@ -479,6 +527,9 @@ describe("current-word symbolic draft v0.1", () => {
     rerender(<CurrentWordSymbolicDraftV0_1 analyzedWord="DALLIM" draftTargetWord="DALLOJ" targetLanguage="Albanian" targetDialect="Standard Albanian" />);
     expect(screen.getByTestId("current-word-graph-identity-null")).toBeInTheDocument();
     expect(screen.getByTestId("current-word-symbolic-whole-word-status")).toHaveTextContent("UNKNOWN_OR_NULL");
+    expect(screen.getByTestId("current-word-graph-summary-meaning-null")).toHaveTextContent("Not established");
+    expect(screen.getByTestId("current-word-graph-summary-missing")).toHaveTextContent("identity-bound explanation is withheld");
+    expect(screen.getByTestId("current-word-graph-summary")).not.toHaveTextContent("Act of distinguishing");
     expect(screen.queryByTestId("current-word-graph-user-bridge-text")).not.toBeInTheDocument();
     expect(screen.queryByTestId("current-word-graph-selected-sense")).not.toBeInTheDocument();
   });

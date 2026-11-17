@@ -57,6 +57,100 @@ export type CurrentWordGraphMeaningProjectionV0_1 = Readonly<{
   reasonCodes: readonly string[];
 }>;
 
+export type CurrentWordGraphMeaningSummaryV0_1 = Readonly<{
+  targetWord: string;
+  meaning: Readonly<{
+    kind: "SOURCE_FACT" | "USER_PROPOSAL";
+    text: string;
+    label: string;
+    definition: string;
+    evidenceStatus: "CITATION_ENTERED_UNVERIFIED" | "USER_PROPOSED";
+  }> | null;
+  contributions: readonly Readonly<{
+    mappingId: string;
+    computedOutput: string;
+    proposedRole: string;
+    evidenceStatus: "USER_PROPOSED";
+  }> [];
+  sourceMeanings: readonly Readonly<{
+    text: string;
+    citationStatus: "CITATION_ENTERED_UNVERIFIED";
+  }> [];
+  statusLabel: string;
+  missingDescription: string | null;
+}>;
+
+/** Builds the short UI readout from the selected sense and evaluated builder mappings. */
+export function currentWordGraphMeaningSummaryV0_1(input: Readonly<{
+  targetWord: string;
+  selectedSense: SymbolicFunctionalSenseV0_1 | null;
+  sourceAlternatives: readonly CurrentWordGraphMeaningSourceSenseV0_1[];
+  projection: CurrentWordGraphMeaningProjectionV0_1;
+}>): CurrentWordGraphMeaningSummaryV0_1 {
+  const plan = input.projection.plan;
+  const bridge = plan?.ok ? plan.graphMeaningBridge : null;
+  const reasonCodes = input.projection.reasonCodes;
+  const selectedMeaningForms = new Set(
+    input.selectedSense
+      ? [input.selectedSense.label, input.selectedSense.definition]
+          .map((text) => text.normalize("NFC").trim().toLowerCase())
+      : [],
+  );
+  let missingDescription: string | null = null;
+  if (input.projection.status === "PARTIAL_NULL") {
+    if (reasonCodes.includes("CURRENT_WORD_IDENTITY_MISMATCH")) {
+      missingDescription = "The draft word does not match the analyzed word; its identity-bound explanation is withheld.";
+    } else if (!input.selectedSense || reasonCodes.includes("SELECTED_TARGET_SENSE_REQUIRED")) {
+      missingDescription = "Choose a source meaning or enter your own proposed reading.";
+    } else if (reasonCodes.some((reason) => reason.startsWith("FUNCTIONAL_EDGE_DRAFT_INCOMPLETE") || reason.startsWith("TRANSFORMATION_REQUIRES_RELATIONS"))) {
+      missingDescription = "Complete the missing relationship links in the symbolic graph.";
+    } else if (reasonCodes.some((reason) => reason.startsWith("GRAPH_MEANING_MAPPING") || reason === "GRAPH_MEANING_ROLE_MAPPING_REQUIRED")) {
+      missingDescription = "Complete at least one computed-output mapping to a proposed functional role.";
+    } else if (reasonCodes.includes("USER_PROPOSED_FUNCTION_FORM_AND_DESCRIPTION_REQUIRED")) {
+      missingDescription = "Add a proposed function and its description.";
+    } else if (reasonCodes.includes("FUNCTION_RELATION_KIND_NOT_SELECTED")) {
+      missingDescription = "Choose how the proposed function relates to the selected meaning.";
+    } else if (reasonCodes.some((reason) => reason.includes("BRIDGE_MISSING_OR_UNRESOLVED"))) {
+      missingDescription = "Add a whole-word bridge proposal.";
+    } else {
+      missingDescription = "A required graph dependency is incomplete; see the detailed analysis and evidence.";
+    }
+  }
+
+  const statusLabel = input.projection.status === "COMPLETE_PROPOSED"
+    ? "Proposal complete — not verified"
+    : input.projection.status === "MULTIPLE_PROPOSED"
+      ? "Multiple proposals remain — not verified"
+      : "Explanation incomplete";
+
+  return {
+    targetWord: input.targetWord,
+    meaning: input.selectedSense ? {
+      kind: input.selectedSense.claimLayer,
+      text: input.selectedSense.claimLayer === "USER_PROPOSAL"
+        ? input.selectedSense.label
+        : input.selectedSense.definition,
+      label: input.selectedSense.label,
+      definition: input.selectedSense.definition,
+      evidenceStatus: input.selectedSense.evidenceStatus,
+    } : null,
+    contributions: bridge?.mappings.map((mapping) => ({
+      mappingId: mapping.mappingId,
+      computedOutput: mapping.graphOutput.text,
+      proposedRole: mapping.functionalRole.label,
+      evidenceStatus: mapping.evidenceStatus,
+    })) ?? [],
+    sourceMeanings: input.sourceAlternatives.filter(({ sense }) =>
+      !selectedMeaningForms.has(sense.definition.normalize("NFC").trim().toLowerCase()),
+    ).map(({ sense, source }) => ({
+      text: sense.definition,
+      citationStatus: source.citationStatus,
+    })),
+    statusLabel,
+    missingDescription,
+  };
+}
+
 function sortedUnique(values: readonly string[]): string[] {
   return [...new Set(values)].sort((left, right) => left.localeCompare(right));
 }

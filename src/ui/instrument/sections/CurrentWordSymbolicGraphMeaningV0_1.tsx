@@ -9,6 +9,7 @@ import type {
 } from "@/shared/openInstrument/symbolicFunctionalComposition.v0_3";
 import {
   buildCurrentWordGraphMeaningProjectionV0_1,
+  currentWordGraphMeaningSummaryV0_1,
   currentWordGraphMeaningNodesV0_1,
   currentWordGraphMeaningSourceSensesV0_1,
   type CurrentWordGraphMeaningBridgeDraftV0_1,
@@ -19,10 +20,6 @@ import {
 const fieldClass = "mt-1 w-full min-w-0 rounded border border-[#46505c] bg-[#0d1117] px-2 py-1.5 text-sm text-[#f5f7fb] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#d8bb7a]";
 const labelClass = "block min-w-0 text-xs font-medium text-[#c5ced8]";
 const cardClass = "mt-2 min-w-0 rounded border border-[#38433a] p-2 text-xs leading-5";
-
-function selectedSenseDescription(sense: Readonly<{ label: string; definition: string; claimLayer: string; evidenceStatus: string }>): string {
-  return `${sense.claimLayer} · ${sense.evidenceStatus} · ${sense.label}: ${sense.definition}`;
-}
 
 export function CurrentWordSymbolicGraphMeaningV0_1({
   analyzedWord,
@@ -135,10 +132,15 @@ export function CurrentWordSymbolicGraphMeaningV0_1({
     : [];
   const availableBridges = bridges.filter(({ role, text }) => role && text.trim());
   const planBridge = plan?.ok ? plan.graphMeaningBridge : null;
-  const displayedWholeWordStatus = selectedSense && projection.status !== "PARTIAL_NULL"
-    ? projection.status
-    : "PARTIAL_NULL · UNKNOWN_OR_NULL";
-
+  const sourceAlternatives = sourceSenseChoices.filter(({ sense }) => sense.senseId !== selectedSense?.senseId);
+  const sourceRecords = [...new Map(sourceSenseChoices.map((choice) => [choice.sourceRecordId, choice])).values()];
+  const summary = currentWordGraphMeaningSummaryV0_1({
+    targetWord: analyzedWord,
+    selectedSense,
+    sourceAlternatives,
+    projection,
+  });
+  const nodeTextById = new Map(nodes.map(({ nodeId, text }) => [nodeId, text]));
   const addRowId = (prefix: string) => {
     const next = rowSequence + 1;
     setRowSequence(next);
@@ -174,7 +176,7 @@ export function CurrentWordSymbolicGraphMeaningV0_1({
         <h5 className="font-semibold text-[#f5f7fb]">1. Select a lexical sense</h5>
         {sourceSenseChoices.length === 0 && identityMatches ? (
           <p className="mt-1 text-[#aeb7c5]" data-testid="current-word-graph-source-sense-unavailable">
-            No exact-form source sense is available in the current analysis context for this language and dialect. You may enter a separate USER_PROPOSED sense; this does not assert an attested meaning.
+            No exact-form source sense is available in the current analysis context for this language and dialect. You may enter your own proposed meaning; this does not assert an attested meaning.
           </p>
         ) : null}
         <label className={labelClass}>
@@ -198,36 +200,33 @@ export function CurrentWordSymbolicGraphMeaningV0_1({
           >
             <option value="">Choose a source sense or a user proposal</option>
             {sourceSenseChoices.map(({ optionId, sense }) => (
-              <option key={optionId} value={optionId}>{sense.label} · {sense.definition} · CITATION_ENTERED_UNVERIFIED</option>
+              <option key={optionId} value={optionId}>Source-reported · {sense.definition} · Source citation not independently verified</option>
             ))}
-            <option value="USER_PROPOSED">Enter a USER_PROPOSED lexical sense</option>
+            <option value="USER_PROPOSED">Enter your proposed reading</option>
           </select>
         </label>
 
         {userSenseSelected ? (
           <div className="mt-2 grid min-w-0 gap-2 sm:grid-cols-2" data-testid="current-word-graph-user-sense-fields">
             <label className={labelClass}>
-              Proposed lexical sense label · USER_PROPOSED
+              Proposed lexical sense label
               <input aria-label="Proposed lexical sense label" className={fieldClass} value={proposedSenseLabel} disabled={!identityMatches} onChange={(event) => setProposedSenseLabel(event.target.value)} />
             </label>
             <label className={labelClass}>
-              Proposed sense definition · USER_PROPOSED
+              Proposed sense definition
               <textarea aria-label="Proposed sense definition" className={fieldClass} rows={2} value={proposedSenseDefinition} disabled={!identityMatches} onChange={(event) => setProposedSenseDefinition(event.target.value)} />
             </label>
           </div>
         ) : null}
 
         {selectedSense ? (
-          <div className="mt-2 break-words" data-testid="current-word-graph-selected-sense">
-            Selected lexical sense: {selectedSenseDescription(selectedSense)}
-            {selectedSourceSense ? (
-              <div className="mt-1 text-[#aeb7c5]">
-                Source: {selectedSourceSense.source.label} · {selectedSourceSense.sourceRecordId} · {selectedSourceSense.entryLocator} · {selectedSourceSense.sourceSnapshotId} · licensing {selectedSourceSense.source.licensingStatus}
-              </div>
-            ) : null}
+          <div className="mt-2 break-words" data-testid="current-word-graph-selected-sense-indicator">
+            {selectedSourceSense
+              ? "A source-reported meaning is selected. Its citation has not been independently verified."
+              : "Your proposed meaning is selected."}
           </div>
         ) : (
-          <p className="mt-2 text-[#aeb7c5]" data-testid="current-word-graph-selected-sense-null">Selected lexical sense: UNKNOWN_OR_NULL · no sense selected or proposed.</p>
+          <p className="mt-2 text-[#aeb7c5]" data-testid="current-word-graph-selected-sense-indicator-empty">Meaning not established. Choose a source meaning or enter your own proposal.</p>
         )}
       </div>
 
@@ -236,11 +235,11 @@ export function CurrentWordSymbolicGraphMeaningV0_1({
         <p className="mt-1 text-[#aeb7c5]">These fields are always user-authored. A source-reported whole-word sense does not make this function or relation source-established.</p>
         <div className="mt-2 grid min-w-0 gap-2 sm:grid-cols-2">
           <label className={labelClass}>
-            Proposed functional form / function · USER_PROPOSED
+            Your proposed functional form / function
             <input aria-label="Proposed functional form or function" className={fieldClass} value={functionForm} disabled={!identityMatches} onChange={(event) => setFunctionForm(event.target.value)} />
           </label>
           <label className={labelClass}>
-            Proposed function description · USER_PROPOSED
+            Your proposed function description
             <textarea aria-label="Proposed function description" className={fieldClass} rows={2} value={functionDescription} disabled={!identityMatches} onChange={(event) => setFunctionDescription(event.target.value)} />
           </label>
         </div>
@@ -369,47 +368,173 @@ export function CurrentWordSymbolicGraphMeaningV0_1({
       </> : null}
 
       <div className="mt-2 min-w-0 rounded border border-[#746541] bg-[#18140e] p-2" data-testid="current-word-graph-meaning-result">
-        <h5 className="font-semibold text-[#f0ddb0]">Typed graph-to-meaning result</h5>
-        <p data-testid="current-word-symbolic-whole-word-status">
-          Whole-word functional motivation: {displayedWholeWordStatus}{selectedSense ? " · user decision required" : " · UNKNOWN_OR_NULL"}
-        </p>
-        <p data-testid="current-word-symbolic-graph-status">
-          Graph-to-meaning: {projection.status}{projection.reasonCodes.length ? ` · ${projection.reasonCodes.join(" · ")}` : ""}
-        </p>
-        {planBridge?.mappings.length ? planBridge.mappings.map((mapping) => (
-          <div key={mapping.mappingId} className="mt-2 break-words" data-testid="current-word-graph-generated-contribution">
-            GENERATED CONTRIBUTION · USER_PROPOSAL / USER_PROPOSED · {mapping.graphOutput.text} → {mapping.functionalRole.label} → {mapping.selectedLexicalFunction.exactForm}: {mapping.selectedLexicalFunction.functionText} · {mapping.generatedContribution}
+        <div className="min-w-0" data-testid="current-word-graph-summary">
+          <h5 className="font-semibold text-[#f0ddb0]">Functional explanation</h5>
+          <p className="mt-1 font-semibold text-[#f5f7fb]" data-testid="current-word-graph-summary-target">
+            {summary.targetWord || "UNKNOWN_OR_NULL"}
+          </p>
+          {summary.meaning ? (
+            <p className="mt-1 break-words" data-testid="current-word-graph-summary-meaning">
+              <span className="font-medium">{summary.meaning.kind === "SOURCE_FACT" ? "Source-reported meaning:" : "Your proposed reading:"}</span>{" "}
+              {summary.meaning.text}
+              {summary.meaning.kind === "SOURCE_FACT" ? <span className="text-[#d8bb7a]"> · Source citation not independently verified</span> : null}
+            </p>
+          ) : (
+            <p className="mt-1" data-testid="current-word-graph-summary-meaning-null">Not established</p>
+          )}
+
+          <div className="mt-2 min-w-0" data-testid="current-word-graph-summary-contributions">
+            <p className="font-medium text-[#f5f7fb]">How it is constructed</p>
+            <p className="text-[#aeb7c5]">Computed symbolic output → your proposed functional role</p>
+            {summary.contributions.length ? (
+              <ul className="mt-1 list-inside list-disc">
+                {summary.contributions.slice(0, 2).map((contribution) => (
+                  <li key={contribution.mappingId} className="break-words" data-testid="current-word-graph-summary-contribution">
+                    {contribution.computedOutput} → {contribution.proposedRole}
+                  </li>
+                ))}
+                {summary.contributions.length > 2 ? <li>See detailed analysis for {summary.contributions.length - 2} additional contributions.</li> : null}
+              </ul>
+            ) : (
+              <p className="mt-1" data-testid="current-word-graph-summary-contribution-null">Not established — no valid computed contribution is available.</p>
+            )}
           </div>
-        )) : (
-          <p className="mt-1" data-testid="current-word-graph-contribution-null">UNKNOWN_OR_NULL · no graph-to-meaning contribution is supported by the current sense, function, edge and mapping inputs.</p>
-        )}
-        {planBridge?.wholeWordExplanations.length && projection.status !== "PARTIAL_NULL" ? planBridge.wholeWordExplanations.map((explanation) => (
-          <div key={explanation.bridgeId} className="mt-2 break-words" data-testid="current-word-graph-whole-word-explanation">
-            Generated whole-word explanation · {explanation.bridgeRole} · USER_PROPOSAL / USER_PROPOSED: {explanation.text}
+
+          {summary.sourceMeanings.length ? (
+            <p className="mt-2 break-words" data-testid="current-word-graph-summary-source-meanings">
+              <span className="font-medium">Source also records:</span>{" "}
+              {summary.sourceMeanings.slice(0, 2).map(({ text }) => text).join(" · ")}
+              <span className="text-[#d8bb7a]"> · Source citation not independently verified</span>
+              {summary.sourceMeanings.length > 2 ? ` · ${summary.sourceMeanings.length - 2} more in detailed evidence` : ""}
+            </p>
+          ) : null}
+
+          <p className="mt-2 font-medium" data-testid="current-word-graph-plain-status">Status: {summary.statusLabel}</p>
+          {summary.missingDescription ? (
+            <p className="mt-1 break-words text-[#d8bb7a]" data-testid="current-word-graph-summary-missing">{summary.missingDescription}</p>
+          ) : null}
+          <p className="mt-1">No interpretation is selected automatically; interpretation remains with you.</p>
+        </div>
+
+        <details className="mt-3 min-w-0 border-t border-[#38433a] pt-2" data-testid="current-word-graph-details">
+          <summary className="cursor-pointer rounded text-[#d8e4ca] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#d8bb7a]">
+            View detailed analysis and evidence
+          </summary>
+          <div className="mt-2 grid min-w-0 gap-3 break-words">
+            <section className="min-w-0" aria-label="Machine status and authority details">
+              <h6 className="font-semibold text-[#f5f7fb]">Status and authority</h6>
+              <p data-testid="current-word-symbolic-whole-word-status">
+                Whole-word functional motivation: {selectedSense ? projection.status : "PARTIAL_NULL · UNKNOWN_OR_NULL"}
+              </p>
+              <p data-testid="current-word-symbolic-graph-status">
+                Graph-to-meaning: {projection.status}{projection.reasonCodes.length ? ` · ${projection.reasonCodes.join(" · ")}` : ""}
+              </p>
+              <p data-testid="current-word-graph-provenance">
+                Claim layer: EXPLORATORY_HYPOTHESIS · authored lexical function, graph edges, role mappings and bridges: USER_PROPOSED · Linguistic applicability: NOT_ASSESSED · Source-authority promotion: NONE · Production authority: NONE · Historical origin: NOT_CLAIMED
+              </p>
+              <p data-testid="current-word-graph-decision">
+                Interpretation remains with the user; none is chosen automatically · no_single_winner · selected candidate: null · user_decides
+              </p>
+              <p className="text-[#aeb7c5]">A mechanically complete symbolic proposal is not independent linguistic or etymological verification.</p>
+              {selectedSense ? (
+                <div className="mt-1" data-testid="current-word-graph-selected-sense">
+                  Selected sense identity: {selectedSense.senseId} · {selectedSense.claimLayer} · {selectedSense.evidenceStatus} · source IDs: {selectedSense.sourceIds.join(", ") || "none"}
+                  <div>Definition: {selectedSense.definition}</div>
+                </div>
+              ) : <p data-testid="current-word-graph-selected-sense-null">UNKNOWN_OR_NULL · no selected or proposed sense.</p>}
+            </section>
+
+            <section className="min-w-0" aria-label="Source records and citations">
+              <h6 className="font-semibold text-[#f5f7fb]">Source records and citations</h6>
+              {sourceRecords.length ? sourceRecords.map((record) => {
+                const source = record.source;
+                const recordSenses = sourceSenseChoices.filter(({ sourceRecordId }) => sourceRecordId === record.sourceRecordId);
+                return (
+                  <div key={record.sourceRecordId} className="mt-1 rounded border border-[#38433a] p-2" data-testid="current-word-graph-source-record">
+                    <p>{source.label} · record {record.sourceRecordId} · entry {record.entryLocator}</p>
+                    <p>Snapshot: {record.sourceSnapshotId}</p>
+                    <p>Citation: {source.citationStatus} · licensing: {source.licensingStatus}</p>
+                    <a className="break-all underline" href={source.url} target="_blank" rel="noreferrer">{source.url}</a>
+                    <ul className="mt-1 list-inside list-disc">
+                      {recordSenses.map(({ sense }) => <li key={sense.senseId}>{sense.senseId} · {sense.claimLayer} · {sense.evidenceStatus}</li>)}
+                    </ul>
+                  </div>
+                );
+              }) : <p>UNKNOWN_OR_NULL · no exact-form source records are available.</p>}
+            </section>
+
+            <section className="min-w-0" aria-label="Computed mappings and authored bridge">
+              <h6 className="font-semibold text-[#f5f7fb]">Computed contributions</h6>
+              {planBridge?.mappings.length ? planBridge.mappings.map((mapping) => (
+                <article key={mapping.mappingId} className="mt-1 rounded border border-[#38433a] p-2" data-testid="current-word-graph-generated-contribution">
+                  <p>{mapping.generatedContribution}</p>
+                  <p>Mapping {mapping.mappingId} · bridge {mapping.bridgeId} · relation {mapping.relationType}</p>
+                  <p>Graph output: {mapping.graphOutput.symbolId} · producer {mapping.graphOutput.producerOperationId} · {mapping.graphOutput.claimLayer} · {mapping.graphOutput.evidenceStatus} · source IDs: {mapping.graphOutput.sourceIds.join(", ") || "none"}</p>
+                  <p>Role: {mapping.functionalRole.roleId} · {mapping.functionalRole.claimLayer} · {mapping.functionalRole.evidenceStatus} · source IDs: {mapping.functionalRole.sourceIds.join(", ") || "none"}</p>
+                  <p>Function: {mapping.selectedLexicalFunction.exactForm} · {mapping.selectedLexicalFunction.claimLayer} · {mapping.selectedLexicalFunction.evidenceStatus} · relation {mapping.selectedLexicalFunction.compositionOperationId}: {mapping.selectedLexicalFunction.compositionStatus} / {mapping.selectedLexicalFunction.compositionClaimLayer} / {mapping.selectedLexicalFunction.compositionEvidenceStatus} · linguistic applicability {mapping.selectedLexicalFunction.linguisticApplicability}</p>
+                </article>
+              )) : <p data-testid="current-word-graph-contribution-null">UNKNOWN_OR_NULL · no valid computed contribution.</p>}
+
+              <h6 className="mt-2 font-semibold text-[#f5f7fb]">Generated whole-word explanation status</h6>
+              {planBridge?.wholeWordExplanations.length ? planBridge.wholeWordExplanations.map((explanation) => (
+                <p key={explanation.bridgeId} className="mt-1" data-testid="current-word-graph-whole-word-explanation">
+                  Bridge {explanation.bridgeId} · {explanation.bridgeRole} · {explanation.claimLayer} / {explanation.evidenceStatus} · composed from the unique generated contributions listed above.
+                </p>
+              )) : (
+                <p className="mt-1" data-testid="current-word-graph-whole-word-null">PARTIAL_NULL / UNKNOWN_OR_NULL · a bridge requires a computed relationship graph and at least one valid role mapping.</p>
+              )}
+
+              <h6 className="mt-2 font-semibold text-[#f5f7fb]">Original user-authored bridge</h6>
+              {bridges.filter(({ text }) => text.trim()).length ? bridges.filter(({ text }) => text.trim()).map((bridge) => (
+                <p key={bridge.bridgeId} className="mt-1" data-testid="current-word-graph-user-bridge-text">
+                  Bridge {bridge.bridgeId} · {bridge.role || "UNKNOWN_OR_NULL"} · USER_PROPOSAL / USER_PROPOSED: {bridge.text}
+                </p>
+              )) : <p>UNKNOWN_OR_NULL · no user-authored bridge text.</p>}
+            </section>
+
+            <section className="min-w-0" aria-label="Graph relationships and operation trace">
+              <h6 className="font-semibold text-[#f5f7fb]">Graph relationships</h6>
+              {edges.length ? (
+                <ul className="list-inside list-disc" data-testid="current-word-graph-relationships">
+                  {edges.map((edge) => (
+                    <li key={edge.edgeId}>{edge.edgeId} · {nodeTextById.get(edge.leftNodeId) ?? edge.leftNodeId} —{edge.relationText || "UNKNOWN_OR_NULL"}→ {nodeTextById.get(edge.rightNodeId) ?? edge.rightNodeId} · USER_PROPOSED</li>
+                  ))}
+                </ul>
+              ) : <p>UNKNOWN_OR_NULL · no user-proposed graph relationships.</p>}
+              <h6 className="mt-2 font-semibold text-[#f5f7fb]">Evaluated operation trace</h6>
+              {plan?.ok && plan.evaluation.ok ? (
+                <ol className="list-inside list-decimal" data-testid="current-word-graph-operation-trace">
+                  {plan.evaluation.operationTrace.map((trace) => (
+                    <li key={trace.operationId}>
+                      {trace.operationId} · {trace.kind} · {trace.status} · depends on {trace.dependsOn.join(", ") || "none"} · {trace.contribution ?? "UNKNOWN_OR_NULL"} · reasons: {trace.reasonCodes.join(", ") || "none"}
+                    </li>
+                  ))}
+                </ol>
+              ) : <p data-testid="current-word-graph-operation-trace">UNKNOWN_OR_NULL · no successful operation trace is available.</p>}
+            </section>
+
+            <section className="min-w-0" aria-label="Alternatives and unresolved claims">
+              <h6 className="font-semibold text-[#f5f7fb]">Alternatives</h6>
+              <div className="mt-1" data-testid="current-word-graph-alternatives">
+                {plan?.ok && plan.sourceFunctionLayer.alternativeReadings.length
+                  ? plan.sourceFunctionLayer.alternativeReadings.map(({ readingId, text, claimLayer, evidenceStatus, sourceIds }) => `${readingId} · ${claimLayer} · ${evidenceStatus} · source IDs: ${sourceIds.join(", ") || "none"} · ${text}`).join(" | ")
+                  : "UNKNOWN_OR_NULL · no alternative reading entered or available."}
+              </div>
+              <h6 className="mt-2 font-semibold text-[#f5f7fb]">Reason codes and unresolved claims</h6>
+              <div className="mt-1" data-testid="current-word-graph-unresolved">
+                {plan?.ok
+                  ? plan.functionalMotivation.unresolvedParts.map(({ claimId, text, claimLayer, evidenceStatus, sourceIds }) => `${claimId} · ${claimLayer} / ${evidenceStatus} · source IDs: ${sourceIds.join(", ") || "none"} · ${text}`).join(" | ") || "UNKNOWN_OR_NULL"
+                  : "UNKNOWN_OR_NULL · no selected lexical sense."}
+              </div>
+              <ul className="mt-1 list-inside list-disc" data-testid="current-word-graph-reason-codes">
+                {projection.reasonCodes.map((reason) => <li key={reason}>{reason}</li>)}
+                {plan?.ok ? plan.graphMeaningBridge.reasonCodes.map((reason) => <li key={`bridge:${reason}`}>{reason}</li>) : null}
+                {plan?.ok ? plan.graphMeaningBridge.unresolvedMappings.flatMap((mapping) => mapping.reasonCodes.map((reason) => <li key={`${mapping.mappingId}:${reason}`}>{reason}</li>)) : null}
+                {!projection.reasonCodes.length && (!plan?.ok || !plan.graphMeaningBridge.reasonCodes.length) ? <li>UNKNOWN_OR_NULL · no reason code supplied.</li> : null}
+              </ul>
+            </section>
           </div>
-        )) : (
-          <p className="mt-1" data-testid="current-word-graph-whole-word-null">PARTIAL_NULL / UNKNOWN_OR_NULL · a bridge requires a computed relationship graph and at least one valid role mapping.</p>
-        )}
-        {identityMatches ? bridges.filter(({ text }) => text.trim()).map((bridge) => (
-          <div key={bridge.bridgeId} className="mt-1 break-words" data-testid="current-word-graph-user-bridge-text">
-            User-authored bridge text · {bridge.role || "role UNKNOWN_OR_NULL"} · USER_PROPOSAL / USER_PROPOSED: {bridge.text}
-          </div>
-        )) : null}
-        <div className="mt-2 break-words" data-testid="current-word-graph-alternatives">
-          Alternatives remain separate: {plan?.ok && plan.sourceFunctionLayer.alternativeReadings.length
-            ? plan.sourceFunctionLayer.alternativeReadings.map(({ text, claimLayer, evidenceStatus }) => `${claimLayer} · ${evidenceStatus} · ${text}`).join(" | ")
-            : "UNKNOWN_OR_NULL · no alternative reading entered or available."}
-        </div>
-        <div className="mt-1 break-words" data-testid="current-word-graph-unresolved">
-          Open structural items: {plan?.ok
-            ? plan.functionalMotivation.unresolvedParts.map(({ text }) => text).join(" | ") || "UNKNOWN_OR_NULL"
-            : "UNKNOWN_OR_NULL · no selected lexical sense."}
-        </div>
-        <div className="mt-2 break-words" data-testid="current-word-graph-provenance">
-          Claim layer: EXPLORATORY_HYPOTHESIS · all authored lexical function, graph-edge, role-mapping and bridge claims remain USER_PROPOSED. Linguistic applicability: NOT_ASSESSED. Source-authority promotion: NONE. Historical origin: NOT_CLAIMED.
-        </div>
-        <p data-testid="current-word-graph-decision">Interpretation remains with the user; none is chosen automatically.</p>
-        <p className="mt-1 text-[#aeb7c5]">A mechanically complete symbolic proposal is not independent linguistic proof.</p>
+        </details>
       </div>
     </section>
   );
