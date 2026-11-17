@@ -27,6 +27,60 @@ function renderDraft(overrides: Partial<Parameters<typeof CurrentWordSymbolicDra
   );
 }
 
+function selectDallimVoiceOperations() {
+  select("Spectrum association for D at position 0", DIVISION);
+  select("Voice operator for A@1", INITIATE);
+  select("Explicit operand for A@1", "spectrum:D@0-1");
+  select("Spectrum association for L at position 3", "l:linear-flow");
+  select("Voice operator for I@4", FOCUS);
+  select("Explicit operand for I@4", "spectrum:L@3-4");
+}
+
+function completeDallimGraphMeaningDraft() {
+  select("Spectrum association for L at position 2", "l:spreading");
+  select("Spectrum association for M at position 5", "m:result");
+  select("Lexical sense for current-word graph meaning", "USER_PROPOSED");
+  fireEvent.change(screen.getByLabelText("Proposed lexical sense label"), { target: { value: "Act of distinguishing" } });
+  fireEvent.change(screen.getByLabelText("Proposed sense definition"), { target: { value: "The act of distinguishing things." } });
+  fireEvent.change(screen.getByLabelText("Proposed functional form or function"), { target: { value: "DALLOJ" } });
+  fireEvent.change(screen.getByLabelText("Proposed function description"), { target: { value: "distinguish or recognize one thing from another" } });
+  select("Proposed lexical function relationship", "ACTION_OF_VERB_FUNCTION");
+
+  fireEvent.click(screen.getByRole("button", { name: "Add user-proposed graph relationship" }));
+  fireEvent.click(screen.getByRole("button", { name: "Add user-proposed graph relationship" }));
+  fireEvent.click(screen.getByRole("button", { name: "Add user-proposed graph relationship" }));
+  fireEvent.click(screen.getByRole("button", { name: "Add user-proposed graph relationship" }));
+  fireEvent.click(screen.getByRole("button", { name: "Add user-proposed graph relationship" }));
+  select("Left computed node for relationship 1", "selection:spectrum:D@0-1");
+  select("Relationship text 1", "produces");
+  select("Right computed node for relationship 1", "voice:voice:A@1");
+  select("Left computed node for relationship 2", "voice:voice:A@1");
+  select("Relationship text 2", "continues through");
+  select("Right computed node for relationship 2", "selection:spectrum:L@2-3");
+  select("Left computed node for relationship 3", "selection:spectrum:L@2-3");
+  select("Relationship text 3", "is traced across");
+  select("Right computed node for relationship 3", "selection:spectrum:L@3-4");
+  select("Left computed node for relationship 4", "selection:spectrum:L@3-4");
+  select("Relationship text 4", "is focused as");
+  select("Right computed node for relationship 4", "voice:voice:I@4");
+  select("Left computed node for relationship 5", "voice:voice:I@4");
+  select("Relationship text 5", "yields");
+  select("Right computed node for relationship 5", "selection:spectrum:M@5-6");
+
+  fireEvent.click(screen.getByRole("button", { name: "Add user-proposed whole-word bridge" }));
+  select("Interpretation role for bridge 1", "PRIMARY");
+  fireEvent.change(screen.getByLabelText("Whole-word explanatory bridge 1"), { target: { value: "The selected graph is a user-proposed reading of distinguishing." } });
+
+  fireEvent.click(screen.getByRole("button", { name: "Add proposed role mapping" }));
+  fireEvent.click(screen.getByRole("button", { name: "Add proposed role mapping" }));
+  select("Bridge for role mapping 1", "bridge-6");
+  select("Computed output for role mapping 1", "symbol:voice:voice:A@1");
+  fireEvent.change(screen.getByLabelText("Proposed functional role 1"), { target: { value: "an initiated distinction" } });
+  select("Bridge for role mapping 2", "bridge-6");
+  select("Computed output for role mapping 2", "symbol:voice:voice:I@4");
+  fireEvent.change(screen.getByLabelText("Proposed functional role 2"), { target: { value: "a focused distinction" } });
+}
+
 describe("current-word symbolic draft v0.1", () => {
   it("projects explicit occurrence and Voice bindings into dependent v0.3 evaluator operations", () => {
     const projection = buildCurrentWordSymbolicDraftProjectionV0_1({
@@ -102,7 +156,7 @@ describe("current-word symbolic draft v0.1", () => {
     expect(screen.getByTestId("current-word-symbolic-written-voices")).toHaveTextContent("A@1 → I@4");
     expect(screen.getByTestId("current-word-symbolic-source-meaning")).toHaveTextContent("UNKNOWN_OR_NULL");
     expect(screen.getByTestId("current-word-symbolic-whole-word-status")).toHaveTextContent("UNKNOWN_OR_NULL");
-    expect(screen.getByTestId("current-word-symbolic-graph-status")).toHaveTextContent("PARTIAL_NULL · NOT_YET_MAPPED");
+    expect(screen.getByTestId("current-word-symbolic-graph-status")).toHaveTextContent("PARTIAL_NULL");
     expect(screen.getByTestId("current-word-symbolic-decision")).toHaveTextContent("No interpretation is selected automatically");
     expect(screen.getByTestId("current-word-symbolic-decision")).toHaveTextContent("user_decides");
     expect(screen.getByTestId("current-word-symbolic-decision")).not.toHaveTextContent(/winner/i);
@@ -118,6 +172,13 @@ describe("current-word symbolic draft v0.1", () => {
     ]) {
       expect(screen.getByLabelText(label)).toHaveValue("");
     }
+    expect(screen.getByLabelText("Lexical sense for current-word graph meaning")).toHaveValue("");
+    expect(screen.getByLabelText("Proposed functional form or function")).toHaveValue("");
+    expect(screen.getByLabelText("Proposed function description")).toHaveValue("");
+    expect(screen.getByTestId("current-word-graph-provenance")).toHaveTextContent(/source-authority promotion: NONE/i);
+    expect(screen.getByTestId("current-word-graph-decision")).toHaveTextContent("Interpretation remains with the user");
+    expect(screen.getByTestId("current-word-graph-decision")).toHaveTextContent("none is chosen automatically");
+    expect(screen.getByTestId("current-word-graph-decision")).not.toHaveTextContent(/winner|rank/i);
     expect(screen.getByTestId("current-word-symbolic-result")).not.toHaveTextContent("initiated(");
     expect(screen.getByTestId("current-word-symbolic-result")).toHaveTextContent("Source-authority promotion: NONE");
   });
@@ -136,8 +197,8 @@ describe("current-word symbolic draft v0.1", () => {
     expect(outputs[0]).toHaveTextContent("A@1 · initiated(division)");
     expect(outputs[1]).toHaveTextContent("I@4 · focused(linear flow)");
     expect(screen.getByTestId("current-word-symbolic-operation-trace")).toHaveTextContent("APPLY_VOICE_OPERATOR · COMPUTED");
-    expect(screen.getByTestId("current-word-symbolic-whole-word-status")).toHaveTextContent("UNKNOWN_OR_NULL");
-    expect(screen.getByTestId("current-word-symbolic-graph-status")).toHaveTextContent("PARTIAL_NULL · NOT_YET_MAPPED");
+    expect(screen.getByTestId("current-word-symbolic-whole-word-status")).toHaveTextContent("PARTIAL_NULL · UNKNOWN_OR_NULL");
+    expect(screen.getByTestId("current-word-symbolic-graph-status")).toHaveTextContent("PARTIAL_NULL");
     expect(screen.getByTestId("current-word-symbolic-result")).toHaveTextContent("USER_PROPOSED / EXPLORATORY_HYPOTHESIS");
     expect(screen.getByTestId("current-word-symbolic-result")).not.toHaveTextContent("COMPLETE_PROPOSED");
   });
@@ -201,9 +262,18 @@ describe("current-word symbolic draft v0.1", () => {
 
     expect(screen.getByTestId("current-word-symbolic-source-meaning")).toHaveTextContent("SOURCE_FACT");
     expect(screen.getByTestId("current-word-symbolic-source-meaning")).toHaveTextContent("act of distinguishing");
+    const senseSelector = screen.getByLabelText("Lexical sense for current-word graph meaning");
+    expect(senseSelector).toHaveValue("");
+    const sourceSenseOption = "source-sense:kaikki:fixture:dallim:sense:ordinal-1:1";
+    expect(screen.getByRole("option", { name: /Sense 1 .*act of distinguishing .*CITATION_ENTERED_UNVERIFIED/ })).toBeInTheDocument();
     expect(screen.getByTestId("current-word-symbolic-result")).toHaveTextContent("Source-authority promotion: NONE");
     expect(screen.getByTestId("current-word-symbolic-whole-word-status")).toHaveTextContent("UNKNOWN_OR_NULL");
     expect(screen.getByTestId("current-word-symbolic-result")).not.toHaveTextContent("act of distinguishing");
+
+    fireEvent.change(senseSelector, { target: { value: sourceSenseOption } });
+    expect(screen.getByTestId("current-word-graph-selected-sense")).toHaveTextContent("SOURCE_FACT · CITATION_ENTERED_UNVERIFIED");
+    expect(screen.getByTestId("current-word-graph-selected-sense")).toHaveTextContent("licensing NOT_ASSESSED");
+    expect(screen.getByLabelText("Proposed functional form or function")).toHaveValue("");
 
     rerender(
       <CurrentWordSymbolicDraftV0_1
@@ -216,6 +286,9 @@ describe("current-word symbolic draft v0.1", () => {
     );
     expect(screen.getByTestId("current-word-symbolic-source-meaning")).toHaveTextContent("source evidence withheld");
     expect(screen.getByTestId("current-word-symbolic-source-meaning")).not.toHaveTextContent("act of distinguishing");
+    expect(screen.getByLabelText("Lexical sense for current-word graph meaning")).toHaveValue("");
+    expect(screen.queryByRole("option", { name: /Sense 1 .*act of distinguishing/ })).not.toBeInTheDocument();
+    expect(screen.getByTestId("current-word-graph-selected-sense-null")).toHaveTextContent("UNKNOWN_OR_NULL");
   });
 
   it("clears selections when the parent workbench word, language, or dialect identity changes", () => {
@@ -255,5 +328,89 @@ describe("current-word symbolic draft v0.1", () => {
     expect(screen.getByLabelText("Exact target word")).toHaveValue("DALLIM");
     expect(screen.getByLabelText("Component 1 exact spelling")).toHaveValue("");
     expect(screen.getByRole("combobox", { name: "Choose a read-only method example" })).toHaveValue("");
+  });
+
+  it("builds current-word graph meaning only from explicit computed nodes and typed mappings", () => {
+    renderDraft();
+    selectDallimVoiceOperations();
+    completeDallimGraphMeaningDraft();
+
+    expect(screen.getAllByTestId("current-word-symbolic-computed-output")[0]).toHaveTextContent("initiated(division)");
+    expect(screen.getAllByTestId("current-word-graph-generated-contribution")).toHaveLength(2);
+    expect(screen.getByTestId("current-word-symbolic-whole-word-status")).toHaveTextContent("COMPLETE_PROPOSED");
+    expect(screen.getByTestId("current-word-symbolic-graph-status")).toHaveTextContent("COMPLETE_PROPOSED");
+    expect(screen.getByTestId("current-word-graph-whole-word-explanation")).toHaveTextContent("initiated(division)");
+    expect(screen.getByTestId("current-word-graph-whole-word-explanation")).toHaveTextContent("focused(linear flow)");
+    expect(screen.getByTestId("current-word-graph-selected-sense")).toHaveTextContent("USER_PROPOSAL · USER_PROPOSED");
+    expect(screen.getByTestId("current-word-graph-provenance")).toHaveTextContent("Linguistic applicability: NOT_ASSESSED");
+    expect(screen.getByTestId("current-word-graph-provenance")).toHaveTextContent("Source-authority promotion: NONE");
+    expect(screen.getByTestId("current-word-graph-decision")).toHaveTextContent("Interpretation remains with the user");
+    expect(screen.getByTestId("current-word-graph-decision")).toHaveTextContent("none is chosen automatically");
+
+    select("Spectrum association for D at position 0", LIGHT);
+    expect(screen.getAllByTestId("current-word-graph-generated-contribution")[0]).toHaveTextContent("initiated(light)");
+    expect(screen.getAllByTestId("current-word-graph-generated-contribution").map(({ textContent }) => textContent).join(" "))
+      .not.toContain("initiated(division)");
+  });
+
+  it("keeps incomplete edge or mapping drafts PARTIAL_NULL and does not treat bridge prose alone as completion", () => {
+    renderDraft();
+    selectDallimVoiceOperations();
+    select("Lexical sense for current-word graph meaning", "USER_PROPOSED");
+    fireEvent.change(screen.getByLabelText("Proposed lexical sense label"), { target: { value: "Act of distinguishing" } });
+    fireEvent.change(screen.getByLabelText("Proposed sense definition"), { target: { value: "The act of distinguishing things." } });
+    fireEvent.change(screen.getByLabelText("Proposed functional form or function"), { target: { value: "DALLOJ" } });
+    fireEvent.change(screen.getByLabelText("Proposed function description"), { target: { value: "distinguish or recognize" } });
+    select("Proposed lexical function relationship", "ACTION_OF_VERB_FUNCTION");
+    fireEvent.click(screen.getByRole("button", { name: "Add user-proposed whole-word bridge" }));
+    select("Interpretation role for bridge 1", "PRIMARY");
+    fireEvent.change(screen.getByLabelText("Whole-word explanatory bridge 1"), { target: { value: "Free text does not complete the graph." } });
+
+    expect(screen.getByTestId("current-word-symbolic-graph-status")).toHaveTextContent("PARTIAL_NULL");
+    expect(screen.getByTestId("current-word-graph-whole-word-null")).toBeInTheDocument();
+    expect(screen.getByTestId("current-word-graph-user-bridge-text")).toHaveTextContent("USER_PROPOSED");
+    expect(screen.queryByTestId("current-word-graph-whole-word-explanation")).not.toBeInTheDocument();
+  });
+
+  it("removing a graph edge invalidates the whole-word explanation", () => {
+    renderDraft();
+    selectDallimVoiceOperations();
+    completeDallimGraphMeaningDraft();
+    expect(screen.getAllByTestId("current-word-graph-generated-contribution")).toHaveLength(2);
+
+    fireEvent.click(screen.getByRole("button", { name: "Remove relationship 2" }));
+    expect(screen.getByTestId("current-word-symbolic-graph-status")).toHaveTextContent("PARTIAL_NULL");
+    expect(screen.queryByTestId("current-word-graph-whole-word-explanation")).not.toBeInTheDocument();
+  });
+
+  it("removing role mappings removes their generated contribution and leaves an unmapped bridge partial", () => {
+    renderDraft();
+    selectDallimVoiceOperations();
+    completeDallimGraphMeaningDraft();
+    fireEvent.click(screen.getByRole("button", { name: "Remove role mapping 1" }));
+    expect(screen.getAllByTestId("current-word-graph-generated-contribution")).toHaveLength(1);
+    expect(screen.getAllByTestId("current-word-graph-generated-contribution").map(({ textContent }) => textContent).join(" "))
+      .not.toContain("initiated(division)");
+
+    fireEvent.click(screen.getByRole("button", { name: "Remove role mapping 1" }));
+    expect(screen.getByTestId("current-word-symbolic-graph-status")).toHaveTextContent("PARTIAL_NULL");
+    expect(screen.queryByTestId("current-word-graph-whole-word-explanation")).not.toBeInTheDocument();
+  });
+
+  it("withholds stale bridge claims when the current target identity changes", () => {
+    const { rerender } = renderDraft();
+    select("Lexical sense for current-word graph meaning", "USER_PROPOSED");
+    fireEvent.change(screen.getByLabelText("Proposed lexical sense label"), { target: { value: "Act of distinguishing" } });
+    fireEvent.change(screen.getByLabelText("Proposed sense definition"), { target: { value: "The act of distinguishing things." } });
+    fireEvent.click(screen.getByRole("button", { name: "Add user-proposed whole-word bridge" }));
+    select("Interpretation role for bridge 1", "PRIMARY");
+    fireEvent.change(screen.getByLabelText("Whole-word explanatory bridge 1"), { target: { value: "A draft identity-bound proposal." } });
+    expect(screen.getByTestId("current-word-graph-user-bridge-text")).toHaveTextContent("A draft identity-bound proposal.");
+
+    rerender(<CurrentWordSymbolicDraftV0_1 analyzedWord="DALLIM" draftTargetWord="DALLOJ" targetLanguage="Albanian" targetDialect="Standard Albanian" />);
+    expect(screen.getByTestId("current-word-graph-identity-null")).toBeInTheDocument();
+    expect(screen.getByTestId("current-word-symbolic-whole-word-status")).toHaveTextContent("UNKNOWN_OR_NULL");
+    expect(screen.queryByTestId("current-word-graph-user-bridge-text")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("current-word-graph-selected-sense")).not.toBeInTheDocument();
   });
 });
