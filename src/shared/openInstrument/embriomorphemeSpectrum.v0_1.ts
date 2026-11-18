@@ -47,7 +47,8 @@ function entry(unit: string, associationTexts: readonly string[]): Embriomorphem
 /**
  * Owner-supplied working hypotheses for exploratory ZË-RO composition.
  * These entries are not source-verified definitions, historical etymologies,
- * or universal consonant meanings.
+ * or universal consonant meanings. A core unit with no associations is
+ * structural-only and has no proposed functional meaning.
  */
 export const EMBRIOMORPHEME_SPECTRUM_V0_1: readonly EmbriomorphemeSpectrumEntryV0_1[] =
   Object.freeze([
@@ -78,6 +79,7 @@ export const EMBRIOMORPHEME_SPECTRUM_V0_1: readonly EmbriomorphemeSpectrumEntryV
     entry("X", ["binding", "solid", "form"]),
     entry("XH", ["heat", "intensity", "burst"]),
     entry("ZH", ["sound", "echo", "vibration"]),
+    entry("G", []),
   ]);
 
 /** Ç is a separate target-local proposal and is not part of the 15-unit table. */

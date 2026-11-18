@@ -258,7 +258,7 @@ function syntheticShGjYInput(): SymbolicFunctionalCompositionInputV0_3 {
 
 describe("symbolic functional composition v0.3", () => {
   it("preserves the original fifteen-unit hypotheses and Ç target-local values explicitly proposed and source-free", () => {
-    expect(EMBRIOMORPHEME_SPECTRUM_V0_1).toHaveLength(27);
+    expect(EMBRIOMORPHEME_SPECTRUM_V0_1).toHaveLength(28);
     const originalFifteen = EMBRIOMORPHEME_SPECTRUM_V0_1.slice(0, 15);
     expect(originalFifteen.map(({ unit }) => unit)).toEqual([
       "R", "L", "D", "M", "N", "SH", "GJ", "B", "P", "T", "K", "V", "S", "Z", "F",
@@ -319,7 +319,7 @@ describe("symbolic functional composition v0.3", () => {
       { unit: "ZH", associations: [["zh:sound", "sound"], ["zh:echo", "echo"], ["zh:vibration", "vibration"]] },
     ] as const;
 
-    expect(EMBRIOMORPHEME_SPECTRUM_V0_1.slice(15).map(({ unit }) => unit)).toEqual(expected.map(({ unit }) => unit));
+    expect(EMBRIOMORPHEME_SPECTRUM_V0_1.slice(15, 27).map(({ unit }) => unit)).toEqual(expected.map(({ unit }) => unit));
     for (const { unit, associations } of expected) {
       const entry = getEmbriomorphemeSpectrumEntryV0_1(unit);
       expect(entry?.associations.map(({ candidateId, association }) => [candidateId, association])).toEqual(associations);
@@ -338,7 +338,7 @@ describe("symbolic functional composition v0.3", () => {
       ...TARGET_LOCAL_SPECTRUM_ASSOCIATIONS_V0_1.map(({ candidateId }) => candidateId),
     ];
     expect(new Set(allCandidateIds).size).toBe(allCandidateIds.length);
-    expect(getEmbriomorphemeSpectrumEntryV0_1("G")).toBeUndefined();
+    expect(getEmbriomorphemeSpectrumEntryV0_1("G")).toEqual({ unit: "G", associations: [] });
     expect(TARGET_LOCAL_SPECTRUM_ASSOCIATIONS_V0_1.map(({ unit, association }) => [unit, association])).toEqual([
       ["Ç", "release"], ["Ç", "emit"],
     ]);
@@ -404,7 +404,7 @@ describe("symbolic functional composition v0.3", () => {
     },
   );
 
-  it("leaves G explicitly unmatched rather than inventing a spectrum unit", () => {
+  it("recognizes G structurally while keeping its unsupported function Null", () => {
     const result = buildSymbolicFunctionalCompositionV0_3({
       target: {
         exactSpelling: "G",
@@ -416,12 +416,126 @@ describe("symbolic functional composition v0.3", () => {
     });
     expect(result.ok).toBe(true);
     if (!result.ok) return;
-    expect(result.spectrumOccurrences).toEqual([]);
-    expect(result.unmatchedLetterSpans).toEqual([{
+
+    expect(result.target.codePoints).toEqual([{ character: "G", position: 0 }]);
+    expect(result.target.writtenVoices).toEqual([]);
+    expect(result.spectrumOccurrences).toEqual([expect.objectContaining({
+      occurrenceId: spectrumOccurrenceIdV0_3("G", 0, 1),
+      unit: "G",
       exactText: "G",
       span: { start: 0, end: 1 },
-      reason: "NO_SPECTRUM_UNIT_MATCH",
-    }]);
+      associationCandidates: [],
+      selectedAssociationIds: [],
+      status: "UNKNOWN_OR_NULL",
+    })]);
+    expect(result.unmatchedLetterSpans).toEqual([]);
+    expect(result.symbolicComposition.status).toBe("PARTIAL_NULL");
+    expect(result.symbolicComposition.expression).toBeNull();
+    expect(result.symbolicComposition.reasonCodes).toContain("SPECTRUM_ASSOCIATION_MISSING:spectrum:G@0-1");
+    expect(result.symbolicComposition.reasonCodes).not.toContain("UNMATCHED_SPECTRUM_UNIT:G@0");
+    expect(result.interpretationSelection).toEqual({
+      mode: "no_single_winner",
+      selectedCandidateId: null,
+      userDecisionPosture: "user_decides",
+    });
+  });
+
+  it("longest-matches GJ before G in GJITHÇKA and conserves its written Voices without selecting hypotheses", () => {
+    const result = buildSymbolicFunctionalCompositionV0_3({
+      target: {
+        exactSpelling: "GJITHÇKA",
+        language: "Albanian",
+        variety: "Standard Albanian",
+        wholeWordConcept: "test-only unselected placeholder",
+      },
+      operations: [],
+    });
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+
+    expect(result.target.codePoints).toEqual(
+      Array.from("GJITHÇKA").map((character, position) => ({ character, position })),
+    );
+    expect(result.target.writtenVoices).toEqual([
+      { voice: "I", position: 2 },
+      { voice: "A", position: 7 },
+    ]);
+    expect(result.spectrumOccurrences.map(({ unit, exactText, span }) => ({ unit, exactText, span }))).toEqual([
+      { unit: "GJ", exactText: "GJ", span: { start: 0, end: 2 } },
+      { unit: "TH", exactText: "TH", span: { start: 3, end: 5 } },
+      { unit: "Ç", exactText: "Ç", span: { start: 5, end: 6 } },
+      { unit: "K", exactText: "K", span: { start: 6, end: 7 } },
+    ]);
+    expect(result.spectrumOccurrences.some(({ unit }) => unit === "G")).toBe(false);
+    expect(result.spectrumOccurrences.every(({ selectedAssociationIds, status }) =>
+      selectedAssociationIds.length === 0 && status === "UNKNOWN_OR_NULL",
+    )).toBe(true);
+    expect(result.voiceEvents.map(({ canonicalIdentity, position, selectedOperator, status }) => ({
+      canonicalIdentity, position, selectedOperator, status,
+    }))).toEqual([
+      { canonicalIdentity: "I", position: 2, selectedOperator: null, status: "UNKNOWN_OR_NULL" },
+      { canonicalIdentity: "A", position: 7, selectedOperator: null, status: "UNKNOWN_OR_NULL" },
+    ]);
+    expect(result.unmatchedLetterSpans).toEqual([]);
+    expect(result.symbolicComposition.status).toBe("PARTIAL_NULL");
+    expect(result.symbolicComposition.reasonCodes).toContain("SPECTRUM_ASSOCIATION_MISSING:spectrum:GJ@0-2");
+    expect(result.interpretationSelection).toEqual({
+      mode: "no_single_winner",
+      selectedCandidateId: null,
+      userDecisionPosture: "user_decides",
+    });
+  });
+
+  it("recognizes G in GUR while conserving U@1 and retaining Null for the unsupported G function", () => {
+    const result = buildSymbolicFunctionalCompositionV0_3({
+      target: {
+        exactSpelling: "GUR",
+        language: "Albanian",
+        variety: "Standard Albanian",
+        wholeWordConcept: "test-only unselected placeholder",
+      },
+      operations: [],
+    });
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+
+    expect(result.target.codePoints).toEqual(
+      Array.from("GUR").map((character, position) => ({ character, position })),
+    );
+    expect(result.target.writtenVoices).toEqual([{ voice: "U", position: 1 }]);
+    expect(result.spectrumOccurrences.map(({ unit, exactText, span, associationCandidates, selectedAssociationIds, status }) => ({
+      unit, exactText, span, associationCandidates, selectedAssociationIds, status,
+    }))).toEqual([
+      {
+        unit: "G",
+        exactText: "G",
+        span: { start: 0, end: 1 },
+        associationCandidates: [],
+        selectedAssociationIds: [],
+        status: "UNKNOWN_OR_NULL",
+      },
+      {
+        unit: "R",
+        exactText: "R",
+        span: { start: 2, end: 3 },
+        associationCandidates: EMBRIOMORPHEME_SPECTRUM_V0_1.find(({ unit }) => unit === "R")?.associations,
+        selectedAssociationIds: [],
+        status: "UNKNOWN_OR_NULL",
+      },
+    ]);
+    expect(result.voiceEvents.map(({ canonicalIdentity, position, selectedOperator, status }) => ({
+      canonicalIdentity, position, selectedOperator, status,
+    }))).toEqual([
+      { canonicalIdentity: "U", position: 1, selectedOperator: null, status: "UNKNOWN_OR_NULL" },
+    ]);
+    expect(result.unmatchedLetterSpans).toEqual([]);
+    expect(result.symbolicComposition.status).toBe("PARTIAL_NULL");
+    expect(result.symbolicComposition.reasonCodes).toContain("SPECTRUM_ASSOCIATION_MISSING:spectrum:G@0-1");
+    expect(result.interpretationSelection).toEqual({
+      mode: "no_single_winner",
+      selectedCandidateId: null,
+      userDecisionPosture: "user_decides",
+    });
   });
 
   it("retains independent I@3 and I@5 events with canonical, trait-table, and proposed operator labels separated", () => {

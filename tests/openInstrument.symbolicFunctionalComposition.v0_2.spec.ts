@@ -283,7 +283,7 @@ function syntheticShGjYInput(): SymbolicFunctionalCompositionInputV0_2 {
 
 describe("symbolic functional composition v0.2", () => {
   it("preserves the original fifteen-unit hypotheses and Ç target-local values explicitly proposed and source-free", () => {
-    expect(EMBRIOMORPHEME_SPECTRUM_V0_1).toHaveLength(27);
+    expect(EMBRIOMORPHEME_SPECTRUM_V0_1).toHaveLength(28);
     const originalFifteen = EMBRIOMORPHEME_SPECTRUM_V0_1.slice(0, 15);
     expect(originalFifteen.map(({ unit }) => unit)).toEqual([
       "R", "L", "D", "M", "N", "SH", "GJ", "B", "P", "T", "K", "V", "S", "Z", "F",
@@ -326,6 +326,42 @@ describe("symbolic functional composition v0.2", () => {
       provenanceClass === "TARGET_LOCAL_USER_PROPOSAL_NOT_IN_FIFTEEN_UNIT_TABLE",
     )).toBe(true);
     expect(getEmbriomorphemeAssociationV0_1(associationId("Ç", "release"))?.sourceIds).toEqual([]);
+  });
+
+  it("recognizes G structurally while keeping its unsupported function Null", () => {
+    const result = buildSymbolicFunctionalCompositionV0_2({
+      target: {
+        exactSpelling: "G",
+        language: "Albanian",
+        variety: "Standard Albanian",
+        wholeWordConcept: "test-only unselected placeholder",
+      },
+      operations: [],
+    });
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+
+    expect(result.target.codePoints).toEqual([{ character: "G", position: 0 }]);
+    expect(result.target.writtenVoices).toEqual([]);
+    expect(result.spectrumOccurrences).toEqual([expect.objectContaining({
+      occurrenceId: spectrumOccurrenceIdV0_2("G", 0, 1),
+      unit: "G",
+      exactText: "G",
+      span: { start: 0, end: 1 },
+      associationCandidates: [],
+      selectedAssociationIds: [],
+      status: "UNKNOWN_OR_NULL",
+    })]);
+    expect(result.unmatchedLetterSpans).toEqual([]);
+    expect(result.symbolicComposition.status).toBe("PARTIAL_NULL");
+    expect(result.symbolicComposition.expression).toBeNull();
+    expect(result.symbolicComposition.reasonCodes).toContain("SPECTRUM_ASSOCIATION_MISSING:spectrum:G@0-1");
+    expect(result.symbolicComposition.reasonCodes).not.toContain("UNMATCHED_SPECTRUM_UNIT:G@0");
+    expect(result.interpretationSelection).toEqual({
+      mode: "no_single_winner",
+      selectedCandidateId: null,
+      userDecisionPosture: "user_decides",
+    });
   });
 
   it("retains independent I@3 and I@5 events with canonical, trait-table, and proposed operator labels separated", () => {
