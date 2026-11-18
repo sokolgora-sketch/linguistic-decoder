@@ -66,6 +66,18 @@ export const EMBRIOMORPHEME_SPECTRUM_V0_1: readonly EmbriomorphemeSpectrumEntryV
     entry("S", ["structure", "solidity", "sibilance"]),
     entry("Z", ["sound", "darkness", "deep"]),
     entry("F", ["breath", "spirit", "force"]),
+    entry("C", ["point", "cut", "sharp"]),
+    entry("DH", ["earth", "thickness", "density"]),
+    entry("H", ["breath", "space", "opening"]),
+    entry("J", ["link", "joining", "flow"]),
+    entry("LL", ["light", "flame", "clarity"]),
+    entry("NJ", ["unity", "softness", "inside"]),
+    entry("Q", ["center", "circle", "enclosure"]),
+    entry("RR", ["rapid motion", "flow", "rush"]),
+    entry("TH", ["point", "sharpness", "piercing"]),
+    entry("X", ["binding", "solid", "form"]),
+    entry("XH", ["heat", "intensity", "burst"]),
+    entry("ZH", ["sound", "echo", "vibration"]),
   ]);
 
 /** Ç is a separate target-local proposal and is not part of the 15-unit table. */

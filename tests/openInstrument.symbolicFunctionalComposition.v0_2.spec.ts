@@ -282,9 +282,13 @@ function syntheticShGjYInput(): SymbolicFunctionalCompositionInputV0_2 {
 }
 
 describe("symbolic functional composition v0.2", () => {
-  it("keeps the fifteen-unit hypotheses and Ç target-local values explicitly proposed and source-free", () => {
-    expect(EMBRIOMORPHEME_SPECTRUM_V0_1).toHaveLength(15);
-    expect(Object.fromEntries(EMBRIOMORPHEME_SPECTRUM_V0_1.map(({ unit, associations }) => [
+  it("preserves the original fifteen-unit hypotheses and Ç target-local values explicitly proposed and source-free", () => {
+    expect(EMBRIOMORPHEME_SPECTRUM_V0_1).toHaveLength(27);
+    const originalFifteen = EMBRIOMORPHEME_SPECTRUM_V0_1.slice(0, 15);
+    expect(originalFifteen.map(({ unit }) => unit)).toEqual([
+      "R", "L", "D", "M", "N", "SH", "GJ", "B", "P", "T", "K", "V", "S", "Z", "F",
+    ]);
+    expect(Object.fromEntries(originalFifteen.map(({ unit, associations }) => [
       unit,
       associations.map(({ association }) => association),
     ]))).toEqual({
