@@ -11,6 +11,7 @@ import { CurrentWordSymbolicGraphMeaningV0_1 } from "@/ui/instrument/sections/Cu
 import type { SymbolicFunctionalOperationPlanInputV0_1 } from "@/shared/openInstrument/symbolicFunctionalOperationPlanBuilder.v0_1";
 import { sameAlbanianSourceForm } from "@/ui/instrument/albanianSourceFormIdentity.v0_1";
 import type { SingleWordCurrentWordEvidenceContextV0_1 } from "@/ui/instrument/sections/SingleWordMotivationWorkbenchV0_1";
+import { CurrentWordSourceFunctionalSuggestionV0_1 } from "@/ui/instrument/sections/CurrentWordSourceFunctionalSuggestionV0_1";
 
 export type CurrentWordSymbolicVoiceDraftV0_1 = Readonly<{
   operatorCandidateId: string;
@@ -263,6 +264,16 @@ export function CurrentWordSymbolicDraftV0_1({
         }.</p>}
         <p className="mt-1 text-[#aeb7c5]">This lexical evidence is displayed separately and does not authorize a symbolic association or meaning bridge.</p>
       </div>
+
+      <CurrentWordSourceFunctionalSuggestionV0_1
+        key={JSON.stringify([analyzedWord, draftTargetWord, language, variety])}
+        analyzedWord={analyzedWord}
+        draftTargetWord={draftTargetWord}
+        language={language}
+        variety={variety}
+        identityMatches={identityMatches}
+        runtimeSourceStatus={sourceStatus}
+      />
 
       {!identityMatches ? (
         <p role="status" data-testid="current-word-symbolic-identity-mismatch" className="mt-3 rounded border border-[#746541] bg-[#18140e] p-2 text-xs leading-5 text-[#f0ddb0]">
