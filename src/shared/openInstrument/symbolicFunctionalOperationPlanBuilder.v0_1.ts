@@ -243,8 +243,9 @@ function buildGraphMeaningBridge(
   const unresolvedMappings: SymbolicGraphMeaningBridgeV0_1["unresolvedMappings"][number][] = [];
   const failedBridgeIds = new Set<string>();
   const resolvedMappingIdsByBridge = new Map<string, string[]>();
+  const targetCompositionPartial = evaluation.ok &&
+    evaluation.symbolicComposition.status === "PARTIAL_NULL";
   const transformationComputed = evaluation.ok &&
-    evaluation.symbolicComposition.status !== "PARTIAL_NULL" &&
     evaluation.symbolicComposition.transformationText !== null &&
     evaluation.operationTrace.some(({ kind, status }) =>
       kind === "REPRESENT_SYMBOLIC_TRANSFORMATION" && status === "COMPUTED",
@@ -254,6 +255,7 @@ function buildGraphMeaningBridge(
   if (input.functionalBridges.length !== validBridges.length) {
     reasons.push("GRAPH_MEANING_BRIDGE_NOT_VALID_FOR_SELECTED_SENSE");
   }
+  if (targetCompositionPartial) reasons.push("GRAPH_MEANING_TARGET_COMPOSITION_PARTIAL_NULL");
   if (!transformationComputed) reasons.push("GRAPH_MEANING_REQUIRES_COMPUTED_TRANSFORMATION");
 
   for (const mapping of mappingInputs) {
@@ -311,6 +313,10 @@ function buildGraphMeaningBridge(
       mappingReasons.push(`GRAPH_MEANING_MAPPING_GRAPH_OUTPUT_NOT_COMPUTED:${mapping.mappingId}`);
     }
     if (!transformationComputed) {
+      mappingReasons.push(`GRAPH_MEANING_MAPPING_NOT_IN_COMPUTED_TRANSFORMATION:${mapping.mappingId}`);
+    } else if (!input.functionalEdges.some(({ left, right }) =>
+      symbolId(left) === mapping.symbolOutputId || symbolId(right) === mapping.symbolOutputId,
+    )) {
       mappingReasons.push(`GRAPH_MEANING_MAPPING_NOT_IN_COMPUTED_TRANSFORMATION:${mapping.mappingId}`);
     }
 
@@ -376,6 +382,7 @@ function buildGraphMeaningBridge(
       reasons.push(`GRAPH_MEANING_MAPPING_REQUIRED_FOR_BRIDGE:${bridge.bridgeId}`);
     }
     if (failedBridgeIds.has(bridge.bridgeId) || bridgeMappingIds.length === 0) continue;
+    if (targetCompositionPartial) continue;
     const contributions = mappings
       .filter(({ bridgeId }) => bridgeId === bridge.bridgeId)
       .map(({ generatedContribution }) => generatedContribution);

@@ -140,6 +140,7 @@ export function CurrentWordSymbolicGraphMeaningV0_1({
     sourceAlternatives,
     projection,
   });
+  const proposedInteractions = bridges.filter(({ text }) => text.trim());
   const nodeTextById = new Map(nodes.map(({ nodeId, text }) => [nodeId, text]));
   const addRowId = (prefix: string) => {
     const next = rowSequence + 1;
@@ -400,6 +401,19 @@ export function CurrentWordSymbolicGraphMeaningV0_1({
             )}
           </div>
 
+          {proposedInteractions.length ? (
+            <div className="mt-2 break-words" data-testid="current-word-graph-summary-proposed-interaction">
+              <p className="font-medium text-[#f5f7fb]">Your proposed interaction</p>
+              <ul className="mt-1 list-inside list-disc">
+                {proposedInteractions.map((bridge) => (
+                  <li key={bridge.bridgeId}>
+                    {bridge.role || "UNRESOLVED_ROLE"} · USER_PROPOSAL / USER_PROPOSED: {bridge.text}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ) : null}
+
           {summary.sourceMeanings.length ? (
             <p className="mt-2 break-words" data-testid="current-word-graph-summary-source-meanings">
               <span className="font-medium">Source also records:</span>{" "}
@@ -486,7 +500,11 @@ export function CurrentWordSymbolicGraphMeaningV0_1({
                   Bridge {explanation.bridgeId} · {explanation.bridgeRole} · {explanation.claimLayer} / {explanation.evidenceStatus} · composed from the unique generated contributions listed above.
                 </p>
               )) : (
-                <p className="mt-1" data-testid="current-word-graph-whole-word-null">PARTIAL_NULL / UNKNOWN_OR_NULL · a bridge requires a computed relationship graph and at least one valid role mapping.</p>
+                <p className="mt-1" data-testid="current-word-graph-whole-word-null">
+                  {plan?.ok && plan.evaluation.ok && plan.evaluation.symbolicComposition.status === "PARTIAL_NULL"
+                    ? "PARTIAL_NULL / UNKNOWN_OR_NULL · computed contributions may be shown, but unresolved target structure prevents a whole-word explanation."
+                    : "PARTIAL_NULL / UNKNOWN_OR_NULL · a bridge requires a computed relationship graph and at least one valid role mapping."}
+                </p>
               )}
 
               <h6 className="mt-2 font-semibold text-[#f5f7fb]">Original user-authored bridge</h6>

@@ -15,6 +15,8 @@ import type { SingleWordCurrentWordEvidenceContextV0_1 } from "@/ui/instrument/s
 export type CurrentWordSymbolicVoiceDraftV0_1 = Readonly<{
   operatorCandidateId: string;
   operandOccurrenceId: string;
+  /** A previous computed Voice event may feed a later Voice event. */
+  operandVoiceEventId?: string;
 }>;
 
 export type CurrentWordSymbolicSelectionsV0_1 = Readonly<{
@@ -72,6 +74,8 @@ function buildDraftOperations(
   const operations: SymbolicCompositionOperationV0_3[] = [];
   const symbolIdsByOccurrence = new Map<string, string>();
   const producerIdsByOccurrence = new Map<string, string>();
+  const symbolIdsByVoiceEvent = new Map<string, string>();
+  const producerIdsByVoiceEvent = new Map<string, string>();
 
   structure.spectrumOccurrences.forEach((occurrence, index) => {
     const candidateId = selections.spectrumCandidateByOccurrenceId[occurrence.occurrenceId];
@@ -93,19 +97,28 @@ function buildDraftOperations(
   structure.voiceEvents.forEach((event, index) => {
     const selection = selections.voiceDraftByEventId[event.eventId];
     if (!selection?.operatorCandidateId) return;
-    const inputSymbolId = symbolIdsByOccurrence.get(selection.operandOccurrenceId) ?? `unselected-operand-${index}`;
-    const producerId = producerIdsByOccurrence.get(selection.operandOccurrenceId);
+    const usesVoiceOperand = Boolean(selection.operandVoiceEventId);
+    const inputSymbolId = usesVoiceOperand
+      ? symbolIdsByVoiceEvent.get(selection.operandVoiceEventId!) ?? `unselected-voice-operand-${index}`
+      : symbolIdsByOccurrence.get(selection.operandOccurrenceId) ?? `unselected-operand-${index}`;
+    const producerId = usesVoiceOperand
+      ? producerIdsByVoiceEvent.get(selection.operandVoiceEventId!)
+      : producerIdsByOccurrence.get(selection.operandOccurrenceId);
+    const operationId = `draft-voice-${index}`;
+    const outputSymbolId = `draft-voice-output-${index}`;
     operations.push({
-      operationId: `draft-voice-${index}`,
+      operationId,
       kind: "APPLY_VOICE_OPERATOR",
       voice: event.canonicalIdentity,
       position: event.position,
       voiceEventId: event.eventId,
       operatorCandidateId: selection.operatorCandidateId,
       inputSymbolId,
-      outputSymbolId: `draft-voice-output-${index}`,
+      outputSymbolId,
       dependsOn: producerId ? [producerId] : [],
     });
+    symbolIdsByVoiceEvent.set(event.eventId, outputSymbolId);
+    producerIdsByVoiceEvent.set(event.eventId, operationId);
   });
 
   return operations;
@@ -202,13 +215,18 @@ export function CurrentWordSymbolicDraftV0_1({
   const graphVoiceBindings: SymbolicFunctionalOperationPlanInputV0_1["voiceBindings"] = structure.ok
     ? structure.voiceEvents.flatMap((voiceEvent) => {
         const selection = voiceDrafts[voiceEvent.eventId];
-        return selection?.operatorCandidateId && selection.operandOccurrenceId
+        const input = selection?.operandVoiceEventId
+          ? { kind: "VOICE_BINDING" as const, bindingId: selection.operandVoiceEventId }
+          : selection?.operandOccurrenceId
+            ? { kind: "SPECTRUM_SELECTION" as const, selectionId: selection.operandOccurrenceId }
+            : null;
+        return selection?.operatorCandidateId && input
           ? [{
               bindingId: voiceEvent.eventId,
               voice: voiceEvent.canonicalIdentity,
               position: voiceEvent.position,
               operatorCandidateId: selection.operatorCandidateId,
-              input: { kind: "SPECTRUM_SELECTION" as const, selectionId: selection.operandOccurrenceId },
+              input,
             }]
           : [];
       })
@@ -281,8 +299,22 @@ export function CurrentWordSymbolicDraftV0_1({
                 </label>
               ))}
 
-              {structure.voiceEvents.map((voiceEvent) => {
+              {structure.voiceEvents.map((voiceEvent, eventIndex) => {
                 const selection = voiceDrafts[voiceEvent.eventId] ?? { operatorCandidateId: "", operandOccurrenceId: "" };
+                const operandValue = selection.operandVoiceEventId
+                  ? `voice:${selection.operandVoiceEventId}`
+                  : selection.operandOccurrenceId
+                    ? `spectrum:${selection.operandOccurrenceId}`
+                    : "";
+                const earlierComputedVoiceOptions = structure.voiceEvents
+                  .slice(0, eventIndex)
+                  .flatMap((earlierEvent, earlierIndex) => {
+                    const outputSymbolId = `draft-voice-output-${earlierIndex}`;
+                    const output = evaluation.ok
+                      ? evaluation.symbols.find(({ symbolId }) => symbolId === outputSymbolId)
+                      : undefined;
+                    return output ? [{ event: earlierEvent, output }] : [];
+                  });
                 return (
                   <fieldset key={voiceEvent.eventId} className="grid min-w-0 gap-2 rounded border border-[#38433a] p-2 sm:grid-cols-2">
                     <legend className="px-1 text-xs font-semibold text-[#d8e4ca]">Voice event {voiceEvent.canonicalIdentity}@{voiceEvent.position}</legend>
@@ -310,22 +342,35 @@ export function CurrentWordSymbolicDraftV0_1({
                       <select
                         aria-label={`Explicit operand for ${voiceEvent.canonicalIdentity}@${voiceEvent.position}`}
                         className={inputClass}
-                        value={selection.operandOccurrenceId}
-                        onChange={(event) => setVoiceDrafts((previous) => ({
-                          ...previous,
-                          [voiceEvent.eventId]: { ...selection, operandOccurrenceId: event.target.value },
-                        }))}
+                        value={operandValue}
+                        onChange={(event) => setVoiceDrafts((previous) => {
+                          const value = event.target.value;
+                          const isVoiceOperand = value.startsWith("voice:");
+                          return {
+                            ...previous,
+                            [voiceEvent.eventId]: {
+                              ...selection,
+                              operandOccurrenceId: value.startsWith("spectrum:") ? value.slice("spectrum:".length) : "",
+                              operandVoiceEventId: isVoiceOperand ? value.slice("voice:".length) : undefined,
+                            },
+                          };
+                        })}
                       >
-                        <option value="">Select an explicitly selected spectrum operand</option>
+                        <option value="">Select an explicitly computed operand</option>
                         {selectedOccurrenceOptions.map((occurrence) => {
                           const candidateId = selectedAssociations[occurrence.occurrenceId];
                           const candidate = occurrence.associationCandidates.find(({ candidateId: id }) => id === candidateId);
                           return (
-                            <option key={occurrence.occurrenceId} value={occurrence.occurrenceId}>
+                            <option key={occurrence.occurrenceId} value={`spectrum:${occurrence.occurrenceId}`}>
                               {occurrence.unit}@{occurrence.span.start} · {candidate?.association ?? "UNKNOWN_OR_NULL"}
                             </option>
                           );
                         })}
+                        {earlierComputedVoiceOptions.map(({ event: earlierEvent, output }) => (
+                          <option key={earlierEvent.eventId} value={`voice:${earlierEvent.eventId}`}>
+                            Voice {earlierEvent.canonicalIdentity}@{earlierEvent.position} · {output.text} · computed proposal
+                          </option>
+                        ))}
                       </select>
                     </label>
                   </fieldset>

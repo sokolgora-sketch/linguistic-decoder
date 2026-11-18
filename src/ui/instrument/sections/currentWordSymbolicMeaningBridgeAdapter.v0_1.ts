@@ -106,6 +106,8 @@ export function currentWordGraphMeaningSummaryV0_1(input: Readonly<{
       missingDescription = "Complete the missing relationship links in the symbolic graph.";
     } else if (reasonCodes.some((reason) => reason.startsWith("GRAPH_MEANING_MAPPING") || reason === "GRAPH_MEANING_ROLE_MAPPING_REQUIRED")) {
       missingDescription = "Complete at least one computed-output mapping to a proposed functional role.";
+    } else if (reasonCodes.includes("GRAPH_MEANING_TARGET_COMPOSITION_PARTIAL_NULL")) {
+      missingDescription = "Some target structure or operations remain unresolved. The computed contributions are partial and do not establish a whole-word explanation.";
     } else if (reasonCodes.includes("USER_PROPOSED_FUNCTION_FORM_AND_DESCRIPTION_REQUIRED")) {
       missingDescription = "Add a proposed function and its description.";
     } else if (reasonCodes.includes("FUNCTION_RELATION_KIND_NOT_SELECTED")) {
