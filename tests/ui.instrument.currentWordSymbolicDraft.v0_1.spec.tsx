@@ -5,6 +5,7 @@ import {
 } from "@/ui/instrument/sections/CurrentWordSymbolicDraftV0_1";
 import { SingleWordMotivationWorkbenchV0_1 } from "@/ui/instrument/sections/SingleWordMotivationWorkbenchV0_1";
 import type { SingleWordCurrentWordEvidenceContextV0_1 } from "@/ui/instrument/sections/SingleWordMotivationWorkbenchV0_1";
+import type { RuntimeAlbanianSourceSenseSelectionV0_1 } from "@/ui/instrument/sections/currentWordSourceFunctionalSuggestionAdapter.v0_1";
 
 const DIVISION = "d:division";
 const LIGHT = "d:light";
@@ -126,6 +127,28 @@ function selectNdarjeVoiceOperations() {
   select("Explicit operand for A@2", "spectrum:spectrum:D@1-2");
   select("Voice operator for E@5", EXPAND);
   select("Explicit operand for E@5", "voice:voice:A@2");
+}
+
+function selectedRuntimeNdarjeSense(): RuntimeAlbanianSourceSenseSelectionV0_1 {
+  return {
+    exactSourceForm: "ndarje",
+    apiUrl: "https://fjalorishqip.org/api/v1/fjala/ndarje.json",
+    licence: "CC BY-SA 4.0",
+    analysisLanguage: "sq",
+    analysisVariety: "Standard Albanian",
+    recordSources: ["sq-wiktionary", "editor"],
+    selectedSense: {
+      entryIndex: 1,
+      senseIndex: 1,
+      partOfSpeech: "noun",
+      gloss: "division; separation",
+      glossLanguage: "en",
+      senseSource: "sq-wiktionary",
+      tags: ["noun"],
+      entrySources: ["sq-wiktionary", "editor"],
+    },
+    alternativeSenses: [],
+  };
 }
 
 function completeNdarjeFunctionalDraft() {
@@ -388,6 +411,50 @@ describe("current-word symbolic draft v0.1", () => {
     expect(screen.getAllByTestId("current-word-symbolic-computed-output")
       .map(({ textContent }) => textContent).join(" "))
       .not.toContain("expanded(initiated(division))");
+  });
+
+  it("shows a generated conditional reading from the selected Fjalori sense and live computed chain", () => {
+    renderDraft({
+      analyzedWord: "NDARJE",
+      draftTargetWord: "NDARJE",
+      targetLanguage: "Albanian",
+      targetDialect: "Standard Albanian",
+      selectedSourceSense: selectedRuntimeNdarjeSense(),
+    });
+
+    expect(screen.getByTestId("current-word-exploratory-selected-sense")).toHaveTextContent(
+      "SOURCE_FACT · CITATION_ENTERED_UNVERIFIED · division; separation",
+    );
+    expect(screen.getByTestId("current-word-exploratory-null")).toHaveTextContent("PARTIAL_NULL");
+    expect(screen.getByText(/source-linked interpretation below uses your explicit sense selection and computed outputs/i)).toBeInTheDocument();
+    expect(screen.getByTestId("current-word-source-functional-manual-fallback")).not.toHaveAttribute("open");
+    expect(screen.getByTestId("current-word-symbolic-code-points")).toHaveTextContent(
+      "N@0 · D@1 · A@2 · R@3 · J@4 · E@5",
+    );
+    expect(screen.getByTestId("current-word-symbolic-written-voices")).toHaveTextContent("A@2 → E@5");
+
+    selectNdarjeVoiceOperations();
+
+    const explanation = screen.getByTestId("current-word-exploratory-explanation");
+    expect(explanation).toHaveTextContent("division; separation");
+    expect(explanation).toHaveTextContent("initiated(division)");
+    expect(explanation).toHaveTextContent("expanded(initiated(division))");
+    expect(screen.getByTestId("current-word-exploratory-computed-contributions")).toHaveTextContent(
+      "COMPUTED · A@2 · INITIATE / GROUND(division) → initiated(division)",
+    );
+    expect(screen.getByTestId("current-word-exploratory-computed-contributions")).toHaveTextContent(
+      "COMPUTED · E@5 · EXPAND / OUTWARD(initiated(division)) → expanded(initiated(division))",
+    );
+    expect(screen.getByTestId("current-word-exploratory-motivation")).toHaveTextContent("WHOLE_WORD_FUNCTION_NOT_ESTABLISHED");
+    expect(screen.getByTestId("current-word-exploratory-motivation")).toHaveTextContent("SOURCE_SYMBOLIC_RELATION_NOT_REPORTED");
+    expect(screen.getByTestId("current-word-exploratory-decision")).toHaveTextContent("no_single_winner · user_decides");
+    expect(screen.getByTestId("current-word-exploratory-motivation")).toHaveTextContent("source-authority promotion NONE");
+    expect(screen.getByTestId("current-word-exploratory-motivation")).toHaveTextContent("historical origin NOT_CLAIMED");
+
+    select("Spectrum association for D at position 1", LIGHT);
+    expect(screen.getByTestId("current-word-exploratory-explanation")).toHaveTextContent("initiated(light)");
+    expect(screen.getByTestId("current-word-exploratory-explanation")).toHaveTextContent("expanded(initiated(light))");
+    expect(screen.getByTestId("current-word-exploratory-explanation")).not.toHaveTextContent("initiated(division)");
   });
 
   it("displays a source-bounded NDARJE contribution chain without promoting its partial graph to a whole-word explanation", () => {

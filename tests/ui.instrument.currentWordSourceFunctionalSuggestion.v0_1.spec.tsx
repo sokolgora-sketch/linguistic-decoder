@@ -1,10 +1,18 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import {
+  buildCurrentWordExploratoryMotivationV0_1,
   buildCurrentWordSourceFunctionalSuggestionV0_1,
   type CurrentWordSourceFunctionalSuggestionDraftV0_1,
+  type RuntimeAlbanianSourceSenseSelectionV0_1,
 } from "@/ui/instrument/sections/currentWordSourceFunctionalSuggestionAdapter.v0_1";
 import { CurrentWordSourceFunctionalSuggestionV0_1 } from "@/ui/instrument/sections/CurrentWordSourceFunctionalSuggestionV0_1";
-import { CurrentWordSymbolicDraftV0_1 } from "@/ui/instrument/sections/CurrentWordSymbolicDraftV0_1";
+import { CurrentWordSymbolicDraftV0_1, buildCurrentWordSymbolicDraftProjectionV0_1 } from "@/ui/instrument/sections/CurrentWordSymbolicDraftV0_1";
+import type { SymbolicFunctionalCompositionResultV0_3 } from "@/shared/openInstrument/symbolicFunctionalComposition.v0_3";
+
+const DIVISION = "d:division";
+const LIGHT = "d:light";
+const INITIATE = "voice-a:initiate-ground";
+const EXPAND = "voice-e:expand-outward";
 
 function validDraft(overrides: Partial<CurrentWordSourceFunctionalSuggestionDraftV0_1> = {}): CurrentWordSourceFunctionalSuggestionDraftV0_1 {
   return {
@@ -31,6 +39,7 @@ function validDraft(overrides: Partial<CurrentWordSourceFunctionalSuggestionDraf
 }
 
 function fillNdarjeForm() {
+  fireEvent.click(screen.getByText("Optional manual research fallback · enter separate source claims"));
   const values: ReadonlyArray<readonly [string, string]> = [
     ["Exact source target form", "NDARJE"],
     ["Source-reported target sense label", "Action/state corresponding to NDAJ or NDAHEM"],
@@ -50,6 +59,63 @@ function fillNdarjeForm() {
     fireEvent.change(screen.getByLabelText(label), { target: { value } });
   }
   fireEvent.click(screen.getByLabelText("Source explicitly relates this action sense to the verb"));
+}
+
+function runtimeNdarjeSense(): RuntimeAlbanianSourceSenseSelectionV0_1 {
+  return {
+    exactSourceForm: "ndarje",
+    apiUrl: "https://fjalorishqip.org/api/v1/fjala/ndarje.json",
+    licence: "CC BY-SA 4.0",
+    analysisLanguage: "sq",
+    analysisVariety: "Standard Albanian",
+    recordSources: ["sq-wiktionary", "editor"],
+    selectedSense: {
+      entryIndex: 1,
+      senseIndex: 1,
+      partOfSpeech: "noun",
+      gloss: "division; separation",
+      glossLanguage: "en",
+      senseSource: "sq-wiktionary",
+      tags: ["noun"],
+      entrySources: ["sq-wiktionary", "editor"],
+    },
+    alternativeSenses: [{
+      entryIndex: 1,
+      senseIndex: 2,
+      partOfSpeech: "noun",
+      gloss: "a divided part",
+      glossLanguage: "en",
+      senseSource: "editor",
+      tags: [],
+      entrySources: ["sq-wiktionary", "editor"],
+    }],
+  };
+}
+
+function evaluatedNdarje(associationCandidateId = DIVISION, includeExpand = true): SymbolicFunctionalCompositionResultV0_3 {
+  const empty = buildCurrentWordSymbolicDraftProjectionV0_1({
+    exactSpelling: "NDARJE",
+    language: "sq",
+    variety: "Standard Albanian",
+    selections: { spectrumCandidateByOccurrenceId: {}, voiceDraftByEventId: {} },
+  });
+  if (!empty.structure.ok) throw new Error("NDARJE structure did not compile in test fixture");
+  const occurrence = empty.structure.spectrumOccurrences.find(({ unit }) => unit === "D");
+  const aEvent = empty.structure.voiceEvents.find(({ voice, position }) => voice === "A" && position === 2);
+  const eEvent = empty.structure.voiceEvents.find(({ voice, position }) => voice === "E" && position === 5);
+  if (!occurrence || !aEvent || !eEvent) throw new Error("NDARJE D/A/E test occurrences were not found");
+  return buildCurrentWordSymbolicDraftProjectionV0_1({
+    exactSpelling: "NDARJE",
+    language: "sq",
+    variety: "Standard Albanian",
+    selections: {
+      spectrumCandidateByOccurrenceId: { [occurrence.occurrenceId]: associationCandidateId },
+      voiceDraftByEventId: {
+        [aEvent.eventId]: { operatorCandidateId: INITIATE, operandOccurrenceId: occurrence.occurrenceId },
+        ...(includeExpand ? { [eEvent.eventId]: { operatorCandidateId: EXPAND, operandVoiceEventId: aEvent.eventId, operandOccurrenceId: "" } } : {}),
+      },
+    },
+  }).evaluation;
 }
 
 describe("current-word source functional suggestion v0.1", () => {
@@ -122,6 +188,7 @@ describe("current-word source functional suggestion v0.1", () => {
       />,
     );
     expect(screen.getByTestId("current-word-source-suggestion-runtime-status")).toHaveTextContent("SOURCE_NOT_FOUND");
+    expect(screen.getByTestId("current-word-exploratory-null")).toHaveTextContent("SOURCE_SENSE_NOT_SELECTED");
     expect(screen.getByTestId("current-word-source-functional-null")).toHaveTextContent("UNKNOWN_OR_NULL");
     expect(screen.queryByTestId("current-word-source-functional-suggestion-text")).not.toBeInTheDocument();
 
@@ -139,6 +206,124 @@ describe("current-word source functional suggestion v0.1", () => {
     expect(screen.getByText(/source authority promotion: NONE/)).toBeInTheDocument();
     expect(screen.getByText(/Unassigned target Voice roles: A@2, E@5 · UNKNOWN_OR_NULL/)).toBeInTheDocument();
     expect(screen.getByText(/Unassigned consonant associations: N@0, D@1, R@3, J@4 · UNKNOWN_OR_NULL/)).toBeInTheDocument();
+  });
+
+  it("generates a conditional reading from the selected runtime sense and verified evaluator outputs", () => {
+    const selection = runtimeNdarjeSense();
+    const evaluation = evaluatedNdarje();
+    if (!evaluation.ok) throw new Error("expected successful symbolic evaluation");
+    const projection = buildCurrentWordExploratoryMotivationV0_1({
+      analyzedWord: "NDARJE",
+      draftTargetWord: "NDARJE",
+      language: "Albanian",
+      variety: "Standard Albanian",
+      selectedSourceSense: selection,
+      evaluation,
+    });
+
+    expect(projection.status).toBe("CONDITIONAL_SUGGESTION");
+    expect(projection.sourceContent?.ok).toBe(true);
+    if (!projection.sourceContent?.ok) return;
+    expect(projection.sourceContent.content.target.codePoints).toEqual(
+      Array.from("NDARJE").map((character, position) => ({ character, position })),
+    );
+    expect(projection.sourceContent.content.target.writtenVoices).toEqual([
+      { voice: "A", position: 2 },
+      { voice: "E", position: 5 },
+    ]);
+    expect(projection.sourceContent.content.target.selectedSense).toMatchObject({
+      label: "division; separation",
+      claimLayer: "SOURCE_FACT",
+      evidenceStatus: "CITATION_ENTERED_UNVERIFIED",
+      functionalFrame: "UNKNOWN_OR_NULL",
+    });
+    expect(projection.computedContributions.map(({ contribution }) => contribution)).toEqual([
+      "INITIATE / GROUND(division) → initiated(division)",
+      "EXPAND / OUTWARD(initiated(division)) → expanded(initiated(division))",
+    ]);
+    expect(projection.conditionalExplanation).toContain("could be proposed as a conditional functional framing");
+    expect(projection.reasonCodes).toContain("SOURCE_SYMBOLIC_RELATION_NOT_REPORTED");
+    expect(projection.wholeWordStatus).toBe("PARTIAL_NULL");
+    expect(projection.sourceAuthorityPromotion).toBe("NONE");
+    expect(projection.historicalOrigin).toBe("NOT_CLAIMED");
+    expect(projection.noSingleWinner).toBe(true);
+    expect(projection.userDecisionPosture).toBe("user_decides");
+
+    const changed = buildCurrentWordExploratoryMotivationV0_1({
+      analyzedWord: "NDARJE",
+      draftTargetWord: "NDARJE",
+      language: "Albanian",
+      variety: "Standard Albanian",
+      selectedSourceSense: selection,
+      evaluation: evaluatedNdarje(LIGHT),
+    });
+    expect(changed.computedContributions[0]?.outputText).toBe("initiated(light)");
+    expect(changed.conditionalExplanation).toContain("initiated(light)");
+    expect(changed.conditionalExplanation).not.toContain("initiated(division)");
+  });
+
+  it("keeps unresolved structure and broken Voice dependencies partial", () => {
+    const evaluation = evaluatedNdarje();
+    if (!evaluation.ok) throw new Error("expected evaluator success result");
+    const brokenEvaluation = {
+      ...evaluation,
+      operationTrace: evaluation.operationTrace.map((trace) => trace.kind === "APPLY_VOICE_OPERATOR" && trace.targetVoiceEventId === "voice:E@5"
+        ? { ...trace, dependsOn: [] }
+        : trace),
+    } as SymbolicFunctionalCompositionResultV0_3;
+    const projection = buildCurrentWordExploratoryMotivationV0_1({
+      analyzedWord: "NDARJE",
+      draftTargetWord: "NDARJE",
+      language: "Albanian",
+      variety: "Standard Albanian",
+      selectedSourceSense: runtimeNdarjeSense(),
+      evaluation: brokenEvaluation,
+    });
+    expect(projection.status).toBe("PARTIAL_NULL");
+    expect(projection.wholeWordStatus).toBe("PARTIAL_NULL");
+    expect(projection.computedContributions).toHaveLength(1);
+    expect(projection.unresolved).toContain("VOICE_OPERATION_NOT_VERIFIABLY_COMPUTED:draft-voice-1");
+    expect(projection.conditionalExplanation).toContain("initiated(division)");
+
+    const mismatched = buildCurrentWordExploratoryMotivationV0_1({
+      analyzedWord: "NDARJE",
+      draftTargetWord: "NDAJ",
+      language: "Albanian",
+      variety: "Standard Albanian",
+      selectedSourceSense: runtimeNdarjeSense(),
+      evaluation,
+    });
+    expect(mismatched.status).toBe("PARTIAL_NULL");
+    expect(mismatched.sourceContent).toBeNull();
+    expect(mismatched.reasonCodes).toContain("CURRENT_WORD_IDENTITY_MISMATCH");
+    expect(mismatched.conditionalExplanation).toBeNull();
+  });
+
+  it("withholds a direct Voice result when its spectrum-selection dependency is absent", () => {
+    const evaluation = evaluatedNdarje();
+    if (!evaluation.ok) throw new Error("expected successful symbolic evaluation");
+    const brokenEvaluation = {
+      ...evaluation,
+      operationTrace: evaluation.operationTrace.map((trace) =>
+        trace.kind === "APPLY_VOICE_OPERATOR" && trace.targetVoiceEventId === "voice:A@2"
+          ? { ...trace, dependsOn: [] }
+          : trace,
+      ),
+    } as SymbolicFunctionalCompositionResultV0_3;
+
+    const projection = buildCurrentWordExploratoryMotivationV0_1({
+      analyzedWord: "NDARJE",
+      draftTargetWord: "NDARJE",
+      language: "Albanian",
+      variety: "Standard Albanian",
+      selectedSourceSense: runtimeNdarjeSense(),
+      evaluation: brokenEvaluation,
+    });
+
+    expect(projection.status).toBe("PARTIAL_NULL");
+    expect(projection.computedContributions).toHaveLength(0);
+    expect(projection.unresolved).toContain("VOICE_OPERATION_NOT_VERIFIABLY_COMPUTED:draft-voice-0");
+    expect(projection.conditionalExplanation).toBeNull();
   });
 
   it("withholds entered source relationships when the current draft target differs", () => {

@@ -11,6 +11,7 @@ function responseFor(
     description?: string | null;
     entrySources?: readonly (readonly string[])[];
     recordSources?: readonly string[];
+    senses?: readonly Readonly<{ gloss: string; lang: "en" | "sq"; source: string; tags?: readonly string[] }>[];
   }> = {},
 ) {
   const entrySources = options.entrySources ?? [["en-wiktionary", "wikidata"]];
@@ -28,7 +29,9 @@ function responseFor(
       entries: entrySources.map((sources) => ({
         pos: "noun",
         sources: [...sources],
-        senses: [{ gloss: "test-only English gloss", lang: "en", source: "en-wiktionary" }],
+        senses: options.senses?.map((sense) => ({ ...sense, tags: [...(sense.tags ?? [])] })) ?? [
+          { gloss: "test-only English gloss", lang: "en", source: "en-wiktionary" },
+        ],
       })),
     }),
   };
@@ -76,6 +79,56 @@ describe("FjaloriShqip Albanian meaning evidence v0.1", () => {
       "https://fjalorishqip.org/api/v1/fjala/drit%C3%AB.json",
       expect.objectContaining({ cache: "force-cache" }),
     );
+  });
+
+  it("passes only an explicitly selected, response-attributed lexical sense to the workbench", async () => {
+    global.fetch = jest.fn().mockResolvedValue(responseFor("ndarje", {
+      entrySources: [["sq-wiktionary", "editor"]],
+      recordSources: ["sq-wiktionary", "editor"],
+      senses: [
+        { gloss: "division; separation", lang: "en", source: "sq-wiktionary", tags: ["noun"] },
+        { gloss: "a divided part", lang: "en", source: "editor" },
+      ],
+    })) as unknown as typeof fetch;
+    const onSelect = jest.fn();
+
+    render(
+      <FjaloriCrossSourceEvidenceV0_1
+        word="NDARJE"
+        analysisLanguage="sq"
+        analysisVariety="Standard Albanian"
+        onSelectSourceSenseForMotivation={onSelect}
+      />,
+    );
+
+    await screen.findByText("division; separation");
+    expect(onSelect).not.toHaveBeenCalled();
+    fireEvent.click(screen.getByRole("button", { name: "Use Fjalori source sense entry 1 sense 1 in the functional workbench" }));
+
+    expect(onSelect).toHaveBeenCalledWith(expect.objectContaining({
+      exactSourceForm: "ndarje",
+      apiUrl: "https://fjalorishqip.org/api/v1/fjala/ndarje.json",
+      licence: "CC BY-SA 4.0",
+      analysisLanguage: "sq",
+      analysisVariety: "Standard Albanian",
+      recordSources: ["sq-wiktionary", "editor"],
+      selectedSense: expect.objectContaining({
+        entryIndex: 1,
+        senseIndex: 1,
+        gloss: "division; separation",
+        senseSource: "sq-wiktionary",
+        tags: ["noun"],
+      }),
+      alternativeSenses: [expect.objectContaining({
+        entryIndex: 1,
+        senseIndex: 2,
+        gloss: "a divided part",
+        senseSource: "editor",
+      })],
+    }));
+    expect(screen.getByTestId("fjalori-workbench-sense-selection")).toHaveTextContent("USER_SELECTED");
+    fireEvent.click(screen.getByRole("button", { name: "Clear workbench sense selection" }));
+    expect(onSelect).toHaveBeenLastCalledWith(null);
   });
 
   it("preserves the KAN proposal spelling while requesting the established canonical form", async () => {

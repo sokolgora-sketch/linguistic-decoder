@@ -5,11 +5,13 @@ import { readFileSync } from "node:fs";
 import React from "react";
 import {
   cleanup,
+  fireEvent,
   render,
   screen,
 } from "@testing-library/react";
 
 import { GET } from "../app/api/analyze-v1/route";
+import { GET as getAnalyzeV2 } from "../app/api/analyze-v2/route";
 import { adaptAnalysisToTelemetryVM } from "../src/ui/instrument/contractAdapter";
 import { buildCandidateRowsFromVM } from "../src/ui/candidates/candidateModel";
 import { InstrumentPanel } from "../src/ui/instrument/InstrumentPanel";
@@ -23,9 +25,11 @@ const baselineManifest = JSON.parse(
     "utf8",
   ),
 ) as { cases: AnyRecord[] };
+const originalFetch = global.fetch;
 
 afterEach(() => {
   cleanup();
+  global.fetch = originalFetch;
 });
 
 async function analyze(input: AnyRecord): Promise<AnyRecord> {
@@ -130,6 +134,64 @@ describe("Open Instrument lexical evidence primary surface v0.1", () => {
     expect(lexical).toHaveTextContent("Source form: QIRI");
     expect(lexical).toHaveTextContent("Source form: candēla");
     expect(lexical).not.toHaveTextContent(/functional correspondence/i);
+  });
+
+  it("hands an explicitly selected Fjalori sense from Overview into the current-word symbolic workbench", async () => {
+    const v2Response = await getAnalyzeV2(
+      new Request("http://localhost/api/analyze-v2?word=NDARJE&mode=strict&alphabet=albanian&language=sq"),
+    );
+    expect(v2Response.status).toBe(200);
+    const body = await v2Response.json() as AnyRecord;
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => ({
+        word: "ndarje",
+        licence: "CC BY-SA 4.0",
+        attribution: ["Albanian descriptions written with AI help — CC BY-SA 4.0"],
+        sources: ["sq-wiktionary", "editor"],
+        description: { text: "AI-assisted record description", source: "ai" },
+        entries: [{
+          pos: "noun",
+          sources: ["sq-wiktionary", "editor"],
+          senses: [
+            { gloss: "division; separation", lang: "en", source: "sq-wiktionary", tags: ["noun"] },
+            { gloss: "a divided part", lang: "en", source: "editor", tags: [] },
+          ],
+        }],
+      }),
+    }) as unknown as typeof fetch;
+
+    render(<InstrumentPanel payload={body} />);
+    const selectSense = await screen.findByRole("button", {
+      name: "Use Fjalori source sense entry 1 sense 1 in the functional workbench",
+    });
+    expect(screen.getAllByTestId("fjalori-source-sense-gloss").map((node) => node.textContent)).toEqual([
+      "division; separation",
+      "a divided part",
+    ]);
+    fireEvent.click(selectSense);
+    expect(screen.getByTestId("fjalori-workbench-sense-selection")).toHaveTextContent("USER_SELECTED");
+
+    fireEvent.click(screen.getByRole("tab", { name: "My Interpretation" }));
+    expect(screen.getByTestId("current-word-exploratory-selected-sense")).toHaveTextContent("division; separation");
+    expect(screen.getByTestId("current-word-exploratory-alternatives")).toHaveTextContent("a divided part");
+    expect(screen.getByTestId("current-word-symbolic-written-voices")).toHaveTextContent("A@2 → E@5");
+
+    fireEvent.change(screen.getByLabelText("Spectrum association for D at position 1"), { target: { value: "d:division" } });
+    fireEvent.change(screen.getByLabelText("Voice operator for A@2"), { target: { value: "voice-a:initiate-ground" } });
+    fireEvent.change(screen.getByLabelText("Explicit operand for A@2"), { target: { value: "spectrum:spectrum:D@1-2" } });
+    fireEvent.change(screen.getByLabelText("Voice operator for E@5"), { target: { value: "voice-e:expand-outward" } });
+    fireEvent.change(screen.getByLabelText("Explicit operand for E@5"), { target: { value: "voice:voice:A@2" } });
+
+    expect(screen.getByTestId("current-word-exploratory-explanation")).toHaveTextContent("division; separation");
+    expect(screen.getByTestId("current-word-exploratory-explanation")).toHaveTextContent("expanded(initiated(division))");
+    expect(screen.getByTestId("current-word-exploratory-motivation")).toHaveTextContent("PARTIAL_NULL");
+    expect(screen.getByTestId("current-word-exploratory-motivation")).toHaveTextContent("N@0");
+    expect(screen.getByTestId("current-word-exploratory-motivation")).toHaveTextContent("R@3");
+    expect(screen.getByTestId("current-word-exploratory-motivation")).toHaveTextContent("J@4");
+    expect(screen.getByTestId("current-word-exploratory-decision")).toHaveTextContent("no_single_winner · user_decides");
+    expect(screen.getByTestId("current-word-exploratory-motivation")).toHaveTextContent("source-authority promotion NONE");
   });
 
   it("does not create a lexical block when the result has no evidence", async () => {

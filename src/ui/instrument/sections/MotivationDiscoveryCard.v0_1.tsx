@@ -16,6 +16,7 @@ import type {
 } from "@/shared/openInstrument/motivationEngineDiscoveryServerOnly.v0_1";
 import type { NeutralInterpretationSelectionV0_2 } from "@/shared/openInstrument/neutralInterpretationProjection.v0_2";
 import { FjaloriCrossSourceEvidenceV0_1 } from "@/ui/instrument/sections/FjaloriCrossSourceEvidence.v0_1";
+import type { RuntimeAlbanianSourceSenseSelectionV0_1 } from "@/ui/instrument/sections/currentWordSourceFunctionalSuggestionAdapter.v0_1";
 import {
   aggregateMotivationDiscoveryCandidatesV0_1,
   measureMotivationDiscoveryAggregationV0_1,
@@ -132,6 +133,17 @@ function zcText(value: unknown): string {
   const d = Array.isArray(record.d) ? record.d.join(" · ") : null;
   if (p === null || s === null || a === null || i === null || d === null) return "present";
   return `P ${p} · I ${i || "none"} · S ${s} · D ${d || "none"} · A ${a}`;
+}
+
+function identifiesAlbanianSourceContext(language: string, profile: string): boolean {
+  const normalize = (value: string) => value.normalize("NFC").trim().toLocaleLowerCase("en-US");
+  const normalizedLanguage = normalize(language);
+  const normalizedProfile = normalize(profile);
+  const values = [normalizedLanguage, normalizedProfile].filter(Boolean);
+  const isAlbanian = (value: string) => value === "sq" || value.startsWith("sq-") || value.includes("albanian");
+  const isExplicitlyOtherLanguage = (value: string) => /\b(english|latin|greek|turkish|arabic)\b/u.test(value);
+  return values.some(isAlbanian) && !values.some(isExplicitlyOtherLanguage) &&
+    (!normalizedLanguage || isAlbanian(normalizedLanguage));
 }
 
 function functionalStatusLabel(
@@ -516,11 +528,13 @@ export function MotivationDiscoveryCardV0_1({
   discovery,
   interpretation,
   onAnalyzeAlbanianSourceRecord,
+  onSelectSourceSenseForMotivation,
   sourceRecordSelectionDisabled = false,
 }: {
   discovery: PresentOrMissing<MotivationDiscoveryV0_2VM> | undefined;
   interpretation?: PresentOrMissing<FunctionalMotivationInterpretationV0_2VM | FunctionalMotivationInterpretationV0_3VM>;
   onAnalyzeAlbanianSourceRecord?: (sourceRecordId: string) => void;
+  onSelectSourceSenseForMotivation?: (selection: RuntimeAlbanianSourceSenseSelectionV0_1 | null) => void;
   sourceRecordSelectionDisabled?: boolean;
 }) {
   if (!discovery || discovery.kind !== "present") return null;
@@ -1025,9 +1039,6 @@ export function MotivationDiscoveryCardV0_1({
                 </div>
               </div>
             </div>
-          ) : null}
-          {albanianLexicalReading.primarySourceFact ? (
-            <FjaloriCrossSourceEvidenceV0_1 word={value.inputWord} />
           ) : null}
           {albanianLexicalReading.senseAlignedLexicalRole ? (
             <section
@@ -1594,6 +1605,15 @@ export function MotivationDiscoveryCardV0_1({
             </div>
           )}
         </div>
+      ) : null}
+
+      {onSelectSourceSenseForMotivation && identifiesAlbanianSourceContext(value.inputLanguage, value.inputProfile) ? (
+        <FjaloriCrossSourceEvidenceV0_1
+          word={value.inputWord}
+          analysisLanguage={value.inputLanguage}
+          analysisVariety={value.inputProfile}
+          onSelectSourceSenseForMotivation={onSelectSourceSenseForMotivation}
+        />
       ) : null}
 
       {interpretation?.kind === "present" ? (

@@ -2,12 +2,21 @@
 
 import { useMemo, useState } from "react";
 import {
+  buildCurrentWordExploratoryMotivationV0_1,
   buildCurrentWordSourceFunctionalSuggestionV0_1,
   type CurrentWordSourceFunctionalSuggestionDraftV0_1,
+  type RuntimeAlbanianSourceSenseSelectionV0_1,
 } from "@/ui/instrument/sections/currentWordSourceFunctionalSuggestionAdapter.v0_1";
+import type { SymbolicFunctionalCompositionResultV0_3 } from "@/shared/openInstrument/symbolicFunctionalComposition.v0_3";
+import { SYMBOLIC_FUNCTIONAL_COMPOSITION_SCHEMA_V0_3 } from "@/shared/openInstrument/symbolicFunctionalComposition.v0_3";
 
 const textFieldClass = "mt-1 w-full min-w-0 rounded border border-[#46505c] bg-[#0d1117] px-2 py-1.5 text-sm text-[#f5f7fb] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#d8bb7a]";
 const fieldLabelClass = "block min-w-0 text-xs font-medium text-[#c5ced8]";
+const missingEvaluation: SymbolicFunctionalCompositionResultV0_3 = {
+  ok: false,
+  schemaVersion: SYMBOLIC_FUNCTIONAL_COMPOSITION_SCHEMA_V0_3,
+  reasonCodes: ["SYMBOLIC_EVALUATION_NOT_SUPPLIED"],
+};
 
 type DraftField = Exclude<keyof CurrentWordSourceFunctionalSuggestionDraftV0_1,
   "analyzedWord" | "draftTargetWord" | "language" | "variety" | "sourceReportsActionRelation">;
@@ -35,6 +44,8 @@ export function CurrentWordSourceFunctionalSuggestionV0_1({
   variety,
   identityMatches,
   runtimeSourceStatus,
+  selectedSourceSense = null,
+  evaluation = missingEvaluation,
 }: {
   analyzedWord: string;
   draftTargetWord: string;
@@ -42,6 +53,8 @@ export function CurrentWordSourceFunctionalSuggestionV0_1({
   variety: string;
   identityMatches: boolean;
   runtimeSourceStatus?: Readonly<{ status: string; reasonCode?: string | null }>;
+  selectedSourceSense?: RuntimeAlbanianSourceSenseSelectionV0_1 | null;
+  evaluation?: SymbolicFunctionalCompositionResultV0_3;
 }) {
   const [fields, setFields] = useState(emptyFields);
   const [sourceReportsActionRelation, setSourceReportsActionRelation] = useState(false);
@@ -57,6 +70,14 @@ export function CurrentWordSourceFunctionalSuggestionV0_1({
   const update = (field: DraftField, value: string) => setFields((current) => ({ ...current, [field]: value }));
   const content = projection.result?.ok ? projection.result.content : null;
   const composition = content?.compositions.find(({ targetSenseId }) => targetSenseId === content.target.selectedSense.senseId);
+  const exploratoryProjection = useMemo(() => buildCurrentWordExploratoryMotivationV0_1({
+    analyzedWord,
+    draftTargetWord,
+    language,
+    variety,
+    selectedSourceSense,
+    evaluation,
+  }), [analyzedWord, draftTargetWord, language, variety, selectedSourceSense, evaluation]);
 
   return (
     <section
@@ -66,12 +87,71 @@ export function CurrentWordSourceFunctionalSuggestionV0_1({
     >
       <h4 className="font-semibold text-[#d8e4ca]">Source-linked conditional function suggestion</h4>
       <p className="mt-1 text-[#aeb7c5]">
-        Enter short source paraphrases and citations. Nothing is looked up or selected automatically. The generated action/process wording is a logical inference from the relation you record; citations stay unverified and linguistic applicability is not assessed. This remains separate from the symbolic hypotheses below.
+        Select a lexical sense in the Overview source panel, then choose symbolic hypotheses above. The conditional wording below is generated from that selected source response and the evaluator outputs; the source does not authorize their relationship.
       </p>
+      <div className="mt-2 rounded border border-[#53604a] bg-[#111710] p-2" data-testid="current-word-exploratory-motivation">
+        <h5 className="font-semibold text-[#f5f7fb]">Conditional exploratory interpretation</h5>
+        {exploratoryProjection.sourceContent?.ok ? (
+          <>
+            <p className="mt-1 break-words" data-testid="current-word-exploratory-selected-sense">
+              SOURCE_FACT · CITATION_ENTERED_UNVERIFIED · {exploratoryProjection.sourceContent.content.target.selectedSense.label}
+            </p>
+            <p className="mt-1 break-words text-[10px] text-[#aeb7c5]">
+              FjaloriShqip · {selectedSourceSense?.selectedSense.senseSource} · Entry {selectedSourceSense?.selectedSense.entryIndex} · Sense {selectedSourceSense?.selectedSense.senseIndex} · response position, not a source-issued sense ID · entry sources {selectedSourceSense?.selectedSense.entrySources.join(", ") || "UNKNOWN_OR_NULL"} · record sources {selectedSourceSense?.recordSources.join(", ") || "UNKNOWN_OR_NULL"}
+            </p>
+            {selectedSourceSense ? (
+              <p className="mt-1 break-all text-[10px] text-[#aeb7c5]" data-testid="current-word-exploratory-source-citation">
+                Source response: <a className="underline" href={selectedSourceSense.apiUrl} target="_blank" rel="noreferrer">{selectedSourceSense.apiUrl}</a> · {selectedSourceSense.licence} · citation CITATION_ENTERED_UNVERIFIED
+              </p>
+            ) : null}
+            {exploratoryProjection.conditionalExplanation ? (
+              <p className="mt-2 break-words" data-testid="current-word-exploratory-explanation">
+                {exploratoryProjection.conditionalExplanation}
+              </p>
+            ) : (
+              <p role="status" className="mt-2 text-[#f0ddb0]" data-testid="current-word-exploratory-null">
+                PARTIAL_NULL · choose at least one complete Voice operation with an explicit computed operand.
+              </p>
+            )}
+            {exploratoryProjection.computedContributions.length ? (
+              <ol className="mt-2 space-y-1" data-testid="current-word-exploratory-computed-contributions">
+                {exploratoryProjection.computedContributions.map((contribution) => (
+                  <li key={contribution.operationId} className="break-words">
+                    COMPUTED · {contribution.voice}@{contribution.position} · {contribution.contribution} · USER_PROPOSED / EXPLORATORY_HYPOTHESIS
+                  </li>
+                ))}
+              </ol>
+            ) : null}
+            {exploratoryProjection.sourceContent.content.target.alternativeSenses.length ? (
+              <div className="mt-2" data-testid="current-word-exploratory-alternatives">
+                Other source response senses remain alternatives: {exploratoryProjection.sourceContent.content.target.alternativeSenses.map(({ label }) => label).join(" · ")} · CITATION_ENTERED_UNVERIFIED
+              </div>
+            ) : null}
+            <p className="mt-2 break-words text-[#c5b995]">
+              The source response reports the lexical gloss only; it does not establish a symbolic, morphological, or derivational relationship. Remaining material: {exploratoryProjection.unresolved.join(" · ") || "UNKNOWN_OR_NULL"}.
+            </p>
+            <p className="mt-1">Conditional proposal: {exploratoryProjection.status} · whole-word status: {exploratoryProjection.wholeWordStatus} · source-authority promotion {exploratoryProjection.sourceAuthorityPromotion} · historical origin {exploratoryProjection.historicalOrigin}</p>
+            <p className="mt-1" data-testid="current-word-exploratory-decision">{exploratoryProjection.noSingleWinner ? "no_single_winner" : "UNKNOWN_OR_NULL"} · {exploratoryProjection.userDecisionPosture}</p>
+            {exploratoryProjection.reasonCodes.length ? (
+              <p className="mt-1 break-words text-[10px] text-[#aeb7c5]" data-testid="current-word-exploratory-reason-codes">
+                Reason codes: {exploratoryProjection.reasonCodes.join(" · ")}
+              </p>
+            ) : null}
+          </>
+        ) : (
+          <p role="status" className="mt-1 text-[#f0ddb0]" data-testid="current-word-exploratory-null">
+            PARTIAL_NULL · {exploratoryProjection.reasonCodes.join(" · ") || "No source sense is selected. Choose one explicitly in the Overview FjaloriShqip panel; no interpretation is selected automatically."}
+          </p>
+        )}
+      </div>
       <p className="mt-1 text-[#c5ced8]" data-testid="current-word-source-suggestion-runtime-status">
-        Current exact-form source lookup: {runtimeSourceStatus?.status ?? "UNKNOWN_OR_NULL"}
+        Existing analysis lexical-source status (separate from the selected FjaloriShqip response): {runtimeSourceStatus?.status ?? "UNKNOWN_OR_NULL"}
         {runtimeSourceStatus?.reasonCode ? ` · ${runtimeSourceStatus.reasonCode}` : ""}. A missing runtime lookup does not become evidence here.
       </p>
+
+      <details className="mt-2 rounded border border-[#38433a] p-2" data-testid="current-word-source-functional-manual-fallback">
+        <summary className="cursor-pointer font-semibold text-[#d8e4ca]">Optional manual research fallback · enter separate source claims</summary>
+        <p className="mt-1 text-[10px] text-[#aeb7c5]">Use only when no suitable runtime lexical sense is available. Every entered relation remains user-asserted and citation-unverified; it is not merged with the source-selected symbolic path above.</p>
 
       {!identityMatches ? (
         <p role="status" data-testid="current-word-source-suggestion-identity-null" className="mt-2 rounded border border-[#746541] bg-[#18140e] p-2 text-[#f0ddb0]">
@@ -195,6 +275,7 @@ export function CurrentWordSourceFunctionalSuggestionV0_1({
           ) : null}
         </>
       )}
+      </details>
     </section>
   );
 }
