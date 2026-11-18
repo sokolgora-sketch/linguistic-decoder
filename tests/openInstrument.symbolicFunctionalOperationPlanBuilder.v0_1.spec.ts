@@ -19,7 +19,7 @@ function associationId(unit: string, association: string): string {
   return candidate.candidateId;
 }
 
-function operatorId(voice: "A" | "I" | "U"): string {
+function operatorId(voice: "A" | "E" | "I" | "U"): string {
   const candidate = SYMBOLIC_VOICE_OPERATOR_PROFILE_V0_3.find((entry) => entry.voice === voice);
   if (!candidate) throw new Error(`Missing fixture Voice operator ${voice}`);
   return candidate.candidateId;
@@ -257,6 +257,168 @@ function dallimInput(
   };
 }
 
+function ndarjePartialInput(): SymbolicFunctionalOperationPlanInputV0_1 {
+  const selectedSenseId = "user-proposed-ndarje-action";
+  const functionCandidateId = "user-proposed-ndaj-divide";
+  const compositionOperationId = "user-proposed-ndarje-action-relation";
+  const sourceFunctionInput: SymbolicFunctionalContentInputV0_1 = {
+    target: {
+      exactSpelling: "NDARJE",
+      language: "Albanian",
+      variety: "Standard Albanian",
+      selectedSense: {
+        senseId: selectedSenseId,
+        label: "Action/state of separation or division",
+        definition: "User-proposed working sense; external citations are not attached as source records.",
+        claimLayer: "USER_PROPOSAL",
+        evidenceStatus: "USER_PROPOSED",
+        sourceIds: [],
+        functionalFrame: "ACTION_OF_VERB_FUNCTION",
+      },
+      alternativeSenses: [],
+    },
+    sources: [],
+    segmentationCandidates: [{
+      candidateId: "user-proposed-ndar-plus-je",
+      components: [
+        { componentId: "ndar", exactSpelling: "NDAR" },
+        { componentId: "je", exactSpelling: "JE" },
+      ],
+      claimLayer: "USER_PROPOSAL",
+      evidenceStatus: "USER_PROPOSED",
+      sourceIds: [],
+    }],
+    functionCandidates: [{
+      candidateId: functionCandidateId,
+      exactForm: "NDAJ / NDAHEM",
+      sourceSenseId: selectedSenseId,
+      functionText: "separate or divide a whole into parts",
+      claimLayer: "USER_PROPOSAL",
+      evidenceStatus: "USER_PROPOSED",
+      sourceIds: [],
+    }],
+    componentFunctionBindings: [],
+    voiceRoleCandidates: [],
+    consonantAssociationCandidates: [],
+    compositionOperations: [{
+      operationId: compositionOperationId,
+      operationType: "ACTION_OF_VERB_FUNCTION",
+      candidateLabel: "User-proposed action/function relation",
+      targetSenseId: selectedSenseId,
+      functionCandidateId,
+      operationStatus: "USER_PROPOSED",
+      evidenceStatus: "USER_PROPOSED",
+      relationSourceIds: [],
+    }],
+    alternativeReadings: [{
+      readingId: "user-proposed-ndarje-part-sense",
+      text: "Alternative: a part or compartment into which something is divided; external citation not attached to this analysis.",
+      claimLayer: "USER_PROPOSAL",
+      evidenceStatus: "USER_PROPOSED",
+      sourceIds: [],
+    }],
+    unresolvedClaims: [{
+      claimId: "ndarje-internal-morphology",
+      text: "N, R, J and a word-specific NDAR + -JE derivation remain unresolved.",
+      sourceIds: [],
+    }],
+  };
+
+  return {
+    target: { exactSpelling: "NDARJE", language: "Albanian", variety: "Standard Albanian" },
+    sourceFunctionInput,
+    spectrumSelections: [{
+      selectionId: "d-at-1",
+      unit: "D",
+      start: 1,
+      end: 2,
+      associationCandidateId: associationId("D", "division"),
+    }],
+    voiceBindings: [
+      {
+        bindingId: "a-at-2",
+        voice: "A",
+        position: 2,
+        operatorCandidateId: operatorId("A"),
+        input: { kind: "SPECTRUM_SELECTION", selectionId: "d-at-1" },
+      },
+      {
+        bindingId: "e-at-5",
+        voice: "E",
+        position: 5,
+        operatorCandidateId: operatorId("E"),
+        input: { kind: "VOICE_BINDING", bindingId: "a-at-2" },
+      },
+    ],
+    functionalEdges: [
+      {
+        edgeId: "division-to-initiation",
+        left: { kind: "SPECTRUM_SELECTION", selectionId: "d-at-1" },
+        right: { kind: "VOICE_BINDING", bindingId: "a-at-2" },
+        relationText: "initiates",
+      },
+      {
+        edgeId: "initiation-to-expansion",
+        left: { kind: "VOICE_BINDING", bindingId: "a-at-2" },
+        right: { kind: "VOICE_BINDING", bindingId: "e-at-5" },
+        relationText: "is expanded outward as",
+      },
+    ],
+    transformationLabel: "user-proposed NDARJE separation path",
+    functionalBridges: [{
+      bridgeId: "user-proposed-separation-bridge",
+      targetSenseId: selectedSenseId,
+      role: "PRIMARY",
+      status: "USER_PROPOSED",
+      text: "An initiated division expanded outward into parts is proposed as one possible reading of separation or division.",
+      claimLayer: "USER_PROPOSAL",
+      evidenceStatus: "USER_PROPOSED",
+      sourceIds: [],
+    }],
+    functionalRoleMappings: [
+      {
+        mappingId: "initiated-division-role",
+        bridgeId: "user-proposed-separation-bridge",
+        symbolOutputId: "symbol:voice:a-at-2",
+        selectedSenseId,
+        functionCandidateId,
+        compositionOperationId,
+        functionalRole: {
+          roleId: "initiated-division",
+          label: "an initiated act of dividing",
+          claimLayer: "USER_PROPOSAL",
+          evidenceStatus: "USER_PROPOSED",
+          sourceIds: [],
+        },
+        relationType: "PROPOSED_CONTRIBUTES_TO_SELECTED_LEXICAL_FUNCTION",
+      },
+      {
+        mappingId: "expanded-division-role",
+        bridgeId: "user-proposed-separation-bridge",
+        symbolOutputId: "symbol:voice:e-at-5",
+        selectedSenseId,
+        functionCandidateId,
+        compositionOperationId,
+        functionalRole: {
+          roleId: "expanded-division",
+          label: "the division extended into separate parts",
+          claimLayer: "USER_PROPOSAL",
+          evidenceStatus: "USER_PROPOSED",
+          sourceIds: [],
+        },
+        relationType: "PROPOSED_CONTRIBUTES_TO_SELECTED_LEXICAL_FUNCTION",
+      },
+    ],
+    unresolvedParts: [{
+      claimId: "unresolved-ndarje-material",
+      text: "N, R, J and the word-specific NDAR + -JE analysis remain unresolved.",
+      claimLayer: "UNKNOWN_OR_NULL",
+      evidenceStatus: "UNKNOWN_OR_NULL",
+      sourceIds: [],
+    }],
+  };
+}
+
 function syntheticNonDallimInput(): SymbolicFunctionalOperationPlanInputV0_1 {
   const sourceFunctionInput: SymbolicFunctionalContentInputV0_1 = {
     target: {
@@ -371,6 +533,62 @@ function syntheticNonDallimInput(): SymbolicFunctionalOperationPlanInputV0_1 {
 }
 
 describe("symbolic functional operation plan builder v0.1", () => {
+  it("maps a computed NDARJE subgraph while preserving target-level Null for unresolved structure", () => {
+    const result = buildSymbolicFunctionalOperationPlanV0_1(ndarjePartialInput());
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+
+    expect(result.evaluation.ok).toBe(true);
+    if (!result.evaluation.ok) return;
+    expect(result.evaluation.target.codePoints).toEqual(
+      Array.from("NDARJE").map((character, position) => ({ character, position })),
+    );
+    expect(result.evaluation.target.writtenVoices).toEqual([
+      { voice: "A", position: 2 },
+      { voice: "E", position: 5 },
+    ]);
+    expect(result.evaluation.operationTrace.find(({ kind, operationId }) =>
+      kind === "APPLY_VOICE_OPERATOR" && operationId === "apply:e-at-5",
+    )).toMatchObject({
+      status: "COMPUTED",
+      dependsOn: ["apply:a-at-2"],
+      contribution: "EXPAND / OUTWARD(initiated(division)) → expanded(initiated(division))",
+    });
+    expect(result.evaluation.symbolicComposition.status).toBe("PARTIAL_NULL");
+    expect(result.evaluation.symbolicComposition.transformationText).toContain(
+      "division initiates initiated(division)",
+    );
+    expect(result.evaluation.symbolicComposition.transformationText).toContain(
+      "initiated(division) is expanded outward as expanded(initiated(division))",
+    );
+    expect(result.sourceFunctionLayer.target.selectedSense).toMatchObject({
+      claimLayer: "USER_PROPOSAL",
+      evidenceStatus: "USER_PROPOSED",
+      sourceIds: [],
+    });
+    expect(result.sourceFunctionLayer.segmentations[0]).toMatchObject({
+      rawReconstruction: "NDARJE",
+      reconstructionStatus: "EXACT_MATCH",
+      claimLayer: "USER_PROPOSAL",
+    });
+    expect(result.graphMeaningBridge.status).toBe("PARTIAL_NULL");
+    expect(result.graphMeaningBridge.reasonCodes).toContain("GRAPH_MEANING_TARGET_COMPOSITION_PARTIAL_NULL");
+    expect(result.graphMeaningBridge.mappings.map(({ graphOutput }) => graphOutput.text)).toEqual([
+      "initiated(division)",
+      "expanded(initiated(division))",
+    ]);
+    expect(result.graphMeaningBridge.wholeWordExplanations).toEqual([]);
+    expect(result.functionalMotivation.status).toBe("PARTIAL_NULL");
+    expect(result.functionalMotivation.unresolvedParts[0]?.text).toContain("N, R, J");
+    expect(result.functionalMotivation.sourceAuthorityPromotion).toBe("NONE");
+    expect(result.functionalMotivation.historicalOrigin).toBe("NOT_CLAIMED");
+    expect(result.functionalMotivation.interpretationSelection).toEqual({
+      mode: "no_single_winner",
+      selectedCandidateId: null,
+      userDecisionPosture: "user_decides",
+    });
+  });
+
   it("compiles the DALLIM source-linked sense into the existing v0.3 evaluator", () => {
     const input = dallimInput();
     const result = buildSymbolicFunctionalOperationPlanV0_1(input);

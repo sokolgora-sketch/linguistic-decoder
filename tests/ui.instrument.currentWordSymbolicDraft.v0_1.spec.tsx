@@ -9,6 +9,7 @@ import type { SingleWordCurrentWordEvidenceContextV0_1 } from "@/ui/instrument/s
 const DIVISION = "d:division";
 const LIGHT = "d:light";
 const INITIATE = "voice-a:initiate-ground";
+const EXPAND = "voice-e:expand-outward";
 const FOCUS = "voice-i:specify-focus";
 
 function select(label: string, value: string) {
@@ -74,9 +75,9 @@ function selectDallimVoiceOperations() {
   select("Spectrum association for D at position 0", DIVISION);
   select("Spectrum association for LL at position 2", "ll:clarity");
   select("Voice operator for A@1", INITIATE);
-  select("Explicit operand for A@1", "spectrum:D@0-1");
+  select("Explicit operand for A@1", "spectrum:spectrum:D@0-1");
   select("Voice operator for I@4", FOCUS);
-  select("Explicit operand for I@4", "spectrum:LL@2-4");
+  select("Explicit operand for I@4", "spectrum:spectrum:LL@2-4");
 }
 
 function completeDallimGraphMeaningDraft() {
@@ -117,6 +118,67 @@ function completeDallimGraphMeaningDraft() {
   select("Bridge for role mapping 2", "bridge-5");
   select("Computed output for role mapping 2", "symbol:voice:voice:I@4");
   fireEvent.change(screen.getByLabelText("Proposed functional role 2"), { target: { value: "a focused clarity contribution proposed for distinguishing" } });
+}
+
+function selectNdarjeVoiceOperations() {
+  select("Spectrum association for D at position 1", DIVISION);
+  select("Voice operator for A@2", INITIATE);
+  select("Explicit operand for A@2", "spectrum:spectrum:D@1-2");
+  select("Voice operator for E@5", EXPAND);
+  select("Explicit operand for E@5", "voice:voice:A@2");
+}
+
+function completeNdarjeFunctionalDraft() {
+  selectNdarjeVoiceOperations();
+  select("Lexical sense for current-word graph meaning", "USER_PROPOSED");
+  fireEvent.change(screen.getByLabelText("Proposed lexical sense label"), {
+    target: { value: "Action/state of separation or division" },
+  });
+  fireEvent.change(screen.getByLabelText("Proposed sense definition"), {
+    target: { value: "A user-proposed working sense for NDARJE." },
+  });
+  fireEvent.change(screen.getByLabelText("Proposed functional form or function"), {
+    target: { value: "NDAJ / NDAHEM" },
+  });
+  fireEvent.change(screen.getByLabelText("Proposed function description"), {
+    target: { value: "separate or divide a whole into parts" },
+  });
+  select("Proposed lexical function relationship", "ACTION_OF_VERB_FUNCTION");
+
+  fireEvent.click(screen.getByRole("button", { name: "Add user-proposed graph relationship" }));
+  fireEvent.click(screen.getByRole("button", { name: "Add user-proposed graph relationship" }));
+  select("Left computed node for relationship 1", "selection:spectrum:D@1-2");
+  select("Relationship text 1", "initiates");
+  select("Right computed node for relationship 1", "voice:voice:A@2");
+  select("Left computed node for relationship 2", "voice:voice:A@2");
+  select("Relationship text 2", "is expanded outward as");
+  select("Right computed node for relationship 2", "voice:voice:E@5");
+
+  fireEvent.click(screen.getByRole("button", { name: "Add user-proposed whole-word bridge" }));
+  select("Interpretation role for bridge 1", "PRIMARY");
+  fireEvent.change(screen.getByLabelText("Whole-word explanatory bridge 1"), {
+    target: {
+      value: "USER_PROPOSED: initiated(division) is expanded outward into distinct parts as a possible reading of separation or division. FJALË NDARJE/NDAJ/NDAHEM and Newmark §3.2 p.125 are entered as external research references, not attached source records here. N, R, J, and a word-specific NDAR + -JE formation remain unresolved.",
+    },
+  });
+
+  fireEvent.click(screen.getByRole("button", { name: "Add proposed role mapping" }));
+  fireEvent.click(screen.getByRole("button", { name: "Add proposed role mapping" }));
+  select("Bridge for role mapping 1", "bridge-3");
+  select("Computed output for role mapping 1", "symbol:voice:voice:A@2");
+  fireEvent.change(screen.getByLabelText("Proposed functional role 1"), {
+    target: { value: "an initiated act of dividing" },
+  });
+  select("Bridge for role mapping 2", "bridge-3");
+  select("Computed output for role mapping 2", "symbol:voice:voice:E@5");
+  fireEvent.change(screen.getByLabelText("Proposed functional role 2"), {
+    target: { value: "the division extended into separate parts" },
+  });
+  fireEvent.change(screen.getByLabelText("Optional alternative reading"), {
+    target: {
+      value: "Alternative sense reported in FJALË NDARJE, sense 2: a part or compartment into which something is divided; citation not attached to this analysis.",
+    },
+  });
 }
 
 describe("current-word symbolic draft v0.1", () => {
@@ -162,6 +224,57 @@ describe("current-word symbolic draft v0.1", () => {
         selectedCandidateId: null,
         userDecisionPosture: "user_decides",
       });
+    }
+  });
+
+  it("binds a later Voice event to a prior computed Voice result with an explicit producer dependency", () => {
+    const projection = buildCurrentWordSymbolicDraftProjectionV0_1({
+      exactSpelling: "NDARJE",
+      language: "Albanian",
+      variety: "Standard Albanian",
+      selections: {
+        spectrumCandidateByOccurrenceId: { "spectrum:D@1-2": DIVISION },
+        voiceDraftByEventId: {
+          "voice:A@2": {
+            operatorCandidateId: INITIATE,
+            operandOccurrenceId: "spectrum:D@1-2",
+          },
+          "voice:E@5": {
+            operatorCandidateId: EXPAND,
+            operandOccurrenceId: "",
+            operandVoiceEventId: "voice:A@2",
+          },
+        },
+      },
+    });
+
+    expect(projection.structure.ok).toBe(true);
+    expect(projection.structure.ok && projection.structure.target.writtenVoices).toEqual([
+      { voice: "A", position: 2 },
+      { voice: "E", position: 5 },
+    ]);
+    const chainedOperation = projection.operations.find(
+      (operation) => operation.kind === "APPLY_VOICE_OPERATOR" && operation.voice === "E",
+    );
+    expect(chainedOperation).toMatchObject({
+      kind: "APPLY_VOICE_OPERATOR",
+      position: 5,
+      voiceEventId: "voice:E@5",
+      operatorCandidateId: EXPAND,
+      inputSymbolId: "draft-voice-output-0",
+      dependsOn: ["draft-voice-0"],
+    });
+    expect(projection.evaluation.ok).toBe(true);
+    if (projection.evaluation.ok) {
+      expect(projection.evaluation.symbols
+        .filter(({ symbolKind }) => symbolKind === "VOICE_TRANSFORM")
+        .map(({ text }) => text)).toEqual([
+        "initiated(division)",
+        "expanded(initiated(division))",
+      ]);
+      expect(projection.evaluation.symbolicComposition.status).toBe("PARTIAL_NULL");
+      expect(projection.evaluation.sourceAuthorityPromotion).toBe("NONE");
+      expect(projection.evaluation.historicalOrigin).toBe("NOT_CLAIMED");
     }
   });
 
@@ -227,10 +340,10 @@ describe("current-word symbolic draft v0.1", () => {
     renderDraft();
     select("Spectrum association for D at position 0", DIVISION);
     select("Voice operator for A@1", INITIATE);
-    select("Explicit operand for A@1", "spectrum:D@0-1");
+    select("Explicit operand for A@1", "spectrum:spectrum:D@0-1");
     select("Voice operator for I@4", FOCUS);
     select("Spectrum association for LL at position 2", "ll:clarity");
-    select("Explicit operand for I@4", "spectrum:LL@2-4");
+    select("Explicit operand for I@4", "spectrum:spectrum:LL@2-4");
 
     const outputs = screen.getAllByTestId("current-word-symbolic-computed-output");
     expect(outputs).toHaveLength(2);
@@ -243,11 +356,87 @@ describe("current-word symbolic draft v0.1", () => {
     expect(screen.getByTestId("current-word-symbolic-result")).not.toHaveTextContent("COMPLETE_PROPOSED");
   });
 
+  it("lets NDARJE explicitly expand the computed A@2 output and keeps the whole-word result partial", () => {
+    renderDraft({
+      analyzedWord: "NDARJE",
+      draftTargetWord: "NDARJE",
+      targetLanguage: "Albanian",
+      targetDialect: "Standard Albanian",
+      currentWordEvidence: makeCurrentWordEvidence({
+        analyzedWord: "NDARJE",
+        sourceLookupStatus: "SOURCE_NOT_FOUND",
+        sourceSenses: [],
+      }),
+    });
+
+    expect(screen.getByTestId("current-word-symbolic-code-points")).toHaveTextContent(
+      "N@0 · D@1 · A@2 · R@3 · J@4 · E@5",
+    );
+    expect(screen.getByTestId("current-word-symbolic-written-voices")).toHaveTextContent("A@2 → E@5");
+    expect(screen.getByTestId("current-word-graph-source-sense-unavailable")).toHaveTextContent("No exact-form source sense is available");
+
+    selectNdarjeVoiceOperations();
+    expect(screen.getByLabelText("Explicit operand for E@5")).toHaveValue("voice:voice:A@2");
+    const outputs = screen.getAllByTestId("current-word-symbolic-computed-output");
+    expect(outputs).toHaveLength(2);
+    expect(outputs[0]).toHaveTextContent("A@2 · initiated(division)");
+    expect(outputs[1]).toHaveTextContent("E@5 · expanded(initiated(division))");
+    expect(screen.getByTestId("current-word-symbolic-whole-word-status")).toHaveTextContent("PARTIAL_NULL · UNKNOWN_OR_NULL");
+
+    select("Spectrum association for D at position 1", LIGHT);
+    expect(screen.getAllByTestId("current-word-symbolic-computed-output")[1]).toHaveTextContent("expanded(initiated(light))");
+    expect(screen.getAllByTestId("current-word-symbolic-computed-output")
+      .map(({ textContent }) => textContent).join(" "))
+      .not.toContain("expanded(initiated(division))");
+  });
+
+  it("displays a source-bounded NDARJE contribution chain without promoting its partial graph to a whole-word explanation", () => {
+    renderDraft({
+      analyzedWord: "NDARJE",
+      draftTargetWord: "NDARJE",
+      targetLanguage: "Albanian",
+      targetDialect: "Standard Albanian",
+      currentWordEvidence: makeCurrentWordEvidence({
+        analyzedWord: "NDARJE",
+        sourceLookupStatus: "SOURCE_NOT_FOUND",
+        sourceSenses: [],
+      }),
+    });
+
+    completeNdarjeFunctionalDraft();
+
+    const summary = screen.getByTestId("current-word-graph-summary");
+    expect(summary).toHaveTextContent("Your proposed reading: Action/state of separation or division");
+    expect(summary).toHaveTextContent("initiated(division) → an initiated act of dividing");
+    expect(summary).toHaveTextContent("expanded(initiated(division)) → the division extended into separate parts");
+    expect(summary).toHaveTextContent("Your proposed interaction");
+    expect(summary).toHaveTextContent("N, R, J, and a word-specific NDAR + -JE formation remain unresolved.");
+    expect(summary).toHaveTextContent("Explanation incomplete");
+    expect(summary).toHaveTextContent("Some target structure or operations remain unresolved");
+    expect(summary.querySelectorAll('[data-testid="current-word-graph-summary-contribution"]')).toHaveLength(2);
+    expect(screen.getByTestId("current-word-graph-summary-proposed-interaction")).toHaveTextContent("USER_PROPOSAL / USER_PROPOSED");
+
+    const details = screen.getByTestId("current-word-graph-details");
+    expect(details).not.toHaveAttribute("open");
+    fireEvent.click(screen.getByText("View detailed analysis and evidence"));
+    expect(screen.getByTestId("current-word-symbolic-whole-word-status")).toHaveTextContent("PARTIAL_NULL");
+    expect(screen.getByTestId("current-word-symbolic-graph-status")).toHaveTextContent("PARTIAL_NULL");
+    expect(screen.getByTestId("current-word-graph-whole-word-null")).toHaveTextContent("unresolved target structure prevents a whole-word explanation");
+    expect(screen.queryByTestId("current-word-graph-whole-word-explanation")).not.toBeInTheDocument();
+    expect(details).toHaveTextContent("GRAPH_MEANING_TARGET_COMPOSITION_PARTIAL_NULL");
+    expect(screen.getByTestId("current-word-graph-selected-sense")).toHaveTextContent("USER_PROPOSAL · USER_PROPOSED · source IDs: none");
+    expect(screen.queryByTestId("current-word-graph-source-record")).not.toBeInTheDocument();
+    expect(screen.getByTestId("current-word-graph-alternatives")).toHaveTextContent("Alternative sense reported in FJALË NDARJE");
+    expect(screen.getByTestId("current-word-graph-provenance")).toHaveTextContent("Source-authority promotion: NONE");
+    expect(screen.getByTestId("current-word-graph-decision")).toHaveAttribute("data-interpretation-selection-mode", "no_single_winner");
+    expect(screen.getByTestId("current-word-graph-decision")).toHaveAttribute("data-user-decision-posture", "user_decides");
+  });
+
   it("changes computed output when the explicitly selected operand candidate changes", () => {
     renderDraft();
     select("Spectrum association for D at position 0", DIVISION);
     select("Voice operator for A@1", INITIATE);
-    select("Explicit operand for A@1", "spectrum:D@0-1");
+    select("Explicit operand for A@1", "spectrum:spectrum:D@0-1");
     expect(screen.getAllByTestId("current-word-symbolic-computed-output")[0]).toHaveTextContent("initiated(division)");
 
     select("Spectrum association for D at position 0", LIGHT);
@@ -381,7 +570,7 @@ describe("current-word symbolic draft v0.1", () => {
     render(<SingleWordMotivationWorkbenchV0_1 initialTargetWord="DALLIM" />);
     select("Spectrum association for D at position 0", DIVISION);
     select("Voice operator for A@1", INITIATE);
-    select("Explicit operand for A@1", "spectrum:D@0-1");
+    select("Explicit operand for A@1", "spectrum:spectrum:D@0-1");
     expect(screen.getAllByTestId("current-word-symbolic-computed-output")[0]).toHaveTextContent("initiated(division)");
 
     fireEvent.change(screen.getByLabelText("Target language"), { target: { value: "Albanian" } });
@@ -390,7 +579,7 @@ describe("current-word symbolic draft v0.1", () => {
 
     select("Spectrum association for D at position 0", DIVISION);
     select("Voice operator for A@1", INITIATE);
-    select("Explicit operand for A@1", "spectrum:D@0-1");
+    select("Explicit operand for A@1", "spectrum:spectrum:D@0-1");
     fireEvent.change(screen.getByLabelText("Target dialect (optional)"), { target: { value: "Standard Albanian" } });
     expect(screen.getByLabelText("Spectrum association for D at position 0")).toHaveValue("");
     expect(screen.queryByTestId("current-word-symbolic-computed-output")).not.toBeInTheDocument();
@@ -409,7 +598,7 @@ describe("current-word symbolic draft v0.1", () => {
     expect(screen.getByRole("combobox", { name: "Choose a read-only method example" })).toHaveValue("");
     select("Spectrum association for D at position 0", DIVISION);
     select("Voice operator for A@1", INITIATE);
-    select("Explicit operand for A@1", "spectrum:D@0-1");
+    select("Explicit operand for A@1", "spectrum:spectrum:D@0-1");
 
     expect(screen.getByLabelText("Exact target word")).toHaveValue("DALLIM");
     expect(screen.getByLabelText("Component 1 exact spelling")).toHaveValue("");
