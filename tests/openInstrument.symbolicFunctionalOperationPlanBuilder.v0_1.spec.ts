@@ -195,7 +195,7 @@ function dallimInput(
         targetSenseId: selectedSenseId,
         role: "PRIMARY",
         status: "USER_PROPOSED",
-        text: "This illustrative proposal pairs an initiated division with focused clarity as one possible functional reading of the act of distinguishing.",
+        text: "This illustrative proposal pairs an initiated contribution with focused clarity as one possible functional reading of the act of distinguishing.",
         claimLayer: "USER_PROPOSAL",
         evidenceStatus: "USER_PROPOSED",
         sourceIds: [],
@@ -205,7 +205,7 @@ function dallimInput(
         targetSenseId: selectedSenseId,
         role: "ALTERNATIVE",
         status: "USER_PROPOSED",
-        text: "Alternatively, initiating a division and focusing clarity are proposed as a way to attend to one thing as distinct from another.",
+        text: "Alternatively, an initiated contribution and focused clarity are proposed as a way to attend to one thing as distinct from another.",
         claimLayer: "USER_PROPOSAL",
         evidenceStatus: "USER_PROPOSED",
         sourceIds: [],
@@ -221,7 +221,7 @@ function dallimInput(
         compositionOperationId: "source-reported-dallim-action-link",
         functionalRole: {
           roleId: "initiated-division",
-          label: "an initiated division contribution proposed for distinguishing",
+          label: "an initiated contribution proposed for distinguishing",
           claimLayer: "USER_PROPOSAL",
           evidenceStatus: "USER_PROPOSED",
           sourceIds: [],
@@ -516,6 +516,14 @@ describe("symbolic functional operation plan builder v0.1", () => {
     expect(direction.evaluation.symbolicComposition.transformationText).not.toBe(division.evaluation.symbolicComposition.transformationText);
     expect(division.ok && division.graphMeaningBridge.wholeWordExplanations[0]?.text).toContain("initiated(division)");
     expect(direction.ok && direction.graphMeaningBridge.wholeWordExplanations[0]?.text).toContain("initiated(direction)");
+    expect(direction.functionalMotivation.bridges.map(({ role, text }) => [role, text])).toEqual([
+      ["PRIMARY", "This illustrative proposal pairs an initiated contribution with focused clarity as one possible functional reading of the act of distinguishing."],
+      ["ALTERNATIVE", "Alternatively, an initiated contribution and focused clarity are proposed as a way to attend to one thing as distinct from another."],
+    ]);
+    expect(direction.graphMeaningBridge.wholeWordExplanations[0]?.text).toContain(
+      "functional role “an initiated contribution proposed for distinguishing”",
+    );
+    expect(direction.functionalMotivation.bridges.map(({ text }) => text).join(" ")).not.toMatch(/initiated division|initiating a division/iu);
   });
 
   it("returns partial Null when an explicitly bound Voice event has no operand", () => {

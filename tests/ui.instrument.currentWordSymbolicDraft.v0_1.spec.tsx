@@ -113,7 +113,7 @@ function completeDallimGraphMeaningDraft() {
   fireEvent.click(screen.getByRole("button", { name: "Add proposed role mapping" }));
   select("Bridge for role mapping 1", "bridge-5");
   select("Computed output for role mapping 1", "symbol:voice:voice:A@1");
-  fireEvent.change(screen.getByLabelText("Proposed functional role 1"), { target: { value: "an initiated division contribution proposed for distinguishing" } });
+  fireEvent.change(screen.getByLabelText("Proposed functional role 1"), { target: { value: "an initiated contribution proposed for distinguishing" } });
   select("Bridge for role mapping 2", "bridge-5");
   select("Computed output for role mapping 2", "symbol:voice:voice:I@4");
   fireEvent.change(screen.getByLabelText("Proposed functional role 2"), { target: { value: "a focused clarity contribution proposed for distinguishing" } });
@@ -427,7 +427,7 @@ describe("current-word symbolic draft v0.1", () => {
     expect(details).not.toHaveAttribute("open");
     expect(summary).toHaveTextContent("DALLIM");
     expect(summary).toHaveTextContent("Your proposed reading: Act of distinguishing");
-    expect(summary).toHaveTextContent("initiated(division) → an initiated division contribution proposed for distinguishing");
+    expect(summary).toHaveTextContent("initiated(division) → an initiated contribution proposed for distinguishing");
     expect(summary).toHaveTextContent("focused(clarity) → a focused clarity contribution proposed for distinguishing");
     expect(summary).toHaveTextContent("Proposal complete — not verified");
     expect(summary).toHaveTextContent("No interpretation is selected automatically");
@@ -454,8 +454,9 @@ describe("current-word symbolic draft v0.1", () => {
     expect(details).toHaveTextContent("INITIATE / GROUND(division) → initiated(division)");
 
     select("Spectrum association for D at position 0", LIGHT);
-    expect(screen.getByTestId("current-word-graph-summary")).toHaveTextContent("initiated(light) → an initiated division contribution proposed for distinguishing");
+    expect(screen.getByTestId("current-word-graph-summary")).toHaveTextContent("initiated(light) → an initiated contribution proposed for distinguishing");
     expect(screen.getByTestId("current-word-graph-summary")).not.toHaveTextContent("initiated(division)");
+    expect(screen.getByLabelText("Proposed functional role 1")).toHaveValue("an initiated contribution proposed for distinguishing");
     expect(screen.getAllByTestId("current-word-graph-generated-contribution")[0]).toHaveTextContent("initiated(light)");
     expect(screen.getAllByTestId("current-word-graph-generated-contribution").map(({ textContent }) => textContent).join(" "))
       .not.toContain("initiated(division)");

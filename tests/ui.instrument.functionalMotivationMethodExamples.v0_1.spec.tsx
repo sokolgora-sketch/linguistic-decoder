@@ -131,6 +131,21 @@ describe("functional-motivation method examples in the Single Word workbench", (
     expect(screen.getByTestId("functional-method-symbolic-operation-trace")).toBeInTheDocument();
   });
 
+  it("keeps prepared DALLIM role wording coherent when the selected D association changes", () => {
+    const division = getFunctionalMotivationMethodExampleV0_1("DALLIM");
+    const light = getFunctionalMotivationMethodExampleV0_1("DALLIM", { dAssociation: "light" });
+    expect(division?.summary).toContain("D=division");
+    expect(light?.summary).toContain("D=light");
+    expect(light?.symbolic?.voiceApplications[0]?.outputText).toBe("initiated(light)");
+    expect(light?.symbolic?.wholeWordExplanations[0]?.text).toContain("initiated(light)");
+    expect(light?.symbolic?.wholeWordExplanations[0]?.text).toContain(
+      "functional role “an initiated contribution proposed for distinguishing”",
+    );
+    expect(light?.symbolic?.wholeWordExplanations.map(({ text }) => text).join(" ")).not.toMatch(
+      /initiated division|initiating a division/iu,
+    );
+  });
+
   it("changes rendered computed NDRIÇIM output when the selected spectrum input changes", () => {
     const light = getFunctionalMotivationMethodExampleV0_1("NDRIÇIM");
     const direction = getFunctionalMotivationMethodExampleV0_1("NDRIÇIM", { dAssociation: "direction" });
