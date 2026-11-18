@@ -1607,7 +1607,8 @@ export function MotivationDiscoveryCardV0_1({
         </div>
       ) : null}
 
-      {onSelectSourceSenseForMotivation && identifiesAlbanianSourceContext(value.inputLanguage, value.inputProfile) ? (
+      {albanianLexicalReading?.primarySourceFact ||
+      (onSelectSourceSenseForMotivation && identifiesAlbanianSourceContext(value.inputLanguage, value.inputProfile)) ? (
         <FjaloriCrossSourceEvidenceV0_1
           word={value.inputWord}
           analysisLanguage={value.inputLanguage}
