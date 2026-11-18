@@ -91,7 +91,7 @@ describe("functional-motivation method examples in the Single Word workbench", (
     expect(screen.getAllByText(/Source-authority promotion: NONE/).length).toBeGreaterThan(0);
   });
 
-  it("renders DALLIM's distinct A/I applications, repeated L occurrences and typed proposed mappings", () => {
+  it("renders DALLIM's distinct A/I applications, one longest-match LL occurrence and typed proposed mappings", () => {
     render(<SingleWordMotivationWorkbenchV0_1 initialTargetWord="ARBITRARY" />);
     const selector = screen.getByRole("combobox", { name: "Choose a read-only method example" });
     fireEvent.change(selector, { target: { value: "DALLIM" } });
@@ -103,16 +103,18 @@ describe("functional-motivation method examples in the Single Word workbench", (
     expect(screen.getByTestId("functional-method-written-voices-DALLIM")).toHaveTextContent("A@1 → I@4");
     expect(screen.getAllByTestId("functional-method-symbolic-voice-application")).toHaveLength(2);
     expect(screen.getAllByTestId("functional-method-symbolic-voice-application")[0]).toHaveTextContent("initiated(division)");
-    expect(screen.getAllByTestId("functional-method-symbolic-voice-application")[1]).toHaveTextContent("focused(linear flow)");
+    expect(screen.getAllByTestId("functional-method-symbolic-voice-application")[1]).toHaveTextContent("focused(clarity)");
     expect(screen.getAllByTestId("functional-method-symbolic-voice-application").map((node) => node.getAttribute("data-voice-event"))).toEqual([
       "voice:A@1",
       "voice:I@4",
     ]);
-    const lSelections = screen.getAllByTestId("functional-method-symbolic-spectrum")
-      .filter((node) => node.getAttribute("data-unit") === "L");
-    expect(lSelections.map((node) => node.getAttribute("data-span-start"))).toEqual(["2", "3"]);
-    expect(lSelections[0]).toHaveTextContent("spreading");
-    expect(lSelections[1]).toHaveTextContent("linear flow");
+    const llSelections = screen.getAllByTestId("functional-method-symbolic-spectrum")
+      .filter((node) => node.getAttribute("data-unit") === "LL");
+    expect(llSelections).toHaveLength(1);
+    expect(llSelections[0]).toHaveAttribute("data-span-start", "2");
+    expect(llSelections[0]).toHaveTextContent("LL@2 [2,4) → clarity · EXPLORATORY_HYPOTHESIS/USER_PROPOSED · sources none");
+    expect(screen.getAllByTestId("functional-method-symbolic-spectrum")
+      .filter((node) => node.getAttribute("data-unit") === "L")).toHaveLength(0);
     expect(screen.getByTestId("functional-method-symbolic-graph-mappings")).toBeInTheDocument();
     expect(screen.getAllByTestId("functional-method-symbolic-graph-mapping")).toHaveLength(2);
     expect(screen.getAllByTestId("functional-method-symbolic-graph-mapping")[0]).toHaveTextContent(

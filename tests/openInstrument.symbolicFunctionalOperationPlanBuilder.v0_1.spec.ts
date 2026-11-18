@@ -136,8 +136,7 @@ function dallimInput(
   const selectedSenseId = "dallim.action-of-distinguishing";
   const spectrumSelections = [
     { selectionId: "d", unit: "D", start: 0, end: 1, associationCandidateId: associationId("D", dAssociation) },
-    { selectionId: "l-first", unit: "L", start: 2, end: 3, associationCandidateId: associationId("L", "spreading") },
-    { selectionId: "l-second", unit: "L", start: 3, end: 4, associationCandidateId: associationId("L", "linear flow") },
+    { selectionId: "ll", unit: "LL", start: 2, end: 4, associationCandidateId: associationId("LL", "clarity") },
     { selectionId: "m", unit: "M", start: 5, end: 6, associationCandidateId: associationId("M", "result") },
   ] as const;
   const voiceBindings = [
@@ -149,11 +148,11 @@ function dallimInput(
       input: { kind: "SPECTRUM_SELECTION" as const, selectionId: "d" },
     },
     {
-      bindingId: "i-focuses-second-l",
+      bindingId: "i-focuses-ll",
       voice: "I" as const,
       position: 4,
       operatorCandidateId: operatorId("I"),
-      input: { kind: "SPECTRUM_SELECTION" as const, selectionId: "l-second" },
+      input: { kind: "SPECTRUM_SELECTION" as const, selectionId: "ll" },
     },
   ];
   const functionalEdges = [
@@ -164,26 +163,20 @@ function dallimInput(
       relationText: "produces",
     },
     {
-      edgeId: "initiation-spread",
+      edgeId: "initiation-clarity",
       left: { kind: "VOICE_BINDING" as const, bindingId: "a-initiates-d" },
-      right: { kind: "SPECTRUM_SELECTION" as const, selectionId: "l-first" },
-      relationText: "separates within",
+      right: { kind: "SPECTRUM_SELECTION" as const, selectionId: "ll" },
+      relationText: "is paired with",
     },
     {
-      edgeId: "spread-linear-flow",
-      left: { kind: "SPECTRUM_SELECTION" as const, selectionId: "l-first" },
-      right: { kind: "SPECTRUM_SELECTION" as const, selectionId: "l-second" },
-      relationText: "is traced across",
-    },
-    {
-      edgeId: "flow-focus",
-      left: { kind: "SPECTRUM_SELECTION" as const, selectionId: "l-second" },
-      right: { kind: "VOICE_BINDING" as const, bindingId: "i-focuses-second-l" },
+      edgeId: "clarity-focus",
+      left: { kind: "SPECTRUM_SELECTION" as const, selectionId: "ll" },
+      right: { kind: "VOICE_BINDING" as const, bindingId: "i-focuses-ll" },
       relationText: "is focused as",
     },
     {
       edgeId: "focus-result",
-      left: { kind: "VOICE_BINDING" as const, bindingId: "i-focuses-second-l" },
+      left: { kind: "VOICE_BINDING" as const, bindingId: "i-focuses-ll" },
       right: { kind: "SPECTRUM_SELECTION" as const, selectionId: "m" },
       relationText: "yields",
     },
@@ -202,7 +195,7 @@ function dallimInput(
         targetSenseId: selectedSenseId,
         role: "PRIMARY",
         status: "USER_PROPOSED",
-        text: "The act of distinguishing is provisionally read as initiating a division within a spread of items, tracing a difference, and focusing the result.",
+        text: "This illustrative proposal pairs an initiated division with focused clarity as one possible functional reading of the act of distinguishing.",
         claimLayer: "USER_PROPOSAL",
         evidenceStatus: "USER_PROPOSED",
         sourceIds: [],
@@ -212,7 +205,7 @@ function dallimInput(
         targetSenseId: selectedSenseId,
         role: "ALTERNATIVE",
         status: "USER_PROPOSED",
-        text: "Alternatively, distinguishing is provisionally read as directing attention along a separating line to identify one result among others.",
+        text: "Alternatively, initiating a division and focusing clarity are proposed as a way to attend to one thing as distinct from another.",
         claimLayer: "USER_PROPOSAL",
         evidenceStatus: "USER_PROPOSED",
         sourceIds: [],
@@ -220,15 +213,15 @@ function dallimInput(
     ],
     functionalRoleMappings: [
       {
-        mappingId: "focused-division-contribution",
+        mappingId: "initiated-division-contribution",
         bridgeId: "focused-distinction",
         symbolOutputId: "symbol:voice:a-initiates-d",
         selectedSenseId,
         functionCandidateId: "dalloj.distinguish-or-recognize",
         compositionOperationId: "source-reported-dallim-action-link",
         functionalRole: {
-          roleId: "initiated-separation",
-          label: "an initiated separation process",
+          roleId: "initiated-division",
+          label: "an initiated division contribution proposed for distinguishing",
           claimLayer: "USER_PROPOSAL",
           evidenceStatus: "USER_PROPOSED",
           sourceIds: [],
@@ -236,15 +229,15 @@ function dallimInput(
         relationType: "PROPOSED_CONTRIBUTES_TO_SELECTED_LEXICAL_FUNCTION",
       },
       {
-        mappingId: "alternative-focused-flow-contribution",
+        mappingId: "focused-clarity-contribution",
         bridgeId: "attentive-separation-alternative",
-        symbolOutputId: "symbol:voice:i-focuses-second-l",
+        symbolOutputId: "symbol:voice:i-focuses-ll",
         selectedSenseId,
         functionCandidateId: "dalloj.distinguish-or-recognize",
         compositionOperationId: "source-reported-dallim-action-link",
         functionalRole: {
-          roleId: "focused-distinguishing-result",
-          label: "a focused distinguishing result",
+          roleId: "focused-clarity",
+          label: "a focused clarity contribution proposed for distinguishing",
           claimLayer: "USER_PROPOSAL",
           evidenceStatus: "USER_PROPOSED",
           sourceIds: [],
@@ -397,35 +390,34 @@ describe("symbolic functional operation plan builder v0.1", () => {
       unit, span, selectedAssociationIds,
     }))).toEqual([
       { unit: "D", span: { start: 0, end: 1 }, selectedAssociationIds: [associationId("D", "division")] },
-      { unit: "L", span: { start: 2, end: 3 }, selectedAssociationIds: [associationId("L", "spreading")] },
-      { unit: "L", span: { start: 3, end: 4 }, selectedAssociationIds: [associationId("L", "linear flow")] },
+      { unit: "LL", span: { start: 2, end: 4 }, selectedAssociationIds: [associationId("LL", "clarity")] },
       { unit: "M", span: { start: 5, end: 6 }, selectedAssociationIds: [associationId("M", "result")] },
     ]);
     expect(result.evaluation.voiceEvents.map(({ eventId, appliedOperationIds }) => ({ eventId, appliedOperationIds }))).toEqual([
       { eventId: "voice:A@1", appliedOperationIds: ["apply:a-initiates-d"] },
-      { eventId: "voice:I@4", appliedOperationIds: ["apply:i-focuses-second-l"] },
+      { eventId: "voice:I@4", appliedOperationIds: ["apply:i-focuses-ll"] },
     ]);
     expect(result.evaluation.operationTrace.filter(({ kind }) => kind === "APPLY_VOICE_OPERATOR").map(({ contribution }) => contribution)).toEqual([
       "INITIATE / GROUND(division) → initiated(division)",
-      "SPECIFY / FOCUS(linear flow) → focused(linear flow)",
+      "SPECIFY / FOCUS(clarity) → focused(clarity)",
     ]);
     expect(result.operationPlan.reduce<Record<string, number>>((counts, operation) => {
       counts[operation.kind] = (counts[operation.kind] ?? 0) + 1;
       return counts;
     }, {})).toEqual({
-      SELECT_SPECTRUM_CANDIDATE: 4,
+      SELECT_SPECTRUM_CANDIDATE: 3,
       APPLY_VOICE_OPERATOR: 2,
-      CONNECT_SYMBOLS: 5,
+      CONNECT_SYMBOLS: 4,
       REPRESENT_SYMBOLIC_TRANSFORMATION: 1,
       EXPRESS_RESULT: 2,
     });
     expect(result.operationPlan.filter((operation) => operation.kind === "APPLY_VOICE_OPERATOR").map(({ dependsOn }) => dependsOn)).toEqual([
       ["select:d"],
-      ["select:l-second"],
+      ["select:ll"],
     ]);
     expect(result.evaluation.symbolicComposition.status).toBe("MULTIPLE_PROPOSED");
     expect(result.evaluation.symbolicComposition.transformationText).toContain("division produces initiated(division)");
-    expect(result.evaluation.symbolicComposition.transformationText).toContain("focused(linear flow) yields result");
+    expect(result.evaluation.symbolicComposition.transformationText).toContain("focused(clarity) yields result");
     expect(result.functionalMotivation.bridges.map(({ role, status }) => [role, status])).toEqual([
       ["PRIMARY", "USER_PROPOSED"],
       ["ALTERNATIVE", "USER_PROPOSED"],
@@ -459,13 +451,13 @@ describe("symbolic functional operation plan builder v0.1", () => {
         generatedContribution: expect.stringContaining("initiated(division)"),
       },
       {
-        symbol: "focused(linear flow)",
+        symbol: "focused(clarity)",
         functionCandidateId: "dalloj.distinguish-or-recognize",
         functionEvidence: "CITATION_ENTERED_UNVERIFIED",
         relationClaimLayer: "SOURCE_FACT",
         compositionEvidence: "CITATION_ENTERED_UNVERIFIED",
         applicability: "NOT_ASSESSED",
-        generatedContribution: expect.stringContaining("focused(linear flow)"),
+        generatedContribution: expect.stringContaining("focused(clarity)"),
       },
     ]);
     expect(result.graphMeaningBridge.wholeWordExplanations).toHaveLength(2);
@@ -528,7 +520,7 @@ describe("symbolic functional operation plan builder v0.1", () => {
 
   it("returns partial Null when an explicitly bound Voice event has no operand", () => {
     const input = dallimInput();
-    const voiceBindings = input.voiceBindings.map((binding) => binding.bindingId === "i-focuses-second-l"
+    const voiceBindings = input.voiceBindings.map((binding) => binding.bindingId === "i-focuses-ll"
       ? { ...binding, input: { kind: "SPECTRUM_SELECTION" as const, selectionId: "missing-operand" } }
       : binding);
     const result = buildSymbolicFunctionalOperationPlanV0_1({ ...input, voiceBindings });
@@ -574,7 +566,7 @@ describe("symbolic functional operation plan builder v0.1", () => {
   it("returns partial Null for a role mapping that is disconnected from an evaluated graph output", () => {
     const input = dallimInput();
     const functionalRoleMappings = input.functionalRoleMappings?.map((mapping) =>
-      mapping.mappingId === "focused-division-contribution"
+      mapping.mappingId === "initiated-division-contribution"
         ? { ...mapping, symbolOutputId: "symbol:voice:missing-output" }
         : mapping,
     );
@@ -584,9 +576,9 @@ describe("symbolic functional operation plan builder v0.1", () => {
 
     expect(result.graphMeaningBridge.status).toBe("PARTIAL_NULL");
     expect(result.graphMeaningBridge.unresolvedMappings).toContainEqual(expect.objectContaining({
-      mappingId: "focused-division-contribution",
+      mappingId: "initiated-division-contribution",
       reasonCodes: expect.arrayContaining([
-        "GRAPH_MEANING_MAPPING_GRAPH_OUTPUT_NOT_FOUND:focused-division-contribution",
+        "GRAPH_MEANING_MAPPING_GRAPH_OUTPUT_NOT_FOUND:initiated-division-contribution",
       ]),
     }));
     expect(result.functionalMotivation.status).toBe("PARTIAL_NULL");
@@ -595,7 +587,7 @@ describe("symbolic functional operation plan builder v0.1", () => {
   it("requires the mapping to reference the selected lexical function relation", () => {
     const input = dallimInput();
     const functionalRoleMappings = input.functionalRoleMappings?.map((mapping) =>
-      mapping.mappingId === "focused-division-contribution"
+      mapping.mappingId === "initiated-division-contribution"
         ? { ...mapping, functionCandidateId: "unselected.lexical-function" }
         : mapping,
     );
@@ -605,10 +597,10 @@ describe("symbolic functional operation plan builder v0.1", () => {
 
     expect(result.graphMeaningBridge.status).toBe("PARTIAL_NULL");
     expect(result.graphMeaningBridge.unresolvedMappings).toContainEqual(expect.objectContaining({
-      mappingId: "focused-division-contribution",
+      mappingId: "initiated-division-contribution",
       reasonCodes: expect.arrayContaining([
-        "GRAPH_MEANING_MAPPING_LEXICAL_FUNCTION_NOT_FOUND:focused-division-contribution",
-        "GRAPH_MEANING_MAPPING_SELECTED_FUNCTION_RELATION_NOT_FOUND:focused-division-contribution",
+        "GRAPH_MEANING_MAPPING_LEXICAL_FUNCTION_NOT_FOUND:initiated-division-contribution",
+        "GRAPH_MEANING_MAPPING_SELECTED_FUNCTION_RELATION_NOT_FOUND:initiated-division-contribution",
       ]),
     }));
     expect(result.functionalMotivation.status).toBe("PARTIAL_NULL");
