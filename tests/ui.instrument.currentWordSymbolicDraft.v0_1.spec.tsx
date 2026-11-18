@@ -72,15 +72,14 @@ function renderDraft(overrides: Partial<Parameters<typeof CurrentWordSymbolicDra
 
 function selectDallimVoiceOperations() {
   select("Spectrum association for D at position 0", DIVISION);
+  select("Spectrum association for LL at position 2", "ll:clarity");
   select("Voice operator for A@1", INITIATE);
   select("Explicit operand for A@1", "spectrum:D@0-1");
-  select("Spectrum association for L at position 3", "l:linear-flow");
   select("Voice operator for I@4", FOCUS);
-  select("Explicit operand for I@4", "spectrum:L@3-4");
+  select("Explicit operand for I@4", "spectrum:LL@2-4");
 }
 
 function completeDallimGraphMeaningDraft() {
-  select("Spectrum association for L at position 2", "l:spreading");
   select("Spectrum association for M at position 5", "m:result");
   select("Lexical sense for current-word graph meaning", "USER_PROPOSED");
   fireEvent.change(screen.getByLabelText("Proposed lexical sense label"), { target: { value: "Act of distinguishing" } });
@@ -93,22 +92,18 @@ function completeDallimGraphMeaningDraft() {
   fireEvent.click(screen.getByRole("button", { name: "Add user-proposed graph relationship" }));
   fireEvent.click(screen.getByRole("button", { name: "Add user-proposed graph relationship" }));
   fireEvent.click(screen.getByRole("button", { name: "Add user-proposed graph relationship" }));
-  fireEvent.click(screen.getByRole("button", { name: "Add user-proposed graph relationship" }));
   select("Left computed node for relationship 1", "selection:spectrum:D@0-1");
   select("Relationship text 1", "produces");
   select("Right computed node for relationship 1", "voice:voice:A@1");
   select("Left computed node for relationship 2", "voice:voice:A@1");
-  select("Relationship text 2", "continues through");
-  select("Right computed node for relationship 2", "selection:spectrum:L@2-3");
-  select("Left computed node for relationship 3", "selection:spectrum:L@2-3");
-  select("Relationship text 3", "is traced across");
-  select("Right computed node for relationship 3", "selection:spectrum:L@3-4");
-  select("Left computed node for relationship 4", "selection:spectrum:L@3-4");
-  select("Relationship text 4", "is focused as");
-  select("Right computed node for relationship 4", "voice:voice:I@4");
-  select("Left computed node for relationship 5", "voice:voice:I@4");
-  select("Relationship text 5", "yields");
-  select("Right computed node for relationship 5", "selection:spectrum:M@5-6");
+  select("Relationship text 2", "is paired with");
+  select("Right computed node for relationship 2", "selection:spectrum:LL@2-4");
+  select("Left computed node for relationship 3", "selection:spectrum:LL@2-4");
+  select("Relationship text 3", "is focused as");
+  select("Right computed node for relationship 3", "voice:voice:I@4");
+  select("Left computed node for relationship 4", "voice:voice:I@4");
+  select("Relationship text 4", "yields");
+  select("Right computed node for relationship 4", "selection:spectrum:M@5-6");
 
   fireEvent.click(screen.getByRole("button", { name: "Add user-proposed whole-word bridge" }));
   select("Interpretation role for bridge 1", "PRIMARY");
@@ -116,12 +111,12 @@ function completeDallimGraphMeaningDraft() {
 
   fireEvent.click(screen.getByRole("button", { name: "Add proposed role mapping" }));
   fireEvent.click(screen.getByRole("button", { name: "Add proposed role mapping" }));
-  select("Bridge for role mapping 1", "bridge-6");
+  select("Bridge for role mapping 1", "bridge-5");
   select("Computed output for role mapping 1", "symbol:voice:voice:A@1");
-  fireEvent.change(screen.getByLabelText("Proposed functional role 1"), { target: { value: "an initiated distinction" } });
-  select("Bridge for role mapping 2", "bridge-6");
+  fireEvent.change(screen.getByLabelText("Proposed functional role 1"), { target: { value: "an initiated contribution proposed for distinguishing" } });
+  select("Bridge for role mapping 2", "bridge-5");
   select("Computed output for role mapping 2", "symbol:voice:voice:I@4");
-  fireEvent.change(screen.getByLabelText("Proposed functional role 2"), { target: { value: "a focused distinction" } });
+  fireEvent.change(screen.getByLabelText("Proposed functional role 2"), { target: { value: "a focused clarity contribution proposed for distinguishing" } });
 }
 
 describe("current-word symbolic draft v0.1", () => {
@@ -206,8 +201,7 @@ describe("current-word symbolic draft v0.1", () => {
 
     for (const label of [
       "Spectrum association for D at position 0",
-      "Spectrum association for L at position 2",
-      "Spectrum association for L at position 3",
+      "Spectrum association for LL at position 2",
       "Voice operator for A@1",
       "Explicit operand for A@1",
       "Voice operator for I@4",
@@ -235,13 +229,13 @@ describe("current-word symbolic draft v0.1", () => {
     select("Voice operator for A@1", INITIATE);
     select("Explicit operand for A@1", "spectrum:D@0-1");
     select("Voice operator for I@4", FOCUS);
-    select("Spectrum association for L at position 3", "l:linear-flow");
-    select("Explicit operand for I@4", "spectrum:L@3-4");
+    select("Spectrum association for LL at position 2", "ll:clarity");
+    select("Explicit operand for I@4", "spectrum:LL@2-4");
 
     const outputs = screen.getAllByTestId("current-word-symbolic-computed-output");
     expect(outputs).toHaveLength(2);
     expect(outputs[0]).toHaveTextContent("A@1 · initiated(division)");
-    expect(outputs[1]).toHaveTextContent("I@4 · focused(linear flow)");
+    expect(outputs[1]).toHaveTextContent("I@4 · focused(clarity)");
     expect(screen.getByTestId("current-word-symbolic-operation-trace")).toHaveTextContent("APPLY_VOICE_OPERATOR · COMPUTED");
     expect(screen.getByTestId("current-word-symbolic-whole-word-status")).toHaveTextContent("PARTIAL_NULL · UNKNOWN_OR_NULL");
     expect(screen.getByTestId("current-word-symbolic-graph-status")).toHaveTextContent("PARTIAL_NULL");
@@ -261,12 +255,12 @@ describe("current-word symbolic draft v0.1", () => {
     expect(screen.getAllByTestId("current-word-symbolic-computed-output")[0]).not.toHaveTextContent("initiated(division)");
   });
 
-  it("keeps repeated occurrences independent and leaves an operator without an operand as evaluator Null", () => {
+  it("recognizes LL as one occurrence and leaves an operator without an operand as evaluator Null", () => {
     renderDraft();
-    select("Spectrum association for L at position 2", "l:spreading");
-    select("Spectrum association for L at position 3", "l:linear-flow");
-    expect(screen.getByLabelText("Spectrum association for L at position 2")).toHaveValue("l:spreading");
-    expect(screen.getByLabelText("Spectrum association for L at position 3")).toHaveValue("l:linear-flow");
+    expect(screen.getByLabelText("Spectrum association for LL at position 2")).toHaveValue("");
+    expect(screen.queryByLabelText("Spectrum association for L at position 3")).not.toBeInTheDocument();
+    select("Spectrum association for LL at position 2", "ll:clarity");
+    expect(screen.getByLabelText("Spectrum association for LL at position 2")).toHaveValue("ll:clarity");
 
     select("Spectrum association for D at position 0", DIVISION);
     select("Voice operator for A@1", INITIATE);
@@ -433,8 +427,8 @@ describe("current-word symbolic draft v0.1", () => {
     expect(details).not.toHaveAttribute("open");
     expect(summary).toHaveTextContent("DALLIM");
     expect(summary).toHaveTextContent("Your proposed reading: Act of distinguishing");
-    expect(summary).toHaveTextContent("initiated(division) → an initiated distinction");
-    expect(summary).toHaveTextContent("focused(linear flow) → a focused distinction");
+    expect(summary).toHaveTextContent("initiated(division) → an initiated contribution proposed for distinguishing");
+    expect(summary).toHaveTextContent("focused(clarity) → a focused clarity contribution proposed for distinguishing");
     expect(summary).toHaveTextContent("Proposal complete — not verified");
     expect(summary).toHaveTextContent("No interpretation is selected automatically");
     expect(summary.querySelectorAll('[data-testid="current-word-graph-summary-contribution"]')).toHaveLength(2);
@@ -460,8 +454,9 @@ describe("current-word symbolic draft v0.1", () => {
     expect(details).toHaveTextContent("INITIATE / GROUND(division) → initiated(division)");
 
     select("Spectrum association for D at position 0", LIGHT);
-    expect(screen.getByTestId("current-word-graph-summary")).toHaveTextContent("initiated(light) → an initiated distinction");
+    expect(screen.getByTestId("current-word-graph-summary")).toHaveTextContent("initiated(light) → an initiated contribution proposed for distinguishing");
     expect(screen.getByTestId("current-word-graph-summary")).not.toHaveTextContent("initiated(division)");
+    expect(screen.getByLabelText("Proposed functional role 1")).toHaveValue("an initiated contribution proposed for distinguishing");
     expect(screen.getAllByTestId("current-word-graph-generated-contribution")[0]).toHaveTextContent("initiated(light)");
     expect(screen.getAllByTestId("current-word-graph-generated-contribution").map(({ textContent }) => textContent).join(" "))
       .not.toContain("initiated(division)");

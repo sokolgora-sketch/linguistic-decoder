@@ -1208,8 +1208,7 @@ function createDallimOperationPlanInput(
   const selectedSenseId = "dallim.action-of-distinguishing";
   const spectrumSelections = [
     { selectionId: "d", unit: "D", start: 0, end: 1, associationCandidateId: symbolicAssociationId("D", dAssociation) },
-    { selectionId: "l-first", unit: "L", start: 2, end: 3, associationCandidateId: symbolicAssociationId("L", "spreading") },
-    { selectionId: "l-second", unit: "L", start: 3, end: 4, associationCandidateId: symbolicAssociationId("L", "linear flow") },
+    { selectionId: "ll", unit: "LL", start: 2, end: 4, associationCandidateId: symbolicAssociationId("LL", "clarity") },
     { selectionId: "m", unit: "M", start: 5, end: 6, associationCandidateId: symbolicAssociationId("M", "result") },
   ] as const;
   const voiceBindings = [
@@ -1221,11 +1220,11 @@ function createDallimOperationPlanInput(
       input: { kind: "SPECTRUM_SELECTION" as const, selectionId: "d" },
     },
     {
-      bindingId: "i-focuses-second-l",
+      bindingId: "i-focuses-ll",
       voice: "I" as const,
       position: 4,
       operatorCandidateId: symbolicOperatorId("I"),
-      input: { kind: "SPECTRUM_SELECTION" as const, selectionId: "l-second" },
+      input: { kind: "SPECTRUM_SELECTION" as const, selectionId: "ll" },
     },
   ];
   const functionalEdges = [
@@ -1236,26 +1235,20 @@ function createDallimOperationPlanInput(
       relationText: "produces",
     },
     {
-      edgeId: "initiation-spread",
+      edgeId: "initiation-clarity",
       left: { kind: "VOICE_BINDING" as const, bindingId: "a-initiates-d" },
-      right: { kind: "SPECTRUM_SELECTION" as const, selectionId: "l-first" },
-      relationText: "separates within",
+      right: { kind: "SPECTRUM_SELECTION" as const, selectionId: "ll" },
+      relationText: "is paired with",
     },
     {
-      edgeId: "spread-linear-flow",
-      left: { kind: "SPECTRUM_SELECTION" as const, selectionId: "l-first" },
-      right: { kind: "SPECTRUM_SELECTION" as const, selectionId: "l-second" },
-      relationText: "is traced across",
-    },
-    {
-      edgeId: "flow-focus",
-      left: { kind: "SPECTRUM_SELECTION" as const, selectionId: "l-second" },
-      right: { kind: "VOICE_BINDING" as const, bindingId: "i-focuses-second-l" },
+      edgeId: "clarity-focus",
+      left: { kind: "SPECTRUM_SELECTION" as const, selectionId: "ll" },
+      right: { kind: "VOICE_BINDING" as const, bindingId: "i-focuses-ll" },
       relationText: "is focused as",
     },
     {
       edgeId: "focus-result",
-      left: { kind: "VOICE_BINDING" as const, bindingId: "i-focuses-second-l" },
+      left: { kind: "VOICE_BINDING" as const, bindingId: "i-focuses-ll" },
       right: { kind: "SPECTRUM_SELECTION" as const, selectionId: "m" },
       relationText: "yields",
     },
@@ -1274,7 +1267,7 @@ function createDallimOperationPlanInput(
         targetSenseId: selectedSenseId,
         role: "PRIMARY",
         status: "USER_PROPOSED",
-        text: "The act of distinguishing is provisionally read as initiating a division within a spread of items, tracing a difference, and focusing the result.",
+        text: "This illustrative proposal pairs an initiated contribution with focused clarity as one possible functional reading of the act of distinguishing.",
         claimLayer: "USER_PROPOSAL",
         evidenceStatus: "USER_PROPOSED",
         sourceIds: [],
@@ -1284,7 +1277,7 @@ function createDallimOperationPlanInput(
         targetSenseId: selectedSenseId,
         role: "ALTERNATIVE",
         status: "USER_PROPOSED",
-        text: "Alternatively, distinguishing is provisionally read as directing attention along a separating line to identify one result among others.",
+        text: "Alternatively, an initiated contribution and focused clarity are proposed as a way to attend to one thing as distinct from another.",
         claimLayer: "USER_PROPOSAL",
         evidenceStatus: "USER_PROPOSED",
         sourceIds: [],
@@ -1292,15 +1285,15 @@ function createDallimOperationPlanInput(
     ],
     functionalRoleMappings: [
       {
-        mappingId: "focused-division-contribution",
+        mappingId: "initiated-division-contribution",
         bridgeId: "focused-distinction",
         symbolOutputId: "symbol:voice:a-initiates-d",
         selectedSenseId,
         functionCandidateId: "dalloj.distinguish-or-recognize",
         compositionOperationId: "source-reported-dallim-action-link",
         functionalRole: {
-          roleId: "initiated-separation",
-          label: "an initiated separation process",
+          roleId: "initiated-division",
+          label: "an initiated contribution proposed for distinguishing",
           claimLayer: "USER_PROPOSAL",
           evidenceStatus: "USER_PROPOSED",
           sourceIds: [],
@@ -1308,15 +1301,15 @@ function createDallimOperationPlanInput(
         relationType: "PROPOSED_CONTRIBUTES_TO_SELECTED_LEXICAL_FUNCTION",
       },
       {
-        mappingId: "alternative-focused-flow-contribution",
+        mappingId: "focused-clarity-contribution",
         bridgeId: "attentive-separation-alternative",
-        symbolOutputId: "symbol:voice:i-focuses-second-l",
+        symbolOutputId: "symbol:voice:i-focuses-ll",
         selectedSenseId,
         functionCandidateId: "dalloj.distinguish-or-recognize",
         compositionOperationId: "source-reported-dallim-action-link",
         functionalRole: {
-          roleId: "focused-distinguishing-result",
-          label: "a focused distinguishing result",
+          roleId: "focused-clarity",
+          label: "a focused clarity contribution proposed for distinguishing",
           claimLayer: "USER_PROPOSAL",
           evidenceStatus: "USER_PROPOSED",
           sourceIds: [],
@@ -1577,7 +1570,7 @@ function buildDallimExample(
   return projectSymbolicMethodExample(
     "DALLIM",
     "DALLIM · symbolic composition",
-    "The existing operation-plan builder evaluates the selected symbolic graph and its explicitly proposed mappings to the selected lexical function.",
+    `Updated illustrative proposal: D=${dAssociation} and the owner-supplied LL=clarity association are explicitly selected inputs. LL=clarity remains USER_PROPOSED, not source-established or an automatic continuation of the prior two-L hypothesis.`,
     result.evaluation,
     result.sourceFunctionLayer,
     result.sourceReferences,

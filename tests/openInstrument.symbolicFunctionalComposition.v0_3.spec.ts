@@ -6,6 +6,7 @@ import {
   EMBRIOMORPHEME_SPECTRUM_V0_1,
   TARGET_LOCAL_SPECTRUM_ASSOCIATIONS_V0_1,
   getEmbriomorphemeAssociationV0_1,
+  getEmbriomorphemeSpectrumEntryV0_1,
 } from "@/shared/openInstrument/embriomorphemeSpectrum.v0_1";
 import {
   SYMBOLIC_VOICE_OPERATOR_PROFILE_V0_3,
@@ -256,9 +257,13 @@ function syntheticShGjYInput(): SymbolicFunctionalCompositionInputV0_3 {
 }
 
 describe("symbolic functional composition v0.3", () => {
-  it("keeps the fifteen-unit hypotheses and Ç target-local values explicitly proposed and source-free", () => {
-    expect(EMBRIOMORPHEME_SPECTRUM_V0_1).toHaveLength(15);
-    expect(Object.fromEntries(EMBRIOMORPHEME_SPECTRUM_V0_1.map(({ unit, associations }) => [
+  it("preserves the original fifteen-unit hypotheses and Ç target-local values explicitly proposed and source-free", () => {
+    expect(EMBRIOMORPHEME_SPECTRUM_V0_1).toHaveLength(27);
+    const originalFifteen = EMBRIOMORPHEME_SPECTRUM_V0_1.slice(0, 15);
+    expect(originalFifteen.map(({ unit }) => unit)).toEqual([
+      "R", "L", "D", "M", "N", "SH", "GJ", "B", "P", "T", "K", "V", "S", "Z", "F",
+    ]);
+    expect(Object.fromEntries(originalFifteen.map(({ unit, associations }) => [
       unit,
       associations.map(({ association }) => association),
     ]))).toEqual({
@@ -296,6 +301,127 @@ describe("symbolic functional composition v0.3", () => {
       provenanceClass === "TARGET_LOCAL_USER_PROPOSAL_NOT_IN_FIFTEEN_UNIT_TABLE",
     )).toBe(true);
     expect(getEmbriomorphemeAssociationV0_1(associationId("Ç", "release"))?.sourceIds).toEqual([]);
+  });
+
+  it("appends all twelve retrievable owner-proposed units with unique provisional IDs and no source authority", () => {
+    const expected = [
+      { unit: "C", associations: [["c:point", "point"], ["c:cut", "cut"], ["c:sharp", "sharp"]] },
+      { unit: "DH", associations: [["dh:earth", "earth"], ["dh:thickness", "thickness"], ["dh:density", "density"]] },
+      { unit: "H", associations: [["h:breath", "breath"], ["h:space", "space"], ["h:opening", "opening"]] },
+      { unit: "J", associations: [["j:link", "link"], ["j:joining", "joining"], ["j:flow", "flow"]] },
+      { unit: "LL", associations: [["ll:light", "light"], ["ll:flame", "flame"], ["ll:clarity", "clarity"]] },
+      { unit: "NJ", associations: [["nj:unity", "unity"], ["nj:softness", "softness"], ["nj:inside", "inside"]] },
+      { unit: "Q", associations: [["q:center", "center"], ["q:circle", "circle"], ["q:enclosure", "enclosure"]] },
+      { unit: "RR", associations: [["rr:rapid-motion", "rapid motion"], ["rr:flow", "flow"], ["rr:rush", "rush"]] },
+      { unit: "TH", associations: [["th:point", "point"], ["th:sharpness", "sharpness"], ["th:piercing", "piercing"]] },
+      { unit: "X", associations: [["x:binding", "binding"], ["x:solid", "solid"], ["x:form", "form"]] },
+      { unit: "XH", associations: [["xh:heat", "heat"], ["xh:intensity", "intensity"], ["xh:burst", "burst"]] },
+      { unit: "ZH", associations: [["zh:sound", "sound"], ["zh:echo", "echo"], ["zh:vibration", "vibration"]] },
+    ] as const;
+
+    expect(EMBRIOMORPHEME_SPECTRUM_V0_1.slice(15).map(({ unit }) => unit)).toEqual(expected.map(({ unit }) => unit));
+    for (const { unit, associations } of expected) {
+      const entry = getEmbriomorphemeSpectrumEntryV0_1(unit);
+      expect(entry?.associations.map(({ candidateId, association }) => [candidateId, association])).toEqual(associations);
+      expect(entry?.associations.every((candidate) =>
+        candidate.provenanceClass === "OWNER_SUPPLIED_PROVISIONAL_RESEARCH_ASSOCIATION" &&
+        candidate.claimLayer === "EXPLORATORY_HYPOTHESIS" &&
+        candidate.evidenceStatus === "USER_PROPOSED" &&
+        candidate.sourceIds.length === 0 &&
+        candidate.citationStatus === "NO_CITATION_ENTERED" &&
+        candidate.historicalStatus === "NOT_CLAIMED",
+      )).toBe(true);
+    }
+
+    const allCandidateIds = [
+      ...EMBRIOMORPHEME_SPECTRUM_V0_1.flatMap(({ associations }) => associations.map(({ candidateId }) => candidateId)),
+      ...TARGET_LOCAL_SPECTRUM_ASSOCIATIONS_V0_1.map(({ candidateId }) => candidateId),
+    ];
+    expect(new Set(allCandidateIds).size).toBe(allCandidateIds.length);
+    expect(getEmbriomorphemeSpectrumEntryV0_1("G")).toBeUndefined();
+    expect(TARGET_LOCAL_SPECTRUM_ASSOCIATIONS_V0_1.map(({ unit, association }) => [unit, association])).toEqual([
+      ["Ç", "release"], ["Ç", "emit"],
+    ]);
+  });
+
+  it("recognizes THIKË as TH + K, conserves I@2 and Ë@4, and selects no hypotheses automatically", () => {
+    const result = buildSymbolicFunctionalCompositionV0_3({
+      target: {
+        exactSpelling: "THIKË",
+        language: "Albanian",
+        variety: "Standard Albanian",
+        wholeWordConcept: "test-only unselected placeholder",
+      },
+      operations: [],
+    });
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+
+    expect(result.target.codePoints).toEqual(["T", "H", "I", "K", "Ë"].map((character, position) => ({ character, position })));
+    expect(result.target.writtenVoices).toEqual([{ voice: "I", position: 2 }, { voice: "Ë", position: 4 }]);
+    expect(result.spectrumOccurrences.map(({ unit, exactText, span }) => ({ unit, exactText, span }))).toEqual([
+      { unit: "TH", exactText: "TH", span: { start: 0, end: 2 } },
+      { unit: "K", exactText: "K", span: { start: 3, end: 4 } },
+    ]);
+    expect(result.unmatchedLetterSpans).toEqual([]);
+    expect(result.spectrumOccurrences.every(({ selectedAssociationIds, status }) =>
+      selectedAssociationIds.length === 0 && status === "UNKNOWN_OR_NULL",
+    )).toBe(true);
+    expect(result.voiceEvents.map(({ canonicalIdentity, position, selectedOperator, status }) => ({
+      canonicalIdentity, position, selectedOperator, status,
+    }))).toEqual([
+      { canonicalIdentity: "I", position: 2, selectedOperator: null, status: "UNKNOWN_OR_NULL" },
+      { canonicalIdentity: "Ë", position: 4, selectedOperator: null, status: "UNKNOWN_OR_NULL" },
+    ]);
+    expect(result.symbolicComposition.status).toBe("PARTIAL_NULL");
+    expect(result.symbolicComposition.reasonCodes).toContain("SPECTRUM_ASSOCIATION_MISSING:spectrum:TH@0-2");
+    expect(result.interpretationSelection).toEqual({
+      mode: "no_single_winner",
+      selectedCandidateId: null,
+      userDecisionPosture: "user_decides",
+    });
+  });
+
+  it.each(["DH", "LL", "NJ", "RR", "TH", "XH", "ZH"])(
+    "longest-matches the two-character spectrum unit %s",
+    (unit) => {
+      const result = buildSymbolicFunctionalCompositionV0_3({
+        target: {
+          exactSpelling: unit,
+          language: "Synthetic test form",
+          variety: "Test only",
+          wholeWordConcept: "test-only unselected placeholder",
+        },
+        operations: [],
+      });
+      expect(result.ok).toBe(true);
+      if (!result.ok) return;
+      expect(result.spectrumOccurrences.map(({ unit: matchedUnit, exactText, span }) => ({
+        unit: matchedUnit, exactText, span,
+      }))).toEqual([{ unit, exactText: unit, span: { start: 0, end: 2 } }]);
+      expect(result.unmatchedLetterSpans).toEqual([]);
+      expect(result.spectrumOccurrences[0]?.selectedAssociationIds).toEqual([]);
+    },
+  );
+
+  it("leaves G explicitly unmatched rather than inventing a spectrum unit", () => {
+    const result = buildSymbolicFunctionalCompositionV0_3({
+      target: {
+        exactSpelling: "G",
+        language: "Albanian",
+        variety: "Standard Albanian",
+        wholeWordConcept: "test-only unselected placeholder",
+      },
+      operations: [],
+    });
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.spectrumOccurrences).toEqual([]);
+    expect(result.unmatchedLetterSpans).toEqual([{
+      exactText: "G",
+      span: { start: 0, end: 1 },
+      reason: "NO_SPECTRUM_UNIT_MATCH",
+    }]);
   });
 
   it("retains independent I@3 and I@5 events with canonical, trait-table, and proposed operator labels separated", () => {

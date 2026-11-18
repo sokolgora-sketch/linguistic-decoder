@@ -28,21 +28,19 @@ function makeProjection(dAssociation = "d:division") {
     selections: {
       spectrumCandidateByOccurrenceId: {
         "spectrum:D@0-1": dAssociation,
-        "spectrum:L@2-3": "l:spreading",
-        "spectrum:L@3-4": "l:linear-flow",
+        "spectrum:LL@2-4": "ll:clarity",
         "spectrum:M@5-6": "m:result",
       },
       voiceDraftByEventId: {
         "voice:A@1": { operatorCandidateId: "voice-a:initiate-ground", operandOccurrenceId: "spectrum:D@0-1" },
-        "voice:I@4": { operatorCandidateId: "voice-i:specify-focus", operandOccurrenceId: "spectrum:L@3-4" },
+        "voice:I@4": { operatorCandidateId: "voice-i:specify-focus", operandOccurrenceId: "spectrum:LL@2-4" },
       },
     },
   });
   const nodes = currentWordGraphMeaningNodesV0_1(current.operations, current.evaluation);
   const spectrumSelections = [
     { selectionId: "spectrum:D@0-1", unit: "D", start: 0, end: 1, associationCandidateId: dAssociation },
-    { selectionId: "spectrum:L@2-3", unit: "L", start: 2, end: 3, associationCandidateId: "l:spreading" },
-    { selectionId: "spectrum:L@3-4", unit: "L", start: 3, end: 4, associationCandidateId: "l:linear-flow" },
+    { selectionId: "spectrum:LL@2-4", unit: "LL", start: 2, end: 4, associationCandidateId: "ll:clarity" },
     { selectionId: "spectrum:M@5-6", unit: "M", start: 5, end: 6, associationCandidateId: "m:result" },
   ];
   const voiceBindings = [
@@ -58,20 +56,19 @@ function makeProjection(dAssociation = "d:division") {
       voice: "I" as const,
       position: 4,
       operatorCandidateId: "voice-i:specify-focus",
-      input: { kind: "SPECTRUM_SELECTION" as const, selectionId: "spectrum:L@3-4" },
+      input: { kind: "SPECTRUM_SELECTION" as const, selectionId: "spectrum:LL@2-4" },
     },
   ];
   const node = (nodeId: string) => nodes.find(({ nodeId: candidate }) => candidate === nodeId)!;
   const edges: CurrentWordGraphMeaningEdgeDraftV0_1[] = [
     { edgeId: "edge-d-a", leftNodeId: "selection:spectrum:D@0-1", rightNodeId: "voice:voice:A@1", relationText: "produces" },
-    { edgeId: "edge-a-l-first", leftNodeId: "voice:voice:A@1", rightNodeId: "selection:spectrum:L@2-3", relationText: "separates within" },
-    { edgeId: "edge-l-first-second", leftNodeId: "selection:spectrum:L@2-3", rightNodeId: "selection:spectrum:L@3-4", relationText: "is traced across" },
-    { edgeId: "edge-l-i", leftNodeId: "selection:spectrum:L@3-4", rightNodeId: "voice:voice:I@4", relationText: "is focused as" },
+    { edgeId: "edge-a-ll", leftNodeId: "voice:voice:A@1", rightNodeId: "selection:spectrum:LL@2-4", relationText: "is paired with" },
+    { edgeId: "edge-ll-i", leftNodeId: "selection:spectrum:LL@2-4", rightNodeId: "voice:voice:I@4", relationText: "is focused as" },
     { edgeId: "edge-i-m", leftNodeId: "voice:voice:I@4", rightNodeId: "selection:spectrum:M@5-6", relationText: "yields" },
   ];
   const mappings: CurrentWordGraphMeaningMappingDraftV0_1[] = [
     { mappingId: "mapping-a", bridgeId: "bridge-primary", symbolOutputId: node("voice:voice:A@1").symbolOutputId, roleLabel: "an initiated distinction" },
-    { mappingId: "mapping-i", bridgeId: "bridge-primary", symbolOutputId: node("voice:voice:I@4").symbolOutputId, roleLabel: "a focused distinction" },
+    { mappingId: "mapping-i", bridgeId: "bridge-primary", symbolOutputId: node("voice:voice:I@4").symbolOutputId, roleLabel: "a focused clarity contribution proposed for distinguishing" },
   ];
   return { current, nodes, spectrumSelections, voiceBindings, edges, mappings };
 }
@@ -142,11 +139,10 @@ describe("current-word graph meaning adapter v0.1", () => {
     expect(fixture.current.evaluation.ok).toBe(true);
     expect(fixture.nodes.map(({ text, reference, symbolOutputId }) => [text, reference, symbolOutputId])).toEqual([
       ["division", { kind: "SPECTRUM_SELECTION", selectionId: "spectrum:D@0-1" }, "symbol:selection:spectrum:D@0-1"],
-      ["spreading", { kind: "SPECTRUM_SELECTION", selectionId: "spectrum:L@2-3" }, "symbol:selection:spectrum:L@2-3"],
-      ["linear flow", { kind: "SPECTRUM_SELECTION", selectionId: "spectrum:L@3-4" }, "symbol:selection:spectrum:L@3-4"],
+      ["clarity", { kind: "SPECTRUM_SELECTION", selectionId: "spectrum:LL@2-4" }, "symbol:selection:spectrum:LL@2-4"],
       ["result", { kind: "SPECTRUM_SELECTION", selectionId: "spectrum:M@5-6" }, "symbol:selection:spectrum:M@5-6"],
       ["initiated(division)", { kind: "VOICE_BINDING", bindingId: "voice:A@1" }, "symbol:voice:voice:A@1"],
-      ["focused(linear flow)", { kind: "VOICE_BINDING", bindingId: "voice:I@4" }, "symbol:voice:voice:I@4"],
+      ["focused(clarity)", { kind: "VOICE_BINDING", bindingId: "voice:I@4" }, "symbol:voice:voice:I@4"],
     ]);
   });
 
@@ -157,7 +153,7 @@ describe("current-word graph meaning adapter v0.1", () => {
     if (!result.plan?.ok) return;
     expect(result.plan.evaluation.operationTrace.filter(({ kind, status }) => kind === "APPLY_VOICE_OPERATOR" && status === "COMPUTED").map(({ contribution }) => contribution)).toEqual([
       "INITIATE / GROUND(division) → initiated(division)",
-      "SPECIFY / FOCUS(linear flow) → focused(linear flow)",
+      "SPECIFY / FOCUS(clarity) → focused(clarity)",
     ]);
     expect(result.plan.graphMeaningBridge.mappings.map(({ graphOutput, selectedLexicalFunction, generatedContribution }) => ({
       output: graphOutput.text,
@@ -174,11 +170,11 @@ describe("current-word graph meaning adapter v0.1", () => {
         contribution: expect.stringContaining("distinguish or recognize one thing from another"),
       },
       {
-        output: "focused(linear flow)",
+        output: "focused(clarity)",
         sense: "USER_PROPOSAL",
         functionStatus: "USER_PROPOSED",
         relationStatus: "USER_PROPOSED",
-        contribution: expect.stringContaining("focused(linear flow)"),
+        contribution: expect.stringContaining("focused(clarity)"),
       },
     ]);
     expect(result.plan.graphMeaningBridge).toMatchObject({
@@ -229,7 +225,7 @@ describe("current-word graph meaning adapter v0.1", () => {
     });
     expect(summary.contributions).toEqual([
       { mappingId: "mapping-a", computedOutput: "initiated(division)", proposedRole: "an initiated distinction", evidenceStatus: "USER_PROPOSED" },
-      { mappingId: "mapping-i", computedOutput: "focused(linear flow)", proposedRole: "a focused distinction", evidenceStatus: "USER_PROPOSED" },
+      { mappingId: "mapping-i", computedOutput: "focused(clarity)", proposedRole: "a focused clarity contribution proposed for distinguishing", evidenceStatus: "USER_PROPOSED" },
     ]);
     expect(summary.sourceMeanings).toEqual([{ text: "difference", citationStatus: "CITATION_ENTERED_UNVERIFIED" }]);
     expect(summary.statusLabel).toBe("Proposal complete — not verified");
