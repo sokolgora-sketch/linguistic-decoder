@@ -1,4 +1,4 @@
-import { act, cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { act, cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { FjaloriCrossSourceEvidenceV0_1 } from "@/ui/instrument/sections/FjaloriCrossSourceEvidence.v0_1";
 
 const testedWords = ["dritare", "dritë", "bletar", "pelar", "qymyrtar", "gjitar", "thëngjilltar"] as const;
@@ -129,6 +129,86 @@ describe("FjaloriShqip Albanian meaning evidence v0.1", () => {
     expect(screen.getByTestId("fjalori-workbench-sense-selection")).toHaveTextContent("USER_SELECTED");
     fireEvent.click(screen.getByRole("button", { name: "Clear workbench sense selection" }));
     expect(onSelect).toHaveBeenLastCalledWith(null);
+  });
+
+  it("emits every available Fjalori sense with response-position provenance without selecting one", async () => {
+    global.fetch = jest.fn().mockResolvedValue(responseFor("ndarje", {
+      entrySources: [["sq-wiktionary", "editor"]],
+      recordSources: ["sq-wiktionary", "editor"],
+      senses: [
+        { gloss: "division; separation", lang: "en", source: "sq-wiktionary", tags: ["noun"] },
+        { gloss: "a part into which something has been divided", lang: "en", source: "editor" },
+        { gloss: "an unrelated fixture-only sense", lang: "sq", source: "editor" },
+      ],
+    })) as unknown as typeof fetch;
+    const onRuntimeSourceResponse = jest.fn();
+    const onSelect = jest.fn();
+
+    render(
+      <FjaloriCrossSourceEvidenceV0_1
+        word="NDARJE"
+        analysisLanguage="sq"
+        analysisVariety="albanian"
+        onSelectSourceSenseForMotivation={onSelect}
+        onRuntimeSourceResponse={onRuntimeSourceResponse}
+      />,
+    );
+
+    await screen.findByText("division; separation");
+    await waitFor(() => expect(onRuntimeSourceResponse).toHaveBeenLastCalledWith(expect.objectContaining({
+      requestKey: "NDARJE\u0000ndarje",
+      queryForm: "NDARJE",
+      status: "available",
+      exactSourceForm: "ndarje",
+      apiUrl: "https://fjalorishqip.org/api/v1/fjala/ndarje.json",
+      licence: "CC BY-SA 4.0",
+      analysisLanguage: "sq",
+      analysisVariety: "albanian",
+      recordSources: ["sq-wiktionary", "editor"],
+      senses: [
+        expect.objectContaining({ entryIndex: 1, senseIndex: 1, gloss: "division; separation", senseSource: "sq-wiktionary", entrySources: ["sq-wiktionary", "editor"] }),
+        expect.objectContaining({ entryIndex: 1, senseIndex: 2, gloss: "a part into which something has been divided", senseSource: "editor" }),
+        expect.objectContaining({ entryIndex: 1, senseIndex: 3, gloss: "an unrelated fixture-only sense", glossLanguage: "sq" }),
+      ],
+    })));
+    expect(onRuntimeSourceResponse.mock.calls.some(([response]) => response.status === "loading")).toBe(true);
+    expect(onSelect).not.toHaveBeenCalled();
+    expect(onRuntimeSourceResponse.mock.calls.at(-1)?.[0]).not.toHaveProperty("senses.0.senseId");
+  });
+
+  it("emits the unavailable provider state without carrying old senses", async () => {
+    global.fetch = jest.fn().mockResolvedValue({ ok: false, status: 404 }) as unknown as typeof fetch;
+    const onRuntimeSourceResponse = jest.fn();
+
+    render(<FjaloriCrossSourceEvidenceV0_1 word="NDARJE" onRuntimeSourceResponse={onRuntimeSourceResponse} />);
+
+    await screen.findByTestId("fjalori-evidence-null");
+    await waitFor(() => expect(onRuntimeSourceResponse).toHaveBeenLastCalledWith(expect.objectContaining({
+      queryForm: "NDARJE",
+      status: "http-not-found",
+      httpStatus: 404,
+      exactSourceForm: null,
+      senses: [],
+    })));
+  });
+
+  it("emits invalid response status with no source senses", async () => {
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => ({ word: "different-form", entries: [] }),
+    }) as unknown as typeof fetch;
+    const onRuntimeSourceResponse = jest.fn();
+
+    render(<FjaloriCrossSourceEvidenceV0_1 word="NDARJE" onRuntimeSourceResponse={onRuntimeSourceResponse} />);
+
+    await screen.findByTestId("fjalori-evidence-null");
+    await waitFor(() => expect(onRuntimeSourceResponse).toHaveBeenLastCalledWith(expect.objectContaining({
+      queryForm: "NDARJE",
+      status: "invalid",
+      exactSourceForm: null,
+      senses: [],
+    })));
   });
 
   it("preserves the KAN proposal spelling while requesting the established canonical form", async () => {
@@ -615,17 +695,18 @@ describe("FjaloriShqip Albanian meaning evidence v0.1", () => {
       return String(input).endsWith("/kan.json") ? pendingKan : Promise.resolve(responseFor("ka"));
     });
     global.fetch = fetchMock as unknown as typeof fetch;
+    const onRuntimeSourceResponse = jest.fn();
     const kanProposal = {
       componentId: "0", exactSpelling: "KAN", proposedMeaning: "KAN draft",
       proposedGrammaticalRole: "", language: "Albanian", dialect: "", unresolved: false,
     };
     const kaProposal = { ...kanProposal, exactSpelling: "KA", proposedMeaning: "KA draft" };
     const view = render(
-      <FjaloriCrossSourceEvidenceV0_1 word="KAN" context="component" componentProposal={kanProposal} />,
+      <FjaloriCrossSourceEvidenceV0_1 word="KAN" context="component" componentProposal={kanProposal} onRuntimeSourceResponse={onRuntimeSourceResponse} />,
     );
 
     view.rerender(
-      <FjaloriCrossSourceEvidenceV0_1 word="KA" context="component" componentProposal={kaProposal} />,
+      <FjaloriCrossSourceEvidenceV0_1 word="KA" context="component" componentProposal={kaProposal} onRuntimeSourceResponse={onRuntimeSourceResponse} />,
     );
     expect(await screen.findByText("Përshkrim prove për ka")).toBeInTheDocument();
     await act(async () => {
@@ -638,6 +719,12 @@ describe("FjaloriShqip Albanian meaning evidence v0.1", () => {
     expect(screen.getByTestId("fjalori-source-description")).toHaveTextContent("Përshkrim prove për ka");
     expect(screen.queryByText("Përshkrim prove për kan")).not.toBeInTheDocument();
     expect(screen.queryByTestId("fjalori-selected-sense")).not.toBeInTheDocument();
+    expect(onRuntimeSourceResponse.mock.calls.some(([response]) => response.status === "available" && response.queryForm === "KAN")).toBe(false);
+    expect(onRuntimeSourceResponse).toHaveBeenLastCalledWith(expect.objectContaining({
+      queryForm: "KA",
+      status: "available",
+      exactSourceForm: "ka",
+    }));
   });
 
   it("resets a manually selected sense assessment when the analyzed word changes", async () => {

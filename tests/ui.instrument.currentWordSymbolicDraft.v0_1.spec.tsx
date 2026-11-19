@@ -1,11 +1,14 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, within } from "@testing-library/react";
 import {
   buildCurrentWordSymbolicDraftProjectionV0_1,
   CurrentWordSymbolicDraftV0_1,
 } from "@/ui/instrument/sections/CurrentWordSymbolicDraftV0_1";
 import { SingleWordMotivationWorkbenchV0_1 } from "@/ui/instrument/sections/SingleWordMotivationWorkbenchV0_1";
 import type { SingleWordCurrentWordEvidenceContextV0_1 } from "@/ui/instrument/sections/SingleWordMotivationWorkbenchV0_1";
-import type { RuntimeAlbanianSourceSenseSelectionV0_1 } from "@/ui/instrument/sections/currentWordSourceFunctionalSuggestionAdapter.v0_1";
+import type {
+  RuntimeAlbanianSourceSenseSelectionV0_1,
+  RuntimeFjaloriSourceResponseV0_1,
+} from "@/ui/instrument/sections/currentWordSourceFunctionalSuggestionAdapter.v0_1";
 
 const DIVISION = "d:division";
 const LIGHT = "d:light";
@@ -35,19 +38,26 @@ function makeCurrentWordEvidence(options: Partial<{
     discovery: {
       kind: "present",
       value: {
+        schemaVersion: "open-instrument.motivation-engine-discovery.v0_2",
+        status: "MATCHES_FOUND",
         inputWord: analyzedWord,
         inputLanguage: options.inputLanguage ?? "sq",
         inputProfile: options.inputProfile ?? "albanian",
-        sourceFact: { language: "Albanian" },
+        sourceFact: { language: "Albanian", layer: "SOURCE_FACT", profile: "Albanian", representation: "albanian_profile", sourceStatus: "observed_external_snapshot", authorityBoundary: "source fact only" },
         exactLexicalSourceStatus: { status: options.sourceLookupStatus ?? "MATCHES_FOUND" },
         exactLexicalSourceFacts: [{
-          languageCode: options.languageCode ?? "sq",
-          form: sourceForm,
-          attestationTruth: options.attestationTruth ?? "fact",
-          sourceStatus: "observed_external_snapshot",
           sourceRecordId: `fixture:${normalizedSourceForm}`,
           entryLocator: `${normalizedSourceForm}#Albanian`,
+          physicalRecordOrdinal: 0,
+          language: "Albanian",
+          languageCode: options.languageCode ?? "sq",
+          form: sourceForm,
+          partOfSpeech: "noun",
+          attestationTruth: options.attestationTruth ?? "fact",
+          sourceStatus: "observed_external_snapshot",
           senses: (options.sourceSenses ?? ["act of distinguishing"]).map((gloss) => ({ glosses: [gloss] })),
+          ipaObservations: [],
+          pronunciationAuthority: "CURRENT_KAIKKI_RECORD_ONLY_UNBOUND_TO_FROZEN_PROFILE",
           sourceSnapshot: {
             sourceFamilyId: "fixture-source-family",
             sourceUrl: "https://example.invalid/fixture.jsonl",
@@ -58,6 +68,24 @@ function makeCurrentWordEvidence(options: Partial<{
       },
     },
   } as unknown as SingleWordCurrentWordEvidenceContextV0_1;
+}
+
+function runtimeNdarjeSourceResponse(senses = [
+  { entryIndex: 1, senseIndex: 1, partOfSpeech: "noun", gloss: "division; separation", glossLanguage: "en" as const, senseSource: "sq-wiktionary", tags: ["noun"], entrySources: ["sq-wiktionary", "editor"] },
+  { entryIndex: 1, senseIndex: 2, partOfSpeech: "noun", gloss: "a part into which something has been divided", glossLanguage: "en" as const, senseSource: "editor", tags: [], entrySources: ["sq-wiktionary", "editor"] },
+]) : RuntimeFjaloriSourceResponseV0_1 {
+  return {
+    requestKey: "NDARJE\u0000ndarje",
+    queryForm: "NDARJE",
+    status: "available",
+    exactSourceForm: "ndarje",
+    apiUrl: "https://fjalorishqip.org/api/v1/fjala/ndarje.json",
+    licence: "CC BY-SA 4.0",
+    analysisLanguage: "sq",
+    analysisVariety: "albanian",
+    recordSources: ["sq-wiktionary", "editor"],
+    senses,
+  };
 }
 
 function renderDraft(overrides: Partial<Parameters<typeof CurrentWordSymbolicDraftV0_1>[0]> = {}) {
@@ -426,7 +454,7 @@ describe("current-word symbolic draft v0.1", () => {
       "SOURCE_FACT · CITATION_ENTERED_UNVERIFIED · division; separation",
     );
     expect(screen.getByTestId("current-word-exploratory-null")).toHaveTextContent("PARTIAL_NULL");
-    expect(screen.getByText(/source-linked interpretation below uses your explicit sense selection and computed outputs/i)).toBeInTheDocument();
+    expect(screen.getByText(/DA functional-motivation candidate below uses qualifying exact-form source facts/i)).toBeInTheDocument();
     expect(screen.getByTestId("current-word-source-functional-manual-fallback")).not.toHaveAttribute("open");
     expect(screen.getByTestId("current-word-symbolic-code-points")).toHaveTextContent(
       "N@0 · D@1 · A@2 · R@3 · J@4 · E@5",
@@ -631,6 +659,218 @@ describe("current-word symbolic draft v0.1", () => {
     rerender(<CurrentWordSymbolicDraftV0_1 analyzedWord="DALLIM" draftTargetWord="DALLIM" targetLanguage="sq" targetDialect="Tosk" currentWordEvidence={makeCurrentWordEvidence()} />);
     expect(sourceMeaning()).toHaveTextContent("source evidence withheld");
     expect(sourceSenseOption()).not.toBeInTheDocument();
+  });
+
+  it("shows the generated NDARJE functional candidate from validated exact-form facts without selecting a sense or symbolic operation", () => {
+    render(
+      <CurrentWordSymbolicDraftV0_1
+        analyzedWord="NDARJE"
+        draftTargetWord="NDARJE"
+        targetLanguage=""
+        targetDialect=""
+        currentWordEvidence={makeCurrentWordEvidence({
+          analyzedWord: "NDARJE",
+          sourceForm: "ndarje",
+          sourceSenses: ["division; separation", "a part into which something has been divided"],
+        })}
+      />,
+    );
+
+    const generated = screen.getAllByTestId("current-word-da-generated-functional-candidate");
+    expect(generated).toHaveLength(2);
+    const firstGenerated = within(generated[0]);
+    expect(firstGenerated.getByTestId("current-word-da-generated-source-sense")).toHaveTextContent("SOURCE_FACT");
+    expect(firstGenerated.getByTestId("current-word-da-generated-source-sense")).toHaveTextContent("fixture:ndarje");
+    expect(firstGenerated.getByTestId("current-word-da-generated-structure")).toHaveTextContent("DA span [1,3)");
+    expect(firstGenerated.getByTestId("current-word-da-generated-functional-reading")).toHaveTextContent(
+      "DA “to split, cut, divide” → a dividing/separating action → the source sense “division; separation”",
+    );
+    expect(firstGenerated.getByTestId("current-word-da-generated-claim-boundary")).toHaveTextContent("UNSELECTED");
+    expect(firstGenerated.getByTestId("current-word-da-generated-claim-boundary")).toHaveTextContent("PARTIAL_NULL");
+    expect(firstGenerated.getByTestId("current-word-da-generated-claim-boundary")).toHaveTextContent("no_single_winner / user_decides");
+    expect(firstGenerated.getByTestId("current-word-da-generated-unresolved")).toHaveTextContent("N@0 functional association UNKNOWN_OR_NULL");
+    expect(firstGenerated.getByTestId("current-word-da-generated-unresolved")).toHaveTextContent("A@2 symbolic role UNKNOWN_OR_NULL");
+    expect(screen.getByTestId("current-word-da-candidate-structure")).toHaveTextContent("N@0 · D@1 · A@2 · R@3 · J@4 · E@5");
+    expect(screen.getByTestId("current-word-da-candidate-structure")).toHaveTextContent("A@2 → E@5");
+    expect(screen.getByTestId("current-word-symbolic-code-points")).toHaveTextContent("N@0 · D@1 · A@2 · R@3 · J@4 · E@5");
+    expect(screen.getByTestId("current-word-symbolic-written-voices")).toHaveTextContent("A@2 → E@5");
+    expect(screen.getByLabelText("Spectrum association for D at position 1")).toHaveValue("");
+    expect(screen.getByLabelText("Voice operator for A@2")).toHaveValue("");
+    expect(screen.getByLabelText("Voice operator for E@5")).toHaveValue("");
+    expect(screen.getByLabelText("Propose DA at code-point span 1 to 3")).not.toBeChecked();
+    expect(screen.getByLabelText("Propose DA at code-point span 1 to 3")).toBeDisabled();
+    expect(screen.queryByTestId("current-word-symbolic-computed-output")).not.toBeInTheDocument();
+  });
+
+  it("generates unselected NDARJE motivation from available Fjalori senses when Kaikki is SOURCE_NOT_FOUND", () => {
+    render(
+      <CurrentWordSymbolicDraftV0_1
+        analyzedWord="NDARJE"
+        draftTargetWord="NDARJE"
+        targetLanguage=""
+        targetDialect=""
+        currentWordEvidence={makeCurrentWordEvidence({
+          analyzedWord: "NDARJE",
+          sourceForm: "ndarje",
+          sourceLookupStatus: "SOURCE_NOT_FOUND",
+          sourceSenses: [],
+        })}
+        runtimeFjaloriSourceResponse={runtimeNdarjeSourceResponse()}
+      />,
+    );
+
+    const generated = screen.getAllByTestId("current-word-da-generated-functional-candidate");
+    expect(generated).toHaveLength(2);
+    expect(within(generated[0]).getByTestId("current-word-da-generated-source-sense")).toHaveTextContent(
+      "FjaloriShqip response · response status available · exact target form ndarje · Entry 1 · Sense 1 (response position, not a source-issued sense ID): division; separation",
+    );
+    expect(within(generated[0]).getByTestId("current-word-da-generated-fjalori-provenance")).toHaveTextContent(
+      "Record sources sq-wiktionary · editor · entry sources sq-wiktionary · editor",
+    );
+    expect(within(generated[0]).getByTestId("current-word-da-generated-fjalori-provenance")).toHaveTextContent("CC BY-SA 4.0");
+    expect(within(generated[0]).getByTestId("current-word-da-generated-fjalori-provenance")).toHaveTextContent("CITATION_ENTERED_UNVERIFIED");
+    expect(within(generated[0]).getByTestId("current-word-da-generated-fjalori-provenance")).toHaveTextContent("NOT_ASSESSED");
+    expect(within(generated[0]).getByTestId("current-word-da-generated-functional-reading")).toHaveTextContent(
+      "DA “to split, cut, divide” → a dividing/separating action → the source sense “division; separation”",
+    );
+    expect(screen.getByTestId("current-word-da-candidate-structure")).toHaveTextContent("N@0 · D@1 · A@2 · R@3 · J@4 · E@5");
+    expect(screen.getByTestId("current-word-da-candidate-structure")).toHaveTextContent("A@2 → E@5");
+    expect(screen.getByTestId("current-word-source-suggestion-runtime-status")).toHaveTextContent("SOURCE_NOT_FOUND");
+    expect(screen.getByLabelText("Spectrum association for D at position 1")).toHaveValue("");
+    expect(screen.getByLabelText("Voice operator for A@2")).toHaveValue("");
+    expect(screen.getByLabelText("Voice operator for E@5")).toHaveValue("");
+    expect(screen.getByLabelText("Propose DA at code-point span 1 to 3")).not.toBeChecked();
+    expect(screen.getByLabelText("Propose DA at code-point span 1 to 3")).toBeDisabled();
+    expect(within(generated[0]).getByTestId("current-word-da-generated-claim-boundary")).toHaveTextContent("UNSELECTED");
+    expect(within(generated[0]).getByTestId("current-word-da-generated-claim-boundary")).toHaveTextContent("PARTIAL_NULL");
+  });
+
+  it("keeps matching Kaikki and Fjalori senses as separately attributed candidate records", () => {
+    render(
+      <CurrentWordSymbolicDraftV0_1
+        analyzedWord="NDARJE"
+        draftTargetWord="NDARJE"
+        targetLanguage=""
+        targetDialect=""
+        currentWordEvidence={makeCurrentWordEvidence({
+          analyzedWord: "NDARJE",
+          sourceForm: "ndarje",
+          sourceSenses: ["division; separation"],
+        })}
+        runtimeFjaloriSourceResponse={runtimeNdarjeSourceResponse()}
+      />,
+    );
+
+    const candidates = screen.getAllByTestId("current-word-da-generated-functional-candidate");
+    expect(candidates).toHaveLength(3);
+    expect(within(candidates[0]).getByTestId("current-word-da-generated-source-sense")).toHaveTextContent("Kaikki exact target form ndarje");
+    expect(within(candidates[0]).getByTestId("current-word-da-generated-source-sense")).toHaveTextContent("fixture:ndarje");
+    expect(within(candidates[1]).getByTestId("current-word-da-generated-source-sense")).toHaveTextContent("FjaloriShqip response");
+    expect(within(candidates[1]).getByTestId("current-word-da-generated-source-sense")).toHaveTextContent("Entry 1 · Sense 1");
+    expect(within(candidates[2]).getByTestId("current-word-da-generated-source-sense")).toHaveTextContent("Entry 1 · Sense 2");
+    expect(screen.getByTestId("current-word-da-generated-functional-candidates")).not.toHaveTextContent("corroborat");
+  });
+
+  it("returns explicit Null when neither exact-form provider supplies usable NDARJE senses", () => {
+    const unavailableFjalori: RuntimeFjaloriSourceResponseV0_1 = {
+      requestKey: "NDARJE\u0000ndarje",
+      queryForm: "NDARJE",
+      status: "http-not-found",
+      httpStatus: 404,
+      exactSourceForm: null,
+      apiUrl: "https://fjalorishqip.org/api/v1/fjala/ndarje.json",
+      licence: null,
+      analysisLanguage: "sq",
+      analysisVariety: "albanian",
+      recordSources: [],
+      senses: [],
+    };
+    render(
+      <CurrentWordSymbolicDraftV0_1
+        analyzedWord="NDARJE"
+        draftTargetWord="NDARJE"
+        targetLanguage=""
+        targetDialect=""
+        currentWordEvidence={makeCurrentWordEvidence({
+          analyzedWord: "NDARJE",
+          sourceForm: "ndarje",
+          sourceLookupStatus: "SOURCE_NOT_FOUND",
+          sourceSenses: [],
+        })}
+        runtimeFjaloriSourceResponse={unavailableFjalori}
+      />,
+    );
+
+    expect(screen.queryByTestId("current-word-da-generated-functional-candidate")).not.toBeInTheDocument();
+    expect(screen.getByTestId("current-word-da-generated-functional-null")).toHaveTextContent("PARTIAL_NULL");
+    expect(screen.getByTestId("current-word-da-generated-functional-null")).toHaveTextContent("EXACT_TARGET_SOURCE_FACTS_NOT_AVAILABLE");
+    expect(screen.getByTestId("current-word-da-generated-functional-null")).toHaveTextContent("FJALORISHQIP_SOURCE_HTTP_NOT_FOUND");
+  });
+
+  it("keeps Fjalori response positions as distinct alternatives and withholds them after a target change", () => {
+    const response = runtimeNdarjeSourceResponse([
+      { entryIndex: 1, senseIndex: 1, partOfSpeech: "noun", gloss: "division; separation", glossLanguage: "en", senseSource: "sq-wiktionary", tags: [], entrySources: ["sq-wiktionary"] },
+      { entryIndex: 1, senseIndex: 2, partOfSpeech: "noun", gloss: "separation of parts", glossLanguage: "en", senseSource: "editor", tags: [], entrySources: ["editor"] },
+      { entryIndex: 1, senseIndex: 3, partOfSpeech: "noun", gloss: "an unrelated meaning", glossLanguage: "en", senseSource: "editor", tags: [], entrySources: ["editor"] },
+    ]);
+    const { rerender } = render(
+      <CurrentWordSymbolicDraftV0_1
+        analyzedWord="NDARJE"
+        draftTargetWord="NDARJE"
+        targetLanguage=""
+        targetDialect=""
+        currentWordEvidence={makeCurrentWordEvidence({ analyzedWord: "NDARJE", sourceForm: "ndarje", sourceLookupStatus: "SOURCE_NOT_FOUND", sourceSenses: [] })}
+        runtimeFjaloriSourceResponse={response}
+      />,
+    );
+
+    const generated = screen.getAllByTestId("current-word-da-generated-functional-candidate");
+    expect(generated).toHaveLength(2);
+    expect(within(generated[0]).getByTestId("current-word-da-generated-source-sense")).toHaveTextContent("Entry 1 · Sense 1");
+    expect(within(generated[1]).getByTestId("current-word-da-generated-source-sense")).toHaveTextContent("Entry 1 · Sense 2");
+    expect(screen.getByTestId("current-word-da-generated-functional-candidates")).not.toHaveTextContent("an unrelated meaning");
+
+    rerender(
+      <CurrentWordSymbolicDraftV0_1
+        analyzedWord="DALLIM"
+        draftTargetWord="DALLIM"
+        targetLanguage=""
+        targetDialect=""
+        currentWordEvidence={makeCurrentWordEvidence({ analyzedWord: "DALLIM", sourceForm: "dallim", sourceLookupStatus: "SOURCE_NOT_FOUND", sourceSenses: ["act of distinguishing"] })}
+        runtimeFjaloriSourceResponse={response}
+      />,
+    );
+    expect(screen.queryByTestId("current-word-da-generated-functional-candidate")).not.toBeInTheDocument();
+    expect(screen.getByTestId("current-word-da-generated-functional-null")).toHaveTextContent("EXACT_TARGET_SOURCE_FACTS_NOT_AVAILABLE");
+  });
+
+  it("withholds Fjalori senses when workbench language or dialect differs from the source analysis", () => {
+    const response = runtimeNdarjeSourceResponse();
+    const { rerender } = render(
+      <CurrentWordSymbolicDraftV0_1
+        analyzedWord="NDARJE"
+        draftTargetWord="NDARJE"
+        targetLanguage="English"
+        targetDialect=""
+        currentWordEvidence={makeCurrentWordEvidence({ analyzedWord: "NDARJE", sourceForm: "ndarje", sourceLookupStatus: "SOURCE_NOT_FOUND", sourceSenses: [] })}
+        runtimeFjaloriSourceResponse={response}
+      />,
+    );
+    expect(screen.queryByTestId("current-word-da-generated-functional-candidate")).not.toBeInTheDocument();
+    expect(screen.getByTestId("current-word-da-generated-functional-null")).toHaveTextContent("TARGET_LANGUAGE_NOT_ALBANIAN");
+
+    rerender(
+      <CurrentWordSymbolicDraftV0_1
+        analyzedWord="NDARJE"
+        draftTargetWord="NDARJE"
+        targetLanguage=""
+        targetDialect="Tosk Albanian"
+        currentWordEvidence={makeCurrentWordEvidence({ analyzedWord: "NDARJE", sourceForm: "ndarje", sourceLookupStatus: "SOURCE_NOT_FOUND", sourceSenses: [] })}
+        runtimeFjaloriSourceResponse={response}
+      />,
+    );
+    expect(screen.queryByTestId("current-word-da-generated-functional-candidate")).not.toBeInTheDocument();
+    expect(screen.getByTestId("current-word-da-generated-functional-null")).toHaveTextContent("EXACT_TARGET_SOURCE_FACTS_NOT_AVAILABLE");
   });
 
   it("clears selections when the parent workbench word, language, or dialect identity changes", () => {

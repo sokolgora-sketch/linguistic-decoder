@@ -1,7 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import type { RuntimeAlbanianSourceSenseRecordV0_1, RuntimeAlbanianSourceSenseSelectionV0_1 } from "@/ui/instrument/sections/currentWordSourceFunctionalSuggestionAdapter.v0_1";
+import { useEffect, useMemo, useState } from "react";
+import type {
+  RuntimeAlbanianSourceSenseRecordV0_1,
+  RuntimeAlbanianSourceSenseSelectionV0_1,
+  RuntimeFjaloriSourceResponseV0_1,
+} from "@/ui/instrument/sections/currentWordSourceFunctionalSuggestionAdapter.v0_1";
 
 const FJALORI_API_ROOT = "https://fjalorishqip.org/api/v1/fjala";
 const FETCH_TIMEOUT_MS = 8_000;
@@ -56,6 +60,7 @@ type EvidenceState =
     }>;
 
 type KeyedEvidenceState = Readonly<{ requestKey: string; evidence: EvidenceState }>;
+const LOADING_EVIDENCE: EvidenceState = { status: "loading" };
 
 function canonicalAlbanianWord(value: string): string | null {
   if (value.length > MAX_WORD_CODEPOINTS * 2 + 16) return null;
@@ -186,6 +191,7 @@ export function FjaloriCrossSourceEvidenceV0_1({
   analysisLanguage,
   analysisVariety,
   onSelectSourceSenseForMotivation,
+  onRuntimeSourceResponse,
 }: Readonly<{
   word: string;
   context?: "word-reading" | "component";
@@ -194,6 +200,7 @@ export function FjaloriCrossSourceEvidenceV0_1({
   analysisLanguage?: string;
   analysisVariety?: string;
   onSelectSourceSenseForMotivation?: (selection: RuntimeAlbanianSourceSenseSelectionV0_1 | null) => void;
+  onRuntimeSourceResponse?: (response: RuntimeFjaloriSourceResponseV0_1) => void;
 }>) {
   const canonicalWord = canonicalAlbanianWord(word);
   const userProposedMeaning = componentProposal?.unresolved
@@ -222,7 +229,7 @@ export function FjaloriCrossSourceEvidenceV0_1({
   });
   const evidence = storedEvidence.requestKey === requestKey
     ? storedEvidence.evidence
-    : { status: "loading" as const };
+    : LOADING_EVIDENCE;
   const [selectedSense, setSelectedSense] = useState<Readonly<{
     entryIndex: number;
     senseIndex: number;
@@ -299,9 +306,68 @@ export function FjaloriCrossSourceEvidenceV0_1({
     };
   }, [canonicalWord, requestKey]);
 
+  const apiUrl = `${FJALORI_API_ROOT}/${encodeURIComponent(canonicalWord ?? "")}.json`;
+  const runtimeSourceResponse = useMemo<RuntimeFjaloriSourceResponseV0_1>(() => {
+    if (!canonicalWord) {
+      return {
+        requestKey,
+        queryForm: word,
+        status: "invalid",
+        httpStatus: null,
+        exactSourceForm: null,
+        apiUrl,
+        licence: null,
+        analysisLanguage: analysisLanguage ?? "",
+        analysisVariety: analysisVariety ?? "",
+        recordSources: [],
+        senses: [],
+      };
+    }
+    if (evidence.status !== "available") {
+      return {
+        requestKey,
+        queryForm: word,
+        status: evidence.status,
+        httpStatus: evidence.status === "http-not-found" || evidence.status === "http-error" ? evidence.httpStatus : null,
+        exactSourceForm: null,
+        apiUrl,
+        licence: null,
+        analysisLanguage: analysisLanguage ?? "",
+        analysisVariety: analysisVariety ?? "",
+        recordSources: [],
+        senses: [],
+      };
+    }
+    const senses = evidence.entries.flatMap((entry, entryIndex) => entry.senses.map((sense, senseIndex) => ({
+      entryIndex: entryIndex + 1,
+      senseIndex: senseIndex + 1,
+      partOfSpeech: entry.pos,
+      gloss: sense.gloss,
+      glossLanguage: sense.lang,
+      senseSource: sense.source,
+      tags: sense.tags,
+      entrySources: entry.sources,
+    })));
+    return {
+      requestKey,
+      queryForm: word,
+      status: "available",
+      exactSourceForm: evidence.sourceWord,
+      apiUrl,
+      licence: evidence.licence,
+      analysisLanguage: analysisLanguage ?? "",
+      analysisVariety: analysisVariety ?? "",
+      recordSources: evidence.recordSources,
+      senses,
+    };
+  }, [analysisLanguage, analysisVariety, apiUrl, canonicalWord, evidence, requestKey, word]);
+
+  useEffect(() => {
+    onRuntimeSourceResponse?.(runtimeSourceResponse);
+  }, [onRuntimeSourceResponse, runtimeSourceResponse]);
+
   if (!canonicalWord) return null;
 
-  const apiUrl = `${FJALORI_API_ROOT}/${encodeURIComponent(canonicalWord)}.json`;
   const wordPageUrl = `https://fjalorishqip.org/fjala/${encodeURIComponent(canonicalWord)}/`;
   const buildSenseSelection = (
     entryIndex: number,
