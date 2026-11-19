@@ -29,6 +29,7 @@ import { CrossLanguageFunctionalMotivationWorkbenchV0_1 } from "@/ui/instrument/
 import { FunctionalMotivationMethodExamplesCardV0_1 } from "@/ui/instrument/sections/FunctionalMotivationMethodExamplesCardV0_1";
 import { CurrentWordSymbolicDraftV0_1 } from "@/ui/instrument/sections/CurrentWordSymbolicDraftV0_1";
 import { sameAlbanianSourceForm } from "@/ui/instrument/albanianSourceFormIdentity.v0_1";
+import type { RuntimeAlbanianSourceSenseSelectionV0_1 } from "@/ui/instrument/sections/currentWordSourceFunctionalSuggestionAdapter.v0_1";
 
 type DraftSegment = SingleWordFunctionalMotivationSegmentInputV0_1;
 type DraftTransformation = SingleWordFunctionalMotivationTransformationInputV0_1;
@@ -1399,9 +1400,11 @@ function opaqueValidationMessageForReasonCode(reasonCode: string): string {
 export function SingleWordMotivationWorkbenchV0_1({
   initialTargetWord,
   currentWordEvidence,
+  selectedSourceSense,
 }: {
   initialTargetWord: string;
   currentWordEvidence?: SingleWordCurrentWordEvidenceContextV0_1;
+  selectedSourceSense?: RuntimeAlbanianSourceSenseSelectionV0_1 | null;
 }) {
   const [targetWord, setTargetWord] = useState(initialTargetWord);
   const [targetLanguage, setTargetLanguage] = useState("");
@@ -1648,6 +1651,7 @@ export function SingleWordMotivationWorkbenchV0_1({
         targetLanguage={targetLanguage}
         targetDialect={targetDialect}
         currentWordEvidence={currentWordEvidence}
+        selectedSourceSense={selectedSourceSense}
       />
 
       <FunctionalMotivationMethodExamplesCardV0_1 />

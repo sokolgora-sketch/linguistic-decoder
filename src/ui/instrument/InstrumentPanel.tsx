@@ -45,6 +45,7 @@ import { SpokenResultCompositionSummaryV0_1 } from "./sections/SpokenResultCompo
 import { PrimaryAlbanianReadingCardV0_1 } from "./sections/PrimaryAlbanianReadingCard.v0_1";
 import { MotivationDiscoveryCardV0_1 } from "./sections/MotivationDiscoveryCard.v0_1";
 import { SingleWordMotivationWorkbenchV0_1 } from "./sections/SingleWordMotivationWorkbenchV0_1";
+import type { RuntimeAlbanianSourceSenseSelectionV0_1 } from "./sections/currentWordSourceFunctionalSuggestionAdapter.v0_1";
 import type { GenericFunctionalWitnessV1 } from "@/shared/openInstrument/genericFunctionalWitnessDiscovery.v1";
 import { OriginClaimCard } from '@/components/OriginClaimCard';
 import { cn } from "@/lib/utils";
@@ -260,6 +261,10 @@ export function InstrumentPanel(props: Props) {
     candidateId: string;
     requestId: number;
   } | null>(null);
+  const [selectedSourceSense, setSelectedSourceSense] = React.useState<Readonly<{
+    analysisIdentity: string;
+    selection: RuntimeAlbanianSourceSenseSelectionV0_1;
+  }> | null>(null);
 
   const inputVm = "vm" in props ? props.vm : undefined;
   const inputPayload = "payload" in props ? props.payload : undefined;
@@ -270,6 +275,31 @@ export function InstrumentPanel(props: Props) {
   }, [inputVm, inputPayload]);
 
   const isValidVm = isTelemetryVm(vm);
+  const sourceSenseAnalysisIdentity = isValidVm
+    ? JSON.stringify([
+        vm.readout.word,
+        vm.motivationDiscoveryV0_2?.kind === "present" ? vm.motivationDiscoveryV0_2.value.inputWord : null,
+        vm.motivationDiscoveryV0_2?.kind === "present" ? vm.motivationDiscoveryV0_2.value.inputLanguage : null,
+        vm.motivationDiscoveryV0_2?.kind === "present" ? vm.motivationDiscoveryV0_2.value.inputProfile : null,
+      ])
+    : null;
+  const selectedSourceSenseForCurrentAnalysis = selectedSourceSense?.analysisIdentity === sourceSenseAnalysisIdentity
+    ? selectedSourceSense.selection
+    : null;
+  const handleSourceSenseSelection = (selection: RuntimeAlbanianSourceSenseSelectionV0_1 | null) => {
+    if (!selection || !sourceSenseAnalysisIdentity) {
+      setSelectedSourceSense(null);
+      return;
+    }
+    setSelectedSourceSense({ analysisIdentity: sourceSenseAnalysisIdentity, selection });
+  };
+
+  React.useEffect(() => {
+    setSelectedSourceSense((current) =>
+      current && current.analysisIdentity !== sourceSenseAnalysisIdentity ? null : current,
+    );
+  }, [sourceSenseAnalysisIdentity]);
+
   const structuralInput = props.wordForMask ?? (isValidVm ? vm.readout?.word : "");
   const albanianStructuralEvidence = React.useMemo(
     () => adaptAlbanianStructuralEvidenceToVMV0_1(structuralInput),
@@ -573,6 +603,7 @@ export function InstrumentPanel(props: Props) {
                 discovery={vm.motivationDiscoveryV0_2}
                 interpretation={vm.functionalMotivationInterpretationV0_3}
                 onAnalyzeAlbanianSourceRecord={props.onAnalyzeAlbanianSourceRecord}
+                onSelectSourceSenseForMotivation={handleSourceSenseSelection}
                 sourceRecordSelectionDisabled={props.sourceRecordSelectionDisabled}
               />
 
@@ -651,6 +682,7 @@ export function InstrumentPanel(props: Props) {
                       sourceWitnesses: crossLanguageSourceWitnesses,
                     }
                   : undefined}
+                selectedSourceSense={selectedSourceSenseForCurrentAnalysis}
               />
             </div>
           </TabPanel>

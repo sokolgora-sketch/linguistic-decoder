@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import type { RuntimeAlbanianSourceSenseRecordV0_1, RuntimeAlbanianSourceSenseSelectionV0_1 } from "@/ui/instrument/sections/currentWordSourceFunctionalSuggestionAdapter.v0_1";
 
 const FJALORI_API_ROOT = "https://fjalorishqip.org/api/v1/fjala";
 const FETCH_TIMEOUT_MS = 8_000;
@@ -44,6 +45,8 @@ type EvidenceState =
   | Readonly<{ status: "invalid" }>
   | Readonly<{
       status: "available";
+      sourceWord: string;
+      licence: "CC BY-SA 4.0";
       description: FjaloriDescription | null;
       entries: readonly FjaloriEntry[];
       entrySources: readonly (readonly string[])[];
@@ -164,6 +167,8 @@ function readFjaloriEvidence(payload: unknown, canonicalWord: string): Extract<E
 
   return Object.freeze({
     status: "available",
+    sourceWord: payload.word,
+    licence: "CC BY-SA 4.0",
     description,
     entries: Object.freeze(entries),
     entrySources: Object.freeze(entrySources),
@@ -178,11 +183,17 @@ export function FjaloriCrossSourceEvidenceV0_1({
   context = "word-reading",
   proposalMeaning,
   componentProposal,
+  analysisLanguage,
+  analysisVariety,
+  onSelectSourceSenseForMotivation,
 }: Readonly<{
   word: string;
   context?: "word-reading" | "component";
   proposalMeaning?: string;
   componentProposal?: ComponentProposalContextV0_1;
+  analysisLanguage?: string;
+  analysisVariety?: string;
+  onSelectSourceSenseForMotivation?: (selection: RuntimeAlbanianSourceSenseSelectionV0_1 | null) => void;
 }>) {
   const canonicalWord = canonicalAlbanianWord(word);
   const userProposedMeaning = componentProposal?.unresolved
@@ -199,7 +210,11 @@ export function FjaloriCrossSourceEvidenceV0_1({
         dialect: componentProposal?.dialect ?? "",
         unresolved: componentProposal?.unresolved ?? false,
       })
-    : proposalMeaning ?? "";
+    : JSON.stringify({
+        proposalMeaning: proposalMeaning ?? "",
+        analysisLanguage: analysisLanguage ?? "",
+        analysisVariety: analysisVariety ?? "",
+      });
   const requestKey = `${word}\u0000${canonicalWord ?? ""}`;
   const [storedEvidence, setStoredEvidence] = useState<KeyedEvidenceState>({
     requestKey,
@@ -288,6 +303,54 @@ export function FjaloriCrossSourceEvidenceV0_1({
 
   const apiUrl = `${FJALORI_API_ROOT}/${encodeURIComponent(canonicalWord)}.json`;
   const wordPageUrl = `https://fjalorishqip.org/fjala/${encodeURIComponent(canonicalWord)}/`;
+  const buildSenseSelection = (
+    entryIndex: number,
+    senseIndex: number,
+  ): RuntimeAlbanianSourceSenseSelectionV0_1 | null => {
+    if (evidence.status !== "available") return null;
+    const entry = evidence.entries[entryIndex];
+    const sense = entry?.senses[senseIndex];
+    if (!entry || !sense) return null;
+    const toRecord = (
+      recordEntryIndex: number,
+      recordSenseIndex: number,
+      senseEntry: FjaloriEntry,
+      senseRecord: FjaloriSense,
+    ): RuntimeAlbanianSourceSenseRecordV0_1 => ({
+      entryIndex: recordEntryIndex + 1,
+      senseIndex: recordSenseIndex + 1,
+      partOfSpeech: senseEntry.pos,
+      gloss: senseRecord.gloss,
+      glossLanguage: senseRecord.lang,
+      senseSource: senseRecord.source,
+      tags: senseRecord.tags,
+      entrySources: senseEntry.sources,
+    });
+    const alternatives = evidence.entries.flatMap((alternativeEntry, alternativeEntryIndex) =>
+      alternativeEntry.senses.flatMap((alternativeSense, alternativeSenseIndex) =>
+        alternativeEntryIndex === entryIndex && alternativeSenseIndex === senseIndex
+          ? []
+          : [toRecord(alternativeEntryIndex, alternativeSenseIndex, alternativeEntry, alternativeSense)],
+      ),
+    );
+    return {
+      exactSourceForm: evidence.sourceWord,
+      apiUrl,
+      licence: evidence.licence,
+      analysisLanguage: analysisLanguage ?? "",
+      analysisVariety: analysisVariety ?? "",
+      recordSources: evidence.recordSources,
+      selectedSense: toRecord(entryIndex, senseIndex, entry, sense),
+      alternativeSenses: alternatives,
+    };
+  };
+  const selectedSenseForMotivation = evidence.status === "available" && selectedSense
+    ? (() => {
+        return selectedSense.comparisonScope === comparisonScope
+          ? buildSenseSelection(selectedSense.entryIndex, selectedSense.senseIndex)
+          : null;
+      })()
+    : null;
 
   return (
     <section
@@ -370,12 +433,17 @@ export function FjaloriCrossSourceEvidenceV0_1({
               English entry senses identify en-wiktionary/Kaikki lineage; they are not independent corroboration of the Kaikki lexical fact.
             </p>
           ) : null}
-          {context === "component" ? (
+          {context === "component" || onSelectSourceSenseForMotivation ? (
             <section className="mt-3 rounded border border-[#3d465c] bg-[#10131d] p-2" data-testid="fjalori-component-senses">
-              <h3 className="font-semibold text-[#f0f1fa]">Individual source senses · response order</h3>
+              <h3 className="font-semibold text-[#f0f1fa]">{context === "component" ? "Individual source senses · response order" : "Source-reported lexical senses · choose explicitly for exploration"}</h3>
               <p className="mt-1 text-[10px] text-[#aeb4ce]">
                 No source sense is selected or aligned automatically with the proposed meaning. Entry and sense numbers identify positions in this response, not source-issued IDs; no stable source sense ID is supplied here.
               </p>
+              {context === "word-reading" && onSelectSourceSenseForMotivation ? (
+                <p className="mt-1 text-[10px] text-[#aeb4ce]">
+                  Choosing a sense only supplies its source-reported gloss to the symbolic workbench. It does not supply a component relation, select a symbolic hypothesis, or verify a functional reading.
+                </p>
+              ) : null}
               {evidence.entries.some((entry) => entry.senses.length > 0) ? (
                 <div className="mt-2 space-y-2">
                   {evidence.entries.map((entry, entryIndex) => (
@@ -405,6 +473,19 @@ export function FjaloriCrossSourceEvidenceV0_1({
                                 {isSelected ? (
                                   <div className="mt-2 rounded border border-[#53604a] p-2" data-testid="fjalori-selected-sense">
                                     <p className="font-semibold">Manually selected source sense · no automatic interpretation selection or alignment</p>
+                                    {context === "word-reading" && onSelectSourceSenseForMotivation ? (
+                                      <button
+                                        type="button"
+                                        className="mt-2 rounded border border-[#53604a] px-2 py-1 text-[10px] text-[#dce9ca]"
+                                        aria-label={`Use Fjalori source sense entry ${entryIndex + 1} sense ${senseIndex + 1} in the functional workbench`}
+                                        onClick={() => {
+                                          const selection = buildSenseSelection(entryIndex, senseIndex);
+                                          if (selection) onSelectSourceSenseForMotivation(selection);
+                                        }}
+                                      >
+                                        Use this sense in the workbench
+                                      </button>
+                                    ) : null}
                                     {context === "component" ? (
                                       <section className="mt-2 rounded border border-[#46505c] bg-[#0d1117] p-2" data-testid="fjalori-component-meaning-comparison">
                                         <h5 className="font-semibold text-[#f0f1fa]">Component meaning comparison · USER_INTERPRETATION</h5>
@@ -431,37 +512,58 @@ export function FjaloriCrossSourceEvidenceV0_1({
                                         </p>
                                       </section>
                                     ) : null}
-                                    <label className="mt-1 block text-[10px] text-[#c5ced8]">
-                                      USER_INTERPRETATION assessment
-                                      <select
-                                        aria-label={`USER_INTERPRETATION assessment for entry ${entryIndex + 1} sense ${senseIndex + 1}`}
-                                        className="mt-1 w-full rounded border border-[#46505c] bg-[#0d1117] px-2 py-1 text-xs text-[#f5f7fb]"
-                                        value={userAssessment ?? ""}
-                                        onChange={(event) => setUserAssessment(event.target.value ? event.target.value as UserSenseAssessment : null)}
-                                      >
-                                        <option value="">Not assessed</option>
-                                        <option value="POTENTIALLY_SUPPORTS_PROPOSAL">POTENTIALLY_SUPPORTS_PROPOSAL</option>
-                                        <option value="DOES_NOT_SUPPORT_PROPOSAL">DOES_NOT_SUPPORT_PROPOSAL</option>
-                                        <option value="UNDECIDED">UNDECIDED</option>
-                                      </select>
-                                    </label>
-                                    <p className="mt-1 text-[10px] text-[#aeb4ce]">
-                                      This local assessment does not change the proposal, evidence ledger, source sense, or engine result.
-                                      {userAssessment ? ` Current assessment: ${userAssessment}.` : " No assessment entered."}
-                                    </p>
+                                    {context === "component" ? (
+                                      <>
+                                        <label className="mt-1 block text-[10px] text-[#c5ced8]">
+                                          USER_INTERPRETATION assessment
+                                          <select
+                                            aria-label={`USER_INTERPRETATION assessment for entry ${entryIndex + 1} sense ${senseIndex + 1}`}
+                                            className="mt-1 w-full rounded border border-[#46505c] bg-[#0d1117] px-2 py-1 text-xs text-[#f5f7fb]"
+                                            value={userAssessment ?? ""}
+                                            onChange={(event) => setUserAssessment(event.target.value ? event.target.value as UserSenseAssessment : null)}
+                                          >
+                                            <option value="">Not assessed</option>
+                                            <option value="POTENTIALLY_SUPPORTS_PROPOSAL">POTENTIALLY_SUPPORTS_PROPOSAL</option>
+                                            <option value="DOES_NOT_SUPPORT_PROPOSAL">DOES_NOT_SUPPORT_PROPOSAL</option>
+                                            <option value="UNDECIDED">UNDECIDED</option>
+                                          </select>
+                                        </label>
+                                        <p className="mt-1 text-[10px] text-[#aeb4ce]">
+                                          This local assessment does not change the proposal, evidence ledger, source sense, or engine result.
+                                          {userAssessment ? ` Current assessment: ${userAssessment}.` : " No assessment entered."}
+                                        </p>
+                                      </>
+                                    ) : null}
                                   </div>
                                 ) : (
-                                  <button
-                                    type="button"
-                                    className="mt-2 rounded border border-[#53604a] px-2 py-1 text-[10px] text-[#dce9ca]"
-                                    aria-label={`Select source sense entry ${entryIndex + 1} sense ${senseIndex + 1} for inspection`}
-                                    onClick={() => {
-                                      setSelectedSense({ entryIndex, senseIndex, comparisonScope });
-                                      setUserAssessment(null);
-                                    }}
-                                  >
-                                    Select sense for inspection
-                                  </button>
+                                  <div className="mt-2 flex flex-wrap gap-2">
+                                    <button
+                                      type="button"
+                                      className="rounded border border-[#53604a] px-2 py-1 text-[10px] text-[#dce9ca]"
+                                      aria-label={`Select source sense entry ${entryIndex + 1} sense ${senseIndex + 1} for inspection`}
+                                      onClick={() => {
+                                        setSelectedSense({ entryIndex, senseIndex, comparisonScope });
+                                        setUserAssessment(null);
+                                      }}
+                                    >
+                                      Select sense for inspection
+                                    </button>
+                                    {context === "word-reading" && onSelectSourceSenseForMotivation ? (
+                                      <button
+                                        type="button"
+                                        className="rounded border border-[#53604a] px-2 py-1 text-[10px] text-[#dce9ca]"
+                                        aria-label={`Use Fjalori source sense entry ${entryIndex + 1} sense ${senseIndex + 1} in the functional workbench`}
+                                        onClick={() => {
+                                          setSelectedSense({ entryIndex, senseIndex, comparisonScope });
+                                          setUserAssessment(null);
+                                          const selection = buildSenseSelection(entryIndex, senseIndex);
+                                          if (selection) onSelectSourceSenseForMotivation(selection);
+                                        }}
+                                      >
+                                        Use this sense in the workbench
+                                      </button>
+                                    ) : null}
+                                  </div>
                                 )}
                               </li>
                             );
@@ -483,6 +585,23 @@ export function FjaloriCrossSourceEvidenceV0_1({
                 <a href={apiUrl} target="_blank" rel="noreferrer" className="underline">FjaloriShqip API record</a>
                 <a href="https://github.com/EndritRushiti/FjaloriShqip/blob/main/DATA-LICENSE.md" target="_blank" rel="noreferrer" className="underline">Data sources and license</a>
               </div>
+              {context === "word-reading" && onSelectSourceSenseForMotivation && selectedSenseForMotivation ? (
+                <div className="mt-2 rounded border border-[#53604a] p-2" data-testid="fjalori-workbench-sense-selection">
+                  <p className="font-semibold">Selected for the current-word workbench · USER_SELECTED</p>
+                  <p>{selectedSenseForMotivation.selectedSense.gloss} · {selectedSenseForMotivation.selectedSense.senseSource} · Entry {selectedSenseForMotivation.selectedSense.entryIndex} · Sense {selectedSenseForMotivation.selectedSense.senseIndex}</p>
+                  <p className="text-[10px] text-[#aeb4ce]">SOURCE_FACT · CITATION_ENTERED_UNVERIFIED · no source-issued sense ID · no source-authorized symbolic relationship.</p>
+                  <button
+                    type="button"
+                    className="mt-2 rounded border border-[#53604a] px-2 py-1 text-[10px] text-[#dce9ca]"
+                    onClick={() => {
+                      setSelectedSense(null);
+                      onSelectSourceSenseForMotivation(null);
+                    }}
+                  >
+                    Clear workbench sense selection
+                  </button>
+                </div>
+              ) : null}
             </section>
           ) : null}
           <p className="mt-2 text-[#d3c99c]" data-testid="fjalori-alignment-boundary">

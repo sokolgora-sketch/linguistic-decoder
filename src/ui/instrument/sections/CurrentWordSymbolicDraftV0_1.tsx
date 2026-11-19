@@ -11,6 +11,8 @@ import { CurrentWordSymbolicGraphMeaningV0_1 } from "@/ui/instrument/sections/Cu
 import type { SymbolicFunctionalOperationPlanInputV0_1 } from "@/shared/openInstrument/symbolicFunctionalOperationPlanBuilder.v0_1";
 import { sameAlbanianSourceForm } from "@/ui/instrument/albanianSourceFormIdentity.v0_1";
 import type { SingleWordCurrentWordEvidenceContextV0_1 } from "@/ui/instrument/sections/SingleWordMotivationWorkbenchV0_1";
+import { CurrentWordSourceFunctionalSuggestionV0_1 } from "@/ui/instrument/sections/CurrentWordSourceFunctionalSuggestionV0_1";
+import type { RuntimeAlbanianSourceSenseSelectionV0_1 } from "@/ui/instrument/sections/currentWordSourceFunctionalSuggestionAdapter.v0_1";
 
 export type CurrentWordSymbolicVoiceDraftV0_1 = Readonly<{
   operatorCandidateId: string;
@@ -168,12 +170,14 @@ export function CurrentWordSymbolicDraftV0_1({
   targetLanguage,
   targetDialect,
   currentWordEvidence,
+  selectedSourceSense,
 }: {
   analyzedWord: string;
   draftTargetWord: string;
   targetLanguage: string;
   targetDialect: string;
   currentWordEvidence?: SingleWordCurrentWordEvidenceContextV0_1;
+  selectedSourceSense?: RuntimeAlbanianSourceSenseSelectionV0_1 | null;
 }) {
   const [selectedAssociations, setSelectedAssociations] = useState<Record<string, string>>({});
   const [voiceDrafts, setVoiceDrafts] = useState<Record<string, CurrentWordSymbolicVoiceDraftV0_1>>({});
@@ -240,7 +244,7 @@ export function CurrentWordSymbolicDraftV0_1({
     >
       <h3 className="text-sm font-semibold text-[#f5f7fb]">Current-word symbolic draft</h3>
       <p className="mt-1 text-xs leading-5 text-[#aeb7c5]">
-        Select every spectrum association, Voice operator and operand yourself. These computed transformations stay exploratory and do not map themselves to a word meaning.
+        Select every spectrum association, Voice operator and operand yourself. The source-linked interpretation below uses your explicit sense selection and computed outputs to form a conditional proposal; it does not establish the relationship as fact.
       </p>
       <p className="mt-2 text-xs text-[#c5ced8]" data-testid="current-word-symbolic-identity">
         Analyzed form: <strong>{analyzedWord || "UNKNOWN_OR_NULL"}</strong> · language {language} · variety {variety}
@@ -263,6 +267,18 @@ export function CurrentWordSymbolicDraftV0_1({
         }.</p>}
         <p className="mt-1 text-[#aeb7c5]">This lexical evidence is displayed separately and does not authorize a symbolic association or meaning bridge.</p>
       </div>
+
+      <CurrentWordSourceFunctionalSuggestionV0_1
+        key={JSON.stringify([analyzedWord, draftTargetWord, language, variety])}
+        analyzedWord={analyzedWord}
+        draftTargetWord={draftTargetWord}
+        language={language}
+        variety={variety}
+        identityMatches={identityMatches}
+        runtimeSourceStatus={sourceStatus}
+        selectedSourceSense={selectedSourceSense ?? null}
+        evaluation={evaluation}
+      />
 
       {!identityMatches ? (
         <p role="status" data-testid="current-word-symbolic-identity-mismatch" className="mt-3 rounded border border-[#746541] bg-[#18140e] p-2 text-xs leading-5 text-[#f0ddb0]">
