@@ -496,7 +496,7 @@ export type FreeOperatorFamilyFunctionalNetworkProjectionV0_1 = Readonly<{
     sourceId: string;
     sourceStatus: "reviewed_accepted";
     claimLayer: "SOURCE_FACT";
-  }>;
+  }> | null;
   directForms: readonly FreeOperatorFamilyFormProjectionV0_1[];
   derivativeFamilyForms: readonly FreeOperatorFamilyFormProjectionV0_1[];
   target: Readonly<{
@@ -521,9 +521,11 @@ export type FreeOperatorFamilyFunctionalNetworkProjectionV0_1 = Readonly<{
 }>;
 
 type FreeOperatorFamilyFunctionalNetworkInputV0_1 = Readonly<{
-  profile: FreeOperatorProfileV0_1;
+  profile: Omit<FreeOperatorProfileV0_1, "derivativeFamilySupport"> & {
+    derivativeFamilySupport?: FreeOperatorProfileTermSetV0_1 | null;
+  };
   protoRoot: ProtoRoot | null;
-  reviewedEmbryo: CurrentWordDaStandaloneEvidenceV0_1;
+  reviewedEmbryo: CurrentWordDaStandaloneEvidenceV0_1 | null;
   targetForm: string;
   targetSense: Readonly<{
     exactSourceForm: string;
@@ -569,33 +571,42 @@ function familyFormProjectionsV0_1(
 export function projectFreeOperatorFamilyFunctionalNetworkV0_1(
   input: FreeOperatorFamilyFunctionalNetworkInputV0_1,
 ): FreeOperatorFamilyFunctionalNetworkProjectionV0_1 {
+  const derivativeFamilySupport = input.profile.derivativeFamilySupport ?? null;
+  const derivativeFamilyTermSet = derivativeFamilySupport ?? { forms: [], glossTerms: [], categories: [] };
+  const protoRootMatches = Boolean(input.protoRoot && freeOperatorProfileFormMatchesV0_1(
+    [input.profile.operator],
+    input.protoRoot.id,
+  ));
+  const matchingProtoRoot = protoRootMatches ? input.protoRoot : null;
   const directForms = familyFormProjectionsV0_1(
-    input.protoRoot,
+    matchingProtoRoot,
     input.profile.directFreeOperator,
     "DIRECT_FREE_OPERATOR_FORM",
   );
   const derivativeFamilyForms = familyFormProjectionsV0_1(
-    input.protoRoot,
-    input.profile.derivativeFamilySupport,
+    matchingProtoRoot,
+    derivativeFamilyTermSet,
     "DERIVATIVE_FAMILY_SUPPORT",
   );
   const reasons: string[] = [];
-  const directFormMatches = freeOperatorProfileFormMatchesV0_1(
-    input.profile.directFreeOperator.forms,
-    input.reviewedEmbryo.sourceForm,
-  );
-  const reviewedFunctionMatches = freeOperatorProfileGlossMatchesV0_1(
-    input.profile.directFreeOperator.glossTerms,
-    input.reviewedEmbryo.attestedGloss,
-  );
-  if (!input.protoRoot || !freeOperatorProfileFormMatchesV0_1([input.profile.operator], input.protoRoot.id)) {
-    reasons.push("FREE_OPERATOR_PROFILE_ROOT_RECORD_MISMATCH");
+  const reviewedEmbryo = input.reviewedEmbryo;
+  if (!reviewedEmbryo) {
+    reasons.push("REVIEWED_EMBRYO_NOT_AVAILABLE");
+  } else {
+    const directFormMatches = freeOperatorProfileFormMatchesV0_1(
+      input.profile.directFreeOperator.forms,
+      reviewedEmbryo.sourceForm,
+    );
+    const reviewedFunctionMatches = freeOperatorProfileGlossMatchesV0_1(
+      input.profile.directFreeOperator.glossTerms,
+      reviewedEmbryo.attestedGloss,
+    );
+    if (!directFormMatches || reviewedEmbryo.sourceStatus !== "reviewed_accepted") {
+      reasons.push("REVIEWED_EMBRYO_NOT_IN_DIRECT_PROFILE_FORMS");
+    }
+    if (!reviewedFunctionMatches) reasons.push("REVIEWED_EMBRYO_FUNCTION_OUTSIDE_PROFILE_DOMAIN");
+    if (!reviewedEmbryo.sourceId.trim()) reasons.push("REVIEWED_EMBRYO_SOURCE_IDENTITY_NOT_AVAILABLE");
   }
-  if (!directFormMatches || input.reviewedEmbryo.sourceStatus !== "reviewed_accepted") {
-    reasons.push("REVIEWED_EMBRYO_NOT_IN_DIRECT_PROFILE_FORMS");
-  }
-  if (!reviewedFunctionMatches) reasons.push("REVIEWED_EMBRYO_FUNCTION_OUTSIDE_PROFILE_DOMAIN");
-  if (!derivativeFamilyForms.length) reasons.push("DERIVATIVE_FAMILY_SUPPORT_NOT_AVAILABLE");
   if (!input.targetSense) {
     reasons.push("EXACT_TARGET_SOURCE_SENSE_NOT_AVAILABLE");
   } else {
@@ -608,7 +619,7 @@ export function projectFreeOperatorFamilyFunctionalNetworkV0_1(
     }
     if (!input.targetSense.glosses.some((gloss) =>
       freeOperatorProfileGlossMatchesV0_1(
-        [...input.profile.directFreeOperator.glossTerms, ...input.profile.derivativeFamilySupport.glossTerms],
+        [...input.profile.directFreeOperator.glossTerms, ...(derivativeFamilySupport?.glossTerms ?? [])],
         gloss,
       ),
     )) {
@@ -640,11 +651,14 @@ export function projectFreeOperatorFamilyFunctionalNetworkV0_1(
   ].join("; ");
   const familyGlossesText = familyCarrierAnnotations.join("; ") || "UNKNOWN_OR_NULL";
   const targetFormLabel = target?.exactForm.toLocaleUpperCase("sq-AL") ?? input.targetForm.toLocaleUpperCase("sq-AL");
-  const explanation = target && !reasons.length
-    ? `The reviewed ${input.reviewedEmbryo.dialect} source gives ${input.reviewedEmbryo.sourceForm.toLocaleUpperCase("sq-AL")} the function “${input.reviewedEmbryo.attestedGloss}.” That function offers a bounded functional point of comparison for the exact-form source sense “${target.senseText}” in ${targetFormLabel}: splitting or dividing can be considered in relation to a division or separation sense. The profile separately lists ${familyFormsText}; optional ProtoRoots carrier annotations include ${familyGlossesText} and remain exploratory candidates, not source facts or selected intermediate meanings. An intermediate result-state function remains UNKNOWN_OR_NULL unless independently characterized. This does not establish that the listed forms descend from one another or that ${targetFormLabel} has this morphology.`
+  const protoRootAnnotationText = protoRootMatches
+    ? `optional ProtoRoots carrier annotations include ${familyGlossesText} and remain exploratory candidates, not source facts or selected intermediate meanings`
+    : `ProtoRoots carrier annotations are UNKNOWN_OR_NULL (${input.protoRoot ? "mismatched record ignored" : "no matching record available"})`;
+  const explanation = target && reviewedEmbryo && !reasons.length
+    ? `The reviewed ${reviewedEmbryo.dialect} source gives ${reviewedEmbryo.sourceForm.toLocaleUpperCase("sq-AL")} the function “${reviewedEmbryo.attestedGloss}.” That function offers a bounded functional point of comparison for the exact-form source sense “${target.senseText}” in ${targetFormLabel}: splitting or dividing can be considered in relation to a division or separation sense. The profile separately lists ${familyFormsText}; ${protoRootAnnotationText}. An intermediate result-state function remains UNKNOWN_OR_NULL unless independently characterized. This does not establish that the listed forms descend from one another or that ${targetFormLabel} has this morphology.`
     : null;
-  const functionalEquation = target && !reasons.length
-    ? `FUNCTIONAL READING · reviewed ${input.reviewedEmbryo.sourceForm.toLocaleUpperCase("sq-AL")} function “${input.reviewedEmbryo.attestedGloss}” → exact-form ${targetFormLabel} sense “${target.senseText}” · ${familyFormsText}; optional carrier annotations ${familyGlossesText}; intermediate result-state function UNKNOWN_OR_NULL · conditional functional proposal, not a morphological sequence`
+  const functionalEquation = target && reviewedEmbryo && !reasons.length
+    ? `FUNCTIONAL READING · reviewed ${reviewedEmbryo.sourceForm.toLocaleUpperCase("sq-AL")} function “${reviewedEmbryo.attestedGloss}” → exact-form ${targetFormLabel} sense “${target.senseText}” · ${familyFormsText}; ${protoRootAnnotationText}; intermediate result-state function UNKNOWN_OR_NULL · conditional functional proposal, not a morphological sequence`
     : null;
   const finalReasons = [...new Set(reasons)].sort();
   return {
@@ -652,13 +666,15 @@ export function projectFreeOperatorFamilyFunctionalNetworkV0_1(
       ? "CONDITIONAL_FAMILY_READING"
       : "PARTIAL_NULL",
     operator: input.profile.operator.toLocaleUpperCase("sq-AL"),
-    embryo: {
-      form: input.reviewedEmbryo.sourceForm,
-      functionText: input.reviewedEmbryo.attestedGloss,
-      sourceId: input.reviewedEmbryo.sourceId,
-      sourceStatus: input.reviewedEmbryo.sourceStatus,
-      claimLayer: "SOURCE_FACT",
-    },
+    embryo: reviewedEmbryo
+      ? {
+          form: reviewedEmbryo.sourceForm,
+          functionText: reviewedEmbryo.attestedGloss,
+          sourceId: reviewedEmbryo.sourceId,
+          sourceStatus: reviewedEmbryo.sourceStatus,
+          claimLayer: "SOURCE_FACT",
+        }
+      : null,
     directForms,
     derivativeFamilyForms,
     target,
@@ -673,6 +689,11 @@ export function projectFreeOperatorFamilyFunctionalNetworkV0_1(
       "Intermediate result-state function remains UNKNOWN_OR_NULL unless independently characterized",
       "Target internal segmentation remains UNKNOWN_OR_NULL",
       "Target-specific source-to-family relation remains an EXPLORATORY_HYPOTHESIS",
+      ...(!reviewedEmbryo ? ["Reviewed embryo function remains UNKNOWN_OR_NULL"] : []),
+      ...(!protoRootMatches
+        ? [`ProtoRoots carrier annotations are UNKNOWN_OR_NULL; ${input.protoRoot ? "mismatched record ignored" : "no matching record available"}`]
+        : []),
+      ...(!derivativeFamilyForms.length ? ["Derivative-family forms and function remain UNKNOWN_OR_NULL"] : []),
     ],
     reasonCodes: finalReasons,
     sourceAuthorityPromotion: "NONE",

@@ -362,6 +362,136 @@ describe("current-word source functional suggestion v0.1", () => {
     expect(withoutOptionalCarrierAnnotation.reasonCodes).toEqual([]);
   });
 
+  it("keeps a valid conditional reading when ProtoRoots enrichment is absent", () => {
+    const candidate = generatedDaCandidate();
+    const reviewedEmbryo = candidate.standaloneEvidence;
+    if (!reviewedEmbryo) throw new Error("expected the reviewed DA source evidence");
+
+    // Synthetic contract fixture only; it is not a live NDARJE source record.
+    const projection = projectFreeOperatorFamilyFunctionalNetworkV0_1({
+      profile: DA_FREE_OPERATOR_PROFILE_V0_1,
+      protoRoot: null,
+      reviewedEmbryo,
+      targetForm: "NDARJE",
+      targetSense: {
+        exactSourceForm: "ndarje",
+        glosses: ["division; separation"],
+        sourceIdentity: "synthetic-test-fixture:NDARJE-sense-not-live-evidence",
+        evidenceStatus: "CITATION_ENTERED_UNVERIFIED",
+      },
+    });
+
+    expect(projection.status).toBe("CONDITIONAL_FAMILY_READING");
+    expect(projection.reasonCodes).toEqual([]);
+    expect(projection.directForms.every(({ carrierAnnotation }) => carrierAnnotation === null)).toBe(true);
+    expect(projection.derivativeFamilyForms.every(({ carrierAnnotation }) => carrierAnnotation === null)).toBe(true);
+    expect(projection.functionalEquation).toContain("ProtoRoots carrier annotations are UNKNOWN_OR_NULL");
+    expect(projection.functionalEquation).toContain("intermediate result-state function UNKNOWN_OR_NULL");
+    expect(projection.wholeWordStatus).toBe("PARTIAL_NULL");
+  });
+
+  it("ignores a mismatched ProtoRoots record without contaminating the valid base reading", () => {
+    const candidate = generatedDaCandidate();
+    const reviewedEmbryo = candidate.standaloneEvidence;
+    const daProtoRoot = PROTO_ROOTS_V1.find(({ id }) => id === "DA");
+    if (!reviewedEmbryo || !daProtoRoot) throw new Error("expected reviewed DA evidence and its ProtoRoots record");
+
+    // Synthetic mismatched record deliberately carries colliding forms to prove it is ignored.
+    const mismatchedProtoRoot = {
+      ...daProtoRoot,
+      id: "DI",
+      carriers: [
+        { lang: "sq", form: "da", gloss: "unrelated root contamination" },
+        { lang: "sq", form: "ndaj", gloss: "unrelated family contamination" },
+      ],
+    };
+    const projection = projectFreeOperatorFamilyFunctionalNetworkV0_1({
+      profile: DA_FREE_OPERATOR_PROFILE_V0_1,
+      protoRoot: mismatchedProtoRoot,
+      reviewedEmbryo,
+      targetForm: "NDARJE",
+      targetSense: {
+        exactSourceForm: "ndarje",
+        glosses: ["division; separation"],
+        sourceIdentity: "synthetic-test-fixture:NDARJE-sense-not-live-evidence",
+        evidenceStatus: "CITATION_ENTERED_UNVERIFIED",
+      },
+    });
+
+    expect(projection.status).toBe("CONDITIONAL_FAMILY_READING");
+    expect(projection.reasonCodes).toEqual([]);
+    expect(projection.explanation).toContain("mismatched record ignored");
+    expect(projection.explanation).toContain("ProtoRoots carrier annotations are UNKNOWN_OR_NULL");
+    expect(JSON.stringify(projection)).not.toContain("unrelated root contamination");
+    expect(JSON.stringify(projection)).not.toContain("unrelated family contamination");
+    expect([...projection.directForms, ...projection.derivativeFamilyForms]
+      .every(({ carrierAnnotation }) => carrierAnnotation === null)).toBe(true);
+  });
+
+  it("keeps the base proposal when derivative-family profile data is absent and marks that layer Null", () => {
+    const candidate = generatedDaCandidate();
+    const reviewedEmbryo = candidate.standaloneEvidence;
+    const protoRoot = PROTO_ROOTS_V1.find(({ id }) => id === "DA");
+    if (!reviewedEmbryo || !protoRoot) throw new Error("expected reviewed DA evidence and its ProtoRoots record");
+
+    const projection = projectFreeOperatorFamilyFunctionalNetworkV0_1({
+      profile: { ...DA_FREE_OPERATOR_PROFILE_V0_1, derivativeFamilySupport: undefined },
+      protoRoot,
+      reviewedEmbryo,
+      targetForm: "NDARJE",
+      targetSense: {
+        exactSourceForm: "ndarje",
+        glosses: ["division; separation"],
+        sourceIdentity: "synthetic-test-fixture:NDARJE-sense-not-live-evidence",
+        evidenceStatus: "CITATION_ENTERED_UNVERIFIED",
+      },
+    });
+
+    expect(projection.status).toBe("CONDITIONAL_FAMILY_READING");
+    expect(projection.reasonCodes).toEqual([]);
+    expect(projection.derivativeFamilyForms).toEqual([]);
+    expect(projection.functionalEquation).toContain("derivative-family support UNKNOWN_OR_NULL");
+    expect(projection.unresolvedMaterial).toContain("Derivative-family forms and function remain UNKNOWN_OR_NULL");
+    expect(projection.functionalEquation).toContain("intermediate result-state function UNKNOWN_OR_NULL");
+    expect(projection.wholeWordStatus).toBe("PARTIAL_NULL");
+  });
+
+  it("withholds the conditional reading when the reviewed embryo or its source identity is missing", () => {
+    const candidate = generatedDaCandidate();
+    const reviewedEmbryo = candidate.standaloneEvidence;
+    const protoRoot = PROTO_ROOTS_V1.find(({ id }) => id === "DA");
+    if (!reviewedEmbryo || !protoRoot) throw new Error("expected reviewed DA evidence and its ProtoRoots record");
+
+    const targetSense = {
+      exactSourceForm: "ndarje",
+      glosses: ["division; separation"],
+      sourceIdentity: "synthetic-test-fixture:NDARJE-sense-not-live-evidence",
+      evidenceStatus: "CITATION_ENTERED_UNVERIFIED" as const,
+    };
+    const missingEmbryo = projectFreeOperatorFamilyFunctionalNetworkV0_1({
+      profile: DA_FREE_OPERATOR_PROFILE_V0_1,
+      protoRoot,
+      reviewedEmbryo: null,
+      targetForm: "NDARJE",
+      targetSense,
+    });
+    expect(missingEmbryo.status).toBe("PARTIAL_NULL");
+    expect(missingEmbryo.embryo).toBeNull();
+    expect(missingEmbryo.functionalEquation).toBeNull();
+    expect(missingEmbryo.reasonCodes).toContain("REVIEWED_EMBRYO_NOT_AVAILABLE");
+
+    const missingIdentity = projectFreeOperatorFamilyFunctionalNetworkV0_1({
+      profile: DA_FREE_OPERATOR_PROFILE_V0_1,
+      protoRoot,
+      reviewedEmbryo: { ...reviewedEmbryo, sourceId: " " },
+      targetForm: "NDARJE",
+      targetSense,
+    });
+    expect(missingIdentity.status).toBe("PARTIAL_NULL");
+    expect(missingIdentity.reasonCodes).toContain("REVIEWED_EMBRYO_SOURCE_IDENTITY_NOT_AVAILABLE");
+    expect(missingIdentity.functionalEquation).toBeNull();
+  });
+
   it("shows the staged DA-family explanation automatically without selecting a sense, DA mapping, or Voice operator", () => {
     render(
       <CurrentWordSourceFunctionalSuggestionV0_1
