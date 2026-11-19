@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import {
-  buildCurrentWordEmbryoWholeFunctionalBridgeV0_1,
+  buildCurrentWordDaAnchoredEmbryoCandidateV0_1,
   buildCurrentWordExploratoryMotivationV0_1,
   buildCurrentWordSourceFunctionalSuggestionV0_1,
   type CurrentWordSourceFunctionalSuggestionDraftV0_1,
@@ -95,15 +95,37 @@ export function CurrentWordSourceFunctionalSuggestionV0_1({
     selectedSourceSense,
     evaluation,
   }), [analyzedWord, draftTargetWord, language, variety, selectedSourceSense, evaluation]);
-  const embryoWholeBridge = useMemo(() => buildCurrentWordEmbryoWholeFunctionalBridgeV0_1({
+  const selectedSenseIdentity = selectedSourceSense
+    ? [selectedSourceSense.exactSourceForm, selectedSourceSense.apiUrl,
+      selectedSourceSense.selectedSense.entryIndex, selectedSourceSense.selectedSense.senseIndex,
+      selectedSourceSense.selectedSense.senseSource, selectedSourceSense.selectedSense.gloss]
+      .map((value) => String(value).normalize("NFC").trim().toLocaleLowerCase("sq-AL")).join("\u0001")
+    : "NO_SENSE_SELECTED";
+  const daProposalIdentity = contextIdentity + "\u0002" + (identityMatches ? "IDENTITY_MATCHED" : "IDENTITY_NOT_CONFIRMED") + "\u0002" + selectedSenseIdentity;
+  const [daProposalStateIdentity, setDaProposalStateIdentity] = useState(daProposalIdentity);
+  const [selectedDaOccurrenceId, setSelectedDaOccurrenceId] = useState<string | null>(null);
+  const daProposalStateIsCurrent = daProposalStateIdentity === daProposalIdentity;
+  useEffect(() => {
+    if (daProposalStateIsCurrent) return;
+    setSelectedDaOccurrenceId(null);
+    setDaProposalStateIdentity(daProposalIdentity);
+  }, [daProposalIdentity, daProposalStateIsCurrent]);
+  const currentSelectedDaOccurrenceId = daProposalStateIsCurrent ? selectedDaOccurrenceId : null;
+  const daCandidate = useMemo(() => buildCurrentWordDaAnchoredEmbryoCandidateV0_1({
     analyzedWord,
     draftTargetWord,
+    identityMatches,
     language,
     variety,
     selectedSourceSense,
-    sourceRelation: projection,
     evaluation,
-  }), [analyzedWord, draftTargetWord, language, variety, selectedSourceSense, projection, evaluation]);
+    proposedOccurrenceId: currentSelectedDaOccurrenceId,
+  }), [analyzedWord, draftTargetWord, identityMatches, language, variety, selectedSourceSense, evaluation, currentSelectedDaOccurrenceId]);
+
+  const selectDaOccurrence = (occurrenceId: string, checked: boolean) => {
+    setDaProposalStateIdentity(daProposalIdentity);
+    setSelectedDaOccurrenceId(checked ? occurrenceId : null);
+  };
 
   return (
     <section
@@ -113,8 +135,87 @@ export function CurrentWordSourceFunctionalSuggestionV0_1({
     >
       <h4 className="font-semibold text-[#d8e4ca]">Source-linked conditional function suggestion</h4>
       <p className="mt-1 text-[#aeb7c5]">
-        Select a lexical sense in the Overview source panel, then choose symbolic hypotheses above. When a separate cited action relation is entered, the bridge compares the two sources by exact target spelling only; it does not merge their source identities or assume their senses are equivalent.
+        Select a lexical sense in the Overview source panel and choose symbolic hypotheses above. The DA candidate uses a reviewed standalone lexical record plus an exact observed substring; only an explicit checkbox proposes a target relationship. The optional manual research form remains separate and is not required for this candidate.
       </p>
+      {daCandidate.occurrences.length ? (
+      <div className="mt-2 min-w-0 rounded border border-[#53604a] bg-[#111710] p-2" data-testid="current-word-da-anchored-candidate">
+        <h5 className="font-semibold text-[#f5f7fb]">DA-anchored functional embryo candidate</h5>
+        {daCandidate.standaloneEvidence ? (
+          <>
+            <p className="mt-1 break-words" data-testid="current-word-da-source-fact">
+              SOURCE_FACT · reviewed source row {daCandidate.standaloneEvidence.sourceStatus} · citation {daCandidate.standaloneEvidence.citationStatus}: Gheg {daCandidate.standaloneEvidence.sourceForm} — “{daCandidate.standaloneEvidence.attestedGloss}”.
+            </p>
+            <p className="mt-1 break-all text-[10px] text-[#aeb7c5]">
+              {daCandidate.standaloneEvidence.sourceTitle} · {daCandidate.standaloneEvidence.sourceAuthorOrEditor} · {daCandidate.standaloneEvidence.locator} · source {daCandidate.standaloneEvidence.sourceId} · citation {daCandidate.standaloneEvidence.citationId} · <a className="underline" href={daCandidate.standaloneEvidence.sourceUrl} target="_blank" rel="noreferrer">source record</a>
+            </p>
+            <p className="mt-1 break-words text-[10px] text-[#aeb7c5]">
+              DA-family forms {daCandidate.derivativeFamilySupport.map(({ form, categories }) => `${form} (${categories.join(", ")})`).join(" · ") || "UNKNOWN_OR_NULL"} remain separate derivative support. Homophone alternatives {daCandidate.homophoneCollisionAlternatives.map(({ form, glossTerms, categories }) => `${form} = ${glossTerms.join("/")} (${categories.join(", ")})`).join(" · ") || "UNKNOWN_OR_NULL"} are not assigned to this target.
+            </p>
+          </>
+        ) : (
+          <p role="status" className="mt-1 text-[#f0ddb0]">PARTIAL_NULL · {daCandidate.reasonCodes.join(" · ") || "DA source evidence unavailable"}</p>
+        )}
+        <p className="mt-2 break-words" data-testid="current-word-da-candidate-structure">
+          DERIVED_STRUCTURE · {analyzedWord || "UNKNOWN_OR_NULL"}: {daCandidate.exactCodePoints.map(({ character, position }) => `${character}@${position}`).join(" · ") || "UNKNOWN_OR_NULL"} · written Voices {daCandidate.writtenVoices.map(({ voice, position }) => `${voice}@${position}`).join(" → ") || "∅"} · pronunciation NOT_ESTABLISHED.
+        </p>
+        {daCandidate.occurrences.length ? (
+          <fieldset className="mt-2 min-w-0 rounded border border-[#38433a] p-2">
+            <legend className="px-1 font-semibold text-[#d8e4ca]">Candidate exact DA substring · no automatic target mapping</legend>
+            {daCandidate.occurrences.map((occurrence) => (
+              <label key={occurrence.occurrenceId} className="mt-1 flex min-w-0 items-start gap-2 break-words text-[#c5ced8]">
+                <input
+                  type="checkbox"
+                  aria-label={`Propose DA at code-point span ${occurrence.span.start} to ${occurrence.span.end}`}
+                  className="mt-1 shrink-0 accent-[#d8bb7a]"
+                  checked={currentSelectedDaOccurrenceId === occurrence.occurrenceId}
+                  disabled={!selectedSourceSense || !identityMatches}
+                  onChange={(event) => selectDaOccurrence(occurrence.occurrenceId, event.target.checked)}
+                />
+                <span>Explicit proposal: {occurrence.exactSurface} at zero-based code-point span [{occurrence.span.start},{occurrence.span.end}) · DERIVED_STRUCTURE. Align with selected whole-word sense only as USER_PROPOSED / EXPLORATORY_HYPOTHESIS; this is not a morpheme boundary or derivation.</span>
+              </label>
+            ))}
+            {!selectedSourceSense ? <p role="status" className="mt-1 text-[#f0ddb0]">Select a whole-word source sense explicitly before authorizing a DA-to-target proposal.</p> : null}
+          </fieldset>
+        ) : (
+          <p role="status" className="mt-2 text-[#f0ddb0]" data-testid="current-word-da-candidate-null">
+            No exact DA substring candidate in this spelling · {daCandidate.reasonCodes.join(" · ") || "DA_EXACT_SUBSTRING_NOT_FOUND"}.
+          </p>
+        )}
+        {daCandidate.functionalReading ? (
+          <>
+            <p className="mt-2 break-words" data-testid="current-word-exploratory-explanation">{daCandidate.functionalReading}</p>
+            <p className="mt-1 break-words text-[10px] text-[#aeb7c5]" data-testid="current-word-da-computed-operations">
+              COMPUTED from user-selected symbolic hypotheses: {daCandidate.computedVoiceOperations.map(({ voice, position, contribution }) => `${voice}@${position} · ${contribution}`).join(" · ") || "UNKNOWN_OR_NULL"}.
+            </p>
+            <p className="mt-1 break-words text-[10px] text-[#aeb7c5]" data-testid="current-word-da-overlapping-voices">
+              Voice overlap: {daCandidate.overlappingVoiceEvents.map(({ voice, position }) => `${voice}@${position}`).join(" · ") || "none"}; conserved once in the written path. Unresolved: {daCandidate.unresolvedMaterial.join(" · ") || "UNKNOWN_OR_NULL"}.
+            </p>
+            <p className="mt-1">Target mapping USER_PROPOSED / EXPLORATORY_HYPOTHESIS · whole-word PARTIAL_NULL · source-authority promotion NONE · historical origin NOT_CLAIMED · no_single_winner / user_decides</p>
+          </>
+        ) : currentSelectedDaOccurrenceId ? (
+          <p role="status" className="mt-2 break-words text-[#f0ddb0]" data-testid="current-word-da-proposal-null">
+            PARTIAL_NULL · proposal remains USER_PROPOSED, but no complete candidate explanation is available · {daCandidate.reasonCodes.join(" · ") || daCandidate.unresolvedMaterial.join(" · ") || "UNKNOWN_OR_NULL"}.
+          </p>
+        ) : (
+          <p role="status" className="mt-2 text-[#aeb7c5]" data-testid="current-word-da-not-selected">
+            Candidate only · no target mapping or interpretation is selected automatically · user_decides.
+          </p>
+        )}
+        <details className="mt-2 rounded border border-[#38433a] p-2" data-testid="current-word-da-candidate-details">
+          <summary className="cursor-pointer font-semibold text-[#d8e4ca]">View DA candidate trace and evidence</summary>
+          {daCandidate.selectedSourceSense ? <p className="mt-1 break-words">Selected source sense SOURCE_FACT / {daCandidate.selectedSourceSense.evidenceStatus}: {daCandidate.selectedSourceSense.label} · {daCandidate.selectedSourceSense.responsePosition} · {daCandidate.selectedSourceSense.sourceId}.</p> : <p className="mt-1">Selected whole-word source sense UNKNOWN_OR_NULL.</p>}
+          {daCandidate.alternatives.length ? <p className="mt-1 break-words">Alternative senses remain separate SOURCE_FACT candidates: {daCandidate.alternatives.map(({ label }) => label).join(" · ")}.</p> : null}
+          {daCandidate.reasoningTrace ? (
+            <ol className="mt-1 list-decimal space-y-1 pl-5" data-testid="current-word-da-reasoning-trace">
+              {daCandidate.reasoningTrace.reasoningTrace.map((step) => <li key={step.id} className="break-words">{step.title}: {step.from} → {step.to} · {step.claimLayer} / {step.status} · {step.evidenceNote} · {step.supportBoundary}</li>)}
+            </ol>
+          ) : null}
+          <p className="mt-1">Target mapping claim {daCandidate.targetMappingClaimLayer} / {daCandidate.targetMappingEvidenceStatus}; selected occurrence {daCandidate.selectedOccurrenceId ?? "NONE"}.</p>
+          <p className="mt-1 break-words">Status {daCandidate.status} · source status {daCandidate.standaloneEvidence?.sourceStatus ?? "UNKNOWN_OR_NULL"} · citation status {daCandidate.standaloneEvidence?.citationStatus ?? "UNKNOWN_OR_NULL"} · unresolved {daCandidate.unresolvedMaterial.join(" · ") || "UNKNOWN_OR_NULL"} · reasons {daCandidate.reasonCodes.join(" · ") || "NONE"}.</p>
+          <p className="mt-1">no_single_winner · selected candidate {daCandidate.selectedOccurrenceId ?? "NONE"} · user_decides · sourceAuthorityPromotion {daCandidate.sourceAuthorityPromotion} · historicalOrigin {daCandidate.historicalOrigin}.</p>
+        </details>
+      </div>
+      ) : null}
       <div className="mt-2 rounded border border-[#53604a] bg-[#111710] p-2" data-testid="current-word-exploratory-motivation">
         <h5 className="font-semibold text-[#f5f7fb]">Conditional exploratory interpretation</h5>
         {exploratoryProjection.sourceContent?.ok ? (
@@ -130,27 +231,10 @@ export function CurrentWordSourceFunctionalSuggestionV0_1({
                 Source response: <a className="underline" href={selectedSourceSense.apiUrl} target="_blank" rel="noreferrer">{selectedSourceSense.apiUrl}</a> · {selectedSourceSense.licence} · citation CITATION_ENTERED_UNVERIFIED
               </p>
             ) : null}
-            {embryoWholeBridge.explanation ? (
-              <div className="mt-2 rounded border border-[#53604a] bg-[#0d1117] p-2" data-testid="current-word-embryo-whole-bridge">
-                <p className="break-words" data-testid="current-word-exploratory-explanation">{embryoWholeBridge.explanation}</p>
-                <p className="mt-1 break-words text-[10px] text-[#aeb7c5]" data-testid="current-word-embryo-whole-bridge-structure">
-                  DERIVED_STRUCTURE · ORTHOGRAPHIC: {embryoWholeBridge.exactCodePoints.map(({ character, position }) => `${character}@${position}`).join(" · ")} · written Voices {embryoWholeBridge.writtenVoices.map(({ voice, position }) => `${voice}@${position}`).join(" → ") || "∅"} · pronunciation NOT_ESTABLISHED
-                </p>
-                <p className="mt-1 break-words text-[10px] text-[#aeb7c5]" data-testid="current-word-embryo-whole-bridge-embryos">
-                  Selected spectrum inputs: {embryoWholeBridge.selectedSpectrumInputs.map(({ unit, span, text, evidenceStatus }) => `${unit}@${span.start}${span.end - span.start > 1 ? `-${span.end}` : ""} “${text}” · ${evidenceStatus} / EXPLORATORY_HYPOTHESIS`).join(" · ") || "UNKNOWN_OR_NULL"}
-                </p>
-                <p className="mt-1 break-words text-[10px] text-[#aeb7c5]" data-testid="current-word-embryo-whole-bridge-unresolved">
-                  Unresolved structure: {embryoWholeBridge.unresolvedMaterial.join(" · ") || "UNKNOWN_OR_NULL"}
-                </p>
-                {embryoWholeBridge.enteredActionRelation ? (
-                  <p className="mt-1 break-all text-[10px] text-[#aeb7c5]" data-testid="current-word-embryo-whole-bridge-sources">
-                    Separate relation: SOURCE_FACT / CITATION_ENTERED_UNVERIFIED · composed relation LOGICAL_INFERENCE / CITATION_ENTERED_UNVERIFIED. Citations: <a className="underline" href={embryoWholeBridge.enteredActionRelation.targetSourceUrl} target="_blank" rel="noreferrer">{embryoWholeBridge.enteredActionRelation.targetSourceLabel}</a> · {embryoWholeBridge.enteredActionRelation.targetSourceLocator} · <a className="underline" href={embryoWholeBridge.enteredActionRelation.verbSourceUrl} target="_blank" rel="noreferrer">{embryoWholeBridge.enteredActionRelation.verbSourceLabel}</a> · {embryoWholeBridge.enteredActionRelation.verbSourceLocator} · licensing NOT_ASSESSED
-                  </p>
-                ) : null}
-                <p className="mt-1 text-[10px] text-[#aeb7c5]">
-                  Exact target-form match only · cross-source sense alignment UNKNOWN_OR_NULL · bridge EXPLORATORY_HYPOTHESIS / USER_PROPOSED · whole-word PARTIAL_NULL · source-authority promotion NONE · historical origin NOT_CLAIMED · no_single_winner / user_decides
-                </p>
-              </div>
+            {daCandidate.functionalReading ? (
+              <p className="mt-2 break-words text-[#aeb7c5]" data-testid="current-word-da-explanation-reference">
+                The DA-anchored proposal and its computed explanation are shown above; this section does not repeat them.
+              </p>
             ) : exploratoryProjection.conditionalExplanation ? (
               <p className="mt-2 break-words" data-testid="current-word-exploratory-explanation">
                 {exploratoryProjection.conditionalExplanation}
@@ -160,12 +244,7 @@ export function CurrentWordSourceFunctionalSuggestionV0_1({
                 PARTIAL_NULL · choose at least one complete Voice operation with an explicit computed operand.
               </p>
             )}
-            {embryoWholeBridge.status === "PARTIAL_NULL" && selectedSourceSense ? (
-              <p role="status" className="mt-2 break-words text-[#f0ddb0]" data-testid="current-word-embryo-whole-bridge-null">
-                Embryo-to-whole bridge PARTIAL_NULL · {embryoWholeBridge.reasonCodes.join(" · ") || "UNKNOWN_OR_NULL"}. Cross-source sense alignment and internal segmentation remain UNKNOWN_OR_NULL.
-              </p>
-            ) : null}
-            {exploratoryProjection.computedContributions.length ? (
+            {exploratoryProjection.computedContributions.length && !daCandidate.functionalReading ? (
               <ol className="mt-2 space-y-1" data-testid="current-word-exploratory-computed-contributions">
                 {exploratoryProjection.computedContributions.map((contribution) => (
                   <li key={contribution.operationId} className="break-words">
@@ -203,7 +282,7 @@ export function CurrentWordSourceFunctionalSuggestionV0_1({
 
       <details className="mt-2 rounded border border-[#38433a] p-2" data-testid="current-word-source-functional-manual-fallback">
         <summary className="cursor-pointer font-semibold text-[#d8e4ca]">Optional manual research fallback · enter separate source claims</summary>
-        <p className="mt-1 text-[10px] text-[#aeb7c5]">Enter a separately cited research relation here. Each claim remains user-entered and citation-unverified. If a runtime sense is selected, the generated bridge compares the separate inputs conditionally without merging their source identities or asserting sense equivalence.</p>
+        <p className="mt-1 text-[10px] text-[#aeb7c5]">Enter an optional separately cited research relation here. Each claim remains user-entered and citation-unverified. This fallback is independent of the reviewed DA substring candidate above; neither input path verifies the other.</p>
 
       {!identityMatches ? (
         <p role="status" data-testid="current-word-source-suggestion-identity-null" className="mt-2 rounded border border-[#746541] bg-[#18140e] p-2 text-[#f0ddb0]">

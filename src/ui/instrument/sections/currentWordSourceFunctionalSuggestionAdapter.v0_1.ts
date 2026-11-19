@@ -5,6 +5,17 @@ import {
   type SymbolicFunctionalSourceV0_1,
 } from "@/shared/openInstrument/symbolicFunctionalContentEngine.v0_1";
 import type { SymbolicFunctionalCompositionResultV0_3 } from "@/shared/openInstrument/symbolicFunctionalComposition.v0_3";
+import { extractSevenVowelsFromString } from "@/shared/math7.core";
+import { classifyFreeOperatorEvidenceV0_1 } from "@/shared/freeOperatorEvidence.v0_1";
+import { DA_FREE_OPERATOR_PROFILE_V0_1 } from "@/shared/freeOperatorProfile.v0_1";
+import { canonicalOperatorProfilesV0_1 } from "@/shared/canonicalOperatorProfile.v0_1";
+import { reviewedExternalLexiconSourceRowCandidateRegistryV0_1 } from "@/shared/reviewedExternalLexiconSourceRowRegistry.v0_1";
+import {
+  projectFunctionalMotivationTraceV0_1,
+  type FunctionalMotivationTraceInputV0_1,
+  type FunctionalMotivationTraceProjectionV0_1,
+  type ProjectFunctionalMotivationTraceResultV0_1,
+} from "@/shared/openInstrument/functionalMotivationTrace.v0_1";
 import { sameAlbanianSourceForm } from "@/ui/instrument/albanianSourceFormIdentity.v0_1";
 
 export type RuntimeAlbanianSourceSenseRecordV0_1 = Readonly<{
@@ -348,54 +359,63 @@ export function buildCurrentWordExploratoryMotivationV0_1(input: Readonly<{
   };
 }
 
-export type CurrentWordEmbryoWholeFunctionalBridgeProjectionV0_1 = Readonly<{
-  status: "CONDITIONAL_BRIDGE" | "PARTIAL_NULL";
-  explanation: string | null;
-  selectedRuntimeSense: Readonly<{
+export type CurrentWordDaAnchoredEmbryoOccurrenceV0_1 = Readonly<{
+  occurrenceId: string;
+  exactSurface: string;
+  span: Readonly<{ start: number; end: number }>;
+}>;
+
+export type CurrentWordDaStandaloneEvidenceV0_1 = Readonly<{
+  operator: "DA";
+  sourceForm: string;
+  attestedGloss: string;
+  dialect: "Gheg Albanian";
+  sourceId: string;
+  candidateId: string;
+  sourceStatus: "reviewed_accepted";
+  citationId: string;
+  citationStatus: "reviewed_accepted";
+  sourceTitle: string;
+  sourceAuthorOrEditor: string;
+  sourcePublisherOrHost: string;
+  sourceDateOrVersion: string;
+  sourceUrl: string;
+  locator: string;
+  grammarNote: string;
+  reviewNote: string;
+  claimLayer: "SOURCE_FACT";
+  freeOperatorCategories: readonly string[];
+}>;
+
+export type CurrentWordDaAnchoredEmbryoCandidateProjectionV0_1 = Readonly<{
+  status: "CANDIDATE_AVAILABLE" | "CONDITIONAL_PROPOSAL" | "PARTIAL_NULL";
+  occurrences: readonly CurrentWordDaAnchoredEmbryoOccurrenceV0_1[];
+  selectedOccurrenceId: string | null;
+  standaloneEvidence: CurrentWordDaStandaloneEvidenceV0_1 | null;
+  selectedSourceSense: Readonly<{
     label: string;
     responsePosition: string;
     sourceId: string;
     claimLayer: "SOURCE_FACT";
     evidenceStatus: "CITATION_ENTERED_UNVERIFIED";
   }> | null;
-  alternativeRuntimeSenses: readonly Readonly<{
+  alternatives: readonly Readonly<{
     label: string;
     claimLayer: "SOURCE_FACT";
     evidenceStatus: "CITATION_ENTERED_UNVERIFIED";
   }>[];
-  enteredActionRelation: Readonly<{
-    targetSenseDefinition: string;
-    relatedVerbForm: string;
-    verbFunctionText: string;
-    composedRelationText: string;
-    targetSourceLabel: string;
-    targetSourceUrl: string;
-    targetSourceLocator: string;
-    verbSourceLabel: string;
-    verbSourceUrl: string;
-    verbSourceLocator: string;
-    relationSourceClaimLayer: "SOURCE_FACT";
-    relationSourceEvidenceStatus: "CITATION_ENTERED_UNVERIFIED";
-    compositionClaimLayer: "LOGICAL_INFERENCE";
-    compositionEvidenceStatus: "CITATION_ENTERED_UNVERIFIED";
-  }> | null;
+  computedVoiceOperations: readonly RuntimeComputedVoiceContributionV0_1[];
   exactCodePoints: readonly Readonly<{ character: string; position: number }>[];
   writtenVoices: readonly Readonly<{ voice: string; position: number }>[];
-  selectedSpectrumInputs: readonly Readonly<{
-    unit: string;
-    span: Readonly<{ start: number; end: number }>;
-    text: string;
-    claimLayer: "EXPLORATORY_HYPOTHESIS";
-    evidenceStatus: "USER_PROPOSED";
-    sourceIds: readonly [];
-  }>[];
-  computedChain: readonly RuntimeComputedVoiceContributionV0_1[];
-  crossSourceTargetFormMatch: "EXACT_ALBANIAN_FORM_MATCH" | "UNKNOWN_OR_NULL";
-  crossSourceSenseAlignment: "UNKNOWN_OR_NULL";
+  overlappingVoiceEvents: readonly Readonly<{ voice: string; position: number }>[];
+  derivativeFamilySupport: readonly Readonly<{ form: string; categories: readonly string[] }>[];
+  homophoneCollisionAlternatives: readonly Readonly<{ form: string; glossTerms: readonly string[]; categories: readonly string[] }>[];
+  functionalReading: string | null;
+  reasoningTrace: FunctionalMotivationTraceProjectionV0_1 | null;
   unresolvedMaterial: readonly string[];
   reasonCodes: readonly string[];
-  bridgeClaimLayer: "EXPLORATORY_HYPOTHESIS";
-  bridgeEvidenceStatus: "USER_PROPOSED";
+  targetMappingClaimLayer: "EXPLORATORY_HYPOTHESIS";
+  targetMappingEvidenceStatus: "USER_PROPOSED" | "NOT_SELECTED";
   wholeWordStatus: "PARTIAL_NULL";
   sourceAuthorityPromotion: "NONE";
   historicalOrigin: "NOT_CLAIMED";
@@ -403,43 +423,316 @@ export type CurrentWordEmbryoWholeFunctionalBridgeProjectionV0_1 = Readonly<{
   userDecisionPosture: "user_decides";
 }>;
 
-function connectedComputedVoiceChain(
-  contributions: readonly RuntimeComputedVoiceContributionV0_1[],
-): readonly RuntimeComputedVoiceContributionV0_1[] | null {
-  if (contributions.length < 2) return null;
-  const producerByOutput = new Map(contributions.map((contribution) => [contribution.outputSymbolId, contribution]));
-  if (producerByOutput.size !== contributions.length) return null;
-  const roots = contributions.filter(({ inputSymbolId }) => !producerByOutput.has(inputSymbolId));
-  if (roots.length !== 1) return null;
+type DaStandaloneSourceResolutionV0_1 = Readonly<{
+  evidence: CurrentWordDaStandaloneEvidenceV0_1;
+  profileClassification: ReturnType<typeof classifyFreeOperatorEvidenceV0_1>;
+}>;
 
-  const chain: RuntimeComputedVoiceContributionV0_1[] = [];
-  const visited = new Set<string>();
-  let current: RuntimeComputedVoiceContributionV0_1 | undefined = roots[0];
-  while (current && !visited.has(current.operationId)) {
-    chain.push(current);
-    visited.add(current.operationId);
-    const children = contributions.filter(({ inputSymbolId }) => inputSymbolId === current?.outputSymbolId);
-    if (children.length > 1) return null;
-    current = children[0];
-  }
-  return chain.length === contributions.length ? chain : null;
+function daStandaloneSourceResolutionV0_1(): DaStandaloneSourceResolutionV0_1 | null {
+  const canonicalProfile = canonicalOperatorProfilesV0_1.find(({ operatorId }) => operatorId === "DA");
+  const sourceRow = canonicalProfile
+    ? reviewedExternalLexiconSourceRowCandidateRegistryV0_1.find(({ sourceId }) => sourceId === canonicalProfile.sourceId)
+    : undefined;
+  if (!sourceRow || sourceRow.sourceStatus !== "reviewed_accepted") return null;
+
+  const citation = sourceRow.externalCitations.find((candidate) =>
+    candidate.citationStatus === "reviewed_accepted" &&
+    candidate.attestedForm?.normalize("NFC").trim().toLocaleLowerCase("sq-AL") === "da" &&
+    Boolean(candidate.attestedGloss?.trim()) && Boolean(candidate.sourceUrlOrArchiveRef?.trim()) &&
+    Boolean(candidate.entryLocator?.trim()),
+  );
+  if (!citation?.attestedForm || !citation.attestedGloss || !citation.sourceUrlOrArchiveRef ||
+      !citation.entryLocator || !citation.citationId || !citation.sourceTitle ||
+      !citation.sourceAuthorOrEditor || !citation.sourcePublisherOrHost ||
+      !citation.sourceDateOrVersion || !citation.attestedGrammarNote || !citation.reviewNote ||
+      !canonicalProfile || canonicalProfile.embryo !== "DA" || sourceRow.embryo !== "DA") return null;
+
+  const profileClassification = classifyFreeOperatorEvidenceV0_1({
+    operator: "DA",
+    attestedForm: citation.attestedForm,
+    attestedGloss: citation.attestedGloss,
+    dialect: "Gheg Albanian",
+  });
+  if (!profileClassification.categories.includes("free_operator_attested") ||
+      profileClassification.categories.includes("functional_motivation_supported")) return null;
+
+  return {
+    evidence: {
+      operator: "DA",
+      sourceForm: citation.attestedForm,
+      attestedGloss: citation.attestedGloss,
+      dialect: "Gheg Albanian",
+      sourceId: sourceRow.sourceId,
+      candidateId: sourceRow.candidateId,
+      sourceStatus: "reviewed_accepted",
+      citationId: citation.citationId,
+      citationStatus: "reviewed_accepted",
+      sourceTitle: citation.sourceTitle,
+      sourceAuthorOrEditor: citation.sourceAuthorOrEditor,
+      sourcePublisherOrHost: citation.sourcePublisherOrHost,
+      sourceDateOrVersion: citation.sourceDateOrVersion,
+      sourceUrl: citation.sourceUrlOrArchiveRef,
+      locator: citation.entryLocator,
+      grammarNote: citation.attestedGrammarNote,
+      reviewNote: citation.reviewNote,
+      claimLayer: "SOURCE_FACT",
+      freeOperatorCategories: profileClassification.categories,
+    },
+    profileClassification,
+  };
 }
 
-/**
- * Connects a separately entered, cited lexical relation to an explicitly
- * selected runtime sense and an already-computed, dependency-connected Voice
- * chain. The cross-source sense match stays unknown and the bridge stays a
- * user-proposed hypothesis; this function does not evaluate operations.
- */
-export function buildCurrentWordEmbryoWholeFunctionalBridgeV0_1(input: Readonly<{
+function exactOrthographicOccurrencesV0_1(target: string, sourceForm: string): CurrentWordDaAnchoredEmbryoOccurrenceV0_1[] {
+  const targetCodePoints = Array.from(target);
+  const foldedTarget = targetCodePoints.map((character) => character.normalize("NFC").toLocaleLowerCase("sq-AL"));
+  const foldedSource = Array.from(sourceForm.normalize("NFC").toLocaleLowerCase("sq-AL"));
+  if (!foldedSource.length || foldedSource.some((character) => !character)) return [];
+
+  const occurrences: CurrentWordDaAnchoredEmbryoOccurrenceV0_1[] = [];
+  for (let start = 0; start <= foldedTarget.length - foldedSource.length; start += 1) {
+    const matches = foldedSource.every((character, offset) => foldedTarget[start + offset] === character);
+    if (!matches) continue;
+    const end = start + foldedSource.length;
+    occurrences.push({
+      occurrenceId: target + "|" + sourceForm + "|" + start + ":" + end,
+      exactSurface: targetCodePoints.slice(start, end).join(""),
+      span: { start, end },
+    });
+  }
+  return occurrences;
+}
+
+function buildDaAnchoredFunctionalTraceV0_1(input: Readonly<{
+  analyzedWord: string;
+  language: string;
+  variety: string;
+  occurrence: CurrentWordDaAnchoredEmbryoOccurrenceV0_1;
+  evidence: CurrentWordDaStandaloneEvidenceV0_1;
+  selectedSense: RuntimeAlbanianSourceSenseSelectionV0_1;
+  selectedSenseDefinition: string;
+  selectedSenseSourceId: string;
+  computedContributions: readonly RuntimeComputedVoiceContributionV0_1[];
+  unresolvedMaterial: readonly string[];
+  functionalReading: string;
+}>): ProjectFunctionalMotivationTraceResultV0_1 {
+  const targetSource = {
+    sourceId: input.selectedSenseSourceId,
+    label: "FjaloriShqip API response · " + input.selectedSense.selectedSense.senseSource,
+    url: input.selectedSense.apiUrl,
+    locator: "Entry " + input.selectedSense.selectedSense.entryIndex + " · Sense " + input.selectedSense.selectedSense.senseIndex +
+      " · response position, not a source-issued sense ID · entry sources " +
+      (input.selectedSense.selectedSense.entrySources.join(", ") || "UNKNOWN_OR_NULL"),
+    citationStatus: "CITATION_ENTERED_UNVERIFIED" as const,
+    licensingStatus: "NOT_ASSESSED" as const,
+  };
+  const daSource = {
+    sourceId: input.evidence.sourceId,
+    label: input.evidence.sourceAuthorOrEditor + " · " + input.evidence.sourceDateOrVersion,
+    url: input.evidence.sourceUrl,
+    locator: input.evidence.locator,
+    citationStatus: "CITATION_ENTERED_UNVERIFIED" as const,
+    licensingStatus: "NOT_ASSESSED" as const,
+  };
+  const exactCodePoints = Array.from(input.analyzedWord).map((character, position) => ({ character, position }));
+  const targetVoiceEvents = exactCodePoints.flatMap(({ character, position }) => {
+    const voice = extractSevenVowelsFromString(character)[0];
+    return voice ? [{ voice, position }] : [];
+  });
+  const unresolvedClaims = input.unresolvedMaterial.map((text) => ({
+    text,
+    claimLayer: "UNKNOWN_OR_NULL" as const,
+    status: "UNKNOWN_OR_NULL",
+    sourceIds: [] as const,
+  }));
+  const traceInput: FunctionalMotivationTraceInputV0_1 = {
+    target: {
+      exactSpelling: input.analyzedWord,
+      language: input.language,
+      variety: input.variety,
+      grammaticalCategory: input.selectedSense.selectedSense.partOfSpeech ?? "UNKNOWN_OR_NULL",
+      selectedSense: input.selectedSenseDefinition,
+      evidenceStatus: "CITATION_ENTERED_UNVERIFIED",
+      sourceIds: [input.selectedSenseSourceId],
+      expectedCodePoints: exactCodePoints,
+      expectedWrittenVoices: targetVoiceEvents,
+    },
+    sources: [targetSource, daSource],
+    terms: [
+      {
+        id: "standalone-da",
+        spelling: input.evidence.sourceForm.toLocaleUpperCase("sq-AL"),
+        functionText: input.evidence.attestedGloss,
+        claimLayer: "SOURCE_FACT",
+        status: "source row " + input.evidence.sourceStatus + "; citation metadata " + input.evidence.citationStatus,
+        sourceIds: [input.evidence.sourceId],
+        roleNote: "standalone Gheg lexical function only; not a target segmentation",
+        freeOperatorClassification: input.evidence.freeOperatorCategories.join(", "),
+      },
+      {
+        id: "selected-whole-word-sense",
+        spelling: input.analyzedWord,
+        functionText: input.selectedSenseDefinition,
+        claimLayer: "SOURCE_FACT",
+        status: "CITATION_ENTERED_UNVERIFIED",
+        sourceIds: [input.selectedSenseSourceId],
+        roleNote: "explicitly selected runtime lexical sense; not a derivation",
+      },
+    ],
+    equation: {
+      contributorTermIds: ["standalone-da"],
+      resultText: input.selectedSenseDefinition,
+      targetDescription: "selected whole-word source sense; target mapping remains user-proposed",
+      claimLayer: "EXPLORATORY_HYPOTHESIS",
+      status: "USER_PROPOSED",
+      sourceIds: [],
+    },
+    functionalReading: {
+      text: input.functionalReading,
+      claimLayer: "EXPLORATORY_HYPOTHESIS",
+      status: "USER_PROPOSED",
+      sourceIds: [],
+    },
+    surfaceReconstruction: {
+      components: [{
+        spelling: input.analyzedWord,
+        functionText: "exact whole-word spelling; internal segmentation UNKNOWN_OR_NULL",
+        claimLayer: "UNKNOWN_OR_NULL",
+        status: "WHOLE_WORD_SURFACE_ONLY",
+        unresolved: true,
+      }],
+      expectedStatus: "EXACT_MATCH",
+      note: "The whole target spelling is preserved without segmentation. The DA occurrence is an overlapping substring candidate at [" +
+        input.occurrence.span.start + "," + input.occurrence.span.end + "); it is not asserted as a morpheme boundary.",
+      sourceIds: [],
+    },
+    operations: [],
+    alternatives: input.selectedSense.alternativeSenses.map((sense) => ({
+      text: "Alternative source sense: " + sense.gloss,
+      claimLayer: "SOURCE_FACT",
+      status: "CITATION_ENTERED_UNVERIFIED",
+      sourceIds: [input.selectedSenseSourceId],
+    })),
+    contrasts: [],
+    unresolved: unresolvedClaims,
+    notes: [
+      "The reviewed DA source row's separate DA-to-DAM/DAMAGE functional candidate is not transferred to this target.",
+      "NDAJ, NDARË, and NDARE remain derivative-family support and are not used as direct standalone DA evidence.",
+      "The DA profile records a give/gave/given homophone collision; it is preserved as a separate lexical alternative and is not assigned to this target occurrence.",
+      "The observed DA span overlaps a written Voice event; that is the same conserved event, not an additional occurrence.",
+      "The FjaloriShqip and DA source identities remain separate; their existence does not by itself establish corroboration or sense equivalence.",
+      "This is not a claim of pronunciation, historical origin, or an exact reconstruction of Petro Zheji's method.",
+    ],
+    reasoningSteps: [
+      {
+        id: "selected-whole-word-sense",
+        title: "Selected whole-word sense",
+        from: input.analyzedWord,
+        relationshipType: "explicitly selected lexical sense",
+        to: input.selectedSenseDefinition,
+        claimLayer: "SOURCE_FACT",
+        status: "CITATION_ENTERED_UNVERIFIED",
+        sourceIds: [input.selectedSenseSourceId],
+        evidenceNote: "Selected FjaloriShqip response position Entry " + input.selectedSense.selectedSense.entryIndex +
+          ", Sense " + input.selectedSense.selectedSense.senseIndex + "; response position is not a source-issued sense identifier.",
+        supportBoundary: "The lexical sense is a source-reported input and does not establish internal segmentation or symbolic function.",
+      },
+      {
+        id: "observed-da-substring",
+        title: "Observed DA substring candidate",
+        from: input.analyzedWord + " code-point span [" + input.occurrence.span.start + "," + input.occurrence.span.end + ")",
+        relationshipType: "exact orthographic substring",
+        to: input.occurrence.exactSurface,
+        claimLayer: "DERIVED_STRUCTURE",
+        status: "OBSERVED_IN_TARGET_SPELLING",
+        sourceIds: [],
+        evidenceNote: "The exact surface and zero-based end-exclusive span are computed from the analyzed spelling.",
+        supportBoundary: "This observation does not establish a morpheme boundary, target sense, or derivational relationship.",
+        exactStructure: input.occurrence.exactSurface + "@[" + input.occurrence.span.start + "," + input.occurrence.span.end + ")",
+      },
+      {
+        id: "standalone-da-function",
+        title: "Standalone DA lexical function",
+        from: input.evidence.dialect + " " + input.evidence.sourceForm,
+        relationshipType: "reviewed standalone lexical source record",
+        to: input.evidence.attestedGloss,
+        claimLayer: "SOURCE_FACT",
+        status: input.evidence.sourceStatus + " source row; " + input.evidence.citationStatus + " citation metadata",
+        sourceIds: [input.evidence.sourceId],
+        evidenceNote: input.evidence.sourceTitle + "; " + input.evidence.locator + "; source record " +
+          input.evidence.sourceId + "; citation " + input.evidence.citationId + ".",
+        supportBoundary: "This source supports standalone Gheg DA only. It does not establish this DA substring as a component of the target.",
+      },
+      {
+        id: "explicit-da-target-mapping",
+        title: "User-authorized DA-to-target proposal",
+        from: input.occurrence.exactSurface + "@[" + input.occurrence.span.start + "," + input.occurrence.span.end + ") · " + input.evidence.attestedGloss,
+        relationshipType: "user-proposed functional alignment",
+        to: input.analyzedWord + " · " + input.selectedSenseDefinition,
+        claimLayer: "EXPLORATORY_HYPOTHESIS",
+        status: "USER_PROPOSED",
+        sourceIds: [],
+        evidenceNote: "This relation appears only after explicit user selection; no target mapping is inferred from substring matching.",
+        supportBoundary: "The proposal does not establish morphology, historical derivation, or a complete whole-word explanation.",
+      },
+      ...input.computedContributions.map((contribution) => ({
+        id: "voice-operation-" + contribution.operationId,
+        title: "Computed user-selected Voice operation",
+        from: contribution.voice + "@" + contribution.position + " · " + contribution.operatorText + "(" + contribution.inputText + ")",
+        relationshipType: "evaluated symbolic transformation",
+        to: contribution.outputText,
+        claimLayer: "EXPLORATORY_HYPOTHESIS" as const,
+        status: "COMPUTED_FROM_USER_PROPOSED_INPUTS",
+        sourceIds: [] as const,
+        evidenceNote: "Operation " + contribution.operationId + "; input " + contribution.inputSymbolId +
+          "; output " + contribution.outputSymbolId + "; sourceIds empty.",
+        supportBoundary: contribution.voice === "A" && contribution.position >= input.occurrence.span.start && contribution.position < input.occurrence.span.end
+          ? "The A event is the single written Voice event also contained in the DA substring span; the event is reused once and is not an independent DA occurrence."
+          : "A deterministic symbolic computation over user-selected hypotheses; it does not validate the DA-to-target proposal.",
+      })),
+      ...input.unresolvedMaterial.map((text, index) => ({
+        id: "unresolved-" + index,
+        title: "Unresolved target material",
+        from: input.analyzedWord,
+        relationshipType: "unsupported or unassigned structure",
+        to: text,
+        claimLayer: "UNKNOWN_OR_NULL" as const,
+        status: "UNKNOWN_OR_NULL",
+        sourceIds: [] as const,
+        evidenceNote: "No qualifying component function or relationship is established by these inputs.",
+        supportBoundary: "Retained as Null; no meaning is assigned.",
+      })),
+    ],
+  };
+  return projectFunctionalMotivationTraceV0_1(traceInput);
+}
+
+export function buildCurrentWordDaAnchoredEmbryoCandidateV0_1(input: Readonly<{
   analyzedWord: string;
   draftTargetWord: string;
+  identityMatches: boolean;
   language: string;
   variety: string;
   selectedSourceSense: RuntimeAlbanianSourceSenseSelectionV0_1 | null;
-  sourceRelation: CurrentWordSourceFunctionalSuggestionProjectionV0_1 | null;
   evaluation: SymbolicFunctionalCompositionResultV0_3;
-}>): CurrentWordEmbryoWholeFunctionalBridgeProjectionV0_1 {
+  proposedOccurrenceId: string | null;
+}>): CurrentWordDaAnchoredEmbryoCandidateProjectionV0_1 {
+  const reasons: string[] = [];
+  if (!input.analyzedWord || input.draftTargetWord !== input.analyzedWord) reasons.push("CURRENT_WORD_IDENTITY_MISMATCH");
+  if (!input.identityMatches) reasons.push("ANALYSIS_IDENTITY_NOT_CONFIRMED");
+  if (!isAlbanianLanguage(input.language)) reasons.push("TARGET_LANGUAGE_NOT_ALBANIAN");
+  if (!isCompatibleAlbanianVariety(input.variety)) reasons.push("TARGET_VARIETY_REQUIRED");
+
+  const sourceResolution = daStandaloneSourceResolutionV0_1();
+  if (!sourceResolution) reasons.push("DA_REVIEWED_STANDALONE_SOURCE_NOT_AVAILABLE");
+  const occurrences = sourceResolution
+    ? exactOrthographicOccurrencesV0_1(input.analyzedWord, sourceResolution.evidence.sourceForm)
+    : [];
+  if (sourceResolution && occurrences.length === 0) reasons.push("DA_EXACT_SUBSTRING_NOT_FOUND");
+  const proposedOccurrence = input.proposedOccurrenceId
+    ? occurrences.find(({ occurrenceId }) => occurrenceId === input.proposedOccurrenceId) ?? null
+    : null;
+  if (input.proposedOccurrenceId && !proposedOccurrence) reasons.push("DA_TARGET_MAPPING_SELECTION_NOT_IN_CURRENT_CANDIDATES");
+
   const exploratory = buildCurrentWordExploratoryMotivationV0_1({
     analyzedWord: input.analyzedWord,
     draftTargetWord: input.draftTargetWord,
@@ -448,185 +741,146 @@ export function buildCurrentWordEmbryoWholeFunctionalBridgeV0_1(input: Readonly<
     selectedSourceSense: input.selectedSourceSense,
     evaluation: input.evaluation,
   });
-  const reasons = exploratory.reasonCodes.filter((reason) => ![
-    "SOURCE_SYMBOLIC_RELATION_NOT_REPORTED",
-    "WHOLE_WORD_FUNCTION_NOT_ESTABLISHED",
-    "NO_VERIFIABLY_COMPUTED_VOICE_OUTPUTS",
-  ].includes(reason));
-  const selectedContent = exploratory.sourceContent?.ok ? exploratory.sourceContent.content : null;
-  const relationContent = input.sourceRelation?.status === "CONDITIONAL_SUGGESTION" && input.sourceRelation.result?.ok
-    ? input.sourceRelation.result.content
-    : null;
-  const selectedSense = input.selectedSourceSense;
-
-  if (!selectedSense) reasons.push("SOURCE_SENSE_NOT_SELECTED");
-  if (!selectedContent) reasons.push("SELECTED_RUNTIME_SENSE_NOT_VALID_FOR_TARGET");
-  if (!relationContent) reasons.push("CITED_ACTION_RELATION_NOT_AVAILABLE");
-
-  let enteredActionRelation: CurrentWordEmbryoWholeFunctionalBridgeProjectionV0_1["enteredActionRelation"] = null;
-  if (relationContent) {
-    const composition = relationContent.compositions.find(({ targetSenseId }) =>
-      targetSenseId === relationContent.target.selectedSense.senseId,
-    );
-    const relatedFunction = composition && relationContent.functionCandidates.find(({ candidateId }) =>
-      candidateId === composition.functionCandidateId,
-    );
-    const relationSource = composition?.provenance.relation.sourceIds[0];
-    const functionSource = composition?.provenance.function.sourceIds[0];
-    const targetCitation = relationSource && input.sourceRelation?.sourceCitations.find(({ sourceId }) => sourceId === relationSource);
-    const verbCitation = functionSource && input.sourceRelation?.sourceCitations.find(({ sourceId }) => sourceId === functionSource);
-    const relationIsSourceBound = Boolean(
-      composition && relatedFunction && targetCitation && verbCitation &&
-      relationContent.target.selectedSense.functionalFrame === "ACTION_OF_VERB_FUNCTION" &&
-      relationContent.target.selectedSense.claimLayer === "SOURCE_FACT" &&
-      relationContent.target.selectedSense.evidenceStatus === "CITATION_ENTERED_UNVERIFIED" &&
-      composition.senseRole === "SELECTED_SENSE" &&
-      composition.status === "COMPOSED_FROM_SOURCE_RELATION" &&
-      composition.claimLayer === "LOGICAL_INFERENCE" &&
-      composition.evidenceStatus === "CITATION_ENTERED_UNVERIFIED" &&
-      composition.provenance.relation.claimLayer === "SOURCE_FACT" &&
-      composition.provenance.relation.evidenceStatus === "CITATION_ENTERED_UNVERIFIED" &&
-      composition.provenance.function.claimLayer === "SOURCE_FACT" &&
-      composition.provenance.function.evidenceStatus === "CITATION_ENTERED_UNVERIFIED" &&
-      relatedFunction.claimLayer === "SOURCE_FACT" &&
-      relatedFunction.evidenceStatus === "CITATION_ENTERED_UNVERIFIED" &&
-      Boolean(composition.resultText?.trim()) && Boolean(relatedFunction.exactForm.trim()) &&
-      Boolean(relatedFunction.functionText?.trim()) &&
-      targetCitation.citationStatus === "CITATION_ENTERED_UNVERIFIED" &&
-      targetCitation.licensingStatus === "NOT_ASSESSED" &&
-      verbCitation.citationStatus === "CITATION_ENTERED_UNVERIFIED" &&
-      verbCitation.licensingStatus === "NOT_ASSESSED",
-    );
-    if (!relationIsSourceBound || !composition || !relatedFunction || !targetCitation || !verbCitation) {
-      reasons.push("CITED_ACTION_RELATION_PROVENANCE_INVALID");
-    } else if (!sameAlbanianSourceForm(relationContent.target.exactSpelling, input.analyzedWord)) {
-      reasons.push("CITED_ACTION_RELATION_TARGET_MISMATCH");
-    } else if (normalizeSourceContext(relationContent.target.language) !== normalizeSourceContext(input.language) ||
-        normalizeSourceContext(relationContent.target.variety) !== normalizeSourceContext(input.variety)) {
-      reasons.push("CITED_ACTION_RELATION_CONTEXT_MISMATCH");
-    } else if (selectedSense && sameSourceOrigin(targetCitation.url, selectedSense.apiUrl)) {
-      reasons.push("CITED_RELATION_MUST_REMAIN_SEPARATE_FROM_RUNTIME_SOURCE");
-    } else {
-      enteredActionRelation = {
-        targetSenseDefinition: relationContent.target.selectedSense.definition,
-        relatedVerbForm: relatedFunction.exactForm,
-        verbFunctionText: relatedFunction.functionText ?? "UNKNOWN_OR_NULL",
-        composedRelationText: composition.resultText ?? "UNKNOWN_OR_NULL",
-        targetSourceLabel: targetCitation.label,
-        targetSourceUrl: targetCitation.url,
-        targetSourceLocator: targetCitation.locator,
-        verbSourceLabel: verbCitation.label,
-        verbSourceUrl: verbCitation.url,
-        verbSourceLocator: verbCitation.locator,
-        relationSourceClaimLayer: "SOURCE_FACT",
-        relationSourceEvidenceStatus: "CITATION_ENTERED_UNVERIFIED",
-        compositionClaimLayer: "LOGICAL_INFERENCE",
-        compositionEvidenceStatus: "CITATION_ENTERED_UNVERIFIED",
-      };
-    }
-  }
-
-  let computedChain: readonly RuntimeComputedVoiceContributionV0_1[] = [];
-  let selectedSpectrumInputs: CurrentWordEmbryoWholeFunctionalBridgeProjectionV0_1["selectedSpectrumInputs"] = [];
-  let exactCodePoints: readonly Readonly<{ character: string; position: number }>[] = [];
-  let writtenVoices: readonly Readonly<{ voice: string; position: number }>[] = [];
-  let unresolvedMaterial: string[] = ["INTERNAL_SEGMENTATION_OR_MORPHOLOGY_NOT_ESTABLISHED"];
-  let crossSourceTargetFormMatch: CurrentWordEmbryoWholeFunctionalBridgeProjectionV0_1["crossSourceTargetFormMatch"] = "UNKNOWN_OR_NULL";
-
+  const sourceContent = exploratory.sourceContent?.ok ? exploratory.sourceContent.content : null;
   if (input.evaluation.ok) {
-    const target = input.evaluation.target;
-    const evaluatedSymbols = input.evaluation.symbols;
-    if (!sameAlbanianSourceForm(target.exactSpelling, input.analyzedWord) || target.exactSpelling !== input.draftTargetWord) {
+    if (input.evaluation.target.exactSpelling !== input.analyzedWord || input.evaluation.target.exactSpelling !== input.draftTargetWord) {
       reasons.push("SYMBOLIC_EVALUATION_TARGET_MISMATCH");
     }
-    if (selectedContent) {
-      exactCodePoints = selectedContent.target.codePoints;
-      writtenVoices = selectedContent.target.writtenVoices;
-      const codePointsMatch = JSON.stringify(target.codePoints) === JSON.stringify(selectedContent.target.codePoints);
-      const voicePathMatch = JSON.stringify(target.writtenVoices) === JSON.stringify(selectedContent.target.writtenVoices);
-      if (!codePointsMatch) reasons.push("TARGET_CODE_POINT_ACCOUNTING_MISMATCH");
-      if (!voicePathMatch) reasons.push("TARGET_WRITTEN_VOICE_PATH_MISMATCH");
-      const runtimeSourceId = selectedContent.target.selectedSense.sourceIds[0];
-      if (relationContent && sameAlbanianSourceForm(relationContent.target.exactSpelling, input.analyzedWord) &&
-          relationContent.target.selectedSense.sourceIds[0] !== runtimeSourceId) {
-        crossSourceTargetFormMatch = "EXACT_ALBANIAN_FORM_MATCH";
-      }
+    if (sourceContent && JSON.stringify(input.evaluation.target.codePoints) !== JSON.stringify(sourceContent.target.codePoints)) {
+      reasons.push("TARGET_CODE_POINT_ACCOUNTING_MISMATCH");
     }
-    computedChain = connectedComputedVoiceChain(exploratory.computedContributions) ?? [];
-    selectedSpectrumInputs = [...new Map(computedChain.flatMap(({ inputSymbolId }) => {
-      const symbol = evaluatedSymbols.find(({ symbolId }) => symbolId === inputSymbolId);
-      return symbol?.symbolKind === "SPECTRUM_ASSOCIATION" && symbol.unit && symbol.span
-        ? [[symbol.symbolId, {
-            unit: symbol.unit,
-            span: symbol.span,
-            text: symbol.text,
-            claimLayer: "EXPLORATORY_HYPOTHESIS" as const,
-            evidenceStatus: "USER_PROPOSED" as const,
-            sourceIds: [] as const,
-          }] as const]
-        : [];
-    }))].map(([, symbol]) => symbol).sort((left, right) => left.span.start - right.span.start);
-    if (computedChain.length < 2) reasons.push("CONNECTED_COMPUTED_VOICE_CHAIN_REQUIRED");
-    if (exploratory.unresolved.some((item) => item.startsWith("VOICE_OPERATION_NOT_VERIFIABLY_COMPUTED:"))) {
-      reasons.push("VOICE_OPERATION_DEPENDENCY_NOT_VERIFIABLE");
+    if (sourceContent && JSON.stringify(input.evaluation.target.writtenVoices) !== JSON.stringify(sourceContent.target.writtenVoices)) {
+      reasons.push("TARGET_WRITTEN_VOICE_PATH_MISMATCH");
     }
-    unresolvedMaterial = [
-      ...input.evaluation.spectrumOccurrences
-        .filter(({ selectedAssociationIds }) => selectedAssociationIds.length === 0)
-        .map(({ unit, span }) => `${unit}@${span.start}${span.end - span.start > 1 ? `-${span.end}` : ""} · UNKNOWN_OR_NULL`),
-      ...input.evaluation.unmatchedLetterSpans.map(({ exactText, span }) => `${exactText}@${span.start} · UNKNOWN_OR_NULL`),
-      ...input.evaluation.voiceEvents
-        .filter(({ appliedOperationIds }) => appliedOperationIds.length === 0)
-        .map(({ voice, position }) => `${voice}@${position} · UNKNOWN_OR_NULL`),
-      "INTERNAL_SEGMENTATION_OR_MORPHOLOGY_NOT_ESTABLISHED",
-    ];
   } else {
-    reasons.push(...input.evaluation.reasonCodes.map((reason) => `SYMBOLIC_EVALUATION_${reason}`));
+    reasons.push(...input.evaluation.reasonCodes.map((reason) => "SYMBOLIC_EVALUATION_" + reason));
+  }
+  reasons.push(...exploratory.unresolved
+    .filter((reason) => reason.startsWith("VOICE_OPERATION_NOT_VERIFIABLY_COMPUTED:"))
+    .map((reason) => "SYMBOLIC_" + reason));
+  if (proposedOccurrence && !input.selectedSourceSense) reasons.push("TARGET_SOURCE_SENSE_NOT_SELECTED");
+  if (proposedOccurrence && !sourceContent) reasons.push("TARGET_SOURCE_SENSE_NOT_VALID_FOR_CURRENT_WORD");
+  if (proposedOccurrence && exploratory.computedContributions.length === 0) {
+    reasons.push("NO_VERIFIABLY_COMPUTED_VOICE_OUTPUTS");
   }
 
-  if (selectedContent && enteredActionRelation && crossSourceTargetFormMatch !== "EXACT_ALBANIAN_FORM_MATCH") {
-    reasons.push("CROSS_SOURCE_TARGET_FORM_MATCH_NOT_ESTABLISHED");
-  }
-  const reasonCodes = [...new Set(reasons)].sort();
-  const valid = reasonCodes.length === 0 && selectedContent !== null && enteredActionRelation !== null &&
-    computedChain.length >= 2 && crossSourceTargetFormMatch === "EXACT_ALBANIAN_FORM_MATCH";
-  const selectedRuntimeSense = selectedContent && selectedSense
-    ? {
-        label: selectedContent.target.selectedSense.label,
-        responsePosition: `Entry ${selectedSense.selectedSense.entryIndex} · Sense ${selectedSense.selectedSense.senseIndex}`,
-        sourceId: selectedContent.target.selectedSense.sourceIds[0],
-        claimLayer: "SOURCE_FACT" as const,
-        evidenceStatus: "CITATION_ENTERED_UNVERIFIED" as const,
-      }
-    : null;
-  const alternativeRuntimeSenses = selectedContent?.target.alternativeSenses.map(({ label }) => ({
+  const exactCodePoints = Array.from(input.analyzedWord).map((character, position) => ({ character, position }));
+  const writtenVoices = exactCodePoints.flatMap(({ character, position }) => {
+    const voice = extractSevenVowelsFromString(character)[0];
+    return voice ? [{ voice, position }] : [];
+  });
+  const overlappingVoiceEvents = proposedOccurrence
+    ? writtenVoices.filter(({ position }) => position >= proposedOccurrence.span.start && position < proposedOccurrence.span.end)
+    : [];
+  const alternatives = input.identityMatches ? sourceContent?.target.alternativeSenses.map(({ label }) => ({
     label,
     claimLayer: "SOURCE_FACT" as const,
     evidenceStatus: "CITATION_ENTERED_UNVERIFIED" as const,
-  })) ?? [];
-  const chainText = computedChain.map(({ voice, position, operatorText, inputText, outputText }) =>
-    `${voice}@${position} ${operatorText}: “${inputText}” → “${outputText}”`,
-  ).join("; then ");
-  const explanation = valid && selectedRuntimeSense && enteredActionRelation
-    ? `For ${input.analyzedWord}, the selected runtime sense is “${selectedRuntimeSense.label}” (${selectedRuntimeSense.responsePosition}; SOURCE_FACT, citation entered unverified). A separate entered relation describes the target sense as “${enteredActionRelation.targetSenseDefinition}” and relates it to ${enteredActionRelation.relatedVerbForm} (“${enteredActionRelation.verbFunctionText}”); these citations are not independently verified. Your computed USER_PROPOSED Voice chain is ${chainText}. The ordered outputs and their dependencies give a staged symbolic proposal for that entered verb function. If the separate action relation applies to the selected runtime sense, those stages offer a conditional framing of its function. This is an exploratory analogy, not a verified cross-source sense match, internal segmentation, or whole-word derivation.`
-    : null;
+  })) ?? [] : [];
+  const unresolvedMaterial = [...new Set([
+    ...exploratory.unresolved,
+    ...(proposedOccurrence ? [
+      "DA occurrence is not established as a morpheme or derivational component",
+      "INTERNAL_SEGMENTATION_OR_MORPHOLOGY_NOT_ESTABLISHED",
+      ...exactCodePoints
+        .filter(({ position, character }) =>
+          (position < proposedOccurrence.span.start || position >= proposedOccurrence.span.end) &&
+          extractSevenVowelsFromString(character).length === 0,
+        )
+        .map(({ character, position }) => `${character}@${position} functional association UNKNOWN_OR_NULL`),
+    ] : []),
+    ...writtenVoices
+      .filter(({ position }) => !exploratory.computedContributions.some((contribution) => contribution.position === position))
+      .map(({ voice, position }) => `${voice}@${position} functional role UNKNOWN_OR_NULL`),
+    ...(proposedOccurrence && overlappingVoiceEvents.length
+      ? [overlappingVoiceEvents.map(({ voice, position }) => `${voice}@${position}`).join(", ") +
+        " is the conserved written Voice event overlapping the DA span; no separate vowel occurrence is created"]
+      : []),
+    ...(proposedOccurrence && exploratory.computedContributions.length === 0
+      ? ["No computed Voice operation is available to accompany the DA proposal"]
+      : []),
+  ])].sort();
 
+  const reasonCodes = [...new Set(reasons)].sort();
+  const proposalReady = Boolean(
+    proposedOccurrence && sourceResolution && sourceContent && input.evaluation.ok &&
+    !reasonCodes.length && exploratory.computedContributions.length > 0,
+  );
+  let functionalReading: string | null = null;
+  let reasoningTrace: FunctionalMotivationTraceProjectionV0_1 | null = null;
+  if (proposalReady && proposedOccurrence && sourceResolution && sourceContent && input.selectedSourceSense) {
+    const operations = exploratory.computedContributions.map(({ voice, position, operatorText, inputText, outputText }) =>
+      voice + "@" + position + " " + operatorText + "(" + inputText + ") → " + outputText,
+    ).join(" · ");
+    const overlapText = overlappingVoiceEvents.length
+      ? overlappingVoiceEvents.map(({ voice, position }) => voice + "@" + position).join(", ")
+      : "none";
+    functionalReading = "The reviewed standalone Gheg source record reports " + sourceResolution.evidence.sourceForm +
+      " (“" + sourceResolution.evidence.attestedGloss + "”). The exact target spelling contains " +
+      proposedOccurrence.exactSurface + " at code-point span [" + proposedOccurrence.span.start + "," + proposedOccurrence.span.end +
+      "). If you interpret this occurrence as a functional embryo, the source-reported function “" + sourceResolution.evidence.attestedGloss +
+      "” may help motivate the selected whole-word source sense “" +
+      sourceContent.target.selectedSense.definition + "”. The separately computed, user-selected Voice outputs are " + operations +
+      ". The substring overlaps written Voice event " + overlapText +
+      "; that event is conserved once. This target mapping is USER_PROPOSED / EXPLORATORY_HYPOTHESIS, not an established morpheme or derivation. Other structure and the complete whole-word function remain UNKNOWN_OR_NULL.";
+    const selectedSenseSourceId = sourceContent.target.selectedSense.sourceIds[0];
+    const traceResult = buildDaAnchoredFunctionalTraceV0_1({
+      analyzedWord: input.analyzedWord,
+      language: input.language,
+      variety: input.variety,
+      occurrence: proposedOccurrence,
+      evidence: sourceResolution.evidence,
+      selectedSense: input.selectedSourceSense,
+      selectedSenseDefinition: sourceContent.target.selectedSense.definition,
+      selectedSenseSourceId,
+      computedContributions: exploratory.computedContributions,
+      unresolvedMaterial,
+      functionalReading,
+    });
+    if (traceResult.status === "READY") {
+      reasoningTrace = traceResult.projection;
+    } else {
+      reasons.push(...traceResult.reasonCodes.map((reason) => "FUNCTIONAL_TRACE_" + reason));
+      functionalReading = null;
+    }
+  }
+
+  const finalReasonCodes = [...new Set(reasons)].sort();
+  const selectedOccurrenceId = proposedOccurrence?.occurrenceId ?? null;
   return {
-    status: valid ? "CONDITIONAL_BRIDGE" : "PARTIAL_NULL",
-    explanation,
-    selectedRuntimeSense,
-    alternativeRuntimeSenses,
-    enteredActionRelation,
+    status: functionalReading ? "CONDITIONAL_PROPOSAL" : occurrences.length && !finalReasonCodes.length ? "CANDIDATE_AVAILABLE" : "PARTIAL_NULL",
+    occurrences,
+    selectedOccurrenceId,
+    standaloneEvidence: sourceResolution?.evidence ?? null,
+    selectedSourceSense: input.identityMatches && sourceContent && input.selectedSourceSense
+      ? {
+          label: sourceContent.target.selectedSense.definition,
+          responsePosition: "Entry " + input.selectedSourceSense.selectedSense.entryIndex + " · Sense " + input.selectedSourceSense.selectedSense.senseIndex,
+          sourceId: sourceContent.target.selectedSense.sourceIds[0],
+          claimLayer: "SOURCE_FACT",
+          evidenceStatus: "CITATION_ENTERED_UNVERIFIED",
+        }
+      : null,
+    alternatives,
+    computedVoiceOperations: input.evaluation.ok && !finalReasonCodes.some((reason) => reason === "SYMBOLIC_EVALUATION_TARGET_MISMATCH")
+      ? exploratory.computedContributions
+      : [],
     exactCodePoints,
     writtenVoices,
-    selectedSpectrumInputs,
-    computedChain,
-    crossSourceTargetFormMatch,
-    crossSourceSenseAlignment: "UNKNOWN_OR_NULL",
-    unresolvedMaterial: [...new Set(unresolvedMaterial)].sort(),
-    reasonCodes: valid ? [] : reasonCodes,
-    bridgeClaimLayer: "EXPLORATORY_HYPOTHESIS",
-    bridgeEvidenceStatus: "USER_PROPOSED",
+    overlappingVoiceEvents,
+    derivativeFamilySupport: DA_FREE_OPERATOR_PROFILE_V0_1.derivativeFamilySupport.forms.map((form) => ({
+      form,
+      categories: DA_FREE_OPERATOR_PROFILE_V0_1.derivativeFamilySupport.categories,
+    })),
+    homophoneCollisionAlternatives: DA_FREE_OPERATOR_PROFILE_V0_1.homophoneCollisions.flatMap((collision) =>
+      collision.forms.map((form) => ({ form, glossTerms: collision.glossTerms, categories: collision.categories })),
+    ),
+    functionalReading,
+    reasoningTrace,
+    unresolvedMaterial,
+    reasonCodes: finalReasonCodes,
+    targetMappingClaimLayer: "EXPLORATORY_HYPOTHESIS",
+    targetMappingEvidenceStatus: selectedOccurrenceId ? "USER_PROPOSED" : "NOT_SELECTED",
     wholeWordStatus: "PARTIAL_NULL",
     sourceAuthorityPromotion: "NONE",
     historicalOrigin: "NOT_CLAIMED",
