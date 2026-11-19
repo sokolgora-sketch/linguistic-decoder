@@ -3,9 +3,12 @@ import {
   buildCurrentWordDaAnchoredEmbryoCandidateV0_1,
   buildCurrentWordExploratoryMotivationV0_1,
   buildCurrentWordSourceFunctionalSuggestionV0_1,
+  projectFreeOperatorFamilyFunctionalNetworkV0_1,
   type CurrentWordSourceFunctionalSuggestionDraftV0_1,
   type RuntimeAlbanianSourceSenseSelectionV0_1,
 } from "@/ui/instrument/sections/currentWordSourceFunctionalSuggestionAdapter.v0_1";
+import { DA_FREE_OPERATOR_PROFILE_V0_1 } from "@/shared/freeOperatorProfile.v0_1";
+import { PROTO_ROOTS_V1 } from "@/shared/protoRoots.v1";
 import { CurrentWordSourceFunctionalSuggestionV0_1 } from "@/ui/instrument/sections/CurrentWordSourceFunctionalSuggestionV0_1";
 import { CurrentWordSymbolicDraftV0_1, buildCurrentWordSymbolicDraftProjectionV0_1 } from "@/ui/instrument/sections/CurrentWordSymbolicDraftV0_1";
 import type { SymbolicFunctionalCompositionResultV0_3 } from "@/shared/openInstrument/symbolicFunctionalComposition.v0_3";
@@ -215,11 +218,52 @@ describe("current-word source functional suggestion v0.1", () => {
       noSingleWinner: true,
       userDecisionPosture: "user_decides",
     });
-    expect(generated.candidates[0].functionalReading).toContain(
-      "DA “to split, cut, divide” → a dividing/separating action → the source sense “division; separation”",
-    );
-    expect(generated.candidates[0].functionalReading).toContain("ndaj · ndarë · ndare");
-    expect(generated.candidates[0].functionalReading).toContain("does not establish a morpheme boundary");
+    expect(generated.candidates[0].familyNetwork).toMatchObject({
+      status: "CONDITIONAL_FAMILY_READING",
+      embryo: {
+        form: "da",
+        functionText: "to split, cut, divide",
+        sourceStatus: "reviewed_accepted",
+        claimLayer: "SOURCE_FACT",
+      },
+      directForms: expect.arrayContaining([
+        expect.objectContaining({ form: "daj", profileClassification: "DIRECT_FREE_OPERATOR_FORM" }),
+      ]),
+      derivativeFamilyForms: expect.arrayContaining([
+        expect.objectContaining({ form: "ndaj", profileClassification: "DERIVATIVE_FAMILY_SUPPORT" }),
+        expect.objectContaining({ form: "ndarë", profileClassification: "DERIVATIVE_FAMILY_SUPPORT" }),
+      ]),
+      target: {
+        exactForm: "NDARJE",
+        senseText: "division; separation",
+        sourceIdentity: sourceFact.sourceRecordId,
+        evidenceStatus: "OBSERVED_EXTERNAL_SNAPSHOT",
+        claimLayer: "SOURCE_FACT",
+      },
+      claimLayer: "EXPLORATORY_HYPOTHESIS",
+      evidenceStatus: "GENERATED_UNSELECTED_CANDIDATE",
+      selectionStatus: "UNSELECTED",
+      wholeWordStatus: "PARTIAL_NULL",
+      sourceAuthorityPromotion: "NONE",
+      historicalOrigin: "NOT_CLAIMED",
+      noSingleWinner: true,
+      userDecisionPosture: "user_decides",
+    });
+    expect(generated.candidates[0].familyNetwork.functionalEquation).toContain("to split, cut, divide");
+    expect(generated.candidates[0].familyNetwork.functionalEquation).toContain("NDARJE sense “division; separation”");
+    expect(generated.candidates[0].functionalReading).toContain("divide / share");
+    expect(generated.candidates[0].functionalReading).toContain("divided");
+    expect(generated.candidates[0].functionalReading).toContain("action-to-possible-result reading");
+    expect(generated.candidates[0].functionalReading).toContain("could remain meaningful across the profile-listed forms");
+    expect(generated.candidates[0].functionalReading).toContain("does not establish that the forms descend from one another");
+    expect(generated.candidates[0].functionalReading).toContain("NDARJE has this morphology");
+    expect(generated.candidates[0].familyNetwork.directForms.find(({ form }) => form === "daj")?.carrierAnnotation).toMatchObject({
+      gloss: "split / divide",
+      claimLayer: "EXPLORATORY_HYPOTHESIS",
+      evidenceStatus: "CANDIDATE_CARRIER_ANNOTATION_NOT_SOURCE_FACT",
+      sourceIds: [],
+    });
+    expect(generated.candidates[0].familyNetwork.derivativeFamilyForms.find(({ form }) => form === "ndare")?.carrierAnnotation).toBeNull();
     expect(candidate.exactCodePoints).toEqual(
       Array.from("NDARJE").map((character, position) => ({ character, position })),
     );
@@ -234,6 +278,78 @@ describe("current-word source functional suggestion v0.1", () => {
       "A@2 symbolic role UNKNOWN_OR_NULL; written Voice preserved",
       "E@5 symbolic role UNKNOWN_OR_NULL; written Voice preserved",
     ]));
+  });
+
+  it("reuses the generic family projection for NDAJ but keeps its whole-word sense Null without exact-source evidence", () => {
+    const candidate = generatedDaCandidate();
+    if (!candidate.standaloneEvidence) throw new Error("expected the reviewed DA source evidence");
+    const projection = projectFreeOperatorFamilyFunctionalNetworkV0_1({
+      profile: DA_FREE_OPERATOR_PROFILE_V0_1,
+      protoRoot: PROTO_ROOTS_V1.find(({ id }) => id === "DA") ?? null,
+      reviewedEmbryo: candidate.standaloneEvidence,
+      targetForm: "NDAJ",
+      targetSense: null,
+    });
+
+    expect(projection.status).toBe("PARTIAL_NULL");
+    expect(projection.directForms).toEqual(expect.arrayContaining([
+      expect.objectContaining({ form: "daj", profileClassification: "DIRECT_FREE_OPERATOR_FORM" }),
+    ]));
+    expect(projection.derivativeFamilyForms).toEqual(expect.arrayContaining([
+      expect.objectContaining({
+        form: "ndaj",
+        profileClassification: "DERIVATIVE_FAMILY_SUPPORT",
+        carrierAnnotation: expect.objectContaining({
+          gloss: "divide / share",
+          claimLayer: "EXPLORATORY_HYPOTHESIS",
+          sourceIds: [],
+        }),
+      }),
+    ]));
+    expect(projection.target).toBeNull();
+    expect(projection.functionalEquation).toBeNull();
+    expect(projection.explanation).toBeNull();
+    expect(projection.reasonCodes).toContain("EXACT_TARGET_SOURCE_SENSE_NOT_AVAILABLE");
+    expect(projection.wholeWordStatus).toBe("PARTIAL_NULL");
+  });
+
+  it("shows the staged DA-family explanation automatically without selecting a sense, DA mapping, or Voice operator", () => {
+    render(
+      <CurrentWordSourceFunctionalSuggestionV0_1
+        analyzedWord="NDARJE"
+        draftTargetWord="NDARJE"
+        language="Albanian"
+        variety="Standard Albanian"
+        identityMatches
+        sourceFacts={[exactNdarjeSourceFact({
+          senses: [{ senseId: "ndarje-sense-1", glosses: ["division; separation"] }],
+        })]}
+      />,
+    );
+
+    const network = screen.getByTestId("current-word-da-family-functional-network");
+    expect(network).toHaveTextContent("DA");
+    expect(network).toHaveTextContent("DAJ");
+    expect(network).toHaveTextContent("NDAJ");
+    expect(network).toHaveTextContent("NDARË");
+    expect(network).toHaveTextContent("divided");
+    expect(network).toHaveTextContent("NDARJE");
+    expect(network).toHaveTextContent("division; separation");
+    expect(network).toHaveTextContent("EXPLORATORY_HYPOTHESIS");
+    expect(network).toHaveTextContent("UNSELECTED");
+    expect(network).toHaveTextContent("PARTIAL_NULL");
+    expect(network).toHaveTextContent("sourceAuthorityPromotion NONE");
+    expect(network).toHaveTextContent("historicalOrigin NOT_CLAIMED");
+    expect(network).toHaveTextContent("no_single_winner / user_decides");
+    expect(screen.getByTestId("current-word-da-candidate-structure")).toHaveTextContent(
+      "N@0 · D@1 · A@2 · R@3 · J@4 · E@5 · written Voices A@2 → E@5",
+    );
+    expect(screen.getByLabelText("Propose DA at code-point span 1 to 3")).not.toBeChecked();
+    expect(screen.getByTestId("current-word-source-functional-manual-fallback")).not.toHaveAttribute("open");
+    const unresolved = screen.getByTestId("current-word-da-generated-unresolved");
+    expect(unresolved).toHaveTextContent("N@0 functional association UNKNOWN_OR_NULL");
+    expect(unresolved).toHaveTextContent("R@3 functional association UNKNOWN_OR_NULL");
+    expect(unresolved).toHaveTextContent("J@4 functional association UNKNOWN_OR_NULL");
   });
 
   it.each([

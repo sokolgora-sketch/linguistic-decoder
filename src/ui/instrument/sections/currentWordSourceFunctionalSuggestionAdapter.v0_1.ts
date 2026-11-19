@@ -9,8 +9,12 @@ import { extractSevenVowelsFromString } from "@/shared/math7.core";
 import { classifyFreeOperatorEvidenceV0_1 } from "@/shared/freeOperatorEvidence.v0_1";
 import {
   DA_FREE_OPERATOR_PROFILE_V0_1,
+  freeOperatorProfileFormMatchesV0_1,
   freeOperatorProfileGlossMatchesV0_1,
+  type FreeOperatorProfileV0_1,
+  type FreeOperatorProfileTermSetV0_1,
 } from "@/shared/freeOperatorProfile.v0_1";
+import { PROTO_ROOTS_V1, type ProtoRoot } from "@/shared/protoRoots.v1";
 import { canonicalOperatorProfilesV0_1 } from "@/shared/canonicalOperatorProfile.v0_1";
 import { reviewedExternalLexiconSourceRowCandidateRegistryV0_1 } from "@/shared/reviewedExternalLexiconSourceRowRegistry.v0_1";
 import {
@@ -428,6 +432,7 @@ export type CurrentWordDaFunctionalMotivationCandidateV0_1 = Readonly<{
   targetSenseId: string | null;
   targetSenseGlosses: readonly string[];
   familySupport: readonly Readonly<{ form: string; categories: readonly string[] }>[];
+  familyNetwork: FreeOperatorFamilyFunctionalNetworkProjectionV0_1;
   functionalReading: string;
   claimLayer: "EXPLORATORY_HYPOTHESIS";
   generatedBy: "DA_REVIEWED_SOURCE_PLUS_EXACT_FORM";
@@ -467,6 +472,221 @@ export type CurrentWordDaStandaloneEvidenceV0_1 = Readonly<{
   claimLayer: "SOURCE_FACT";
   freeOperatorCategories: readonly string[];
 }>;
+
+export type FreeOperatorFamilyFormProjectionV0_1 = Readonly<{
+  form: string;
+  profileClassification: "DIRECT_FREE_OPERATOR_FORM" | "DERIVATIVE_FAMILY_SUPPORT";
+  profileCategories: readonly string[];
+  profileGlossTerms: readonly string[];
+  carrierAnnotation: Readonly<{
+    gloss: string;
+    dialect: string | null;
+    claimLayer: "EXPLORATORY_HYPOTHESIS";
+    evidenceStatus: "CANDIDATE_CARRIER_ANNOTATION_NOT_SOURCE_FACT";
+    sourceIds: readonly [];
+  }> | null;
+}>;
+
+export type FreeOperatorFamilyFunctionalNetworkProjectionV0_1 = Readonly<{
+  status: "CONDITIONAL_FAMILY_READING" | "PARTIAL_NULL";
+  operator: string;
+  embryo: Readonly<{
+    form: string;
+    functionText: string;
+    sourceId: string;
+    sourceStatus: "reviewed_accepted";
+    claimLayer: "SOURCE_FACT";
+  }>;
+  directForms: readonly FreeOperatorFamilyFormProjectionV0_1[];
+  derivativeFamilyForms: readonly FreeOperatorFamilyFormProjectionV0_1[];
+  target: Readonly<{
+    exactForm: string;
+    senseText: string;
+    sourceIdentity: string;
+    evidenceStatus: "CITATION_ENTERED_UNVERIFIED" | "OBSERVED_EXTERNAL_SNAPSHOT";
+    claimLayer: "SOURCE_FACT";
+  }> | null;
+  functionalEquation: string | null;
+  explanation: string | null;
+  claimLayer: "EXPLORATORY_HYPOTHESIS";
+  evidenceStatus: "GENERATED_UNSELECTED_CANDIDATE";
+  selectionStatus: "UNSELECTED";
+  wholeWordStatus: "PARTIAL_NULL";
+  unresolvedMaterial: readonly string[];
+  reasonCodes: readonly string[];
+  sourceAuthorityPromotion: "NONE";
+  historicalOrigin: "NOT_CLAIMED";
+  noSingleWinner: true;
+  userDecisionPosture: "user_decides";
+}>;
+
+type FreeOperatorFamilyFunctionalNetworkInputV0_1 = Readonly<{
+  profile: FreeOperatorProfileV0_1;
+  protoRoot: ProtoRoot | null;
+  reviewedEmbryo: CurrentWordDaStandaloneEvidenceV0_1;
+  targetForm: string;
+  targetSense: Readonly<{
+    exactSourceForm: string;
+    glosses: readonly string[];
+    sourceIdentity: string;
+    evidenceStatus: "CITATION_ENTERED_UNVERIFIED" | "OBSERVED_EXTERNAL_SNAPSHOT";
+  }> | null;
+}>;
+
+function familyFormProjectionsV0_1(
+  protoRoot: ProtoRoot | null,
+  termSet: FreeOperatorProfileTermSetV0_1,
+  profileClassification: FreeOperatorFamilyFormProjectionV0_1["profileClassification"],
+): FreeOperatorFamilyFormProjectionV0_1[] {
+  return termSet.forms.map((form) => {
+    const carrier = protoRoot?.carriers.find(({ lang, form: carrierForm }) =>
+      lang === "sq" && sameAlbanianSourceForm(carrierForm, form),
+    );
+    const gloss = carrier?.gloss?.normalize("NFC").trim() ?? "";
+    return {
+      form,
+      profileClassification,
+      profileCategories: termSet.categories,
+      profileGlossTerms: termSet.glossTerms,
+      carrierAnnotation: gloss
+        ? {
+            gloss,
+            dialect: carrier?.dialect ?? null,
+            claimLayer: "EXPLORATORY_HYPOTHESIS" as const,
+            evidenceStatus: "CANDIDATE_CARRIER_ANNOTATION_NOT_SOURCE_FACT" as const,
+            sourceIds: [] as const,
+          }
+        : null,
+    };
+  });
+}
+
+/**
+ * Projects existing operator-profile and carrier records into a family-level
+ * functional proposal. Registry membership is shown as profile data; carrier
+ * glosses remain exploratory annotations and never establish morphology.
+ */
+export function projectFreeOperatorFamilyFunctionalNetworkV0_1(
+  input: FreeOperatorFamilyFunctionalNetworkInputV0_1,
+): FreeOperatorFamilyFunctionalNetworkProjectionV0_1 {
+  const directForms = familyFormProjectionsV0_1(
+    input.protoRoot,
+    input.profile.directFreeOperator,
+    "DIRECT_FREE_OPERATOR_FORM",
+  );
+  const derivativeFamilyForms = familyFormProjectionsV0_1(
+    input.protoRoot,
+    input.profile.derivativeFamilySupport,
+    "DERIVATIVE_FAMILY_SUPPORT",
+  );
+  const reasons: string[] = [];
+  const directFormMatches = freeOperatorProfileFormMatchesV0_1(
+    input.profile.directFreeOperator.forms,
+    input.reviewedEmbryo.sourceForm,
+  );
+  const reviewedFunctionMatches = freeOperatorProfileGlossMatchesV0_1(
+    input.profile.directFreeOperator.glossTerms,
+    input.reviewedEmbryo.attestedGloss,
+  );
+  if (!input.protoRoot || !freeOperatorProfileFormMatchesV0_1([input.profile.operator], input.protoRoot.id)) {
+    reasons.push("FREE_OPERATOR_PROFILE_ROOT_RECORD_MISMATCH");
+  }
+  if (!directFormMatches || input.reviewedEmbryo.sourceStatus !== "reviewed_accepted") {
+    reasons.push("REVIEWED_EMBRYO_NOT_IN_DIRECT_PROFILE_FORMS");
+  }
+  if (!reviewedFunctionMatches) reasons.push("REVIEWED_EMBRYO_FUNCTION_OUTSIDE_PROFILE_DOMAIN");
+  if (!derivativeFamilyForms.length) reasons.push("DERIVATIVE_FAMILY_SUPPORT_NOT_AVAILABLE");
+  const resultStateCarrier = derivativeFamilyForms.find(({ carrierAnnotation }) =>
+    carrierAnnotation?.gloss.trim().toLocaleLowerCase("en-US") === "divided",
+  ) ?? null;
+  if (!resultStateCarrier) reasons.push("CANDIDATE_RESULT_STATE_CARRIER_NOT_AVAILABLE");
+  if (!input.targetSense) {
+    reasons.push("EXACT_TARGET_SOURCE_SENSE_NOT_AVAILABLE");
+  } else {
+    if (!sameAlbanianSourceForm(input.targetSense.exactSourceForm, input.targetForm)) {
+      reasons.push("EXACT_TARGET_SOURCE_FORM_MISMATCH");
+    }
+    if (!input.targetSense.sourceIdentity.trim()) reasons.push("EXACT_TARGET_SOURCE_IDENTITY_NOT_AVAILABLE");
+    if (!input.targetSense.glosses.some((gloss) => gloss.trim())) {
+      reasons.push("EXACT_TARGET_SOURCE_SENSE_GLOSS_NOT_AVAILABLE");
+    }
+    if (!input.targetSense.glosses.some((gloss) =>
+      freeOperatorProfileGlossMatchesV0_1(
+        [...input.profile.directFreeOperator.glossTerms, ...input.profile.derivativeFamilySupport.glossTerms],
+        gloss,
+      ),
+    )) {
+      reasons.push("TARGET_SENSE_OUTSIDE_PROFILE_FUNCTION_DOMAIN");
+    }
+  }
+
+  const targetSenseText = input.targetSense?.glosses.join("; ") ?? "";
+  const target = input.targetSense && targetSenseText
+    ? {
+        exactForm: input.targetSense.exactSourceForm,
+        senseText: targetSenseText,
+        sourceIdentity: input.targetSense.sourceIdentity,
+        evidenceStatus: input.targetSense.evidenceStatus,
+        claimLayer: "SOURCE_FACT" as const,
+      }
+    : null;
+  const familyCarrierAnnotations = [...directForms, ...derivativeFamilyForms]
+    .flatMap(({ form, carrierAnnotation }) => carrierAnnotation
+      ? [`${form.toLocaleUpperCase("sq-AL")} “${carrierAnnotation.gloss}”`]
+      : []);
+  const familyFormsText = [
+    directForms.length
+      ? `direct profile forms ${directForms.map(({ form }) => form.toLocaleUpperCase("sq-AL")).join(" / ")}`
+      : "direct profile forms UNKNOWN_OR_NULL",
+    derivativeFamilyForms.length
+      ? `derivative-family support ${derivativeFamilyForms.map(({ form }) => form.toLocaleUpperCase("sq-AL")).join(" / ")}`
+      : "derivative-family support UNKNOWN_OR_NULL",
+  ].join("; ");
+  const familyGlossesText = familyCarrierAnnotations.join("; ") || "UNKNOWN_OR_NULL";
+  const targetFormLabel = target?.exactForm.toLocaleUpperCase("sq-AL") ?? input.targetForm.toLocaleUpperCase("sq-AL");
+  const resultStateText = resultStateCarrier?.carrierAnnotation
+    ? `${resultStateCarrier.form.toLocaleUpperCase("sq-AL")} “${resultStateCarrier.carrierAnnotation.gloss}”`
+    : "UNKNOWN_OR_NULL";
+  const explanation = target && !reasons.length
+    ? `The reviewed ${input.reviewedEmbryo.dialect} source gives ${input.reviewedEmbryo.sourceForm.toLocaleUpperCase("sq-AL")} the function “${input.reviewedEmbryo.attestedGloss}.” The operator profile records ${familyFormsText}; separate ProtoRoots candidate annotations include ${familyGlossesText}. Read together, they support an exploratory action-to-possible-result reading: the split/divide action can be considered alongside the family note ${resultStateText} and the exact-form sense “${target.senseText}” in ${targetFormLabel}. This explains how the function could remain meaningful across the profile-listed forms, while leaving every family relation exploratory; it does not establish that the forms descend from one another or that ${targetFormLabel} has this morphology.`
+    : null;
+  const functionalEquation = target && !reasons.length
+    ? `FUNCTIONAL READING · “${input.reviewedEmbryo.attestedGloss}” action → ${familyFormsText} → possible result-state note ${resultStateText} → ${targetFormLabel} sense “${target.senseText}” · proposed functional relation, not a morphological sequence`
+    : null;
+  const finalReasons = [...new Set(reasons)].sort();
+  return {
+    status: !finalReasons.length && target && explanation && functionalEquation
+      ? "CONDITIONAL_FAMILY_READING"
+      : "PARTIAL_NULL",
+    operator: input.profile.operator.toLocaleUpperCase("sq-AL"),
+    embryo: {
+      form: input.reviewedEmbryo.sourceForm,
+      functionText: input.reviewedEmbryo.attestedGloss,
+      sourceId: input.reviewedEmbryo.sourceId,
+      sourceStatus: input.reviewedEmbryo.sourceStatus,
+      claimLayer: "SOURCE_FACT",
+    },
+    directForms,
+    derivativeFamilyForms,
+    target,
+    functionalEquation,
+    explanation,
+    claimLayer: "EXPLORATORY_HYPOTHESIS",
+    evidenceStatus: "GENERATED_UNSELECTED_CANDIDATE",
+    selectionStatus: "UNSELECTED",
+    wholeWordStatus: "PARTIAL_NULL",
+    unresolvedMaterial: [
+      "Profile membership and carrier annotations do not establish a linear morphological or historical derivation",
+      "Target internal segmentation remains UNKNOWN_OR_NULL",
+      "Target-specific source-to-family relation remains an EXPLORATORY_HYPOTHESIS",
+    ],
+    reasonCodes: finalReasons,
+    sourceAuthorityPromotion: "NONE",
+    historicalOrigin: "NOT_CLAIMED",
+    noSingleWinner: true,
+    userDecisionPosture: "user_decides",
+  };
+}
 
 export type CurrentWordDaAnchoredEmbryoCandidateProjectionV0_1 = Readonly<{
   status: "CANDIDATE_AVAILABLE" | "CONDITIONAL_PROPOSAL" | "PARTIAL_NULL";
@@ -670,10 +890,8 @@ function generatedDaFunctionalMotivationV0_1(input: Readonly<{
   }
 
   const candidates = !hardReasonCodes.length && input.sourceResolution
-    ? input.occurrences.flatMap((occurrence) => matchingSourceSenses.map((senseRecord) => {
+    ? input.occurrences.flatMap((occurrence) => matchingSourceSenses.flatMap((senseRecord) => {
           const targetSenseGlosses = senseRecord.glosses;
-          const familyForms = DA_FREE_OPERATOR_PROFILE_V0_1.derivativeFamilySupport.forms.join(" · ");
-          const targetSenseLabel = targetSenseGlosses.join("; ");
           const targetSource = senseRecord.provider === "KAIKKI"
             ? {
                 provider: "KAIKKI" as const,
@@ -702,13 +920,34 @@ function generatedDaFunctionalMotivationV0_1(input: Readonly<{
           const sourceIdentity = senseRecord.provider === "KAIKKI"
             ? senseRecord.sourceFact.sourceRecordId
             : `fjalorishqip:${canonicalQueryForm}:entry-${senseRecord.sense.entryIndex}:sense-${senseRecord.sense.senseIndex}`;
-          const sourceDescription = senseRecord.provider === "KAIKKI"
-            ? `the exact-form Kaikki source record ${senseRecord.sourceFact.sourceRecordId} (${senseRecord.sourceFact.entryLocator})`
-            : `the FjaloriShqip response for ${senseRecord.sourceResponse.exactSourceForm}, Entry ${senseRecord.sense.entryIndex} · Sense ${senseRecord.sense.senseIndex} (response position, not a source-issued sense ID; citation entered unverified; licensing not assessed)`;
+          const targetExactSourceForm = senseRecord.provider === "KAIKKI"
+            ? senseRecord.sourceFact.form
+            : senseRecord.sourceResponse.exactSourceForm;
+          const familyNetwork = projectFreeOperatorFamilyFunctionalNetworkV0_1({
+            profile: DA_FREE_OPERATOR_PROFILE_V0_1,
+            protoRoot: PROTO_ROOTS_V1.find(({ id }) =>
+              freeOperatorProfileFormMatchesV0_1([DA_FREE_OPERATOR_PROFILE_V0_1.operator], id),
+            ) ?? null,
+            reviewedEmbryo: input.sourceResolution!.evidence,
+            targetForm: input.analyzedWord,
+            targetSense: {
+              exactSourceForm: targetExactSourceForm,
+              glosses: targetSenseGlosses,
+              sourceIdentity,
+              evidenceStatus: senseRecord.provider === "KAIKKI"
+                ? "OBSERVED_EXTERNAL_SNAPSHOT"
+                : "CITATION_ENTERED_UNVERIFIED",
+            },
+          });
+          if (familyNetwork.status !== "CONDITIONAL_FAMILY_READING" || !familyNetwork.explanation) {
+            reasonCodes.push(...familyNetwork.reasonCodes.map((reason) => `DA_FAMILY_NETWORK_${reason}`));
+            return [];
+          }
           const unresolvedMaterial = [
             `${occurrence.exactSurface}@${occurrence.span.start}-${occurrence.span.end} is observed spelling structure, not an established morpheme boundary`,
-            "The DA-to-target functional relationship is an unselected exploratory hypothesis, not a source-reported derivation",
+            "The DA-family-to-target functional relationship is an unselected exploratory hypothesis, not a source-reported derivation",
             "Internal segmentation and morphology remain UNKNOWN_OR_NULL",
+            ...familyNetwork.unresolvedMaterial,
             ...input.exactCodePoints
               .filter(({ position, character }) =>
                 (position < occurrence.span.start || position >= occurrence.span.end) &&
@@ -718,19 +957,19 @@ function generatedDaFunctionalMotivationV0_1(input: Readonly<{
             ...input.writtenVoices.map(({ voice, position }) => `${voice}@${position} symbolic role UNKNOWN_OR_NULL; written Voice preserved`),
             "Complete whole-word functional derivation remains UNKNOWN_OR_NULL",
           ];
-          return {
+          return [{
             candidateId: `da-functional:${sourceIdentity}:${senseRecord.senseOrdinal}:${occurrence.span.start}-${occurrence.span.end}`,
             occurrence,
             targetSource,
             targetSenseOrdinal: senseRecord.senseOrdinal,
             targetSenseId: senseRecord.senseId,
             targetSenseGlosses,
+            familyNetwork,
             familySupport: DA_FREE_OPERATOR_PROFILE_V0_1.derivativeFamilySupport.forms.map((form) => ({
               form,
               categories: DA_FREE_OPERATOR_PROFILE_V0_1.derivativeFamilySupport.categories,
             })),
-            functionalReading:
-              `The reviewed standalone Gheg source reports DA (“${input.sourceResolution!.evidence.attestedGloss}”). ${sourceDescription} reports the target sense “${targetSenseLabel}”; the DA profile separately lists ${familyForms || "UNKNOWN_OR_NULL"} as derivative-family support, not as a source-reported relation to ${input.analyzedWord}. Conditional functional path: DA “${input.sourceResolution!.evidence.attestedGloss}” → a dividing/separating action → the source sense “${targetSenseLabel}”, when that sense denotes division, separation, or a result of dividing. The observed DA span [${occurrence.span.start},${occurrence.span.end}) is structural only. This generated EXPLORATORY_HYPOTHESIS does not establish a morpheme boundary, target derivation, or historical origin; other target material and symbolic Voice roles remain unresolved.`,
+            functionalReading: familyNetwork.explanation,
             claimLayer: "EXPLORATORY_HYPOTHESIS" as const,
             generatedBy: "DA_REVIEWED_SOURCE_PLUS_EXACT_FORM" as const,
             selectionStatus: "UNSELECTED" as const,
@@ -740,7 +979,7 @@ function generatedDaFunctionalMotivationV0_1(input: Readonly<{
             historicalOrigin: "NOT_CLAIMED" as const,
             noSingleWinner: true as const,
             userDecisionPosture: "user_decides" as const,
-          };
+          }];
         }))
     : [];
 

@@ -682,9 +682,13 @@ describe("current-word symbolic draft v0.1", () => {
     expect(firstGenerated.getByTestId("current-word-da-generated-source-sense")).toHaveTextContent("SOURCE_FACT");
     expect(firstGenerated.getByTestId("current-word-da-generated-source-sense")).toHaveTextContent("fixture:ndarje");
     expect(firstGenerated.getByTestId("current-word-da-generated-structure")).toHaveTextContent("DA span [1,3)");
-    expect(firstGenerated.getByTestId("current-word-da-generated-functional-reading")).toHaveTextContent(
-      "DA “to split, cut, divide” → a dividing/separating action → the source sense “division; separation”",
+    const generatedFamilyReadings = screen.getAllByTestId("current-word-da-generated-functional-reading");
+    expect(generatedFamilyReadings).toHaveLength(2);
+    expect(generatedFamilyReadings[0]).toHaveTextContent(
+      "The reviewed Gheg Albanian source gives DA the function “to split, cut, divide.”",
     );
+    expect(generatedFamilyReadings[0]).toHaveTextContent("action-to-possible-result reading");
+    expect(generatedFamilyReadings[0]).toHaveTextContent("NDARJE");
     expect(firstGenerated.getByTestId("current-word-da-generated-claim-boundary")).toHaveTextContent("UNSELECTED");
     expect(firstGenerated.getByTestId("current-word-da-generated-claim-boundary")).toHaveTextContent("PARTIAL_NULL");
     expect(firstGenerated.getByTestId("current-word-da-generated-claim-boundary")).toHaveTextContent("no_single_winner / user_decides");
@@ -730,9 +734,13 @@ describe("current-word symbolic draft v0.1", () => {
     expect(within(generated[0]).getByTestId("current-word-da-generated-fjalori-provenance")).toHaveTextContent("CC BY-SA 4.0");
     expect(within(generated[0]).getByTestId("current-word-da-generated-fjalori-provenance")).toHaveTextContent("CITATION_ENTERED_UNVERIFIED");
     expect(within(generated[0]).getByTestId("current-word-da-generated-fjalori-provenance")).toHaveTextContent("NOT_ASSESSED");
-    expect(within(generated[0]).getByTestId("current-word-da-generated-functional-reading")).toHaveTextContent(
-      "DA “to split, cut, divide” → a dividing/separating action → the source sense “division; separation”",
+    const generatedFamilyReadings = screen.getAllByTestId("current-word-da-generated-functional-reading");
+    expect(generatedFamilyReadings.length).toBeGreaterThan(0);
+    expect(generatedFamilyReadings[0]).toHaveTextContent(
+      "The reviewed Gheg Albanian source gives DA the function “to split, cut, divide.”",
     );
+    expect(generatedFamilyReadings[0]).toHaveTextContent("action-to-possible-result reading");
+    expect(generatedFamilyReadings[0]).toHaveTextContent("division; separation");
     expect(screen.getByTestId("current-word-da-candidate-structure")).toHaveTextContent("N@0 · D@1 · A@2 · R@3 · J@4 · E@5");
     expect(screen.getByTestId("current-word-da-candidate-structure")).toHaveTextContent("A@2 → E@5");
     expect(screen.getByTestId("current-word-source-suggestion-runtime-status")).toHaveTextContent("SOURCE_NOT_FOUND");
