@@ -7,6 +7,7 @@ import {
   buildCurrentWordSourceFunctionalSuggestionV0_1,
   type CurrentWordSourceFunctionalSuggestionDraftV0_1,
   type RuntimeAlbanianSourceSenseSelectionV0_1,
+  type RuntimeFjaloriSourceResponseV0_1,
 } from "@/ui/instrument/sections/currentWordSourceFunctionalSuggestionAdapter.v0_1";
 import type { AlbanianKaikkiExactLexicalSourceFactV0_1 } from "@/shared/openInstrument/albanianKaikkiServerOnlyExactLexicalSource.v0_1";
 import type { SymbolicFunctionalCompositionResultV0_3 } from "@/shared/openInstrument/symbolicFunctionalComposition.v0_3";
@@ -48,6 +49,7 @@ export function CurrentWordSourceFunctionalSuggestionV0_1({
   runtimeSourceStatus,
   selectedSourceSense = null,
   sourceFacts = [],
+  fjaloriSourceResponse = null,
   evaluation = missingEvaluation,
 }: {
   analyzedWord: string;
@@ -58,6 +60,7 @@ export function CurrentWordSourceFunctionalSuggestionV0_1({
   runtimeSourceStatus?: Readonly<{ status: string; reasonCode?: string | null }>;
   selectedSourceSense?: RuntimeAlbanianSourceSenseSelectionV0_1 | null;
   sourceFacts?: readonly AlbanianKaikkiExactLexicalSourceFactV0_1[];
+  fjaloriSourceResponse?: RuntimeFjaloriSourceResponseV0_1 | null;
   evaluation?: SymbolicFunctionalCompositionResultV0_3;
 }) {
   const contextIdentity = [analyzedWord, draftTargetWord, language, variety]
@@ -123,8 +126,9 @@ export function CurrentWordSourceFunctionalSuggestionV0_1({
     selectedSourceSense,
     evaluation,
     exactSourceFacts: sourceFacts,
+    fjaloriSourceResponse,
     proposedOccurrenceId: currentSelectedDaOccurrenceId,
-  }), [analyzedWord, draftTargetWord, identityMatches, language, variety, selectedSourceSense, sourceFacts, evaluation, currentSelectedDaOccurrenceId]);
+  }), [analyzedWord, draftTargetWord, identityMatches, language, variety, selectedSourceSense, sourceFacts, fjaloriSourceResponse, evaluation, currentSelectedDaOccurrenceId]);
 
   const selectDaOccurrence = (occurrenceId: string, checked: boolean) => {
     setDaProposalStateIdentity(daProposalIdentity);
@@ -139,7 +143,7 @@ export function CurrentWordSourceFunctionalSuggestionV0_1({
     >
       <h4 className="font-semibold text-[#d8e4ca]">Source-linked conditional function suggestion</h4>
       <p className="mt-1 text-[#aeb7c5]">
-        Generated DA candidates use the exact-form Albanian source facts already attached to this analysis, the reviewed standalone DA record, and observed spelling structure. No source sense or interpretation is selected automatically. Optional Voice operations can add a separate symbolic layer; they are not required to see the functional candidate.
+        Generated DA candidates use exact-form lexical senses available from the analysis sources, the reviewed standalone DA record, and observed spelling structure. Provider records remain separate, and no source sense or interpretation is selected automatically. Optional Voice operations can add a separate symbolic layer; they are not required to see the functional candidate.
       </p>
       {daCandidate.occurrences.length ? (
       <div className="mt-2 min-w-0 rounded border border-[#53604a] bg-[#111710] p-2" data-testid="current-word-da-anchored-candidate">
@@ -168,11 +172,21 @@ export function CurrentWordSourceFunctionalSuggestionV0_1({
             {daCandidate.generatedFunctionalMotivation.candidates.map((candidate) => (
               <article key={candidate.candidateId} className="min-w-0 rounded border border-[#465b42] bg-[#101710] p-2" data-testid="current-word-da-generated-functional-candidate">
                 <p className="break-words" data-testid="current-word-da-generated-source-sense">
-                  SOURCE_FACT · exact target form {candidate.sourceFact.form} · {candidate.sourceFact.sourceStatus} · attestation {candidate.sourceFact.attestationTruth} · sense {candidate.targetSenseOrdinal}: {candidate.targetSenseGlosses.join("; ")} · {candidate.sourceFact.sourceRecordId} · {candidate.sourceFact.entryLocator}.
+                  {candidate.targetSource.provider === "KAIKKI" ? (
+                    <>SOURCE_FACT · Kaikki exact target form {candidate.targetSource.sourceFact.form} · {candidate.targetSource.sourceFact.sourceStatus} · attestation {candidate.targetSource.sourceFact.attestationTruth} · sense {candidate.targetSource.senseOrdinal}: {candidate.targetSenseGlosses.join("; ")} · {candidate.targetSource.sourceFact.sourceRecordId} · {candidate.targetSource.sourceFact.entryLocator}.</>
+                  ) : (
+                    <>SOURCE_FACT · FjaloriShqip response · response status {candidate.targetSource.responseStatus} · exact target form {candidate.targetSource.exactSourceForm} · Entry {candidate.targetSource.responsePosition.entryIndex} · Sense {candidate.targetSource.responsePosition.senseIndex} (response position, not a source-issued sense ID): {candidate.targetSenseGlosses.join("; ")} · sense attribution {candidate.targetSource.senseSource} · gloss language {candidate.targetSource.glossLanguage} · {candidate.targetSource.partOfSpeech ?? "part of speech UNKNOWN_OR_NULL"}.</>
+                  )}
                 </p>
-                <p className="mt-1 break-all text-[10px] text-[#aeb7c5]">
-                  Source snapshot {candidate.sourceFact.sourceSnapshot.sourceFamilyId} · SHA-256 {candidate.sourceFact.sourceSnapshot.sha256} · {candidate.sourceFact.sourceSnapshot.sourceUrl}
-                </p>
+                {candidate.targetSource.provider === "KAIKKI" ? (
+                  <p className="mt-1 break-all text-[10px] text-[#aeb7c5]">
+                    Source snapshot {candidate.targetSource.sourceFact.sourceSnapshot.sourceFamilyId} · SHA-256 {candidate.targetSource.sourceFact.sourceSnapshot.sha256} · {candidate.targetSource.sourceFact.sourceSnapshot.sourceUrl}
+                  </p>
+                ) : (
+                  <p className="mt-1 break-all text-[10px] text-[#aeb7c5]" data-testid="current-word-da-generated-fjalori-provenance">
+                    Record sources {candidate.targetSource.recordSources.join(" · ") || "UNKNOWN_OR_NULL"} · entry sources {candidate.targetSource.entrySources.join(" · ") || "UNKNOWN_OR_NULL"} · tags {candidate.targetSource.tags.join(" · ") || "UNKNOWN_OR_NULL"} · licence {candidate.targetSource.licence} · citation {candidate.targetSource.citationStatus} · licensing {candidate.targetSource.licensingStatus} · <a className="underline" href={candidate.targetSource.apiUrl} target="_blank" rel="noreferrer">source response</a>
+                  </p>
+                )}
                 <p className="mt-1 break-words text-[10px] text-[#aeb7c5]" data-testid="current-word-da-generated-structure">
                   DERIVED_STRUCTURE · exact DA span [{candidate.occurrence.span.start},{candidate.occurrence.span.end}) in {analyzedWord} · written Voices {daCandidate.writtenVoices.map(({ voice, position }) => `${voice}@${position}`).join(" → ") || "∅"}.
                 </p>

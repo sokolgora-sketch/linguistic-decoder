@@ -45,6 +45,33 @@ export type RuntimeAlbanianSourceSenseSelectionV0_1 = Readonly<{
   alternativeSenses: readonly RuntimeAlbanianSourceSenseRecordV0_1[];
 }>;
 
+export type RuntimeFjaloriSourceResponseV0_1 =
+  | Readonly<{
+      requestKey: string;
+      queryForm: string;
+      status: "available";
+      exactSourceForm: string;
+      apiUrl: string;
+      licence: "CC BY-SA 4.0";
+      analysisLanguage: string;
+      analysisVariety: string;
+      recordSources: readonly string[];
+      senses: readonly RuntimeAlbanianSourceSenseRecordV0_1[];
+    }>
+  | Readonly<{
+      requestKey: string;
+      queryForm: string;
+      status: "loading" | "network-failure" | "timeout" | "unavailable" | "http-not-found" | "http-error" | "invalid";
+      httpStatus: number | null;
+      exactSourceForm: null;
+      apiUrl: string;
+      licence: null;
+      analysisLanguage: string;
+      analysisVariety: string;
+      recordSources: readonly [];
+      senses: readonly [];
+    }>;
+
 export type RuntimeComputedVoiceContributionV0_1 = Readonly<{
   operationId: string;
   voiceEventId: string;
@@ -372,7 +399,31 @@ export type CurrentWordDaAnchoredEmbryoOccurrenceV0_1 = Readonly<{
 export type CurrentWordDaFunctionalMotivationCandidateV0_1 = Readonly<{
   candidateId: string;
   occurrence: CurrentWordDaAnchoredEmbryoOccurrenceV0_1;
-  sourceFact: AlbanianKaikkiExactLexicalSourceFactV0_1;
+  targetSource:
+    | Readonly<{
+        provider: "KAIKKI";
+        sourceFact: AlbanianKaikkiExactLexicalSourceFactV0_1;
+        senseOrdinal: number;
+        senseId: string | null;
+      }>
+    | Readonly<{
+        provider: "FJALORISHQIP";
+        responseStatus: "available";
+        exactSourceForm: string;
+        apiUrl: string;
+        licence: "CC BY-SA 4.0";
+        analysisLanguage: string;
+        analysisVariety: string;
+        recordSources: readonly string[];
+        responsePosition: Readonly<{ entryIndex: number; senseIndex: number }>;
+        partOfSpeech: string | null;
+        glossLanguage: "en" | "sq";
+        senseSource: string;
+        tags: readonly string[];
+        entrySources: readonly string[];
+        citationStatus: "CITATION_ENTERED_UNVERIFIED";
+        licensingStatus: "NOT_ASSESSED";
+      }>;
   targetSenseOrdinal: number;
   targetSenseId: string | null;
   targetSenseGlosses: readonly string[];
@@ -542,16 +593,17 @@ function generatedDaFunctionalMotivationV0_1(input: Readonly<{
   sourceResolution: DaStandaloneSourceResolutionV0_1 | null;
   occurrences: readonly CurrentWordDaAnchoredEmbryoOccurrenceV0_1[];
   sourceFacts: readonly AlbanianKaikkiExactLexicalSourceFactV0_1[];
+  fjaloriSourceResponse: RuntimeFjaloriSourceResponseV0_1 | null;
   exactCodePoints: readonly Readonly<{ character: string; position: number }>[];
   writtenVoices: readonly Readonly<{ voice: string; position: number }>[];
 }>): CurrentWordDaFunctionalMotivationProjectionV0_1 {
-  const reasonCodes: string[] = [];
-  if (!input.analyzedWord || input.draftTargetWord !== input.analyzedWord) reasonCodes.push("CURRENT_WORD_IDENTITY_MISMATCH");
-  if (!input.identityMatches) reasonCodes.push("ANALYSIS_IDENTITY_NOT_CONFIRMED");
-  if (!isAlbanianLanguage(input.language)) reasonCodes.push("TARGET_LANGUAGE_NOT_ALBANIAN");
-  if (!isCompatibleAlbanianVariety(input.variety)) reasonCodes.push("TARGET_VARIETY_REQUIRED");
-  if (!input.sourceResolution) reasonCodes.push("DA_REVIEWED_STANDALONE_SOURCE_NOT_AVAILABLE");
-  if (!input.occurrences.length) reasonCodes.push("DA_EXACT_SUBSTRING_NOT_FOUND");
+  const hardReasonCodes: string[] = [];
+  if (!input.analyzedWord || input.draftTargetWord !== input.analyzedWord) hardReasonCodes.push("CURRENT_WORD_IDENTITY_MISMATCH");
+  if (!input.identityMatches) hardReasonCodes.push("ANALYSIS_IDENTITY_NOT_CONFIRMED");
+  if (!isAlbanianLanguage(input.language)) hardReasonCodes.push("TARGET_LANGUAGE_NOT_ALBANIAN");
+  if (!isCompatibleAlbanianVariety(input.variety)) hardReasonCodes.push("TARGET_VARIETY_REQUIRED");
+  if (!input.sourceResolution) hardReasonCodes.push("DA_REVIEWED_STANDALONE_SOURCE_NOT_AVAILABLE");
+  if (!input.occurrences.length) hardReasonCodes.push("DA_EXACT_SUBSTRING_NOT_FOUND");
 
   const sourceFacts = input.sourceFacts.filter((fact) =>
     fact.language === "Albanian" && fact.languageCode === "sq" &&
@@ -560,36 +612,99 @@ function generatedDaFunctionalMotivationV0_1(input: Readonly<{
     sameAlbanianSourceForm(fact.form, input.analyzedWord) &&
     /^[0-9a-f]{64}$/iu.test(fact.sourceSnapshot.sha256) && fact.sourceSnapshot.bytes > 0,
   );
-  if (!sourceFacts.length) reasonCodes.push("EXACT_TARGET_SOURCE_FACTS_NOT_AVAILABLE");
-  const sourceSenses = sourceFacts.flatMap((sourceFact) =>
-    sourceFact.senses.map((sense, senseIndex) => ({ sourceFact, sense, senseIndex })),
-  );
-  const sourceSensesWithGlosses = sourceSenses.filter(({ sense }) =>
-    sense.glosses.some((gloss) => gloss.trim().length > 0),
-  );
-  if (sourceFacts.length && !sourceSensesWithGlosses.length) {
-    reasonCodes.push("EXACT_TARGET_SOURCE_SENSE_GLOSSES_NOT_AVAILABLE");
+  const response = input.fjaloriSourceResponse;
+  const canonicalQueryForm = response?.queryForm.normalize("NFC").trim().toLocaleLowerCase("sq-AL") ?? "";
+  const fjaloriResponseIdentityValid = response?.status === "available" &&
+    sameAlbanianSourceForm(response.queryForm, input.analyzedWord) &&
+    sameAlbanianSourceForm(response.exactSourceForm, input.analyzedWord) &&
+    response.requestKey === `${response.queryForm}\u0000${canonicalQueryForm}` &&
+    response.licence === "CC BY-SA 4.0" &&
+    response.apiUrl === `https://fjalorishqip.org/api/v1/fjala/${encodeURIComponent(canonicalQueryForm)}.json` &&
+    isAlbanianLanguage(response.analysisLanguage) && isAlbanianLanguage(input.language) &&
+    (!input.variety.trim() || !response.analysisVariety.trim() ||
+      normalizeSourceContext(response.analysisVariety) === normalizeSourceContext(input.variety));
+  const fjaloriSenses = fjaloriResponseIdentityValid && response?.status === "available"
+    ? response.senses.filter((sense) =>
+        Number.isInteger(sense.entryIndex) && sense.entryIndex > 0 &&
+        Number.isInteger(sense.senseIndex) && sense.senseIndex > 0 &&
+        sense.gloss.trim().length > 0 && sense.senseSource.trim().length > 0,
+      ).map((sense) => ({ response, sense }))
+    : [];
+  const sourceSenses = [
+    ...sourceFacts.flatMap((sourceFact) => sourceFact.senses.map((sense, senseIndex) => ({
+      provider: "KAIKKI" as const,
+      sourceFact,
+      sense,
+      senseOrdinal: senseIndex + 1,
+      senseId: sense.senseId ?? null,
+      glosses: sense.glosses.map((gloss) => gloss.trim()).filter(Boolean),
+    }))),
+    ...fjaloriSenses.map(({ response: sourceResponse, sense }) => ({
+      provider: "FJALORISHQIP" as const,
+      sourceResponse,
+      sense,
+      senseOrdinal: sense.senseIndex,
+      senseId: null,
+      glosses: [sense.gloss.trim()],
+    })),
+  ];
+  const sourceSensesWithGlosses = sourceSenses.filter(({ glosses }) => glosses.length > 0);
+  const reasonCodes: string[] = [...hardReasonCodes];
+  if (response?.status === "available" && !fjaloriResponseIdentityValid) {
+    reasonCodes.push("FJALORISHQIP_SOURCE_IDENTITY_OR_PROVENANCE_INVALID");
   }
+  if (response && response.status !== "available" && !sourceFacts.length) {
+    reasonCodes.push(`FJALORISHQIP_SOURCE_${response.status.replaceAll("-", "_").toLocaleUpperCase("en-US")}`);
+  }
+  if (!sourceSenses.length) reasonCodes.push("EXACT_TARGET_SOURCE_FACTS_NOT_AVAILABLE");
+  else if (!sourceSensesWithGlosses.length) reasonCodes.push("EXACT_TARGET_SOURCE_SENSE_GLOSSES_NOT_AVAILABLE");
   const daFunctionalGlossTerms = [
     ...DA_FREE_OPERATOR_PROFILE_V0_1.directFreeOperator.glossTerms,
     ...DA_FREE_OPERATOR_PROFILE_V0_1.derivativeFamilySupport.glossTerms,
   ];
-  const matchingSourceSenses = sourceSensesWithGlosses.filter(({ sense }) =>
-    sense.glosses.some((gloss) => freeOperatorProfileGlossMatchesV0_1(daFunctionalGlossTerms, gloss)),
+  const matchingSourceSenses = sourceSensesWithGlosses.filter(({ glosses }) =>
+    glosses.some((gloss) => freeOperatorProfileGlossMatchesV0_1(daFunctionalGlossTerms, gloss)),
   );
   if (sourceSensesWithGlosses.length && !matchingSourceSenses.length) {
     reasonCodes.push("DA_FUNCTIONAL_DOMAIN_NOT_MATCHED_TO_TARGET_SENSE");
   }
 
-  const candidates = !reasonCodes.length && input.sourceResolution
-    ? input.occurrences.flatMap((occurrence) => sourceFacts.flatMap((sourceFact) =>
-        sourceFact.senses.flatMap((sense, senseIndex) => {
-          const targetSenseGlosses = sense.glosses.map((gloss) => gloss.trim()).filter(Boolean);
-          if (!targetSenseGlosses.length || !targetSenseGlosses.some((gloss) =>
-            freeOperatorProfileGlossMatchesV0_1(daFunctionalGlossTerms, gloss),
-          )) return [];
+  const candidates = !hardReasonCodes.length && input.sourceResolution
+    ? input.occurrences.flatMap((occurrence) => matchingSourceSenses.map((senseRecord) => {
+          const targetSenseGlosses = senseRecord.glosses;
           const familyForms = DA_FREE_OPERATOR_PROFILE_V0_1.derivativeFamilySupport.forms.join(" · ");
           const targetSenseLabel = targetSenseGlosses.join("; ");
+          const targetSource = senseRecord.provider === "KAIKKI"
+            ? {
+                provider: "KAIKKI" as const,
+                sourceFact: senseRecord.sourceFact,
+                senseOrdinal: senseRecord.senseOrdinal,
+                senseId: senseRecord.senseId,
+              }
+            : {
+                provider: "FJALORISHQIP" as const,
+                responseStatus: "available" as const,
+                exactSourceForm: senseRecord.sourceResponse.exactSourceForm,
+                apiUrl: senseRecord.sourceResponse.apiUrl,
+                licence: senseRecord.sourceResponse.licence,
+                analysisLanguage: senseRecord.sourceResponse.analysisLanguage,
+                analysisVariety: senseRecord.sourceResponse.analysisVariety,
+                recordSources: senseRecord.sourceResponse.recordSources,
+                responsePosition: { entryIndex: senseRecord.sense.entryIndex, senseIndex: senseRecord.sense.senseIndex },
+                partOfSpeech: senseRecord.sense.partOfSpeech,
+                glossLanguage: senseRecord.sense.glossLanguage,
+                senseSource: senseRecord.sense.senseSource,
+                tags: senseRecord.sense.tags,
+                entrySources: senseRecord.sense.entrySources,
+                citationStatus: "CITATION_ENTERED_UNVERIFIED" as const,
+                licensingStatus: "NOT_ASSESSED" as const,
+              };
+          const sourceIdentity = senseRecord.provider === "KAIKKI"
+            ? senseRecord.sourceFact.sourceRecordId
+            : `fjalorishqip:${canonicalQueryForm}:entry-${senseRecord.sense.entryIndex}:sense-${senseRecord.sense.senseIndex}`;
+          const sourceDescription = senseRecord.provider === "KAIKKI"
+            ? `the exact-form Kaikki source record ${senseRecord.sourceFact.sourceRecordId} (${senseRecord.sourceFact.entryLocator})`
+            : `the FjaloriShqip response for ${senseRecord.sourceResponse.exactSourceForm}, Entry ${senseRecord.sense.entryIndex} · Sense ${senseRecord.sense.senseIndex} (response position, not a source-issued sense ID; citation entered unverified; licensing not assessed)`;
           const unresolvedMaterial = [
             `${occurrence.exactSurface}@${occurrence.span.start}-${occurrence.span.end} is observed spelling structure, not an established morpheme boundary`,
             "The DA-to-target functional relationship is an unselected exploratory hypothesis, not a source-reported derivation",
@@ -603,19 +718,19 @@ function generatedDaFunctionalMotivationV0_1(input: Readonly<{
             ...input.writtenVoices.map(({ voice, position }) => `${voice}@${position} symbolic role UNKNOWN_OR_NULL; written Voice preserved`),
             "Complete whole-word functional derivation remains UNKNOWN_OR_NULL",
           ];
-          return [{
-            candidateId: `da-functional:${sourceFact.sourceRecordId}:${senseIndex + 1}:${occurrence.span.start}-${occurrence.span.end}`,
+          return {
+            candidateId: `da-functional:${sourceIdentity}:${senseRecord.senseOrdinal}:${occurrence.span.start}-${occurrence.span.end}`,
             occurrence,
-            sourceFact,
-            targetSenseOrdinal: senseIndex + 1,
-            targetSenseId: sense.senseId,
+            targetSource,
+            targetSenseOrdinal: senseRecord.senseOrdinal,
+            targetSenseId: senseRecord.senseId,
             targetSenseGlosses,
             familySupport: DA_FREE_OPERATOR_PROFILE_V0_1.derivativeFamilySupport.forms.map((form) => ({
               form,
               categories: DA_FREE_OPERATOR_PROFILE_V0_1.derivativeFamilySupport.categories,
             })),
             functionalReading:
-              `The reviewed standalone Gheg source reports DA (“${input.sourceResolution!.evidence.attestedGloss}”). The exact target source sense is “${targetSenseLabel}”; the DA profile separately lists ${familyForms || "UNKNOWN_OR_NULL"} as derivative-family support, not as a source-reported relation to ${input.analyzedWord}. Conditional functional path: DA “${input.sourceResolution!.evidence.attestedGloss}” → a dividing/separating action → the source sense “${targetSenseLabel}”, when that sense denotes division, separation, or a result of dividing. The observed DA span [${occurrence.span.start},${occurrence.span.end}) is structural only. This generated EXPLORATORY_HYPOTHESIS does not establish a morpheme boundary, target derivation, or historical origin; other target material and symbolic Voice roles remain unresolved.`,
+              `The reviewed standalone Gheg source reports DA (“${input.sourceResolution!.evidence.attestedGloss}”). ${sourceDescription} reports the target sense “${targetSenseLabel}”; the DA profile separately lists ${familyForms || "UNKNOWN_OR_NULL"} as derivative-family support, not as a source-reported relation to ${input.analyzedWord}. Conditional functional path: DA “${input.sourceResolution!.evidence.attestedGloss}” → a dividing/separating action → the source sense “${targetSenseLabel}”, when that sense denotes division, separation, or a result of dividing. The observed DA span [${occurrence.span.start},${occurrence.span.end}) is structural only. This generated EXPLORATORY_HYPOTHESIS does not establish a morpheme boundary, target derivation, or historical origin; other target material and symbolic Voice roles remain unresolved.`,
             claimLayer: "EXPLORATORY_HYPOTHESIS" as const,
             generatedBy: "DA_REVIEWED_SOURCE_PLUS_EXACT_FORM" as const,
             selectionStatus: "UNSELECTED" as const,
@@ -625,9 +740,8 @@ function generatedDaFunctionalMotivationV0_1(input: Readonly<{
             historicalOrigin: "NOT_CLAIMED" as const,
             noSingleWinner: true as const,
             userDecisionPosture: "user_decides" as const,
-          }];
-        }),
-      ))
+          };
+        }))
     : [];
 
   const finalReasonCodes = [...new Set(reasonCodes)].sort();
@@ -850,6 +964,7 @@ export function buildCurrentWordDaAnchoredEmbryoCandidateV0_1(input: Readonly<{
   variety: string;
   selectedSourceSense: RuntimeAlbanianSourceSenseSelectionV0_1 | null;
   exactSourceFacts?: readonly AlbanianKaikkiExactLexicalSourceFactV0_1[];
+  fjaloriSourceResponse?: RuntimeFjaloriSourceResponseV0_1 | null;
   evaluation: SymbolicFunctionalCompositionResultV0_3;
   proposedOccurrenceId: string | null;
 }>): CurrentWordDaAnchoredEmbryoCandidateProjectionV0_1 {
@@ -1032,6 +1147,7 @@ export function buildCurrentWordDaAnchoredEmbryoCandidateV0_1(input: Readonly<{
       sourceResolution,
       occurrences,
       sourceFacts: input.exactSourceFacts ?? [],
+      fjaloriSourceResponse: input.fjaloriSourceResponse ?? null,
       exactCodePoints,
       writtenVoices,
     }),

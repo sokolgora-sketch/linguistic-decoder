@@ -16,7 +16,10 @@ import type {
 } from "@/shared/openInstrument/motivationEngineDiscoveryServerOnly.v0_1";
 import type { NeutralInterpretationSelectionV0_2 } from "@/shared/openInstrument/neutralInterpretationProjection.v0_2";
 import { FjaloriCrossSourceEvidenceV0_1 } from "@/ui/instrument/sections/FjaloriCrossSourceEvidence.v0_1";
-import type { RuntimeAlbanianSourceSenseSelectionV0_1 } from "@/ui/instrument/sections/currentWordSourceFunctionalSuggestionAdapter.v0_1";
+import type {
+  RuntimeAlbanianSourceSenseSelectionV0_1,
+  RuntimeFjaloriSourceResponseV0_1,
+} from "@/ui/instrument/sections/currentWordSourceFunctionalSuggestionAdapter.v0_1";
 import {
   aggregateMotivationDiscoveryCandidatesV0_1,
   measureMotivationDiscoveryAggregationV0_1,
@@ -529,12 +532,14 @@ export function MotivationDiscoveryCardV0_1({
   interpretation,
   onAnalyzeAlbanianSourceRecord,
   onSelectSourceSenseForMotivation,
+  onRuntimeSourceResponse,
   sourceRecordSelectionDisabled = false,
 }: {
   discovery: PresentOrMissing<MotivationDiscoveryV0_2VM> | undefined;
   interpretation?: PresentOrMissing<FunctionalMotivationInterpretationV0_2VM | FunctionalMotivationInterpretationV0_3VM>;
   onAnalyzeAlbanianSourceRecord?: (sourceRecordId: string) => void;
   onSelectSourceSenseForMotivation?: (selection: RuntimeAlbanianSourceSenseSelectionV0_1 | null) => void;
+  onRuntimeSourceResponse?: (response: RuntimeFjaloriSourceResponseV0_1) => void;
   sourceRecordSelectionDisabled?: boolean;
 }) {
   if (!discovery || discovery.kind !== "present") return null;
@@ -1608,12 +1613,13 @@ export function MotivationDiscoveryCardV0_1({
       ) : null}
 
       {albanianLexicalReading?.primarySourceFact ||
-      (onSelectSourceSenseForMotivation && identifiesAlbanianSourceContext(value.inputLanguage, value.inputProfile)) ? (
+      ((onSelectSourceSenseForMotivation || onRuntimeSourceResponse) && identifiesAlbanianSourceContext(value.inputLanguage, value.inputProfile)) ? (
         <FjaloriCrossSourceEvidenceV0_1
           word={value.inputWord}
           analysisLanguage={value.inputLanguage}
           analysisVariety={value.inputProfile}
           onSelectSourceSenseForMotivation={onSelectSourceSenseForMotivation}
+          onRuntimeSourceResponse={onRuntimeSourceResponse}
         />
       ) : null}
 

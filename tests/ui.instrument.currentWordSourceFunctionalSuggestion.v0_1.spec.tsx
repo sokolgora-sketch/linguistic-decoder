@@ -204,7 +204,7 @@ describe("current-word source functional suggestion v0.1", () => {
     expect(generated.candidates.map(({ targetSenseOrdinal }) => targetSenseOrdinal)).toEqual([1, 2]);
     expect(generated.candidates[0]).toMatchObject({
       occurrence: { exactSurface: "DA", span: { start: 1, end: 3 } },
-      sourceFact,
+      targetSource: { provider: "KAIKKI", sourceFact, senseOrdinal: 1, senseId: "ndarje-sense-1" },
       targetSenseGlosses: ["division; separation"],
       claimLayer: "EXPLORATORY_HYPOTHESIS",
       generatedBy: "DA_REVIEWED_SOURCE_PLUS_EXACT_FORM",

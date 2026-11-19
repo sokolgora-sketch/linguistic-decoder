@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import { GET } from "../app/api/analyze-v1/route";
 import { adaptAnalysisToTelemetryVM } from "@/ui/instrument/contractAdapter";
 import { MotivationDiscoveryCardV0_1 } from "@/ui/instrument/sections/MotivationDiscoveryCard.v0_1";
@@ -11,11 +11,12 @@ import type { MotivationDiscoveryV0_1VM } from "@/ui/telemetry/types";
 import type { AlbanianLexicalReadingV0_1 } from "@/shared/openInstrument/motivationEngineDiscoveryServerOnly.v0_1";
 
 function model(overrides: Partial<MotivationDiscoveryV0_1VM> = {}): MotivationDiscoveryV0_1VM {
-  const writtenAnalysis = analyzeStructuralInputV0_2("study");
+  const inputWord = overrides.inputWord ?? "study";
+  const writtenAnalysis = analyzeStructuralInputV0_2(inputWord);
   return {
     schemaVersion: "open-instrument.motivation-engine-discovery.v0_1",
     status: "MATCHES_FOUND",
-    inputWord: "study",
+    inputWord,
     inputLanguage: "en",
     inputProfile: "open-instrument.cmudict-arpabet-en-us.v0_1",
     sourceFact: {
@@ -132,7 +133,64 @@ function model(overrides: Partial<MotivationDiscoveryV0_1VM> = {}): MotivationDi
   };
 }
 
+const originalFetch = global.fetch;
+afterEach(() => {
+  global.fetch = originalFetch;
+});
+
 describe("Motivation Discovery Lab presentation v0.1", () => {
+  it("relays the existing exact-word Fjalori response to the current-word consumer", async () => {
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => ({
+        word: "ndarje",
+        licence: "CC BY-SA 4.0",
+        attribution: ["Albanian descriptions written with AI help — CC BY-SA 4.0"],
+        sources: ["sq-wiktionary", "editor"],
+        entries: [{
+          pos: "noun",
+          sources: ["sq-wiktionary", "editor"],
+          senses: [
+            { gloss: "division; separation", lang: "en", source: "sq-wiktionary", tags: ["noun"] },
+          ],
+        }],
+      }),
+    }) as unknown as typeof fetch;
+    const ndarjeModel = model({
+      inputWord: "NDARJE",
+      inputLanguage: "sq",
+      inputProfile: "albanian",
+      sourceFact: {
+        layer: "SOURCE_FACT",
+        language: "Albanian",
+        profile: "Albanian",
+        representation: "albanian_profile",
+        sourceStatus: "observed_external_snapshot",
+        authorityBoundary: "source fact only",
+      },
+      exactLexicalSourceStatus: { status: "SOURCE_NOT_FOUND", queryForm: "NDARJE", reasonCode: "ALBANIAN_EXACT_FORM_NOT_FOUND" },
+      exactLexicalSourceFacts: [],
+    });
+    const discovery = adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: ndarjeModel }).motivationDiscoveryV0_2;
+    if (discovery.kind !== "present") throw new Error("Expected the fixture discovery to adapt as present");
+    const onRuntimeSourceResponse = jest.fn();
+
+    render(<MotivationDiscoveryCardV0_1 discovery={discovery} onRuntimeSourceResponse={onRuntimeSourceResponse} />);
+
+    await waitFor(() => expect(onRuntimeSourceResponse).toHaveBeenLastCalledWith(expect.objectContaining({
+      queryForm: "NDARJE",
+      status: "available",
+      exactSourceForm: "ndarje",
+      senses: [expect.objectContaining({
+        entryIndex: 1,
+        senseIndex: 1,
+        gloss: "division; separation",
+        senseSource: "sq-wiktionary",
+      })],
+    })));
+  });
+
   it("wraps Overview Null bridge reasons while preserving source evidence and Null posture", () => {
     const sourceRecordId = "kaikki-albanian-jsonl:word=zjarrfikës:ordinal=0";
     const sourceSnapshot = {

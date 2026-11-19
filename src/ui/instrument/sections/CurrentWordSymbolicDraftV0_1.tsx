@@ -12,7 +12,10 @@ import type { SymbolicFunctionalOperationPlanInputV0_1 } from "@/shared/openInst
 import { sameAlbanianSourceForm } from "@/ui/instrument/albanianSourceFormIdentity.v0_1";
 import type { SingleWordCurrentWordEvidenceContextV0_1 } from "@/ui/instrument/sections/SingleWordMotivationWorkbenchV0_1";
 import { CurrentWordSourceFunctionalSuggestionV0_1 } from "@/ui/instrument/sections/CurrentWordSourceFunctionalSuggestionV0_1";
-import type { RuntimeAlbanianSourceSenseSelectionV0_1 } from "@/ui/instrument/sections/currentWordSourceFunctionalSuggestionAdapter.v0_1";
+import type {
+  RuntimeAlbanianSourceSenseSelectionV0_1,
+  RuntimeFjaloriSourceResponseV0_1,
+} from "@/ui/instrument/sections/currentWordSourceFunctionalSuggestionAdapter.v0_1";
 
 export type CurrentWordSymbolicVoiceDraftV0_1 = Readonly<{
   operatorCandidateId: string;
@@ -164,6 +167,21 @@ function sourceFactsForWord(
   );
 }
 
+function fjaloriSourceResponseForWord(
+  response: RuntimeFjaloriSourceResponseV0_1 | null | undefined,
+  discovery: NonNullable<ReturnType<typeof getDiscovery>> | null,
+  analyzedWord: string,
+  targetLanguage: string,
+  targetDialect: string,
+): RuntimeFjaloriSourceResponseV0_1 | null {
+  if (!response || !discovery || !sourceIdentityMatchesDraft(discovery, targetLanguage, targetDialect) ||
+      !discoveryIdentifiesAlbanian(discovery) || !sameAlbanianSourceForm(response.queryForm, analyzedWord)) return null;
+  const normalize = (value: string) => value.normalize("NFC").trim().toLocaleLowerCase("en-US");
+  if (normalize(response.analysisLanguage) !== normalize(discovery.inputLanguage) ||
+      normalize(response.analysisVariety) !== normalize(discovery.inputProfile)) return null;
+  return response;
+}
+
 export function CurrentWordSymbolicDraftV0_1({
   analyzedWord,
   draftTargetWord,
@@ -171,6 +189,7 @@ export function CurrentWordSymbolicDraftV0_1({
   targetDialect,
   currentWordEvidence,
   selectedSourceSense,
+  runtimeFjaloriSourceResponse,
 }: {
   analyzedWord: string;
   draftTargetWord: string;
@@ -178,6 +197,7 @@ export function CurrentWordSymbolicDraftV0_1({
   targetDialect: string;
   currentWordEvidence?: SingleWordCurrentWordEvidenceContextV0_1;
   selectedSourceSense?: RuntimeAlbanianSourceSenseSelectionV0_1 | null;
+  runtimeFjaloriSourceResponse?: RuntimeFjaloriSourceResponseV0_1 | null;
 }) {
   const [selectedAssociations, setSelectedAssociations] = useState<Record<string, string>>({});
   const [voiceDrafts, setVoiceDrafts] = useState<Record<string, CurrentWordSymbolicVoiceDraftV0_1>>({});
@@ -199,6 +219,13 @@ export function CurrentWordSymbolicDraftV0_1({
   const { structure, evaluation } = projection;
 
   const facts = sourceFactsForWord(currentWordEvidence, analyzedWord, targetLanguage, targetDialect);
+  const fjaloriResponse = fjaloriSourceResponseForWord(
+    runtimeFjaloriSourceResponse,
+    discovery,
+    analyzedWord,
+    targetLanguage,
+    targetDialect,
+  );
   const sourceIdentityMismatch = Boolean(discovery && !sourceIdentityMatchesDraft(discovery, targetLanguage, targetDialect));
   const evaluationFailureReasonCodes = evaluation.ok ? null : evaluation.reasonCodes;
   const selectedOccurrenceOptions = structure.ok
@@ -277,6 +304,7 @@ export function CurrentWordSymbolicDraftV0_1({
         identityMatches={identityMatches}
         runtimeSourceStatus={sourceStatus}
         selectedSourceSense={selectedSourceSense ?? null}
+        fjaloriSourceResponse={fjaloriResponse}
         sourceFacts={facts}
         evaluation={evaluation}
       />

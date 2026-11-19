@@ -45,7 +45,10 @@ import { SpokenResultCompositionSummaryV0_1 } from "./sections/SpokenResultCompo
 import { PrimaryAlbanianReadingCardV0_1 } from "./sections/PrimaryAlbanianReadingCard.v0_1";
 import { MotivationDiscoveryCardV0_1 } from "./sections/MotivationDiscoveryCard.v0_1";
 import { SingleWordMotivationWorkbenchV0_1 } from "./sections/SingleWordMotivationWorkbenchV0_1";
-import type { RuntimeAlbanianSourceSenseSelectionV0_1 } from "./sections/currentWordSourceFunctionalSuggestionAdapter.v0_1";
+import type {
+  RuntimeAlbanianSourceSenseSelectionV0_1,
+  RuntimeFjaloriSourceResponseV0_1,
+} from "./sections/currentWordSourceFunctionalSuggestionAdapter.v0_1";
 import type { GenericFunctionalWitnessV1 } from "@/shared/openInstrument/genericFunctionalWitnessDiscovery.v1";
 import { OriginClaimCard } from '@/components/OriginClaimCard';
 import { cn } from "@/lib/utils";
@@ -265,6 +268,10 @@ export function InstrumentPanel(props: Props) {
     analysisIdentity: string;
     selection: RuntimeAlbanianSourceSenseSelectionV0_1;
   }> | null>(null);
+  const [runtimeFjaloriSource, setRuntimeFjaloriSource] = React.useState<Readonly<{
+    analysisIdentity: string;
+    response: RuntimeFjaloriSourceResponseV0_1;
+  }> | null>(null);
 
   const inputVm = "vm" in props ? props.vm : undefined;
   const inputPayload = "payload" in props ? props.payload : undefined;
@@ -286,6 +293,9 @@ export function InstrumentPanel(props: Props) {
   const selectedSourceSenseForCurrentAnalysis = selectedSourceSense?.analysisIdentity === sourceSenseAnalysisIdentity
     ? selectedSourceSense.selection
     : null;
+  const runtimeFjaloriSourceForCurrentAnalysis = runtimeFjaloriSource?.analysisIdentity === sourceSenseAnalysisIdentity
+    ? runtimeFjaloriSource.response
+    : null;
   const handleSourceSenseSelection = (selection: RuntimeAlbanianSourceSenseSelectionV0_1 | null) => {
     if (!selection || !sourceSenseAnalysisIdentity) {
       setSelectedSourceSense(null);
@@ -293,9 +303,21 @@ export function InstrumentPanel(props: Props) {
     }
     setSelectedSourceSense({ analysisIdentity: sourceSenseAnalysisIdentity, selection });
   };
+  const handleRuntimeFjaloriSourceResponse = React.useCallback((response: RuntimeFjaloriSourceResponseV0_1) => {
+    if (!sourceSenseAnalysisIdentity) {
+      setRuntimeFjaloriSource(null);
+      return;
+    }
+    setRuntimeFjaloriSource({ analysisIdentity: sourceSenseAnalysisIdentity, response });
+  }, [sourceSenseAnalysisIdentity]);
 
   React.useEffect(() => {
     setSelectedSourceSense((current) =>
+      current && current.analysisIdentity !== sourceSenseAnalysisIdentity ? null : current,
+    );
+  }, [sourceSenseAnalysisIdentity]);
+  React.useEffect(() => {
+    setRuntimeFjaloriSource((current) =>
       current && current.analysisIdentity !== sourceSenseAnalysisIdentity ? null : current,
     );
   }, [sourceSenseAnalysisIdentity]);
@@ -604,6 +626,7 @@ export function InstrumentPanel(props: Props) {
                 interpretation={vm.functionalMotivationInterpretationV0_3}
                 onAnalyzeAlbanianSourceRecord={props.onAnalyzeAlbanianSourceRecord}
                 onSelectSourceSenseForMotivation={handleSourceSenseSelection}
+                onRuntimeSourceResponse={handleRuntimeFjaloriSourceResponse}
                 sourceRecordSelectionDisabled={props.sourceRecordSelectionDisabled}
               />
 
@@ -683,6 +706,7 @@ export function InstrumentPanel(props: Props) {
                     }
                   : undefined}
                 selectedSourceSense={selectedSourceSenseForCurrentAnalysis}
+                runtimeFjaloriSourceResponse={runtimeFjaloriSourceForCurrentAnalysis}
               />
             </div>
           </TabPanel>
