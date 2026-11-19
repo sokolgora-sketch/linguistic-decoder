@@ -685,11 +685,10 @@ describe("current-word symbolic draft v0.1", () => {
     const generatedFamilyReadings = screen.getAllByTestId("current-word-da-generated-functional-reading");
     expect(generatedFamilyReadings).toHaveLength(2);
     expect(generatedFamilyReadings[0]).toHaveTextContent(
-      "The reviewed Gheg Albanian source gives DA the function “to split, cut, divide.”",
+      "The recorded verb function “to split, cut, divide” is proposed as an action-level contribution to the recorded noun sense “division; separation.”",
     );
-    expect(generatedFamilyReadings[0]).toHaveTextContent("bounded functional point of comparison");
-    expect(generatedFamilyReadings[0]).toHaveTextContent("intermediate result-state function remains UNKNOWN_OR_NULL");
-    expect(generatedFamilyReadings[0]).toHaveTextContent("NDARJE");
+    expect(generatedFamilyReadings[0]).toHaveTextContent("This relation is not source-reported.");
+    expect(generatedFamilyReadings[0]).toHaveTextContent("The relation beyond the exact overlap remains UNKNOWN_OR_NULL; no derivation is asserted.");
     expect(firstGenerated.getByTestId("current-word-da-generated-claim-boundary")).toHaveTextContent("UNSELECTED");
     expect(firstGenerated.getByTestId("current-word-da-generated-claim-boundary")).toHaveTextContent("PARTIAL_NULL");
     expect(firstGenerated.getByTestId("current-word-da-generated-claim-boundary")).toHaveTextContent("no_single_winner / user_decides");
@@ -738,11 +737,10 @@ describe("current-word symbolic draft v0.1", () => {
     const generatedFamilyReadings = screen.getAllByTestId("current-word-da-generated-functional-reading");
     expect(generatedFamilyReadings.length).toBeGreaterThan(0);
     expect(generatedFamilyReadings[0]).toHaveTextContent(
-      "The reviewed Gheg Albanian source gives DA the function “to split, cut, divide.”",
+      "The recorded verb function “to split, cut, divide” is proposed as an action-level contribution to the recorded noun sense “division; separation.”",
     );
-    expect(generatedFamilyReadings[0]).toHaveTextContent("bounded functional point of comparison");
-    expect(generatedFamilyReadings[0]).toHaveTextContent("intermediate result-state function remains UNKNOWN_OR_NULL");
-    expect(generatedFamilyReadings[0]).toHaveTextContent("division; separation");
+    expect(generatedFamilyReadings[0]).toHaveTextContent("This relation is not source-reported.");
+    expect(generatedFamilyReadings[0]).toHaveTextContent("The relation beyond the exact overlap remains UNKNOWN_OR_NULL; no derivation is asserted.");
     expect(screen.getByTestId("current-word-da-candidate-structure")).toHaveTextContent("N@0 · D@1 · A@2 · R@3 · J@4 · E@5");
     expect(screen.getByTestId("current-word-da-candidate-structure")).toHaveTextContent("A@2 → E@5");
     expect(screen.getByTestId("current-word-source-suggestion-runtime-status")).toHaveTextContent("SOURCE_NOT_FOUND");
