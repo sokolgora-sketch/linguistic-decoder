@@ -1,5 +1,6 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import {
+  buildCurrentWordEmbryoWholeFunctionalBridgeV0_1,
   buildCurrentWordExploratoryMotivationV0_1,
   buildCurrentWordSourceFunctionalSuggestionV0_1,
   type CurrentWordSourceFunctionalSuggestionDraftV0_1,
@@ -116,6 +117,19 @@ function evaluatedNdarje(associationCandidateId = DIVISION, includeExpand = true
       },
     },
   }).evaluation;
+}
+
+function ndarjeBridge(overrides: Partial<Parameters<typeof buildCurrentWordEmbryoWholeFunctionalBridgeV0_1>[0]> = {}) {
+  return buildCurrentWordEmbryoWholeFunctionalBridgeV0_1({
+    analyzedWord: "NDARJE",
+    draftTargetWord: "NDARJE",
+    language: "Albanian",
+    variety: "Standard Albanian",
+    selectedSourceSense: runtimeNdarjeSense(),
+    sourceRelation: buildCurrentWordSourceFunctionalSuggestionV0_1(validDraft()),
+    evaluation: evaluatedNdarje(),
+    ...overrides,
+  });
 }
 
 describe("current-word source functional suggestion v0.1", () => {
@@ -260,6 +274,154 @@ describe("current-word source functional suggestion v0.1", () => {
     expect(changed.computedContributions[0]?.outputText).toBe("initiated(light)");
     expect(changed.conditionalExplanation).toContain("initiated(light)");
     expect(changed.conditionalExplanation).not.toContain("initiated(division)");
+  });
+
+  it("builds a conditional embryo-to-whole bridge from separate source claims and a connected computed Voice chain", () => {
+    const bridge = ndarjeBridge();
+
+    expect(bridge.status).toBe("CONDITIONAL_BRIDGE");
+    expect(bridge.explanation).toContain("For NDARJE");
+    expect(bridge.explanation).toContain("division; separation");
+    expect(bridge.explanation).toContain("Action or state of separating");
+    expect(bridge.explanation).toContain("staged symbolic proposal");
+    expect(bridge.explanation).toContain("initiated(division)");
+    expect(bridge.explanation).toContain("expanded(initiated(division))");
+    expect(bridge.selectedRuntimeSense).toMatchObject({
+      label: "division; separation",
+      responsePosition: "Entry 1 · Sense 1",
+      claimLayer: "SOURCE_FACT",
+      evidenceStatus: "CITATION_ENTERED_UNVERIFIED",
+    });
+    expect(bridge.enteredActionRelation).toMatchObject({
+      relatedVerbForm: "NDAJ",
+      relationSourceClaimLayer: "SOURCE_FACT",
+      relationSourceEvidenceStatus: "CITATION_ENTERED_UNVERIFIED",
+      compositionClaimLayer: "LOGICAL_INFERENCE",
+      compositionEvidenceStatus: "CITATION_ENTERED_UNVERIFIED",
+      targetSourceUrl: "https://fjale.al/ndarje",
+      verbSourceUrl: "https://fjale.al/ndaj",
+    });
+    expect(bridge.exactCodePoints).toEqual(Array.from("NDARJE").map((character, position) => ({ character, position })));
+    expect(bridge.writtenVoices).toEqual([{ voice: "A", position: 2 }, { voice: "E", position: 5 }]);
+    expect(bridge.selectedSpectrumInputs).toEqual([expect.objectContaining({
+      unit: "D",
+      span: { start: 1, end: 2 },
+      text: "division",
+      claimLayer: "EXPLORATORY_HYPOTHESIS",
+      evidenceStatus: "USER_PROPOSED",
+      sourceIds: [],
+    })]);
+    expect(bridge.computedChain.map(({ voice, position, outputText }) => ({ voice, position, outputText }))).toEqual([
+      { voice: "A", position: 2, outputText: "initiated(division)" },
+      { voice: "E", position: 5, outputText: "expanded(initiated(division))" },
+    ]);
+    expect(bridge.crossSourceTargetFormMatch).toBe("EXACT_ALBANIAN_FORM_MATCH");
+    expect(bridge.crossSourceSenseAlignment).toBe("UNKNOWN_OR_NULL");
+    expect(bridge.alternativeRuntimeSenses).toEqual([expect.objectContaining({
+      label: "a divided part",
+      claimLayer: "SOURCE_FACT",
+      evidenceStatus: "CITATION_ENTERED_UNVERIFIED",
+    })]);
+    expect(bridge.unresolvedMaterial).toEqual(expect.arrayContaining([
+      "N@0 · UNKNOWN_OR_NULL",
+      "R@3 · UNKNOWN_OR_NULL",
+      "J@4 · UNKNOWN_OR_NULL",
+      "INTERNAL_SEGMENTATION_OR_MORPHOLOGY_NOT_ESTABLISHED",
+    ]));
+    expect(bridge.bridgeClaimLayer).toBe("EXPLORATORY_HYPOTHESIS");
+    expect(bridge.bridgeEvidenceStatus).toBe("USER_PROPOSED");
+    expect(bridge.wholeWordStatus).toBe("PARTIAL_NULL");
+    expect(bridge.sourceAuthorityPromotion).toBe("NONE");
+    expect(bridge.historicalOrigin).toBe("NOT_CLAIMED");
+    expect(bridge.noSingleWinner).toBe(true);
+    expect(bridge.userDecisionPosture).toBe("user_decides");
+    expect(bridge.reasonCodes).toEqual([]);
+  });
+
+  it("recomputes the generated bridge when a selected symbolic operand changes", () => {
+    const changed = ndarjeBridge({ evaluation: evaluatedNdarje(LIGHT) });
+    expect(changed.status).toBe("CONDITIONAL_BRIDGE");
+    expect(changed.explanation).toContain("initiated(light)");
+    expect(changed.explanation).toContain("expanded(initiated(light))");
+    expect(changed.explanation).not.toContain("initiated(division)");
+  });
+
+  it("keeps the bridge Null when the source relation is missing or its target does not match", () => {
+    const missing = ndarjeBridge({ sourceRelation: null });
+    expect(missing.status).toBe("PARTIAL_NULL");
+    expect(missing.explanation).toBeNull();
+    expect(missing.reasonCodes).toContain("CITED_ACTION_RELATION_NOT_AVAILABLE");
+
+    const wrongTarget = ndarjeBridge({
+      sourceRelation: buildCurrentWordSourceFunctionalSuggestionV0_1(validDraft({ sourceTargetForm: "NDAJ" })),
+    });
+    expect(wrongTarget.status).toBe("PARTIAL_NULL");
+    expect(wrongTarget.explanation).toBeNull();
+  });
+
+  it("withholds the bridge for mismatched identity, shared source identity, or disconnected operations", () => {
+    const identityMismatch = ndarjeBridge({ draftTargetWord: "DALLIM" });
+    expect(identityMismatch.status).toBe("PARTIAL_NULL");
+    expect(identityMismatch.reasonCodes).toContain("CURRENT_WORD_IDENTITY_MISMATCH");
+    expect(identityMismatch.explanation).toBeNull();
+
+    const sameProvider = ndarjeBridge({
+      sourceRelation: buildCurrentWordSourceFunctionalSuggestionV0_1(validDraft({
+        targetSourceUrl: "https://fjalorishqip.org/ndarje",
+      })),
+    });
+    expect(sameProvider.status).toBe("PARTIAL_NULL");
+    expect(sameProvider.reasonCodes).toContain("CITED_RELATION_MUST_REMAIN_SEPARATE_FROM_RUNTIME_SOURCE");
+
+    const disconnected = ndarjeBridge({ evaluation: evaluatedNdarje(DIVISION, false) });
+    expect(disconnected.status).toBe("PARTIAL_NULL");
+    expect(disconnected.reasonCodes).toContain("CONNECTED_COMPUTED_VOICE_CHAIN_REQUIRED");
+    expect(disconnected.explanation).toBeNull();
+  });
+
+  it("withholds the bridge when a computed Voice dependency is broken", () => {
+    const evaluation = evaluatedNdarje();
+    if (!evaluation.ok) throw new Error("expected successful symbolic evaluation");
+    const brokenEvaluation = {
+      ...evaluation,
+      operationTrace: evaluation.operationTrace.map((trace) => trace.kind === "APPLY_VOICE_OPERATOR" && trace.targetVoiceEventId === "voice:E@5"
+        ? { ...trace, dependsOn: [] }
+        : trace),
+    } as SymbolicFunctionalCompositionResultV0_3;
+    const bridge = ndarjeBridge({ evaluation: brokenEvaluation });
+    expect(bridge.status).toBe("PARTIAL_NULL");
+    expect(bridge.reasonCodes).toContain("VOICE_OPERATION_DEPENDENCY_NOT_VERIFIABLE");
+    expect(bridge.explanation).toBeNull();
+  });
+
+  it("resets separately entered research when the current word changes", () => {
+    const props = {
+      analyzedWord: "NDARJE",
+      draftTargetWord: "NDARJE",
+      language: "Albanian",
+      variety: "Standard Albanian",
+      identityMatches: true,
+      selectedSourceSense: runtimeNdarjeSense(),
+      evaluation: evaluatedNdarje(),
+    };
+    const { rerender } = render(<CurrentWordSourceFunctionalSuggestionV0_1 {...props} />);
+    fillNdarjeForm();
+    expect(screen.getByLabelText("Exact source target form")).toHaveValue("NDARJE");
+    expect(screen.getByTestId("current-word-embryo-whole-bridge")).toHaveTextContent("initiated(division)");
+    expect(screen.getByTestId("current-word-embryo-whole-bridge-embryos")).toHaveTextContent("D@1 “division” · USER_PROPOSED / EXPLORATORY_HYPOTHESIS");
+    expect(screen.getByTestId("current-word-embryo-whole-bridge-unresolved")).toHaveTextContent("N@0 · UNKNOWN_OR_NULL");
+    expect(screen.getByTestId("current-word-embryo-whole-bridge-sources")).toHaveTextContent("CITATION_ENTERED_UNVERIFIED");
+
+    rerender(<CurrentWordSourceFunctionalSuggestionV0_1
+      {...props}
+      analyzedWord="DALLIM"
+      draftTargetWord="DALLIM"
+      selectedSourceSense={null}
+      evaluation={undefined}
+    />);
+    expect(screen.getByLabelText("Exact source target form")).toHaveValue("");
+    expect(screen.getByLabelText("Source explicitly relates this action sense to the verb")).not.toBeChecked();
+    expect(screen.queryByTestId("current-word-embryo-whole-bridge")).not.toBeInTheDocument();
   });
 
   it("keeps unresolved structure and broken Voice dependencies partial", () => {

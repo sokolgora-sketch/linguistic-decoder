@@ -1,7 +1,8 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
+  buildCurrentWordEmbryoWholeFunctionalBridgeV0_1,
   buildCurrentWordExploratoryMotivationV0_1,
   buildCurrentWordSourceFunctionalSuggestionV0_1,
   type CurrentWordSourceFunctionalSuggestionDraftV0_1,
@@ -56,18 +57,34 @@ export function CurrentWordSourceFunctionalSuggestionV0_1({
   selectedSourceSense?: RuntimeAlbanianSourceSenseSelectionV0_1 | null;
   evaluation?: SymbolicFunctionalCompositionResultV0_3;
 }) {
+  const contextIdentity = [analyzedWord, draftTargetWord, language, variety]
+    .map((value) => value.normalize("NFC").trim().toLocaleLowerCase("sq-AL"))
+    .join("\u0000");
   const [fields, setFields] = useState(emptyFields);
   const [sourceReportsActionRelation, setSourceReportsActionRelation] = useState(false);
+  const [draftContextIdentity, setDraftContextIdentity] = useState(contextIdentity);
+  const identityIsCurrent = draftContextIdentity === contextIdentity;
+  const currentFields = identityIsCurrent ? fields : emptyFields;
+  const currentSourceReportsActionRelation = identityIsCurrent ? sourceReportsActionRelation : false;
+  useEffect(() => {
+    if (identityIsCurrent) return;
+    setFields(emptyFields);
+    setSourceReportsActionRelation(false);
+    setDraftContextIdentity(contextIdentity);
+  }, [contextIdentity, identityIsCurrent]);
   const projection = useMemo(() => buildCurrentWordSourceFunctionalSuggestionV0_1({
-    ...fields,
+    ...currentFields,
     analyzedWord,
     draftTargetWord,
     language,
     variety,
-    sourceReportsActionRelation,
-  }), [fields, analyzedWord, draftTargetWord, language, variety, sourceReportsActionRelation]);
+    sourceReportsActionRelation: currentSourceReportsActionRelation,
+  }), [currentFields, analyzedWord, draftTargetWord, language, variety, currentSourceReportsActionRelation]);
 
-  const update = (field: DraftField, value: string) => setFields((current) => ({ ...current, [field]: value }));
+  const update = (field: DraftField, value: string) => setFields((current) => ({
+    ...(identityIsCurrent ? current : emptyFields),
+    [field]: value,
+  }));
   const content = projection.result?.ok ? projection.result.content : null;
   const composition = content?.compositions.find(({ targetSenseId }) => targetSenseId === content.target.selectedSense.senseId);
   const exploratoryProjection = useMemo(() => buildCurrentWordExploratoryMotivationV0_1({
@@ -78,6 +95,15 @@ export function CurrentWordSourceFunctionalSuggestionV0_1({
     selectedSourceSense,
     evaluation,
   }), [analyzedWord, draftTargetWord, language, variety, selectedSourceSense, evaluation]);
+  const embryoWholeBridge = useMemo(() => buildCurrentWordEmbryoWholeFunctionalBridgeV0_1({
+    analyzedWord,
+    draftTargetWord,
+    language,
+    variety,
+    selectedSourceSense,
+    sourceRelation: projection,
+    evaluation,
+  }), [analyzedWord, draftTargetWord, language, variety, selectedSourceSense, projection, evaluation]);
 
   return (
     <section
@@ -87,7 +113,7 @@ export function CurrentWordSourceFunctionalSuggestionV0_1({
     >
       <h4 className="font-semibold text-[#d8e4ca]">Source-linked conditional function suggestion</h4>
       <p className="mt-1 text-[#aeb7c5]">
-        Select a lexical sense in the Overview source panel, then choose symbolic hypotheses above. The conditional wording below is generated from that selected source response and the evaluator outputs; the source does not authorize their relationship.
+        Select a lexical sense in the Overview source panel, then choose symbolic hypotheses above. When a separate cited action relation is entered, the bridge compares the two sources by exact target spelling only; it does not merge their source identities or assume their senses are equivalent.
       </p>
       <div className="mt-2 rounded border border-[#53604a] bg-[#111710] p-2" data-testid="current-word-exploratory-motivation">
         <h5 className="font-semibold text-[#f5f7fb]">Conditional exploratory interpretation</h5>
@@ -104,7 +130,28 @@ export function CurrentWordSourceFunctionalSuggestionV0_1({
                 Source response: <a className="underline" href={selectedSourceSense.apiUrl} target="_blank" rel="noreferrer">{selectedSourceSense.apiUrl}</a> · {selectedSourceSense.licence} · citation CITATION_ENTERED_UNVERIFIED
               </p>
             ) : null}
-            {exploratoryProjection.conditionalExplanation ? (
+            {embryoWholeBridge.explanation ? (
+              <div className="mt-2 rounded border border-[#53604a] bg-[#0d1117] p-2" data-testid="current-word-embryo-whole-bridge">
+                <p className="break-words" data-testid="current-word-exploratory-explanation">{embryoWholeBridge.explanation}</p>
+                <p className="mt-1 break-words text-[10px] text-[#aeb7c5]" data-testid="current-word-embryo-whole-bridge-structure">
+                  DERIVED_STRUCTURE · ORTHOGRAPHIC: {embryoWholeBridge.exactCodePoints.map(({ character, position }) => `${character}@${position}`).join(" · ")} · written Voices {embryoWholeBridge.writtenVoices.map(({ voice, position }) => `${voice}@${position}`).join(" → ") || "∅"} · pronunciation NOT_ESTABLISHED
+                </p>
+                <p className="mt-1 break-words text-[10px] text-[#aeb7c5]" data-testid="current-word-embryo-whole-bridge-embryos">
+                  Selected spectrum inputs: {embryoWholeBridge.selectedSpectrumInputs.map(({ unit, span, text, evidenceStatus }) => `${unit}@${span.start}${span.end - span.start > 1 ? `-${span.end}` : ""} “${text}” · ${evidenceStatus} / EXPLORATORY_HYPOTHESIS`).join(" · ") || "UNKNOWN_OR_NULL"}
+                </p>
+                <p className="mt-1 break-words text-[10px] text-[#aeb7c5]" data-testid="current-word-embryo-whole-bridge-unresolved">
+                  Unresolved structure: {embryoWholeBridge.unresolvedMaterial.join(" · ") || "UNKNOWN_OR_NULL"}
+                </p>
+                {embryoWholeBridge.enteredActionRelation ? (
+                  <p className="mt-1 break-all text-[10px] text-[#aeb7c5]" data-testid="current-word-embryo-whole-bridge-sources">
+                    Separate relation: SOURCE_FACT / CITATION_ENTERED_UNVERIFIED · composed relation LOGICAL_INFERENCE / CITATION_ENTERED_UNVERIFIED. Citations: <a className="underline" href={embryoWholeBridge.enteredActionRelation.targetSourceUrl} target="_blank" rel="noreferrer">{embryoWholeBridge.enteredActionRelation.targetSourceLabel}</a> · {embryoWholeBridge.enteredActionRelation.targetSourceLocator} · <a className="underline" href={embryoWholeBridge.enteredActionRelation.verbSourceUrl} target="_blank" rel="noreferrer">{embryoWholeBridge.enteredActionRelation.verbSourceLabel}</a> · {embryoWholeBridge.enteredActionRelation.verbSourceLocator} · licensing NOT_ASSESSED
+                  </p>
+                ) : null}
+                <p className="mt-1 text-[10px] text-[#aeb7c5]">
+                  Exact target-form match only · cross-source sense alignment UNKNOWN_OR_NULL · bridge EXPLORATORY_HYPOTHESIS / USER_PROPOSED · whole-word PARTIAL_NULL · source-authority promotion NONE · historical origin NOT_CLAIMED · no_single_winner / user_decides
+                </p>
+              </div>
+            ) : exploratoryProjection.conditionalExplanation ? (
               <p className="mt-2 break-words" data-testid="current-word-exploratory-explanation">
                 {exploratoryProjection.conditionalExplanation}
               </p>
@@ -113,6 +160,11 @@ export function CurrentWordSourceFunctionalSuggestionV0_1({
                 PARTIAL_NULL · choose at least one complete Voice operation with an explicit computed operand.
               </p>
             )}
+            {embryoWholeBridge.status === "PARTIAL_NULL" && selectedSourceSense ? (
+              <p role="status" className="mt-2 break-words text-[#f0ddb0]" data-testid="current-word-embryo-whole-bridge-null">
+                Embryo-to-whole bridge PARTIAL_NULL · {embryoWholeBridge.reasonCodes.join(" · ") || "UNKNOWN_OR_NULL"}. Cross-source sense alignment and internal segmentation remain UNKNOWN_OR_NULL.
+              </p>
+            ) : null}
             {exploratoryProjection.computedContributions.length ? (
               <ol className="mt-2 space-y-1" data-testid="current-word-exploratory-computed-contributions">
                 {exploratoryProjection.computedContributions.map((contribution) => (
@@ -151,7 +203,7 @@ export function CurrentWordSourceFunctionalSuggestionV0_1({
 
       <details className="mt-2 rounded border border-[#38433a] p-2" data-testid="current-word-source-functional-manual-fallback">
         <summary className="cursor-pointer font-semibold text-[#d8e4ca]">Optional manual research fallback · enter separate source claims</summary>
-        <p className="mt-1 text-[10px] text-[#aeb7c5]">Use only when no suitable runtime lexical sense is available. Every entered relation remains user-asserted and citation-unverified; it is not merged with the source-selected symbolic path above.</p>
+        <p className="mt-1 text-[10px] text-[#aeb7c5]">Enter a separately cited research relation here. Each claim remains user-entered and citation-unverified. If a runtime sense is selected, the generated bridge compares the separate inputs conditionally without merging their source identities or asserting sense equivalence.</p>
 
       {!identityMatches ? (
         <p role="status" data-testid="current-word-source-suggestion-identity-null" className="mt-2 rounded border border-[#746541] bg-[#18140e] p-2 text-[#f0ddb0]">
@@ -162,41 +214,41 @@ export function CurrentWordSourceFunctionalSuggestionV0_1({
           <div className="mt-2 grid min-w-0 gap-2 sm:grid-cols-2">
             <label className={fieldLabelClass}>
               Exact target form in cited source
-              <input aria-label="Exact source target form" className={textFieldClass} value={fields.sourceTargetForm} onChange={(event) => update("sourceTargetForm", event.target.value)} />
+              <input aria-label="Exact source target form" className={textFieldClass} value={currentFields.sourceTargetForm} onChange={(event) => update("sourceTargetForm", event.target.value)} />
             </label>
             <label className={fieldLabelClass}>
               Source-reported target sense label
-              <input aria-label="Source-reported target sense label" className={textFieldClass} value={fields.targetSenseLabel} onChange={(event) => update("targetSenseLabel", event.target.value)} />
+              <input aria-label="Source-reported target sense label" className={textFieldClass} value={currentFields.targetSenseLabel} onChange={(event) => update("targetSenseLabel", event.target.value)} />
             </label>
             <label className={fieldLabelClass}>
               Short source paraphrase of the target sense
-              <textarea aria-label="Source target sense paraphrase" className={textFieldClass} rows={2} value={fields.targetSenseDefinition} onChange={(event) => update("targetSenseDefinition", event.target.value)} />
+              <textarea aria-label="Source target sense paraphrase" className={textFieldClass} rows={2} value={currentFields.targetSenseDefinition} onChange={(event) => update("targetSenseDefinition", event.target.value)} />
             </label>
             <label className={fieldLabelClass}>
               Related verb form
-              <input aria-label="Related source verb form" className={textFieldClass} value={fields.relatedVerbForm} onChange={(event) => update("relatedVerbForm", event.target.value)} />
+              <input aria-label="Related source verb form" className={textFieldClass} value={currentFields.relatedVerbForm} onChange={(event) => update("relatedVerbForm", event.target.value)} />
             </label>
             <label className={fieldLabelClass}>
               Short source paraphrase of the verb function
-              <textarea aria-label="Source verb function paraphrase" className={textFieldClass} rows={2} value={fields.verbFunctionText} onChange={(event) => update("verbFunctionText", event.target.value)} />
+              <textarea aria-label="Source verb function paraphrase" className={textFieldClass} rows={2} value={currentFields.verbFunctionText} onChange={(event) => update("verbFunctionText", event.target.value)} />
             </label>
           </div>
 
           <fieldset className="mt-2 min-w-0 rounded border border-[#38433a] p-2">
             <legend className="px-1 font-semibold text-[#d8e4ca]">Target sense citation</legend>
             <div className="grid min-w-0 gap-2 sm:grid-cols-2">
-              <label className={fieldLabelClass}>Source label<input aria-label="Target source label" className={textFieldClass} value={fields.targetSourceLabel} onChange={(event) => update("targetSourceLabel", event.target.value)} /></label>
-              <label className={fieldLabelClass}>Source URL<input aria-label="Target source URL" className={textFieldClass} value={fields.targetSourceUrl} onChange={(event) => update("targetSourceUrl", event.target.value)} /></label>
-              <label className={fieldLabelClass}>Sense/relation locator<input aria-label="Target source locator" className={textFieldClass} value={fields.targetSourceLocator} onChange={(event) => update("targetSourceLocator", event.target.value)} /></label>
+              <label className={fieldLabelClass}>Source label<input aria-label="Target source label" className={textFieldClass} value={currentFields.targetSourceLabel} onChange={(event) => update("targetSourceLabel", event.target.value)} /></label>
+              <label className={fieldLabelClass}>Source URL<input aria-label="Target source URL" className={textFieldClass} value={currentFields.targetSourceUrl} onChange={(event) => update("targetSourceUrl", event.target.value)} /></label>
+              <label className={fieldLabelClass}>Sense/relation locator<input aria-label="Target source locator" className={textFieldClass} value={currentFields.targetSourceLocator} onChange={(event) => update("targetSourceLocator", event.target.value)} /></label>
             </div>
           </fieldset>
 
           <fieldset className="mt-2 min-w-0 rounded border border-[#38433a] p-2">
             <legend className="px-1 font-semibold text-[#d8e4ca]">Verb-function citation</legend>
             <div className="grid min-w-0 gap-2 sm:grid-cols-2">
-              <label className={fieldLabelClass}>Source label<input aria-label="Verb source label" className={textFieldClass} value={fields.verbSourceLabel} onChange={(event) => update("verbSourceLabel", event.target.value)} /></label>
-              <label className={fieldLabelClass}>Source URL<input aria-label="Verb source URL" className={textFieldClass} value={fields.verbSourceUrl} onChange={(event) => update("verbSourceUrl", event.target.value)} /></label>
-              <label className={fieldLabelClass}>Verb sense locator<input aria-label="Verb source locator" className={textFieldClass} value={fields.verbSourceLocator} onChange={(event) => update("verbSourceLocator", event.target.value)} /></label>
+              <label className={fieldLabelClass}>Source label<input aria-label="Verb source label" className={textFieldClass} value={currentFields.verbSourceLabel} onChange={(event) => update("verbSourceLabel", event.target.value)} /></label>
+              <label className={fieldLabelClass}>Source URL<input aria-label="Verb source URL" className={textFieldClass} value={currentFields.verbSourceUrl} onChange={(event) => update("verbSourceUrl", event.target.value)} /></label>
+              <label className={fieldLabelClass}>Verb sense locator<input aria-label="Verb source locator" className={textFieldClass} value={currentFields.verbSourceLocator} onChange={(event) => update("verbSourceLocator", event.target.value)} /></label>
             </div>
           </fieldset>
 
@@ -205,7 +257,7 @@ export function CurrentWordSourceFunctionalSuggestionV0_1({
               aria-label="Source explicitly relates this action sense to the verb"
               className="mt-1 shrink-0 accent-[#d8bb7a]"
               type="checkbox"
-              checked={sourceReportsActionRelation}
+              checked={currentSourceReportsActionRelation}
               onChange={(event) => setSourceReportsActionRelation(event.target.checked)}
             />
             <span>I am recording that the target source explicitly defines this selected sense by reference to the cited verb. This assertion is entered by me; the source and relation remain CITATION_ENTERED_UNVERIFIED.</span>
@@ -214,8 +266,8 @@ export function CurrentWordSourceFunctionalSuggestionV0_1({
           <details className="mt-2 rounded border border-[#38433a] p-2">
             <summary className="cursor-pointer font-semibold text-[#d8e4ca]">Add a separate alternative target sense (optional)</summary>
             <div className="mt-2 grid min-w-0 gap-2 sm:grid-cols-2">
-              <label className={fieldLabelClass}>Alternative sense label<input aria-label="Alternative source sense label" className={textFieldClass} value={fields.alternativeSenseLabel} onChange={(event) => update("alternativeSenseLabel", event.target.value)} /></label>
-              <label className={fieldLabelClass}>Short alternative sense paraphrase<textarea aria-label="Alternative source sense paraphrase" className={textFieldClass} rows={2} value={fields.alternativeSenseDefinition} onChange={(event) => update("alternativeSenseDefinition", event.target.value)} /></label>
+              <label className={fieldLabelClass}>Alternative sense label<input aria-label="Alternative source sense label" className={textFieldClass} value={currentFields.alternativeSenseLabel} onChange={(event) => update("alternativeSenseLabel", event.target.value)} /></label>
+              <label className={fieldLabelClass}>Short alternative sense paraphrase<textarea aria-label="Alternative source sense paraphrase" className={textFieldClass} rows={2} value={currentFields.alternativeSenseDefinition} onChange={(event) => update("alternativeSenseDefinition", event.target.value)} /></label>
             </div>
           </details>
 
@@ -255,7 +307,7 @@ export function CurrentWordSourceFunctionalSuggestionV0_1({
               <div className="mt-2" data-testid="current-word-source-functional-code-points">
                 Exact code points: {content.target.codePoints.map(({ character, position }) => `${character}@${position}`).join(" · ")}
               </div>
-              <div>Exact target form entered from source: {fields.sourceTargetForm}</div>
+              <div>Exact target form entered from source: {currentFields.sourceTargetForm}</div>
               <div>Representation authority: ORTHOGRAPHIC · pronunciation authority: NOT_ESTABLISHED</div>
               <div>Decision: {content.selection.mode} · {content.selection.userDecisionPosture}</div>
               <div>Production authority: {content.productionAuthority} · source authority promotion: {content.sourceAuthorityPromotion} · historical origin: {content.historicalOrigin}</div>
@@ -265,10 +317,10 @@ export function CurrentWordSourceFunctionalSuggestionV0_1({
               <div>Unresolved: {content.unresolved.map(({ text }) => text).join(" ") || "No additional unresolved items entered."}</div>
               <ul className="mt-1 list-disc pl-5">
                 <li className="break-all">
-                  Target: {fields.targetSourceLabel} · {fields.targetSourceUrl} · {fields.targetSourceLocator} · CITATION_ENTERED_UNVERIFIED · licensing NOT_ASSESSED
+                  Target: {currentFields.targetSourceLabel} · {currentFields.targetSourceUrl} · {currentFields.targetSourceLocator} · CITATION_ENTERED_UNVERIFIED · licensing NOT_ASSESSED
                 </li>
                 <li className="break-all">
-                  Verb: {fields.verbSourceLabel} · {fields.verbSourceUrl} · {fields.verbSourceLocator} · CITATION_ENTERED_UNVERIFIED · licensing NOT_ASSESSED
+                  Verb: {currentFields.verbSourceLabel} · {currentFields.verbSourceUrl} · {currentFields.verbSourceLocator} · CITATION_ENTERED_UNVERIFIED · licensing NOT_ASSESSED
                 </li>
               </ul>
             </details>
