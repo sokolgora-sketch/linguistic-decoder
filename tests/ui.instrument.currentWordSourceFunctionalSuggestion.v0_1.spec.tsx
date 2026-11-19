@@ -253,9 +253,9 @@ describe("current-word source functional suggestion v0.1", () => {
     expect(generated.candidates[0].familyNetwork.functionalEquation).toContain("NDARJE sense “division; separation”");
     expect(generated.candidates[0].functionalReading).toContain("divide / share");
     expect(generated.candidates[0].functionalReading).toContain("divided");
-    expect(generated.candidates[0].functionalReading).toContain("action-to-possible-result reading");
-    expect(generated.candidates[0].functionalReading).toContain("could remain meaningful across the profile-listed forms");
-    expect(generated.candidates[0].functionalReading).toContain("does not establish that the forms descend from one another");
+    expect(generated.candidates[0].functionalReading).toContain("bounded functional point of comparison");
+    expect(generated.candidates[0].functionalReading).toContain("intermediate result-state function remains UNKNOWN_OR_NULL");
+    expect(generated.candidates[0].functionalReading).toContain("does not establish that the listed forms descend from one another");
     expect(generated.candidates[0].functionalReading).toContain("NDARJE has this morphology");
     expect(generated.candidates[0].familyNetwork.directForms.find(({ form }) => form === "daj")?.carrierAnnotation).toMatchObject({
       gloss: "split / divide",
@@ -272,6 +272,7 @@ describe("current-word source functional suggestion v0.1", () => {
       { voice: "E", position: 5 },
     ]);
     expect(generated.candidates[0].unresolvedMaterial).toEqual(expect.arrayContaining([
+      "Intermediate result-state function remains UNKNOWN_OR_NULL unless independently characterized",
       "N@0 functional association UNKNOWN_OR_NULL",
       "R@3 functional association UNKNOWN_OR_NULL",
       "J@4 functional association UNKNOWN_OR_NULL",
@@ -311,6 +312,54 @@ describe("current-word source functional suggestion v0.1", () => {
     expect(projection.explanation).toBeNull();
     expect(projection.reasonCodes).toContain("EXACT_TARGET_SOURCE_SENSE_NOT_AVAILABLE");
     expect(projection.wholeWordStatus).toBe("PARTIAL_NULL");
+  });
+
+  it("keeps a second DA-family target available with or without an optional carrier annotation", () => {
+    const candidate = generatedDaCandidate();
+    if (!candidate.standaloneEvidence) throw new Error("expected the reviewed DA source evidence");
+    const protoRoot = PROTO_ROOTS_V1.find(({ id }) => id === "DA");
+    if (!protoRoot) throw new Error("expected the existing DA ProtoRoots record");
+
+    // Synthetic shape-only input: NDAJ is not asserted here as live source evidence.
+    const targetSense = {
+      exactSourceForm: "ndaj",
+      glosses: ["separation"],
+      sourceIdentity: "synthetic-test-fixture:NDAJ-sense-not-live-evidence",
+      evidenceStatus: "CITATION_ENTERED_UNVERIFIED" as const,
+    };
+    const project = (root: typeof protoRoot) => projectFreeOperatorFamilyFunctionalNetworkV0_1({
+      profile: DA_FREE_OPERATOR_PROFILE_V0_1,
+      protoRoot: root,
+      reviewedEmbryo: candidate.standaloneEvidence!,
+      targetForm: "NDAJ",
+      targetSense,
+    });
+
+    const withCarrierAnnotation = project(protoRoot);
+    const withoutOptionalCarrierAnnotation = project({
+      ...protoRoot,
+      carriers: protoRoot.carriers.filter(({ lang, form }) =>
+        !(lang === "sq" && form.toLocaleLowerCase("sq-AL") === "ndarë"),
+      ),
+    });
+
+    expect(withCarrierAnnotation.status).toBe("CONDITIONAL_FAMILY_READING");
+    expect(withCarrierAnnotation.target).toMatchObject({
+      exactForm: "ndaj",
+      senseText: "separation",
+      sourceIdentity: "synthetic-test-fixture:NDAJ-sense-not-live-evidence",
+      evidenceStatus: "CITATION_ENTERED_UNVERIFIED",
+    });
+    expect(withCarrierAnnotation.explanation).toContain("NDARË “divided”");
+    expect(withCarrierAnnotation.explanation).toContain("intermediate result-state function remains UNKNOWN_OR_NULL");
+    expect(withCarrierAnnotation.reasonCodes).toEqual([]);
+
+    expect(withoutOptionalCarrierAnnotation.status).toBe("CONDITIONAL_FAMILY_READING");
+    expect(withoutOptionalCarrierAnnotation.derivativeFamilyForms.find(({ form }) => form === "ndarë")?.carrierAnnotation).toBeNull();
+    expect(withoutOptionalCarrierAnnotation.functionalEquation).toContain("NDAJ sense “separation”");
+    expect(withoutOptionalCarrierAnnotation.explanation).not.toContain("NDARË “divided”");
+    expect(withoutOptionalCarrierAnnotation.explanation).toContain("intermediate result-state function remains UNKNOWN_OR_NULL");
+    expect(withoutOptionalCarrierAnnotation.reasonCodes).toEqual([]);
   });
 
   it("shows the staged DA-family explanation automatically without selecting a sense, DA mapping, or Voice operator", () => {

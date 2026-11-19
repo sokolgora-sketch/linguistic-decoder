@@ -596,10 +596,6 @@ export function projectFreeOperatorFamilyFunctionalNetworkV0_1(
   }
   if (!reviewedFunctionMatches) reasons.push("REVIEWED_EMBRYO_FUNCTION_OUTSIDE_PROFILE_DOMAIN");
   if (!derivativeFamilyForms.length) reasons.push("DERIVATIVE_FAMILY_SUPPORT_NOT_AVAILABLE");
-  const resultStateCarrier = derivativeFamilyForms.find(({ carrierAnnotation }) =>
-    carrierAnnotation?.gloss.trim().toLocaleLowerCase("en-US") === "divided",
-  ) ?? null;
-  if (!resultStateCarrier) reasons.push("CANDIDATE_RESULT_STATE_CARRIER_NOT_AVAILABLE");
   if (!input.targetSense) {
     reasons.push("EXACT_TARGET_SOURCE_SENSE_NOT_AVAILABLE");
   } else {
@@ -644,14 +640,11 @@ export function projectFreeOperatorFamilyFunctionalNetworkV0_1(
   ].join("; ");
   const familyGlossesText = familyCarrierAnnotations.join("; ") || "UNKNOWN_OR_NULL";
   const targetFormLabel = target?.exactForm.toLocaleUpperCase("sq-AL") ?? input.targetForm.toLocaleUpperCase("sq-AL");
-  const resultStateText = resultStateCarrier?.carrierAnnotation
-    ? `${resultStateCarrier.form.toLocaleUpperCase("sq-AL")} “${resultStateCarrier.carrierAnnotation.gloss}”`
-    : "UNKNOWN_OR_NULL";
   const explanation = target && !reasons.length
-    ? `The reviewed ${input.reviewedEmbryo.dialect} source gives ${input.reviewedEmbryo.sourceForm.toLocaleUpperCase("sq-AL")} the function “${input.reviewedEmbryo.attestedGloss}.” The operator profile records ${familyFormsText}; separate ProtoRoots candidate annotations include ${familyGlossesText}. Read together, they support an exploratory action-to-possible-result reading: the split/divide action can be considered alongside the family note ${resultStateText} and the exact-form sense “${target.senseText}” in ${targetFormLabel}. This explains how the function could remain meaningful across the profile-listed forms, while leaving every family relation exploratory; it does not establish that the forms descend from one another or that ${targetFormLabel} has this morphology.`
+    ? `The reviewed ${input.reviewedEmbryo.dialect} source gives ${input.reviewedEmbryo.sourceForm.toLocaleUpperCase("sq-AL")} the function “${input.reviewedEmbryo.attestedGloss}.” That function offers a bounded functional point of comparison for the exact-form source sense “${target.senseText}” in ${targetFormLabel}: splitting or dividing can be considered in relation to a division or separation sense. The profile separately lists ${familyFormsText}; optional ProtoRoots carrier annotations include ${familyGlossesText} and remain exploratory candidates, not source facts or selected intermediate meanings. An intermediate result-state function remains UNKNOWN_OR_NULL unless independently characterized. This does not establish that the listed forms descend from one another or that ${targetFormLabel} has this morphology.`
     : null;
   const functionalEquation = target && !reasons.length
-    ? `FUNCTIONAL READING · “${input.reviewedEmbryo.attestedGloss}” action → ${familyFormsText} → possible result-state note ${resultStateText} → ${targetFormLabel} sense “${target.senseText}” · proposed functional relation, not a morphological sequence`
+    ? `FUNCTIONAL READING · reviewed ${input.reviewedEmbryo.sourceForm.toLocaleUpperCase("sq-AL")} function “${input.reviewedEmbryo.attestedGloss}” → exact-form ${targetFormLabel} sense “${target.senseText}” · ${familyFormsText}; optional carrier annotations ${familyGlossesText}; intermediate result-state function UNKNOWN_OR_NULL · conditional functional proposal, not a morphological sequence`
     : null;
   const finalReasons = [...new Set(reasons)].sort();
   return {
@@ -677,6 +670,7 @@ export function projectFreeOperatorFamilyFunctionalNetworkV0_1(
     wholeWordStatus: "PARTIAL_NULL",
     unresolvedMaterial: [
       "Profile membership and carrier annotations do not establish a linear morphological or historical derivation",
+      "Intermediate result-state function remains UNKNOWN_OR_NULL unless independently characterized",
       "Target internal segmentation remains UNKNOWN_OR_NULL",
       "Target-specific source-to-family relation remains an EXPLORATORY_HYPOTHESIS",
     ],

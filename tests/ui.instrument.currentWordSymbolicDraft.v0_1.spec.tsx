@@ -687,7 +687,8 @@ describe("current-word symbolic draft v0.1", () => {
     expect(generatedFamilyReadings[0]).toHaveTextContent(
       "The reviewed Gheg Albanian source gives DA the function “to split, cut, divide.”",
     );
-    expect(generatedFamilyReadings[0]).toHaveTextContent("action-to-possible-result reading");
+    expect(generatedFamilyReadings[0]).toHaveTextContent("bounded functional point of comparison");
+    expect(generatedFamilyReadings[0]).toHaveTextContent("intermediate result-state function remains UNKNOWN_OR_NULL");
     expect(generatedFamilyReadings[0]).toHaveTextContent("NDARJE");
     expect(firstGenerated.getByTestId("current-word-da-generated-claim-boundary")).toHaveTextContent("UNSELECTED");
     expect(firstGenerated.getByTestId("current-word-da-generated-claim-boundary")).toHaveTextContent("PARTIAL_NULL");
@@ -739,7 +740,8 @@ describe("current-word symbolic draft v0.1", () => {
     expect(generatedFamilyReadings[0]).toHaveTextContent(
       "The reviewed Gheg Albanian source gives DA the function “to split, cut, divide.”",
     );
-    expect(generatedFamilyReadings[0]).toHaveTextContent("action-to-possible-result reading");
+    expect(generatedFamilyReadings[0]).toHaveTextContent("bounded functional point of comparison");
+    expect(generatedFamilyReadings[0]).toHaveTextContent("intermediate result-state function remains UNKNOWN_OR_NULL");
     expect(generatedFamilyReadings[0]).toHaveTextContent("division; separation");
     expect(screen.getByTestId("current-word-da-candidate-structure")).toHaveTextContent("N@0 · D@1 · A@2 · R@3 · J@4 · E@5");
     expect(screen.getByTestId("current-word-da-candidate-structure")).toHaveTextContent("A@2 → E@5");
