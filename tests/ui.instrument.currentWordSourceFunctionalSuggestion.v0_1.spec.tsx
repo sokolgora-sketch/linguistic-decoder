@@ -9,6 +9,10 @@ import {
 import { CurrentWordSourceFunctionalSuggestionV0_1 } from "@/ui/instrument/sections/CurrentWordSourceFunctionalSuggestionV0_1";
 import { CurrentWordSymbolicDraftV0_1, buildCurrentWordSymbolicDraftProjectionV0_1 } from "@/ui/instrument/sections/CurrentWordSymbolicDraftV0_1";
 import type { SymbolicFunctionalCompositionResultV0_3 } from "@/shared/openInstrument/symbolicFunctionalComposition.v0_3";
+import {
+  ALBANIAN_KAIKKI_LEXICAL_PRONUNCIATION_AUTHORITY_V0_1,
+  type AlbanianKaikkiExactLexicalSourceFactV0_1,
+} from "@/shared/openInstrument/albanianKaikkiServerOnlyExactLexicalSource.v0_1";
 
 const DIVISION = "d:division";
 const LIGHT = "d:light";
@@ -93,6 +97,35 @@ function runtimeNdarjeSense(): RuntimeAlbanianSourceSenseSelectionV0_1 {
   };
 }
 
+function exactNdarjeSourceFact(
+  overrides: Partial<AlbanianKaikkiExactLexicalSourceFactV0_1> = {},
+): AlbanianKaikkiExactLexicalSourceFactV0_1 {
+  return {
+    sourceRecordId: "kaikki-albanian-jsonl:word=ndarje:ordinal=0",
+    entryLocator: "word=ndarje#Albanian#1",
+    physicalRecordOrdinal: 0,
+    language: "Albanian",
+    languageCode: "sq",
+    form: "ndarje",
+    partOfSpeech: "noun",
+    senses: [
+      { senseId: "ndarje-sense-1", glosses: ["division; separation"] },
+      { senseId: "ndarje-sense-2", glosses: ["a part into which something has been divided"] },
+    ],
+    ipaObservations: [],
+    sourceStatus: "observed_external_snapshot",
+    attestationTruth: "fact",
+    pronunciationAuthority: ALBANIAN_KAIKKI_LEXICAL_PRONUNCIATION_AUTHORITY_V0_1,
+    sourceSnapshot: {
+      sourceFamilyId: "kaikki-albanian-jsonl-v1",
+      sourceUrl: "https://kaikki.org/dictionary/Albanian/meaning/n/nd/ndarje.html",
+      sha256: "b".repeat(64),
+      bytes: 128,
+    },
+    ...overrides,
+  };
+}
+
 function evaluatedNdarje(associationCandidateId = DIVISION, includeExpand = true): SymbolicFunctionalCompositionResultV0_3 {
   const empty = buildCurrentWordSymbolicDraftProjectionV0_1({
     exactSpelling: "NDARJE",
@@ -136,7 +169,117 @@ function daCandidate(overrides: Partial<Parameters<typeof buildCurrentWordDaAnch
   return buildCurrentWordDaAnchoredEmbryoCandidateV0_1({ ...base, proposedOccurrenceId: occurrenceId });
 }
 
+function generatedDaCandidate(
+  overrides: Partial<Parameters<typeof buildCurrentWordDaAnchoredEmbryoCandidateV0_1>[0]> = {},
+) {
+  const noOperations = buildCurrentWordSymbolicDraftProjectionV0_1({
+    exactSpelling: "NDARJE",
+    language: "sq",
+    variety: "Standard Albanian",
+    selections: { spectrumCandidateByOccurrenceId: {}, voiceDraftByEventId: {} },
+  }).evaluation;
+  return buildCurrentWordDaAnchoredEmbryoCandidateV0_1({
+    analyzedWord: "NDARJE",
+    draftTargetWord: "NDARJE",
+    identityMatches: true,
+    language: "Albanian",
+    variety: "Standard Albanian",
+    selectedSourceSense: null,
+    exactSourceFacts: [exactNdarjeSourceFact()],
+    evaluation: noOperations,
+    proposedOccurrenceId: null,
+    ...overrides,
+  });
+}
+
 describe("current-word source functional suggestion v0.1", () => {
+  it("generates unselected DA-to-sense functional candidates from exact target facts without manual sense or Voice choices", () => {
+    const sourceFact = exactNdarjeSourceFact({ form: "NDARJE" });
+    const candidate = generatedDaCandidate({ exactSourceFacts: [sourceFact] });
+    const generated = candidate.generatedFunctionalMotivation;
+
+    expect(generated.status).toBe("CANDIDATES_AVAILABLE");
+    expect(generated.reasonCodes).toEqual([]);
+    expect(generated.candidates).toHaveLength(2);
+    expect(generated.candidates.map(({ targetSenseOrdinal }) => targetSenseOrdinal)).toEqual([1, 2]);
+    expect(generated.candidates[0]).toMatchObject({
+      occurrence: { exactSurface: "DA", span: { start: 1, end: 3 } },
+      sourceFact,
+      targetSenseGlosses: ["division; separation"],
+      claimLayer: "EXPLORATORY_HYPOTHESIS",
+      generatedBy: "DA_REVIEWED_SOURCE_PLUS_EXACT_FORM",
+      selectionStatus: "UNSELECTED",
+      wholeWordStatus: "PARTIAL_NULL",
+      sourceAuthorityPromotion: "NONE",
+      historicalOrigin: "NOT_CLAIMED",
+      noSingleWinner: true,
+      userDecisionPosture: "user_decides",
+    });
+    expect(generated.candidates[0].functionalReading).toContain(
+      "DA “to split, cut, divide” → a dividing/separating action → the source sense “division; separation”",
+    );
+    expect(generated.candidates[0].functionalReading).toContain("ndaj · ndarë · ndare");
+    expect(generated.candidates[0].functionalReading).toContain("does not establish a morpheme boundary");
+    expect(candidate.exactCodePoints).toEqual(
+      Array.from("NDARJE").map((character, position) => ({ character, position })),
+    );
+    expect(candidate.writtenVoices).toEqual([
+      { voice: "A", position: 2 },
+      { voice: "E", position: 5 },
+    ]);
+    expect(generated.candidates[0].unresolvedMaterial).toEqual(expect.arrayContaining([
+      "N@0 functional association UNKNOWN_OR_NULL",
+      "R@3 functional association UNKNOWN_OR_NULL",
+      "J@4 functional association UNKNOWN_OR_NULL",
+      "A@2 symbolic role UNKNOWN_OR_NULL; written Voice preserved",
+      "E@5 symbolic role UNKNOWN_OR_NULL; written Voice preserved",
+    ]));
+  });
+
+  it.each([
+    ["no exact target source fact", [], "EXACT_TARGET_SOURCE_FACTS_NOT_AVAILABLE"],
+    ["a source fact for another form", [exactNdarjeSourceFact({ form: "NDAJ" })], "EXACT_TARGET_SOURCE_FACTS_NOT_AVAILABLE"],
+    ["a non-fact record", [exactNdarjeSourceFact({ attestationTruth: "candidate" as unknown as "fact" })], "EXACT_TARGET_SOURCE_FACTS_NOT_AVAILABLE"],
+    ["a source record without a valid snapshot identity", [exactNdarjeSourceFact({ sourceSnapshot: { sourceFamilyId: "fixture", sourceUrl: "https://example.invalid", sha256: "not-a-hash", bytes: 0 } })], "EXACT_TARGET_SOURCE_FACTS_NOT_AVAILABLE"],
+  ])("keeps generated DA motivation Null for %s", (_label, exactSourceFacts, reasonCode) => {
+    const candidate = generatedDaCandidate({ exactSourceFacts });
+    expect(candidate.generatedFunctionalMotivation.status).toBe("PARTIAL_NULL");
+    expect(candidate.generatedFunctionalMotivation.candidates).toEqual([]);
+    expect(candidate.generatedFunctionalMotivation.reasonCodes).toContain(reasonCode);
+  });
+
+  it("does not force the DA function onto an unrelated exact-form source sense", () => {
+    const sourceFact = exactNdarjeSourceFact({
+      sourceRecordId: "kaikki-albanian-jsonl:word=dallim:ordinal=0",
+      entryLocator: "word=dallim#Albanian#1",
+      form: "dallim",
+      senses: [{ senseId: "dallim-sense-1", glosses: ["act of distinguishing"] }],
+    });
+    const candidate = generatedDaCandidate({
+      analyzedWord: "DALLIM",
+      draftTargetWord: "DALLIM",
+      exactSourceFacts: [sourceFact],
+    });
+
+    expect(candidate.generatedFunctionalMotivation.status).toBe("PARTIAL_NULL");
+    expect(candidate.generatedFunctionalMotivation.candidates).toEqual([]);
+    expect(candidate.generatedFunctionalMotivation.reasonCodes).toContain(
+      "DA_FUNCTIONAL_DOMAIN_NOT_MATCHED_TO_TARGET_SENSE",
+    );
+  });
+
+  it.each([
+    ["unconfirmed analysis identity", { identityMatches: false }, "ANALYSIS_IDENTITY_NOT_CONFIRMED"],
+    ["changed target identity", { draftTargetWord: "NDAJ" }, "CURRENT_WORD_IDENTITY_MISMATCH"],
+    ["non-Albanian language", { language: "English" }, "TARGET_LANGUAGE_NOT_ALBANIAN"],
+    ["non-Albanian variety", { variety: "English" }, "TARGET_VARIETY_REQUIRED"],
+  ])("withholds generated DA candidates for %s", (_label, overrides, reasonCode) => {
+    const candidate = generatedDaCandidate(overrides);
+    expect(candidate.generatedFunctionalMotivation.status).toBe("PARTIAL_NULL");
+    expect(candidate.generatedFunctionalMotivation.candidates).toEqual([]);
+    expect(candidate.generatedFunctionalMotivation.reasonCodes).toContain(reasonCode);
+  });
+
   it("computes a repeatable conditional function from an explicitly entered exact target relation", () => {
     const first = buildCurrentWordSourceFunctionalSuggestionV0_1(validDraft());
     const second = buildCurrentWordSourceFunctionalSuggestionV0_1(validDraft());

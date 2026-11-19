@@ -8,6 +8,7 @@ import {
   type CurrentWordSourceFunctionalSuggestionDraftV0_1,
   type RuntimeAlbanianSourceSenseSelectionV0_1,
 } from "@/ui/instrument/sections/currentWordSourceFunctionalSuggestionAdapter.v0_1";
+import type { AlbanianKaikkiExactLexicalSourceFactV0_1 } from "@/shared/openInstrument/albanianKaikkiServerOnlyExactLexicalSource.v0_1";
 import type { SymbolicFunctionalCompositionResultV0_3 } from "@/shared/openInstrument/symbolicFunctionalComposition.v0_3";
 import { SYMBOLIC_FUNCTIONAL_COMPOSITION_SCHEMA_V0_3 } from "@/shared/openInstrument/symbolicFunctionalComposition.v0_3";
 
@@ -46,6 +47,7 @@ export function CurrentWordSourceFunctionalSuggestionV0_1({
   identityMatches,
   runtimeSourceStatus,
   selectedSourceSense = null,
+  sourceFacts = [],
   evaluation = missingEvaluation,
 }: {
   analyzedWord: string;
@@ -55,6 +57,7 @@ export function CurrentWordSourceFunctionalSuggestionV0_1({
   identityMatches: boolean;
   runtimeSourceStatus?: Readonly<{ status: string; reasonCode?: string | null }>;
   selectedSourceSense?: RuntimeAlbanianSourceSenseSelectionV0_1 | null;
+  sourceFacts?: readonly AlbanianKaikkiExactLexicalSourceFactV0_1[];
   evaluation?: SymbolicFunctionalCompositionResultV0_3;
 }) {
   const contextIdentity = [analyzedWord, draftTargetWord, language, variety]
@@ -119,8 +122,9 @@ export function CurrentWordSourceFunctionalSuggestionV0_1({
     variety,
     selectedSourceSense,
     evaluation,
+    exactSourceFacts: sourceFacts,
     proposedOccurrenceId: currentSelectedDaOccurrenceId,
-  }), [analyzedWord, draftTargetWord, identityMatches, language, variety, selectedSourceSense, evaluation, currentSelectedDaOccurrenceId]);
+  }), [analyzedWord, draftTargetWord, identityMatches, language, variety, selectedSourceSense, sourceFacts, evaluation, currentSelectedDaOccurrenceId]);
 
   const selectDaOccurrence = (occurrenceId: string, checked: boolean) => {
     setDaProposalStateIdentity(daProposalIdentity);
@@ -135,7 +139,7 @@ export function CurrentWordSourceFunctionalSuggestionV0_1({
     >
       <h4 className="font-semibold text-[#d8e4ca]">Source-linked conditional function suggestion</h4>
       <p className="mt-1 text-[#aeb7c5]">
-        Select a lexical sense in the Overview source panel and choose symbolic hypotheses above. The DA candidate uses a reviewed standalone lexical record plus an exact observed substring; only an explicit checkbox proposes a target relationship. The optional manual research form remains separate and is not required for this candidate.
+        Generated DA candidates use the exact-form Albanian source facts already attached to this analysis, the reviewed standalone DA record, and observed spelling structure. No source sense or interpretation is selected automatically. Optional Voice operations can add a separate symbolic layer; they are not required to see the functional candidate.
       </p>
       {daCandidate.occurrences.length ? (
       <div className="mt-2 min-w-0 rounded border border-[#53604a] bg-[#111710] p-2" data-testid="current-word-da-anchored-candidate">
@@ -158,9 +162,41 @@ export function CurrentWordSourceFunctionalSuggestionV0_1({
         <p className="mt-2 break-words" data-testid="current-word-da-candidate-structure">
           DERIVED_STRUCTURE · {analyzedWord || "UNKNOWN_OR_NULL"}: {daCandidate.exactCodePoints.map(({ character, position }) => `${character}@${position}`).join(" · ") || "UNKNOWN_OR_NULL"} · written Voices {daCandidate.writtenVoices.map(({ voice, position }) => `${voice}@${position}`).join(" → ") || "∅"} · pronunciation NOT_ESTABLISHED.
         </p>
+        {daCandidate.generatedFunctionalMotivation.candidates.length ? (
+          <section className="mt-2 space-y-2" data-testid="current-word-da-generated-functional-candidates">
+            <h6 className="font-semibold text-[#d8e4ca]">Generated functional-motivation candidates · unselected</h6>
+            {daCandidate.generatedFunctionalMotivation.candidates.map((candidate) => (
+              <article key={candidate.candidateId} className="min-w-0 rounded border border-[#465b42] bg-[#101710] p-2" data-testid="current-word-da-generated-functional-candidate">
+                <p className="break-words" data-testid="current-word-da-generated-source-sense">
+                  SOURCE_FACT · exact target form {candidate.sourceFact.form} · {candidate.sourceFact.sourceStatus} · attestation {candidate.sourceFact.attestationTruth} · sense {candidate.targetSenseOrdinal}: {candidate.targetSenseGlosses.join("; ")} · {candidate.sourceFact.sourceRecordId} · {candidate.sourceFact.entryLocator}.
+                </p>
+                <p className="mt-1 break-all text-[10px] text-[#aeb7c5]">
+                  Source snapshot {candidate.sourceFact.sourceSnapshot.sourceFamilyId} · SHA-256 {candidate.sourceFact.sourceSnapshot.sha256} · {candidate.sourceFact.sourceSnapshot.sourceUrl}
+                </p>
+                <p className="mt-1 break-words text-[10px] text-[#aeb7c5]" data-testid="current-word-da-generated-structure">
+                  DERIVED_STRUCTURE · exact DA span [{candidate.occurrence.span.start},{candidate.occurrence.span.end}) in {analyzedWord} · written Voices {daCandidate.writtenVoices.map(({ voice, position }) => `${voice}@${position}`).join(" → ") || "∅"}.
+                </p>
+                <p className="mt-1 break-words text-[10px] text-[#aeb7c5]" data-testid="current-word-da-generated-family-support">
+                  DA profile derivative-family support, separately recorded and not a target-specific relation: {candidate.familySupport.map(({ form, categories }) => `${form} (${categories.join(", ")})`).join(" · ") || "UNKNOWN_OR_NULL"}.
+                </p>
+                <p className="mt-2 break-words" data-testid="current-word-da-generated-functional-reading">{candidate.functionalReading}</p>
+                <p className="mt-1 break-words text-[10px] text-[#aeb7c5]" data-testid="current-word-da-generated-claim-boundary">
+                  {candidate.claimLayer} · generated candidate · {candidate.selectionStatus} · whole-word {candidate.wholeWordStatus} · sourceAuthorityPromotion {candidate.sourceAuthorityPromotion} · historicalOrigin {candidate.historicalOrigin} · no_single_winner / {candidate.userDecisionPosture}.
+                </p>
+                <p className="mt-1 break-words text-[10px] text-[#aeb7c5]" data-testid="current-word-da-generated-unresolved">
+                  Unresolved: {candidate.unresolvedMaterial.join(" · ") || "UNKNOWN_OR_NULL"}
+                </p>
+              </article>
+            ))}
+          </section>
+        ) : (
+          <p role="status" className="mt-2 break-words text-[#f0ddb0]" data-testid="current-word-da-generated-functional-null">
+            PARTIAL_NULL · no conditional DA functional candidate is available · {daCandidate.generatedFunctionalMotivation.reasonCodes.join(" · ") || "UNKNOWN_OR_NULL"}. Missing exact-form source data does not establish that the target is absent from Albanian.
+          </p>
+        )}
         {daCandidate.occurrences.length ? (
           <fieldset className="mt-2 min-w-0 rounded border border-[#38433a] p-2">
-            <legend className="px-1 font-semibold text-[#d8e4ca]">Candidate exact DA substring · no automatic target mapping</legend>
+            <legend className="px-1 font-semibold text-[#d8e4ca]">Optional DA target mapping for computed Voice enrichment · no automatic selection</legend>
             {daCandidate.occurrences.map((occurrence) => (
               <label key={occurrence.occurrenceId} className="mt-1 flex min-w-0 items-start gap-2 break-words text-[#c5ced8]">
                 <input
@@ -174,7 +210,7 @@ export function CurrentWordSourceFunctionalSuggestionV0_1({
                 <span>Explicit proposal: {occurrence.exactSurface} at zero-based code-point span [{occurrence.span.start},{occurrence.span.end}) · DERIVED_STRUCTURE. Align with selected whole-word sense only as USER_PROPOSED / EXPLORATORY_HYPOTHESIS; this is not a morpheme boundary or derivation.</span>
               </label>
             ))}
-            {!selectedSourceSense ? <p role="status" className="mt-1 text-[#f0ddb0]">Select a whole-word source sense explicitly before authorizing a DA-to-target proposal.</p> : null}
+            {!selectedSourceSense ? <p role="status" className="mt-1 text-[#f0ddb0]">Select a whole-word source sense only if you want the optional operator-enriched trace below. The generated functional candidate above does not require this selection.</p> : null}
           </fieldset>
         ) : (
           <p role="status" className="mt-2 text-[#f0ddb0]" data-testid="current-word-da-candidate-null">

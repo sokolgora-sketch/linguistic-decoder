@@ -7,7 +7,10 @@ import {
 import type { SymbolicFunctionalCompositionResultV0_3 } from "@/shared/openInstrument/symbolicFunctionalComposition.v0_3";
 import { extractSevenVowelsFromString } from "@/shared/math7.core";
 import { classifyFreeOperatorEvidenceV0_1 } from "@/shared/freeOperatorEvidence.v0_1";
-import { DA_FREE_OPERATOR_PROFILE_V0_1 } from "@/shared/freeOperatorProfile.v0_1";
+import {
+  DA_FREE_OPERATOR_PROFILE_V0_1,
+  freeOperatorProfileGlossMatchesV0_1,
+} from "@/shared/freeOperatorProfile.v0_1";
 import { canonicalOperatorProfilesV0_1 } from "@/shared/canonicalOperatorProfile.v0_1";
 import { reviewedExternalLexiconSourceRowCandidateRegistryV0_1 } from "@/shared/reviewedExternalLexiconSourceRowRegistry.v0_1";
 import {
@@ -17,6 +20,7 @@ import {
   type ProjectFunctionalMotivationTraceResultV0_1,
 } from "@/shared/openInstrument/functionalMotivationTrace.v0_1";
 import { sameAlbanianSourceForm } from "@/ui/instrument/albanianSourceFormIdentity.v0_1";
+import type { AlbanianKaikkiExactLexicalSourceFactV0_1 } from "@/shared/openInstrument/albanianKaikkiServerOnlyExactLexicalSource.v0_1";
 
 export type RuntimeAlbanianSourceSenseRecordV0_1 = Readonly<{
   entryIndex: number;
@@ -365,6 +369,32 @@ export type CurrentWordDaAnchoredEmbryoOccurrenceV0_1 = Readonly<{
   span: Readonly<{ start: number; end: number }>;
 }>;
 
+export type CurrentWordDaFunctionalMotivationCandidateV0_1 = Readonly<{
+  candidateId: string;
+  occurrence: CurrentWordDaAnchoredEmbryoOccurrenceV0_1;
+  sourceFact: AlbanianKaikkiExactLexicalSourceFactV0_1;
+  targetSenseOrdinal: number;
+  targetSenseId: string | null;
+  targetSenseGlosses: readonly string[];
+  familySupport: readonly Readonly<{ form: string; categories: readonly string[] }>[];
+  functionalReading: string;
+  claimLayer: "EXPLORATORY_HYPOTHESIS";
+  generatedBy: "DA_REVIEWED_SOURCE_PLUS_EXACT_FORM";
+  selectionStatus: "UNSELECTED";
+  unresolvedMaterial: readonly string[];
+  wholeWordStatus: "PARTIAL_NULL";
+  sourceAuthorityPromotion: "NONE";
+  historicalOrigin: "NOT_CLAIMED";
+  noSingleWinner: true;
+  userDecisionPosture: "user_decides";
+}>;
+
+export type CurrentWordDaFunctionalMotivationProjectionV0_1 = Readonly<{
+  status: "CANDIDATES_AVAILABLE" | "PARTIAL_NULL";
+  candidates: readonly CurrentWordDaFunctionalMotivationCandidateV0_1[];
+  reasonCodes: readonly string[];
+}>;
+
 export type CurrentWordDaStandaloneEvidenceV0_1 = Readonly<{
   operator: "DA";
   sourceForm: string;
@@ -412,6 +442,7 @@ export type CurrentWordDaAnchoredEmbryoCandidateProjectionV0_1 = Readonly<{
   homophoneCollisionAlternatives: readonly Readonly<{ form: string; glossTerms: readonly string[]; categories: readonly string[] }>[];
   functionalReading: string | null;
   reasoningTrace: FunctionalMotivationTraceProjectionV0_1 | null;
+  generatedFunctionalMotivation: CurrentWordDaFunctionalMotivationProjectionV0_1;
   unresolvedMaterial: readonly string[];
   reasonCodes: readonly string[];
   targetMappingClaimLayer: "EXPLORATORY_HYPOTHESIS";
@@ -500,6 +531,111 @@ function exactOrthographicOccurrencesV0_1(target: string, sourceForm: string): C
     });
   }
   return occurrences;
+}
+
+function generatedDaFunctionalMotivationV0_1(input: Readonly<{
+  analyzedWord: string;
+  draftTargetWord: string;
+  identityMatches: boolean;
+  language: string;
+  variety: string;
+  sourceResolution: DaStandaloneSourceResolutionV0_1 | null;
+  occurrences: readonly CurrentWordDaAnchoredEmbryoOccurrenceV0_1[];
+  sourceFacts: readonly AlbanianKaikkiExactLexicalSourceFactV0_1[];
+  exactCodePoints: readonly Readonly<{ character: string; position: number }>[];
+  writtenVoices: readonly Readonly<{ voice: string; position: number }>[];
+}>): CurrentWordDaFunctionalMotivationProjectionV0_1 {
+  const reasonCodes: string[] = [];
+  if (!input.analyzedWord || input.draftTargetWord !== input.analyzedWord) reasonCodes.push("CURRENT_WORD_IDENTITY_MISMATCH");
+  if (!input.identityMatches) reasonCodes.push("ANALYSIS_IDENTITY_NOT_CONFIRMED");
+  if (!isAlbanianLanguage(input.language)) reasonCodes.push("TARGET_LANGUAGE_NOT_ALBANIAN");
+  if (!isCompatibleAlbanianVariety(input.variety)) reasonCodes.push("TARGET_VARIETY_REQUIRED");
+  if (!input.sourceResolution) reasonCodes.push("DA_REVIEWED_STANDALONE_SOURCE_NOT_AVAILABLE");
+  if (!input.occurrences.length) reasonCodes.push("DA_EXACT_SUBSTRING_NOT_FOUND");
+
+  const sourceFacts = input.sourceFacts.filter((fact) =>
+    fact.language === "Albanian" && fact.languageCode === "sq" &&
+    fact.attestationTruth === "fact" && fact.sourceStatus === "observed_external_snapshot" &&
+    fact.sourceRecordId.trim().length > 0 && fact.entryLocator.trim().length > 0 &&
+    sameAlbanianSourceForm(fact.form, input.analyzedWord) &&
+    /^[0-9a-f]{64}$/iu.test(fact.sourceSnapshot.sha256) && fact.sourceSnapshot.bytes > 0,
+  );
+  if (!sourceFacts.length) reasonCodes.push("EXACT_TARGET_SOURCE_FACTS_NOT_AVAILABLE");
+  const sourceSenses = sourceFacts.flatMap((sourceFact) =>
+    sourceFact.senses.map((sense, senseIndex) => ({ sourceFact, sense, senseIndex })),
+  );
+  const sourceSensesWithGlosses = sourceSenses.filter(({ sense }) =>
+    sense.glosses.some((gloss) => gloss.trim().length > 0),
+  );
+  if (sourceFacts.length && !sourceSensesWithGlosses.length) {
+    reasonCodes.push("EXACT_TARGET_SOURCE_SENSE_GLOSSES_NOT_AVAILABLE");
+  }
+  const daFunctionalGlossTerms = [
+    ...DA_FREE_OPERATOR_PROFILE_V0_1.directFreeOperator.glossTerms,
+    ...DA_FREE_OPERATOR_PROFILE_V0_1.derivativeFamilySupport.glossTerms,
+  ];
+  const matchingSourceSenses = sourceSensesWithGlosses.filter(({ sense }) =>
+    sense.glosses.some((gloss) => freeOperatorProfileGlossMatchesV0_1(daFunctionalGlossTerms, gloss)),
+  );
+  if (sourceSensesWithGlosses.length && !matchingSourceSenses.length) {
+    reasonCodes.push("DA_FUNCTIONAL_DOMAIN_NOT_MATCHED_TO_TARGET_SENSE");
+  }
+
+  const candidates = !reasonCodes.length && input.sourceResolution
+    ? input.occurrences.flatMap((occurrence) => sourceFacts.flatMap((sourceFact) =>
+        sourceFact.senses.flatMap((sense, senseIndex) => {
+          const targetSenseGlosses = sense.glosses.map((gloss) => gloss.trim()).filter(Boolean);
+          if (!targetSenseGlosses.length || !targetSenseGlosses.some((gloss) =>
+            freeOperatorProfileGlossMatchesV0_1(daFunctionalGlossTerms, gloss),
+          )) return [];
+          const familyForms = DA_FREE_OPERATOR_PROFILE_V0_1.derivativeFamilySupport.forms.join(" · ");
+          const targetSenseLabel = targetSenseGlosses.join("; ");
+          const unresolvedMaterial = [
+            `${occurrence.exactSurface}@${occurrence.span.start}-${occurrence.span.end} is observed spelling structure, not an established morpheme boundary`,
+            "The DA-to-target functional relationship is an unselected exploratory hypothesis, not a source-reported derivation",
+            "Internal segmentation and morphology remain UNKNOWN_OR_NULL",
+            ...input.exactCodePoints
+              .filter(({ position, character }) =>
+                (position < occurrence.span.start || position >= occurrence.span.end) &&
+                extractSevenVowelsFromString(character).length === 0,
+              )
+              .map(({ character, position }) => `${character}@${position} functional association UNKNOWN_OR_NULL`),
+            ...input.writtenVoices.map(({ voice, position }) => `${voice}@${position} symbolic role UNKNOWN_OR_NULL; written Voice preserved`),
+            "Complete whole-word functional derivation remains UNKNOWN_OR_NULL",
+          ];
+          return [{
+            candidateId: `da-functional:${sourceFact.sourceRecordId}:${senseIndex + 1}:${occurrence.span.start}-${occurrence.span.end}`,
+            occurrence,
+            sourceFact,
+            targetSenseOrdinal: senseIndex + 1,
+            targetSenseId: sense.senseId,
+            targetSenseGlosses,
+            familySupport: DA_FREE_OPERATOR_PROFILE_V0_1.derivativeFamilySupport.forms.map((form) => ({
+              form,
+              categories: DA_FREE_OPERATOR_PROFILE_V0_1.derivativeFamilySupport.categories,
+            })),
+            functionalReading:
+              `The reviewed standalone Gheg source reports DA (“${input.sourceResolution!.evidence.attestedGloss}”). The exact target source sense is “${targetSenseLabel}”; the DA profile separately lists ${familyForms || "UNKNOWN_OR_NULL"} as derivative-family support, not as a source-reported relation to ${input.analyzedWord}. Conditional functional path: DA “${input.sourceResolution!.evidence.attestedGloss}” → a dividing/separating action → the source sense “${targetSenseLabel}”, when that sense denotes division, separation, or a result of dividing. The observed DA span [${occurrence.span.start},${occurrence.span.end}) is structural only. This generated EXPLORATORY_HYPOTHESIS does not establish a morpheme boundary, target derivation, or historical origin; other target material and symbolic Voice roles remain unresolved.`,
+            claimLayer: "EXPLORATORY_HYPOTHESIS" as const,
+            generatedBy: "DA_REVIEWED_SOURCE_PLUS_EXACT_FORM" as const,
+            selectionStatus: "UNSELECTED" as const,
+            unresolvedMaterial,
+            wholeWordStatus: "PARTIAL_NULL" as const,
+            sourceAuthorityPromotion: "NONE" as const,
+            historicalOrigin: "NOT_CLAIMED" as const,
+            noSingleWinner: true as const,
+            userDecisionPosture: "user_decides" as const,
+          }];
+        }),
+      ))
+    : [];
+
+  const finalReasonCodes = [...new Set(reasonCodes)].sort();
+  return {
+    status: candidates.length ? "CANDIDATES_AVAILABLE" : "PARTIAL_NULL",
+    candidates,
+    reasonCodes: candidates.length ? [] : finalReasonCodes,
+  };
 }
 
 function buildDaAnchoredFunctionalTraceV0_1(input: Readonly<{
@@ -713,6 +849,7 @@ export function buildCurrentWordDaAnchoredEmbryoCandidateV0_1(input: Readonly<{
   language: string;
   variety: string;
   selectedSourceSense: RuntimeAlbanianSourceSenseSelectionV0_1 | null;
+  exactSourceFacts?: readonly AlbanianKaikkiExactLexicalSourceFactV0_1[];
   evaluation: SymbolicFunctionalCompositionResultV0_3;
   proposedOccurrenceId: string | null;
 }>): CurrentWordDaAnchoredEmbryoCandidateProjectionV0_1 {
@@ -886,6 +1023,18 @@ export function buildCurrentWordDaAnchoredEmbryoCandidateV0_1(input: Readonly<{
     historicalOrigin: "NOT_CLAIMED",
     noSingleWinner: true,
     userDecisionPosture: "user_decides",
+    generatedFunctionalMotivation: generatedDaFunctionalMotivationV0_1({
+      analyzedWord: input.analyzedWord,
+      draftTargetWord: input.draftTargetWord,
+      identityMatches: input.identityMatches,
+      language: input.language,
+      variety: input.variety,
+      sourceResolution,
+      occurrences,
+      sourceFacts: input.exactSourceFacts ?? [],
+      exactCodePoints,
+      writtenVoices,
+    }),
   };
 }
 

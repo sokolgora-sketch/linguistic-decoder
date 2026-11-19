@@ -22,6 +22,7 @@ The tier describes the requested change, not an environment setting or a caller-
 
 1. Restate the requested outcome and its authorized scope. A Linear milestone, prior prompt, green CI, or skill is not permission to expand the task.
 2. Read the current Linear ZE-21 workflow first. Read ZE-15 and ZE-18 when the task concerns their research or delivery scope. Use current repository policy and live service state over dated snapshots.
+   For owner-specific functional-motivation priorities, follow the latest live ZE-15/ZE-21 directive and Notion Session Bootstrap; this skill is a workflow pointer and does not supersede those decisions.
 3. Check Codex task/session inventory for concurrent work. Do not treat an absent PR or a clean branch as proof that no task is running. If a concurrent task or ownership boundary cannot be resolved, stop and report `ACTIVE_CODEX_STATUS_UNKNOWN`.
 4. Verify the canonical repository path and identity; live GitHub `main`; relevant open PRs, exact heads, merge/CI status, and parked dispositions; local branch, HEAD, `origin/main`, divergence, and `git status --porcelain=v1 -uall`.
 5. List every registered worktree and inspect its branch, HEAD, and tracked/untracked status. Preserve protected or dirty paths. Never reset, clean, stash, prune, switch, or write to them.
