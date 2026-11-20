@@ -224,7 +224,7 @@ describe("Motivation Discovery Lab presentation v0.1", () => {
     expect(reasoning.compareDocumentPosition(detail) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
   });
 
-  it("renders the computed DA-family transition network and its source/Null boundaries in Overview", () => {
+  it("renders the computed DA-family transition network and its source/Null boundaries in Overview", async () => {
     const familyResponse = (
       form: string,
       senses: Extract<RuntimeFjaloriFamilyFormResponseV0_1, { status: "available" }>["senses"],
@@ -329,13 +329,28 @@ describe("Motivation Discovery Lab presentation v0.1", () => {
     const discovery = adaptAnalysisToTelemetryVM({
       motivationDiscoveryV0_1: model({ inputWord: "NDARJE", inputLanguage: "sq", inputProfile: "albanian" }),
     }).motivationDiscoveryV0_2;
-    global.fetch = jest.fn().mockResolvedValue({
+    const sourceFetch = jest.fn().mockResolvedValue({
       ok: true,
       status: 200,
       json: async () => ({ word: "ndarje", licence: "CC BY-SA 4.0", attribution: ["AI help — CC BY-SA 4.0"], sources: ["ai"], entries: [] }),
-    }) as unknown as typeof fetch;
+    });
+    global.fetch = sourceFetch as unknown as typeof fetch;
+    const onRuntimeSourceResponse = jest.fn();
 
-    render(<MotivationDiscoveryCardV0_1 discovery={discovery} functionalReasoning={projection} />);
+    render(<MotivationDiscoveryCardV0_1
+      discovery={discovery}
+      functionalReasoning={projection}
+      onRuntimeSourceResponse={onRuntimeSourceResponse}
+    />);
+
+    await waitFor(() => expect(sourceFetch).toHaveBeenCalledTimes(5));
+    expect(sourceFetch.mock.calls.map(([url]) => String(url))).toEqual(expect.arrayContaining([
+      "https://fjalorishqip.org/api/v1/fjala/ndarje.json",
+      "https://fjalorishqip.org/api/v1/fjala/daj.json",
+      "https://fjalorishqip.org/api/v1/fjala/ndaj.json",
+      "https://fjalorishqip.org/api/v1/fjala/ndar%C3%AB.json",
+      "https://fjalorishqip.org/api/v1/fjala/ndare.json",
+    ]));
 
     expect(screen.getByTestId("automatic-functional-reasoning-equation")).toHaveTextContent("DA function");
     expect(screen.getByTestId("automatic-functional-reasoning-equation")).toHaveTextContent("NDAJ (verb: to divide a whole into several parts");
@@ -351,6 +366,45 @@ describe("Motivation Discovery Lab presentation v0.1", () => {
     expect(screen.getByTestId("automatic-functional-family-source-records")).toHaveTextContent("not derivation evidence");
     expect(screen.getByTestId("automatic-functional-reasoning-steps")).toHaveTextContent("FAMILY_ACTION_TO_TARGET_EVENT_HYPOTHESIS");
     expect(screen.getByTestId("automatic-functional-reasoning-steps")).toHaveTextContent("INTERMEDIATE_STATE_UNKNOWN");
+  });
+
+  it("does not fetch DA-family records for DALLIM without a qualifying functional proposal", async () => {
+    const onRuntimeSourceResponse = jest.fn();
+    const sourceFetch = jest.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => ({
+        word: "dallim",
+        licence: "CC BY-SA 4.0",
+        sources: ["en-wiktionary"],
+        entries: [{
+          pos: "noun",
+          sources: ["en-wiktionary"],
+          senses: [{ gloss: "difference", lang: "en", source: "en-wiktionary", tags: ["noun"] }],
+        }],
+      }),
+    });
+    global.fetch = sourceFetch as unknown as typeof fetch;
+    const discovery = adaptAnalysisToTelemetryVM({
+      motivationDiscoveryV0_1: model({ inputWord: "DALLIM", inputLanguage: "sq", inputProfile: "albanian" }),
+    }).motivationDiscoveryV0_2;
+
+    render(
+      <MotivationDiscoveryCardV0_1
+        discovery={discovery}
+        functionalReasoning={null}
+        onRuntimeSourceResponse={onRuntimeSourceResponse}
+      />,
+    );
+
+    await waitFor(() => expect(onRuntimeSourceResponse).toHaveBeenCalledWith(expect.objectContaining({
+      queryForm: "DALLIM",
+      status: "available",
+      exactSourceForm: "dallim",
+    })));
+    expect(sourceFetch.mock.calls.map(([url]) => String(url))).toEqual([
+      "https://fjalorishqip.org/api/v1/fjala/dallim.json",
+    ]);
   });
 
   it("relays the existing exact-word Fjalori response to the current-word consumer", async () => {

@@ -1724,7 +1724,9 @@ export function MotivationDiscoveryCardV0_1({
           word={value.inputWord}
           analysisLanguage={value.inputLanguage}
           analysisVariety={value.inputProfile}
-          relatedForms={functionalFamilySourceLookupFormsV0_1(value.inputWord, value.inputLanguage)}
+          relatedForms={functionalReasoning?.candidates.length
+            ? functionalFamilySourceLookupFormsV0_1(value.inputWord, value.inputLanguage)
+            : []}
           onSelectSourceSenseForMotivation={onSelectSourceSenseForMotivation}
           onRuntimeSourceResponse={onRuntimeSourceResponse}
         />
