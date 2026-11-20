@@ -907,6 +907,13 @@ async function main(): Promise<void> {
           result.structuralReadoutStatus = "UNSUPPORTED_STRUCTURAL_INPUT_NULL";
           result.sourceStatus = "UNKNOWN_OR_NULL";
         } else {
+          const overviewDetails = page.getByTestId("instrument-tab-details-overview");
+          assert(
+            await overviewDetails.getAttribute("open") === null,
+            `Expanded Overview details should remain collapsed by default for ${testCase.word}.`,
+          );
+          await overviewDetails.locator(":scope > summary").click();
+
           await page.waitForFunction((target) => {
             const word = document.querySelector('[data-testid="instrument-word"]')?.textContent ?? "";
             const voicePath = document.querySelector('[data-testid="albanian-structural-voice-path"]')?.textContent ?? "";
