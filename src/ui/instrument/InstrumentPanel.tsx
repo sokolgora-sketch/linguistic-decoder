@@ -191,14 +191,20 @@ function TabPanel({
 function TabContentDisclosure({
   id,
   label,
+  activeSection,
   children,
 }: {
   id: InstrumentSectionKey;
   label: string;
+  activeSection: InstrumentSectionKey;
   children: React.ReactNode;
 }) {
   return (
-    <details data-testid={`instrument-tab-details-${id}`} className="min-w-0 rounded-xl border border-[#303a45] bg-[#10151c]">
+    <details
+      data-testid={`instrument-tab-details-${id}`}
+      open={id !== "overview" && activeSection === id}
+      className="min-w-0 rounded-xl border border-[#303a45] bg-[#10151c]"
+    >
       <summary className="cursor-pointer list-none px-4 py-3 text-sm font-semibold text-[#cfe6ff] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#d8bb7a] [&::-webkit-details-marker]:hidden">
         {label}
       </summary>
@@ -659,7 +665,7 @@ export function InstrumentPanel(props: Props) {
                   Analyze another word
                 </button>
               ) : null}
-              <TabContentDisclosure id="overview" label="More overview, sources, and analysis">
+              <TabContentDisclosure id="overview" activeSection={activeSection} label="More overview, sources, and analysis">
               <div className="space-y-4">
               <div
                 data-testid="primary-reading-scroll-target"
@@ -751,7 +757,7 @@ export function InstrumentPanel(props: Props) {
           </TabPanel>
 
           <TabPanel id="my-interpretation" active={activeSection}>
-            <TabContentDisclosure id="my-interpretation" label="Open interpretation tools">
+            <TabContentDisclosure id="my-interpretation" activeSection={activeSection} label="Open interpretation tools">
             <div className="space-y-4">
               <SingleWordMotivationWorkbenchV0_1
                 key={vm.readout.word}
@@ -771,7 +777,7 @@ export function InstrumentPanel(props: Props) {
           </TabPanel>
 
           <TabPanel id="evidence" active={activeSection}>
-            <TabContentDisclosure id="evidence" label="View evidence records and exports">
+            <TabContentDisclosure id="evidence" activeSection={activeSection} label="View evidence records and exports">
             <div className="grid gap-4 xl:grid-cols-12">
               <div className="space-y-4 xl:col-span-5">
                 <EvidenceTraceCard
@@ -801,7 +807,7 @@ export function InstrumentPanel(props: Props) {
           </TabPanel>
 
           <TabPanel id="candidates" active={activeSection}>
-            <TabContentDisclosure id="candidates" label="View candidates and source records">
+            <TabContentDisclosure id="candidates" activeSection={activeSection} label="View candidates and source records">
             <div className="space-y-4">
               <EmbryoExpansionContextCardV0_1
                 vm={vm}
@@ -831,7 +837,7 @@ export function InstrumentPanel(props: Props) {
           </TabPanel>
 
           <TabPanel id="roots" active={activeSection}>
-            <TabContentDisclosure id="roots" label="View roots, structure, and meaning tools">
+            <TabContentDisclosure id="roots" activeSection={activeSection} label="View roots, structure, and meaning tools">
             <div className="grid gap-4 xl:grid-cols-12">
               <div className="space-y-4 xl:col-span-5">
                 <VowelPathTimeline
@@ -873,7 +879,7 @@ export function InstrumentPanel(props: Props) {
           </TabPanel>
 
           <TabPanel id="advanced" active={activeSection}>
-            <TabContentDisclosure id="advanced" label="Open technical and diagnostic tools">
+            <TabContentDisclosure id="advanced" activeSection={activeSection} label="Open technical and diagnostic tools">
             <div className="grid gap-4 xl:grid-cols-12">
               <div className="space-y-4 xl:col-span-5">
                 <div data-testid="advanced-boundary">

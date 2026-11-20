@@ -6,6 +6,7 @@ import { fireEvent, render, screen, within } from "@testing-library/react";
 import { InstrumentPanel } from "@/ui/instrument/InstrumentPanel";
 import type { TelemetryViewModel } from "@/ui/telemetry/types";
 import { INTERPRETATION_DECISION_POLICY_V0_1 } from "@/shared/openInstrument/interpretationDecisionPolicy.v0_1";
+import { openInstrumentOverviewDetails } from "./helpers/openInstrumentOverviewDetails";
 
 jest.mock("@/hooks/use-toast", () => ({
   useToast: () => ({ toast: jest.fn() }),
@@ -132,9 +133,10 @@ describe("Open Instrument canonical Null primary readout v0.1", () => {
     );
 
     const overview = visibleOverview();
-    expect(
-      within(overview).getByRole("heading", { name: "Null — no supported candidate" }),
-    ).toBeVisible();
+    expect(screen.getByTestId("human-reading-functional-null")).toHaveTextContent(
+      "Not enough information for a functional explanation from the current evidence.",
+    );
+    openInstrumentOverviewDetails();
     expect(
       within(overview).getByText(/Null is a valid result/i),
     ).toBeVisible();
@@ -189,6 +191,7 @@ describe("Open Instrument canonical Null primary readout v0.1", () => {
         vm={vmFixture({ analysisStatusV0_2: statusValue("candidate_only") })}
       />,
     );
+    openInstrumentOverviewDetails();
 
     const overview = visibleOverview();
     expect(
@@ -255,6 +258,7 @@ describe("Open Instrument canonical Null primary readout v0.1", () => {
       "aria-selected",
       "true",
     );
+    openInstrumentOverviewDetails();
     expect(
       within(visibleOverview()).getByRole("heading", {
         name: "Null — no supported candidate",

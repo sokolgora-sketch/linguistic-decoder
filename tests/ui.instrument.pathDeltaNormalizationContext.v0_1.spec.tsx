@@ -1,7 +1,7 @@
 /** @jest-environment jsdom */
 
 import React from "react";
-import { render, screen, within } from "@testing-library/react";
+import { fireEvent, render, screen, within } from "@testing-library/react";
 
 import { InstrumentPanel } from "@/ui/instrument/InstrumentPanel";
 import { VowelPathTimeline } from "@/ui/instrument/VowelPathTimeline";
@@ -26,6 +26,7 @@ describe("Open Instrument path delta normalization context v0.1", () => {
     render(<InstrumentPanel payload={studyFixture} />);
 
     const overview = screen.getByRole("tabpanel");
+    fireEvent.click(screen.getByText("More overview, sources, and analysis"));
     const timeline = within(overview)
       .getByText("Voice Path Layers")
       .closest("div.rounded-xl");
@@ -46,6 +47,7 @@ describe("Open Instrument path delta normalization context v0.1", () => {
     render(<InstrumentPanel payload={damageFixture} />);
 
     const overview = screen.getByRole("tabpanel");
+    fireEvent.click(screen.getByText("More overview, sources, and analysis"));
     const timeline = within(overview)
       .getByText("Voice Path Layers")
       .closest("div.rounded-xl");

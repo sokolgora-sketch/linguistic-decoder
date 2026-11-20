@@ -6,6 +6,7 @@ import { render, screen, within } from "@testing-library/react";
 import { GET } from "../app/api/analyze-v1/route";
 import { InstrumentPanel } from "@/ui/instrument/InstrumentPanel";
 import type { TelemetryViewModel } from "@/ui/telemetry/types";
+import { openInstrumentOverviewDetails } from "./helpers/openInstrumentOverviewDetails";
 
 jest.mock("@/hooks/use-toast", () => ({
   useToast: () => ({ toast: jest.fn() }),
@@ -80,8 +81,9 @@ async function analyze(word: string): Promise<unknown> {
 }
 
 describe("Open Instrument Overview vowel-path visibility v0.1", () => {
-  it("shows the VM-backed comparison in the default Overview for a successful analysis", async () => {
+  it("shows the VM-backed comparison when Overview details are opened", async () => {
     render(<InstrumentPanel payload={await analyze("study")} />);
+    openInstrumentOverviewDetails();
 
     const overview = screen.getByRole("tabpanel");
     const functionalCard = within(overview).getByTestId("functional-motivation-card");
@@ -114,6 +116,7 @@ describe("Open Instrument Overview vowel-path visibility v0.1", () => {
 
   it("preserves the existing not-emitted behavior for missing VM paths", () => {
     render(<InstrumentPanel vm={vmWithMissingPaths()} />);
+    openInstrumentOverviewDetails();
 
     const overview = screen.getByRole("tabpanel");
 

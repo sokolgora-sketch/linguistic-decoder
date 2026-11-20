@@ -5,6 +5,7 @@ import { render, screen, within } from "@testing-library/react";
 
 import { GET } from "../app/api/analyze-v1/route";
 import { InstrumentPanel } from "../src/ui/instrument/InstrumentPanel";
+import { openInstrumentOverviewDetails } from "./helpers/openInstrumentOverviewDetails";
 
 jest.mock("@/hooks/use-toast", () => ({
   useToast: () => ({ toast: jest.fn() }),
@@ -64,6 +65,7 @@ describe("Open Instrument primary reading orientation card v0.1", () => {
     async (word, structure, doctrine, evidence) => {
       const body = await analyze(word);
       render(<InstrumentPanel payload={body} />);
+      openInstrumentOverviewDetails();
 
       const card = screen.getByTestId("primary-reading-orientation-card");
       expect(within(card).getByTestId("orientation-structure")).toHaveTextContent(
@@ -93,6 +95,7 @@ describe("Open Instrument primary reading orientation card v0.1", () => {
       expect(body.doctrineReading.analyzedVoicePath.join(" → ")).toBe(spokenPath);
 
       render(<InstrumentPanel payload={body} />);
+      openInstrumentOverviewDetails();
 
       const orientation = screen.getByTestId("primary-reading-orientation-card");
       expect(within(orientation).getByText("Spoken / canonical Voice path:")).toBeVisible();
@@ -121,6 +124,7 @@ describe("Open Instrument primary reading orientation card v0.1", () => {
     async (word, orthographicPath, functionalDepth) => {
       const body = await analyze(word);
       render(<InstrumentPanel payload={body} />);
+      openInstrumentOverviewDetails();
 
       const timeline = screen
         .getAllByText("Voice Path Layers")[0]
@@ -141,6 +145,7 @@ describe("Open Instrument primary reading orientation card v0.1", () => {
   it("keeps structural absence distinct from evidence absence for 123", async () => {
     const body = await analyze("123");
     render(<InstrumentPanel payload={body} />);
+    openInstrumentOverviewDetails();
 
     const card = screen.getByTestId("primary-reading-orientation-card");
     expect(within(card).getByText("Spoken / canonical Voice path:")).toBeVisible();
@@ -155,6 +160,7 @@ describe("Open Instrument primary reading orientation card v0.1", () => {
 
   it("preserves malformed doctrine as a contract error instead of ordinary absence", () => {
     render(<InstrumentPanel payload={{ word: "x", doctrineReading: "bad" }} />);
+    openInstrumentOverviewDetails();
 
     const card = screen.getByTestId("primary-reading-orientation-card");
     expect(within(card).getByTestId("orientation-doctrine")).toHaveTextContent(
@@ -168,6 +174,7 @@ describe("Open Instrument primary reading orientation card v0.1", () => {
     async (word) => {
       const body = await analyze(word);
       render(<InstrumentPanel payload={body} />);
+      openInstrumentOverviewDetails();
 
       const card = screen.getByTestId("primary-reading-orientation-card");
       expect(within(card).getByTestId("orientation-doctrine")).toHaveTextContent(
@@ -182,6 +189,7 @@ describe("Open Instrument primary reading orientation card v0.1", () => {
   it("keeps the detailed doctrine and evidence surfaces below the orientation summary", async () => {
     const body = await analyze("study");
     render(<InstrumentPanel payload={body} />);
+    openInstrumentOverviewDetails();
 
     const orientation = screen.getByTestId("primary-reading-orientation-card");
     expect(screen.getByTestId("doctrine-reading-card")).toBeVisible();
@@ -194,6 +202,7 @@ describe("Open Instrument primary reading orientation card v0.1", () => {
   it("does not expose internal status or trace labels in the orientation card", async () => {
     const body = await analyze("study");
     render(<InstrumentPanel payload={body} />);
+    openInstrumentOverviewDetails();
 
     const card = screen.getByTestId("primary-reading-orientation-card");
     expect(card).not.toHaveTextContent(

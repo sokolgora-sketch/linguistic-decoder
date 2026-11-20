@@ -161,6 +161,7 @@ describe("Open Instrument primary candidate navigation affordance v0.1", () => {
     render(<InstrumentPanel payload={body.payload} />);
 
     const overviewPanel = screen.getByRole("tabpanel");
+    fireEvent.click(screen.getByText("More overview, sources, and analysis"));
     expect(within(overviewPanel).getByRole("button", { name: "View candidate record" })).toBeVisible();
     expect(within(overviewPanel).getByText("Evidence sources")).toBeVisible();
     expect(within(overviewPanel).getByRole("link")).toBeVisible();

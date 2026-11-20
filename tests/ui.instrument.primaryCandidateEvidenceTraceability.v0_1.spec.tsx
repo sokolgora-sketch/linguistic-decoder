@@ -7,6 +7,7 @@ import { GET } from "../app/api/analyze-v1/route";
 import { InstrumentPanel } from "../src/ui/instrument/InstrumentPanel";
 import { EmbryoExpansionContextCardV0_1 } from "../src/ui/instrument/sections/EmbryoExpansionContextCard.v0_1";
 import { adaptAnalysisToTelemetryVM } from "../src/ui/instrument/contractAdapter";
+import { openInstrumentOverviewDetails } from "./helpers/openInstrumentOverviewDetails";
 import {
   getReviewedExternalLexiconProductionSourceRowsV0_1,
 } from "../src/shared/reviewedExternalLexiconSourceRowRegistry.v0_1";
@@ -68,6 +69,7 @@ describe("Open Instrument primary candidate evidence traceability v0.1", () => {
 
     render(<InstrumentPanel payload={body} />);
 
+    openInstrumentOverviewDetails();
     const overview = screen.getByRole("tabpanel");
     expect(within(overview).getByText("Evidence: Reviewed lexical bridge · exploratory")).toBeVisible();
     expect(within(overview).getByText("Evidence sources")).toHaveClass(
@@ -187,6 +189,7 @@ describe("Open Instrument primary candidate evidence traceability v0.1", () => {
       />,
     );
 
+    openInstrumentOverviewDetails();
     const overview = screen.getByRole("tabpanel");
     expect(within(overview).getByText("Research hypothesis")).toBeVisible();
     expect(
@@ -208,6 +211,7 @@ describe("Open Instrument primary candidate evidence traceability v0.1", () => {
       />,
     );
 
+    openInstrumentOverviewDetails();
     const overview = screen.getByRole("tabpanel");
     expect(within(overview).getByText("Evidence sources")).toBeVisible();
     expect(within(overview).getByText("Unresolved reference")).toBeVisible();
@@ -230,6 +234,7 @@ describe("Open Instrument primary candidate evidence traceability v0.1", () => {
       />,
     );
 
+    openInstrumentOverviewDetails();
     const overview = screen.getByRole("tabpanel");
     expect(within(overview).queryByText("Evidence sources")).not.toBeInTheDocument();
     expect(within(overview).getByText("Evidence: Proposed")).toBeVisible();
@@ -240,6 +245,7 @@ describe("Open Instrument primary candidate evidence traceability v0.1", () => {
 
     render(<InstrumentPanel payload={body} />);
 
+    openInstrumentOverviewDetails();
     const overview = screen.getByRole("tabpanel");
     expect(
       within(overview).getByRole("heading", {
