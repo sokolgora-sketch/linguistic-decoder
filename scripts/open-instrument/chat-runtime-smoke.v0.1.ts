@@ -106,7 +106,7 @@ async function main(): Promise<void> {
       !(await page.getByText("MULTILINGUAL SOURCE DISCOVERY", { exact: true }).first().isVisible()),
       "Detailed source discovery should not be visible before the user opens Overview details.",
     );
-    await overviewDetails.locator("summary").click();
+    await overviewDetails.locator(":scope > summary").click();
     console.log("OVERVIEW_DETAILS_DISCLOSURE=PASS");
 
     const assertAuthorityHierarchy = async (viewportLabel: "DESKTOP" | "MOBILE") => {
