@@ -58,6 +58,8 @@ import { safeText } from "./safeText";
 import { MT } from "@/ui/typography/marketingType.v0.1";
 import { adaptAlbanianStructuralEvidenceToVMV0_1 } from "./albanianStructuralEvidenceAdapter.v0_1";
 import { AlbanianStructuralEvidenceCardV0_1 } from "./sections/AlbanianStructuralEvidenceCard.v0_1";
+import { buildHumanReadingSummaryV0_1 } from "./sections/humanReadingSummaryAdapter.v0_1";
+import { HumanReadingSummaryCardV0_1 } from "./sections/HumanReadingSummaryCardV0_1";
 
 type Props =
   | {
@@ -183,6 +185,25 @@ function TabPanel({
     <div role="tabpanel" hidden={active !== id}>
       {children}
     </div>
+  );
+}
+
+function TabContentDisclosure({
+  id,
+  label,
+  children,
+}: {
+  id: InstrumentSectionKey;
+  label: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <details data-testid={`instrument-tab-details-${id}`} className="min-w-0 rounded-xl border border-[#303a45] bg-[#10151c]">
+      <summary className="cursor-pointer list-none px-4 py-3 text-sm font-semibold text-[#cfe6ff] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#d8bb7a] [&::-webkit-details-marker]:hidden">
+        {label}
+      </summary>
+      <div className="min-w-0 border-t border-[#303a45] p-4">{children}</div>
+    </details>
   );
 }
 
@@ -316,6 +337,15 @@ export function InstrumentPanel(props: Props) {
     });
     return projection.candidates.length ? projection : null;
   }, [isValidVm, vm, sourceSenseAnalysisIdentity, runtimeFjaloriSourceForCurrentAnalysis]);
+  const humanReadingSummary = React.useMemo(() => isValidVm
+    ? buildHumanReadingSummaryV0_1({
+        word: vm.readout.word,
+        discovery: vm.motivationDiscoveryV0_2,
+        functionalReasoning: automaticFunctionalReasoning,
+        runtimeSourceResponse: runtimeFjaloriSourceForCurrentAnalysis,
+      })
+    : null,
+  [isValidVm, vm, automaticFunctionalReasoning, runtimeFjaloriSourceForCurrentAnalysis]);
   const handleSourceSenseSelection = (selection: RuntimeAlbanianSourceSenseSelectionV0_1 | null) => {
     if (!selection || !sourceSenseAnalysisIdentity) {
       setSelectedSourceSense(null);
@@ -609,6 +639,8 @@ export function InstrumentPanel(props: Props) {
           </div>
         </div>
 
+        {humanReadingSummary ? <HumanReadingSummaryCardV0_1 summary={humanReadingSummary} /> : null}
+
         <SectionTabs
           active={activeSection}
           onChange={setActiveSection}
@@ -617,20 +649,22 @@ export function InstrumentPanel(props: Props) {
         <div className="space-y-4">
           <TabPanel id="overview" active={activeSection}>
             <div className="space-y-4">
+              {props.onMobileComposerJump ? (
+                <button
+                  type="button"
+                  data-testid="mobile-composer-jump"
+                  onClick={props.onMobileComposerJump}
+                  className="inline-flex min-h-10 w-full items-center justify-center rounded-lg border border-[#355a7a] bg-[#111a24] px-3 text-sm font-semibold text-[#cfe6ff] sm:hidden"
+                >
+                  Analyze another word
+                </button>
+              ) : null}
+              <TabContentDisclosure id="overview" label="More overview, sources, and analysis">
+              <div className="space-y-4">
               <div
                 data-testid="primary-reading-scroll-target"
                 className="scroll-mt-24 sm:scroll-mt-0"
               >
-                {props.onMobileComposerJump ? (
-                  <button
-                    type="button"
-                    data-testid="mobile-composer-jump"
-                    onClick={props.onMobileComposerJump}
-                    className="mb-3 inline-flex min-h-10 w-full items-center justify-center rounded-lg border border-[#355a7a] bg-[#111a24] px-3 text-sm font-semibold text-[#cfe6ff] sm:hidden"
-                  >
-                    Analyze another word
-                  </button>
-                ) : null}
                 <PrimaryAlbanianReadingCardV0_1
                   discovery={vm.motivationDiscoveryV0_2}
                   analysisStatus={analysisStatusForUi}
@@ -711,10 +745,13 @@ export function InstrumentPanel(props: Props) {
                   />
                 </div>
               </details>
+              </div>
+              </TabContentDisclosure>
             </div>
           </TabPanel>
 
           <TabPanel id="my-interpretation" active={activeSection}>
+            <TabContentDisclosure id="my-interpretation" label="Open interpretation tools">
             <div className="space-y-4">
               <SingleWordMotivationWorkbenchV0_1
                 key={vm.readout.word}
@@ -730,9 +767,11 @@ export function InstrumentPanel(props: Props) {
                 runtimeFjaloriSourceResponse={runtimeFjaloriSourceForCurrentAnalysis}
               />
             </div>
+            </TabContentDisclosure>
           </TabPanel>
 
           <TabPanel id="evidence" active={activeSection}>
+            <TabContentDisclosure id="evidence" label="View evidence records and exports">
             <div className="grid gap-4 xl:grid-cols-12">
               <div className="space-y-4 xl:col-span-5">
                 <EvidenceTraceCard
@@ -758,9 +797,11 @@ export function InstrumentPanel(props: Props) {
                 <CountsRatiosCard readout={vm.readout} engineVersion={engineVersion} />
               </div>
             </div>
+            </TabContentDisclosure>
           </TabPanel>
 
           <TabPanel id="candidates" active={activeSection}>
+            <TabContentDisclosure id="candidates" label="View candidates and source records">
             <div className="space-y-4">
               <EmbryoExpansionContextCardV0_1
                 vm={vm}
@@ -786,9 +827,11 @@ export function InstrumentPanel(props: Props) {
                 </details>
               ) : null}
             </div>
+            </TabContentDisclosure>
           </TabPanel>
 
           <TabPanel id="roots" active={activeSection}>
+            <TabContentDisclosure id="roots" label="View roots, structure, and meaning tools">
             <div className="grid gap-4 xl:grid-cols-12">
               <div className="space-y-4 xl:col-span-5">
                 <VowelPathTimeline
@@ -826,9 +869,11 @@ export function InstrumentPanel(props: Props) {
                 />
               </div>
             </div>
+            </TabContentDisclosure>
           </TabPanel>
 
           <TabPanel id="advanced" active={activeSection}>
+            <TabContentDisclosure id="advanced" label="Open technical and diagnostic tools">
             <div className="grid gap-4 xl:grid-cols-12">
               <div className="space-y-4 xl:col-span-5">
                 <div data-testid="advanced-boundary">
@@ -906,6 +951,7 @@ export function InstrumentPanel(props: Props) {
                 />
               </div>
             </div>
+            </TabContentDisclosure>
           </TabPanel>
         </div>
       </div>

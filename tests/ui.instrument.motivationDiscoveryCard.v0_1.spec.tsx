@@ -1,7 +1,9 @@
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { GET } from "../app/api/analyze-v1/route";
 import { adaptAnalysisToTelemetryVM } from "@/ui/instrument/contractAdapter";
 import { MotivationDiscoveryCardV0_1 } from "@/ui/instrument/sections/MotivationDiscoveryCard.v0_1";
+import { HumanReadingSummaryCardV0_1 } from "@/ui/instrument/sections/HumanReadingSummaryCardV0_1";
+import { buildHumanReadingSummaryV0_1 } from "@/ui/instrument/sections/humanReadingSummaryAdapter.v0_1";
 import {
   buildCurrentWordFunctionalReasoningV0_1,
   type RuntimeFjaloriFamilyFormResponseV0_1,
@@ -200,28 +202,40 @@ describe("Motivation Discovery Lab presentation v0.1", () => {
       status: 200,
       json: async () => ({ word: "dije", licence: "CC BY-SA 4.0", sources: [], entries: [] }),
     }) as unknown as typeof fetch;
-    render(<MotivationDiscoveryCardV0_1 discovery={discovery} functionalReasoning={projection} />);
+    const summary = buildHumanReadingSummaryV0_1({
+      word: "DIJE",
+      discovery,
+      functionalReasoning: projection,
+      runtimeSourceResponse: response,
+    });
+    render(<>
+      <MotivationDiscoveryCardV0_1 discovery={discovery} functionalReasoning={projection} />
+      <HumanReadingSummaryCardV0_1 summary={summary} />
+    </>);
 
-    const reasoning = screen.getByTestId("automatic-functional-reasoning");
-    expect(screen.getByTestId("automatic-functional-reasoning-equation")).toHaveTextContent(
-      "DI (“know / knowledge”; source-reported verb function) → proposed knowing-to-knowledge relation → DIJE (“knowledge”; source-reported noun sense)",
-    );
-    expect(screen.getByTestId("automatic-functional-reasoning-explanation")).toHaveTextContent(
-      "The recorded knowing function “know / knowledge” is proposed as a knowledge-related contribution",
-    );
-    expect(screen.getByTestId("automatic-functional-reasoning-explanation")).not.toHaveTextContent("action-level");
-    expect(reasoning).toHaveTextContent("candidate_only");
-    expect(reasoning).toHaveTextContent("UNSELECTED");
-    expect(reasoning).toHaveTextContent("PARTIAL_NULL");
-    expect(reasoning).toHaveTextContent("no_single_winner / user_decides");
-    expect(screen.getByTestId("automatic-functional-reasoning-unresolved")).toHaveTextContent("internal morphology");
-    expect(reasoning).toHaveTextContent("target sense CITATION_ENTERED_UNVERIFIED");
-    expect(reasoning).toHaveTextContent("proposed relation is not source-reported");
-    const detail = screen.getByTestId("automatic-functional-reasoning-details");
-    expect(detail).toHaveTextContent("news, information");
-    expect(detail).not.toHaveAttribute("open");
-    expect(screen.getByText("Inspect source evidence and typed reasoning steps")).toBeInTheDocument();
-    expect(reasoning.compareDocumentPosition(detail) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    expect(screen.queryByTestId("automatic-functional-reasoning")).not.toBeInTheDocument();
+    const humanSummary = screen.getByTestId("human-reading-summary");
+    const result = within(humanSummary).getByTestId("human-reading-functional-results");
+    expect(result).toHaveTextContent("knowing → knowledge");
+    expect(result).toHaveTextContent("DIJE");
+    expect(result).not.toHaveTextContent("action-level");
+    expect(result).not.toHaveTextContent("candidate_only");
+    expect(result).not.toHaveTextContent("PARTIAL_NULL");
+    expect(within(humanSummary).getByTestId("human-reading-functional-status")).toHaveTextContent("Proposal only");
+    expect(within(humanSummary).getByTestId("human-reading-meaning")).toHaveTextContent("knowledge");
+    expect(within(humanSummary).getByTestId("human-reading-meaning")).toHaveTextContent("news, information");
+    expect(within(humanSummary).getByTestId("human-reading-written-voices")).toHaveTextContent("I@1 → E@3");
+    expect(within(humanSummary).getByTestId("human-reading-sources-and-alternatives")).not.toHaveAttribute("open");
+    expect(within(humanSummary).getByTestId("human-reading-technical-evidence")).not.toHaveAttribute("open");
+
+    fireEvent.click(within(humanSummary).getByText("Technical evidence"));
+    const technical = within(humanSummary).getByTestId("human-reading-technical-evidence");
+    expect(technical).toHaveTextContent("candidate_only");
+    expect(technical).toHaveTextContent("PARTIAL_NULL");
+    expect(technical).toHaveTextContent("no_single_winner");
+    expect(technical).toHaveTextContent("user_decides");
+    fireEvent.click(within(humanSummary).getByText("Sources and other meanings"));
+    expect(within(humanSummary).getByTestId("human-reading-sources-and-alternatives")).toHaveTextContent("news, information");
   });
 
   it("renders the computed DA-family transition network and its source/Null boundaries in Overview", async () => {
@@ -245,9 +259,9 @@ describe("Motivation Discovery Lab presentation v0.1", () => {
         senses,
       };
     };
-    const verbSense = (gloss: string) => ({
+    const verbSense = (gloss: string, senseIndex = 1) => ({
       entryIndex: 1,
-      senseIndex: 1,
+      senseIndex,
       partOfSpeech: "verb",
       gloss,
       glossLanguage: "en" as const,
@@ -255,6 +269,7 @@ describe("Motivation Discovery Lab presentation v0.1", () => {
       tags: [],
       entrySources: ["en-wiktionary", "editor"],
     });
+    // Synthetic source-response fixture: exercises eight repeated candidate paths, not live lexical evidence.
     const response: RuntimeFjaloriSourceResponseV0_1 = {
       requestKey: "NDARJE\u0000ndarje",
       queryForm: "NDARJE",
@@ -277,7 +292,7 @@ describe("Motivation Discovery Lab presentation v0.1", () => {
         entrySources: ["sq-wiktionary", "editor"],
       }],
       familyFormResponses: [
-        familyResponse("DAJ", [verbSense("to divide"), {
+        familyResponse("DAJ", [verbSense("to divide", 1), verbSense("to split", 2), verbSense("to separate", 3), verbSense("to cut into parts", 4), {
           entryIndex: 2,
           senseIndex: 1,
           partOfSpeech: "noun",
@@ -287,7 +302,12 @@ describe("Motivation Discovery Lab presentation v0.1", () => {
           tags: [],
           entrySources: ["editor"],
         }], "Formë gege e foljes «ndaj»; also a separate kinship sense."),
-        familyResponse("NDAJ", [verbSense("to divide a whole into several parts")], "Bëj që diçka e tërë të bëhet në disa pjesë."),
+        familyResponse("NDAJ", [
+          verbSense("to divide a whole into several parts", 1),
+          verbSense("to separate things that are together", 2),
+          verbSense("to split something into parts", 3),
+          verbSense("to cut a whole into pieces", 4),
+        ], "Bëj që diçka e tërë të bëhet në disa pjesë."),
         {
           requestKey: "ndarë\u0000ndarë",
           queryForm: "ndarë",
@@ -337,11 +357,20 @@ describe("Motivation Discovery Lab presentation v0.1", () => {
     global.fetch = sourceFetch as unknown as typeof fetch;
     const onRuntimeSourceResponse = jest.fn();
 
-    render(<MotivationDiscoveryCardV0_1
-      discovery={discovery}
-      functionalReasoning={projection}
-      onRuntimeSourceResponse={onRuntimeSourceResponse}
-    />);
+    const summary = buildHumanReadingSummaryV0_1({
+      word: "NDARJE",
+      discovery,
+      functionalReasoning: projection,
+      runtimeSourceResponse: response,
+    });
+    render(<>
+      <MotivationDiscoveryCardV0_1
+        discovery={discovery}
+        functionalReasoning={projection}
+        onRuntimeSourceResponse={onRuntimeSourceResponse}
+      />
+      <HumanReadingSummaryCardV0_1 summary={summary} />
+    </>);
 
     await waitFor(() => expect(sourceFetch).toHaveBeenCalledTimes(5));
     expect(sourceFetch.mock.calls.map(([url]) => String(url))).toEqual(expect.arrayContaining([
@@ -352,20 +381,46 @@ describe("Motivation Discovery Lab presentation v0.1", () => {
       "https://fjalorishqip.org/api/v1/fjala/ndare.json",
     ]));
 
-    expect(screen.getByTestId("automatic-functional-reasoning-equation")).toHaveTextContent("DA function");
-    expect(screen.getByTestId("automatic-functional-reasoning-equation")).toHaveTextContent("NDAJ (verb: to divide a whole into several parts");
-    expect(screen.getByTestId("automatic-functional-reasoning-equation")).toHaveTextContent("proposed action-to-event relation");
-    expect(screen.getByTestId("automatic-functional-transition-status")).toHaveTextContent("intermediate state UNKNOWN_OR_NULL");
-    expect(screen.getByTestId("automatic-functional-reasoning-explanation")).toHaveTextContent("neither source reports a relation between the forms");
-    const details = screen.getByTestId("automatic-functional-reasoning-details");
-    expect(details).not.toHaveAttribute("open");
-    fireEvent.click(screen.getByText("Inspect source evidence and typed reasoning steps"));
-    expect(screen.getByTestId("automatic-functional-family-source-records")).toHaveTextContent("maternal");
-    expect(screen.getByTestId("automatic-functional-family-source-records")).toHaveTextContent("NDAJ");
-    expect(screen.getByTestId("automatic-functional-family-source-records")).toHaveTextContent("AI-assisted source attribution");
-    expect(screen.getByTestId("automatic-functional-family-source-records")).toHaveTextContent("not derivation evidence");
-    expect(screen.getByTestId("automatic-functional-reasoning-steps")).toHaveTextContent("FAMILY_ACTION_TO_TARGET_EVENT_HYPOTHESIS");
-    expect(screen.getByTestId("automatic-functional-reasoning-steps")).toHaveTextContent("INTERMEDIATE_STATE_UNKNOWN");
+    expect(screen.queryByTestId("automatic-functional-reasoning")).not.toBeInTheDocument();
+    const humanSummary = screen.getByTestId("human-reading-summary");
+    expect(within(humanSummary).getAllByTestId("human-reading-functional-result")).toHaveLength(1);
+    expect(summary.functionalReadings[0].candidates.flatMap(({ familyNetwork }) => familyNetwork.transitionNetworks)).toHaveLength(8);
+    const concise = within(humanSummary).getByTestId("human-reading-functional-results");
+    expect(concise).toHaveTextContent("DA’s recorded action");
+    expect(concise).toHaveTextContent("Separate DAJ and NDAJ entries");
+    expect(concise).toHaveTextContent("record verb senses about dividing or separating");
+    expect(concise).toHaveTextContent("NDARJE names an action or event of “division; separation”");
+    expect(within(humanSummary).getByTestId("human-reading-functional-status")).toHaveTextContent("Proposal only; no historical origin is claimed.");
+    expect(concise).toHaveTextContent("source entries do not report this relationship");
+    expect(concise).not.toHaveTextContent("UNKNOWN_OR_NULL");
+    expect(concise).not.toHaveTextContent("PARTIAL_NULL");
+    expect(concise).not.toHaveTextContent("CITATION_ENTERED_UNVERIFIED");
+    const sourcesDetails = within(humanSummary).getByTestId("human-reading-sources-and-alternatives");
+    expect(sourcesDetails).not.toHaveAttribute("open");
+    fireEvent.click(within(humanSummary).getByText("Sources and other meanings"));
+    expect(sourcesDetails).toHaveTextContent("maternal");
+    expect(sourcesDetails).toHaveTextContent(/ndaj/i);
+    expect(sourcesDetails).toHaveTextContent(/daj/i);
+    const sourceSenseSection = within(sourcesDetails).getByRole("region", { name: "Available source senses" });
+    const sourceSenseRows = within(sourceSenseSection).getAllByRole("listitem");
+    expect(sourceSenseRows).toHaveLength(1);
+    expect(sourceSenseRows[0]).toHaveTextContent("division; separation");
+    expect(sourceSenseRows[0]).toHaveTextContent("FjaloriShqip · Wiktionary (Albanian edition) · citation not independently verified");
+    expect(sourceSenseRows[0]).not.toHaveTextContent("FjaloriShqip · FjaloriShqip");
+    expect(sourcesDetails).not.toHaveTextContent("FJALORISHQIP");
+    expect(sourcesDetails).toHaveTextContent("Each entry reports its own meaning. The entries do not report a relationship between these forms.");
+    expect(sourcesDetails).toHaveTextContent("citation not independently verified");
+    expect(sourcesDetails).not.toHaveTextContent("CITATION_ENTERED_UNVERIFIED");
+    expect(sourcesDetails).not.toHaveTextContent("DIRECT_FREE_OPERATOR_FORM");
+    expect(sourcesDetails).not.toHaveTextContent("http-not-found");
+    fireEvent.click(within(sourcesDetails).getByText("View all 5 recorded senses"));
+    expect(sourcesDetails).toHaveTextContent("maternal uncle");
+    const technical = within(humanSummary).getByTestId("human-reading-technical-evidence");
+    expect(technical).toHaveTextContent("PARTIAL_NULL");
+    expect(technical).toHaveTextContent("CITATION_ENTERED_UNVERIFIED");
+    expect(technical).toHaveTextContent("FJALORISHQIP");
+    expect(technical).toHaveTextContent("DIRECT_FREE_OPERATOR_FORM");
+    expect(technical).toHaveTextContent("INTERMEDIATE_STATE_UNKNOWN");
   });
 
   it("does not fetch DA-family records for DALLIM without a qualifying functional proposal", async () => {
