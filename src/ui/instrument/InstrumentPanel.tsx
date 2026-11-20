@@ -46,9 +46,11 @@ import { PrimaryAlbanianReadingCardV0_1 } from "./sections/PrimaryAlbanianReadin
 import { MotivationDiscoveryCardV0_1 } from "./sections/MotivationDiscoveryCard.v0_1";
 import { SingleWordMotivationWorkbenchV0_1 } from "./sections/SingleWordMotivationWorkbenchV0_1";
 import type {
+  CurrentWordFunctionalReasoningProjectionV0_1,
   RuntimeAlbanianSourceSenseSelectionV0_1,
   RuntimeFjaloriSourceResponseV0_1,
 } from "./sections/currentWordSourceFunctionalSuggestionAdapter.v0_1";
+import { buildCurrentWordFunctionalReasoningV0_1 } from "./sections/currentWordSourceFunctionalSuggestionAdapter.v0_1";
 import type { GenericFunctionalWitnessV1 } from "@/shared/openInstrument/genericFunctionalWitnessDiscovery.v1";
 import { OriginClaimCard } from '@/components/OriginClaimCard';
 import { cn } from "@/lib/utils";
@@ -296,6 +298,24 @@ export function InstrumentPanel(props: Props) {
   const runtimeFjaloriSourceForCurrentAnalysis = runtimeFjaloriSource?.analysisIdentity === sourceSenseAnalysisIdentity
     ? runtimeFjaloriSource.response
     : null;
+  const automaticFunctionalReasoning: CurrentWordFunctionalReasoningProjectionV0_1 | null = React.useMemo(() => {
+    if (!isValidVm || vm.motivationDiscoveryV0_2?.kind !== "present") return null;
+    const discovery = vm.motivationDiscoveryV0_2.value;
+    const candidateOnlyOperators = vm.analysisStatusV0_2.kind === "present"
+      ? vm.analysisStatusV0_2.value.candidateOnlyOperators
+      : [];
+    const projection = buildCurrentWordFunctionalReasoningV0_1({
+      analyzedWord: vm.readout.word,
+      draftTargetWord: vm.readout.word,
+      identityMatches: discovery.inputWord === vm.readout.word && sourceSenseAnalysisIdentity !== null,
+      language: discovery.inputLanguage,
+      variety: discovery.inputProfile,
+      exactSourceFacts: discovery.exactLexicalSourceFacts ?? [],
+      fjaloriSourceResponse: runtimeFjaloriSourceForCurrentAnalysis,
+      candidateOnlyOperators,
+    });
+    return projection.candidates.length ? projection : null;
+  }, [isValidVm, vm, sourceSenseAnalysisIdentity, runtimeFjaloriSourceForCurrentAnalysis]);
   const handleSourceSenseSelection = (selection: RuntimeAlbanianSourceSenseSelectionV0_1 | null) => {
     if (!selection || !sourceSenseAnalysisIdentity) {
       setSelectedSourceSense(null);
@@ -624,6 +644,7 @@ export function InstrumentPanel(props: Props) {
               <MotivationDiscoveryCardV0_1
                 discovery={vm.motivationDiscoveryV0_2}
                 interpretation={vm.functionalMotivationInterpretationV0_3}
+                functionalReasoning={automaticFunctionalReasoning}
                 onAnalyzeAlbanianSourceRecord={props.onAnalyzeAlbanianSourceRecord}
                 onSelectSourceSenseForMotivation={handleSourceSenseSelection}
                 onRuntimeSourceResponse={handleRuntimeFjaloriSourceResponse}

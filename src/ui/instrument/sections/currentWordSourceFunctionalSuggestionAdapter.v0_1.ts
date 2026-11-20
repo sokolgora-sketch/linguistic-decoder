@@ -9,8 +9,14 @@ import { extractSevenVowelsFromString } from "@/shared/math7.core";
 import { classifyFreeOperatorEvidenceV0_1 } from "@/shared/freeOperatorEvidence.v0_1";
 import {
   DA_FREE_OPERATOR_PROFILE_V0_1,
+  DI_FREE_OPERATOR_PROFILE_V0_1,
+  FREE_OPERATOR_PROFILES_V0_1,
+  freeOperatorProfileFormMatchesV0_1,
   freeOperatorProfileGlossMatchesV0_1,
+  type FreeOperatorProfileV0_1,
+  type FreeOperatorProfileTermSetV0_1,
 } from "@/shared/freeOperatorProfile.v0_1";
+import { PROTO_ROOTS_V1, type ProtoRoot } from "@/shared/protoRoots.v1";
 import { canonicalOperatorProfilesV0_1 } from "@/shared/canonicalOperatorProfile.v0_1";
 import { reviewedExternalLexiconSourceRowCandidateRegistryV0_1 } from "@/shared/reviewedExternalLexiconSourceRowRegistry.v0_1";
 import {
@@ -428,6 +434,7 @@ export type CurrentWordDaFunctionalMotivationCandidateV0_1 = Readonly<{
   targetSenseId: string | null;
   targetSenseGlosses: readonly string[];
   familySupport: readonly Readonly<{ form: string; categories: readonly string[] }>[];
+  familyNetwork: FreeOperatorFamilyFunctionalNetworkProjectionV0_1;
   functionalReading: string;
   claimLayer: "EXPLORATORY_HYPOTHESIS";
   generatedBy: "DA_REVIEWED_SOURCE_PLUS_EXACT_FORM";
@@ -450,7 +457,9 @@ export type CurrentWordDaStandaloneEvidenceV0_1 = Readonly<{
   operator: "DA";
   sourceForm: string;
   attestedGloss: string;
+  partOfSpeech: "verb";
   dialect: "Gheg Albanian";
+  sourceContext: "Gheg Albanian";
   sourceId: string;
   candidateId: string;
   sourceStatus: "reviewed_accepted";
@@ -467,6 +476,805 @@ export type CurrentWordDaStandaloneEvidenceV0_1 = Readonly<{
   claimLayer: "SOURCE_FACT";
   freeOperatorCategories: readonly string[];
 }>;
+
+export type ReviewedFreeOperatorEmbryoEvidenceV0_1 = Readonly<{
+  operator: string;
+  sourceForm: string;
+  attestedGloss: string;
+  partOfSpeech: "verb";
+  sourceContext: string;
+  sourceId: string;
+  candidateId: string;
+  sourceStatus: "reviewed_accepted";
+  citationId: string;
+  citationStatus: "reviewed_accepted";
+  sourceTitle: string;
+  sourceAuthorOrEditor: string;
+  sourcePublisherOrHost: string;
+  sourceDateOrVersion: string;
+  sourceUrl: string;
+  locator: string;
+  grammarNote: string;
+  reviewNote: string;
+  claimLayer: "SOURCE_FACT";
+  freeOperatorCategories: readonly string[];
+}>;
+
+export type FreeOperatorFamilyFormProjectionV0_1 = Readonly<{
+  form: string;
+  profileClassification: "DIRECT_FREE_OPERATOR_FORM" | "DERIVATIVE_FAMILY_SUPPORT";
+  profileCategories: readonly string[];
+  profileGlossTerms: readonly string[];
+  carrierAnnotation: Readonly<{
+    gloss: string;
+    dialect: string | null;
+    claimLayer: "EXPLORATORY_HYPOTHESIS";
+    evidenceStatus: "CANDIDATE_CARRIER_ANNOTATION_NOT_SOURCE_FACT";
+    sourceIds: readonly [];
+  }> | null;
+}>;
+
+export type FreeOperatorFamilyFunctionalNetworkProjectionV0_1 = Readonly<{
+  status: "CONDITIONAL_FAMILY_READING" | "PARTIAL_NULL";
+  operator: string;
+  embryo: Readonly<{
+    form: string;
+    functionText: string;
+    partOfSpeech: "verb";
+    sourceContext: string;
+    sourceId: string;
+    sourceStatus: "reviewed_accepted";
+    claimLayer: "SOURCE_FACT";
+  }> | null;
+  directForms: readonly FreeOperatorFamilyFormProjectionV0_1[];
+  derivativeFamilyForms: readonly FreeOperatorFamilyFormProjectionV0_1[];
+  target: Readonly<{
+    exactForm: string;
+    senseText: string;
+    partOfSpeech: string;
+    sourceIdentity: string;
+    evidenceStatus: "CITATION_ENTERED_UNVERIFIED" | "OBSERVED_EXTERNAL_SNAPSHOT";
+    claimLayer: "SOURCE_FACT";
+  }> | null;
+  functionalEquation: string | null;
+  explanation: string | null;
+  reasoningSteps: readonly FunctionalReasoningStepV0_1[];
+  claimLayer: "EXPLORATORY_HYPOTHESIS";
+  evidenceStatus: "GENERATED_UNSELECTED_CANDIDATE";
+  selectionStatus: "UNSELECTED";
+  wholeWordStatus: "PARTIAL_NULL";
+  unresolvedMaterial: readonly string[];
+  reasonCodes: readonly string[];
+  sourceAuthorityPromotion: "NONE";
+  historicalOrigin: "NOT_CLAIMED";
+  noSingleWinner: true;
+  userDecisionPosture: "user_decides";
+}>;
+
+export type CurrentWordFunctionalReasoningSourceSenseV0_1 = Readonly<{
+  provider: "KAIKKI" | "FJALORISHQIP";
+  exactSourceForm: string;
+  partOfSpeech: string | null;
+  glosses: readonly string[];
+  sourceIdentity: string;
+  sourceUrl: string;
+  locator: string;
+  evidenceStatus: "CITATION_ENTERED_UNVERIFIED" | "OBSERVED_EXTERNAL_SNAPSHOT";
+  sourceSensesInRecord: readonly Readonly<{ partOfSpeech: string | null; glosses: readonly string[]; locator: string }>[];
+}>;
+
+export type CurrentWordFunctionalReasoningCandidateV0_1 = Readonly<{
+  candidateId: string;
+  operator: string;
+  embryoEvidence: ReviewedFreeOperatorEmbryoEvidenceV0_1;
+  targetSource: CurrentWordFunctionalReasoningSourceSenseV0_1;
+  familyNetwork: FreeOperatorFamilyFunctionalNetworkProjectionV0_1;
+  targetAuthorization: "candidate_only" | "not_listed_as_candidate_only";
+  selectionStatus: "UNSELECTED";
+  claimLayer: "EXPLORATORY_HYPOTHESIS";
+  wholeWordStatus: "PARTIAL_NULL";
+  sourceAuthorityPromotion: "NONE";
+  historicalOrigin: "NOT_CLAIMED";
+  noSingleWinner: true;
+  userDecisionPosture: "user_decides";
+}>;
+
+export type CurrentWordFunctionalReasoningProjectionV0_1 = Readonly<{
+  status: "CANDIDATES_AVAILABLE" | "PARTIAL_NULL";
+  candidates: readonly CurrentWordFunctionalReasoningCandidateV0_1[];
+  exactCodePoints: readonly Readonly<{ character: string; position: number }>[];
+  writtenVoices: readonly Readonly<{ voice: string; position: number }>[];
+  reasonCodes: readonly string[];
+  sourceAuthorityPromotion: "NONE";
+  historicalOrigin: "NOT_CLAIMED";
+  noSingleWinner: true;
+  userDecisionPosture: "user_decides";
+}>;
+
+export type FunctionalReasoningStepV0_1 = Readonly<{
+  id: string;
+  order: number;
+  input: string | null;
+  output: string | null;
+  relationshipType:
+    | "REVIEWED_LEXICAL_FUNCTION"
+    | "EXACT_ORTHOGRAPHIC_SUBSTRING"
+    | "PROFILE_ASSOCIATION_NOT_MORPHOLOGY"
+    | "EXACT_TARGET_SOURCE_SENSE"
+    | "VERB_ACTION_TO_NOMINAL_RESULT_HYPOTHESIS"
+    | "EPISTEMIC_FUNCTION_TO_KNOWLEDGE_SENSE_HYPOTHESIS"
+    | "PROFILE_FORM_RELATION_UNKNOWN"
+    | "MORPHOLOGICAL_PATH_UNKNOWN"
+    | "RESIDUAL_STRUCTURE_UNKNOWN"
+    | "WRITTEN_VOICE_ROLE_UNKNOWN";
+  mechanicalObservation: string | null;
+  functionalInference: string | null;
+  sourceRefs: readonly string[];
+  relationSourceRefs: readonly string[];
+  evidenceStatus:
+    | "reviewed_accepted"
+    | "observed_external_snapshot"
+    | "OBSERVED_EXTERNAL_SNAPSHOT"
+    | "DERIVED_STRUCTURE"
+    | "CITATION_ENTERED_UNVERIFIED"
+    | "USER_PROPOSED"
+    | "UNKNOWN_OR_NULL";
+  claimLayer: "SOURCE_FACT" | "DERIVED_STRUCTURE" | "EXPLORATORY_HYPOTHESIS" | "UNKNOWN_OR_NULL";
+  classification:
+    | "SOURCE_REPORTED"
+    | "STRUCTURALLY_DERIVED"
+    | "PROFILE_ASSOCIATION"
+    | "INFERRED"
+    | "PROPOSED"
+    | "UNKNOWN_OR_NULL";
+  reasonCodes: readonly string[];
+  unresolvedDependencies: readonly string[];
+}>;
+
+type FreeOperatorFamilyFunctionalNetworkInputV0_1 = Readonly<{
+  profile: Omit<FreeOperatorProfileV0_1, "derivativeFamilySupport"> & {
+    derivativeFamilySupport?: FreeOperatorProfileTermSetV0_1 | null;
+  };
+  protoRoot: ProtoRoot | null;
+  reviewedEmbryo: ReviewedFreeOperatorEmbryoEvidenceV0_1 | CurrentWordDaStandaloneEvidenceV0_1 | null;
+  targetForm: string;
+  targetSense: Readonly<{
+    exactSourceForm: string;
+    glosses: readonly string[];
+    partOfSpeech?: string | null;
+    sourceIdentity: string;
+    evidenceStatus: "CITATION_ENTERED_UNVERIFIED" | "OBSERVED_EXTERNAL_SNAPSHOT";
+  }> | null;
+  occurrence?: CurrentWordDaAnchoredEmbryoOccurrenceV0_1 | null;
+  writtenVoices?: readonly Readonly<{ voice: string; position: number }>[];
+}>;
+
+function functionalBridgePresentationV0_1(
+  frame: NonNullable<FreeOperatorProfileV0_1["proposedFunctionalBridge"]>["frame"],
+  verbFunction: string,
+  targetSense: string,
+): Readonly<{
+  relationshipType: FunctionalReasoningStepV0_1["relationshipType"];
+  equationLabel: string;
+  inference: string;
+}> {
+  if (frame === "ACTION_TO_NOMINAL_SENSE") {
+    return {
+      relationshipType: "VERB_ACTION_TO_NOMINAL_RESULT_HYPOTHESIS",
+      equationLabel: "proposed action-to-noun relation",
+      inference: `The recorded verb function “${verbFunction}” is proposed as an action-level contribution to the recorded noun sense “${targetSense}.” This relation is not source-reported.`,
+    };
+  }
+
+  return {
+    relationshipType: "EPISTEMIC_FUNCTION_TO_KNOWLEDGE_SENSE_HYPOTHESIS",
+    equationLabel: "proposed knowing-to-knowledge relation",
+    inference: `The recorded knowing function “${verbFunction}” is proposed as a knowledge-related contribution to the recorded noun sense “${targetSense}.” This relation is not source-reported.`,
+  };
+}
+
+function targetGlossMatchesBridgeProposalV0_1(
+  profile: Pick<FreeOperatorProfileV0_1, "proposedFunctionalBridge">,
+  glosses: readonly string[],
+): boolean {
+  const proposal = profile.proposedFunctionalBridge;
+  return Boolean(proposal && glosses.some((gloss) =>
+    freeOperatorProfileGlossMatchesV0_1(proposal.targetGlossTerms, gloss),
+  ));
+}
+
+function familyFormProjectionsV0_1(
+  protoRoot: ProtoRoot | null,
+  termSet: FreeOperatorProfileTermSetV0_1,
+  profileClassification: FreeOperatorFamilyFormProjectionV0_1["profileClassification"],
+): FreeOperatorFamilyFormProjectionV0_1[] {
+  return termSet.forms.map((form) => {
+    const carrier = protoRoot?.carriers.find(({ lang, form: carrierForm }) =>
+      lang === "sq" && sameAlbanianSourceForm(carrierForm, form),
+    );
+    const gloss = carrier?.gloss?.normalize("NFC").trim() ?? "";
+    return {
+      form,
+      profileClassification,
+      profileCategories: termSet.categories,
+      profileGlossTerms: termSet.glossTerms,
+      carrierAnnotation: gloss
+        ? {
+            gloss,
+            dialect: carrier?.dialect ?? null,
+            claimLayer: "EXPLORATORY_HYPOTHESIS" as const,
+            evidenceStatus: "CANDIDATE_CARRIER_ANNOTATION_NOT_SOURCE_FACT" as const,
+            sourceIds: [] as const,
+          }
+        : null,
+    };
+  });
+}
+
+/**
+ * Projects existing operator-profile and carrier records into a family-level
+ * functional proposal. Registry membership is shown as profile data; carrier
+ * glosses remain exploratory annotations and never establish morphology.
+ */
+export function projectFreeOperatorFamilyFunctionalNetworkV0_1(
+  input: FreeOperatorFamilyFunctionalNetworkInputV0_1,
+): FreeOperatorFamilyFunctionalNetworkProjectionV0_1 {
+  const derivativeFamilySupport = input.profile.derivativeFamilySupport ?? null;
+  const derivativeFamilyTermSet = derivativeFamilySupport ?? { forms: [], glossTerms: [], categories: [] };
+  const protoRootMatches = Boolean(input.protoRoot && freeOperatorProfileFormMatchesV0_1(
+    [input.profile.operator],
+    input.protoRoot.id,
+  ));
+  const matchingProtoRoot = protoRootMatches ? input.protoRoot : null;
+  const directForms = familyFormProjectionsV0_1(
+    matchingProtoRoot,
+    input.profile.directFreeOperator,
+    "DIRECT_FREE_OPERATOR_FORM",
+  );
+  const derivativeFamilyForms = familyFormProjectionsV0_1(
+    matchingProtoRoot,
+    derivativeFamilyTermSet,
+    "DERIVATIVE_FAMILY_SUPPORT",
+  );
+  const reasons: string[] = [];
+  const reviewedEmbryo = input.reviewedEmbryo;
+  if (!reviewedEmbryo) {
+    reasons.push("REVIEWED_EMBRYO_NOT_AVAILABLE");
+  } else {
+    const directFormMatches = freeOperatorProfileFormMatchesV0_1(
+      input.profile.directFreeOperator.forms,
+      reviewedEmbryo.sourceForm,
+    );
+    const reviewedFunctionMatches = freeOperatorProfileGlossMatchesV0_1(
+      input.profile.directFreeOperator.glossTerms,
+      reviewedEmbryo.attestedGloss,
+    );
+    if (!directFormMatches || reviewedEmbryo.sourceStatus !== "reviewed_accepted") {
+      reasons.push("REVIEWED_EMBRYO_NOT_IN_DIRECT_PROFILE_FORMS");
+    }
+    if (!reviewedFunctionMatches) reasons.push("REVIEWED_EMBRYO_FUNCTION_OUTSIDE_PROFILE_DOMAIN");
+    if (!reviewedEmbryo.sourceId.trim()) reasons.push("REVIEWED_EMBRYO_SOURCE_IDENTITY_NOT_AVAILABLE");
+  }
+  if (!input.targetSense) {
+    reasons.push("EXACT_TARGET_SOURCE_SENSE_NOT_AVAILABLE");
+  } else {
+    if (!sameAlbanianSourceForm(input.targetSense.exactSourceForm, input.targetForm)) {
+      reasons.push("EXACT_TARGET_SOURCE_FORM_MISMATCH");
+    }
+    if (!input.targetSense.sourceIdentity.trim()) reasons.push("EXACT_TARGET_SOURCE_IDENTITY_NOT_AVAILABLE");
+    if (!input.targetSense.glosses.some((gloss) => gloss.trim())) {
+      reasons.push("EXACT_TARGET_SOURCE_SENSE_GLOSS_NOT_AVAILABLE");
+    }
+    if (!input.targetSense.glosses.some((gloss) =>
+      freeOperatorProfileGlossMatchesV0_1(
+        input.profile.directFreeOperator.glossTerms,
+        gloss,
+      ),
+    )) {
+      reasons.push("TARGET_SENSE_OUTSIDE_PROFILE_FUNCTION_DOMAIN");
+    }
+    if (!input.profile.proposedFunctionalBridge) {
+      reasons.push("FUNCTIONAL_BRIDGE_PROPOSAL_NOT_CONFIGURED");
+    } else if (!targetGlossMatchesBridgeProposalV0_1(input.profile, input.targetSense.glosses)) {
+      reasons.push("TARGET_SENSE_OUTSIDE_PROPOSED_FUNCTIONAL_BRIDGE_SCOPE");
+    }
+    if (!input.targetSense.partOfSpeech || !/^noun$/iu.test(input.targetSense.partOfSpeech.trim())) {
+      reasons.push("TARGET_NOMINAL_SENSE_NOT_CONFIRMED");
+    }
+  }
+
+  const targetSenseText = input.targetSense?.glosses.join("; ") ?? "";
+  const target = input.targetSense && targetSenseText
+    ? {
+        exactForm: input.targetSense.exactSourceForm,
+        senseText: targetSenseText,
+        partOfSpeech: input.targetSense.partOfSpeech ?? "UNKNOWN_OR_NULL",
+        sourceIdentity: input.targetSense.sourceIdentity,
+        evidenceStatus: input.targetSense.evidenceStatus,
+        claimLayer: "SOURCE_FACT" as const,
+      }
+    : null;
+  const targetFormLabel = target?.exactForm.toLocaleUpperCase("sq-AL") ?? input.targetForm.toLocaleUpperCase("sq-AL");
+  const occurrence = input.occurrence ?? (reviewedEmbryo
+    ? exactOrthographicOccurrencesV0_1(input.targetForm, reviewedEmbryo.sourceForm)[0] ?? null
+    : null);
+  const targetVoices = input.writtenVoices ?? Array.from(input.targetForm).flatMap((character, position) => {
+    const voice = extractSevenVowelsFromString(character)[0];
+    return voice ? [{ voice, position }] : [];
+  });
+  const reasoningSteps: FunctionalReasoningStepV0_1[] = [];
+  const addStep = (step: Omit<FunctionalReasoningStepV0_1, "order">) => {
+    reasoningSteps.push({ ...step, order: reasoningSteps.length + 1 });
+  };
+
+  if (reviewedEmbryo) addStep({
+    id: "reviewed-embryo-function",
+    input: reviewedEmbryo.sourceForm,
+    output: reviewedEmbryo.attestedGloss,
+    relationshipType: "REVIEWED_LEXICAL_FUNCTION",
+    mechanicalObservation: null,
+    functionalInference: null,
+    sourceRefs: [reviewedEmbryo.sourceId, reviewedEmbryo.citationId],
+    relationSourceRefs: [reviewedEmbryo.sourceId, reviewedEmbryo.citationId],
+    evidenceStatus: reviewedEmbryo.citationStatus,
+    claimLayer: "SOURCE_FACT",
+    classification: "SOURCE_REPORTED",
+    reasonCodes: [],
+    unresolvedDependencies: [],
+  });
+  if (occurrence) addStep({
+    id: "exact-orthographic-occurrence",
+    input: input.targetForm,
+    output: occurrence.exactSurface,
+    relationshipType: "EXACT_ORTHOGRAPHIC_SUBSTRING",
+    mechanicalObservation: `${occurrence.exactSurface} occupies code-point span [${occurrence.span.start},${occurrence.span.end})`,
+    functionalInference: null,
+    sourceRefs: [],
+    relationSourceRefs: [],
+    evidenceStatus: "DERIVED_STRUCTURE",
+    claimLayer: "DERIVED_STRUCTURE",
+    classification: "STRUCTURALLY_DERIVED",
+    reasonCodes: [],
+    unresolvedDependencies: ["Exact overlap does not establish a morpheme boundary"],
+  });
+  if (target) addStep({
+    id: "exact-target-source-sense",
+    input: target.exactForm,
+    output: target.senseText,
+    relationshipType: "EXACT_TARGET_SOURCE_SENSE",
+    mechanicalObservation: `Source form ${target.exactForm} matches the analyzed target by the Albanian exact-form convention`,
+    functionalInference: null,
+    sourceRefs: [target.sourceIdentity],
+    relationSourceRefs: [target.sourceIdentity],
+    evidenceStatus: target.evidenceStatus,
+    claimLayer: "SOURCE_FACT",
+    classification: "SOURCE_REPORTED",
+    reasonCodes: [],
+    unresolvedDependencies: [],
+  });
+  for (const familyForm of [...directForms, ...derivativeFamilyForms]) addStep({
+    id: `profile-form-${familyForm.form.toLocaleLowerCase("sq-AL")}`,
+    input: familyForm.form,
+    output: familyForm.profileGlossTerms.join(" / ") || familyForm.carrierAnnotation?.gloss || null,
+    relationshipType: "PROFILE_ASSOCIATION_NOT_MORPHOLOGY",
+    mechanicalObservation: `${familyForm.profileClassification} is recorded in the selected operator profile`,
+    functionalInference: null,
+    sourceRefs: [],
+    relationSourceRefs: [],
+    evidenceStatus: "USER_PROPOSED",
+    claimLayer: "EXPLORATORY_HYPOTHESIS",
+    classification: "PROFILE_ASSOCIATION",
+    reasonCodes: ["PROFILE_MEMBERSHIP_DOES_NOT_ESTABLISH_MORPHOLOGY"],
+    unresolvedDependencies: ["No source-attested derivational relation is supplied by profile membership"],
+  });
+  for (const familyForm of [...directForms, ...derivativeFamilyForms]) addStep({
+    id: `profile-form-target-relation-${familyForm.form.toLocaleLowerCase("sq-AL")}`,
+    input: familyForm.form,
+    output: targetFormLabel,
+    relationshipType: "PROFILE_FORM_RELATION_UNKNOWN",
+    mechanicalObservation: "The profile lists this form but does not encode a source-backed edge to the target",
+    functionalInference: null,
+    sourceRefs: [],
+    relationSourceRefs: [],
+    evidenceStatus: "UNKNOWN_OR_NULL",
+    claimLayer: "UNKNOWN_OR_NULL",
+    classification: "UNKNOWN_OR_NULL",
+    reasonCodes: ["PROFILE_FORM_RELATION_NOT_SOURCE_REPORTED"],
+    unresolvedDependencies: [`No source-reported relation from ${familyForm.form} to ${targetFormLabel}`],
+  });
+  const bridgeProposal = input.profile.proposedFunctionalBridge ?? null;
+  const bridgePresentation = bridgeProposal && target && reviewedEmbryo
+    ? functionalBridgePresentationV0_1(
+        bridgeProposal.frame,
+        reviewedEmbryo.attestedGloss,
+        target.senseText,
+      )
+    : null;
+  if (target && reviewedEmbryo && occurrence && bridgeProposal && bridgePresentation && !reasons.length) addStep({
+    id: "proposed-functional-bridge",
+    input: `${reviewedEmbryo.sourceForm}: ${reviewedEmbryo.attestedGloss}`,
+    output: `${target.exactForm}: ${target.senseText}`,
+    relationshipType: bridgePresentation.relationshipType,
+    mechanicalObservation: `A source-recorded ${reviewedEmbryo.partOfSpeech} function, an exact ${target.partOfSpeech} target sense, and the substring occurrence are separately present`,
+    functionalInference: bridgePresentation.inference,
+    sourceRefs: [reviewedEmbryo.sourceId, target.sourceIdentity],
+    relationSourceRefs: [],
+    evidenceStatus: bridgeProposal.evidenceStatus,
+    claimLayer: bridgeProposal.claimLayer,
+    classification: "PROPOSED",
+    reasonCodes: ["FUNCTIONAL_RELATION_NOT_SOURCE_REPORTED"],
+    unresolvedDependencies: ["The functional relation between the source function and target sense is proposed, not independently attested"],
+  });
+  addStep({
+    id: "morphological-path-unknown",
+    input: reviewedEmbryo?.sourceForm ?? null,
+    output: targetFormLabel,
+    relationshipType: "MORPHOLOGICAL_PATH_UNKNOWN",
+    mechanicalObservation: occurrence
+      ? `Only an exact substring at [${occurrence.span.start},${occurrence.span.end}) is observed`
+      : null,
+    functionalInference: null,
+    sourceRefs: [],
+    relationSourceRefs: [],
+    evidenceStatus: "UNKNOWN_OR_NULL",
+    claimLayer: "UNKNOWN_OR_NULL",
+    classification: "UNKNOWN_OR_NULL",
+    reasonCodes: ["MORPHOLOGICAL_RELATION_UNSUPPORTED"],
+    unresolvedDependencies: ["No source-backed morphological or historical path is established"],
+  });
+  const residual = Array.from(input.targetForm).flatMap((character, position) =>
+    !occurrence || position < occurrence.span.start || position >= occurrence.span.end
+      ? [`${character}@${position}`]
+      : [],
+  );
+  addStep({
+    id: "residual-structure-unknown",
+    input: targetFormLabel,
+    output: residual.join(" ") || null,
+    relationshipType: "RESIDUAL_STRUCTURE_UNKNOWN",
+    mechanicalObservation: residual.length ? `Uncovered written positions: ${residual.join(" ")}` : null,
+    functionalInference: null,
+    sourceRefs: [],
+    relationSourceRefs: [],
+    evidenceStatus: "UNKNOWN_OR_NULL",
+    claimLayer: "UNKNOWN_OR_NULL",
+    classification: "UNKNOWN_OR_NULL",
+    reasonCodes: ["RESIDUAL_FUNCTION_UNKNOWN"],
+    unresolvedDependencies: residual,
+  });
+  for (const { voice, position } of targetVoices) addStep({
+    id: `written-voice-${voice.toLocaleUpperCase("en-US")}-${position}-role-unknown`,
+    input: `${voice}@${position}`,
+    output: null,
+    relationshipType: "WRITTEN_VOICE_ROLE_UNKNOWN",
+    mechanicalObservation: `Written Voice event ${voice}@${position} is conserved`,
+    functionalInference: null,
+    sourceRefs: [],
+    relationSourceRefs: [],
+    evidenceStatus: "UNKNOWN_OR_NULL",
+    claimLayer: "UNKNOWN_OR_NULL",
+    classification: "UNKNOWN_OR_NULL",
+    reasonCodes: ["VOICE_FUNCTION_NOT_SELECTED"],
+    unresolvedDependencies: ["No Voice operation or functional role is selected by this projection"],
+  });
+  const finalReasons = [...new Set(reasons)].sort();
+  const functionalStep = reasoningSteps.find(({ id }) => id === "proposed-functional-bridge");
+  const functionalEquation = target && reviewedEmbryo && functionalStep && bridgePresentation
+    ? `${reviewedEmbryo.sourceForm.toLocaleUpperCase("sq-AL")} (“${reviewedEmbryo.attestedGloss}”; source-reported verb function) → ${bridgePresentation.equationLabel} → ${targetFormLabel} (“${target.senseText}”; source-reported noun sense)`
+    : null;
+  const explanation = functionalStep?.functionalInference
+    ? `${functionalStep.functionalInference} The relation beyond the exact overlap remains UNKNOWN_OR_NULL; no derivation is asserted.`
+    : null;
+  return {
+    status: !finalReasons.length && target && explanation && functionalEquation
+      ? "CONDITIONAL_FAMILY_READING"
+      : "PARTIAL_NULL",
+    operator: input.profile.operator.toLocaleUpperCase("sq-AL"),
+    embryo: reviewedEmbryo
+      ? {
+          form: reviewedEmbryo.sourceForm,
+          functionText: reviewedEmbryo.attestedGloss,
+          partOfSpeech: reviewedEmbryo.partOfSpeech,
+          sourceContext: reviewedEmbryo.sourceContext,
+          sourceId: reviewedEmbryo.sourceId,
+          sourceStatus: reviewedEmbryo.sourceStatus,
+          claimLayer: "SOURCE_FACT",
+        }
+      : null,
+    directForms,
+    derivativeFamilyForms,
+    target,
+    functionalEquation,
+    explanation,
+    reasoningSteps,
+    claimLayer: "EXPLORATORY_HYPOTHESIS",
+    evidenceStatus: "GENERATED_UNSELECTED_CANDIDATE",
+    selectionStatus: "UNSELECTED",
+    wholeWordStatus: "PARTIAL_NULL",
+    unresolvedMaterial: [
+      "Profile membership and carrier annotations do not establish a linear morphological or historical derivation",
+      "Intermediate result-state function remains UNKNOWN_OR_NULL unless independently characterized",
+      "Target internal segmentation remains UNKNOWN_OR_NULL",
+      "Target-specific source-to-family relation remains an EXPLORATORY_HYPOTHESIS",
+      ...(!reviewedEmbryo ? ["Reviewed embryo function remains UNKNOWN_OR_NULL"] : []),
+      ...(!protoRootMatches
+        ? [`ProtoRoots carrier annotations are UNKNOWN_OR_NULL; ${input.protoRoot ? "mismatched record ignored" : "no matching record available"}`]
+        : []),
+      ...(!derivativeFamilyForms.length ? ["Derivative-family forms and function remain UNKNOWN_OR_NULL"] : []),
+    ],
+    reasonCodes: finalReasons,
+    sourceAuthorityPromotion: "NONE",
+    historicalOrigin: "NOT_CLAIMED",
+    noSingleWinner: true,
+    userDecisionPosture: "user_decides",
+  };
+}
+
+function reviewedEmbryoEvidenceForProfileV0_1(
+  profile: FreeOperatorProfileV0_1,
+): ReviewedFreeOperatorEmbryoEvidenceV0_1 | null {
+  const operator = profile.operator.toLocaleUpperCase("en-US");
+  const canonical = canonicalOperatorProfilesV0_1.find(({ operatorId }) => operatorId === operator);
+  if (!canonical || canonical.language !== "sq" || canonical.discoveryScope !== "broad_structural" ||
+      canonical.reviewedEvidenceStatus !== "reviewed_functional") return null;
+  const row = reviewedExternalLexiconSourceRowCandidateRegistryV0_1.find(({ sourceId }) => sourceId === canonical.sourceId);
+  if (!row || row.sourceStatus !== "reviewed_accepted" || row.embryo !== operator ||
+      row.originClaim || row.historicalTransmissionClaim || row.candidateTruthClaim ||
+      row.userDecisionPosture !== "user_decides") return null;
+  const citation = row.externalCitations.find((candidate) =>
+    candidate.citationStatus === "reviewed_accepted" &&
+    Boolean(candidate.attestedForm?.trim()) && Boolean(candidate.attestedGloss?.trim()) &&
+    Boolean(candidate.sourceUrlOrArchiveRef?.trim()) && Boolean(candidate.entryLocator?.trim()) &&
+    Boolean(candidate.attestedGrammarNote?.trim()) && /\bverb\b/iu.test(candidate.attestedGrammarNote) &&
+    freeOperatorProfileFormMatchesV0_1(profile.directFreeOperator.forms, candidate.attestedForm ?? "") &&
+    freeOperatorProfileFormMatchesV0_1([row.isolatedStandaloneForm], candidate.attestedForm ?? "") &&
+    freeOperatorProfileGlossMatchesV0_1(profile.directFreeOperator.glossTerms, candidate.attestedGloss ?? ""),
+  );
+  if (!citation?.attestedForm || !citation.attestedGloss || !citation.citationId ||
+      !citation.sourceTitle || !citation.sourceAuthorOrEditor || !citation.sourcePublisherOrHost ||
+      !citation.sourceDateOrVersion || !citation.sourceUrlOrArchiveRef || !citation.entryLocator ||
+      !citation.attestedGrammarNote || !citation.reviewNote) return null;
+  const classification = classifyFreeOperatorEvidenceV0_1({
+    operator,
+    attestedForm: citation.attestedForm,
+    attestedGloss: citation.attestedGloss,
+    dialect: "Albanian",
+  });
+  if (!classification.categories.includes("free_operator_attested") ||
+      classification.categories.includes("functional_motivation_supported")) return null;
+  return {
+    operator,
+    sourceForm: citation.attestedForm,
+    attestedGloss: citation.attestedGloss,
+    partOfSpeech: "verb",
+    sourceContext: "Albanian · " + citation.attestedGrammarNote,
+    sourceId: row.sourceId,
+    candidateId: row.candidateId,
+    sourceStatus: "reviewed_accepted",
+    citationId: citation.citationId,
+    citationStatus: "reviewed_accepted",
+    sourceTitle: citation.sourceTitle,
+    sourceAuthorOrEditor: citation.sourceAuthorOrEditor,
+    sourcePublisherOrHost: citation.sourcePublisherOrHost,
+    sourceDateOrVersion: citation.sourceDateOrVersion,
+    sourceUrl: citation.sourceUrlOrArchiveRef,
+    locator: citation.entryLocator,
+    grammarNote: citation.attestedGrammarNote,
+    reviewNote: citation.reviewNote,
+    claimLayer: "SOURCE_FACT",
+    freeOperatorCategories: classification.categories,
+  };
+}
+
+type ExactFunctionalTargetSenseV0_1 = CurrentWordFunctionalReasoningSourceSenseV0_1 & Readonly<{
+  senseOrdinal: number;
+  senseId: string | null;
+}>;
+
+export function buildCurrentWordFunctionalReasoningV0_1(input: Readonly<{
+  analyzedWord: string;
+  draftTargetWord: string;
+  identityMatches: boolean;
+  language: string;
+  variety: string;
+  exactSourceFacts: readonly AlbanianKaikkiExactLexicalSourceFactV0_1[];
+  fjaloriSourceResponse: RuntimeFjaloriSourceResponseV0_1 | null;
+  candidateOnlyOperators?: readonly string[];
+}>): CurrentWordFunctionalReasoningProjectionV0_1 {
+  const exactCodePoints = Array.from(input.analyzedWord).map((character, position) => ({ character, position }));
+  const writtenVoices = exactCodePoints.flatMap(({ character, position }) => {
+    const voice = extractSevenVowelsFromString(character)[0];
+    return voice ? [{ voice, position }] : [];
+  });
+  const reasons: string[] = [];
+  if (!input.analyzedWord || input.draftTargetWord !== input.analyzedWord) reasons.push("CURRENT_WORD_IDENTITY_MISMATCH");
+  if (!input.identityMatches) reasons.push("ANALYSIS_IDENTITY_NOT_CONFIRMED");
+  if (!isAlbanianLanguage(input.language)) reasons.push("TARGET_LANGUAGE_NOT_ALBANIAN");
+  if (!isCompatibleAlbanianVariety(input.variety)) reasons.push("TARGET_VARIETY_REQUIRED");
+  const invalidAnalysisContext = reasons.some((reason) =>
+    ["CURRENT_WORD_IDENTITY_MISMATCH", "ANALYSIS_IDENTITY_NOT_CONFIRMED", "TARGET_LANGUAGE_NOT_ALBANIAN", "TARGET_VARIETY_REQUIRED"].includes(reason),
+  );
+  if (invalidAnalysisContext) {
+    return {
+      status: "PARTIAL_NULL",
+      candidates: [],
+      exactCodePoints,
+      writtenVoices,
+      reasonCodes: [...new Set(reasons)].sort(),
+      sourceAuthorityPromotion: "NONE",
+      historicalOrigin: "NOT_CLAIMED",
+      noSingleWinner: true,
+      userDecisionPosture: "user_decides",
+    };
+  }
+
+  const sourceFacts = input.exactSourceFacts.filter((fact) =>
+    fact.language === "Albanian" && fact.languageCode === "sq" &&
+    fact.attestationTruth === "fact" && fact.sourceStatus === "observed_external_snapshot" &&
+    Boolean(fact.sourceRecordId.trim()) && Boolean(fact.entryLocator.trim()) &&
+    sameAlbanianSourceForm(fact.form, input.analyzedWord) &&
+    /^[0-9a-f]{64}$/iu.test(fact.sourceSnapshot.sha256) && fact.sourceSnapshot.bytes > 0,
+  );
+  const response = input.fjaloriSourceResponse;
+  const canonicalQueryForm = response?.queryForm.normalize("NFC").trim().toLocaleLowerCase("sq-AL") ?? "";
+  const fjaloriResponseIdentityValid = response?.status === "available" &&
+    sameAlbanianSourceForm(response.queryForm, input.analyzedWord) &&
+    sameAlbanianSourceForm(response.exactSourceForm, input.analyzedWord) &&
+    response.requestKey === `${response.queryForm}\u0000${canonicalQueryForm}` &&
+    response.licence === "CC BY-SA 4.0" &&
+    response.apiUrl === `https://fjalorishqip.org/api/v1/fjala/${encodeURIComponent(canonicalQueryForm)}.json` &&
+    isAlbanianLanguage(response.analysisLanguage) &&
+    (!input.variety.trim() || !response.analysisVariety.trim() ||
+      normalizeSourceContext(response.analysisVariety) === normalizeSourceContext(input.variety));
+  if (response?.status === "available" && !fjaloriResponseIdentityValid) {
+    reasons.push("FJALORISHQIP_SOURCE_IDENTITY_OR_PROVENANCE_INVALID");
+  }
+  if (!sourceFacts.length && !fjaloriResponseIdentityValid) {
+    reasons.push(response && response.status !== "available"
+      ? `FJALORISHQIP_SOURCE_${response.status.replaceAll("-", "_").toLocaleUpperCase("en-US")}`
+      : "EXACT_TARGET_SOURCE_FACTS_NOT_AVAILABLE");
+  }
+
+  const targetSenses: ExactFunctionalTargetSenseV0_1[] = [
+    ...sourceFacts.flatMap((fact) => fact.senses.map((sense, index) => ({
+      provider: "KAIKKI" as const,
+      exactSourceForm: fact.form,
+      partOfSpeech: fact.partOfSpeech,
+      glosses: sense.glosses.map((gloss) => gloss.trim()).filter(Boolean),
+      sourceIdentity: fact.sourceRecordId,
+      sourceUrl: fact.sourceSnapshot.sourceUrl,
+      locator: `${fact.entryLocator} · sense ${sense.senseId ?? index + 1}`,
+      evidenceStatus: "OBSERVED_EXTERNAL_SNAPSHOT" as const,
+      sourceSensesInRecord: fact.senses.map((other, otherIndex) => ({
+        partOfSpeech: fact.partOfSpeech,
+        glosses: other.glosses,
+        locator: `${fact.entryLocator} · sense ${other.senseId ?? otherIndex + 1}`,
+      })),
+      senseOrdinal: index + 1,
+      senseId: sense.senseId ?? null,
+    }))),
+    ...(fjaloriResponseIdentityValid && response?.status === "available"
+      ? response.senses.flatMap((sense) =>
+          Number.isInteger(sense.entryIndex) && sense.entryIndex > 0 &&
+          Number.isInteger(sense.senseIndex) && sense.senseIndex > 0 &&
+          Boolean(sense.gloss.trim()) && Boolean(sense.senseSource.trim())
+            ? [{
+                provider: "FJALORISHQIP" as const,
+                exactSourceForm: response.exactSourceForm,
+                partOfSpeech: sense.partOfSpeech,
+                glosses: [sense.gloss.trim()],
+                sourceIdentity: `fjalorishqip:${canonicalQueryForm}:entry-${sense.entryIndex}:sense-${sense.senseIndex}`,
+                sourceUrl: response.apiUrl,
+                locator: `Entry ${sense.entryIndex} · Sense ${sense.senseIndex} · response position, not a source-issued sense ID`,
+                evidenceStatus: "CITATION_ENTERED_UNVERIFIED" as const,
+                sourceSensesInRecord: response.senses.map((other) => ({
+                  partOfSpeech: other.partOfSpeech,
+                  glosses: [other.gloss],
+                  locator: `Entry ${other.entryIndex} · Sense ${other.senseIndex} · response position`,
+                })),
+                senseOrdinal: sense.senseIndex,
+                senseId: null,
+              }]
+            : [],
+        )
+      : []),
+  ].filter(({ glosses }) => glosses.length > 0);
+
+  const profiles = FREE_OPERATOR_PROFILES_V0_1.filter((profile) => {
+    const canonical = canonicalOperatorProfilesV0_1.find(({ operatorId }) =>
+      operatorId === profile.operator.toLocaleUpperCase("en-US"),
+    );
+    return canonical?.discoveryScope === "broad_structural" &&
+      canonical.reviewedEvidenceStatus === "reviewed_functional";
+  });
+  const candidates: CurrentWordFunctionalReasoningCandidateV0_1[] = [];
+  for (const profile of profiles) {
+    const canonicalProfile = canonicalOperatorProfilesV0_1.find(({ operatorId }) =>
+      operatorId === profile.operator.toLocaleUpperCase("en-US"),
+    );
+    if (canonicalProfile?.positiveProofWords.some((form) => sameAlbanianSourceForm(form, input.analyzedWord))) {
+      continue;
+    }
+    const profileFormOccurs = profile.directFreeOperator.forms.some((form) =>
+      exactOrthographicOccurrencesV0_1(input.analyzedWord, form).length > 0,
+    );
+    if (!profileFormOccurs) continue;
+    const embryoEvidence = reviewedEmbryoEvidenceForProfileV0_1(profile);
+    if (!embryoEvidence) {
+      reasons.push(`REVIEWED_EMBRYO_NOT_AVAILABLE:${profile.operator.toLocaleUpperCase("en-US")}`);
+      continue;
+    }
+    const occurrences = exactOrthographicOccurrencesV0_1(input.analyzedWord, embryoEvidence.sourceForm);
+    if (!occurrences.length) continue;
+    for (const targetSense of targetSenses) {
+      if (!sameAlbanianSourceForm(targetSense.exactSourceForm, input.analyzedWord)) continue;
+      if (!targetSense.glosses.some((gloss) => freeOperatorProfileGlossMatchesV0_1(
+        profile.directFreeOperator.glossTerms,
+        gloss,
+      ))) continue;
+      for (const occurrence of occurrences) {
+        const familyNetwork = projectFreeOperatorFamilyFunctionalNetworkV0_1({
+          profile,
+          protoRoot: PROTO_ROOTS_V1.find(({ id }) =>
+            freeOperatorProfileFormMatchesV0_1([profile.operator], id),
+          ) ?? null,
+          reviewedEmbryo: embryoEvidence,
+          targetForm: input.analyzedWord,
+          targetSense: {
+            exactSourceForm: targetSense.exactSourceForm,
+            glosses: targetSense.glosses,
+            partOfSpeech: targetSense.partOfSpeech,
+            sourceIdentity: targetSense.sourceIdentity,
+            evidenceStatus: targetSense.evidenceStatus,
+          },
+          occurrence,
+          writtenVoices,
+        });
+        if (familyNetwork.status !== "CONDITIONAL_FAMILY_READING") {
+          reasons.push(...familyNetwork.reasonCodes.map((reason) =>
+            `${profile.operator.toLocaleUpperCase("en-US")}_FUNCTIONAL_NETWORK_${reason}`,
+          ));
+          continue;
+        }
+        candidates.push({
+          candidateId: `${profile.operator}:${targetSense.sourceIdentity}:${targetSense.senseOrdinal}:${occurrence.span.start}-${occurrence.span.end}`,
+          operator: profile.operator.toLocaleUpperCase("en-US"),
+          embryoEvidence,
+          targetSource: targetSense,
+          familyNetwork,
+          targetAuthorization: (input.candidateOnlyOperators ?? []).some((candidate) =>
+            candidate.toLocaleUpperCase("en-US") === profile.operator.toLocaleUpperCase("en-US"),
+          ) ? "candidate_only" : "not_listed_as_candidate_only",
+          selectionStatus: "UNSELECTED",
+          claimLayer: "EXPLORATORY_HYPOTHESIS",
+          wholeWordStatus: "PARTIAL_NULL",
+          sourceAuthorityPromotion: "NONE",
+          historicalOrigin: "NOT_CLAIMED",
+          noSingleWinner: true,
+          userDecisionPosture: "user_decides",
+        });
+      }
+    }
+  }
+  if (!targetSenses.length) reasons.push("EXACT_TARGET_SOURCE_SENSE_NOT_AVAILABLE");
+  if (!candidates.length && targetSenses.length) reasons.push("NO_SOURCE_SENSE_MATCHED_A_TYPED_FUNCTIONAL_BRIDGE");
+  const finalReasons = [...new Set(reasons)].sort();
+  return {
+    status: candidates.length && !finalReasons.some((reason) =>
+      ["CURRENT_WORD_IDENTITY_MISMATCH", "ANALYSIS_IDENTITY_NOT_CONFIRMED", "TARGET_LANGUAGE_NOT_ALBANIAN", "TARGET_VARIETY_REQUIRED"].includes(reason),
+    ) ? "CANDIDATES_AVAILABLE" : "PARTIAL_NULL",
+    candidates: finalReasons.some((reason) =>
+      ["CURRENT_WORD_IDENTITY_MISMATCH", "ANALYSIS_IDENTITY_NOT_CONFIRMED", "TARGET_LANGUAGE_NOT_ALBANIAN", "TARGET_VARIETY_REQUIRED"].includes(reason),
+    ) ? [] : candidates,
+    exactCodePoints,
+    writtenVoices,
+    reasonCodes: candidates.length ? [] : finalReasons,
+    sourceAuthorityPromotion: "NONE",
+    historicalOrigin: "NOT_CLAIMED",
+    noSingleWinner: true,
+    userDecisionPosture: "user_decides",
+  };
+}
 
 export type CurrentWordDaAnchoredEmbryoCandidateProjectionV0_1 = Readonly<{
   status: "CANDIDATE_AVAILABLE" | "CONDITIONAL_PROPOSAL" | "PARTIAL_NULL";
@@ -543,7 +1351,9 @@ function daStandaloneSourceResolutionV0_1(): DaStandaloneSourceResolutionV0_1 | 
       operator: "DA",
       sourceForm: citation.attestedForm,
       attestedGloss: citation.attestedGloss,
+      partOfSpeech: "verb",
       dialect: "Gheg Albanian",
+      sourceContext: "Gheg Albanian",
       sourceId: sourceRow.sourceId,
       candidateId: sourceRow.candidateId,
       sourceStatus: "reviewed_accepted",
@@ -670,10 +1480,8 @@ function generatedDaFunctionalMotivationV0_1(input: Readonly<{
   }
 
   const candidates = !hardReasonCodes.length && input.sourceResolution
-    ? input.occurrences.flatMap((occurrence) => matchingSourceSenses.map((senseRecord) => {
+    ? input.occurrences.flatMap((occurrence) => matchingSourceSenses.flatMap((senseRecord) => {
           const targetSenseGlosses = senseRecord.glosses;
-          const familyForms = DA_FREE_OPERATOR_PROFILE_V0_1.derivativeFamilySupport.forms.join(" · ");
-          const targetSenseLabel = targetSenseGlosses.join("; ");
           const targetSource = senseRecord.provider === "KAIKKI"
             ? {
                 provider: "KAIKKI" as const,
@@ -702,13 +1510,39 @@ function generatedDaFunctionalMotivationV0_1(input: Readonly<{
           const sourceIdentity = senseRecord.provider === "KAIKKI"
             ? senseRecord.sourceFact.sourceRecordId
             : `fjalorishqip:${canonicalQueryForm}:entry-${senseRecord.sense.entryIndex}:sense-${senseRecord.sense.senseIndex}`;
-          const sourceDescription = senseRecord.provider === "KAIKKI"
-            ? `the exact-form Kaikki source record ${senseRecord.sourceFact.sourceRecordId} (${senseRecord.sourceFact.entryLocator})`
-            : `the FjaloriShqip response for ${senseRecord.sourceResponse.exactSourceForm}, Entry ${senseRecord.sense.entryIndex} · Sense ${senseRecord.sense.senseIndex} (response position, not a source-issued sense ID; citation entered unverified; licensing not assessed)`;
+          const targetExactSourceForm = senseRecord.provider === "KAIKKI"
+            ? senseRecord.sourceFact.form
+            : senseRecord.sourceResponse.exactSourceForm;
+          const familyNetwork = projectFreeOperatorFamilyFunctionalNetworkV0_1({
+            profile: DA_FREE_OPERATOR_PROFILE_V0_1,
+            protoRoot: PROTO_ROOTS_V1.find(({ id }) =>
+              freeOperatorProfileFormMatchesV0_1([DA_FREE_OPERATOR_PROFILE_V0_1.operator], id),
+            ) ?? null,
+            reviewedEmbryo: input.sourceResolution!.evidence,
+            targetForm: input.analyzedWord,
+            targetSense: {
+              exactSourceForm: targetExactSourceForm,
+              glosses: targetSenseGlosses,
+              partOfSpeech: senseRecord.provider === "KAIKKI"
+                ? senseRecord.sourceFact.partOfSpeech
+                : senseRecord.sense.partOfSpeech,
+              sourceIdentity,
+              evidenceStatus: senseRecord.provider === "KAIKKI"
+                ? "OBSERVED_EXTERNAL_SNAPSHOT"
+                : "CITATION_ENTERED_UNVERIFIED",
+            },
+            occurrence,
+            writtenVoices: input.writtenVoices,
+          });
+          if (familyNetwork.status !== "CONDITIONAL_FAMILY_READING" || !familyNetwork.explanation) {
+            reasonCodes.push(...familyNetwork.reasonCodes.map((reason) => `DA_FAMILY_NETWORK_${reason}`));
+            return [];
+          }
           const unresolvedMaterial = [
             `${occurrence.exactSurface}@${occurrence.span.start}-${occurrence.span.end} is observed spelling structure, not an established morpheme boundary`,
-            "The DA-to-target functional relationship is an unselected exploratory hypothesis, not a source-reported derivation",
+            "The DA-family-to-target functional relationship is an unselected exploratory hypothesis, not a source-reported derivation",
             "Internal segmentation and morphology remain UNKNOWN_OR_NULL",
+            ...familyNetwork.unresolvedMaterial,
             ...input.exactCodePoints
               .filter(({ position, character }) =>
                 (position < occurrence.span.start || position >= occurrence.span.end) &&
@@ -718,19 +1552,19 @@ function generatedDaFunctionalMotivationV0_1(input: Readonly<{
             ...input.writtenVoices.map(({ voice, position }) => `${voice}@${position} symbolic role UNKNOWN_OR_NULL; written Voice preserved`),
             "Complete whole-word functional derivation remains UNKNOWN_OR_NULL",
           ];
-          return {
+          return [{
             candidateId: `da-functional:${sourceIdentity}:${senseRecord.senseOrdinal}:${occurrence.span.start}-${occurrence.span.end}`,
             occurrence,
             targetSource,
             targetSenseOrdinal: senseRecord.senseOrdinal,
             targetSenseId: senseRecord.senseId,
             targetSenseGlosses,
+            familyNetwork,
             familySupport: DA_FREE_OPERATOR_PROFILE_V0_1.derivativeFamilySupport.forms.map((form) => ({
               form,
               categories: DA_FREE_OPERATOR_PROFILE_V0_1.derivativeFamilySupport.categories,
             })),
-            functionalReading:
-              `The reviewed standalone Gheg source reports DA (“${input.sourceResolution!.evidence.attestedGloss}”). ${sourceDescription} reports the target sense “${targetSenseLabel}”; the DA profile separately lists ${familyForms || "UNKNOWN_OR_NULL"} as derivative-family support, not as a source-reported relation to ${input.analyzedWord}. Conditional functional path: DA “${input.sourceResolution!.evidence.attestedGloss}” → a dividing/separating action → the source sense “${targetSenseLabel}”, when that sense denotes division, separation, or a result of dividing. The observed DA span [${occurrence.span.start},${occurrence.span.end}) is structural only. This generated EXPLORATORY_HYPOTHESIS does not establish a morpheme boundary, target derivation, or historical origin; other target material and symbolic Voice roles remain unresolved.`,
+            functionalReading: familyNetwork.explanation,
             claimLayer: "EXPLORATORY_HYPOTHESIS" as const,
             generatedBy: "DA_REVIEWED_SOURCE_PLUS_EXACT_FORM" as const,
             selectionStatus: "UNSELECTED" as const,
@@ -740,7 +1574,7 @@ function generatedDaFunctionalMotivationV0_1(input: Readonly<{
             historicalOrigin: "NOT_CLAIMED" as const,
             noSingleWinner: true as const,
             userDecisionPosture: "user_decides" as const,
-          };
+          }];
         }))
     : [];
 

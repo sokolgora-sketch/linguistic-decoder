@@ -3,6 +3,10 @@ import { GET } from "../app/api/analyze-v1/route";
 import { adaptAnalysisToTelemetryVM } from "@/ui/instrument/contractAdapter";
 import { MotivationDiscoveryCardV0_1 } from "@/ui/instrument/sections/MotivationDiscoveryCard.v0_1";
 import {
+  buildCurrentWordFunctionalReasoningV0_1,
+  type RuntimeFjaloriSourceResponseV0_1,
+} from "@/ui/instrument/sections/currentWordSourceFunctionalSuggestionAdapter.v0_1";
+import {
   aggregateMotivationDiscoveryCandidatesV0_1,
   measureMotivationDiscoveryAggregationV0_1,
 } from "@/ui/instrument/motivationDiscoveryPresentationAggregation.v0_1";
@@ -139,6 +143,86 @@ afterEach(() => {
 });
 
 describe("Motivation Discovery Lab presentation v0.1", () => {
+  it("shows an unselected source-to-function proposal before its collapsed reasoning trace", () => {
+    // Synthetic adapter-shaped source response; this proves UI projection only, not live DIJE evidence.
+    const response: RuntimeFjaloriSourceResponseV0_1 = {
+      requestKey: "DIJE\u0000dije",
+      queryForm: "DIJE",
+      status: "available",
+      exactSourceForm: "dije",
+      apiUrl: "https://fjalorishqip.org/api/v1/fjala/dije.json",
+      licence: "CC BY-SA 4.0",
+      analysisLanguage: "sq",
+      analysisVariety: "albanian",
+      recordSources: ["sq-wiktionary", "editor"],
+      senses: [{
+        entryIndex: 1,
+        senseIndex: 1,
+        partOfSpeech: "noun",
+        gloss: "knowledge",
+        glossLanguage: "en",
+        senseSource: "sq-wiktionary",
+        tags: ["noun"],
+        entrySources: ["sq-wiktionary", "editor"],
+      }, {
+        entryIndex: 1,
+        senseIndex: 2,
+        partOfSpeech: "noun",
+        gloss: "news, information",
+        glossLanguage: "en",
+        senseSource: "sq-wiktionary",
+        tags: ["feminine", "regional"],
+        entrySources: ["sq-wiktionary", "editor"],
+      }],
+    };
+    const projection = buildCurrentWordFunctionalReasoningV0_1({
+      analyzedWord: "DIJE",
+      draftTargetWord: "DIJE",
+      identityMatches: true,
+      language: "sq",
+      variety: "albanian",
+      exactSourceFacts: [],
+      fjaloriSourceResponse: response,
+      candidateOnlyOperators: ["DI"],
+    });
+    const discovery = adaptAnalysisToTelemetryVM({
+      motivationDiscoveryV0_1: model({
+        inputWord: "DIJE",
+        inputLanguage: "sq",
+        inputProfile: "albanian",
+        exactLexicalSourceFacts: [],
+      }),
+    }).motivationDiscoveryV0_2;
+
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => ({ word: "dije", licence: "CC BY-SA 4.0", sources: [], entries: [] }),
+    }) as unknown as typeof fetch;
+    render(<MotivationDiscoveryCardV0_1 discovery={discovery} functionalReasoning={projection} />);
+
+    const reasoning = screen.getByTestId("automatic-functional-reasoning");
+    expect(screen.getByTestId("automatic-functional-reasoning-equation")).toHaveTextContent(
+      "DI (“know / knowledge”; source-reported verb function) → proposed knowing-to-knowledge relation → DIJE (“knowledge”; source-reported noun sense)",
+    );
+    expect(screen.getByTestId("automatic-functional-reasoning-explanation")).toHaveTextContent(
+      "The recorded knowing function “know / knowledge” is proposed as a knowledge-related contribution",
+    );
+    expect(screen.getByTestId("automatic-functional-reasoning-explanation")).not.toHaveTextContent("action-level");
+    expect(reasoning).toHaveTextContent("candidate_only");
+    expect(reasoning).toHaveTextContent("UNSELECTED");
+    expect(reasoning).toHaveTextContent("PARTIAL_NULL");
+    expect(reasoning).toHaveTextContent("no_single_winner / user_decides");
+    expect(screen.getByTestId("automatic-functional-reasoning-unresolved")).toHaveTextContent("internal morphology");
+    expect(reasoning).toHaveTextContent("target sense CITATION_ENTERED_UNVERIFIED");
+    expect(reasoning).toHaveTextContent("proposed relation is not source-reported");
+    const detail = screen.getByTestId("automatic-functional-reasoning-details");
+    expect(detail).toHaveTextContent("news, information");
+    expect(detail).not.toHaveAttribute("open");
+    expect(screen.getByText("Inspect source evidence and typed reasoning steps")).toBeInTheDocument();
+    expect(reasoning.compareDocumentPosition(detail) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
+
   it("relays the existing exact-word Fjalori response to the current-word consumer", async () => {
     global.fetch = jest.fn().mockResolvedValue({
       ok: true,

@@ -148,6 +148,37 @@ export function CurrentWordSourceFunctionalSuggestionV0_1({
       {daCandidate.occurrences.length ? (
       <div className="mt-2 min-w-0 rounded border border-[#53604a] bg-[#111710] p-2" data-testid="current-word-da-anchored-candidate">
         <h5 className="font-semibold text-[#f5f7fb]">DA-anchored functional embryo candidate</h5>
+        {daCandidate.generatedFunctionalMotivation.candidates.length ? (
+          <section className="mt-2 space-y-2 rounded border border-[#52614a] bg-[#0c120e] p-2" data-testid="current-word-da-family-functional-network">
+            <h6 className="font-semibold text-[#d8e4ca]">Proposed embryo-to-family-to-word reading · unselected</h6>
+            {daCandidate.generatedFunctionalMotivation.candidates.map((candidate) => (
+              <article key={candidate.candidateId} className="min-w-0 space-y-1" data-testid="current-word-da-family-functional-candidate">
+                <p className="break-words" data-testid="current-word-da-family-functional-equation">
+                  {candidate.familyNetwork.functionalEquation}
+                </p>
+                <p className="break-words" data-testid="current-word-da-generated-functional-reading">
+                  {candidate.familyNetwork.explanation}
+                </p>
+                <p className="break-words text-[10px] text-[#aeb7c5]">
+                  {"Target sense candidate · SOURCE_FACT · "}
+                  {candidate.familyNetwork.target?.evidenceStatus ?? "UNKNOWN_OR_NULL"}
+                  {" · “"}
+                  {candidate.targetSenseGlosses.join("; ")}
+                  {"” · unselected."}
+                </p>
+                <p className="break-words text-[10px] text-[#aeb7c5]">
+                  Profile direct forms: {candidate.familyNetwork.directForms.map(({ form, profileCategories }) => `${form.toLocaleUpperCase("sq-AL")} (${profileCategories.join(", ")})`).join(" · ") || "UNKNOWN_OR_NULL"} · derivative-family support: {candidate.familyNetwork.derivativeFamilyForms.map(({ form, profileCategories }) => `${form.toLocaleUpperCase("sq-AL")} (${profileCategories.join(", ")})`).join(" · ") || "UNKNOWN_OR_NULL"}.
+                </p>
+                <p className="break-words text-[10px] text-[#aeb7c5]" data-testid="current-word-da-family-carrier-annotations">
+                  ProtoRoots candidate annotations · EXPLORATORY_HYPOTHESIS · no source IDs: {[...candidate.familyNetwork.directForms, ...candidate.familyNetwork.derivativeFamilyForms].map(({ form, carrierAnnotation }) => `${form.toLocaleUpperCase("sq-AL")} ${carrierAnnotation ? `“${carrierAnnotation.gloss}”` : "UNKNOWN_OR_NULL"}`).join(" · ")}.
+                </p>
+                <p className="break-words text-[10px] text-[#aeb7c5]">
+                  {candidate.familyNetwork.claimLayer} · {candidate.familyNetwork.selectionStatus} · whole-word {candidate.familyNetwork.wholeWordStatus} · sourceAuthorityPromotion {candidate.familyNetwork.sourceAuthorityPromotion} · historicalOrigin {candidate.familyNetwork.historicalOrigin} · no_single_winner / {candidate.familyNetwork.userDecisionPosture}.
+                </p>
+              </article>
+            ))}
+          </section>
+        ) : null}
         {daCandidate.standaloneEvidence ? (
           <>
             <p className="mt-1 break-words" data-testid="current-word-da-source-fact">
@@ -190,10 +221,6 @@ export function CurrentWordSourceFunctionalSuggestionV0_1({
                 <p className="mt-1 break-words text-[10px] text-[#aeb7c5]" data-testid="current-word-da-generated-structure">
                   DERIVED_STRUCTURE · exact DA span [{candidate.occurrence.span.start},{candidate.occurrence.span.end}) in {analyzedWord} · written Voices {daCandidate.writtenVoices.map(({ voice, position }) => `${voice}@${position}`).join(" → ") || "∅"}.
                 </p>
-                <p className="mt-1 break-words text-[10px] text-[#aeb7c5]" data-testid="current-word-da-generated-family-support">
-                  DA profile derivative-family support, separately recorded and not a target-specific relation: {candidate.familySupport.map(({ form, categories }) => `${form} (${categories.join(", ")})`).join(" · ") || "UNKNOWN_OR_NULL"}.
-                </p>
-                <p className="mt-2 break-words" data-testid="current-word-da-generated-functional-reading">{candidate.functionalReading}</p>
                 <p className="mt-1 break-words text-[10px] text-[#aeb7c5]" data-testid="current-word-da-generated-claim-boundary">
                   {candidate.claimLayer} · generated candidate · {candidate.selectionStatus} · whole-word {candidate.wholeWordStatus} · sourceAuthorityPromotion {candidate.sourceAuthorityPromotion} · historicalOrigin {candidate.historicalOrigin} · no_single_winner / {candidate.userDecisionPosture}.
                 </p>
