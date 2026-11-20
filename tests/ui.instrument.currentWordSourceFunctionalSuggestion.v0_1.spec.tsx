@@ -9,7 +9,7 @@ import {
   type RuntimeAlbanianSourceSenseSelectionV0_1,
   type RuntimeFjaloriSourceResponseV0_1,
 } from "@/ui/instrument/sections/currentWordSourceFunctionalSuggestionAdapter.v0_1";
-import { DA_FREE_OPERATOR_PROFILE_V0_1 } from "@/shared/freeOperatorProfile.v0_1";
+import { DA_FREE_OPERATOR_PROFILE_V0_1, DI_FREE_OPERATOR_PROFILE_V0_1 } from "@/shared/freeOperatorProfile.v0_1";
 import { PROTO_ROOTS_V1 } from "@/shared/protoRoots.v1";
 import { CurrentWordSourceFunctionalSuggestionV0_1 } from "@/ui/instrument/sections/CurrentWordSourceFunctionalSuggestionV0_1";
 import { CurrentWordSymbolicDraftV0_1, buildCurrentWordSymbolicDraftProjectionV0_1 } from "@/ui/instrument/sections/CurrentWordSymbolicDraftV0_1";
@@ -255,9 +255,24 @@ describe("automatic current-word functional reasoning", () => {
       userDecisionPosture: "user_decides",
     });
     expect(candidate.embryoEvidence).toMatchObject({ operator: "DI", sourceForm: "di", attestedGloss: "know / knowledge", sourceStatus: "reviewed_accepted" });
+    expect(candidate.familyNetwork.functionalEquation).toContain("proposed knowing-to-knowledge relation");
+    const epistemicBridge = candidate.familyNetwork.reasoningSteps.find(({ relationshipType }) =>
+      relationshipType === "EPISTEMIC_FUNCTION_TO_KNOWLEDGE_SENSE_HYPOTHESIS",
+    );
+    expect(epistemicBridge).toMatchObject({
+      input: "di: know / knowledge",
+      output: "dije: knowledge",
+      evidenceStatus: "USER_PROPOSED",
+      claimLayer: "EXPLORATORY_HYPOTHESIS",
+      classification: "PROPOSED",
+      relationSourceRefs: [],
+      reasonCodes: ["FUNCTIONAL_RELATION_NOT_SOURCE_REPORTED"],
+    });
+    expect(epistemicBridge?.functionalInference).toContain("knowing function");
+    expect(epistemicBridge?.functionalInference).not.toContain("action-level");
+    expect(epistemicBridge?.functionalInference).not.toContain("physical result");
     expect(candidate.familyNetwork.reasoningSteps).toEqual(expect.arrayContaining([
       expect.objectContaining({ relationshipType: "EXACT_ORTHOGRAPHIC_SUBSTRING", mechanicalObservation: "DI occupies code-point span [0,2)" }),
-      expect.objectContaining({ relationshipType: "VERB_ACTION_TO_NOMINAL_RESULT_HYPOTHESIS", classification: "PROPOSED", relationSourceRefs: [] }),
       expect.objectContaining({ relationshipType: "MORPHOLOGICAL_PATH_UNKNOWN", claimLayer: "UNKNOWN_OR_NULL" }),
       expect.objectContaining({ relationshipType: "RESIDUAL_STRUCTURE_UNKNOWN", output: "J@2 E@3" }),
       expect.objectContaining({ relationshipType: "WRITTEN_VOICE_ROLE_UNKNOWN", input: "I@1" }),
@@ -285,10 +300,41 @@ describe("automatic current-word functional reasoning", () => {
       .toBe("knowledge");
     expect(learning.familyNetwork.reasoningSteps.find(({ relationshipType }) => relationshipType === "EXACT_TARGET_SOURCE_SENSE")?.output)
       .toBe("learning");
-    expect(knowledge.familyNetwork.reasoningSteps.find(({ relationshipType }) => relationshipType === "VERB_ACTION_TO_NOMINAL_RESULT_HYPOTHESIS")?.output)
+    expect(knowledge.familyNetwork.reasoningSteps.find(({ relationshipType }) => relationshipType === "EPISTEMIC_FUNCTION_TO_KNOWLEDGE_SENSE_HYPOTHESIS")?.output)
       .toBe("dije: knowledge");
-    expect(learning.familyNetwork.reasoningSteps.find(({ relationshipType }) => relationshipType === "VERB_ACTION_TO_NOMINAL_RESULT_HYPOTHESIS")?.output)
+    expect(learning.familyNetwork.reasoningSteps.find(({ relationshipType }) => relationshipType === "EPISTEMIC_FUNCTION_TO_KNOWLEDGE_SENSE_HYPOTHESIS")?.output)
       .toBe("dije: learning");
+  });
+
+  it("does not use DI's knowledge proposal for another gloss frame and preserves Null without proposal metadata", () => {
+    const unrelatedTarget = project("DIJE", runtimeFjaloriResponse("DIJE", ["study"]), {
+      candidateOnlyOperators: ["DI"],
+    });
+    expect(unrelatedTarget.status).toBe("PARTIAL_NULL");
+    expect(unrelatedTarget.candidates).toEqual([]);
+    expect(unrelatedTarget.reasonCodes).toContain(
+      "DI_FUNCTIONAL_NETWORK_TARGET_SENSE_OUTSIDE_PROPOSED_FUNCTIONAL_BRIDGE_SCOPE",
+    );
+
+    const knowledgeCandidate = project("DIJE", runtimeFjaloriResponse("DIJE", ["knowledge"]), {
+      candidateOnlyOperators: ["DI"],
+    }).candidates[0];
+    const proposalNotConfigured = projectFreeOperatorFamilyFunctionalNetworkV0_1({
+      profile: { ...DI_FREE_OPERATOR_PROFILE_V0_1, proposedFunctionalBridge: undefined },
+      protoRoot: null,
+      reviewedEmbryo: knowledgeCandidate.embryoEvidence,
+      targetForm: "DIJE",
+      targetSense: {
+        exactSourceForm: knowledgeCandidate.targetSource.exactSourceForm,
+        glosses: knowledgeCandidate.targetSource.glosses,
+        partOfSpeech: knowledgeCandidate.targetSource.partOfSpeech,
+        sourceIdentity: knowledgeCandidate.targetSource.sourceIdentity,
+        evidenceStatus: knowledgeCandidate.targetSource.evidenceStatus,
+      },
+    });
+    expect(proposalNotConfigured.status).toBe("PARTIAL_NULL");
+    expect(proposalNotConfigured.functionalEquation).toBeNull();
+    expect(proposalNotConfigured.reasonCodes).toContain("FUNCTIONAL_BRIDGE_PROPOSAL_NOT_CONFIGURED");
   });
 
   it("returns Null for missing or unrelated exact senses and clears candidate state on identity mismatch", () => {

@@ -602,6 +602,7 @@ export type FunctionalReasoningStepV0_1 = Readonly<{
     | "PROFILE_ASSOCIATION_NOT_MORPHOLOGY"
     | "EXACT_TARGET_SOURCE_SENSE"
     | "VERB_ACTION_TO_NOMINAL_RESULT_HYPOTHESIS"
+    | "EPISTEMIC_FUNCTION_TO_KNOWLEDGE_SENSE_HYPOTHESIS"
     | "PROFILE_FORM_RELATION_UNKNOWN"
     | "MORPHOLOGICAL_PATH_UNKNOWN"
     | "RESIDUAL_STRUCTURE_UNKNOWN"
@@ -647,6 +648,40 @@ type FreeOperatorFamilyFunctionalNetworkInputV0_1 = Readonly<{
   occurrence?: CurrentWordDaAnchoredEmbryoOccurrenceV0_1 | null;
   writtenVoices?: readonly Readonly<{ voice: string; position: number }>[];
 }>;
+
+function functionalBridgePresentationV0_1(
+  frame: NonNullable<FreeOperatorProfileV0_1["proposedFunctionalBridge"]>["frame"],
+  verbFunction: string,
+  targetSense: string,
+): Readonly<{
+  relationshipType: FunctionalReasoningStepV0_1["relationshipType"];
+  equationLabel: string;
+  inference: string;
+}> {
+  if (frame === "ACTION_TO_NOMINAL_SENSE") {
+    return {
+      relationshipType: "VERB_ACTION_TO_NOMINAL_RESULT_HYPOTHESIS",
+      equationLabel: "proposed action-to-noun relation",
+      inference: `The recorded verb function “${verbFunction}” is proposed as an action-level contribution to the recorded noun sense “${targetSense}.” This relation is not source-reported.`,
+    };
+  }
+
+  return {
+    relationshipType: "EPISTEMIC_FUNCTION_TO_KNOWLEDGE_SENSE_HYPOTHESIS",
+    equationLabel: "proposed knowing-to-knowledge relation",
+    inference: `The recorded knowing function “${verbFunction}” is proposed as a knowledge-related contribution to the recorded noun sense “${targetSense}.” This relation is not source-reported.`,
+  };
+}
+
+function targetGlossMatchesBridgeProposalV0_1(
+  profile: Pick<FreeOperatorProfileV0_1, "proposedFunctionalBridge">,
+  glosses: readonly string[],
+): boolean {
+  const proposal = profile.proposedFunctionalBridge;
+  return Boolean(proposal && glosses.some((gloss) =>
+    freeOperatorProfileGlossMatchesV0_1(proposal.targetGlossTerms, gloss),
+  ));
+}
 
 function familyFormProjectionsV0_1(
   protoRoot: ProtoRoot | null,
@@ -737,6 +772,11 @@ export function projectFreeOperatorFamilyFunctionalNetworkV0_1(
       ),
     )) {
       reasons.push("TARGET_SENSE_OUTSIDE_PROFILE_FUNCTION_DOMAIN");
+    }
+    if (!input.profile.proposedFunctionalBridge) {
+      reasons.push("FUNCTIONAL_BRIDGE_PROPOSAL_NOT_CONFIGURED");
+    } else if (!targetGlossMatchesBridgeProposalV0_1(input.profile, input.targetSense.glosses)) {
+      reasons.push("TARGET_SENSE_OUTSIDE_PROPOSED_FUNCTIONAL_BRIDGE_SCOPE");
     }
     if (!input.targetSense.partOfSpeech || !/^noun$/iu.test(input.targetSense.partOfSpeech.trim())) {
       reasons.push("TARGET_NOMINAL_SENSE_NOT_CONFIRMED");
@@ -842,17 +882,25 @@ export function projectFreeOperatorFamilyFunctionalNetworkV0_1(
     reasonCodes: ["PROFILE_FORM_RELATION_NOT_SOURCE_REPORTED"],
     unresolvedDependencies: [`No source-reported relation from ${familyForm.form} to ${targetFormLabel}`],
   });
-  if (target && reviewedEmbryo && occurrence && !reasons.length) addStep({
-    id: "functional-action-to-nominal-sense-proposal",
+  const bridgeProposal = input.profile.proposedFunctionalBridge ?? null;
+  const bridgePresentation = bridgeProposal && target && reviewedEmbryo
+    ? functionalBridgePresentationV0_1(
+        bridgeProposal.frame,
+        reviewedEmbryo.attestedGloss,
+        target.senseText,
+      )
+    : null;
+  if (target && reviewedEmbryo && occurrence && bridgeProposal && bridgePresentation && !reasons.length) addStep({
+    id: "proposed-functional-bridge",
     input: `${reviewedEmbryo.sourceForm}: ${reviewedEmbryo.attestedGloss}`,
     output: `${target.exactForm}: ${target.senseText}`,
-    relationshipType: "VERB_ACTION_TO_NOMINAL_RESULT_HYPOTHESIS",
+    relationshipType: bridgePresentation.relationshipType,
     mechanicalObservation: `A source-recorded ${reviewedEmbryo.partOfSpeech} function, an exact ${target.partOfSpeech} target sense, and the substring occurrence are separately present`,
-    functionalInference: `The recorded verb function “${reviewedEmbryo.attestedGloss}” is proposed as an action-level contribution to the recorded noun sense “${target.senseText}.” This relation is not source-reported.`,
+    functionalInference: bridgePresentation.inference,
     sourceRefs: [reviewedEmbryo.sourceId, target.sourceIdentity],
     relationSourceRefs: [],
-    evidenceStatus: "USER_PROPOSED",
-    claimLayer: "EXPLORATORY_HYPOTHESIS",
+    evidenceStatus: bridgeProposal.evidenceStatus,
+    claimLayer: bridgeProposal.claimLayer,
     classification: "PROPOSED",
     reasonCodes: ["FUNCTIONAL_RELATION_NOT_SOURCE_REPORTED"],
     unresolvedDependencies: ["The functional relation between the source function and target sense is proposed, not independently attested"],
@@ -910,11 +958,9 @@ export function projectFreeOperatorFamilyFunctionalNetworkV0_1(
     unresolvedDependencies: ["No Voice operation or functional role is selected by this projection"],
   });
   const finalReasons = [...new Set(reasons)].sort();
-  const functionalStep = reasoningSteps.find(({ relationshipType }) =>
-    relationshipType === "VERB_ACTION_TO_NOMINAL_RESULT_HYPOTHESIS",
-  );
-  const functionalEquation = target && reviewedEmbryo && functionalStep
-    ? `${reviewedEmbryo.sourceForm.toLocaleUpperCase("sq-AL")} (“${reviewedEmbryo.attestedGloss}”; source-reported verb function) → proposed action-to-noun relation → ${targetFormLabel} (“${target.senseText}”; source-reported noun sense)`
+  const functionalStep = reasoningSteps.find(({ id }) => id === "proposed-functional-bridge");
+  const functionalEquation = target && reviewedEmbryo && functionalStep && bridgePresentation
+    ? `${reviewedEmbryo.sourceForm.toLocaleUpperCase("sq-AL")} (“${reviewedEmbryo.attestedGloss}”; source-reported verb function) → ${bridgePresentation.equationLabel} → ${targetFormLabel} (“${target.senseText}”; source-reported noun sense)`
     : null;
   const explanation = functionalStep?.functionalInference
     ? `${functionalStep.functionalInference} The relation beyond the exact overlap remains UNKNOWN_OR_NULL; no derivation is asserted.`
@@ -1184,7 +1230,12 @@ export function buildCurrentWordFunctionalReasoningV0_1(input: Readonly<{
           occurrence,
           writtenVoices,
         });
-        if (familyNetwork.status !== "CONDITIONAL_FAMILY_READING") continue;
+        if (familyNetwork.status !== "CONDITIONAL_FAMILY_READING") {
+          reasons.push(...familyNetwork.reasonCodes.map((reason) =>
+            `${profile.operator.toLocaleUpperCase("en-US")}_FUNCTIONAL_NETWORK_${reason}`,
+          ));
+          continue;
+        }
         candidates.push({
           candidateId: `${profile.operator}:${targetSense.sourceIdentity}:${targetSense.senseOrdinal}:${occurrence.span.start}-${occurrence.span.end}`,
           operator: profile.operator.toLocaleUpperCase("en-US"),
@@ -1206,7 +1257,7 @@ export function buildCurrentWordFunctionalReasoningV0_1(input: Readonly<{
     }
   }
   if (!targetSenses.length) reasons.push("EXACT_TARGET_SOURCE_SENSE_NOT_AVAILABLE");
-  if (!candidates.length && targetSenses.length) reasons.push("NO_SOURCE_SENSE_MATCHED_A_REVIEWED_EMBRYO_PROFILE");
+  if (!candidates.length && targetSenses.length) reasons.push("NO_SOURCE_SENSE_MATCHED_A_TYPED_FUNCTIONAL_BRIDGE");
   const finalReasons = [...new Set(reasons)].sort();
   return {
     status: candidates.length && !finalReasons.some((reason) =>

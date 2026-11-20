@@ -6,6 +6,13 @@ export type FreeOperatorProfileTermSetV0_1 = {
   categories: readonly FreeOperatorEvidenceCategoryV0_1[];
 };
 
+export type FreeOperatorFunctionalBridgeProposalV0_1 = Readonly<{
+  frame: "ACTION_TO_NOMINAL_SENSE" | "KNOWING_FUNCTION_TO_KNOWLEDGE_SENSE";
+  targetGlossTerms: readonly string[];
+  claimLayer: "EXPLORATORY_HYPOTHESIS";
+  evidenceStatus: "USER_PROPOSED";
+}>;
+
 export type FreeOperatorProfileHomophoneCollisionV0_1 = {
   forms: readonly string[];
   glossTerms: readonly string[];
@@ -18,6 +25,8 @@ export type FreeOperatorProfileV0_1 = {
   languageScope: readonly string[];
   directFreeOperator: FreeOperatorProfileTermSetV0_1;
   derivativeFamilySupport: FreeOperatorProfileTermSetV0_1;
+  /** Proposal framing only; this does not encode or establish a source relation. */
+  proposedFunctionalBridge?: FreeOperatorFunctionalBridgeProposalV0_1;
   homophoneCollisions: readonly FreeOperatorProfileHomophoneCollisionV0_1[];
   requiresFunctionalBridgeFor: "functional_motivation_supported";
   historicalOriginClaim: "not_claimed";
@@ -37,6 +46,12 @@ export const DA_FREE_OPERATOR_PROFILE_V0_1: FreeOperatorProfileV0_1 = {
     forms: ["ndaj", "ndarë", "ndare"],
     glossTerms: ["split", "divide", "separate", "separation", "cut", "share", "divided"],
     categories: ["derivative_family_support"],
+  },
+  proposedFunctionalBridge: {
+    frame: "ACTION_TO_NOMINAL_SENSE",
+    targetGlossTerms: ["division", "separation", "part"],
+    claimLayer: "EXPLORATORY_HYPOTHESIS",
+    evidenceStatus: "USER_PROPOSED",
   },
   homophoneCollisions: [
     {
@@ -63,6 +78,12 @@ export const DI_FREE_OPERATOR_PROFILE_V0_1: FreeOperatorProfileV0_1 = {
     forms: [],
     glossTerms: [],
     categories: [],
+  },
+  proposedFunctionalBridge: {
+    frame: "KNOWING_FUNCTION_TO_KNOWLEDGE_SENSE",
+    targetGlossTerms: ["knowledge", "learning"],
+    claimLayer: "EXPLORATORY_HYPOTHESIS",
+    evidenceStatus: "USER_PROPOSED",
   },
   homophoneCollisions: [],
   requiresFunctionalBridgeFor: "functional_motivation_supported",

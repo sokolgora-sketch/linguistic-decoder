@@ -164,6 +164,15 @@ describe("Motivation Discovery Lab presentation v0.1", () => {
         senseSource: "sq-wiktionary",
         tags: ["noun"],
         entrySources: ["sq-wiktionary", "editor"],
+      }, {
+        entryIndex: 1,
+        senseIndex: 2,
+        partOfSpeech: "noun",
+        gloss: "news, information",
+        glossLanguage: "en",
+        senseSource: "sq-wiktionary",
+        tags: ["feminine", "regional"],
+        entrySources: ["sq-wiktionary", "editor"],
       }],
     };
     const projection = buildCurrentWordFunctionalReasoningV0_1({
@@ -194,11 +203,12 @@ describe("Motivation Discovery Lab presentation v0.1", () => {
 
     const reasoning = screen.getByTestId("automatic-functional-reasoning");
     expect(screen.getByTestId("automatic-functional-reasoning-equation")).toHaveTextContent(
-      "DI (“know / knowledge”; source-reported verb function) → proposed action-to-noun relation → DIJE (“knowledge”; source-reported noun sense)",
+      "DI (“know / knowledge”; source-reported verb function) → proposed knowing-to-knowledge relation → DIJE (“knowledge”; source-reported noun sense)",
     );
     expect(screen.getByTestId("automatic-functional-reasoning-explanation")).toHaveTextContent(
-      "The recorded verb function “know / knowledge” is proposed as an action-level contribution",
+      "The recorded knowing function “know / knowledge” is proposed as a knowledge-related contribution",
     );
+    expect(screen.getByTestId("automatic-functional-reasoning-explanation")).not.toHaveTextContent("action-level");
     expect(reasoning).toHaveTextContent("candidate_only");
     expect(reasoning).toHaveTextContent("UNSELECTED");
     expect(reasoning).toHaveTextContent("PARTIAL_NULL");
@@ -207,6 +217,7 @@ describe("Motivation Discovery Lab presentation v0.1", () => {
     expect(reasoning).toHaveTextContent("target sense CITATION_ENTERED_UNVERIFIED");
     expect(reasoning).toHaveTextContent("proposed relation is not source-reported");
     const detail = screen.getByTestId("automatic-functional-reasoning-details");
+    expect(detail).toHaveTextContent("news, information");
     expect(detail).not.toHaveAttribute("open");
     expect(screen.getByText("Inspect source evidence and typed reasoning steps")).toBeInTheDocument();
     expect(reasoning.compareDocumentPosition(detail) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
