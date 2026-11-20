@@ -267,6 +267,9 @@ async function main(): Promise<void> {
       await page.getByRole("button", { name: "Analyze" }).click();
       await page.getByTestId("open-instrument-shell").waitFor({ state: "visible" });
       await page.getByText("Current analysis", { exact: true }).waitFor({ state: "visible" });
+      const overviewDetails = page.getByTestId("instrument-tab-details-overview");
+      assert(await overviewDetails.getAttribute("open") === null, "Overview details should start collapsed after a fresh analysis.");
+      await overviewDetails.locator(":scope > summary").click();
       const overview = page.locator('[role="tabpanel"]:not([hidden])');
       await overview
         .getByRole("heading", { name: truthCase.status, exact: true })
