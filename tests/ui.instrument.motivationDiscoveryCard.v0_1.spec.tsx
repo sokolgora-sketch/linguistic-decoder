@@ -4,6 +4,7 @@ import { adaptAnalysisToTelemetryVM } from "@/ui/instrument/contractAdapter";
 import { MotivationDiscoveryCardV0_1 } from "@/ui/instrument/sections/MotivationDiscoveryCard.v0_1";
 import {
   buildCurrentWordFunctionalReasoningV0_1,
+  type RuntimeFjaloriFamilyFormResponseV0_1,
   type RuntimeFjaloriSourceResponseV0_1,
 } from "@/ui/instrument/sections/currentWordSourceFunctionalSuggestionAdapter.v0_1";
 import {
@@ -221,6 +222,135 @@ describe("Motivation Discovery Lab presentation v0.1", () => {
     expect(detail).not.toHaveAttribute("open");
     expect(screen.getByText("Inspect source evidence and typed reasoning steps")).toBeInTheDocument();
     expect(reasoning.compareDocumentPosition(detail) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+  });
+
+  it("renders the computed DA-family transition network and its source/Null boundaries in Overview", () => {
+    const familyResponse = (
+      form: string,
+      senses: Extract<RuntimeFjaloriFamilyFormResponseV0_1, { status: "available" }>["senses"],
+      description: string,
+    ): RuntimeFjaloriFamilyFormResponseV0_1 => {
+      const canonical = form.toLocaleLowerCase("sq-AL");
+      return {
+        requestKey: `${canonical}\u0000${canonical}`,
+        queryForm: canonical,
+        status: "available",
+        exactSourceForm: canonical,
+        apiUrl: `https://fjalorishqip.org/api/v1/fjala/${canonical}.json`,
+        licence: "CC BY-SA 4.0",
+        analysisLanguage: "sq",
+        analysisVariety: "albanian",
+        recordSources: ["en-wiktionary", "editor", "ai"],
+        description: { text: description, source: "ai", attribution: "AI-assisted source attribution · CC BY-SA 4.0" },
+        senses,
+      };
+    };
+    const verbSense = (gloss: string) => ({
+      entryIndex: 1,
+      senseIndex: 1,
+      partOfSpeech: "verb",
+      gloss,
+      glossLanguage: "en" as const,
+      senseSource: "en-wiktionary",
+      tags: [],
+      entrySources: ["en-wiktionary", "editor"],
+    });
+    const response: RuntimeFjaloriSourceResponseV0_1 = {
+      requestKey: "NDARJE\u0000ndarje",
+      queryForm: "NDARJE",
+      status: "available",
+      exactSourceForm: "ndarje",
+      apiUrl: "https://fjalorishqip.org/api/v1/fjala/ndarje.json",
+      licence: "CC BY-SA 4.0",
+      analysisLanguage: "sq",
+      analysisVariety: "albanian",
+      recordSources: ["sq-wiktionary", "editor", "ai"],
+      description: { text: "Ndarja e diçkaje në pjesë.", source: "ai", attribution: "AI-assisted source attribution · CC BY-SA 4.0" },
+      senses: [{
+        entryIndex: 1,
+        senseIndex: 1,
+        partOfSpeech: "noun",
+        gloss: "division; separation",
+        glossLanguage: "en",
+        senseSource: "sq-wiktionary",
+        tags: ["noun"],
+        entrySources: ["sq-wiktionary", "editor"],
+      }],
+      familyFormResponses: [
+        familyResponse("DAJ", [verbSense("to divide"), {
+          entryIndex: 2,
+          senseIndex: 1,
+          partOfSpeech: "noun",
+          gloss: "maternal uncle",
+          glossLanguage: "en",
+          senseSource: "editor",
+          tags: [],
+          entrySources: ["editor"],
+        }], "Formë gege e foljes «ndaj»; also a separate kinship sense."),
+        familyResponse("NDAJ", [verbSense("to divide a whole into several parts")], "Bëj që diçka e tërë të bëhet në disa pjesë."),
+        {
+          requestKey: "ndarë\u0000ndarë",
+          queryForm: "ndarë",
+          status: "http-not-found",
+          httpStatus: 404,
+          exactSourceForm: null,
+          apiUrl: "https://fjalorishqip.org/api/v1/fjala/ndar%C3%AB.json",
+          licence: null,
+          analysisLanguage: "sq",
+          analysisVariety: "albanian",
+          recordSources: [],
+          senses: [],
+        },
+        {
+          requestKey: "ndare\u0000ndare",
+          queryForm: "ndare",
+          status: "http-not-found",
+          httpStatus: 404,
+          exactSourceForm: null,
+          apiUrl: "https://fjalorishqip.org/api/v1/fjala/ndare.json",
+          licence: null,
+          analysisLanguage: "sq",
+          analysisVariety: "albanian",
+          recordSources: [],
+          senses: [],
+        },
+      ],
+    };
+    const projection = buildCurrentWordFunctionalReasoningV0_1({
+      analyzedWord: "NDARJE",
+      draftTargetWord: "NDARJE",
+      identityMatches: true,
+      language: "sq",
+      variety: "albanian",
+      exactSourceFacts: [],
+      fjaloriSourceResponse: response,
+      candidateOnlyOperators: [],
+    });
+    const discovery = adaptAnalysisToTelemetryVM({
+      motivationDiscoveryV0_1: model({ inputWord: "NDARJE", inputLanguage: "sq", inputProfile: "albanian" }),
+    }).motivationDiscoveryV0_2;
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => ({ word: "ndarje", licence: "CC BY-SA 4.0", attribution: ["AI help — CC BY-SA 4.0"], sources: ["ai"], entries: [] }),
+    }) as unknown as typeof fetch;
+
+    render(<MotivationDiscoveryCardV0_1 discovery={discovery} functionalReasoning={projection} />);
+
+    expect(screen.getByTestId("automatic-functional-reasoning-equation")).toHaveTextContent("DA function");
+    expect(screen.getByTestId("automatic-functional-reasoning-equation")).toHaveTextContent("NDAJ (verb: to divide a whole into several parts");
+    expect(screen.getByTestId("automatic-functional-reasoning-equation")).toHaveTextContent("proposed action-to-event relation");
+    expect(screen.getByTestId("automatic-functional-transition-status")).toHaveTextContent("intermediate state UNKNOWN_OR_NULL");
+    expect(screen.getByTestId("automatic-functional-reasoning-explanation")).toHaveTextContent("neither source reports a relation between the forms");
+    const details = screen.getByTestId("automatic-functional-reasoning-details");
+    expect(details).not.toHaveAttribute("open");
+    fireEvent.click(screen.getByText("Inspect source evidence and typed reasoning steps"));
+    expect(screen.getByTestId("automatic-functional-family-source-records")).toHaveTextContent("maternal");
+    expect(screen.getByTestId("automatic-functional-family-source-records")).toHaveTextContent("NDAJ");
+    expect(screen.getByTestId("automatic-functional-family-source-records")).toHaveTextContent("AI-assisted source attribution");
+    expect(screen.getByTestId("automatic-functional-family-source-records")).toHaveTextContent("not derivation evidence");
+    expect(screen.getByTestId("automatic-functional-reasoning-steps")).toHaveTextContent("FAMILY_ACTION_TO_TARGET_EVENT_HYPOTHESIS");
+    expect(screen.getByTestId("automatic-functional-reasoning-steps")).toHaveTextContent("INTERMEDIATE_STATE_UNKNOWN");
   });
 
   it("relays the existing exact-word Fjalori response to the current-word consumer", async () => {

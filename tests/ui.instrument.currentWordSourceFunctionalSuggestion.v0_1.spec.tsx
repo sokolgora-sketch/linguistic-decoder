@@ -4,9 +4,11 @@ import {
   buildCurrentWordFunctionalReasoningV0_1,
   buildCurrentWordExploratoryMotivationV0_1,
   buildCurrentWordSourceFunctionalSuggestionV0_1,
+  functionalFamilySourceLookupFormsV0_1,
   projectFreeOperatorFamilyFunctionalNetworkV0_1,
   type CurrentWordSourceFunctionalSuggestionDraftV0_1,
   type RuntimeAlbanianSourceSenseSelectionV0_1,
+  type RuntimeFjaloriFamilyFormResponseV0_1,
   type RuntimeFjaloriSourceResponseV0_1,
 } from "@/ui/instrument/sections/currentWordSourceFunctionalSuggestionAdapter.v0_1";
 import { DA_FREE_OPERATOR_PROFILE_V0_1, DI_FREE_OPERATOR_PROFILE_V0_1 } from "@/shared/freeOperatorProfile.v0_1";
@@ -161,6 +163,50 @@ function runtimeFjaloriResponse(
   };
 }
 
+function familyFjaloriResponse(
+  form: string,
+  options: Readonly<{
+    senses?: Extract<RuntimeFjaloriFamilyFormResponseV0_1, { status: "available" }>["senses"];
+    description?: string | null;
+  }> = {},
+): RuntimeFjaloriFamilyFormResponseV0_1 {
+  const canonical = form.normalize("NFC").toLocaleLowerCase("sq-AL");
+  return {
+    requestKey: `${canonical}\u0000${canonical}`,
+    queryForm: canonical,
+    status: "available",
+    exactSourceForm: canonical,
+    apiUrl: `https://fjalorishqip.org/api/v1/fjala/${encodeURIComponent(canonical)}.json`,
+    licence: "CC BY-SA 4.0",
+    analysisLanguage: "sq",
+    analysisVariety: "Standard Albanian",
+    recordSources: ["en-wiktionary", "editor", "ai"],
+    description: options.description === null ? null : {
+      text: options.description ?? `Synthetic description fixture for ${canonical}`,
+      source: "ai",
+      attribution: "Synthetic fixture attribution; not live-source evidence",
+    },
+    senses: options.senses ?? [],
+  };
+}
+
+function unavailableFamilyResponse(form: string): RuntimeFjaloriFamilyFormResponseV0_1 {
+  const canonical = form.normalize("NFC").toLocaleLowerCase("sq-AL");
+  return {
+    requestKey: `${canonical}\u0000${canonical}`,
+    queryForm: canonical,
+    status: "http-not-found",
+    httpStatus: 404,
+    exactSourceForm: null,
+    apiUrl: `https://fjalorishqip.org/api/v1/fjala/${encodeURIComponent(canonical)}.json`,
+    licence: null,
+    analysisLanguage: "sq",
+    analysisVariety: "Standard Albanian",
+    recordSources: [],
+    senses: [],
+  };
+}
+
 describe("automatic current-word functional reasoning", () => {
   function project(
     word: string,
@@ -228,6 +274,176 @@ describe("automatic current-word functional reasoning", () => {
     ]));
     expect(projection.exactCodePoints).toEqual(Array.from("NDARJE").map((character, position) => ({ character, position })));
     expect(projection.writtenVoices).toEqual([{ voice: "A", position: 2 }, { voice: "E", position: 5 }]);
+  });
+
+  it("builds an unranked source-aware DA-family action-to-event network while leaving the intermediate state Null", () => {
+    const verb = (entryIndex: number, senseIndex: number, gloss: string) => ({
+      entryIndex,
+      senseIndex,
+      partOfSpeech: "verb",
+      gloss,
+      glossLanguage: "en" as const,
+      senseSource: "en-wiktionary",
+      tags: [],
+      entrySources: ["en-wiktionary", "editor"],
+    });
+    const daj = familyFjaloriResponse("DAJ", {
+      senses: [verb(1, 1, "to divide"), {
+        entryIndex: 2,
+        senseIndex: 1,
+        partOfSpeech: "noun",
+        gloss: "maternal uncle",
+        glossLanguage: "en",
+        senseSource: "editor",
+        tags: [],
+        entrySources: ["editor"],
+      }],
+    });
+    const ndaj = familyFjaloriResponse("NDAJ", {
+      description: "Bëj që diçka e tërë të bëhet në disa pjesë.",
+      senses: [verb(2, 1, "to divide, separate a whole into several parts"), {
+        entryIndex: 1,
+        senseIndex: 2,
+        partOfSpeech: "preposition",
+        gloss: "towards; against",
+        glossLanguage: "en",
+        senseSource: "editor",
+        tags: [],
+        entrySources: ["editor"],
+      }],
+    });
+    const response: RuntimeFjaloriSourceResponseV0_1 = {
+      ...runtimeFjaloriResponse("NDARJE", ["division; separation"]),
+      description: {
+        text: "Ndarja e diçkaje në pjesë.",
+        source: "ai",
+        attribution: "Synthetic fixture attribution; not live-source evidence",
+      },
+      familyFormResponses: [daj, ndaj, unavailableFamilyResponse("NDARË"), unavailableFamilyResponse("NDARE")],
+    };
+    const projection = project("NDARJE", response);
+    const candidate = projection.candidates[0];
+    const network = candidate.familyNetwork;
+
+    expect(functionalFamilySourceLookupFormsV0_1("NDARJE", "sq")).toEqual(["daj", "ndaj", "ndarë", "ndare"]);
+    expect(functionalFamilySourceLookupFormsV0_1("STUDIM", "sq")).toEqual([]);
+    expect(functionalFamilySourceLookupFormsV0_1("DAMAGE", "en")).toEqual([]);
+    expect(network.transitionNetworks).toHaveLength(2);
+    expect(network.transitionNetworks.map(({ familyForm }) => familyForm)).toEqual(["daj", "ndaj"]);
+    expect(network.transitionNetworks.every(({ status, intermediateState, evidenceStatus, claimLayer, relationSourceRefs }) =>
+      status === "PROPOSED_ACTION_TO_EVENT" && intermediateState === "UNKNOWN_OR_NULL" &&
+      evidenceStatus === "USER_PROPOSED" && claimLayer === "EXPLORATORY_HYPOTHESIS" && relationSourceRefs.length === 0,
+    )).toBe(true);
+    expect(network.transitionNetworks[0]).toMatchObject({
+      semanticOperation: "ACTION_TO_NOMINAL_EVENT_OR_RESULT_PROPOSAL",
+      familyEvidenceStatus: "CITATION_ENTERED_UNVERIFIED",
+      targetEvidenceStatus: "CITATION_ENTERED_UNVERIFIED",
+      unresolvedDependencies: expect.arrayContaining([
+        "No exact intermediate state/result sense is available",
+      ]),
+    });
+    expect(network.functionalEquation).toContain("DA function “to split, cut, divide” (reviewed)");
+    expect(network.functionalEquation).toContain("NDAJ (verb: to divide, separate a whole into several parts");
+    expect(network.functionalEquation).toContain("proposed action-to-event relation");
+    expect(network.functionalEquation).toContain("NDARJE (division; separation");
+    expect(network.familySourceRecords.find(({ form }) => form === "ndaj")?.description?.text)
+      .toBe("Bëj që diçka e tërë të bëhet në disa pjesë.");
+    expect(network.familySourceRecords.find(({ form }) => form === "daj")?.senses.map(({ gloss }) => gloss))
+      .toEqual(["to divide", "maternal uncle"]);
+    expect(network.familySourceRecords.find(({ form }) => form === "ndarë")).toMatchObject({
+      responseStatus: "http-not-found",
+      evidenceStatus: "UNKNOWN_OR_NULL",
+      exactSourceForm: null,
+    });
+    expect(network.reasoningSteps).toEqual(expect.arrayContaining([
+      expect.objectContaining({ relationshipType: "FAMILY_ACTION_TO_TARGET_EVENT_HYPOTHESIS", evidenceStatus: "USER_PROPOSED", relationSourceRefs: [] }),
+      expect.objectContaining({ relationshipType: "INTERMEDIATE_STATE_UNKNOWN", evidenceStatus: "UNKNOWN_OR_NULL", output: null }),
+    ]));
+    expect(network.explanation).toContain("neither source reports a relation between the forms");
+    expect(network.explanation).toContain("intermediate changed state");
+    expect(candidate.selectionStatus).toBe("UNSELECTED");
+    expect(candidate.noSingleWinner).toBe(true);
+    expect(candidate.userDecisionPosture).toBe("user_decides");
+    expect(candidate.wholeWordStatus).toBe("PARTIAL_NULL");
+    expect(candidate.sourceAuthorityPromotion).toBe("NONE");
+    expect(candidate.historicalOrigin).toBe("NOT_CLAIMED");
+    expect(projection.exactCodePoints).toEqual(Array.from("NDARJE").map((character, position) => ({ character, position })));
+    expect(projection.writtenVoices).toEqual([{ voice: "A", position: 2 }, { voice: "E", position: 5 }]);
+  });
+
+  it("rejects mismatched family response identity and keeps the prior bounded candidate without contamination", () => {
+    const mismatchedNdaj = {
+      ...familyFjaloriResponse("NDAJ", { senses: [{
+        entryIndex: 1,
+        senseIndex: 1,
+        partOfSpeech: "verb",
+        gloss: "to divide",
+        glossLanguage: "en" as const,
+        senseSource: "editor",
+        tags: [],
+        entrySources: ["editor"],
+      }] }),
+      exactSourceForm: "ndare",
+    };
+    const projection = project("NDARJE", {
+      ...runtimeFjaloriResponse("NDARJE", ["division; separation"]),
+      familyFormResponses: [mismatchedNdaj],
+    });
+    const candidate = projection.candidates[0];
+    expect(candidate).toBeDefined();
+    expect(candidate.familyNetwork.transitionNetworks).toEqual([]);
+    expect(candidate.familyNetwork.familySourceRecords.find(({ form }) => form === "ndaj")).toMatchObject({
+      responseStatus: "invalid",
+      evidenceStatus: "UNKNOWN_OR_NULL",
+      exactSourceForm: null,
+      reasonCodes: ["FAMILY_SOURCE_IDENTITY_OR_PROVENANCE_INVALID"],
+    });
+    expect(candidate.familyNetwork.functionalEquation).toContain("proposed action-to-noun relation");
+    expect(candidate.familyNetwork.status).toBe("CONDITIONAL_FAMILY_READING");
+  });
+
+  it("does not require optional AI record descriptions when exact family and target senses are available", () => {
+    const family = familyFjaloriResponse("NDAJ", {
+      description: null,
+      senses: [{
+        entryIndex: 1,
+        senseIndex: 1,
+        partOfSpeech: "verb",
+        gloss: "to divide, separate a whole into parts",
+        glossLanguage: "en",
+        senseSource: "en-wiktionary",
+        tags: [],
+        entrySources: ["en-wiktionary"],
+      }],
+    });
+    const response: RuntimeFjaloriSourceResponseV0_1 = {
+      ...runtimeFjaloriResponse("NDARJE", ["division; separation"]),
+      description: null,
+      familyFormResponses: [family],
+    };
+    const candidate = project("NDARJE", response).candidates[0];
+
+    expect(candidate.familyNetwork.transitionNetworks).toHaveLength(1);
+    expect(candidate.familyNetwork.transitionNetworks[0]).toMatchObject({
+      familySourceDescription: null,
+      targetSourceDescription: null,
+      semanticOperation: "ACTION_TO_NOMINAL_EVENT_OR_RESULT_PROPOSAL",
+      status: "PROPOSED_ACTION_TO_EVENT",
+    });
+    expect(candidate.familyNetwork.transitionNetworks[0].explanation).toContain("neither source reports a relation");
+    expect(candidate.familyNetwork.wholeWordStatus).toBe("PARTIAL_NULL");
+  });
+
+  it("retains the NDARJE source sense when its exact gloss is only division", () => {
+    const projection = project("NDARJE", runtimeFjaloriResponse("NDARJE", ["division"]));
+
+    expect(projection.candidates).toHaveLength(1);
+    expect(projection.candidates[0].targetSource.glosses).toEqual(["division"]);
+    expect(projection.candidates[0].familyNetwork.status).toBe("CONDITIONAL_FAMILY_READING");
+    expect(projection.candidates[0].familyNetwork.target).toMatchObject({
+      exactForm: "ndarje",
+      senseText: "division",
+    });
   });
 
   it("runs the same mechanism for DIJE while retaining candidate-only authorization and Null for JE and both Voices", () => {

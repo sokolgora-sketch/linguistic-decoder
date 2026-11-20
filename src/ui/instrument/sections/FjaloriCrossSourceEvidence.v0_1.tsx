@@ -4,6 +4,8 @@ import { useEffect, useMemo, useState } from "react";
 import type {
   RuntimeAlbanianSourceSenseRecordV0_1,
   RuntimeAlbanianSourceSenseSelectionV0_1,
+  RuntimeFjaloriFamilyFormResponseV0_1,
+  RuntimeFjaloriSourceDescriptionV0_1,
   RuntimeFjaloriSourceResponseV0_1,
 } from "@/ui/instrument/sections/currentWordSourceFunctionalSuggestionAdapter.v0_1";
 
@@ -60,6 +62,11 @@ type EvidenceState =
     }>;
 
 type KeyedEvidenceState = Readonly<{ requestKey: string; evidence: EvidenceState }>;
+type KeyedFamilyResponseState = Readonly<{
+  requestKey: string;
+  responses: readonly RuntimeFjaloriFamilyFormResponseV0_1[];
+}>;
+const EMPTY_FAMILY_RESPONSES: readonly RuntimeFjaloriFamilyFormResponseV0_1[] = [];
 const LOADING_EVIDENCE: EvidenceState = { status: "loading" };
 
 function canonicalAlbanianWord(value: string): string | null {
@@ -183,6 +190,55 @@ function readFjaloriEvidence(payload: unknown, canonicalWord: string): Extract<E
   });
 }
 
+function familyResponseFromEvidence(
+  form: string,
+  evidence: EvidenceState,
+  analysisLanguage: string,
+  analysisVariety: string,
+): RuntimeFjaloriFamilyFormResponseV0_1 {
+  const requestKey = `${form}\u0000${form}`;
+  const apiUrl = `${FJALORI_API_ROOT}/${encodeURIComponent(form)}.json`;
+  if (evidence.status !== "available") {
+    return {
+      requestKey,
+      queryForm: form,
+      status: evidence.status,
+      httpStatus: evidence.status === "http-not-found" || evidence.status === "http-error" ? evidence.httpStatus : null,
+      exactSourceForm: null,
+      apiUrl,
+      licence: null,
+      analysisLanguage,
+      analysisVariety,
+      recordSources: [],
+      senses: [],
+    };
+  }
+  const senses = evidence.entries.flatMap((entry, entryIndex) => entry.senses.map((sense, senseIndex) => ({
+    entryIndex: entryIndex + 1,
+    senseIndex: senseIndex + 1,
+    partOfSpeech: entry.pos,
+    gloss: sense.gloss,
+    glossLanguage: sense.lang,
+    senseSource: sense.source,
+    tags: sense.tags,
+    entrySources: entry.sources,
+  })));
+  const description: RuntimeFjaloriSourceDescriptionV0_1 | null = evidence.description;
+  return {
+    requestKey,
+    queryForm: form,
+    status: "available",
+    exactSourceForm: evidence.sourceWord,
+    apiUrl,
+    licence: evidence.licence,
+    analysisLanguage,
+    analysisVariety,
+    recordSources: evidence.recordSources,
+    senses,
+    description,
+  };
+}
+
 export function FjaloriCrossSourceEvidenceV0_1({
   word,
   context = "word-reading",
@@ -190,6 +246,7 @@ export function FjaloriCrossSourceEvidenceV0_1({
   componentProposal,
   analysisLanguage,
   analysisVariety,
+  relatedForms = [],
   onSelectSourceSenseForMotivation,
   onRuntimeSourceResponse,
 }: Readonly<{
@@ -199,10 +256,18 @@ export function FjaloriCrossSourceEvidenceV0_1({
   componentProposal?: ComponentProposalContextV0_1;
   analysisLanguage?: string;
   analysisVariety?: string;
+  relatedForms?: readonly string[];
   onSelectSourceSenseForMotivation?: (selection: RuntimeAlbanianSourceSenseSelectionV0_1 | null) => void;
   onRuntimeSourceResponse?: (response: RuntimeFjaloriSourceResponseV0_1) => void;
 }>) {
   const canonicalWord = canonicalAlbanianWord(word);
+  const relatedFormsInputKey = JSON.stringify(relatedForms);
+  const canonicalRelatedForms = useMemo(() => [...new Set(
+    (JSON.parse(relatedFormsInputKey) as string[])
+      .map(canonicalAlbanianWord)
+      .filter((form): form is string => Boolean(form) && form !== canonicalWord),
+  )].slice(0, 8), [canonicalWord, relatedFormsInputKey]);
+  const familyRequestKey = JSON.stringify(canonicalRelatedForms);
   const userProposedMeaning = componentProposal?.unresolved
     ? ""
     : proposalMeaning ?? componentProposal?.proposedMeaning ?? "";
@@ -230,6 +295,13 @@ export function FjaloriCrossSourceEvidenceV0_1({
   const evidence = storedEvidence.requestKey === requestKey
     ? storedEvidence.evidence
     : LOADING_EVIDENCE;
+  const [storedFamilyResponses, setStoredFamilyResponses] = useState<KeyedFamilyResponseState>({
+    requestKey: familyRequestKey,
+    responses: [],
+  });
+  const familyResponses = storedFamilyResponses.requestKey === familyRequestKey
+    ? storedFamilyResponses.responses
+    : EMPTY_FAMILY_RESPONSES;
   const [selectedSense, setSelectedSense] = useState<Readonly<{
     entryIndex: number;
     senseIndex: number;
@@ -306,6 +378,56 @@ export function FjaloriCrossSourceEvidenceV0_1({
     };
   }, [canonicalWord, requestKey]);
 
+  useEffect(() => {
+    setStoredFamilyResponses({ requestKey: familyRequestKey, responses: [] });
+    if (!canonicalRelatedForms.length) return;
+    const controller = new AbortController();
+    let disposed = false;
+    let timedOut = false;
+    const timeout = window.setTimeout(() => {
+      timedOut = true;
+      controller.abort();
+    }, FETCH_TIMEOUT_MS);
+    const loadForm = async (form: string): Promise<RuntimeFjaloriFamilyFormResponseV0_1> => {
+      try {
+        const response = await fetch(
+          `${FJALORI_API_ROOT}/${encodeURIComponent(form)}.json`,
+          { cache: "force-cache", signal: controller.signal },
+        );
+        if (response.status === 404) return familyResponseFromEvidence(form, { status: "http-not-found", httpStatus: 404 }, analysisLanguage ?? "", analysisVariety ?? "");
+        if (!response.ok) {
+          const validStatus = Number.isInteger(response.status) && response.status >= 100 && response.status <= 599;
+          return familyResponseFromEvidence(form, validStatus
+            ? { status: "http-error", httpStatus: response.status }
+            : { status: "unavailable", reason: "HTTP_STATUS_UNKNOWN" }, analysisLanguage ?? "", analysisVariety ?? "");
+        }
+        let payload: unknown;
+        try {
+          payload = await response.json() as unknown;
+        } catch {
+          return familyResponseFromEvidence(form, { status: "invalid" }, analysisLanguage ?? "", analysisVariety ?? "");
+        }
+        return familyResponseFromEvidence(form,
+          readFjaloriEvidence(payload, form) ?? { status: "invalid" },
+          analysisLanguage ?? "",
+          analysisVariety ?? "",
+        );
+      } catch {
+        return familyResponseFromEvidence(form, timedOut
+          ? { status: "timeout" }
+          : { status: "network-failure" }, analysisLanguage ?? "", analysisVariety ?? "");
+      }
+    };
+    void Promise.all(canonicalRelatedForms.map(loadForm)).then((responses) => {
+      if (!disposed) setStoredFamilyResponses({ requestKey: familyRequestKey, responses });
+    }).finally(() => window.clearTimeout(timeout));
+    return () => {
+      disposed = true;
+      window.clearTimeout(timeout);
+      controller.abort();
+    };
+  }, [analysisLanguage, analysisVariety, canonicalRelatedForms, familyRequestKey]);
+
   const apiUrl = `${FJALORI_API_ROOT}/${encodeURIComponent(canonicalWord ?? "")}.json`;
   const runtimeSourceResponse = useMemo<RuntimeFjaloriSourceResponseV0_1>(() => {
     if (!canonicalWord) {
@@ -321,6 +443,7 @@ export function FjaloriCrossSourceEvidenceV0_1({
         analysisVariety: analysisVariety ?? "",
         recordSources: [],
         senses: [],
+        familyFormResponses: familyResponses,
       };
     }
     if (evidence.status !== "available") {
@@ -336,6 +459,7 @@ export function FjaloriCrossSourceEvidenceV0_1({
         analysisVariety: analysisVariety ?? "",
         recordSources: [],
         senses: [],
+        familyFormResponses: familyResponses,
       };
     }
     const senses = evidence.entries.flatMap((entry, entryIndex) => entry.senses.map((sense, senseIndex) => ({
@@ -359,8 +483,10 @@ export function FjaloriCrossSourceEvidenceV0_1({
       analysisVariety: analysisVariety ?? "",
       recordSources: evidence.recordSources,
       senses,
+      description: evidence.description,
+      familyFormResponses: familyResponses,
     };
-  }, [analysisLanguage, analysisVariety, apiUrl, canonicalWord, evidence, requestKey, word]);
+  }, [analysisLanguage, analysisVariety, apiUrl, canonicalWord, evidence, familyResponses, requestKey, word]);
 
   useEffect(() => {
     onRuntimeSourceResponse?.(runtimeSourceResponse);

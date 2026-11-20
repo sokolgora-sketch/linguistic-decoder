@@ -21,6 +21,7 @@ import type {
   RuntimeAlbanianSourceSenseSelectionV0_1,
   RuntimeFjaloriSourceResponseV0_1,
 } from "@/ui/instrument/sections/currentWordSourceFunctionalSuggestionAdapter.v0_1";
+import { functionalFamilySourceLookupFormsV0_1 } from "@/ui/instrument/sections/currentWordSourceFunctionalSuggestionAdapter.v0_1";
 import {
   aggregateMotivationDiscoveryCandidatesV0_1,
   measureMotivationDiscoveryAggregationV0_1,
@@ -625,6 +626,11 @@ export function MotivationDiscoveryCardV0_1({
               <p className="mt-1 break-words font-mono text-sm text-[#e1f2ed]" data-testid="automatic-functional-reasoning-equation">
                 {candidate.familyNetwork.functionalEquation}
               </p>
+              {candidate.familyNetwork.transitionNetworks.length ? (
+                <p className="mt-1 text-xs text-[#c7d1c0]" data-testid="automatic-functional-transition-status">
+                  Conditional action-to-event proposal · intermediate state UNKNOWN_OR_NULL · {candidate.familyNetwork.transitionNetworks.length} unranked source-sense path{candidate.familyNetwork.transitionNetworks.length === 1 ? "" : "s"} · relation source references: none.
+                </p>
+              ) : null}
               <p className="mt-1 text-sm text-[#dce8d5]" data-testid="automatic-functional-reasoning-explanation">
                 {candidate.familyNetwork.explanation}
               </p>
@@ -649,6 +655,32 @@ export function MotivationDiscoveryCardV0_1({
                   <p className="break-words">
                     Target source: {candidate.targetSource.provider} · {candidate.targetSource.evidenceStatus} · {candidate.targetSource.sourceIdentity} · {candidate.targetSource.locator} · <a className="underline" href={candidate.targetSource.sourceUrl} target="_blank" rel="noreferrer">source</a>
                   </p>
+                  {candidate.familyNetwork.familySourceRecords.length ? (
+                    <section data-testid="automatic-functional-family-source-records" className="rounded border border-[#3d465c] p-2">
+                      <h4 className="font-semibold">Related profile-form source lookups · not derivation evidence</h4>
+                      <ul className="mt-1 list-disc space-y-2 pl-5">
+                        {candidate.familyNetwork.familySourceRecords.map((record) => (
+                          <li key={`${record.profileClassification}:${record.form}`} className="break-words">
+                            <span className="font-semibold">{record.form}</span> · {record.profileClassification} · response {record.responseStatus} · {record.evidenceStatus}
+                            {record.sourceIdentity ? ` · ${record.sourceIdentity}` : ""}
+                            {record.sourceUrl ? <> · <a className="underline" href={record.sourceUrl} target="_blank" rel="noreferrer">source response</a></> : null}
+                            {record.description ? <div className="mt-1">Record-level source description (AI-assisted; not sense-specific or independent corroboration): “{record.description.text}” · {record.description.attribution}</div> : null}
+                            {record.senses.length ? (
+                              <ul className="mt-1 list-[circle] space-y-1 pl-5">
+                                {record.senses.map((sense) => (
+                                  <li key={`${sense.entryIndex}:${sense.senseIndex}`}>
+                                    Entry {sense.entryIndex} · Sense {sense.senseIndex} · {sense.partOfSpeech ?? "POS UNKNOWN_OR_NULL"}: {sense.gloss} · {sense.glossLanguage} · {sense.senseSource} · entry sources {sense.entrySources.join(", ") || "UNKNOWN_OR_NULL"}
+                                  </li>
+                                ))}
+                              </ul>
+                            ) : null}
+                            {record.reasonCodes.length ? ` · ${record.reasonCodes.join(", ")}` : ""}
+                          </li>
+                        ))}
+                      </ul>
+                      <p className="mt-2">Family-form profile membership is USER_PROPOSED profile data; each exact-form provider response reports only its own entry. No response here source-reports a DAJ/NDAJ/NDARË-to-NDARJE derivation.</p>
+                    </section>
+                  ) : null}
                   <p className="break-words">
                     Exact code points: {functionalReasoning.exactCodePoints.map(({ character, position }) => `${character}@${position}`).join(" · ") || "UNKNOWN_OR_NULL"} · written Voices: {functionalReasoning.writtenVoices.map(({ voice, position }) => `${voice}@${position}`).join(" → ") || "∅"}
                   </p>
@@ -1692,6 +1724,7 @@ export function MotivationDiscoveryCardV0_1({
           word={value.inputWord}
           analysisLanguage={value.inputLanguage}
           analysisVariety={value.inputProfile}
+          relatedForms={functionalFamilySourceLookupFormsV0_1(value.inputWord, value.inputLanguage)}
           onSelectSourceSenseForMotivation={onSelectSourceSenseForMotivation}
           onRuntimeSourceResponse={onRuntimeSourceResponse}
         />
