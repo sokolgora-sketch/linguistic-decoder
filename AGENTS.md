@@ -18,3 +18,13 @@ Route by task:
 Skills guide work; they do not grant permission. Follow current ZE-21 and repository policy. Preserve user spellings exactly and distinguish Fact, Inference, Hypothesis, and Unknown/Null. A new ZË-RO milestone requires evidence-backed confidence above 80% and explicit owner approval. `npm run gate:prepush` is the required push gate. Never merge without explicit authorization for the exact PR and head.
 
 Long-identifier UI resilience: User-facing reason codes, source references, citation locators, URLs and other unbroken identifiers must remain readable and copyable at mobile widths. Text containers must support overflow wrapping (for example, `overflow-wrap:anywhere`). Flex/grid children that must shrink should use `min-w-0`. Do not rely on ancestor `overflow-x:hidden` as a clipping fix. When one overflow defect is found, inspect surrounding components and adjacent sections for similar strings. Verify element and ancestor `scrollWidth` against `clientWidth`, not only document width. Preserve exact text and evidence authority.
+
+<!-- BEGIN:nextjs-agent-rules -->
+
+## This is NOT the Next.js you know
+
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+
+<!-- END:nextjs-agent-rules -->
