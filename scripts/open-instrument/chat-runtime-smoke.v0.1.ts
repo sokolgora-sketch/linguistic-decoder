@@ -100,6 +100,15 @@ async function main(): Promise<void> {
     console.log("CURRENT_ANALYSIS_PROVENANCE=PASS");
     console.log(`ANALYZE_REQUESTS_AFTER_FRESH=${analyzeRequests}`);
 
+    const overviewDetails = page.getByTestId("instrument-tab-details-overview");
+    assert(await overviewDetails.getAttribute("open") === null, "Expanded Overview details should remain collapsed by default.");
+    assert(
+      !(await page.getByText("MULTILINGUAL SOURCE DISCOVERY", { exact: true }).first().isVisible()),
+      "Detailed source discovery should not be visible before the user opens Overview details.",
+    );
+    await overviewDetails.locator("summary").click();
+    console.log("OVERVIEW_DETAILS_DISCLOSURE=PASS");
+
     const assertAuthorityHierarchy = async (viewportLabel: "DESKTOP" | "MOBILE") => {
       await page.getByText("MULTILINGUAL SOURCE DISCOVERY", { exact: true }).first().waitFor({ state: "visible" });
       await page.getByTestId("multilingual-discovery-role").first().waitFor({ state: "visible" });
