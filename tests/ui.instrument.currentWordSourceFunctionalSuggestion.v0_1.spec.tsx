@@ -1591,8 +1591,13 @@ describe("current-word source functional suggestion v0.1", () => {
       />,
     );
     expect(screen.getByTestId("current-word-source-functional-null")).toHaveTextContent("No source-linked suggestion is available from the current inputs.");
-    expect(screen.getByLabelText("Spectrum association for D at position 1")).toHaveValue("");
-    expect(screen.getByLabelText("Voice operator for A@2")).toHaveValue("");
+    const spectrumSelect = screen.getByLabelText("Spectrum association for D at position 1");
+    const voiceSelect = screen.getByLabelText("Voice operator for A@2");
+    expect(spectrumSelect).toHaveValue("");
+    expect(spectrumSelect).toHaveTextContent("division · Proposed; not source-reported");
+    expect(voiceSelect).toHaveValue("");
+    expect(voiceSelect).toHaveTextContent("INITIATE / GROUND · Proposed; not source-reported");
+    expect(spectrumSelect).not.toHaveTextContent("Proposed by you");
     expect(screen.getByTestId("current-word-symbolic-result")).toHaveTextContent("No complete Voice operation has been selected.");
 
     fireEvent.change(screen.getByLabelText("Spectrum association for D at position 1"), { target: { value: "d:division" } });

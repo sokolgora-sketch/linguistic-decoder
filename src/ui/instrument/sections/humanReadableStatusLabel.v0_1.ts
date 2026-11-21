@@ -7,7 +7,7 @@ const STATUS_LABELS: Readonly<Record<string, string>> = {
   SOURCE_REPORTED: "Source-reported",
   LOGICAL_INFERENCE: "Logical inference",
   USER_PROPOSAL: "Your proposal",
-  USER_PROPOSED: "Proposed by you",
+  USER_PROPOSED: "Proposed; not source-reported",
   EXPLORATORY_HYPOTHESIS: "Exploratory proposal",
   EXPLORATORY_FUNCTIONAL_HYPOTHESIS: "Exploratory proposal",
   CITATION_ENTERED_UNVERIFIED: "Citation not independently verified",

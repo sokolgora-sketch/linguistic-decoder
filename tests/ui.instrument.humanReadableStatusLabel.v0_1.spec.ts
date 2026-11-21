@@ -5,6 +5,8 @@ describe("human-readable research status labels", () => {
     ["UNKNOWN_OR_NULL", "Not established"],
     ["PARTIAL_NULL", "Explanation incomplete"],
     ["SOURCE_FACT", "Source-reported evidence"],
+    ["USER_PROPOSED", "Proposed; not source-reported"],
+    ["USER_PROPOSAL", "Your proposal"],
     ["CITATION_ENTERED_UNVERIFIED", "Citation not independently verified"],
     ["EXPLORATORY_HYPOTHESIS", "Exploratory proposal"],
     ["no_single_winner", "No option is selected automatically"],

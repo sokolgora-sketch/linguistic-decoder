@@ -536,7 +536,7 @@ describe("current-word symbolic draft v0.1", () => {
     expect(summary).toHaveTextContent("Explanation incomplete");
     expect(summary).toHaveTextContent("Some target structure or operations remain unresolved");
     expect(summary.querySelectorAll('[data-testid="current-word-graph-summary-contribution"]')).toHaveLength(2);
-    expect(screen.getByTestId("current-word-graph-summary-proposed-interaction")).toHaveTextContent("Proposed by you");
+    expect(screen.getByTestId("current-word-graph-summary-proposed-interaction")).toHaveTextContent("Proposed; not source-reported");
     expect(screen.getByTestId("current-word-graph-summary-proposed-interaction")).not.toHaveTextContent(/USER_PROPOSAL|USER_PROPOSED/);
 
     const details = screen.getByTestId("current-word-graph-details");
