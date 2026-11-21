@@ -2,6 +2,7 @@ import React from "react";
 import {
   render,
   screen,
+  within,
 } from "@testing-library/react";
 
 import { GET } from "../app/api/analyze-v1/route";
@@ -322,7 +323,11 @@ describe(
       const vm = adaptAnalysisToTelemetryVM(body);
       render(<EmbryoExpansionContextCardV0_1 vm={vm} />);
 
-      expect(screen.getByText(di.semanticBridge)).toBeInTheDocument();
+      expect(
+        within(screen.getByTestId("functional-motivation-card")).getByText(
+          di.semanticBridge,
+        ),
+      ).toBeInTheDocument();
       expect(screen.queryByText(forgedStatement)).not.toBeInTheDocument();
       expect(
         screen.getByText("Evidence: Reviewed lexical bridge · exploratory"),

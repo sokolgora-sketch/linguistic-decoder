@@ -83,7 +83,11 @@ describe(
       ).toBeInTheDocument();
 
       expect(
-        screen.getByText(
+        within(
+          screen.getByTestId(
+            "word-specific-functional-depth-result-albanian-di-know-functional",
+          ),
+        ).getByText(
           "knowledge can motivate study and learning functionally without making a historical-origin claim",
         ),
       ).toBeInTheDocument();

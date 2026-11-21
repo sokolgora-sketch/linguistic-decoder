@@ -3,6 +3,7 @@ import React from "react";
 import type {
   CandidateRowVM,
   FunctionalCandidateComponentVM,
+  FunctionalMotivationInterpretationV0_3VM,
   PresentOrMissing,
   TelemetryViewModel,
   Vowel,
@@ -812,10 +813,41 @@ function NoSupportedFunctionalCandidate({
 
 function WordSpecificFunctionalDepthSummaryV0_1({
   value,
+  word,
+  interpretation,
 }: {
   value: WordSpecificFunctionalDepthV0_2 | undefined;
+  word: string;
+  interpretation: FunctionalMotivationInterpretationV0_3VM | undefined;
 }) {
   if (value === undefined) return null;
+
+  const missingTargetSense = interpretation?.unresolved.some(
+    (item) => item.reason === "MISSING_TARGET_SENSE",
+  ) ?? false;
+
+  const interpretationReadout = interpretation ? (
+    <div
+      className="mt-3 rounded-md border border-slate-200 bg-white/70 p-3 text-xs leading-5 text-slate-700 dark:border-slate-700 dark:bg-black/20 dark:text-slate-300"
+      data-testid="word-specific-functional-depth-interpretation"
+    >
+      <p>
+        Whole-word interpretation status:{" "}
+        <code>{interpretation.status}</code>
+      </p>
+      {missingTargetSense ? (
+        <p
+          className="mt-2"
+          data-testid="word-specific-functional-depth-missing-target-sense"
+        >
+          The existing interpretation reports{" "}
+          <code>MISSING_TARGET_SENSE</code>. A target sense is required for a
+          whole-word interpretation; the component contribution shown here does
+          not fill that gap.
+        </p>
+      ) : null}
+    </div>
+  ) : null;
 
   if (value.status === null) {
     return (
@@ -829,9 +861,18 @@ function WordSpecificFunctionalDepthSummaryV0_1({
         <div className="mt-2 text-sm font-semibold text-slate-900 dark:text-white">
           No supported word-specific functional motivation yet.
         </div>
+        {value.nullReason ? (
+          <div
+            className="mt-2 text-xs text-slate-600 dark:text-slate-400"
+            data-testid="word-specific-functional-depth-null-reason"
+          >
+            Null reason: <code>{value.nullReason}</code>
+          </div>
+        ) : null}
         <div className="mt-2 text-xs leading-5 text-slate-500 dark:text-slate-400">
           Doctrinal readings, structural context, and lexical source evidence remain separate.
         </div>
+        {interpretationReadout}
       </section>
     );
   }
@@ -850,29 +891,151 @@ function WordSpecificFunctionalDepthSummaryV0_1({
         <div className="text-xs font-semibold uppercase tracking-[0.14em] text-emerald-700 dark:text-emerald-200">
           Word-specific functional depth
         </div>
-        <span className="rounded-full border border-emerald-400/50 bg-white/70 px-2.5 py-1 text-[11px] font-semibold text-emerald-900 dark:bg-black/20 dark:text-emerald-100">
+        <span
+          className="rounded-full border border-emerald-400/50 bg-white/70 px-2.5 py-1 text-[11px] font-semibold text-emerald-900 dark:bg-black/20 dark:text-emerald-100"
+          data-testid="word-specific-functional-depth-authority"
+        >
           {authorityLabel}
         </span>
       </div>
 
-      <div className="mt-3 text-sm leading-6 text-slate-800 dark:text-slate-200">
-        {`${value.results.length} qualifying result${value.results.length === 1 ? "" : "s"}; source and claim boundaries remain explicit.`}
+      <div
+        className="mt-2 text-xs text-slate-600 dark:text-slate-400"
+        data-testid="word-specific-functional-depth-status"
+      >
+        Runtime status: <code>{value.status}</code>
       </div>
 
-      <div className="mt-2 flex flex-wrap gap-2">
-        {value.results.map((result) => (
-          <span
-            key={result.candidateId}
-            className="rounded-md border border-emerald-300/70 bg-white/70 px-2 py-1 font-mono text-xs text-slate-800 dark:border-emerald-400/25 dark:bg-black/20 dark:text-slate-200"
-          >
-            {result.form}
-          </span>
-        ))}
+      <div
+        className="mt-3 space-y-3"
+        data-testid="word-specific-functional-depth-results"
+      >
+        {value.results.map((result) => {
+          const resultAuthorityLabel =
+            result.authorityClass === "reviewed_functional"
+              ? "Reviewed functional evidence"
+              : "Research functional hypothesis";
+
+          return (
+            <article
+              key={result.candidateId}
+              className="rounded-md border border-emerald-300/50 bg-white/70 p-3 text-sm leading-6 text-slate-800 dark:border-emerald-400/20 dark:bg-black/20 dark:text-slate-200"
+              data-testid={
+                "word-specific-functional-depth-result-" + result.candidateId
+              }
+            >
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="font-semibold">{resultAuthorityLabel}</span>
+                <code>{result.authorityClass}</code>
+              </div>
+
+              <dl className="mt-2 grid gap-1 text-xs leading-5">
+                <div>
+                  <dt className="inline font-semibold">Candidate form: </dt>
+                  <dd className="inline">
+                    <code>{result.form}</code>
+                  </dd>
+                </div>
+                <div>
+                  <dt className="inline font-semibold">Embryo: </dt>
+                  <dd className="inline">
+                    <code>{result.embryo ?? "UNKNOWN_OR_NULL"}</code>
+                  </dd>
+                </div>
+                {result.expansionChain.length > 0 ? (
+                  <div>
+                    <dt className="inline font-semibold">Expansion path: </dt>
+                    <dd className="inline">
+                      {result.expansionChain.join(" → ")}
+                    </dd>
+                  </div>
+                ) : null}
+                <div>
+                  <dt className="inline font-semibold">Source classification: </dt>
+                  <dd className="inline">
+                    <code>{result.sourceKind}</code>
+                    {" · "}
+                    <code>{result.sourceStatus}</code>
+                  </dd>
+                </div>
+                <div>
+                  <dt className="inline font-semibold">Candidate ID: </dt>
+                  <dd className="inline">
+                    <code>{result.candidateId}</code>
+                  </dd>
+                </div>
+              </dl>
+
+              {result.functionalStatement ? (
+                <p className="mt-2">
+                  <span className="font-semibold">Functional statement: </span>
+                  {result.functionalStatement}
+                </p>
+              ) : null}
+              {result.semanticBridge &&
+              result.semanticBridge !== result.functionalStatement ? (
+                <p className="mt-2">
+                  <span className="font-semibold">Functional bridge: </span>
+                  {result.semanticBridge}
+                </p>
+              ) : null}
+              {!result.functionalStatement && !result.semanticBridge ? (
+                <p className="mt-2">
+                  <span className="font-semibold">Functional contribution: </span>
+                  <code>UNKNOWN_OR_NULL</code>
+                </p>
+              ) : null}
+
+              <div className="mt-2 text-xs leading-5">
+                <span className="font-semibold">Evidence references: </span>
+                <ul className="mt-1 list-disc pl-5">
+                  {result.evidenceRefs.map((ref) => (
+                    <li key={ref}>
+                      <code>{ref}</code>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              <p
+                className="mt-2 text-xs leading-5"
+                data-testid="word-specific-functional-depth-claim-boundary"
+              >
+                <span className="font-semibold">Claim boundary: </span>
+                {result.claimBoundary}
+              </p>
+              <p className="mt-1 text-xs text-slate-600 dark:text-slate-400">
+                Historical origin and candidate truth are not claimed.
+              </p>
+            </article>
+          );
+        })}
       </div>
 
-      <div className="mt-3 text-xs leading-5 text-slate-600 dark:text-slate-400">
-        Multiple candidate interpretations may coexist. User decides. Historical origin and candidate truth are not claimed.
-      </div>
+      {value.interpretationDecisionPolicy.automaticInterpretationSelection ===
+        "DISABLED" &&
+      value.interpretationDecisionPolicy.interpretationDecisionAuthority ===
+        "USER_DECIDES" ? (
+        <p
+          className="mt-3 text-xs leading-5 text-slate-600 dark:text-slate-400"
+          data-testid="word-specific-functional-depth-decision-posture"
+        >
+          Multiple candidate interpretations may coexist. User decides.
+          Qualifying results remain separate and unranked. No interpretation is
+          selected automatically.
+        </p>
+      ) : null}
+
+      <p
+        className="mt-2 text-xs leading-5 text-slate-600 dark:text-slate-400"
+        data-testid="word-specific-functional-depth-whole-word-boundary"
+      >
+        This component-level evidence does not, by itself, establish a verified
+        derivation or complete functional interpretation of{" "}
+        <code>{word || "the analyzed word"}</code>.
+      </p>
+
+      {interpretationReadout}
     </section>
   );
 }
@@ -1039,9 +1202,16 @@ export function EmbryoExpansionContextCardV0_1({
       ? vm.wordSpecificFunctionalDepth.value ?? undefined
       : undefined;
 
+  const functionalMotivationInterpretation =
+    vm.functionalMotivationInterpretationV0_3?.kind === "present"
+      ? vm.functionalMotivationInterpretationV0_3.value
+      : undefined;
+
   const wordSpecificFunctionalDepthSummary = (
     <WordSpecificFunctionalDepthSummaryV0_1
       value={wordSpecificFunctionalDepth}
+      word={word}
+      interpretation={functionalMotivationInterpretation}
     />
   );
 
