@@ -2485,7 +2485,7 @@ describe("Single-word motivation workbench v0.1", () => {
     expect(result).toHaveTextContent("BUKË");
     expect(result).toHaveTextContent("Whole-word proposal by you");
     expect(result).toHaveTextContent("Proposed components: 0");
-    expect(screen.getByTestId("single-word-opaque-meaning-claim")).toHaveTextContent("bread; meal · Proposed by you");
+    expect(screen.getByTestId("single-word-opaque-meaning-claim")).toHaveTextContent("bread; meal · Proposed; not source-reported · entered by you");
     expect(screen.getByTestId("single-word-opaque-source-evidence")).toHaveTextContent("Citation not independently verified");
     expect(screen.getByTestId("single-word-opaque-source-evidence")).toHaveTextContent("https://fjale.al/buk%C3%AB");
     expect(screen.getByTestId("single-word-opaque-source-evidence")).toHaveTextContent("not independently verified");
