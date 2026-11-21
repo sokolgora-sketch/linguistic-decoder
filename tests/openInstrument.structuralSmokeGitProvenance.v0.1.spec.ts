@@ -1,11 +1,32 @@
 import { readFileSync } from "node:fs";
-import { resolveStructuralSmokeGitProvenance } from "../scripts/open-instrument/structuralSmokeGitProvenance.v0.1";
+import {
+  resolveStructuralSmokeCheckoutHeadSha,
+  resolveStructuralSmokeGitProvenance,
+} from "../scripts/open-instrument/structuralSmokeGitProvenance.v0.1";
 
 const checkoutSha = "1111111111111111111111111111111111111111";
 const featureSha = "2222222222222222222222222222222222222222";
 const baseSha = "3333333333333333333333333333333333333333";
 
 describe("structural browser smoke Git provenance", () => {
+  it("uses the verified GitHub workflow SHA without requiring git ownership access", () => {
+    const readGitHead = jest.fn(() => checkoutSha);
+    expect(resolveStructuralSmokeCheckoutHeadSha(featureSha, readGitHead)).toBe(featureSha);
+    expect(readGitHead).not.toHaveBeenCalled();
+  });
+
+  it("uses runtime git provenance for local runs without a workflow SHA", () => {
+    const readGitHead = jest.fn(() => checkoutSha);
+    expect(resolveStructuralSmokeCheckoutHeadSha(null, readGitHead)).toBe(checkoutSha);
+    expect(readGitHead).toHaveBeenCalledTimes(1);
+  });
+
+  it("rejects malformed workflow SHA rather than falling back to a possibly stale checkout", () => {
+    const readGitHead = jest.fn(() => checkoutSha);
+    expect(() => resolveStructuralSmokeCheckoutHeadSha("stale", readGitHead)).toThrow(/exact 40-character/);
+    expect(readGitHead).not.toHaveBeenCalled();
+  });
+
   it("keeps the checked-out commit, PR feature head, base, and smoke result distinct", () => {
     const provenance = resolveStructuralSmokeGitProvenance({
       eventName: "pull_request",

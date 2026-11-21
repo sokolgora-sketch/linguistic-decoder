@@ -7,7 +7,11 @@ import { tmpdir } from "node:os";
 import { join, relative } from "node:path";
 import { chromium, type Browser, type Locator, type Page, type Request } from "playwright";
 import { startNextServer } from "../../tests/helpers/ownedNextServer";
-import { resolveStructuralSmokeGitProvenance, type StructuralSmokeGitProvenance } from "./structuralSmokeGitProvenance.v0.1";
+import {
+  resolveStructuralSmokeCheckoutHeadSha,
+  resolveStructuralSmokeGitProvenance,
+  type StructuralSmokeGitProvenance,
+} from "./structuralSmokeGitProvenance.v0.1";
 
 type SmokeCase = {
   word: string;
@@ -340,7 +344,10 @@ async function main(): Promise<void> {
     report.gitProvenance = resolveStructuralSmokeGitProvenance({
       eventName: process.env.GITHUB_EVENT_NAME ?? null,
       eventPayload,
-      checkoutHeadSha: execFileSync("git", ["rev-parse", "HEAD"], { encoding: "utf8" }).trim(),
+      checkoutHeadSha: resolveStructuralSmokeCheckoutHeadSha(
+        process.env.GITHUB_SHA ?? null,
+        () => execFileSync("git", ["rev-parse", "HEAD"], { encoding: "utf8" }).trim(),
+      ),
       explicitFeatureHeadSha: process.env.OPEN_INSTRUMENT_PR_HEAD ?? null,
       explicitBaseRef: process.env.OPEN_INSTRUMENT_PR_BASE_REF ?? null,
       explicitBaseSha: process.env.OPEN_INSTRUMENT_PR_BASE_SHA ?? null,

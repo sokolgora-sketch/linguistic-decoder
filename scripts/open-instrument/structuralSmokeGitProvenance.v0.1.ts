@@ -25,6 +25,14 @@ export type StructuralSmokeGitProvenanceInput = {
   githubSha: string | null;
 };
 
+export function resolveStructuralSmokeCheckoutHeadSha(
+  githubSha: string | null,
+  readGitHead: () => string,
+): string {
+  if (githubSha) return requireSha(githubSha, "GitHub workflow checkout SHA");
+  return requireSha(readGitHead(), "Runtime checkout HEAD");
+}
+
 function requireSha(value: unknown, label: string): string {
   if (typeof value !== "string" || !SHA_PATTERN.test(value)) {
     throw new Error(`${label} must be an exact 40-character Git commit SHA.`);
