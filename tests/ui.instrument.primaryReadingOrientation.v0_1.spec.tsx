@@ -127,13 +127,13 @@ describe("Open Instrument primary reading orientation card v0.1", () => {
       openInstrumentOverviewDetails();
 
       const timeline = screen
-        .getAllByText("Voice Path Layers")[0]
+        .getAllByText("Voice paths")[0]
         .closest("div.rounded-xl");
 
       expect(timeline).not.toBeNull();
-      expect(within(timeline!).getByText("Spoken / canonical Voice path")).toBeVisible();
-      expect(within(timeline!).getByText("Orthographic vowel sequence (non-authoritative)")).toBeVisible();
-      expect(within(timeline!).getByText("Functional / normalization path")).toBeVisible();
+      expect(within(timeline!).getByText("Detected Voice sequence")).toBeVisible();
+      expect(within(timeline!).getByText("Written vowel sequence")).toBeVisible();
+      expect(within(timeline!).getByText("Functional or normalized sequence")).toBeVisible();
       expect(within(timeline!).getAllByText(orthographicPath).length).toBeGreaterThan(0);
 
       const depth = screen.getAllByTestId("word-specific-functional-depth")[0];

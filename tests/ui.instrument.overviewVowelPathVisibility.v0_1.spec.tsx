@@ -87,9 +87,7 @@ describe("Open Instrument Overview vowel-path visibility v0.1", () => {
 
     const overview = screen.getByRole("tabpanel");
     const functionalCard = within(overview).getByTestId("functional-motivation-card");
-    const timelineHeading = within(overview).getByText(
-      "Voice Path Layers",
-    );
+    const timelineHeading = within(overview).getByText("Voice paths");
     const timeline = timelineHeading.closest("div.rounded-xl");
 
     expect(timeline).not.toBeNull();
@@ -99,13 +97,14 @@ describe("Open Instrument Overview vowel-path visibility v0.1", () => {
       "true",
     );
     expect(timelineHeading).toBeVisible();
-    expect(within(timeline!).getByText("Spoken / canonical Voice path")).toBeVisible();
-    expect(within(timeline!).getByText("Orthographic vowel sequence (non-authoritative)")).toBeVisible();
-    expect(within(timeline!).getByText("Functional / normalization path")).toBeVisible();
-    expect(within(timeline!).getByText("DIVERGE")).toBeVisible();
-    expect(within(timeline!).getAllByText("Ë → I").length).toBe(2);
+    expect(within(timeline!).getByText("Detected Voice sequence")).toBeVisible();
+    expect(within(timeline!).getByText("Written vowel sequence")).toBeVisible();
+    expect(within(timeline!).getByText("Functional or normalized sequence")).toBeVisible();
+    expect(within(timeline!).getByText("Paths differ")).toBeVisible();
+    expect(within(timeline!).getAllByText("Ë → I").length).toBe(1);
     expect(within(timeline!).getByText("U → Y")).toBeVisible();
     expect(within(timeline!).getByText("U → I")).toBeVisible();
+    expect(within(timeline!).queryByText("DIVERGE")).not.toBeInTheDocument();
     expect(functionalCard.compareDocumentPosition(timelineHeading)).toBe(
       Node.DOCUMENT_POSITION_FOLLOWING,
     );
@@ -114,17 +113,20 @@ describe("Open Instrument Overview vowel-path visibility v0.1", () => {
     );
   });
 
-  it("preserves the existing not-emitted behavior for missing VM paths", () => {
+  it("shows unavailable paths in plain language while retaining VM missing states elsewhere", () => {
     render(<InstrumentPanel vm={vmWithMissingPaths()} />);
     openInstrumentOverviewDetails();
 
     const overview = screen.getByRole("tabpanel");
 
     expect(
-      within(overview).getByText("Voice Path Layers"),
+      within(overview).getByText("Voice paths"),
     ).toBeVisible();
-    expect(within(overview).getByText("NOT EMITTED")).toBeVisible();
-    expect(within(overview).getByText("No spoken / canonical Voice path.")).toBeVisible();
-    expect(within(overview).getAllByText("not emitted").length).toBeGreaterThanOrEqual(3);
+    const timeline = within(overview).getByText("Voice paths").closest("div.rounded-xl");
+    expect(timeline).not.toBeNull();
+    expect(within(timeline!).getByText("Comparison unavailable")).toBeVisible();
+    expect(within(timeline!).getAllByText("Not available")).toHaveLength(3);
+    expect(within(timeline!).queryByText("NOT EMITTED")).not.toBeInTheDocument();
+    expect(within(timeline!).queryByText("not_emitted")).not.toBeInTheDocument();
   });
 });

@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, within } from "@testing-library/react";
 import {
   buildCurrentWordDaAnchoredEmbryoCandidateV0_1,
   buildCurrentWordFunctionalReasoningV0_1,
@@ -991,21 +991,29 @@ describe("current-word source functional suggestion v0.1", () => {
     expect(network).toHaveTextContent("divided");
     expect(network).toHaveTextContent("NDARJE");
     expect(network).toHaveTextContent("division; separation");
-    expect(network).toHaveTextContent("EXPLORATORY_HYPOTHESIS");
-    expect(network).toHaveTextContent("UNSELECTED");
-    expect(network).toHaveTextContent("PARTIAL_NULL");
-    expect(network).toHaveTextContent("sourceAuthorityPromotion NONE");
-    expect(network).toHaveTextContent("historicalOrigin NOT_CLAIMED");
-    expect(network).toHaveTextContent("no_single_winner / user_decides");
+    expect(network).toHaveTextContent("Proposed embryo-to-family-to-word reading");
+    expect(network).not.toHaveTextContent(/EXPLORATORY_HYPOTHESIS|PARTIAL_NULL|no_single_winner|user_decides/);
+    const generatedReading = screen.getByTestId("current-word-da-generated-functional-reading");
+    expect(generatedReading).toHaveTextContent("The relation beyond the exact overlap remains Not established; no derivation is asserted.");
+    expect(generatedReading).not.toHaveTextContent("UNKNOWN_OR_NULL");
+    expect(network).toHaveTextContent("unselected");
+    expect(network).toHaveTextContent("not verified");
+    expect(network).toHaveTextContent("you decide");
+    const mappingLabel = screen.getByTestId("current-word-da-mapping-label");
+    expect(mappingLabel).toHaveTextContent("Possible DA match at code-point span [1,3)");
+    expect(mappingLabel).toHaveTextContent("spelling overlap, not an established word part");
+    expect(mappingLabel).toHaveTextContent("Any link to the selected meaning is a proposal");
+    expect(mappingLabel).toHaveClass("min-w-0", "[overflow-wrap:anywhere]");
+    expect(mappingLabel).not.toHaveTextContent(/DERIVED_STRUCTURE|USER_PROPOSED|EXPLORATORY_HYPOTHESIS/);
     expect(screen.getByTestId("current-word-da-candidate-structure")).toHaveTextContent(
       "N@0 · D@1 · A@2 · R@3 · J@4 · E@5 · written Voices A@2 → E@5",
     );
     expect(screen.getByLabelText("Propose DA at code-point span 1 to 3")).not.toBeChecked();
     expect(screen.getByTestId("current-word-source-functional-manual-fallback")).not.toHaveAttribute("open");
     const unresolved = screen.getByTestId("current-word-da-generated-unresolved");
-    expect(unresolved).toHaveTextContent("N@0 functional association UNKNOWN_OR_NULL");
-    expect(unresolved).toHaveTextContent("R@3 functional association UNKNOWN_OR_NULL");
-    expect(unresolved).toHaveTextContent("J@4 functional association UNKNOWN_OR_NULL");
+    expect(unresolved).toHaveTextContent("N@0 functional association Not established");
+    expect(unresolved).toHaveTextContent("R@3 functional association Not established");
+    expect(unresolved).toHaveTextContent("J@4 functional association Not established");
   });
 
   it.each([
@@ -1120,17 +1128,21 @@ describe("current-word source functional suggestion v0.1", () => {
         runtimeSourceStatus={{ status: "SOURCE_NOT_FOUND", reasonCode: "ALBANIAN_EXACT_FORM_NOT_FOUND" }}
       />,
     );
-    expect(screen.getByTestId("current-word-source-suggestion-runtime-status")).toHaveTextContent("SOURCE_NOT_FOUND");
-    expect(screen.getByTestId("current-word-exploratory-null")).toHaveTextContent("SOURCE_SENSE_NOT_SELECTED");
-    expect(screen.getByTestId("current-word-source-functional-null")).toHaveTextContent("UNKNOWN_OR_NULL");
+    expect(screen.getByTestId("current-word-source-suggestion-runtime-status")).toHaveTextContent("No exact source record found");
+    expect(screen.getByTestId("current-word-exploratory-null")).toHaveTextContent("No conditional explanation is available yet");
+    const sourceNull = screen.getByTestId("current-word-source-functional-null");
+    expect(sourceNull).toHaveTextContent("No source-linked suggestion is available from the current inputs.");
+    expect(sourceNull).not.toHaveTextContent(/UNKNOWN_OR_NULL|SOURCE_SENSE_NOT_SELECTED/);
+    const technicalReasons = within(sourceNull).getByText("Technical reasons").closest("details");
+    expect(technicalReasons).not.toHaveAttribute("open");
     expect(screen.queryByTestId("current-word-source-functional-suggestion-text")).not.toBeInTheDocument();
 
     fillNdarjeForm();
     expect(screen.getByTestId("current-word-source-functional-suggestion-text")).toHaveTextContent("NDARJE: Action/process corresponding to the verb function");
     expect(screen.getByTestId("current-word-source-functional-suggestion-text")).toHaveTextContent("separate things or people that are together; divide a whole into parts");
-    expect(screen.getByTestId("current-word-source-functional-suggestion-text").parentElement).toHaveTextContent("LOGICAL_INFERENCE");
-    expect(screen.getByTestId("current-word-source-functional-suggestion-text").parentElement).toHaveTextContent("CITATION_ENTERED_UNVERIFIED");
-    expect(screen.getByTestId("current-word-source-functional-suggestion-text").parentElement).toHaveTextContent("NOT_ASSESSED");
+    const visibleSuggestion = screen.getByTestId("current-word-source-functional-suggestion-result");
+    expect(visibleSuggestion).toHaveTextContent("This is an inference from information you entered");
+    expect(visibleSuggestion).not.toHaveTextContent(/LOGICAL_INFERENCE|CITATION_ENTERED_UNVERIFIED|NOT_ASSESSED/);
     expect(screen.getByTestId("current-word-source-functional-alternative")).toHaveTextContent("Part or compartment");
     expect(screen.getByTestId("current-word-source-functional-relation")).toHaveTextContent("Why suggested");
     expect(screen.getByTestId("current-word-source-functional-details")).not.toHaveAttribute("open");
@@ -1139,6 +1151,8 @@ describe("current-word source functional suggestion v0.1", () => {
     expect(screen.getByText(/source authority promotion: NONE/)).toBeInTheDocument();
     expect(screen.getByText(/Unassigned target Voice roles: A@2, E@5 · UNKNOWN_OR_NULL/)).toBeInTheDocument();
     expect(screen.getByText(/Unassigned consonant associations: N@0, D@1, R@3, J@4 · UNKNOWN_OR_NULL/)).toBeInTheDocument();
+    expect(screen.getByTestId("current-word-source-functional-details")).toHaveTextContent("CITATION_ENTERED_UNVERIFIED");
+    expect(screen.getByTestId("current-word-source-functional-details")).toHaveTextContent("NOT_ASSESSED");
   });
 
   it("generates a conditional reading from the selected runtime sense and computed evaluator outputs", () => {
@@ -1412,16 +1426,16 @@ describe("current-word source functional suggestion v0.1", () => {
     const { rerender } = render(<CurrentWordSourceFunctionalSuggestionV0_1 {...props} />);
     const checkbox = screen.getByLabelText("Propose DA at code-point span 1 to 3");
     expect(checkbox).not.toBeChecked();
-    expect(screen.getByTestId("current-word-da-not-selected")).toHaveTextContent("no target mapping or interpretation is selected automatically");
+    expect(screen.getByTestId("current-word-da-not-selected")).toHaveTextContent("No target mapping or interpretation is selected automatically");
     expect(screen.getByTestId("current-word-source-functional-manual-fallback")).not.toHaveAttribute("open");
 
     fireEvent.click(checkbox);
     expect(screen.getByTestId("current-word-exploratory-explanation")).toHaveTextContent("may help motivate");
     expect(screen.getByTestId("current-word-da-computed-operations")).toHaveTextContent("A@2");
     expect(screen.getByTestId("current-word-da-overlapping-voices")).toHaveTextContent("A@2");
-    expect(screen.getByTestId("current-word-exploratory-selected-sense")).toHaveTextContent("SOURCE_FACT");
+    expect(screen.getByTestId("current-word-exploratory-selected-sense")).toHaveTextContent("Source-reported meaning");
     expect(screen.getByTestId("current-word-exploratory-alternatives")).toHaveTextContent("a divided part");
-    expect(screen.getByTestId("current-word-exploratory-decision")).toHaveTextContent("no_single_winner · user_decides");
+    expect(screen.getByTestId("current-word-exploratory-decision")).toHaveTextContent("No interpretation is selected automatically; you decide.");
     expect(screen.getAllByTestId("current-word-exploratory-explanation")).toHaveLength(1);
     expect(screen.queryByTestId("current-word-exploratory-computed-contributions")).not.toBeInTheDocument();
     fireEvent.click(screen.getByText("View DA candidate trace and evidence"));
@@ -1472,8 +1486,7 @@ describe("current-word source functional suggestion v0.1", () => {
       evaluation={evaluation}
     />);
     fireEvent.click(screen.getByLabelText("Propose DA at code-point span 1 to 3"));
-    expect(screen.getByTestId("current-word-da-proposal-null")).toHaveTextContent("PARTIAL_NULL");
-    expect(screen.getByTestId("current-word-da-proposal-null")).toHaveTextContent("NO_VERIFIABLY_COMPUTED_VOICE_OUTPUTS");
+    expect(screen.getByTestId("current-word-da-proposal-null")).toHaveTextContent("This proposal is incomplete because required computed inputs or source support are missing.");
     expect(screen.getByTestId("current-word-da-candidate-details")).toHaveTextContent("EXPLORATORY_HYPOTHESIS / USER_PROPOSED");
     expect(screen.queryByTestId("current-word-exploratory-explanation")).not.toBeInTheDocument();
   });
@@ -1552,7 +1565,7 @@ describe("current-word source functional suggestion v0.1", () => {
         identityMatches={false}
       />,
     );
-    expect(screen.getByTestId("current-word-source-suggestion-identity-null")).toHaveTextContent("PARTIAL_NULL");
+    expect(screen.getByTestId("current-word-source-suggestion-identity-null")).toHaveTextContent("The draft word does not match the analyzed form NDARJE");
     expect(screen.queryByLabelText("Exact source target form")).not.toBeInTheDocument();
     expect(screen.queryByTestId("current-word-source-functional-suggestion-text")).not.toBeInTheDocument();
   });
@@ -1577,10 +1590,10 @@ describe("current-word source functional suggestion v0.1", () => {
         } as never}
       />,
     );
-    expect(screen.getByTestId("current-word-source-functional-null")).toHaveTextContent("UNKNOWN_OR_NULL");
+    expect(screen.getByTestId("current-word-source-functional-null")).toHaveTextContent("No source-linked suggestion is available from the current inputs.");
     expect(screen.getByLabelText("Spectrum association for D at position 1")).toHaveValue("");
     expect(screen.getByLabelText("Voice operator for A@2")).toHaveValue("");
-    expect(screen.getByTestId("current-word-symbolic-result")).toHaveTextContent("UNKNOWN_OR_NULL");
+    expect(screen.getByTestId("current-word-symbolic-result")).toHaveTextContent("No complete Voice operation has been selected.");
 
     fireEvent.change(screen.getByLabelText("Spectrum association for D at position 1"), { target: { value: "d:division" } });
     fireEvent.change(screen.getByLabelText("Voice operator for A@2"), { target: { value: "voice-a:initiate-ground" } });
@@ -1591,6 +1604,8 @@ describe("current-word source functional suggestion v0.1", () => {
       expect.stringContaining("initiated(division)"),
       expect.stringContaining("expanded(initiated(division))"),
     ]);
-    expect(screen.getAllByTestId("current-word-symbolic-computed-output").every((node) => node.textContent?.includes("USER_PROPOSED / EXPLORATORY_HYPOTHESIS"))).toBe(true);
+    const outputs = screen.getAllByTestId("current-word-symbolic-computed-output");
+    expect(outputs.every((node) => node.textContent?.includes("Computed from your proposed choices"))).toBe(true);
+    expect(outputs.every((node) => !/USER_PROPOSED|EXPLORATORY_HYPOTHESIS/.test(node.textContent ?? ""))).toBe(true);
   });
 });

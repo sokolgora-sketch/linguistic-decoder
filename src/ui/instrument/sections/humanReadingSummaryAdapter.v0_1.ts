@@ -102,17 +102,19 @@ function functionSummary(
   familySenses: readonly HumanReadingFamilySenseV0_1[],
 ): string {
   const displayTargetForm = targetForm.toLocaleUpperCase("sq-AL");
-  if (relationship === "SOURCE_LINKED_PROPOSAL") return functionText;
+  if (relationship === "SOURCE_LINKED_PROPOSAL") {
+    return `A source-linked functional proposal is available for ${displayTargetForm}; its recorded wording and attribution are in Sources.`;
+  }
   if (relationship === "KNOWING_TO_KNOWLEDGE") {
-    return `The recorded function “${functionText}” offers a possible “knowing → knowledge” reading for ${displayTargetForm}’s sense “${targetGloss}”.`;
+    return `${operator} is recorded with the function “${functionText}”. This suggests a possible knowing-to-knowledge connection for ${displayTargetForm}’s “${targetGloss}” sense, but the sources do not establish that relationship.`;
   }
   const familyForms = [...new Set(familySenses
     .filter(({ gloss }) => /\b(?:divide|dividing|divided|separate|separating|separation|split|cut)\b/iu.test(gloss))
     .map(({ form }) => form.toLocaleUpperCase("sq-AL")))];
   const familyClause = familyForms.length
-    ? ` Separate ${familyForms.join(" and ")} entries also record verb senses about dividing or separating.`
+    ? ` Separate ${familyForms.join(" and ")} entries also describe dividing or separating.`
     : "";
-  return `${operator}’s recorded action is “${functionText}”.${familyClause} One possible reading is that ${displayTargetForm} names an action or event of “${targetGloss}”; the source entries do not report this relationship, and the intermediate state and internal structure remain unknown.`;
+  return `${operator} is recorded with the function “${functionText}”.${familyClause} Together, these entries suggest a possible action-to-event connection for ${displayTargetForm}, but do not establish how the word was formed.`;
 }
 
 function buildFunctionalGroups(

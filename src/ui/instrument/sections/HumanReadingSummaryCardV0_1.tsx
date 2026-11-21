@@ -137,7 +137,7 @@ export function HumanReadingSummaryCardV0_1({
       data-testid="human-reading-summary"
       className="min-w-0 rounded-xl border border-[#355a7a] bg-[#111923] p-4 shadow-[0_10px_28px_rgba(0,0,0,0.16)] [overflow-wrap:anywhere]"
     >
-      <h2 data-testid="human-reading-word" className="text-xl font-semibold tracking-tight text-[#f5f7fb]">
+      <h2 data-testid="human-reading-word" className="sr-only">
         {summary.word}
       </h2>
 
@@ -156,9 +156,6 @@ export function HumanReadingSummaryCardV0_1({
           {summarySources.length ? (
             <p className="mt-1 text-xs text-[#aeb7c5]" data-testid="human-reading-source-labels">
               Source{summarySources.length === 1 ? "" : "s"}: {summarySources.map(({ label }) => label).join(", ")}
-              {summary.meanings.some(({ evidenceStatus }) => evidenceStatus === "CITATION_ENTERED_UNVERIFIED")
-                ? " · citation not independently verified"
-                : ""}
             </p>
           ) : null}
         </div>
@@ -182,7 +179,6 @@ export function HumanReadingSummaryCardV0_1({
                 <p className="text-sm leading-6 text-[#e7eee5]">{reading.explanation}</p>
               </article>
             ))}
-            <p data-testid="human-reading-functional-status" className="text-xs text-[#aeb7c5]">Proposal only; no historical origin is claimed.</p>
             {summary.functionalReadings.length > 1 ? (
               <p className="text-xs text-[#aeb7c5]">More than one possible reading is available; you decide.</p>
             ) : null}
@@ -234,6 +230,9 @@ export function HumanReadingSummaryCardV0_1({
           {summary.functionalReadings.map((reading) => (
             <section key={`sources:${reading.groupId}`} aria-label={`Sources for ${reading.targetForm} reading`}>
               <h4 className="font-semibold text-[#f5f7fb]">Source entries behind this possible reading</h4>
+              {reading.relationship === "SOURCE_LINKED_PROPOSAL" ? (
+                <p className="mt-2">Recorded proposal wording: {reading.functionText}</p>
+              ) : null}
               {[...new Map(reading.candidates.map((candidate) => [
                 `${candidate.embryoEvidence.sourceId}\u0000${candidate.targetSource.sourceIdentity}`,
                 candidate,

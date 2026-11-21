@@ -27,6 +27,12 @@ const baselineManifest = JSON.parse(
 ) as { cases: AnyRecord[] };
 const originalFetch = global.fetch;
 
+function visibleTextWithoutClosedDetails(element: HTMLElement): string {
+  const clone = element.cloneNode(true) as HTMLElement;
+  clone.querySelectorAll("details:not([open])").forEach((details) => details.remove());
+  return clone.textContent ?? "";
+}
+
 afterEach(() => {
   cleanup();
   global.fetch = originalFetch;
@@ -186,12 +192,15 @@ describe("Open Instrument lexical evidence primary surface v0.1", () => {
 
     expect(screen.getByTestId("current-word-exploratory-explanation")).toHaveTextContent("division; separation");
     expect(screen.getByTestId("current-word-exploratory-explanation")).toHaveTextContent("expanded(initiated(division))");
-    expect(screen.getByTestId("current-word-exploratory-motivation")).toHaveTextContent("PARTIAL_NULL");
+    const exploratoryMotivation = screen.getByTestId("current-word-exploratory-motivation");
+    expect(exploratoryMotivation).toHaveTextContent("Conditional proposal · Conditional suggestion");
+    expect(screen.getByTestId("current-word-exploratory-reason-codes")).not.toHaveAttribute("open");
     expect(screen.getByTestId("current-word-exploratory-motivation")).toHaveTextContent("N@0");
     expect(screen.getByTestId("current-word-exploratory-motivation")).toHaveTextContent("R@3");
     expect(screen.getByTestId("current-word-exploratory-motivation")).toHaveTextContent("J@4");
-    expect(screen.getByTestId("current-word-exploratory-decision")).toHaveTextContent("no_single_winner · user_decides");
-    expect(screen.getByTestId("current-word-exploratory-motivation")).toHaveTextContent("source-authority promotion NONE");
+    expect(screen.getByTestId("current-word-exploratory-decision")).toHaveTextContent("No interpretation is selected automatically; you decide.");
+    expect(visibleTextWithoutClosedDetails(exploratoryMotivation)).not.toMatch(/PARTIAL_NULL|UNKNOWN_OR_NULL|no_single_winner|user_decides|sourceAuthorityPromotion/);
+    expect(screen.getByTestId("current-word-exploratory-reason-codes")).toHaveTextContent("SOURCE_SYMBOLIC_RELATION_NOT_REPORTED");
   });
 
   it("does not create a lexical block when the result has no evidence", async () => {

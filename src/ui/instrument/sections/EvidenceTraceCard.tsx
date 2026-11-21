@@ -54,9 +54,9 @@ function spokenPronunciationStatus(readout: TelemetryReadout): string {
 
 function TraceRow({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex items-baseline justify-between gap-3 rounded-[8px] border border-[#27313d] bg-[#0d1117] px-3 py-2">
-      <div className="min-w-0 break-words text-xs text-[#8ea4ba]">{label}</div>
-      <div className="text-right text-xs font-mono text-[#f5f7fb]">{value}</div>
+    <div className="flex min-w-0 flex-wrap items-baseline justify-between gap-x-3 gap-y-1 rounded-[8px] border border-[#27313d] bg-[#0d1117] px-3 py-2">
+      <div className="min-w-0 flex-1 break-words text-xs text-[#8ea4ba]">{label}</div>
+      <div className="min-w-0 max-w-full text-left text-xs font-mono text-[#f5f7fb] [overflow-wrap:anywhere] sm:text-right">{value}</div>
     </div>
   );
 }
@@ -77,7 +77,7 @@ export function EvidenceTraceCard({
   const ledgerSources = ledgerSections.map((section) => `${section.source ?? section.key}: ${section.state}`);
 
   return (
-    <section className="rounded-[12px] border border-[#303a45] bg-[#10151c] p-4 shadow-[0_16px_48px_rgba(0,0,0,0.22)]">
+    <section className="min-w-0 [overflow-wrap:anywhere] rounded-[12px] border border-[#303a45] bg-[#10151c] p-4 shadow-[0_16px_48px_rgba(0,0,0,0.22)]">
       <div className="min-w-0">
         <div className="text-[10px] font-semibold uppercase text-[#8ea4ba]">overview field trace</div>
         <div className="mt-1 text-base font-semibold text-[#f5f7fb]">Evidence trace</div>
@@ -86,7 +86,7 @@ export function EvidenceTraceCard({
         </div>
       </div>
 
-      <div className="mt-4 space-y-2 rounded-[10px] border border-[#27313d] bg-[#0d1117] p-3">
+      <div className="mt-4 min-w-0 space-y-2 rounded-[10px] border border-[#27313d] bg-[#0d1117] p-3 [overflow-wrap:anywhere]">
         <TraceRow label="input word" value={readout.word ? `word=${readout.word}` : "not emitted"} />
         <TraceRow label="normalized form" value={`norm=${pomText(readout.normalizedWord, String)}`} />
         <TraceRow label="Spoken / canonical Voice path" value={`path=${vowelPathText(readout.voicePath)}`} />
@@ -100,12 +100,12 @@ export function EvidenceTraceCard({
         <TraceRow label="RootMap hypothesis" value={`rootMap=${rootMapStatus(rootMap)}`} />
       </div>
 
-      <div className="mt-4 rounded-[10px] border border-[#27313d] bg-[#0d1117] p-3">
+      <div className="mt-4 min-w-0 rounded-[10px] border border-[#27313d] bg-[#0d1117] p-3 [overflow-wrap:anywhere]">
         <div className="text-[11px] font-semibold uppercase text-[#8ea4ba]">Ledger sources</div>
         {ledgerSources.length ? (
           <ul className="mt-2 space-y-1.5 text-xs text-[#d7dde7]">
             {ledgerSources.map((source) => (
-              <li key={source} className="font-mono">
+              <li key={source} className="font-mono [overflow-wrap:anywhere]">
                 {source}
               </li>
             ))}
@@ -117,12 +117,12 @@ export function EvidenceTraceCard({
 
       <div
         data-testid="evidence-population-boundary"
-        className="mt-3 rounded-[10px] border border-[#27313d] bg-[#0d1117] p-3 text-[11px] leading-5 text-[#aeb7c5]"
+        className="mt-3 min-w-0 rounded-[10px] border border-[#27313d] bg-[#0d1117] p-3 text-[11px] leading-5 text-[#aeb7c5] [overflow-wrap:anywhere]"
       >
         This is a separate analysis candidate/evidence-row population. It is not a superset of the Motivation Discovery candidate population; the two counts can differ in either direction because they come from different VM fields.
       </div>
 
-      <div className="mt-4 rounded-[10px] border border-[#27313d] bg-[#0d1117] p-3 text-[11px] leading-5 text-[#7d8ea3]">
+      <div className="mt-4 min-w-0 rounded-[10px] border border-[#27313d] bg-[#0d1117] p-3 text-[11px] leading-5 text-[#7d8ea3] [overflow-wrap:anywhere]">
         Boundary: VM field trace only; functional / normalization paths and candidate / structural paths are separate from word-specific functional motivation; not a proof chain; interpretations are not selected automatically.
       </div>
     </section>

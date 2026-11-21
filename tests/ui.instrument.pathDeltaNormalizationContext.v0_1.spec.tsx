@@ -5,6 +5,7 @@ import { fireEvent, render, screen, within } from "@testing-library/react";
 
 import { InstrumentPanel } from "@/ui/instrument/InstrumentPanel";
 import { VowelPathTimeline } from "@/ui/instrument/VowelPathTimeline";
+import { openInstrumentOverviewDetails } from "./helpers/openInstrumentOverviewDetails";
 
 import studyFixture from "./fixtures/openInstrument/analyze-v1/post-ssot-word-regression-v0.1/study.run1.raw.json";
 import damageFixture from "./fixtures/openInstrument/analyze-v1/post-ssot-word-regression-v0.1/damage.run1.raw.json";
@@ -26,36 +27,37 @@ describe("Open Instrument path delta normalization context v0.1", () => {
     render(<InstrumentPanel payload={studyFixture} />);
 
     const overview = screen.getByRole("tabpanel");
-    fireEvent.click(screen.getByText("More overview, sources, and analysis"));
+    openInstrumentOverviewDetails();
     const timeline = within(overview)
-      .getByText("Voice Path Layers")
+      .getByText("Voice paths")
       .closest("div.rounded-xl");
 
     expect(timeline).not.toBeNull();
-    expect(within(timeline!).getByText("Spoken / canonical Voice path")).toBeVisible();
+    expect(within(timeline!).getByText("Detected Voice sequence")).toBeVisible();
     expect(within(timeline!).getAllByText("U → Y").length).toBeGreaterThan(0);
-    expect(within(timeline!).getByText("Functional / normalization path")).toBeVisible();
+    expect(within(timeline!).getByText("Functional or normalized sequence")).toBeVisible();
     expect(within(timeline!).getAllByText("U → I").length).toBeGreaterThan(0);
-    expect(within(timeline!).getByText("DIVERGE")).toBeVisible();
-    expect(within(timeline!).getByText("Normalization / transformation record")).toBeVisible();
-    expect(
-      within(timeline!).getByText("UY → UI (functional_equivalence)"),
-    ).toBeVisible();
+    expect(within(timeline!).getByText("Paths differ")).toBeVisible();
+    const normalizationDetails = within(timeline!).getByText("View exact normalization steps").closest("details");
+    expect(normalizationDetails).not.toBeNull();
+    expect(normalizationDetails).not.toHaveAttribute("open");
+    expect(within(timeline!).getByText("UY → UI (functional_equivalence)")).not.toBeVisible();
+    fireEvent.click(within(timeline!).getByText("View exact normalization steps"));
+    expect(within(timeline!).getByText("UY → UI (functional_equivalence)")).toBeVisible();
   });
 
   it("shows the emitted damage normalization record exactly", () => {
     render(<InstrumentPanel payload={damageFixture} />);
 
     const overview = screen.getByRole("tabpanel");
-    fireEvent.click(screen.getByText("More overview, sources, and analysis"));
+    openInstrumentOverviewDetails();
     const timeline = within(overview)
-      .getByText("Voice Path Layers")
+      .getByText("Voice paths")
       .closest("div.rounded-xl");
 
     expect(timeline).not.toBeNull();
-    expect(
-      within(timeline!).getByText("AAE → AE (functional_equivalence)"),
-    ).toBeVisible();
+    fireEvent.click(within(timeline!).getByText("View exact normalization steps"));
+    expect(within(timeline!).getByText("AAE → AE (functional_equivalence)")).toBeVisible();
   });
 
   it("renders emitted records in order and does not recompute them from paths", () => {
@@ -69,12 +71,15 @@ describe("Open Instrument path delta normalization context v0.1", () => {
       />,
     );
 
+    expect(screen.getByText("emitted-first")).not.toBeVisible();
+    expect(screen.getByText("emitted-second")).not.toBeVisible();
+    fireEvent.click(screen.getByText("View exact normalization steps"));
     expect(screen.getByText("emitted-first")).toBeVisible();
     expect(screen.getByText("emitted-second")).toBeVisible();
     expect(screen.queryByText("UY → UI")).not.toBeInTheDocument();
     expect(screen.getByText("U → Y")).toBeVisible();
     expect(screen.getAllByText("U → I").length).toBeGreaterThan(0);
-    expect(screen.getByText("DIVERGE")).toBeVisible();
+    expect(screen.getByText("Paths differ")).toBeVisible();
 
     const first = screen.getByText("emitted-first");
     const second = screen.getByText("emitted-second");
@@ -94,7 +99,7 @@ describe("Open Instrument path delta normalization context v0.1", () => {
       />,
     );
 
-    expect(screen.queryByText("Normalization / transformation record")).not.toBeInTheDocument();
+    expect(screen.queryByText("View exact normalization steps")).not.toBeInTheDocument();
 
     rerender(
       <VowelPathTimeline
@@ -106,8 +111,8 @@ describe("Open Instrument path delta normalization context v0.1", () => {
       />,
     );
 
-    expect(screen.queryByText("Normalization / transformation record")).not.toBeInTheDocument();
-    expect(screen.getByText("NOT EMITTED")).toBeVisible();
-    expect(screen.getByText("No spoken / canonical Voice path.")).toBeVisible();
+    expect(screen.queryByText("View exact normalization steps")).not.toBeInTheDocument();
+    expect(screen.getByText("Comparison unavailable")).toBeVisible();
+    expect(screen.getAllByText("Not available")).toHaveLength(3);
   });
 });

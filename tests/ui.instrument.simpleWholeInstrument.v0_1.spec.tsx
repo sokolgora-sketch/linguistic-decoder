@@ -303,7 +303,7 @@ describe(
           within(
             rootMapSection!,
           ).getByText(
-            "STATE: PRESENT",
+            "Map status: available",
           ),
         ).toBeVisible();
 

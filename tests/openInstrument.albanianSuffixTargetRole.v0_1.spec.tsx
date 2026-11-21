@@ -311,17 +311,17 @@ describe("source-authored suffix direct-target AGENT synthetic controls", () => 
     render(<InstrumentPanel payload={body} />);
 
     const primary = screen.getByTestId("primary-albanian-reading");
-    expect(primary).toHaveTextContent("Albanian word reading");
+    expect(primary).toHaveTextContent("Albanian source reading");
     expect(primary).toHaveTextContent("Kaikki Albanian · administronjës · noun");
     expect(primary).toHaveTextContent("en-administronjës-sq-noun-aYSRYity");
     expect(primary).toHaveTextContent("Source meaning: manager, administrator");
     expect(primary).toHaveTextContent("sq:Occupations · source w");
-    expect(primary).toHaveTextContent("Functional role: AGENT · exploratory");
+    expect(primary).toHaveTextContent("Functional role: Agent · exploratory");
     expect(primary).toHaveTextContent(
       "Source evidence for this exact reading supports this exploratory classification.",
     );
     expect(primary).not.toHaveTextContent("occupational category supports this exploratory classification");
-    expect(primary).toHaveTextContent("Independent embryo meaning or function: UNKNOWN_OR_NULL");
+    expect(primary).toHaveTextContent("Independent component meaning or function: not established");
     expect(primary).toHaveTextContent("Historical derivation: not established by these source facts.");
     expect(primary).not.toHaveTextContent("Compare administroj.");
     expect(primary).toHaveTextContent("an additional source sense");
@@ -459,12 +459,12 @@ describe("source-authored suffix direct-target AGENT synthetic controls", () => 
       expect(primary).toHaveTextContent("en-ndërtues-sq-noun-32sHF2qb");
       expect(primary).toHaveTextContent("Source meaning: builder");
       expect(primary).toHaveTextContent("sq:Occupations · source w");
-      expect(primary).toHaveTextContent("Functional role: AGENT · exploratory");
+      expect(primary).toHaveTextContent("Functional role: Agent · exploratory");
       expect(primary).toHaveTextContent(
         "Source evidence for this exact reading supports this exploratory classification.",
       );
       expect(screen.getByTestId("primary-albanian-unknown-null"))
-        .toHaveTextContent("Independent embryo meaning or function: UNKNOWN_OR_NULL.");
+        .toHaveTextContent("Independent component meaning or function: not established.");
       expect(screen.getByTestId("primary-albanian-structural-status"))
         .toHaveTextContent("candidate_only");
       expect(screen.getByTestId("primary-albanian-structural-status"))

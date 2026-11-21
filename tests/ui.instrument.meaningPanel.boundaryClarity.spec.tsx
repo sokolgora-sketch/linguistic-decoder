@@ -1,9 +1,9 @@
 import React from "react";
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import MeaningPanel from "@/ui/instrument/MeaningPanel";
 
 describe("MeaningPanel boundary clarity", () => {
-  it("uses deterministic-reading and inspection-evidence labels while keeping the boundary explicit", () => {
+  it("shows a plain structural boundary first and keeps technical inspection details accessible", () => {
     render(
       <MeaningPanel
         vm={{
@@ -24,16 +24,15 @@ describe("MeaningPanel boundary clarity", () => {
       />
     );
 
-    expect(screen.getByText("Meaning")).toBeInTheDocument();
-    expect(screen.getByText("Deterministic reading")).toBeInTheDocument();
-    expect(screen.getByText("Inspection evidence posture")).toBeInTheDocument();
-    expect(
-      screen.getByText(
-        /Human-readable deterministic reading for the current word\. It frames the readout as inspection output, not origin proof\./i
-      )
-    ).toBeInTheDocument();
-    expect(screen.getByText("Functional / normalization path: U → I.")).toBeInTheDocument();
+    expect(screen.getByText(/reports spelling and Voice structure from the analysis/i)).toBeVisible();
+    expect(screen.getByText(/does not by itself establish a word meaning or origin/i)).toBeVisible();
+    expect(screen.getByText("Analysis path: U → I.")).toBeVisible();
     expect(screen.queryByText(/Candidate \/ structural path: U → I/)).not.toBeInTheDocument();
-    expect(screen.getByText(/Boundary: deterministic reading; functional \/ normalization paths and candidate \/ structural paths are separate from word-specific functional motivation; interpretations are not selected automatically; the user decides; not a historical-chain claim\./i)).toBeInTheDocument();
+    const details = screen.getByTestId("meaning-technical-details");
+    expect(details).not.toHaveAttribute("open");
+    expect(screen.getByTestId("meaning-technical-summary")).not.toBeVisible();
+    fireEvent.click(screen.getByText("Technical structure and evidence"));
+    expect(details).toHaveAttribute("open");
+    expect(screen.getByTestId("meaning-technical-summary")).toBeVisible();
   });
 });

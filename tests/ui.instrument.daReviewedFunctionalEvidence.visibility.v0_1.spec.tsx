@@ -36,12 +36,24 @@ describe("DA reviewed functional evidence visibility v0.1", () => {
       />,
     );
 
-    expect(screen.getByText(/Dedvukaj & Ndoci 2023 PLSA/i)).toBeTruthy();
-    expect(screen.getByText(/Example \(4\), page 3; footnote 1/i)).toBeTruthy();
-    expect(screen.getByText(/historicalOriginClaim=not_claimed/i)).toBeTruthy();
-    expect(screen.getByText(/winnerClaim=not_claimed/i)).toBeTruthy();
-    expect(screen.getByText(/languageSuperiorityClaim=not_claimed/i)).toBeTruthy();
-    expect(screen.getByText(/userDecisionPosture=user_decides/i)).toBeTruthy();
+    const visibleEvidence = screen.getAllByTestId("root-map-visible-evidence");
+    const readableClaim = visibleEvidence.find((node) => node.textContent?.includes("Reviewed function evidence: Dedvukaj & Ndoci 2023 PLSA"));
+    expect(readableClaim).toBeDefined();
+    const readableText = readableClaim!.cloneNode(true) as HTMLElement;
+    readableText.querySelectorAll("details").forEach((details) => details.remove());
+    expect(readableText).toHaveTextContent(/Reviewed function evidence: Dedvukaj & Ndoci 2023 PLSA, Example \(4\), page 3; footnote 1/i);
+    expect(readableText).not.toHaveTextContent(/historicalOriginClaim|winnerClaim|languageSuperiorityClaim|userDecisionPosture|user_decides/);
+    const exactEvidence = screen.getAllByTestId("root-map-technical-key-evidence");
+    expect(exactEvidence).toHaveLength(3);
+    const exactReviewedClaim = exactEvidence.find((node) =>
+      node.textContent?.includes("reviewed functional free-operator evidence: Dedvukaj & Ndoci 2023 PLSA, Example (4), page 3; footnote 1"),
+    );
+    expect(exactReviewedClaim).toBeDefined();
+    expect(exactReviewedClaim).not.toHaveAttribute("open");
+    expect(exactReviewedClaim).toHaveTextContent(/historicalOriginClaim=not_claimed/);
+    expect(exactReviewedClaim).toHaveTextContent(/winnerClaim=not_claimed/);
+    expect(exactReviewedClaim).toHaveTextContent(/languageSuperiorityClaim=not_claimed/);
+    expect(exactReviewedClaim).toHaveTextContent(/userDecisionPosture=user_decides/);
   });
 
   it("carries reviewed DA functional evidence through EvidencePackage rootMap export", () => {

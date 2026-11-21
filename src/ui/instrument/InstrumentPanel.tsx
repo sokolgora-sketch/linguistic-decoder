@@ -208,7 +208,7 @@ function TabContentDisclosure({
       <summary className="cursor-pointer list-none px-4 py-3 text-sm font-semibold text-[#cfe6ff] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#d8bb7a] [&::-webkit-details-marker]:hidden">
         {label}
       </summary>
-      <div className="min-w-0 border-t border-[#303a45] p-4">{children}</div>
+      <div className="min-w-0 border-t border-[#303a45] p-4 [overflow-wrap:anywhere]">{children}</div>
     </details>
   );
 }
@@ -654,7 +654,7 @@ export function InstrumentPanel(props: Props) {
 
         <div className="space-y-4">
           <TabPanel id="overview" active={activeSection}>
-            <div className="space-y-4">
+            <div className="min-w-0 space-y-4 [overflow-wrap:anywhere]">
               {props.onMobileComposerJump ? (
                 <button
                   type="button"
@@ -665,7 +665,7 @@ export function InstrumentPanel(props: Props) {
                   Analyze another word
                 </button>
               ) : null}
-              <TabContentDisclosure id="overview" activeSection={activeSection} label="More overview, sources, and analysis">
+              <TabContentDisclosure id="overview" activeSection={activeSection} label="Technical source and analysis details">
               <div className="space-y-4">
               <div
                 data-testid="primary-reading-scroll-target"
@@ -778,8 +778,8 @@ export function InstrumentPanel(props: Props) {
 
           <TabPanel id="evidence" active={activeSection}>
             <TabContentDisclosure id="evidence" activeSection={activeSection} label="View evidence records and exports">
-            <div className="grid gap-4 xl:grid-cols-12">
-              <div className="space-y-4 xl:col-span-5">
+            <div className="grid min-w-0 gap-4 xl:grid-cols-12">
+              <div className="min-w-0 space-y-4 xl:col-span-5">
                 <EvidenceTraceCard
                   readout={vm.readout}
                   ledgerModel={ledgerModel}
@@ -798,7 +798,7 @@ export function InstrumentPanel(props: Props) {
                   onDownloadEvidencePackage={downloadEvidencePackage}
                 />
               </div>
-              <div className="space-y-4 xl:col-span-7">
+              <div className="min-w-0 space-y-4 xl:col-span-7">
                 {ledgerModel ? <EvidenceLedgerCard model={ledgerModel} engineVersion={engineVersion} /> : null}
                 <CountsRatiosCard readout={vm.readout} engineVersion={engineVersion} />
               </div>
@@ -838,8 +838,8 @@ export function InstrumentPanel(props: Props) {
 
           <TabPanel id="roots" active={activeSection}>
             <TabContentDisclosure id="roots" activeSection={activeSection} label="View roots, structure, and meaning tools">
-            <div className="grid gap-4 xl:grid-cols-12">
-              <div className="space-y-4 xl:col-span-5">
+            <div className="grid min-w-0 gap-4 xl:grid-cols-12">
+              <div className="min-w-0 space-y-4 xl:col-span-5">
                 <VowelPathTimeline
                   detected={vm.readout.voicePath}
                   surface={surfaceVoicePath}
@@ -852,11 +852,11 @@ export function InstrumentPanel(props: Props) {
                 })()}
                 <ResonancePanelV01 resonanceProfileV1={resonanceProfileForPanel} />
               </div>
-              <div className="space-y-4 xl:col-span-7">
+              <div className="min-w-0 space-y-4 xl:col-span-7">
                 <div data-testid="roots-meaning-reading">
                   <ShellSection
-                    title="Meaning"
-                    subtitle="Plain deterministic interpretation for the current word."
+                    title="Structure"
+                    subtitle="Written and spoken paths from this analysis."
                   >
                     <MeaningPanel vm={vm} />
                   </ShellSection>
