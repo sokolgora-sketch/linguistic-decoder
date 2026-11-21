@@ -627,6 +627,22 @@ async function main(): Promise<void> {
           await ensureControlUnobscured(control, name);
           await control.click();
         };
+        const inspectTechnicalDisclosure = async (
+          disclosure: Locator,
+          label: string,
+          expectedDetails: string[],
+        ): Promise<string> => {
+          assert(await disclosure.getAttribute("open") === null, `${label} should be collapsed by default.`);
+          const summary = disclosure.locator(":scope > summary");
+          await clickControl(summary, `${label} disclosure`);
+          const detailsText = await disclosure.innerText();
+          for (const expected of expectedDetails) {
+            assert(detailsText.includes(expected), `${label} did not retain ${expected}.`);
+          }
+          await clickControl(summary, `Close ${label} disclosure`);
+          assert(await disclosure.getAttribute("open") === null, `${label} disclosure did not close.`);
+          return detailsText;
+        };
         const checkControl = async (label: string): Promise<void> => {
           const control = workbench.getByLabel(label, { exact: true });
           await ensureControlUnobscured(control, label);
@@ -683,12 +699,18 @@ async function main(): Promise<void> {
           const proposal = workbench.getByTestId("single-word-proposal-result");
           interpretation.proposalStatus = "PROPOSED";
           interpretation.strictEmbryoMeaning = "UNKNOWN_OR_NULL";
-          assert((await proposal.innerText()).includes("PROPOSED"), "Functional proposal was not kept as PROPOSED.");
-          assert((await proposal.innerText()).includes("Strict embryo meaning: Unknown / Null"), "Strict embryo meaning was promoted.");
-          assert((await proposal.innerText()).includes("A → I"), "The complete written Voice path changed after mechanical replay.");
-          assert((await proposal.innerText()).includes("historical origin: not claimed"), "Mechanical replay promoted historical origin.");
+          const proposalText = await proposal.innerText();
+          assert(proposalText.includes("Exploratory proposal by you"), "The user-facing proposal classification was missing.");
+          assert(proposalText.includes("A → I"), "The complete written Voice path changed after mechanical replay.");
+          assert(proposalText.includes("have"), "The user's proposed meaning was not retained.");
+          assert(!/\b(?:PROPOSED|UNKNOWN_OR_NULL|no_single_winner|user_decides|sourceAuthorityPromotion|historicalOrigin|NOT_CLAIMED)\b/u.test(proposalText), "Internal proposal status leaked into ordinary user-facing text.");
+          const proposalStatusDetails = proposal.getByTestId("single-word-proposal-contract-details");
+          await inspectTechnicalDisclosure(proposalStatusDetails, "Exact proposal statuses", [
+            "Candidate status: PROPOSED",
+            "Strict embryo meaning: UNKNOWN_OR_NULL",
+            "historical origin: NOT_CLAIMED",
+          ]);
           assert(await workbench.getByLabel("Component 1 evidence status", { exact: true }).inputValue() === "USER_PROPOSED", "Manual source inspection promoted component evidence status.");
-          assert((await proposal.innerText()).includes("have"), "The user's proposed meaning was not retained.");
 
           const addOperationButton = workbench.getByTestId("single-word-add-mechanical-operation");
           await clickControl(addOperationButton, "Add mechanical operation");
@@ -701,10 +723,11 @@ async function main(): Promise<void> {
           const mechanicalText = await mechanical.innerText();
           assert(mechanicalText.includes("Raw component concatenation: KANDILL"), "KANDIL raw concatenation was incorrect.");
           assert(mechanicalText.includes("Final mechanical spelling: KANDIL"), "KANDIL replay result was incorrect.");
-          assert(mechanicalText.includes("Exact comparison: MATCH"), "KANDIL exact comparison was incorrect.");
-          assert(mechanicalText.includes("DIGRAPH_REMOVED"), "KANDIL LL digraph impact was not reported.");
-          assert(mechanicalText.includes("USER_DECLARED_UNVERIFIED"), "KANDIL mechanical authority was not explicitly unverified.");
-          assert(mechanicalText.includes("linguistic validity NOT_ASSESSED"), "KANDIL replay was promoted to a linguistic-validity assessment.");
+          assert(mechanicalText.includes("Exact comparison: Matches"), "KANDIL exact comparison was not human-readable.");
+          assert(mechanicalText.includes("has not been linguistically assessed"), "KANDIL replay authority boundary was missing.");
+          assert(!/\b(?:DIGRAPH_REMOVED|USER_DECLARED_UNVERIFIED|NOT_ASSESSED|EXAMINED)\b/u.test(mechanicalText), "Mechanical status codes leaked into ordinary user-facing text.");
+          await inspectTechnicalDisclosure(mechanical.getByTestId("single-word-mechanical-technical-details"), "KANDIL operation trace and warnings", ["DIGRAPH_REMOVED"]);
+          await inspectTechnicalDisclosure(mechanical.getByTestId("single-word-mechanical-authority-details"), "KANDIL replay authority", ["USER_DECLARED_UNVERIFIED", "NOT_ASSESSED"]);
           interpretation.rawConcatenation = "KANDILL";
           interpretation.finalMechanicalSpelling = "KANDIL";
           interpretation.exactComparison = "MATCH";
@@ -741,9 +764,11 @@ async function main(): Promise<void> {
           assert(await mechanical.getAttribute("data-status") === "EXAMINED", "DRITARE mechanical replay was not examined.");
           assert(mechanicalText.includes("Raw component concatenation: DRITHARE"), "DRITARE raw concatenation was incorrect.");
           assert(mechanicalText.includes("Final mechanical spelling: DRITARE"), "DRITARE replay result was incorrect.");
-          assert(mechanicalText.includes("DIGRAPH_CROSSES_COMPONENT_BOUNDARY") && mechanicalText.includes("DIGRAPH_REMOVED"), "DRITARE TH boundary impact was not reported.");
-          assert(mechanicalText.includes("USER_DECLARED_UNVERIFIED"), "DRITARE mechanical authority was not explicitly unverified.");
-          assert(mechanicalText.includes("linguistic validity NOT_ASSESSED"), "DRITARE replay was promoted to a linguistic-validity assessment.");
+          assert(mechanicalText.includes("Exact comparison: Matches"), "DRITARE exact comparison was not human-readable.");
+          assert(mechanicalText.includes("has not been linguistically assessed"), "DRITARE replay authority boundary was missing.");
+          assert(!/\b(?:DIGRAPH_CROSSES_COMPONENT_BOUNDARY|DIGRAPH_REMOVED|USER_DECLARED_UNVERIFIED|NOT_ASSESSED|EXAMINED)\b/u.test(mechanicalText), "DRITARE mechanical status codes leaked into ordinary user-facing text.");
+          await inspectTechnicalDisclosure(mechanical.getByTestId("single-word-mechanical-technical-details"), "DRITARE operation trace and warnings", ["DIGRAPH_CROSSES_COMPONENT_BOUNDARY", "DIGRAPH_REMOVED"]);
+          await inspectTechnicalDisclosure(mechanical.getByTestId("single-word-mechanical-authority-details"), "DRITARE replay authority", ["USER_DECLARED_UNVERIFIED", "NOT_ASSESSED"]);
           assert(await workbench.getByLabel("Component 2 exact spelling", { exact: true }).inputValue() === "HARE", "The user spelling HARE was silently changed.");
           interpretation.rawConcatenation = "DRITHARE";
           interpretation.finalMechanicalSpelling = "DRITARE";
