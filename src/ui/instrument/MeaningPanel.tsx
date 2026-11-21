@@ -139,6 +139,24 @@ export default function MeaningPanel({ vm }: Props) {
     !functionalLine && !surfaceLine ? detectedLine : null,
   ]);
 
+  const plainStructuralPaths = joinParts([
+    isPresent<unknown[]>(surface) && Array.isArray(surface.value) && surface.value.length
+      ? `Written vowel sequence: ${formatArrowPath(surface.value)}.`
+      : asText(detection.voicePathSurface)
+        ? `Written vowel sequence: ${asText(detection.voicePathSurface)}.`
+        : null,
+    isPresent<unknown[]>(detected) && Array.isArray(detected.value) && detected.value.length
+      ? `Spoken / canonical Voice path: ${formatArrowPath(detected.value)}.`
+      : asText(detection.voicePath)
+        ? `Spoken / canonical Voice path: ${asText(detection.voicePath)}.`
+        : null,
+    isPresent<unknown[]>(functional) && Array.isArray(functional.value) && functional.value.length
+      ? `Analysis path: ${formatArrowPath(functional.value)}.`
+      : asText(detection.voicePathFunctional)
+        ? `Analysis path: ${asText(detection.voicePathFunctional)}.`
+        : null,
+  ]);
+
   // --- Evidence summary (truth posture) ---
   const evidenceLines = joinParts([
     renderMaybeList('Normalization / transformation', evidence.normalizationSteps),
@@ -148,34 +166,29 @@ export default function MeaningPanel({ vm }: Props) {
   ]);
 
   return (
-    <div className="rounded-[12px] border border-[#303a45] bg-[#10151c] p-4 shadow-[0_16px_48px_rgba(0,0,0,0.22)]">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-        <div className="min-w-0">
-          <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#8ea4ba]">reading surface</div>
-          <div className="mt-1 text-lg font-semibold text-[#f5f7fb]">Meaning</div>
-          <p className="mt-2 max-w-2xl text-[12px] leading-5 text-[#aeb7c5]">
-            Human-readable deterministic reading for the current word. It frames the readout as inspection output, not origin proof.
-          </p>
+    <div data-testid="meaning-panel" className="rounded-[12px] border border-[#303a45] bg-[#10151c] p-4 shadow-[0_16px_48px_rgba(0,0,0,0.22)]">
+      <p className="text-sm leading-6 text-[#d7dde7]">
+        This view reports spelling and Voice structure from the analysis; it does not by itself establish a word meaning or origin.
+      </p>
+      {plainStructuralPaths ? (
+        <p data-testid="meaning-structural-paths" className="mt-3 whitespace-pre-wrap text-sm leading-6 text-[#f5f7fb]">
+          {plainStructuralPaths}
+        </p>
+      ) : (
+        <p data-testid="meaning-structural-paths-unavailable" className="mt-3 text-sm text-[#aeb7c5]">
+          No written or spoken path was produced for this analysis.
+        </p>
+      )}
+      <details data-testid="meaning-technical-details" className="mt-3 rounded-lg border border-[#303a45] bg-[#0d1117]">
+        <summary className="cursor-pointer px-3 py-2 text-sm font-semibold text-[#cfe6ff] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#d8bb7a]">
+          Technical structure and evidence
+        </summary>
+        <div className="space-y-2 border-t border-[#303a45] p-3 text-xs leading-5 text-[#d7dde7]">
+          <p data-testid="meaning-technical-summary">{sentence}</p>
+          {sub ? <p className="whitespace-pre-wrap font-mono text-[#9fb1bf]">{sub}</p> : null}
+          <p data-testid="meaning-technical-evidence" className="whitespace-pre-wrap">{evidenceLines || "No additional evidence details were emitted."}</p>
         </div>
-        <div className="shrink-0 rounded-full border border-[#303a45] bg-[#0d1117] px-3 py-1.5 font-mono text-[11px] uppercase tracking-[0.12em] text-[#cfe6ff]">
-          source=vm
-        </div>
-      </div>
-
-      <div className="mt-4 rounded-[10px] border border-[#355a7a] bg-[#111a24] p-4">
-        <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#8ea4ba]">Deterministic reading</div>
-        <div className="mt-2 text-sm leading-6 text-[#f5f7fb]">{sentence}</div>
-        {sub ? <div className="mt-3 whitespace-pre-wrap font-mono text-xs leading-5 text-[#9fb1bf]">{sub}</div> : null}
-      </div>
-
-      <div className="mt-3 rounded-[10px] border border-[#27313d] bg-[#0d1117] p-4">
-        <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#8ea4ba]">Inspection evidence posture</div>
-        <div className="mt-2 whitespace-pre-wrap text-xs leading-5 text-[#d7dde7]">{evidenceLines}</div>
-      </div>
-
-      <div className="mt-3 text-[11px] leading-5 text-[#7d8ea3]">
-        Boundary: deterministic reading; functional / normalization paths and candidate / structural paths are separate from word-specific functional motivation; interpretations are not selected automatically; the user decides; not a historical-chain claim.
-      </div>
+      </details>
     </div>
   );
 }

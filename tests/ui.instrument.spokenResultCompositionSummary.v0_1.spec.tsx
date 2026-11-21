@@ -4,6 +4,7 @@ import React from "react";
 import { render, screen, within } from "@testing-library/react";
 import { GET } from "../app/api/analyze-v1/route";
 import { InstrumentPanel } from "../src/ui/instrument/InstrumentPanel";
+import { openInstrumentOverviewDetails } from "./helpers/openInstrumentOverviewDetails";
 
 async function analyze(word: string): Promise<any> {
   const response = await GET({
@@ -21,6 +22,7 @@ function summary() {
 describe("spoken result composition summary v0.1", () => {
   it("composes stone's canonical path, Gamma, and ZC after its source authority", async () => {
     render(<InstrumentPanel payload={await analyze("stone")} />);
+    openInstrumentOverviewDetails();
 
     const compact = summary();
     expect(compact).toBeVisible();
@@ -49,6 +51,7 @@ describe("spoken result composition summary v0.1", () => {
 
   it("keeps home on the same Voice path with distinct source consonants", async () => {
     render(<InstrumentPanel payload={await analyze("home")} />);
+    openInstrumentOverviewDetails();
 
     const compact = summary();
     expect(within(screen.getByTestId("spoken-pronunciation-overview")).getByText(/home: .*OW1 M/)).toBeVisible();
@@ -73,6 +76,7 @@ describe("spoken result composition summary v0.1", () => {
 
   it("keeps make and name structurally lossy without collapsing their source consonants", async () => {
     const make = render(<InstrumentPanel payload={await analyze("make")} />);
+    openInstrumentOverviewDetails();
 
     const makeSummary = summary();
     expect(within(screen.getByTestId("spoken-pronunciation-overview")).getByText(/make: .*EY1 K/)).toBeVisible();
@@ -84,6 +88,7 @@ describe("spoken result composition summary v0.1", () => {
 
     make.unmount();
     render(<InstrumentPanel payload={await analyze("name")} />);
+    openInstrumentOverviewDetails();
 
     const nameSummary = summary();
     expect(within(screen.getByTestId("spoken-pronunciation-overview")).getByText(/name: .*EY1 M/)).toBeVisible();
@@ -98,6 +103,7 @@ describe("spoken result composition summary v0.1", () => {
 
   it("uses the prefix-to-suffix explanation for cat's one-source-nucleus composition", async () => {
     render(<InstrumentPanel payload={await analyze("cat")} />);
+    openInstrumentOverviewDetails();
 
     const compact = summary();
     expect(within(compact).getByText("Distribution D: 1 · 1")).toBeVisible();
@@ -107,6 +113,7 @@ describe("spoken result composition summary v0.1", () => {
 
   it("preserves mother pronunciation-derived DH and the existing detailed provenance card", async () => {
     render(<InstrumentPanel payload={await analyze("mother")} />);
+    openInstrumentOverviewDetails();
 
     const compact = summary();
     expect(within(screen.getByTestId("spoken-pronunciation-overview")).getByText(/mother: .*AH1 DH ER0/)).toBeVisible();
@@ -120,6 +127,7 @@ describe("spoken result composition summary v0.1", () => {
 
   it("keeps the between-source-nuclei explanation for study", async () => {
     render(<InstrumentPanel payload={await analyze("study")} />);
+    openInstrumentOverviewDetails();
 
     const compact = summary();
     expect(within(compact).getByText("Source consonant structure Γ")).toBeVisible();
@@ -132,6 +140,7 @@ describe("spoken result composition summary v0.1", () => {
 
   it("renders banana recurrence without assigning semantic meaning", async () => {
     render(<InstrumentPanel payload={await analyze("banana")} />);
+    openInstrumentOverviewDetails();
 
     const compact = summary();
     expect(within(compact).getByText("Distribution D: 1 · 1 · 1 · 0")).toBeVisible();
@@ -144,6 +153,7 @@ describe("spoken result composition summary v0.1", () => {
 
   it("keeps pronunciation Null distinct from candidate Null without spelling fallback", async () => {
     render(<InstrumentPanel payload={await analyze("zzzzzzzz")} />);
+    openInstrumentOverviewDetails();
 
     const compact = summary();
     expect(within(compact).getByText("Spoken pronunciation unavailable")).toBeVisible();

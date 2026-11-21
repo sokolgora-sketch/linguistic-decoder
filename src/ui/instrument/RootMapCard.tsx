@@ -12,6 +12,7 @@ import type {
   RootSpanV1 as RootMapSpanVM,
   RootTokenV1 as RootMapTokenVM,
 } from "@/shared/deepRoot.rootMap.v1";
+import { humanReadableStatusLabelV0_1, humanReadableStatusTextV0_1 } from "@/ui/instrument/sections/humanReadableStatusLabel.v0_1";
 
 type Props = {
   rootMap: PresentOrMissing<RootMapVM>;
@@ -103,11 +104,45 @@ function renderInlineChips(items: string[]) {
   );
 }
 
+function withoutRootMapPolicyMetadata(value: string): string {
+  const policyFields = /^(?:historicalOriginClaim|automaticInterpretationSelection|languageSuperiorityClaim|userDecisionPosture|winnerClaim|sourceAuthorityPromotion)\s*=/iu;
+  return value
+    .split(";")
+    .map((part) => part.trim())
+    .filter((part) => part.length > 0 && !policyFields.test(part))
+    .join("; ");
+}
+
+function rootMapMeaningForDisplay(value: string): string {
+  const reading = withoutRootMapPolicyMetadata(value);
+  return humanReadableStatusTextV0_1(reading)
+    .replace(/^reviewed functional free-operator evidence:\s*/iu, "Reviewed function evidence: ")
+    .trim();
+}
+
+function rootMapEvidenceForDisplay(value: string): string {
+  const evidence = withoutRootMapPolicyMetadata(value);
+  return humanReadableStatusTextV0_1(evidence)
+    .replace(/^sq:\s*/iu, "Albanian form: ")
+    .replace(/^ops:\s*exact$/iu, "Spelling: exact")
+    .replace(/^ops:\s*s_to_sh$/iu, "Spelling correspondence: s → sh")
+    .replace(/^gloss:\s*/iu, "Meaning: ")
+    .replace(/^note:\s*/iu, "Source note: ")
+    .replace(/^reviewed functional free-operator evidence:\s*/iu, "Reviewed function evidence: ")
+    .trim();
+}
+
+function rootMapOperationForDisplay(operation: string): string {
+  if (operation === "exact") return "Exact spelling";
+  if (operation === "s_to_sh") return "s → sh spelling correspondence";
+  return humanReadableStatusLabelV0_1(operation, operation.replace(/_/g, " "));
+}
+
 function metric(label: string, value: string) {
   return (
     <div className="min-w-0 rounded-[8px] border border-[#27313d] bg-[#0d1117] p-3">
       <div className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[#8ea4ba]">{label}</div>
-      <div className="mt-1 truncate font-mono text-[13px] text-[#f5f7fb]" title={value}>
+      <div className="mt-1 break-words font-mono text-[13px] text-[#f5f7fb] [overflow-wrap:anywhere]" title={value}>
         {value}
       </div>
     </div>
@@ -156,8 +191,11 @@ export function RootMapCard(props: Props) {
         </div>
 
         <div className="shrink-0 rounded-full border border-[#303a45] bg-[#0d1117] px-3 py-1.5 font-mono text-[11px] uppercase tracking-[0.12em] text-[#cfe6ff]">
-          <span>STATE: {state}</span>
-          {rootMap.kind === "missing" ? <span className="ml-2">({rootMap.missing})</span> : null}
+          <span>Map status: {state === "PRESENT" ? "available" : state === "MISSING" ? "not available" : "needs review"}</span>
+          <details className="ml-2 text-[10px] normal-case tracking-normal">
+            <summary className="cursor-pointer">Technical status</summary>
+            {state}{rootMap.kind === "missing" ? ` · ${rootMap.missing}` : ""}
+          </details>
         </div>
       </header>
 
@@ -179,10 +217,16 @@ export function RootMapCard(props: Props) {
           <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#8ea4ba]">
             Constructed reading (hypothesis)
           </div>
-          <div className="mt-2 text-sm leading-6 text-[#f5f7fb]">{reading}</div>
+          <div data-testid="root-map-constructed-reading" className="mt-2 text-sm leading-6 text-[#f5f7fb]">{rootMapMeaningForDisplay(reading)}</div>
           <div className="mt-3 text-[11px] leading-5 text-[#9fb1bf]">
             Boundary: deterministic root-map reading; interpretations are not selected automatically; the user decides; not a historical-chain claim.
           </div>
+          {reading ? (
+            <details data-testid="root-map-technical-composed-meaning" className="mt-2 text-xs text-[#9fb1bf]">
+              <summary className="cursor-pointer">View technical wording</summary>
+              <div className="mt-1 break-words font-mono">{reading}</div>
+            </details>
+          ) : null}
         </div>
 
         <div>
@@ -203,7 +247,7 @@ export function RootMapCard(props: Props) {
                     <div className="flex flex-wrap items-baseline justify-between gap-2">
                       <div className="text-sm text-[#f5f7fb]">
                         <span className="font-mono">{k.token}</span>
-                        {k.status ? <span className="ml-2 text-xs text-[#9fb1bf]">({k.status})</span> : null}
+                        {k.status ? <span className="ml-2 text-xs text-[#9fb1bf]">({humanReadableStatusLabelV0_1(k.status)})<details className="ml-1 inline"><summary className="inline cursor-pointer">status details</summary> {k.status}</details></span> : null}
                       </div>
                       <div className="rounded-full border border-[#303a45] bg-[#10151c] px-2 py-0.5 font-mono text-[11px] text-[#9fb1bf]">
                         {k.language ?? "unknown"}
@@ -214,18 +258,28 @@ export function RootMapCard(props: Props) {
 
                     {ops.length ? (
                       <div className="mt-2">
-                        <div className="text-[11px] uppercase tracking-wide text-[#7d8ea3]">ops</div>
-                        {renderInlineChips(ops)}
+                        <div className="text-[11px] uppercase tracking-wide text-[#7d8ea3]">Operations</div>
+                        {renderInlineChips(ops.map(rootMapOperationForDisplay))}
+                        <details className="mt-1 text-xs text-[#9fb1bf]">
+                          <summary className="cursor-pointer">Technical operation labels</summary>
+                          <div className="mt-1 break-words font-mono">{ops.join(" · ")}</div>
+                        </details>
                       </div>
                     ) : null}
 
                     {evidence.length ? (
                       <div className="mt-2">
-                        <div className="text-[11px] uppercase tracking-wide text-[#7d8ea3]">evidence</div>
+                        <div className="text-[11px] uppercase tracking-wide text-[#7d8ea3]">Evidence</div>
                         <ul className="mt-1 space-y-0.5 text-xs text-[#d7dde7]">
                           {evidence.map((e, i) => (
-                            <li key={`e:${k.token}:${i}`} className="font-mono">
-                              {e}
+                            <li key={`e:${k.token}:${i}`} data-testid="root-map-visible-evidence">
+                              {rootMapEvidenceForDisplay(e)}
+                              {rootMapEvidenceForDisplay(e) !== e ? (
+                                <details className="mt-1 text-[11px] text-[#9fb1bf]" data-testid="root-map-technical-key-evidence">
+                                  <summary className="cursor-pointer">Exact technical wording</summary>
+                                  <div className="mt-1 break-words font-mono">{e}</div>
+                                </details>
+                              ) : null}
                             </li>
                           ))}
                         </ul>

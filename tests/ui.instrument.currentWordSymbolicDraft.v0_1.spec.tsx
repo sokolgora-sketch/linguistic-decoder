@@ -233,6 +233,15 @@ function completeNdarjeFunctionalDraft() {
 }
 
 describe("current-word symbolic draft v0.1", () => {
+  it("lets the active symbolic draft and source meaning fit a narrow parent", () => {
+    renderDraft({ analyzedWord: "NDARJE", draftTargetWord: "NDARJE" });
+
+    expect(screen.getByTestId("current-word-symbolic-draft")).toHaveClass("min-w-0", "[overflow-wrap:anywhere]");
+    expect(screen.getByTestId("current-word-symbolic-source-meaning")).toHaveClass("min-w-0", "[overflow-wrap:anywhere]");
+    expect(screen.getByTestId("current-word-symbolic-result")).toHaveClass("min-w-0", "[overflow-wrap:anywhere]");
+    expect(screen.getByTestId("current-word-symbolic-selection-controls")).toHaveClass("min-w-0");
+  });
+
   it("projects explicit occurrence and Voice bindings into dependent v0.3 evaluator operations", () => {
     const projection = buildCurrentWordSymbolicDraftProjectionV0_1({
       exactSpelling: "DALLIM",
@@ -356,11 +365,13 @@ describe("current-word symbolic draft v0.1", () => {
       "D@0 · A@1 · L@2 · L@3 · I@4 · M@5",
     );
     expect(screen.getByTestId("current-word-symbolic-written-voices")).toHaveTextContent("A@1 → I@4");
-    expect(screen.getByTestId("current-word-symbolic-source-meaning")).toHaveTextContent("UNKNOWN_OR_NULL");
+    expect(screen.getByTestId("current-word-symbolic-source-meaning")).toHaveTextContent("No matching exact-form source meaning is available");
+    expect(screen.getByTestId("current-word-symbolic-source-meaning")).not.toHaveTextContent("UNKNOWN_OR_NULL");
     expect(screen.getByTestId("current-word-symbolic-whole-word-status")).toHaveTextContent("UNKNOWN_OR_NULL");
     expect(screen.getByTestId("current-word-symbolic-graph-status")).toHaveTextContent("PARTIAL_NULL");
     expect(screen.getByTestId("current-word-symbolic-decision")).toHaveTextContent("No interpretation is selected automatically");
-    expect(screen.getByTestId("current-word-symbolic-decision")).toHaveTextContent("user_decides");
+    expect(screen.getByTestId("current-word-symbolic-decision")).not.toHaveTextContent("user_decides");
+    expect(screen.getByTestId("current-word-graph-decision")).toHaveAttribute("data-user-decision-posture", "user_decides");
     expect(screen.getByTestId("current-word-symbolic-decision")).not.toHaveTextContent(/winner/i);
 
     for (const label of [
@@ -384,7 +395,8 @@ describe("current-word symbolic draft v0.1", () => {
     expect(screen.getByTestId("current-word-graph-decision")).toHaveAttribute("data-user-decision-posture", "user_decides");
     expect(screen.getByTestId("current-word-graph-summary")).not.toHaveTextContent(/winner|rank/i);
     expect(screen.getByTestId("current-word-symbolic-result")).not.toHaveTextContent("initiated(");
-    expect(screen.getByTestId("current-word-symbolic-result")).toHaveTextContent("Source-authority promotion: NONE");
+    expect(screen.getByTestId("current-word-symbolic-result")).toHaveTextContent("Source authority is unchanged; historical origin is not claimed.");
+    expect(screen.getByTestId("current-word-symbolic-result")).not.toHaveTextContent(/SOURCE_AUTHORITY|UNKNOWN_OR_NULL|PARTIAL_NULL/);
   });
 
   it("renders actual evaluator output from an explicit DALLIM occurrence, Voice event, operator, and operand", () => {
@@ -403,8 +415,9 @@ describe("current-word symbolic draft v0.1", () => {
     expect(screen.getByTestId("current-word-symbolic-operation-trace")).toHaveTextContent("APPLY_VOICE_OPERATOR · COMPUTED");
     expect(screen.getByTestId("current-word-symbolic-whole-word-status")).toHaveTextContent("PARTIAL_NULL · UNKNOWN_OR_NULL");
     expect(screen.getByTestId("current-word-symbolic-graph-status")).toHaveTextContent("PARTIAL_NULL");
-    expect(screen.getByTestId("current-word-symbolic-result")).toHaveTextContent("USER_PROPOSED / EXPLORATORY_HYPOTHESIS");
-    expect(screen.getByTestId("current-word-symbolic-result")).not.toHaveTextContent("COMPLETE_PROPOSED");
+    expect(screen.getByTestId("current-word-symbolic-result")).toHaveTextContent("Computed from your proposed choices");
+    expect(screen.getByTestId("current-word-symbolic-result")).toHaveTextContent("exploratory, not verified");
+    expect(screen.getByTestId("current-word-symbolic-result")).not.toHaveTextContent(/USER_PROPOSED|EXPLORATORY_HYPOTHESIS|COMPLETE_PROPOSED/);
   });
 
   it("lets NDARJE explicitly expand the computed A@2 output and keeps the whole-word result partial", () => {
@@ -451,10 +464,15 @@ describe("current-word symbolic draft v0.1", () => {
     });
 
     expect(screen.getByTestId("current-word-exploratory-selected-sense")).toHaveTextContent(
-      "SOURCE_FACT · CITATION_ENTERED_UNVERIFIED · division; separation",
+      "Source-reported meaning · division; separation",
     );
-    expect(screen.getByTestId("current-word-exploratory-null")).toHaveTextContent("PARTIAL_NULL");
-    expect(screen.getByText(/DA functional-motivation candidate below uses qualifying exact-form source facts/i)).toBeInTheDocument();
+    const sourceDetails = screen.getByTestId("current-word-exploratory-source-citation");
+    expect(sourceDetails).not.toHaveAttribute("open");
+    fireEvent.click(within(sourceDetails).getByText("Sources"));
+    expect(sourceDetails).toHaveTextContent("citation not independently verified");
+    expect(screen.getByTestId("current-word-exploratory-selected-sense")).not.toHaveTextContent(/SOURCE_FACT|CITATION_ENTERED_UNVERIFIED/);
+    expect(screen.getByTestId("current-word-exploratory-null")).toHaveTextContent("Explanation incomplete");
+    expect(screen.getByText(/Source facts and the conditional DA proposal appear below/i)).toBeInTheDocument();
     expect(screen.getByTestId("current-word-source-functional-manual-fallback")).not.toHaveAttribute("open");
     expect(screen.getByTestId("current-word-symbolic-code-points")).toHaveTextContent(
       "N@0 · D@1 · A@2 · R@3 · J@4 · E@5",
@@ -468,16 +486,25 @@ describe("current-word symbolic draft v0.1", () => {
     expect(explanation).toHaveTextContent("initiated(division)");
     expect(explanation).toHaveTextContent("expanded(initiated(division))");
     expect(screen.getByTestId("current-word-exploratory-computed-contributions")).toHaveTextContent(
-      "COMPUTED · A@2 · INITIATE / GROUND(division) → initiated(division)",
+      "Computed proposal · A@2 · INITIATE / GROUND(division) → initiated(division)",
     );
     expect(screen.getByTestId("current-word-exploratory-computed-contributions")).toHaveTextContent(
-      "COMPUTED · E@5 · EXPAND / OUTWARD(initiated(division)) → expanded(initiated(division))",
+      "Computed proposal · E@5 · EXPAND / OUTWARD(initiated(division)) → expanded(initiated(division))",
     );
     expect(screen.getByTestId("current-word-exploratory-motivation")).toHaveTextContent("WHOLE_WORD_FUNCTION_NOT_ESTABLISHED");
     expect(screen.getByTestId("current-word-exploratory-motivation")).toHaveTextContent("SOURCE_SYMBOLIC_RELATION_NOT_REPORTED");
-    expect(screen.getByTestId("current-word-exploratory-decision")).toHaveTextContent("no_single_winner · user_decides");
-    expect(screen.getByTestId("current-word-exploratory-motivation")).toHaveTextContent("source-authority promotion NONE");
-    expect(screen.getByTestId("current-word-exploratory-motivation")).toHaveTextContent("historical origin NOT_CLAIMED");
+    expect(screen.getByTestId("current-word-exploratory-decision")).toHaveTextContent("No interpretation is selected automatically; you decide.");
+    expect(screen.getByTestId("current-word-exploratory-decision")).not.toHaveTextContent(/no_single_winner|user_decides/);
+    const exploratoryReasonDetails = screen.getByTestId("current-word-exploratory-reason-codes");
+    expect(exploratoryReasonDetails).not.toHaveAttribute("open");
+    fireEvent.click(within(exploratoryReasonDetails).getByText("Technical reason details"));
+    expect(exploratoryReasonDetails).toHaveTextContent("SOURCE_SYMBOLIC_RELATION_NOT_REPORTED");
+    expect(exploratoryReasonDetails).toHaveTextContent("WHOLE_WORD_FUNCTION_NOT_ESTABLISHED");
+    const daDetails = screen.getByTestId("current-word-da-candidate-details");
+    expect(daDetails).not.toHaveAttribute("open");
+    fireEvent.click(within(daDetails).getByText("View DA candidate trace and evidence"));
+    expect(daDetails).toHaveTextContent("sourceAuthorityPromotion NONE");
+    expect(daDetails).toHaveTextContent("historicalOrigin NOT_CLAIMED");
 
     select("Spectrum association for D at position 1", LIGHT);
     expect(screen.getByTestId("current-word-exploratory-explanation")).toHaveTextContent("initiated(light)");
@@ -509,7 +536,8 @@ describe("current-word symbolic draft v0.1", () => {
     expect(summary).toHaveTextContent("Explanation incomplete");
     expect(summary).toHaveTextContent("Some target structure or operations remain unresolved");
     expect(summary.querySelectorAll('[data-testid="current-word-graph-summary-contribution"]')).toHaveLength(2);
-    expect(screen.getByTestId("current-word-graph-summary-proposed-interaction")).toHaveTextContent("USER_PROPOSAL / USER_PROPOSED");
+    expect(screen.getByTestId("current-word-graph-summary-proposed-interaction")).toHaveTextContent("Proposed by you");
+    expect(screen.getByTestId("current-word-graph-summary-proposed-interaction")).not.toHaveTextContent(/USER_PROPOSAL|USER_PROPOSED/);
 
     const details = screen.getByTestId("current-word-graph-details");
     expect(details).not.toHaveAttribute("open");
@@ -557,23 +585,27 @@ describe("current-word symbolic draft v0.1", () => {
     const currentWordEvidence = makeCurrentWordEvidence();
     const { rerender } = renderDraft({ currentWordEvidence });
 
-    expect(screen.getByTestId("current-word-symbolic-source-meaning")).toHaveTextContent("SOURCE_FACT");
-    expect(screen.getByTestId("current-word-symbolic-source-meaning")).toHaveTextContent("exact source form dallim");
-    expect(screen.getByTestId("current-word-symbolic-source-meaning")).toHaveTextContent("fixture:dallim");
-    expect(screen.getByTestId("current-word-symbolic-source-meaning")).toHaveTextContent("dallim#Albanian");
-    expect(screen.getByTestId("current-word-symbolic-source-meaning")).toHaveTextContent(`SHA-256 ${"a".repeat(64)}`);
+    expect(screen.getByTestId("current-word-symbolic-source-meaning")).toHaveTextContent("Source-reported form dallim");
+    const sourceRecordDetails = screen.getByTestId("current-word-symbolic-source-meaning").querySelector("details");
+    expect(sourceRecordDetails).not.toHaveAttribute("open");
+    expect(sourceRecordDetails).toHaveTextContent("SOURCE_FACT");
+    expect(sourceRecordDetails?.querySelector("span")).not.toBeVisible();
+    expect(sourceRecordDetails).toHaveTextContent("fixture:dallim");
+    expect(sourceRecordDetails).toHaveTextContent("dallim#Albanian");
+    expect(sourceRecordDetails).toHaveTextContent(`SHA-256 ${"a".repeat(64)}`);
     expect(screen.getByTestId("current-word-symbolic-source-meaning")).toHaveTextContent("act of distinguishing");
     const senseSelector = screen.getByLabelText("Lexical sense for current-word graph meaning");
     expect(senseSelector).toHaveValue("");
     const sourceSenseOption = "source-sense:kaikki:fixture:dallim:sense:ordinal-1:1";
-    expect(screen.getByRole("option", { name: /Source-reported .*act of distinguishing .*Source citation not independently verified/ })).toBeInTheDocument();
-    expect(screen.getByTestId("current-word-symbolic-result")).toHaveTextContent("Source-authority promotion: NONE");
+    expect(screen.getByRole("option", { name: /Source-reported .*act of distinguishing/ })).toBeInTheDocument();
+    expect(screen.getByRole("option", { name: /Source-reported .*act of distinguishing/ })).not.toHaveTextContent(/citation/i);
+    expect(screen.getByTestId("current-word-symbolic-result")).toHaveTextContent("Source authority is unchanged");
     expect(screen.getByTestId("current-word-symbolic-whole-word-status")).toHaveTextContent("UNKNOWN_OR_NULL");
     expect(screen.getByTestId("current-word-symbolic-result")).not.toHaveTextContent("act of distinguishing");
 
     fireEvent.change(senseSelector, { target: { value: sourceSenseOption } });
     expect(screen.getByTestId("current-word-graph-summary-meaning")).toHaveTextContent("Source-reported meaning: act of distinguishing");
-    expect(screen.getByTestId("current-word-graph-summary-meaning")).toHaveTextContent("Source citation not independently verified");
+    expect(screen.getByTestId("current-word-graph-summary-meaning")).not.toHaveTextContent("Source citation not independently verified");
     const evidenceDetails = screen.getByTestId("current-word-graph-details");
     expect(evidenceDetails).not.toHaveAttribute("open");
     fireEvent.click(screen.getByText("View detailed analysis and evidence"));
@@ -581,6 +613,7 @@ describe("current-word symbolic draft v0.1", () => {
     expect(screen.getByTestId("current-word-graph-selected-sense")).toHaveTextContent("fixture:dallim");
     expect(screen.getByTestId("current-word-graph-source-record")).toHaveTextContent("dallim#Albanian");
     expect(screen.getByTestId("current-word-graph-source-record")).toHaveTextContent(`fixture-source-family · SHA-256 ${"a".repeat(64)}`);
+    expect(screen.getByRole("region", { name: "Source records and citations" })).toHaveTextContent("Source citations are entered references and have not been independently verified.");
     expect(screen.getByTestId("current-word-graph-source-record")).toHaveTextContent("licensing: NOT_ASSESSED");
     expect(screen.getByTestId("current-word-graph-source-record")).toHaveTextContent("CITATION_ENTERED_UNVERIFIED");
     expect(screen.getByLabelText("Proposed functional form or function")).toHaveValue("");
@@ -610,8 +643,12 @@ describe("current-word symbolic draft v0.1", () => {
     const summary = screen.getByTestId("current-word-graph-summary");
     expect(summary).toHaveTextContent("Your proposed reading: Act of distinguishing");
     expect(summary).toHaveTextContent("Source also records: difference");
-    expect(summary).toHaveTextContent("Source citation not independently verified");
+    expect(summary).not.toHaveTextContent("Source citation not independently verified");
     expect(summary).not.toHaveTextContent("SOURCE_FACT");
+    const details = screen.getByTestId("current-word-graph-details");
+    expect(details).not.toHaveAttribute("open");
+    fireEvent.click(within(details).getByText("View detailed analysis and evidence"));
+    expect(screen.getByRole("region", { name: "Source records and citations" })).toHaveTextContent("Source citations are entered references and have not been independently verified.");
   });
 
   it("accepts NFC-equivalent Albanian source spelling without changing its source record", () => {
@@ -679,8 +716,8 @@ describe("current-word symbolic draft v0.1", () => {
     const generated = screen.getAllByTestId("current-word-da-generated-functional-candidate");
     expect(generated).toHaveLength(2);
     const firstGenerated = within(generated[0]);
-    expect(firstGenerated.getByTestId("current-word-da-generated-source-sense")).toHaveTextContent("SOURCE_FACT");
-    expect(firstGenerated.getByTestId("current-word-da-generated-source-sense")).toHaveTextContent("fixture:ndarje");
+    expect(firstGenerated.getByTestId("current-word-da-generated-source-sense")).toHaveTextContent("Kaikki source record · exact form ndarje");
+    expect(screen.getByTestId("current-word-symbolic-source-meaning").querySelector("details")).toHaveTextContent("fixture:ndarje");
     expect(firstGenerated.getByTestId("current-word-da-generated-structure")).toHaveTextContent("DA span [1,3)");
     const generatedFamilyReadings = screen.getAllByTestId("current-word-da-generated-functional-reading");
     expect(generatedFamilyReadings).toHaveLength(2);
@@ -688,12 +725,14 @@ describe("current-word symbolic draft v0.1", () => {
       "The recorded verb function “to split, cut, divide” is proposed as an action-level contribution to the recorded noun sense “division; separation.”",
     );
     expect(generatedFamilyReadings[0]).toHaveTextContent("This relation is not source-reported.");
-    expect(generatedFamilyReadings[0]).toHaveTextContent("The relation beyond the exact overlap remains UNKNOWN_OR_NULL; no derivation is asserted.");
-    expect(firstGenerated.getByTestId("current-word-da-generated-claim-boundary")).toHaveTextContent("UNSELECTED");
-    expect(firstGenerated.getByTestId("current-word-da-generated-claim-boundary")).toHaveTextContent("PARTIAL_NULL");
-    expect(firstGenerated.getByTestId("current-word-da-generated-claim-boundary")).toHaveTextContent("no_single_winner / user_decides");
-    expect(firstGenerated.getByTestId("current-word-da-generated-unresolved")).toHaveTextContent("N@0 functional association UNKNOWN_OR_NULL");
-    expect(firstGenerated.getByTestId("current-word-da-generated-unresolved")).toHaveTextContent("A@2 symbolic role UNKNOWN_OR_NULL");
+    expect(generatedFamilyReadings[0]).toHaveTextContent("The relation beyond the exact overlap remains Not established; no derivation is asserted.");
+    expect(generatedFamilyReadings[0]).not.toHaveTextContent(/UNKNOWN_OR_NULL|PARTIAL_NULL/);
+    expect(firstGenerated.getByTestId("current-word-da-generated-claim-boundary")).toHaveTextContent("not selected automatically");
+    expect(firstGenerated.getByTestId("current-word-da-generated-claim-boundary")).toHaveTextContent("whole-word explanation not verified");
+    expect(firstGenerated.getByTestId("current-word-da-generated-claim-boundary")).toHaveTextContent("you decide");
+    expect(firstGenerated.getByTestId("current-word-da-generated-claim-boundary")).not.toHaveTextContent(/PARTIAL_NULL|no_single_winner|user_decides/);
+    expect(firstGenerated.getByTestId("current-word-da-generated-unresolved")).toHaveTextContent("N@0 functional association Not established");
+    expect(firstGenerated.getByTestId("current-word-da-generated-unresolved")).toHaveTextContent("A@2 symbolic role Not established");
     expect(screen.getByTestId("current-word-da-candidate-structure")).toHaveTextContent("N@0 · D@1 · A@2 · R@3 · J@4 · E@5");
     expect(screen.getByTestId("current-word-da-candidate-structure")).toHaveTextContent("A@2 → E@5");
     expect(screen.getByTestId("current-word-symbolic-code-points")).toHaveTextContent("N@0 · D@1 · A@2 · R@3 · J@4 · E@5");
@@ -726,31 +765,32 @@ describe("current-word symbolic draft v0.1", () => {
     const generated = screen.getAllByTestId("current-word-da-generated-functional-candidate");
     expect(generated).toHaveLength(2);
     expect(within(generated[0]).getByTestId("current-word-da-generated-source-sense")).toHaveTextContent(
-      "FjaloriShqip response · response status available · exact target form ndarje · Entry 1 · Sense 1 (response position, not a source-issued sense ID): division; separation",
+      "FjaloriShqip source response · available · exact form ndarje · Entry 1 · Sense 1 (response position, not a source-issued sense ID): division; separation",
     );
     expect(within(generated[0]).getByTestId("current-word-da-generated-fjalori-provenance")).toHaveTextContent(
-      "Record sources sq-wiktionary · editor · entry sources sq-wiktionary · editor",
+      "Source details · record sources sq-wiktionary · editor · entry sources sq-wiktionary · editor",
     );
     expect(within(generated[0]).getByTestId("current-word-da-generated-fjalori-provenance")).toHaveTextContent("CC BY-SA 4.0");
-    expect(within(generated[0]).getByTestId("current-word-da-generated-fjalori-provenance")).toHaveTextContent("CITATION_ENTERED_UNVERIFIED");
-    expect(within(generated[0]).getByTestId("current-word-da-generated-fjalori-provenance")).toHaveTextContent("NOT_ASSESSED");
+    expect(within(generated[0]).getByTestId("current-word-da-generated-fjalori-provenance")).toHaveTextContent("Citation not independently verified");
+    expect(within(generated[0]).getByTestId("current-word-da-generated-fjalori-provenance")).toHaveTextContent("Not assessed");
     const generatedFamilyReadings = screen.getAllByTestId("current-word-da-generated-functional-reading");
     expect(generatedFamilyReadings.length).toBeGreaterThan(0);
     expect(generatedFamilyReadings[0]).toHaveTextContent(
       "The recorded verb function “to split, cut, divide” is proposed as an action-level contribution to the recorded noun sense “division; separation.”",
     );
     expect(generatedFamilyReadings[0]).toHaveTextContent("This relation is not source-reported.");
-    expect(generatedFamilyReadings[0]).toHaveTextContent("The relation beyond the exact overlap remains UNKNOWN_OR_NULL; no derivation is asserted.");
+    expect(generatedFamilyReadings[0]).toHaveTextContent("The relation beyond the exact overlap remains Not established; no derivation is asserted.");
+    expect(generatedFamilyReadings[0]).not.toHaveTextContent(/UNKNOWN_OR_NULL|PARTIAL_NULL/);
     expect(screen.getByTestId("current-word-da-candidate-structure")).toHaveTextContent("N@0 · D@1 · A@2 · R@3 · J@4 · E@5");
     expect(screen.getByTestId("current-word-da-candidate-structure")).toHaveTextContent("A@2 → E@5");
-    expect(screen.getByTestId("current-word-source-suggestion-runtime-status")).toHaveTextContent("SOURCE_NOT_FOUND");
+    expect(screen.getByTestId("current-word-source-suggestion-runtime-status")).toHaveTextContent("No exact source record found");
     expect(screen.getByLabelText("Spectrum association for D at position 1")).toHaveValue("");
     expect(screen.getByLabelText("Voice operator for A@2")).toHaveValue("");
     expect(screen.getByLabelText("Voice operator for E@5")).toHaveValue("");
     expect(screen.getByLabelText("Propose DA at code-point span 1 to 3")).not.toBeChecked();
     expect(screen.getByLabelText("Propose DA at code-point span 1 to 3")).toBeDisabled();
-    expect(within(generated[0]).getByTestId("current-word-da-generated-claim-boundary")).toHaveTextContent("UNSELECTED");
-    expect(within(generated[0]).getByTestId("current-word-da-generated-claim-boundary")).toHaveTextContent("PARTIAL_NULL");
+    expect(within(generated[0]).getByTestId("current-word-da-generated-claim-boundary")).toHaveTextContent("not selected automatically");
+    expect(within(generated[0]).getByTestId("current-word-da-generated-claim-boundary")).toHaveTextContent("not verified");
   });
 
   it("keeps matching Kaikki and Fjalori senses as separately attributed candidate records", () => {
@@ -771,9 +811,9 @@ describe("current-word symbolic draft v0.1", () => {
 
     const candidates = screen.getAllByTestId("current-word-da-generated-functional-candidate");
     expect(candidates).toHaveLength(3);
-    expect(within(candidates[0]).getByTestId("current-word-da-generated-source-sense")).toHaveTextContent("Kaikki exact target form ndarje");
-    expect(within(candidates[0]).getByTestId("current-word-da-generated-source-sense")).toHaveTextContent("fixture:ndarje");
-    expect(within(candidates[1]).getByTestId("current-word-da-generated-source-sense")).toHaveTextContent("FjaloriShqip response");
+    expect(within(candidates[0]).getByTestId("current-word-da-generated-source-sense")).toHaveTextContent("Kaikki source record · exact form ndarje");
+    expect(screen.getByTestId("current-word-symbolic-source-meaning").querySelector("details")).toHaveTextContent("fixture:ndarje");
+    expect(within(candidates[1]).getByTestId("current-word-da-generated-source-sense")).toHaveTextContent("FjaloriShqip source response");
     expect(within(candidates[1]).getByTestId("current-word-da-generated-source-sense")).toHaveTextContent("Entry 1 · Sense 1");
     expect(within(candidates[2]).getByTestId("current-word-da-generated-source-sense")).toHaveTextContent("Entry 1 · Sense 2");
     expect(screen.getByTestId("current-word-da-generated-functional-candidates")).not.toHaveTextContent("corroborat");
@@ -810,9 +850,13 @@ describe("current-word symbolic draft v0.1", () => {
     );
 
     expect(screen.queryByTestId("current-word-da-generated-functional-candidate")).not.toBeInTheDocument();
-    expect(screen.getByTestId("current-word-da-generated-functional-null")).toHaveTextContent("PARTIAL_NULL");
-    expect(screen.getByTestId("current-word-da-generated-functional-null")).toHaveTextContent("EXACT_TARGET_SOURCE_FACTS_NOT_AVAILABLE");
-    expect(screen.getByTestId("current-word-da-generated-functional-null")).toHaveTextContent("FJALORISHQIP_SOURCE_HTTP_NOT_FOUND");
+    const nullResult = screen.getByTestId("current-word-da-generated-functional-null");
+    expect(nullResult).toHaveTextContent("No conditional DA functional reading is available");
+    const reasons = within(nullResult).getByText("Technical reasons").closest("details");
+    expect(reasons).not.toHaveAttribute("open");
+    expect(reasons).toHaveTextContent("PARTIAL_NULL");
+    expect(reasons).toHaveTextContent("EXACT_TARGET_SOURCE_FACTS_NOT_AVAILABLE");
+    expect(reasons).toHaveTextContent("FJALORISHQIP_SOURCE_HTTP_NOT_FOUND");
   });
 
   it("keeps Fjalori response positions as distinct alternatives and withholds them after a target change", () => {
@@ -849,7 +893,9 @@ describe("current-word symbolic draft v0.1", () => {
       />,
     );
     expect(screen.queryByTestId("current-word-da-generated-functional-candidate")).not.toBeInTheDocument();
-    expect(screen.getByTestId("current-word-da-generated-functional-null")).toHaveTextContent("EXACT_TARGET_SOURCE_FACTS_NOT_AVAILABLE");
+    const staleNull = screen.getByTestId("current-word-da-generated-functional-null");
+    expect(staleNull).toHaveTextContent("No conditional DA functional reading is available");
+    expect(within(staleNull).getByText("Technical reasons").closest("details")).toHaveTextContent("EXACT_TARGET_SOURCE_FACTS_NOT_AVAILABLE");
   });
 
   it("withholds Fjalori senses when workbench language or dialect differs from the source analysis", () => {
@@ -865,7 +911,9 @@ describe("current-word symbolic draft v0.1", () => {
       />,
     );
     expect(screen.queryByTestId("current-word-da-generated-functional-candidate")).not.toBeInTheDocument();
-    expect(screen.getByTestId("current-word-da-generated-functional-null")).toHaveTextContent("TARGET_LANGUAGE_NOT_ALBANIAN");
+    const languageNull = screen.getByTestId("current-word-da-generated-functional-null");
+    expect(languageNull).toHaveTextContent("No conditional DA functional reading is available");
+    expect(within(languageNull).getByText("Technical reasons").closest("details")).toHaveTextContent("TARGET_LANGUAGE_NOT_ALBANIAN");
 
     rerender(
       <CurrentWordSymbolicDraftV0_1
@@ -878,7 +926,9 @@ describe("current-word symbolic draft v0.1", () => {
       />,
     );
     expect(screen.queryByTestId("current-word-da-generated-functional-candidate")).not.toBeInTheDocument();
-    expect(screen.getByTestId("current-word-da-generated-functional-null")).toHaveTextContent("EXACT_TARGET_SOURCE_FACTS_NOT_AVAILABLE");
+    const dialectNull = screen.getByTestId("current-word-da-generated-functional-null");
+    expect(dialectNull).toHaveTextContent("No conditional DA functional reading is available");
+    expect(within(dialectNull).getByText("Technical reasons").closest("details")).toHaveTextContent("EXACT_TARGET_SOURCE_FACTS_NOT_AVAILABLE");
   });
 
   it("clears selections when the parent workbench word, language, or dialect identity changes", () => {

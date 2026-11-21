@@ -21,6 +21,7 @@ import type {
   RuntimeAlbanianSourceSenseSelectionV0_1,
   RuntimeFjaloriSourceResponseV0_1,
 } from "@/ui/instrument/sections/currentWordSourceFunctionalSuggestionAdapter.v0_1";
+import { functionalFamilySourceLookupFormsV0_1 } from "@/ui/instrument/sections/currentWordSourceFunctionalSuggestionAdapter.v0_1";
 import {
   aggregateMotivationDiscoveryCandidatesV0_1,
   measureMotivationDiscoveryAggregationV0_1,
@@ -606,77 +607,6 @@ export function MotivationDiscoveryCardV0_1({
           {aggregationMetrics.primaryWitnessCount} primary Discovery witness{aggregationMetrics.primaryWitnessCount === 1 ? "" : "es"}
         </span>
       </div>
-
-      {functionalReasoning ? (
-        <section
-          data-testid="automatic-functional-reasoning"
-          className="mt-3 min-w-0 rounded-lg border border-[#465b42] bg-[#101710] p-3 text-xs leading-5 text-[#dce8d5] [overflow-wrap:anywhere]"
-          aria-label="Automatic functional reasoning candidates"
-        >
-          <div className="font-semibold uppercase tracking-[0.12em] text-[#d8e4ca]">FUNCTIONAL REASONING · UNSELECTED</div>
-          <p className="mt-1 text-xs text-[#b7c6ae]">
-            Proposals use exact-form source records and recorded operator profiles. No interpretation is selected; source records do not attest the proposed relation.
-          </p>
-          {functionalReasoning.candidates.length ? functionalReasoning.candidates.map((candidate) => (
-            <article key={candidate.candidateId} className="mt-2 min-w-0 rounded border border-[#465b42] bg-[#0d140d] p-2" data-testid="automatic-functional-reasoning-candidate">
-              <h3 className="font-semibold text-[#f5f7fb]">
-                {candidate.operator} function “{candidate.embryoEvidence.attestedGloss}” → {candidate.targetSource.exactSourceForm} sense “{candidate.targetSource.glosses.join("; ")}”
-              </h3>
-              <p className="mt-1 break-words font-mono text-sm text-[#e1f2ed]" data-testid="automatic-functional-reasoning-equation">
-                {candidate.familyNetwork.functionalEquation}
-              </p>
-              <p className="mt-1 text-sm text-[#dce8d5]" data-testid="automatic-functional-reasoning-explanation">
-                {candidate.familyNetwork.explanation}
-              </p>
-              <p className="mt-1 text-xs text-[#c7d1c0]" data-testid="automatic-functional-reasoning-unresolved">
-                Residual spelling, internal morphology, profile-form relations, and written Voice functions remain UNKNOWN_OR_NULL.
-              </p>
-              <p className="mt-1 text-[10px] text-[#b7c6ae]">
-                Lexical inputs: embryo {candidate.embryoEvidence.citationStatus}; target sense {candidate.targetSource.evidenceStatus}. The proposed relation is not source-reported.
-              </p>
-              <p className="mt-1 text-[10px] text-[#b7c6ae]">
-                {candidate.targetAuthorization === "candidate_only" ? "Target authorization: candidate_only · " : ""}
-                {candidate.claimLayer} · {candidate.selectionStatus} · whole-word {candidate.wholeWordStatus} · no_single_winner / {candidate.userDecisionPosture} · sourceAuthorityPromotion {candidate.sourceAuthorityPromotion} · historicalOrigin {candidate.historicalOrigin}.
-              </p>
-              <details className="mt-2 rounded border border-[#303843] bg-[#10161c] p-2" data-testid="automatic-functional-reasoning-details">
-                <summary className="cursor-pointer font-semibold text-[#d7dde7] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#d8bb7a]">
-                  Inspect source evidence and typed reasoning steps
-                </summary>
-                <div className="mt-2 space-y-2 border-t border-[#303843] pt-2">
-                  <p className="break-words">
-                    Embryo source: {candidate.embryoEvidence.sourceStatus} · citation {candidate.embryoEvidence.citationStatus} · {candidate.embryoEvidence.sourceTitle} · {candidate.embryoEvidence.locator} · <a className="underline" href={candidate.embryoEvidence.sourceUrl} target="_blank" rel="noreferrer">source</a>
-                  </p>
-                  <p className="break-words">
-                    Target source: {candidate.targetSource.provider} · {candidate.targetSource.evidenceStatus} · {candidate.targetSource.sourceIdentity} · {candidate.targetSource.locator} · <a className="underline" href={candidate.targetSource.sourceUrl} target="_blank" rel="noreferrer">source</a>
-                  </p>
-                  <p className="break-words">
-                    Exact code points: {functionalReasoning.exactCodePoints.map(({ character, position }) => `${character}@${position}`).join(" · ") || "UNKNOWN_OR_NULL"} · written Voices: {functionalReasoning.writtenVoices.map(({ voice, position }) => `${voice}@${position}`).join(" → ") || "∅"}
-                  </p>
-                  <p>Other senses in this source record: {candidate.targetSource.sourceSensesInRecord.map(({ partOfSpeech, glosses }) => `${partOfSpeech ?? "POS UNKNOWN_OR_NULL"}: ${glosses.join("; ") || "UNKNOWN_OR_NULL"}`).join(" · ") || "UNKNOWN_OR_NULL"}</p>
-                  <ol className="list-decimal space-y-1 pl-5" data-testid="automatic-functional-reasoning-steps">
-                    {candidate.familyNetwork.reasoningSteps.map((step) => (
-                      <li key={step.id} className="break-words">
-                        <span className="font-semibold">{step.order}. {step.relationshipType}</span>
-                        {step.input || step.output ? ` · ${step.input ?? "Null"} → ${step.output ?? "Null"}` : ""}
-                        {step.mechanicalObservation ? ` · observed: ${step.mechanicalObservation}` : ""}
-                        {step.functionalInference ? ` · proposed: ${step.functionalInference}` : ""}
-                        {` · ${step.claimLayer}/${step.classification} · evidence ${step.evidenceStatus}`}
-                        {step.sourceRefs.length ? ` · sources ${step.sourceRefs.join(", ")}` : " · no source reference for this relation"}
-                        {step.reasonCodes.length ? ` · reason ${step.reasonCodes.join(", ")}` : ""}
-                        {step.unresolvedDependencies.length ? ` · unresolved ${step.unresolvedDependencies.join(", ")}` : ""}
-                      </li>
-                    ))}
-                  </ol>
-                </div>
-              </details>
-            </article>
-          )) : (
-            <p className="mt-2 break-words text-[#f0ddb0]" role="status" data-testid="automatic-functional-reasoning-null">
-              PARTIAL_NULL · no qualifying exact-form source sense and reviewed verb function are available together · {functionalReasoning.reasonCodes.join(" · ") || "UNKNOWN_OR_NULL"}.
-            </p>
-          )}
-        </section>
-      ) : null}
 
       {lexicalSelfMatchCount > 0 ? (
         <div
@@ -1692,6 +1622,9 @@ export function MotivationDiscoveryCardV0_1({
           word={value.inputWord}
           analysisLanguage={value.inputLanguage}
           analysisVariety={value.inputProfile}
+          relatedForms={functionalReasoning?.candidates.length
+            ? functionalFamilySourceLookupFormsV0_1(value.inputWord, value.inputLanguage)
+            : []}
           onSelectSourceSenseForMotivation={onSelectSourceSenseForMotivation}
           onRuntimeSourceResponse={onRuntimeSourceResponse}
         />

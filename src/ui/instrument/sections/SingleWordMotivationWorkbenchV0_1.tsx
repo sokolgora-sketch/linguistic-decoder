@@ -29,6 +29,7 @@ import { CrossLanguageFunctionalMotivationWorkbenchV0_1 } from "@/ui/instrument/
 import { FunctionalMotivationMethodExamplesCardV0_1 } from "@/ui/instrument/sections/FunctionalMotivationMethodExamplesCardV0_1";
 import { CurrentWordSymbolicDraftV0_1 } from "@/ui/instrument/sections/CurrentWordSymbolicDraftV0_1";
 import { sameAlbanianSourceForm } from "@/ui/instrument/albanianSourceFormIdentity.v0_1";
+import { humanReadableStatusLabelV0_1, humanReadableStatusTextV0_1 } from "@/ui/instrument/sections/humanReadableStatusLabel.v0_1";
 import type {
   RuntimeAlbanianSourceSenseSelectionV0_1,
   RuntimeFjaloriSourceResponseV0_1,
@@ -725,7 +726,7 @@ function CurrentWordEvidenceSectionV0_1({
     >
       <h3 className="text-sm font-semibold text-[#f5f7fb]">Current Word Evidence</h3>
       <p className="mt-1 text-[#aeb7c5]">
-        Read-only context from this analysis. It does not fill proposal fields, select a source sense, or validate a user-entered citation.
+        Evidence from this analysis; it does not fill proposal fields or verify citations.
       </p>
 
       <div className="mt-2 grid gap-2 sm:grid-cols-2">
@@ -744,7 +745,7 @@ function CurrentWordEvidenceSectionV0_1({
           </div>
           {visibleDiscovery ? (
             <div className="break-words text-[#9fb1bf]">
-              Analysis source status: {visibleDiscovery.sourceFact.sourceStatus}
+              Analysis source status: {humanReadableStatusLabelV0_1(visibleDiscovery.sourceFact.sourceStatus)}
             </div>
           ) : null}
         </div>
@@ -778,8 +779,8 @@ function CurrentWordEvidenceSectionV0_1({
       ) : null}
 
       {visibleDiscovery ? (
-        <section aria-label="Progressive evidence trace" data-testid="single-word-progressive-evidence-trace" className="mt-3 rounded border border-[#34495a] bg-[#10161c] p-2">
-          <h4 className="font-semibold text-[#f5f7fb]">Progressive evidence trace</h4>
+        <details aria-label="Progressive evidence trace" data-testid="single-word-progressive-evidence-trace" className="mt-3 rounded border border-[#34495a] bg-[#10161c] p-2">
+          <summary className="cursor-pointer font-semibold text-[#f5f7fb] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#d8bb7a]">View detailed source, Voice and structure evidence</summary>
           <p className="mt-1 text-[#9fb1bf]">The steps keep source facts, structural candidates, source relations, and whole-word interpretations distinct. No step supplies an embryo meaning or selects an interpretation automatically.</p>
           <ol className="mt-2 space-y-2">
             <li>
@@ -788,12 +789,12 @@ function CurrentWordEvidenceSectionV0_1({
             <div className="mt-1 break-words">Analyzed form: {visibleDiscovery.inputWord} · language {visibleDiscovery.inputLanguage} · profile {visibleDiscovery.inputProfile}</div>
             {sourceContextIsAlbanian ? (
               <div className="mt-1 break-words">
-                Exact-form lookup: {sourceStatus?.status ?? "NOT_EMITTED"}
+                Exact-form lookup: {humanReadableStatusLabelV0_1(sourceStatus?.status, "Not available in this analysis")}
                 {sourceStatus?.queryForm ? ` · query ${sourceStatus.queryForm}` : ""}
-                {sourceStatus?.reasonCode ? ` · ${sourceStatus.reasonCode}` : ""}
+                {sourceStatus?.reasonCode ? <details className="ml-1 inline"><summary className="inline cursor-pointer">Technical reason</summary> {sourceStatus.reasonCode}</details> : null}
               </div>
             ) : (
-              <p className="mt-1 text-[#aeb7c5]">NOT_APPLICABLE_FOR_LANGUAGE · The Albanian source result is withheld outside an identified Albanian analysis context; no Albanian lexical conclusion is displayed.</p>
+              <p className="mt-1 text-[#aeb7c5]">Albanian source results are withheld because this analysis does not identify Albanian as the language; no Albanian lexical conclusion is displayed.</p>
             )}
             {sourceStatus?.status === "SOURCE_NOT_FOUND" ? (
               <p className="mt-1 text-[#aeb7c5]">The exact-form lookup returned no source record; this does not establish lexical absence.</p>
@@ -806,7 +807,7 @@ function CurrentWordEvidenceSectionV0_1({
             ) : null}
             {sourceContextIsAlbanian && sourceStatus?.status === "MATCHES_FOUND" && sourceFacts.length === 0 ? (
               <p className="mt-1 text-[#aeb7bf]">
-                MATCHES_FOUND was emitted without a displayable exact-form source fact in this payload.
+                The lookup reported a match, but this analysis did not include a displayable exact-form source fact.
               </p>
             ) : null}
             {sourceFacts.length > 0 ? (
@@ -820,14 +821,13 @@ function CurrentWordEvidenceSectionV0_1({
                         Entry {fact.entryLocator} · {fact.form} · {fact.partOfSpeech ?? "part of speech Unknown / Null"}
                       </div>
                       <div className="break-words text-[#9fb1bf]">
-                        {fact.language} · {fact.sourceStatus} · {fact.attestationTruth.toUpperCase()} · {fact.sourceSnapshot.sourceFamilyId} · SHA-256 {fact.sourceSnapshot.sha256}
+                        {fact.language} · {humanReadableStatusLabelV0_1(fact.sourceStatus)} · {humanReadableStatusLabelV0_1(fact.attestationTruth)}
                       </div>
-                      <div className="break-all text-[#9fb1bf]">Source snapshot: {fact.sourceSnapshot.sourceUrl}</div>
                       {fact.senses.length > 0 ? (
                         <ul className="mt-1 space-y-1">
                           {fact.senses.map((sense, senseIndex) => (
                             <li key={`${fact.sourceRecordId}:${sense.senseId ?? senseIndex}`} className="break-words">
-                              Sense {sense.senseId ?? "UNKNOWN_OR_NULL"}: {sense.glosses.length ? sense.glosses.join("; ") : "Unknown / Null"}
+                              Sense {senseIndex + 1}: {sense.glosses.length ? sense.glosses.join("; ") : "Meaning not supplied"}
                             </li>
                           ))}
                         </ul>
@@ -839,6 +839,12 @@ function CurrentWordEvidenceSectionV0_1({
                           Source-reported IPA observations: {fact.ipaObservations.map((observation) => observation.ipa ?? "Unknown / Null").join("; ")}
                         </div>
                       ) : null}
+                      <details className="mt-1 text-xs text-[#9fb1bf]">
+                        <summary className="cursor-pointer">View source record and citation details</summary>
+                        <div className="mt-1 break-words">Record {fact.sourceRecordId} · entry {fact.entryLocator} · source family {fact.sourceSnapshot.sourceFamilyId} · snapshot SHA-256 {fact.sourceSnapshot.sha256}</div>
+                        <div className="break-all">{fact.sourceSnapshot.sourceUrl}</div>
+                        <div>{fact.senses.map((sense, senseIndex) => `Sense ${senseIndex + 1}: ${sense.senseId ?? "UNKNOWN_OR_NULL"}`).join(" · ") || "No source sense IDs were emitted."}</div>
+                      </details>
                     </li>
                   ))}
                 </ol>
@@ -853,7 +859,7 @@ function CurrentWordEvidenceSectionV0_1({
               <>
                 <div className="mt-1 font-mono text-base text-[#f5f7fb]">{displayVoicePath(writtenInput.voicePath)}</div>
                 <div className="break-words">
-                  Authority: {writtenInput.representationAuthority} · pronunciation: {writtenInput.pronunciationAuthority}
+                  Representation: {humanReadableStatusLabelV0_1(writtenInput.representationAuthority)} · pronunciation evidence: {humanReadableStatusLabelV0_1(writtenInput.pronunciationAuthority)}
                 </div>
                 <div className="break-words text-[#a9d2bf]">
                   {writtenInput.events.length
@@ -861,15 +867,15 @@ function CurrentWordEvidenceSectionV0_1({
                     : "No written Voice events"}
                 </div>
                 <div className="break-words text-[#9fb1bf]">
-                  Positions are zero-based Unicode code points in the NFC written input; sequence status: {writtenInput.inputVoiceSequenceStatus}.
+                  Positions are zero-based Unicode code points in the NFC written input; sequence: {humanReadableStatusLabelV0_1(writtenInput.inputVoiceSequenceStatus)}.
                 </div>
               </>
             ) : (
-              <p className="mt-1">Written path provenance: NOT_EMITTED or input-form mismatch. A selected derived path is not substituted for spelling.</p>
+              <p className="mt-1">Written path provenance is unavailable or does not match the input form. A selected derived path is not substituted for spelling.</p>
             )}
             {structuralAnalysis ? (
               <div className="mt-2 rounded border border-[#263a33] p-2" data-testid="single-word-progressive-written-analysis">
-                <div>v0.2 orthographic recheck: {structuralAnalysis.analysisStatus} · sequence {structuralAnalysis.inputVoiceSequenceStatus}</div>
+                <div>Written spelling recheck: {humanReadableStatusLabelV0_1(structuralAnalysis.analysisStatus)} · sequence {humanReadableStatusLabelV0_1(structuralAnalysis.inputVoiceSequenceStatus)}</div>
                 <div className="font-mono">Complete input events: {displayVoicePath(structuralAnalysis.inputVoiceEvents.map((event) => event.voice))}</div>
                 <div className="break-words">
                   {structuralAnalysis.inputVoiceEvents.length
@@ -887,16 +893,16 @@ function CurrentWordEvidenceSectionV0_1({
                     : "Unknown / Null"}
                 </div>
                 <div className="text-[#9fb1bf]">
-                  API/event sequence comparison: {writtenInput
+                  Written event sequence comparison: {writtenInput
                     ? JSON.stringify(structuralAnalysis.inputVoiceEvents.map((event) => event.voice)) === JSON.stringify(writtenInput.voicePath)
-                      ? "MATCH"
-                      : "MISMATCH · both outputs are retained"
-                    : "UNKNOWN_OR_NULL · API written provenance not emitted"}
+                      ? "Matches"
+                      : "Differs; both outputs are retained"
+                    : "Not available because this analysis did not emit written provenance"}
                 </div>
                 <div className="text-[#9fb1bf]">Representation is orthographic; pronunciation authority is not established.</div>
               </div>
             ) : (
-              <p className="mt-2 text-[#9fb1bf]">v0.2 Albanian grapheme analysis: UNKNOWN_OR_NULL because this discovery does not identify an Albanian language/profile context.</p>
+              <p className="mt-2 text-[#9fb1bf]">Albanian grapheme analysis is unavailable because this discovery does not identify an Albanian language/profile context.</p>
             )}
             {selectedPath ? (
               <div className="mt-2 rounded border border-[#263a33] p-2">
@@ -925,36 +931,36 @@ function CurrentWordEvidenceSectionV0_1({
             <h4 className="font-semibold text-[#f0ddb0]">3 · Structural candidates and component tree</h4>
             {structuralAnalysis ? (
               <div className="mt-2" data-testid="single-word-progressive-v02-structure">
-                <div className="font-semibold">Lossless v0.2 analysis · {structuralAnalysis.analysisStatus}</div>
+                <div className="font-semibold">Spelling structure analysis · {humanReadableStatusLabelV0_1(structuralAnalysis.analysisStatus)}</div>
                 {structuralAnalysis.hypotheses.length ? (
                   <ol className="mt-1 space-y-2">
                     {structuralAnalysis.hypotheses.map((hypothesis) => (
                       <li key={hypothesis.hypothesisId} className="min-w-0 rounded border border-[#303843] p-2">
-                        <div className="break-words font-mono">{hypothesis.hypothesisId} · structural candidate {hypothesis.embryo}</div>
+                        <div className="break-words font-mono">Structural candidate: {hypothesis.embryo}</div>
                         <div className="break-words">Expansion: {hypothesis.expansionChain.join(" → ") || "not emitted"}</div>
-                        <div className="break-words text-[#c5b995]">Reason codes: {hypothesis.reasonCodes.join(", ") || "none emitted"}</div>
+                        {hypothesis.reasonCodes.length ? <details className="break-words text-[#c5b995]"><summary className="cursor-pointer">Technical reasons</summary>{hypothesis.reasonCodes.join(", ")}</details> : null}
                         <div className="mt-1">Components (source order; lexical meaning not evaluated):</div>
                         <ul className="mt-1 space-y-1">
                           {hypothesis.losslessDecomposition.components.map((component) => (
                             <li key={component.componentId} className="break-words">
-                              <span className="font-mono">{component.form}</span> · {component.componentKind} · source span [{component.sourceSpan.start}, {component.sourceSpan.end}) · graphemes {component.graphemeIds.join(", ") || "none"} · Voices {displayVoicePath(component.voiceEvents.map((event) => event.voice))} · meaning UNKNOWN_OR_NULL
+                              <span className="font-mono">{component.form}</span> · {humanReadableStatusLabelV0_1(component.componentKind)} · source span [{component.sourceSpan.start}, {component.sourceSpan.end}) · graphemes {component.graphemeIds.length} · Voices {displayVoicePath(component.voiceEvents.map((event) => event.voice))} · meaning not established
                             </li>
                           ))}
                         </ul>
                         <div className="mt-1 break-words text-[#9fb1bf]">
-                          Conservation: {hypothesis.losslessDecomposition.conservation.status} · event order preserved {String(hypothesis.losslessDecomposition.conservation.eventOrderPreserved)} · grapheme order preserved {String(hypothesis.losslessDecomposition.conservation.graphemeOrderPreserved)} · no digraph split {String(hypothesis.losslessDecomposition.conservation.noDigraphSplit)} · reconstructed {hypothesis.losslessDecomposition.reconstructedBasis}
+                          Structure check: {humanReadableStatusLabelV0_1(hypothesis.losslessDecomposition.conservation.status)} · event order preserved: {hypothesis.losslessDecomposition.conservation.eventOrderPreserved ? "yes" : "no"} · grapheme order preserved: {hypothesis.losslessDecomposition.conservation.graphemeOrderPreserved ? "yes" : "no"} · digraphs kept intact: {hypothesis.losslessDecomposition.conservation.noDigraphSplit ? "yes" : "no"} · reconstructed from {humanReadableStatusLabelV0_1(hypothesis.losslessDecomposition.reconstructedBasis)}
                         </div>
                       </li>
                     ))}
                   </ol>
                 ) : (
-                  <p className="mt-1">No v0.2 reduction candidate emitted. The complete written events above remain available; candidate meaning is UNKNOWN_OR_NULL.</p>
+                  <p className="mt-1">No structural reduction candidate was produced. The complete written events above remain available; component meaning has not been established.</p>
                 )}
                 {structuralAnalysis.excludedHypotheses.length ? (
                   <ul className="mt-1 text-[#c5b995]">
                     {structuralAnalysis.excludedHypotheses.map((excluded) => (
                       <li key={excluded.hypothesisId}>
-                        {excluded.hypothesisId} excluded: Albanian digraph {excluded.digraph} would be split at source position {excluded.splitSourcePosition}.
+                        Excluded: Albanian digraph {excluded.digraph} would be split at source position {excluded.splitSourcePosition}.
                       </li>
                     ))}
                   </ul>
@@ -967,14 +973,14 @@ function CurrentWordEvidenceSectionV0_1({
                 <li className="text-[#9fb1bf]">Legacy discovery hypotheses (v0.1), kept separate from v0.2 decompositions:</li>
                 {structuralHypotheses.map((hypothesis) => (
                   <li key={hypothesis.hypothesisId} className="min-w-0 break-words">
-                    <div className="font-mono">{hypothesis.hypothesisId} · embryo {hypothesis.embryo}</div>
+                    <div className="font-mono">Candidate form: {hypothesis.embryo}</div>
                     <div>Expansion: {hypothesis.expansionChain.join(" → ") || "not emitted"}</div>
-                    <div className="text-[#c5b995]">Reason codes: {hypothesis.reasonCodes.join(", ") || "none emitted"}</div>
+                    {hypothesis.reasonCodes.length ? <details className="text-[#c5b995]"><summary className="cursor-pointer">Technical reasons</summary>{hypothesis.reasonCodes.join(", ")}</details> : null}
                   </li>
                 ))}
               </ul>
             ) : !structuralAnalysis ? (
-              <p className="mt-1">Structural analysis not emitted for this Albanian context; this level remains UNKNOWN_OR_NULL.</p>
+              <p className="mt-1">Structural analysis is not available for this Albanian context.</p>
             ) : (
               <p className="mt-1">No structural hypotheses emitted by the legacy v0.1 field; v0.2 output remains shown separately above.</p>
             )}
@@ -985,31 +991,32 @@ function CurrentWordEvidenceSectionV0_1({
               <section data-testid="single-word-progressive-source-relationships" className="rounded border border-[#303843] bg-[#10161c] p-2">
                 <h4 className="font-semibold text-[#dce9ca]">4 · Source-authored relationships and sense alternatives</h4>
                 {sourceContextIsAlbanian ? (
-                  <div className="break-words">Exact-form source status: {sourceStatus?.status ?? "NOT_EMITTED"} · source relation evidence is shown only if emitted by the current Discovery.</div>
+                  <div className="break-words">Exact-form source lookup: {humanReadableStatusLabelV0_1(sourceStatus?.status, "Not available in this analysis")} · source relations are shown only when this analysis provides them.</div>
                 ) : (
-                  <div>Albanian source relations: UNKNOWN_OR_NULL · no Albanian context is established.</div>
+                  <div>Albanian source relations are not available because this analysis has no Albanian context.</div>
                 )}
                 {sourceComponentReading && componentTargetRecordBinding === "MATCH" ? (
                   <div className="mt-2 rounded border border-[#26323d] p-2">
-                    <div>Source-linked component reading: {sourceComponentReading.status} · {sourceComponentReading.relation.relation}</div>
-                    <div className="break-words">Target record: {sourceComponentReading.primary.sourceRecordId} · {sourceComponentReading.primary.entryLocator} · {sourceComponentReading.primary.form} · {sourceComponentReading.primary.partOfSpeech ?? "POS UNKNOWN_OR_NULL"}</div>
-                    <div>Target record/query binding: {componentTargetRecordBinding}</div>
-                    <div className="break-words">Source-authored explanation: {sourceComponentReading.relation.sourceAuthoredExplanation ?? "UNKNOWN_OR_NULL"}</div>
-                    <div className="break-words">Validated source-attributed component forms (ordered; separate from lexical records): {sourceComponentReading.relation.references.map((reference) => reference.sourceForm).join(" + ") || "UNKNOWN_OR_NULL"}</div>
+                    <div>Source-linked component reading: {humanReadableStatusLabelV0_1(sourceComponentReading.status)} · {humanReadableStatusTextV0_1(sourceComponentReading.relation.relation)}</div>
+                    <div className="break-words">Target record: {sourceComponentReading.primary.form} · {sourceComponentReading.primary.partOfSpeech ?? "part of speech not supplied"}.</div>
+                    <details className="mt-1"><summary className="cursor-pointer">View source record identity and exact relationship</summary>
+                      <div className="break-words">Target record {sourceComponentReading.primary.sourceRecordId} · {sourceComponentReading.primary.entryLocator} · binding {humanReadableStatusLabelV0_1(componentTargetRecordBinding)}</div>
+                      <div className="break-words">Source-authored explanation: {sourceComponentReading.relation.sourceAuthoredExplanation ?? "No source-authored explanation was included."}</div>
+                      <div className="break-words">Source-attributed component forms, in order: {sourceComponentReading.relation.references.map((reference) => reference.sourceForm).join(" + ") || "No component forms were attributed."}</div>
+                    </details>
                     {componentSurfaceJoin !== null ? (
                       <div className="break-words" data-testid="single-word-source-surface-join">
-                        Structured source-form concatenation (leading affix hyphen omitted as notation only): {surfaceJoinMatchesTarget === null
-                          ? `${componentSurfaceJoin.toLocaleUpperCase("sq-AL")} · comparison UNKNOWN_OR_NULL`
-                          : `${componentSurfaceJoin.toLocaleUpperCase("sq-AL")} ${surfaceJoinMatchesTarget ? "=" : "≠"} ${visibleDiscovery.inputWord.toLocaleUpperCase("sq-AL")} · ${surfaceJoinMatchesTarget ? "EXACT_SURFACE_JOIN" : "SURFACE_MISMATCH"}`}
+                        Source-form spelling comparison (leading affix hyphen omitted as notation only): {componentSurfaceJoin.toLocaleUpperCase("sq-AL")} {surfaceJoinMatchesTarget === null ? "cannot be compared" : surfaceJoinMatchesTarget ? "matches" : "does not match"} {visibleDiscovery.inputWord.toLocaleUpperCase("sq-AL")}.
                       </div>
                     ) : (
-                      <div>Structured component-form reconstruction: UNKNOWN_OR_NULL · the validated ordered references do not support a safe concatenation.</div>
+                      <div>These source references do not provide a safe component spelling reconstruction.</div>
                     )}
                     <div className="mt-1">Component reference resolution (source order):</div>
                     <ol className="mt-1 space-y-1">
                       {sourceComponentReading.componentResolutions.map((resolution, index) => (
                         <li key={`${resolution.sourceForm}:${index}`} className="break-words">
-                          {index + 1}. {resolution.sourceForm} · {resolution.status} · reference {resolution.reference ?? "UNKNOWN_OR_NULL"} · source records {resolution.sourceRecordIds.join(", ") || "UNKNOWN_OR_NULL"} · reasons {resolution.reasonCodes.join(", ") || "none emitted"}
+                          {index + 1}. {resolution.sourceForm} · {humanReadableStatusLabelV0_1(resolution.status)}
+                          {resolution.reasonCodes.length ? <details className="ml-1 inline"><summary className="inline cursor-pointer">Technical resolution details</summary> {resolution.reference ?? "No reference supplied"} · records {resolution.sourceRecordIds.join(", ") || "none"} · {resolution.reasonCodes.join(", ")}</details> : null}
                         </li>
                       ))}
                     </ol>
@@ -1017,27 +1024,28 @@ function CurrentWordEvidenceSectionV0_1({
                     <ol className="mt-1 space-y-1">
                       {sourceComponentReading.components.map((component) => (
                         <li key={component.sourceRecordId} className="break-words">
-                          {component.form} · {component.partOfSpeech ?? "POS UNKNOWN_OR_NULL"} · {component.sourceRecordId} · {component.entryLocator}
+                          {component.form} · {component.partOfSpeech ?? "part of speech not supplied"}
                           {component.sourceSenses?.length ? (
                             <ul className="ml-3 list-disc">
                               {component.sourceSenses.map((sense, senseIndex) => (
                                 <li key={`${component.sourceRecordId}:${sense.senseId ?? senseIndex}`}>
-                                  Sense {sense.sourceSenseOrdinal}: {sense.senseId ?? "UNKNOWN_OR_NULL"} · {sense.glosses.join("; ") || "UNKNOWN_OR_NULL"}
+                                  Sense {sense.sourceSenseOrdinal}: {sense.glosses.join("; ") || "Meaning not supplied"}
                                 </li>
                               ))}
                             </ul>
-                          ) : <span> · source senses UNKNOWN_OR_NULL</span>}
+                          ) : <span> · no source senses supplied</span>}
+                          <details className="ml-1 inline"><summary className="inline cursor-pointer">Source record details</summary> {component.sourceRecordId} · {component.entryLocator} · {component.sourceSenses?.map((sense) => sense.senseId ?? "UNKNOWN_OR_NULL").join(", ") || "no sense IDs"}</details>
                         </li>
                       ))}
                     </ol>
-                    <div className="mt-1 break-words">Relationship interpretation: {sourceComponentReading.exploratoryRelationship.status} · {sourceComponentReading.exploratoryRelationship.statement ?? "UNKNOWN_OR_NULL"}</div>
+                    <div className="mt-1 break-words">Relationship interpretation: {humanReadableStatusLabelV0_1(sourceComponentReading.exploratoryRelationship.status)} · {sourceComponentReading.exploratoryRelationship.statement ?? "No interpretation was supplied."}</div>
                     {sourceComponentReading.exploratoryRelationship.alternatives.length ? (
                       <ul className="ml-3 list-disc">
                         {sourceComponentReading.exploratoryRelationship.alternatives.map((alternative, index) => <li key={`${index}:${alternative}`}>{alternative}</li>)}
                       </ul>
                     ) : null}
-                    <div className="break-words">Relationship claim boundary: {(sourceComponentReading.claimBoundary)}</div>
-                    <div className="break-words">Target/component exact-sense crosswalk: UNKNOWN_OR_NULL · no canonical sense alignment is emitted by this record-level relationship.</div>
+                    <div className="break-words">Relationship boundary: {humanReadableStatusTextV0_1(sourceComponentReading.claimBoundary)}</div>
+                    <div className="break-words">The record-level relationship does not provide a canonical target/component sense alignment.</div>
                     {structuralSourceSuffixAlignment ? (
                       <div className="mt-2 rounded border border-[#46523b] bg-[#121811] p-2" data-testid="single-word-structural-source-component-alignment" data-status={structuralSourceSuffixAlignment.comparisonStatus}>
                         <div className="font-semibold">Source-positioned component comparison · {structuralSourceSuffixAlignment.comparisonStatus}</div>
@@ -1261,7 +1269,8 @@ function CurrentWordEvidenceSectionV0_1({
                     </ul>
                     {componentSurfaceJoin !== null ? (
                       <div className="mt-1 break-words">
-                        Source-form reconstruction: {componentSurfaceJoin.toLocaleUpperCase("sq-AL")} {surfaceJoinMatchesTarget ? "=" : "≠"} {visibleDiscovery?.inputWord.toLocaleUpperCase("sq-AL")} · {surfaceJoinMatchesTarget ? "EXACT_SURFACE_JOIN" : "SURFACE_MISMATCH"}. The comparison does not authorize a spelling change.
+                        Source-form comparison: {componentSurfaceJoin.toLocaleUpperCase("sq-AL")} {surfaceJoinMatchesTarget ? "matches" : "does not match"} {visibleDiscovery?.inputWord.toLocaleUpperCase("sq-AL")}. The comparison does not authorize a spelling change.
+                        <details className="ml-1 inline"><summary className="inline cursor-pointer">View exact comparison status</summary><span> {surfaceJoinMatchesTarget ? "EXACT_SURFACE_JOIN" : "SURFACE_MISMATCH"}</span></details>
                       </div>
                     ) : null}
                     <div className="mt-1 break-words">Whole-word evidence remains {functionalBridge.functionalHypothesis.status} · {functionalBridge.functionalHypothesis.functionalOperation}. Component-sense alignment and independent embryo function remain UNKNOWN_OR_NULL; source-record juxtaposition is not independent corroboration. Claim boundary: {(functionalBridge.claimBoundary)}</div>
@@ -1272,12 +1281,12 @@ function CurrentWordEvidenceSectionV0_1({
               </section>
             </li>
           </ol>
-        </section>
+        </details>
       ) : null}
 
       {contextMatchesTarget && !visibleDiscovery ? (
-        <section aria-label="Progressive evidence trace" data-testid="single-word-progressive-evidence-trace" className="mt-3 rounded border border-[#34495a] bg-[#10161c] p-2">
-          <h4 className="font-semibold text-[#f5f7fb]">Progressive evidence trace</h4>
+        <details aria-label="Progressive evidence trace" data-testid="single-word-progressive-evidence-trace" className="mt-3 rounded border border-[#34495a] bg-[#10161c] p-2">
+          <summary className="cursor-pointer font-semibold text-[#f5f7fb] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#d8bb7a]">View detailed source, Voice and structure evidence</summary>
           <div className="mt-1">Analyzed form: {context?.analyzedWord ?? analyzedWord}</div>
           <div className="break-words">Discovery status: {!discoveryState
             ? "NOT_EMITTED"
@@ -1292,7 +1301,7 @@ function CurrentWordEvidenceSectionV0_1({
             <li>5 · Whole-word function: UNKNOWN_OR_NULL · embryo meaning/function: UNKNOWN_OR_NULL.</li>
           </ol>
           <p className="mt-1 text-[#9fb1bf]">Withheld or missing evidence is not a negative lexical finding. No proposal fields are populated from this state.</p>
-        </section>
+        </details>
       ) : null}
 
       {contextMatchesTarget && draftTargetWord !== analyzedWord ? (
@@ -1614,21 +1623,24 @@ export function SingleWordMotivationWorkbenchV0_1({
     <section
       aria-label="Single-word functional motivation workbench"
       data-testid="single-word-motivation-workbench"
-      className="rounded-[12px] border border-[#53604a] bg-[#111710] p-4"
+      className="min-w-0 [overflow-wrap:anywhere] rounded-[12px] border border-[#53604a] bg-[#111710] p-4"
     >
       <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#b9cf8a]">
         SINGLE-WORD MOTIVATION WORKBENCH
       </div>
       <h2 className="mt-1 text-base font-semibold text-[#f5f7fb]">Explore a single-word functional reading</h2>
       <p className="mt-1 max-w-3xl text-xs leading-5 text-[#aeb7c5]">
-        Choose a segmented proposal or a whole-word-only opaque control. User-entered claims and citations are kept separate and are not independently verified here.
+        Choose a proposal format and add components that may help explain the word. Your claims and citations remain proposals until independently verified.
       </p>
       <p className="mt-1 max-w-3xl text-xs leading-5 text-[#aeb7c5]">
-        Keep component languages aligned with the target language; record dialect differences separately.
+        Use the target language for each component; record dialect differences separately.
       </p>
-      <p data-testid="single-word-motivation-field-limits" className="mt-1 max-w-4xl text-xs leading-5 text-[#aeb7c5]">
-        Limits: target word 80 Unicode code points; target/component language and dialect 80 characters; component spelling 80, meaning 300, role 200; evidence references and connecting material 500; transformation endpoints 80, explanation 300, reference 500; functional description 1,000 characters. Segmented mode accepts 2–12 components; opaque mode records zero components.
-      </p>
+      <details className="mt-2 max-w-4xl text-xs leading-5 text-[#aeb7c5]">
+        <summary className="w-fit cursor-pointer">Entry limits</summary>
+        <p data-testid="single-word-motivation-field-limits" className="mt-1">
+          Target word: 80 code points. Language and dialect: 80 characters each. Component spelling: 80; meaning: 300; role: 200. Evidence references and connecting material: 500. Transformation endpoints: 80; explanation: 300; reference: 500. Functional description: 1,000 characters. Segmented proposals accept 2–12 components; opaque proposals accept none.
+        </p>
+      </details>
 
       <CurrentWordEvidenceSectionV0_1
         analyzedWord={initialTargetWord}
@@ -1700,7 +1712,7 @@ export function SingleWordMotivationWorkbenchV0_1({
               (segment.dialect && segment.dialect !== targetDialect)
             ) ? (
               <p role="status" data-testid="single-word-component-identity-mismatch" className="mb-3 rounded border border-[#746541] bg-[#18140e] p-2 text-xs leading-5 text-[#f0ddb0]">
-                Component identity differs from the target: recorded {segment.language || "UNKNOWN_OR_NULL"} · {segment.dialect || "dialect UNKNOWN_OR_NULL"}; target {targetLanguage || "UNKNOWN_OR_NULL"} · {targetDialect || "dialect UNKNOWN_OR_NULL"}. The component identity is retained as entered.
+                Component identity differs from the target: recorded {segment.language || "language not specified"} · {segment.dialect || "dialect not specified"}; target {targetLanguage || "language not specified"} · {targetDialect || "dialect not specified"}. The component identity is retained as entered.
               </p>
             ) : null}
             <div className="grid gap-3 sm:grid-cols-2">
@@ -1765,16 +1777,16 @@ export function SingleWordMotivationWorkbenchV0_1({
                 </p>
                 <p className="mt-1 text-xs text-[#aeb4ce]">
                   <strong>User-proposed meaning (as entered):</strong>{" "}
-                  {segment.unresolved ? "UNKNOWN_OR_NULL" : segment.proposedMeaning || "UNKNOWN_OR_NULL"}. USER_PROPOSED.
+                  {segment.unresolved ? "Not established" : segment.proposedMeaning || "Not established"}. Proposed by you.
                   This Albanian form lookup does not verify that meaning, the recorded language/dialect, or an exact sense alignment.
                 </p>
                 <p className="mt-1 text-xs text-[#aeb4ce]">
                   <strong>User-proposed grammatical role:</strong>{" "}
-                  {segment.unresolved ? "UNKNOWN_OR_NULL" : segment.proposedGrammaticalRole || "UNKNOWN_OR_NULL"}. USER_PROPOSED.
+                  {segment.unresolved ? "Not established" : segment.proposedGrammaticalRole || "Not established"}. Proposed by you.
                 </p>
                 <p className="mt-1 text-xs text-[#aeb4ce]">
                   <strong>Recorded language/dialect (as entered):</strong>{" "}
-                  {segment.language || "UNKNOWN_OR_NULL"}{segment.dialect ? " · " + segment.dialect : ""}.
+                  {segment.language || "Language not specified"}{segment.dialect ? " · " + segment.dialect : ""}.
                 </p>
                 <FjaloriCrossSourceEvidenceV0_1
                   key={selectedComponentSource.componentIndex + ":" + selectedComponentSource.exactSpelling}
@@ -1963,7 +1975,7 @@ export function SingleWordMotivationWorkbenchV0_1({
                 <button type="button" aria-label={`Move mechanical operation ${index + 1} up`} disabled={index === 0} className="underline disabled:opacity-40" onClick={() => moveMechanicalOperation(index, -1)}>Move up</button>
                 <button type="button" aria-label={`Move mechanical operation ${index + 1} down`} disabled={index === mechanicalOperations.length - 1} className="underline disabled:opacity-40" onClick={() => moveMechanicalOperation(index, 1)}>Move down</button>
                 <button type="button" aria-label={`Remove mechanical operation ${index + 1}`} className="underline text-[#f0c5b8]" onClick={() => setMechanicalOperations((current) => current.filter((_, at) => at !== index))}>Remove</button>
-                <span className="text-[#d5c28f]">USER_DECLARED_UNVERIFIED · never treated as linguistic evidence</span>
+                <span className="text-[#d5c28f]">Entered by you; not verified and never treated as linguistic evidence</span>
               </div>
             </fieldset>
           )) : <p className="mt-2 text-xs text-[#9fb1bf]">No mechanical edits declared; Examine will compare the exact component concatenation as entered.</p>}
@@ -1972,48 +1984,57 @@ export function SingleWordMotivationWorkbenchV0_1({
         <div aria-live="polite" className="mt-3 rounded border border-[#303843] bg-[#10131d] p-3 text-xs leading-5 text-[#d7dde7]">
           {mechanicalResultIsStale ? (
             <p data-testid="single-word-mechanical-result-stale" className="mb-2 rounded border border-[#746541] bg-[#18140e] p-2 text-[#f0ddb0]">
-              STALE — interpretation inputs changed after the last examination. The previous replay is hidden; examine the current draft to see a new result.
+              This spelling replay is out of date because the interpretation changed. The old result is hidden; examine the current draft to see a new result.
             </p>
           ) : null}
           {currentMechanicalResult ? (
             <div data-testid="single-word-mechanical-result" data-status={currentMechanicalResult.status}>
-              <div><strong>Status:</strong> {currentMechanicalResult.status}</div>
+              <div><strong>Status:</strong> {humanReadableStatusLabelV0_1(currentMechanicalResult.status, "Replay status unavailable")}</div>
               <div><strong>Exact target, unchanged:</strong> <span className="font-mono">{currentMechanicalResult.targetWord}</span></div>
               <div><strong>Raw component concatenation:</strong> <span className="font-mono">{currentMechanicalResult.rawConcatenation || "∅"}</span></div>
               <div><strong>Last valid intermediate:</strong> <span className="font-mono">{currentMechanicalResult.lastValidIntermediate || "∅"}</span></div>
               {currentMechanicalResult.status === "EXAMINED" ? (
                 <>
                   <div><strong>Final mechanical spelling:</strong> <span className="font-mono">{currentMechanicalResult.finalMechanicalSpelling}</span></div>
-                  <div><strong>Exact comparison:</strong> {currentMechanicalResult.exactComparison}</div>
-                  <div><strong>NFC equivalence (separate from exact spelling):</strong> {currentMechanicalResult.nfcEquivalent === null ? "NOT_COMPUTED" : currentMechanicalResult.nfcEquivalent ? "YES" : "NO"}</div>
+                  <div><strong>Exact comparison:</strong> {humanReadableStatusLabelV0_1(currentMechanicalResult.exactComparison, "Comparison unavailable")}</div>
+                  <div><strong>NFC equivalence (separate from exact spelling):</strong> {currentMechanicalResult.nfcEquivalent === null ? "Not checked" : currentMechanicalResult.nfcEquivalent ? "Yes" : "No"}</div>
                 </>
               ) : (
                 <div className="text-[#f0ddb0]">No final mechanical spelling was produced. Review rejected operations before examining again.</div>
               )}
-              {currentMechanicalResult.operationResults.length ? (
-                <ol data-testid="single-word-mechanical-operation-ledger" className="mt-2 list-inside list-decimal space-y-1">
-                  {currentMechanicalResult.operationResults.map((operation, index) => (
-                    <li key={index}>
-                      <span className="font-semibold">{operation.kind} @ {operation.position ?? "invalid"}: {operation.status}</span>
-                      {operation.intermediateBefore !== null ? <span className="font-mono"> · {operation.intermediateBefore} → {operation.intermediateAfter ?? "not applied"}</span> : null}
-                      {operation.reasonCodes.length ? <span> · {operation.reasonCodes.join(", ")}</span> : null}
-                    </li>
-                  ))}
-                </ol>
-              ) : null}
-              {currentMechanicalResult.reasonCodes.length ? <div className="mt-2 text-[#f0ddb0]">Reason codes: {currentMechanicalResult.reasonCodes.join(", ")}</div> : null}
-              {currentMechanicalResult.warnings.length ? (
-                <ul data-testid="single-word-mechanical-warnings" className="mt-2 list-inside list-disc text-[#f0ddb0]">
-                  {currentMechanicalResult.warnings.map((item, index) => <li key={`${item.code}:${index}`}>{item.code}: {item.message}</li>)}
-                </ul>
-              ) : <p className="mt-2 text-[#9fb1bf]">No digraph or Unicode warnings reported.</p>}
+              {currentMechanicalResult.operationResults.length || currentMechanicalResult.reasonCodes.length || currentMechanicalResult.warnings.length ? (
+                <details className="mt-2 rounded border border-[#38433a] p-2" data-testid="single-word-mechanical-technical-details">
+                  <summary className="cursor-pointer">View exact operation trace and warning codes</summary>
+                  {currentMechanicalResult.operationResults.length ? (
+                    <ol data-testid="single-word-mechanical-operation-ledger" className="mt-2 list-inside list-decimal space-y-1">
+                      {currentMechanicalResult.operationResults.map((operation, index) => (
+                        <li key={index}>
+                          <span className="font-semibold">{operation.kind} @ {operation.position ?? "invalid"}: {operation.status}</span>
+                          {operation.intermediateBefore !== null ? <span className="font-mono"> · {operation.intermediateBefore} → {operation.intermediateAfter ?? "not applied"}</span> : null}
+                          {operation.reasonCodes.length ? <span> · {operation.reasonCodes.join(", ")}</span> : null}
+                        </li>
+                      ))}
+                    </ol>
+                  ) : null}
+                  {currentMechanicalResult.reasonCodes.length ? <div className="mt-2 text-[#f0ddb0]">Reason codes: {currentMechanicalResult.reasonCodes.join(", ")}</div> : null}
+                  {currentMechanicalResult.warnings.length ? (
+                    <ul data-testid="single-word-mechanical-warnings" className="mt-2 list-inside list-disc text-[#f0ddb0]">
+                      {currentMechanicalResult.warnings.map((item, index) => <li key={`${item.code}:${index}`}>{item.code}: {item.message}</li>)}
+                    </ul>
+                  ) : null}
+                </details>
+              ) : <p className="mt-2 text-[#9fb1bf]">No spelling warnings were reported.</p>}
               <p className="mt-2 border-t border-[#303843] pt-2 text-[#d5c28f]">
-                Mechanical spelling replay only · {currentMechanicalResult.authority} · linguistic validity {currentMechanicalResult.linguisticValidity}. This result does not establish a source fact, component meaning, derivation, historical origin, spoken Voice path, or functional operation.
+                This is a mechanical spelling replay of edits you entered. It has not been linguistically assessed and does not establish a source fact, component meaning, derivation, historical origin, spoken Voice path, or functional operation.
               </p>
+              <details className="mt-2" data-testid="single-word-mechanical-authority-details">
+                <summary className="cursor-pointer">View exact replay authority and status</summary>
+                <div>Replay status: {currentMechanicalResult.status} · authority: {currentMechanicalResult.authority} · linguistic validity: {currentMechanicalResult.linguisticValidity}</div>
+              </details>
             </div>
           ) : (
             <div data-testid="single-word-mechanical-result" data-status="NOT_SUBMITTED">
-              <div><strong>Status:</strong> {notSubmittedResult.status}</div>
+              <div><strong>Status:</strong> {humanReadableStatusLabelV0_1(notSubmittedResult.status, "Not examined yet")}</div>
               <div><strong>Exact target:</strong> <span className="font-mono">{notSubmittedResult.targetWord}</span></div>
               <div><strong>Current raw component concatenation:</strong> <span className="font-mono">{notSubmittedResult.rawConcatenation || "∅"}</span></div>
               <p className="mt-1 text-[#9fb1bf]">No mechanical interpretation has been submitted for examination. This is not a linguistic conclusion.</p>
@@ -2037,12 +2058,12 @@ export function SingleWordMotivationWorkbenchV0_1({
             <div className="flex flex-wrap items-center gap-2">
               <strong className="font-mono text-base text-white">{result.proposal.target.exactWord}</strong>
               <span>{result.proposal.target.language}{result.proposal.target.dialect ? ` · ${result.proposal.target.dialect}` : ""}</span>
-              <span className="rounded-full border border-[#746541] px-2 py-0.5 text-[10px] font-semibold uppercase text-[#f0ddb0]">PROPOSED</span>
+              <span className="rounded-full border border-[#746541] px-2 py-0.5 text-[10px] font-semibold text-[#f0ddb0]">Your proposal</span>
             </div>
             <section data-testid="single-word-functional-motivation-reading" aria-label="Functional Motivation Reading" className="mt-3 rounded border border-[#53604a] bg-[#0b100b] p-3">
               <div className="flex flex-wrap items-center justify-between gap-2">
                 <h3 className="font-semibold text-white">Functional Motivation Reading</h3>
-                <span className="rounded-full border border-[#746541] px-2 py-0.5 text-[10px] font-semibold uppercase text-[#f0ddb0]">USER_PROPOSED · exploratory motivation</span>
+                <span className="rounded-full border border-[#746541] px-2 py-0.5 text-[10px] font-semibold text-[#f0ddb0]">Exploratory proposal by you</span>
               </div>
               <p className="mt-2"><strong>Whole word:</strong> <span className="font-mono">{result.proposal.target.exactWord}</span></p>
               <div className="mt-2">
@@ -2050,7 +2071,7 @@ export function SingleWordMotivationWorkbenchV0_1({
                 <ol className="mt-1 list-inside list-decimal space-y-1">
                   {result.proposal.segments.map((segment, index) => (
                     <li key={`${index}:${segment.exactSpelling}`} data-testid="single-word-proposal-segment">
-                      <span className="font-mono">{segment.exactSpelling}</span> — meaning {segment.unresolved ? "Unknown / Null (UNKNOWN_OR_NULL)" : segment.proposedMeaning ?? "Unknown / Null (UNKNOWN_OR_NULL)"}; grammatical role {segment.unresolved ? "Unknown / Null (UNKNOWN_OR_NULL)" : segment.proposedGrammaticalRole ?? "Unknown / Null (UNKNOWN_OR_NULL)"}; {segment.language}{segment.dialect ? ` (${segment.dialect})` : ""}. {evidenceStatusLabel(segment.evidence.status)}{segment.evidence.sourceReference ? ` · ${segment.evidence.sourceReference}` : ""}
+                      <span className="font-mono">{segment.exactSpelling}</span> — meaning {segment.unresolved ? "Not established" : segment.proposedMeaning || "Not established"}; grammatical role {segment.unresolved ? "Not established" : segment.proposedGrammaticalRole || "Not established"}; {segment.language}{segment.dialect ? ` (${segment.dialect})` : ""}. {evidenceStatusLabel(segment.evidence.status)}{segment.evidence.sourceReference ? ` · ${segment.evidence.sourceReference}` : ""}
                       {segment.unresolved ? " · user-marked not yet explained" : ""}
                       {segment.evidence.status === "CITATION_ENTERED_UNVERIFIED" ? " · citation entered by user; not independently verified" : ""}
                     </li>
@@ -2059,7 +2080,7 @@ export function SingleWordMotivationWorkbenchV0_1({
               </div>
               <p className="mt-2"><strong>User-proposed functional interaction:</strong> {result.proposal.functionalMotivation.explanation} · {transparencyLabel(result.proposal.functionalMotivation.transparency)}</p>
               <div data-testid="single-word-functional-reading-reconstruction" className="mt-2 rounded border border-[#66532e] bg-[#18140e] p-2">
-                <strong>Structural spelling comparison:</strong> <span className="font-mono">{result.proposal.segments.map((segment) => segment.exactSpelling).join(" + ")} = {result.proposal.reconstruction.exactConcatenation}</span>; target <span className="font-mono">{result.proposal.reconstruction.targetSpelling}</span> · {result.proposal.reconstruction.formComparison}.
+                <strong>Structural spelling comparison:</strong> <span className="font-mono">{result.proposal.segments.map((segment) => segment.exactSpelling).join(" + ")} = {result.proposal.reconstruction.exactConcatenation}</span>; target <span className="font-mono">{result.proposal.reconstruction.targetSpelling}</span> · {humanReadableStatusLabelV0_1(result.proposal.reconstruction.formComparison)}.
                 {result.proposal.reconstruction.formComparison === "MISMATCH" ? " The spelling correspondence remains unresolved." : " No spelling mismatch is recorded; exact concatenation alone does not establish morphology or etymology."}
               </div>
               <div data-testid="single-word-functional-reading-additional-tensions" className="mt-2">
@@ -2067,7 +2088,7 @@ export function SingleWordMotivationWorkbenchV0_1({
                 {result.proposal.segments.some((segment) => segment.unresolved) || result.proposal.unresolvedConnectingMaterial ? (
                   <ul className="mt-1 list-inside list-disc">
                     {result.proposal.segments.map((segment, index) => segment.unresolved ? (
-                      <li key={`${index}:${segment.exactSpelling}`}>{segment.exactSpelling}: meaning and grammatical role UNKNOWN_OR_NULL; marked by the user as not yet explained.</li>
+                      <li key={`${index}:${segment.exactSpelling}`}>{segment.exactSpelling}: meaning and grammatical role not established; you marked this component as not yet explained.</li>
                     ) : null)}
                     {result.proposal.unresolvedConnectingMaterial ? <li>User-entered unresolved material: {result.proposal.unresolvedConnectingMaterial}</li> : null}
                   </ul>
@@ -2079,8 +2100,26 @@ export function SingleWordMotivationWorkbenchV0_1({
                 ))}
               </div>
               <p className="mt-2 text-xs text-[#d5c28f]">
-                Interpretation status: USER_PROPOSED · exploratory. Strict embryo meaning: <strong>Unknown / Null (UNKNOWN_OR_NULL)</strong>; compound attestation: not claimed · historical origin: not claimed. No interpretation is selected automatically; the user decides. Mechanical replay remains separate and does not validate this reading.
+                This is an exploratory proposal by you. The word’s internal functional meaning has not been established; compound attestation and historical origin are not claimed. No interpretation is selected automatically. Mechanical replay checks spelling only and does not validate this reading.
               </p>
+              <details className="mt-2 text-xs text-[#9fb1bf]" data-testid="single-word-proposal-contract-details">
+                <summary className="cursor-pointer">View exact proposal statuses</summary>
+                <div className="mt-1">Candidate status: {result.proposal.candidateStatus}</div>
+                <div>Functional-motivation evidence: {result.proposal.functionalMotivation.evidenceStatus}</div>
+                <div>Strict embryo meaning: {result.proposal.strictEmbryoMeaning.status} · {result.proposal.strictEmbryoMeaning.reasonCode}</div>
+                <div>Spelling comparison: {result.proposal.reconstruction.formComparison} · rule {result.proposal.reconstruction.comparisonRule}</div>
+                <div>Compound attestation: {result.proposal.compoundAttestation} · historical origin: {result.proposal.historicalOrigin}</div>
+                <div>Decision: {result.proposal.userDecisionPosture} · no-single-winner: {String(result.proposal.noSingleWinner)}</div>
+                <div>Written structure: {result.proposal.writtenStructure.status} · representation: {result.proposal.writtenStructure.representationAuthority} · pronunciation: {result.proposal.writtenStructure.pronunciationAuthority} · positions: {result.proposal.writtenStructure.sourcePositionUnit}</div>
+                <ul className="list-inside list-disc">
+                  {result.proposal.segments.map((segment, index) => (
+                    <li key={`${index}:${segment.exactSpelling}`}>{segment.exactSpelling} evidence: {segment.evidence.status} · entered by {segment.evidence.enteredBy} · independently verified: {String(segment.evidence.independentlyVerifiedByWorkbench)}{segment.evidence.sourceReference ? ` · reference ${segment.evidence.sourceReference}` : ""}</li>
+                  ))}
+                </ul>
+                {result.proposal.declaredTransformations.map((transformation, index) => (
+                  <div key={index}>Declared transformation {transformation.from} → {transformation.to}: {transformation.status} · applied to reconstruction: {String(transformation.appliedToReconstruction)}{transformation.sourceReference ? ` · reference ${transformation.sourceReference}` : ""}</div>
+                ))}
+              </details>
             </section>
             <div className="mt-2 rounded border border-[#303843] bg-[#0b0f0c] p-2">
               <div className="font-semibold">Written Seven-Voices events</div>
@@ -2093,9 +2132,15 @@ export function SingleWordMotivationWorkbenchV0_1({
               <div className="text-xs text-[#9fb1bf]">
                 {result.proposal.writtenStructure.status === "COMPLETE"
                   ? `${result.proposal.writtenStructure.eventCount} events retained in order; source code-point positions ${result.proposal.writtenStructure.voiceEvents.map((event) => event.sourcePosition).join(", ") || "none"}.`
-                  : `Structure unavailable: ${result.proposal.writtenStructure.reasonCode ?? "unknown"}.`}
+                  : "Written spelling structure is unavailable."}
                 {" "}Orthographic only; pronunciation authority not established.
               </div>
+              {result.proposal.writtenStructure.status !== "COMPLETE" ? (
+                <details className="mt-2" data-testid="single-word-proposal-structure-details">
+                  <summary className="cursor-pointer">View written-structure reason</summary>
+                  {result.proposal.writtenStructure.reasonCode ?? "No reason code was emitted."}
+                </details>
+              ) : null}
             </div>
           </article>
         )}
@@ -2111,7 +2156,7 @@ export function SingleWordMotivationWorkbenchV0_1({
             <label className={labelClass}>
               Whole-word meaning claim (optional)
               <textarea aria-label="Whole-word meaning claim" maxLength={300} className={inputClass} rows={2} value={wholeWordMeaningClaim} onChange={(event) => setWholeWordMeaningClaim(event.target.value)} placeholder="Meaning as you wish to record it" />
-              <span className="mt-1 block text-[11px] leading-4 text-[#9fb1bf]">Displayed as a USER_PROPOSED claim, separate from its source citation.</span>
+              <span className="mt-1 block text-[11px] leading-4 text-[#9fb1bf]">Shown as your proposal, separate from its source citation.</span>
             </label>
             <label className={labelClass}>
               Whole-word source evidence status
@@ -2156,21 +2201,21 @@ export function SingleWordMotivationWorkbenchV0_1({
                 <div className="flex flex-wrap items-center gap-2">
                   <strong className="font-mono text-base text-white">{opaqueResult.proposal.target.exactWord}</strong>
                   <span>{opaqueResult.proposal.target.language}{opaqueResult.proposal.target.dialect ? ` · ${opaqueResult.proposal.target.dialect}` : ""}</span>
-                  <span className="rounded-full border border-[#746541] px-2 py-0.5 text-[10px] font-semibold uppercase text-[#f0ddb0]">WHOLE_WORD_OPAQUE · PROPOSED</span>
+                  <span className="rounded-full border border-[#746541] px-2 py-0.5 text-[10px] font-semibold text-[#f0ddb0]">Whole-word proposal by you</span>
                 </div>
                 <p className="mt-2"><strong>Proposed components:</strong> 0 · no component boundaries entered.</p>
                 <p className="mt-2" data-testid="single-word-opaque-meaning-claim">
-                  <strong>Whole-word meaning claim:</strong> {opaqueResult.proposal.wholeWordMeaningClaim.text ?? "Unknown / Null"} · {opaqueResult.proposal.wholeWordMeaningClaim.status} · entered by the user.
+                  <strong>Whole-word meaning claim:</strong> {opaqueResult.proposal.wholeWordMeaningClaim.text ?? "Not established"} · {humanReadableStatusLabelV0_1(opaqueResult.proposal.wholeWordMeaningClaim.status)} · entered by you.
                 </p>
                 <div className="mt-2 break-words" data-testid="single-word-opaque-source-evidence">
-                  <strong>Separate whole-word source evidence:</strong> {opaqueResult.proposal.wholeWordSourceEvidence.status}
+                  <strong>Separate whole-word source evidence:</strong> {humanReadableStatusLabelV0_1(opaqueResult.proposal.wholeWordSourceEvidence.status)}
                   {opaqueResult.proposal.wholeWordSourceEvidence.sourceReference ? ` · ${opaqueResult.proposal.wholeWordSourceEvidence.sourceReference}` : ""} · entered by the user; not independently verified.
                 </div>
                 <p className="mt-2" data-testid="single-word-opaque-functional-description">
-                  <strong>User-proposed functional description:</strong> {opaqueResult.proposal.functionalMotivation.description ?? "Unknown / Null"} · {opaqueResult.proposal.functionalMotivation.status}.
+                  <strong>Your proposed functional description:</strong> {opaqueResult.proposal.functionalMotivation.description ?? "Not established"} · {humanReadableStatusLabelV0_1(opaqueResult.proposal.functionalMotivation.status)}.
                 </p>
                 <div data-testid="single-word-functional-reading-reconstruction" className="mt-2 rounded border border-[#66532e] bg-[#18140e] p-2">
-                  <strong>Component reconstruction:</strong> {opaqueResult.proposal.componentReconstruction.status} · internal functional structure {opaqueResult.proposal.internalFunctionalStructure.status}.
+                  <strong>Component reconstruction:</strong> {humanReadableStatusLabelV0_1(opaqueResult.proposal.componentReconstruction.status)} · internal functional structure {humanReadableStatusLabelV0_1(opaqueResult.proposal.internalFunctionalStructure.status)}.
                 </div>
                 <div className="mt-2 rounded border border-[#303843] bg-[#0b0f0c] p-2" data-testid="single-word-opaque-written-voices">
                   <div className="font-semibold">Written Seven-Voices events</div>
@@ -2182,13 +2227,21 @@ export function SingleWordMotivationWorkbenchV0_1({
                   <div className="text-xs text-[#9fb1bf]">
                     {opaqueResult.proposal.writtenStructure.status === "COMPLETE"
                       ? `${opaqueResult.proposal.writtenStructure.eventCount} canonical events retained in order at Unicode code-point positions.`
-                      : `Structure unavailable: ${opaqueResult.proposal.writtenStructure.reasonCode ?? "unknown"}.`}
+                      : "Written spelling structure is not available."}
                     {" "}Orthographic only; pronunciation authority not established.
                   </div>
                 </div>
                 <p className="mt-2 text-xs text-[#d5c28f]">
-                  Strict embryo meaning: Unknown / Null · source authority promotion: NONE · historical origin: not claimed. No interpretation is selected automatically; interpretation remains with the user.
+                  The word’s internal component meaning has not been established. No source authority was added, and no historical origin is claimed. No interpretation is selected automatically; the choice remains with you.
                 </p>
+                <details className="mt-2" data-testid="single-word-opaque-contract-details">
+                  <summary className="cursor-pointer">View exact proposal statuses</summary>
+                  <div>Meaning claim: {opaqueResult.proposal.wholeWordMeaningClaim.status}</div>
+                  <div>Source evidence: {opaqueResult.proposal.wholeWordSourceEvidence.status}</div>
+                  <div>Functional description: {opaqueResult.proposal.functionalMotivation.status}</div>
+                  <div>Component reconstruction: {opaqueResult.proposal.componentReconstruction.status}</div>
+                  <div>Internal functional structure: {opaqueResult.proposal.internalFunctionalStructure.status}</div>
+                </details>
               </article>
             )}
           </div>

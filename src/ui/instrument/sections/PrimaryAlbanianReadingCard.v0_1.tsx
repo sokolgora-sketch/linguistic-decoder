@@ -6,6 +6,7 @@ import type {
   PresentOrMissing,
 } from "@/ui/telemetry/types";
 import { isInterpretationDecisionPolicyV0_1 } from "@/shared/openInstrument/interpretationDecisionPolicy.v0_1";
+import { humanReadableStatusLabelV0_1, humanReadableStatusTextV0_1 } from "@/ui/instrument/sections/humanReadableStatusLabel.v0_1";
 
 const KAIKKI_ALBANIAN_URL =
   "https://kaikki.org/dictionary/Albanian/kaikki.org-dictionary-Albanian.jsonl";
@@ -13,6 +14,16 @@ const KAIKKI_ALBANIAN_URL =
 function sameWord(left: string, right: string): boolean {
   return left.normalize("NFC").trim().toLocaleLowerCase("sq-AL") ===
     right.normalize("NFC").trim().toLocaleLowerCase("sq-AL");
+}
+
+function exactSourceStatusLabel(status: string): string {
+  switch (status) {
+    case "MATCHES_FOUND": return "Exact source record available";
+    case "SOURCE_NOT_FOUND": return "No exact source record returned";
+    case "UNAVAILABLE": return "Exact source could not be reached";
+    case "NOT_QUERIED": return "Exact source not checked";
+    default: return "Exact source status unavailable";
+  }
 }
 
 export function PrimaryAlbanianReadingCardV0_1({
@@ -149,16 +160,9 @@ export function PrimaryAlbanianReadingCardV0_1({
       className="rounded-xl border border-[#355a7a] bg-[#111a24] p-4 shadow-[0_12px_32px_rgba(0,0,0,0.16)]"
     >
       <div className="flex flex-wrap items-start justify-between gap-3">
-        <div>
-          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#8ea4ba]">
-            Albanian word reading
-          </p>
-          <h2 className="mt-1 text-base font-semibold text-[#f5f7fb]">
-            {value.inputWord}
-          </h2>
-        </div>
+        <h2 className="text-base font-semibold text-[#f5f7fb]">Albanian source reading</h2>
         <span className="rounded-full border border-[#355a7a] px-2.5 py-1 text-[11px] font-semibold text-[#cfe6ff]">
-          Source status · {exactSourceStatus}
+          {exactSourceStatusLabel(exactSourceStatus)}
         </span>
       </div>
 
@@ -179,9 +183,19 @@ export function PrimaryAlbanianReadingCardV0_1({
                   className="min-w-0 border-t border-[#27313d] pt-2 first:border-0 first:pt-0"
                 >
                   <p className="font-semibold">Kaikki Albanian · {record.form} · {record.partOfSpeech ?? "part of speech unavailable"}</p>
-                  <p className="mt-1 break-all font-mono text-[11px] text-[#aeb7c5]">
-                    Source record: {record.sourceRecordId}
-                  </p>
+                  <details className="mt-1 text-xs text-[#aeb7c5]" data-testid="primary-albanian-source-record-details">
+                    <summary className="cursor-pointer">Source record and citation details</summary>
+                    <div className="mt-1 break-words">Record {record.sourceRecordId} · entry {record.entryLocator}{record.sourceSnapshot?.sourceFamilyId ? ` · source family ${record.sourceSnapshot.sourceFamilyId}` : ""}</div>
+                    {record.sourceSnapshot ? (
+                      <div className="break-words">Snapshot SHA-256 {record.sourceSnapshot.sha256} · {record.sourceStatus} · attestation {record.attestationTruth} · pronunciation authority {record.pronunciationAuthority}</div>
+                    ) : null}
+                    {record.sourceSnapshot?.sourceUrl ? (
+                      <a className="break-all underline" href={record.sourceSnapshot.sourceUrl} target="_blank" rel="noreferrer">Open source record</a>
+                    ) : null}
+                    {record.senses.some((sense) => sense.senseId) ? (
+                      <div className="mt-1 break-words">Source sense IDs: {record.senses.map((sense, senseIndex) => sense.senseId ? `Sense ${senseIndex + 1} · ${sense.senseId}` : null).filter(Boolean).join(" · ")}</div>
+                    ) : null}
+                  </details>
                   {record.senses.length > 0 ? (
                     <ol className="mt-2 space-y-2">
                       {record.senses.map((sense, senseIndex) => (
@@ -190,7 +204,7 @@ export function PrimaryAlbanianReadingCardV0_1({
                           className="rounded-md border border-[#27313d] bg-[#11161c] p-2"
                         >
                           <p className="text-[11px] font-semibold text-[#aeb7c5]">
-                            Source sense {senseIndex + 1} · {sense.senseId ?? "sense ID unavailable"}
+                            Source sense {senseIndex + 1}
                           </p>
                           <p className="mt-1">Source meaning: {sense.glosses.join("; ") || "not supplied"}</p>
                           <p className="mt-1 text-xs text-[#aeb7c5]">
@@ -234,7 +248,7 @@ export function PrimaryAlbanianReadingCardV0_1({
           {supportedHypothesis ? (
             <>
               <p className="mt-2 font-semibold">
-                Functional role: {hypothesis.functionalOperation} · exploratory
+                Functional role: {humanReadableStatusLabelV0_1(hypothesis.functionalOperation)} · exploratory
               </p>
               <p
                 className="mt-2 break-words"
@@ -250,11 +264,11 @@ export function PrimaryAlbanianReadingCardV0_1({
             </>
           ) : supportedSourceComponentHypothesis ? (
             <p className="mt-2">
-              No functional operation is classified for this source reading. A separate source-linked conditional component hypothesis is shown below; canonical component-sense selection and independent embryo meaning remain UNKNOWN_OR_NULL.
+              No functional operation is classified for this source reading. A separate source-linked conditional component proposal appears below; its component meaning remains unestablished.
             </p>
           ) : (
             <p className="mt-2">
-              UNKNOWN_OR_NULL · no supported functional interpretation is emitted for this exact source reading.
+              No supported functional interpretation is available for this exact source reading.
             </p>
           )}
         </section>
@@ -268,7 +282,7 @@ export function PrimaryAlbanianReadingCardV0_1({
             <h3 className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#d8bb7a]">
               Source-linked conditional component reading
             </h3>
-            <p className="mt-2 font-semibold">EXPLORATORY_FUNCTIONAL_HYPOTHESIS</p>
+            <p className="mt-2 font-semibold">Exploratory functional proposal</p>
             <p className="mt-1 break-words">
               Source-attributed component forms (source order): {sourceComponentReading.relation.references
                 .map((reference) => reference.sourceForm)
@@ -282,7 +296,7 @@ export function PrimaryAlbanianReadingCardV0_1({
             <p className="mt-2 break-words">{sourceComponentHypothesis.statement}</p>
             <ul className="mt-2 list-disc space-y-1 pl-5 text-xs text-[#d5c28f]">
               <li>Grammatical role: unclassified by this component hypothesis.</li>
-              <li>Canonical component-sense selection: UNKNOWN_OR_NULL; multiple interpretations may coexist, and the user decides.</li>
+              <li>Component meaning is not established; more than one reading may be possible, and you decide.</li>
               <li>Functional operation: Null — none is classified by this hypothesis.</li>
             </ul>
             {sourceComponentHypothesis.alternatives.length > 0 ? (
@@ -290,17 +304,22 @@ export function PrimaryAlbanianReadingCardV0_1({
                 Alternatives: {sourceComponentHypothesis.alternatives.join(" ")}
               </div>
             ) : null}
-            <div className="mt-2 break-words text-xs">
-              Evidence references: {sourceComponentHypothesis.evidenceRefs
+            <details className="mt-2 break-words text-xs">
+              <summary className="cursor-pointer">Source record references</summary>
+              {sourceComponentHypothesis.evidenceRefs
                 .map((reference) => `${reference.sourceRecordId} · ${reference.entryLocator} · senses ${reference.senseIds.join(", ") || "UNKNOWN_OR_NULL"}`)
                 .join(" | ")}
-            </div>
+            </details>
             <p className="mt-2 break-words text-xs text-[#d5c28f]">
-              Source-linked reading boundary: {(sourceComponentReading.claimBoundary)}
+              Source-linked reading boundary: {humanReadableStatusTextV0_1(sourceComponentReading.claimBoundary)}
             </p>
             <p className="mt-1 break-words text-xs text-[#d5c28f]">
-              Functional hypothesis boundary: {(sourceComponentHypothesis.claimBoundary)}
+              Functional hypothesis boundary: {humanReadableStatusTextV0_1(sourceComponentHypothesis.claimBoundary)}
             </p>
+            <details className="mt-1 text-xs">
+              <summary className="cursor-pointer">Exact claim classifications</summary>
+              Source boundary: {sourceComponentReading.claimBoundary} · functional boundary: {sourceComponentHypothesis.claimBoundary}
+            </details>
             <p className="mt-1 text-xs text-[#aeb7c5]">
               Attributed source components do not independently prove morphology, derivation, historical origin, or embryo meaning.
             </p>
@@ -317,8 +336,12 @@ export function PrimaryAlbanianReadingCardV0_1({
           </h3>
           {analysisStatus?.kind === "present" ? (
             <>
-              <p className="mt-2 font-mono text-xs">{analysisStatus.value.status}</p>
-              <p className="mt-1">{analysisStatus.value.summary}</p>
+              <p className="mt-2 text-xs">{humanReadableStatusLabelV0_1(analysisStatus.value.status)}</p>
+              <p className="mt-1">{humanReadableStatusTextV0_1(analysisStatus.value.summary)}</p>
+              <details className="mt-1 text-xs">
+                <summary className="cursor-pointer">Exact status details</summary>
+                {analysisStatus.value.status}
+              </details>
               <p className="mt-2 text-xs text-[#aeb7c5]">
                 This status describes canonical candidates and reviewed evidence; it does not cancel the separate source fact or exploratory reading above.
               </p>
@@ -337,14 +360,14 @@ export function PrimaryAlbanianReadingCardV0_1({
             Unknown / Null
           </h3>
           <ul className="mt-2 list-disc space-y-1 pl-5">
-            <li>Morphological decomposition: UNKNOWN_OR_NULL.</li>
+            <li>Morphological decomposition: not established.</li>
             <li>Historical derivation: not established by these source facts.</li>
             <li>
               Source pronunciation: {reading?.sourcePronunciation?.status === "SUPPORTED" && reading.sourcePronunciation.rawIpa
                 ? `${reading.sourcePronunciation.rawIpa} · current Kaikki record only, not frozen spoken authority.`
                 : "Null / unavailable."}
             </li>
-            <li>Independent embryo meaning or function: UNKNOWN_OR_NULL.</li>
+            <li>Independent component meaning or function: not established.</li>
           </ul>
         </section>
       </div>
