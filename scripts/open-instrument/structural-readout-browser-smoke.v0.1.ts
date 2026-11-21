@@ -1,10 +1,13 @@
 #!/usr/bin/env tsx
 
+import { readFileSync } from "node:fs";
 import { mkdir, writeFile } from "node:fs/promises";
+import { execFileSync } from "node:child_process";
 import { tmpdir } from "node:os";
 import { join, relative } from "node:path";
 import { chromium, type Browser, type Locator, type Page, type Request } from "playwright";
 import { startNextServer } from "../../tests/helpers/ownedNextServer";
+import { resolveStructuralSmokeGitProvenance, type StructuralSmokeGitProvenance } from "./structuralSmokeGitProvenance.v0.1";
 
 type SmokeCase = {
   word: string;
@@ -129,9 +132,8 @@ type InterpretationCaseResult = {
 };
 
 type SmokeReport = {
-  schemaVersion: "open-instrument.structural-and-interpretation-browser-smoke.v0.3";
-  currentHead: string | null;
-  expectedMain: string;
+  schemaVersion: "open-instrument.structural-and-interpretation-browser-smoke.v0.4";
+  gitProvenance: StructuralSmokeGitProvenance | null;
   page: string;
   browser: { name: string; version: string } | null;
   analyzeInteractions: number;
@@ -300,9 +302,8 @@ async function main(): Promise<void> {
   await mkdir(screenshotDirectory, { recursive: true });
 
   const report: SmokeReport = {
-    schemaVersion: "open-instrument.structural-and-interpretation-browser-smoke.v0.3",
-    currentHead: process.env.OPEN_INSTRUMENT_PR_HEAD ?? null,
-    expectedMain: "8a172fe697fbcd2c1a93f3b0baaa96ca6f3b52f4",
+    schemaVersion: "open-instrument.structural-and-interpretation-browser-smoke.v0.4",
+    gitProvenance: null,
     page: "/chat?debug=1",
     browser: null,
     analyzeInteractions: 0,
@@ -333,10 +334,18 @@ async function main(): Promise<void> {
   const localRequestFailures: string[] = [];
 
   try {
-    assert(
-      report.currentHead !== null && /^[a-f0-9]{40}$/iu.test(report.currentHead),
-      "OPEN_INSTRUMENT_PR_HEAD must contain the exact 40-character GitHub PR head SHA.",
-    );
+    const eventPayloadPath = process.env.GITHUB_EVENT_PATH;
+    let eventPayload: unknown = null;
+    if (eventPayloadPath) eventPayload = JSON.parse(readFileSync(eventPayloadPath, "utf8"));
+    report.gitProvenance = resolveStructuralSmokeGitProvenance({
+      eventName: process.env.GITHUB_EVENT_NAME ?? null,
+      eventPayload,
+      checkoutHeadSha: execFileSync("git", ["rev-parse", "HEAD"], { encoding: "utf8" }).trim(),
+      explicitFeatureHeadSha: process.env.OPEN_INSTRUMENT_PR_HEAD ?? null,
+      explicitBaseRef: process.env.OPEN_INSTRUMENT_PR_BASE_REF ?? null,
+      explicitBaseSha: process.env.OPEN_INSTRUMENT_PR_BASE_SHA ?? null,
+      githubSha: process.env.GITHUB_SHA ?? null,
+    });
     server = await startNextServer("start");
     const localOrigin = new URL(server.base).origin;
     browser = await chromium.launch({ headless: true });
