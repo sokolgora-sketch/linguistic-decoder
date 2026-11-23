@@ -11,6 +11,7 @@ function responseFor(
     description?: string | null;
     entrySources?: readonly (readonly string[])[];
     recordSources?: readonly string[];
+    pos?: string;
     senses?: readonly Readonly<{ gloss: string; lang: "en" | "sq"; source: string; tags?: readonly string[] }>[];
   }> = {},
 ) {
@@ -27,7 +28,7 @@ function responseFor(
         ? undefined
         : { text: options.description ?? `Përshkrim prove për ${word}`, source: "ai" },
       entries: entrySources.map((sources) => ({
-        pos: "noun",
+        pos: options.pos ?? "noun",
         sources: [...sources],
         senses: options.senses?.map((sense) => ({ ...sense, tags: [...(sense.tags ?? [])] })) ?? [
           { gloss: "test-only English gloss", lang: "en", source: "en-wiktionary" },
@@ -174,6 +175,64 @@ describe("FjaloriShqip Albanian meaning evidence v0.1", () => {
     expect(onRuntimeSourceResponse.mock.calls.some(([response]) => response.status === "loading")).toBe(true);
     expect(onSelect).not.toHaveBeenCalled();
     expect(onRuntimeSourceResponse.mock.calls.at(-1)?.[0]).not.toHaveProperty("senses.0.senseId");
+  });
+
+  it("uses the same bounded parser for profile-derived family lookups and preserves exact response provenance", async () => {
+    const fetchMock = jest.fn((input: RequestInfo | URL) => {
+      const url = new URL(String(input));
+      const form = decodeURIComponent(url.pathname.split("/").at(-1) ?? "").replace(/\.json$/u, "");
+      if (form === "ndarë") return Promise.resolve({ ok: false, status: 404 });
+      return Promise.resolve(responseFor(form, {
+        pos: form === "ndaj" ? "verb" : "noun",
+        description: form === "ndaj" ? "Bëj që diçka e tërë të bëhet në disa pjesë." : `Përshkrim burimor për ${form}`,
+        entrySources: [["en-wiktionary", "editor"]],
+        recordSources: ["en-wiktionary", "editor", "ai"],
+        senses: [{
+          gloss: form === "ndaj" ? "to divide a whole into parts" : `sense for ${form}`,
+          lang: "en",
+          source: "en-wiktionary",
+        }],
+      }));
+    });
+    global.fetch = fetchMock as unknown as typeof fetch;
+    const onRuntimeSourceResponse = jest.fn();
+
+    render(
+      <FjaloriCrossSourceEvidenceV0_1
+        word="NDARJE"
+        analysisLanguage="sq"
+        analysisVariety="Standard Albanian"
+        relatedForms={["daj", "ndaj", "ndarë"]}
+        onRuntimeSourceResponse={onRuntimeSourceResponse}
+      />,
+    );
+
+    await screen.findByText("Përshkrim burimor për ndarje");
+    await waitFor(() => expect(onRuntimeSourceResponse).toHaveBeenLastCalledWith(expect.objectContaining({
+      familyFormResponses: [
+        expect.objectContaining({
+          queryForm: "daj",
+          status: "available",
+          exactSourceForm: "daj",
+          requestKey: "daj\u0000daj",
+        }),
+        expect.objectContaining({
+          queryForm: "ndaj",
+          status: "available",
+          exactSourceForm: "ndaj",
+          description: expect.objectContaining({ text: "Bëj që diçka e tërë të bëhet në disa pjesë.", source: "ai" }),
+          senses: [expect.objectContaining({ partOfSpeech: "verb", gloss: "to divide a whole into parts", senseSource: "en-wiktionary" })],
+        }),
+        expect.objectContaining({ queryForm: "ndarë", status: "http-not-found", httpStatus: 404, exactSourceForm: null, senses: [] }),
+      ],
+    })));
+    for (const form of ["ndarje", "daj", "ndaj", "ndarë"]) {
+      expect(fetchMock).toHaveBeenCalledWith(
+        `https://fjalorishqip.org/api/v1/fjala/${encodeURIComponent(form)}.json`,
+        expect.objectContaining({ cache: "force-cache", signal: expect.any(AbortSignal) }),
+      );
+    }
+    expect(fetchMock).toHaveBeenCalledTimes(4);
   });
 
   it("emits the unavailable provider state without carrying old senses", async () => {

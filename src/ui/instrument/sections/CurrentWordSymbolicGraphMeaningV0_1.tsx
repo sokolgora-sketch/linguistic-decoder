@@ -16,6 +16,7 @@ import {
   type CurrentWordGraphMeaningEdgeDraftV0_1,
   type CurrentWordGraphMeaningMappingDraftV0_1,
 } from "@/ui/instrument/sections/currentWordSymbolicMeaningBridgeAdapter.v0_1";
+import { humanReadableStatusLabelV0_1, humanReadableStatusTextV0_1 } from "@/ui/instrument/sections/humanReadableStatusLabel.v0_1";
 
 const fieldClass = "mt-1 w-full min-w-0 rounded border border-[#46505c] bg-[#0d1117] px-2 py-1.5 text-sm text-[#f5f7fb] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#d8bb7a]";
 const labelClass = "block min-w-0 text-xs font-medium text-[#c5ced8]";
@@ -168,7 +169,7 @@ export function CurrentWordSymbolicGraphMeaningV0_1({
 
       {!identityMatches ? (
         <p role="status" data-testid="current-word-graph-identity-null" className="mt-2 rounded border border-[#746541] bg-[#18140e] p-2 text-[#f0ddb0]">
-          PARTIAL_NULL · current draft target {draftTargetWord || "UNKNOWN_OR_NULL"} does not match analyzed form {analyzedWord || "UNKNOWN_OR_NULL"}; identity-bound sense, graph and explanation are withheld.
+          The draft word does not match the analyzed form ({draftTargetWord || "not supplied"} vs {analyzedWord || "not supplied"}). Word-specific sense, graph and explanation are withheld.
         </p>
       ) : null}
 
@@ -181,7 +182,7 @@ export function CurrentWordSymbolicGraphMeaningV0_1({
           </p>
         ) : null}
         <label className={labelClass}>
-          Lexical sense for {analyzedWord || "UNKNOWN_OR_NULL"}
+          Lexical sense for {analyzedWord || "not supplied"}
           <select
             aria-label="Lexical sense for current-word graph meaning"
             className={fieldClass}
@@ -201,9 +202,9 @@ export function CurrentWordSymbolicGraphMeaningV0_1({
           >
             <option value="">Choose a source sense or a user proposal</option>
             {sourceSenseChoices.map(({ optionId, sense }) => (
-              <option key={optionId} value={optionId}>Source-reported · {sense.definition} · Source citation not independently verified</option>
+              <option key={optionId} value={optionId}>Source-reported · {sense.definition}</option>
             ))}
-            <option value="USER_PROPOSED">Enter your proposed reading</option>
+            <option value="USER_PROPOSED">Enter your own proposed meaning</option>
           </select>
         </label>
 
@@ -248,19 +249,19 @@ export function CurrentWordSymbolicGraphMeaningV0_1({
           Proposed relationship kind
         <select aria-label="Proposed lexical function relationship" className={fieldClass} value={relationKind} disabled={!identityMatches} onChange={(event) => setRelationKind(event.target.value as "" | "ACTION_OF_VERB_FUNCTION")}>
             <option value="">Select a relationship kind</option>
-            <option value="ACTION_OF_VERB_FUNCTION">ACTION_OF_VERB_FUNCTION · USER_PROPOSED</option>
+            <option value="ACTION_OF_VERB_FUNCTION">Action related to the proposed verb function</option>
           </select>
         </label>
-        <p className="mt-1 text-[#aeb7c5]">The existing contract supports this explicitly proposed action/function relation. Its applicability is NOT_ASSESSED.</p>
+        <p className="mt-1 text-[#aeb7c5]">This action/function relationship is your proposal; its linguistic applicability has not been assessed.</p>
       </div>
 
       <div className={cardClass}>
         <h5 className="font-semibold text-[#f5f7fb]">3. Connect computed symbolic outputs</h5>
         {nodes.length ? nodes.map((node) => (
           <div key={node.nodeId} className="mt-1 break-words" data-testid="current-word-graph-available-node">
-            COMPUTED · {node.text} · {node.symbolKind} · {node.reference.kind === "VOICE_BINDING" ? node.reference.bindingId : node.reference.selectionId} · EXPLORATORY_HYPOTHESIS / USER_PROPOSED
+            Computed from your proposed choices · {node.text} · {node.reference.kind === "VOICE_BINDING" ? "computed Voice operation" : "selected spelling association"} · exploratory, not verified
           </div>
-        )) : <p className="mt-1 text-[#aeb7c5]" data-testid="current-word-graph-nodes-null">UNKNOWN_OR_NULL · no selected symbolic output is currently computed.</p>}
+        )) : <p className="mt-1 text-[#aeb7c5]" data-testid="current-word-graph-nodes-null">No symbolic output has been computed yet.</p>}
         <button type="button" disabled={!identityMatches} className="mt-2 rounded border border-[#58645a] px-2 py-1 text-[#d8e4ca] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#d8bb7a] disabled:opacity-50" onClick={() => {
           const edgeId = addRowId("edge");
           setEdges((previous) => [...previous, { edgeId, leftNodeId: "", rightNodeId: "", relationText: "" }]);
@@ -278,7 +279,7 @@ export function CurrentWordSymbolicGraphMeaningV0_1({
               </select>
             </label>
             <label className={labelClass}>
-              Relationship text · USER_PROPOSED
+              Your proposed relationship
               <input aria-label={`Relationship text ${index + 1}`} className={fieldClass} value={edge.relationText} disabled={!identityMatches} onChange={(event) => updateEdge(edge.edgeId, { relationText: event.target.value })} />
             </label>
             <label className={labelClass}>
@@ -304,17 +305,17 @@ export function CurrentWordSymbolicGraphMeaningV0_1({
         </button>
         {bridges.map((bridge, index) => (
           <fieldset key={bridge.bridgeId} className="mt-2 grid min-w-0 gap-2 rounded border border-[#38433a] p-2 sm:grid-cols-2" data-testid="current-word-graph-bridge-draft">
-            <legend className="px-1 text-[#d8e4ca]">USER_PROPOSED bridge {index + 1}</legend>
+            <legend className="px-1 text-[#d8e4ca]">Your whole-word proposal {index + 1}</legend>
             <label className={labelClass}>
               Interpretation role
               <select aria-label={`Interpretation role for bridge ${index + 1}`} className={fieldClass} value={bridge.role} disabled={!identityMatches} onChange={(event) => updateBridge(bridge.bridgeId, { role: event.target.value as "" | "PRIMARY" | "ALTERNATIVE" })}>
                 <option value="">Select a role; no role is chosen automatically</option>
-                <option value="PRIMARY">PRIMARY · user-proposed</option>
-                <option value="ALTERNATIVE">ALTERNATIVE · user-proposed</option>
+                <option value="PRIMARY">Primary proposal</option>
+                <option value="ALTERNATIVE">Alternative proposal</option>
               </select>
             </label>
             <label className={labelClass}>
-              Whole-word explanatory bridge · USER_PROPOSED
+              Your whole-word explanation
               <textarea aria-label={`Whole-word explanatory bridge ${index + 1}`} className={fieldClass} rows={2} value={bridge.text} disabled={!identityMatches} onChange={(event) => updateBridge(bridge.bridgeId, { text: event.target.value })} />
             </label>
             <button type="button" disabled={!identityMatches} className="justify-self-start rounded border border-[#58645a] px-2 py-1 text-[#d8e4ca] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#d8bb7a] disabled:opacity-50" aria-label={`Remove bridge ${index + 1}`} onClick={() => {
@@ -335,23 +336,23 @@ export function CurrentWordSymbolicGraphMeaningV0_1({
         </button>
         {mappings.map((mapping, index) => (
           <fieldset key={mapping.mappingId} className="mt-2 grid min-w-0 gap-2 rounded border border-[#38433a] p-2 sm:grid-cols-2" data-testid="current-word-graph-mapping-draft">
-            <legend className="px-1 text-[#d8e4ca]">USER_PROPOSED role mapping {index + 1}</legend>
+            <legend className="px-1 text-[#d8e4ca]">Your role mapping {index + 1}</legend>
             <label className={labelClass}>
               Whole-word bridge
               <select aria-label={`Bridge for role mapping ${index + 1}`} className={fieldClass} value={mapping.bridgeId} disabled={!identityMatches} onChange={(event) => updateMapping(mapping.mappingId, { bridgeId: event.target.value })}>
                 <option value="">Select a user-proposed bridge</option>
-                {availableBridges.map(({ bridgeId, role }) => <option key={bridgeId} value={bridgeId}>{role} · {bridgeId}</option>)}
+                {availableBridges.map(({ bridgeId, role }) => <option key={bridgeId} value={bridgeId}>{role === "PRIMARY" ? "Primary proposal" : role === "ALTERNATIVE" ? "Alternative proposal" : "Your proposal"}</option>)}
               </select>
             </label>
             <label className={labelClass}>
               Actual computed output
               <select aria-label={`Computed output for role mapping ${index + 1}`} className={fieldClass} value={mapping.symbolOutputId} disabled={!identityMatches} onChange={(event) => updateMapping(mapping.mappingId, { symbolOutputId: event.target.value })}>
                 <option value="">Select an evaluated graph output</option>
-                {computedNodes.map((node) => <option key={node.symbolOutputId} value={node.symbolOutputId}>{node.text} · {node.symbolOutputId}</option>)}
+                {computedNodes.map((node) => <option key={node.symbolOutputId} value={node.symbolOutputId}>{node.text}</option>)}
               </select>
             </label>
             <label className={labelClass}>
-              Proposed functional role · USER_PROPOSED
+              Your proposed functional role
               <input aria-label={`Proposed functional role ${index + 1}`} className={fieldClass} value={mapping.roleLabel} disabled={!identityMatches} onChange={(event) => updateMapping(mapping.mappingId, { roleLabel: event.target.value })} />
             </label>
             <button type="button" disabled={!identityMatches} className="justify-self-start rounded border border-[#58645a] px-2 py-1 text-[#d8e4ca] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#d8bb7a] disabled:opacity-50" aria-label={`Remove role mapping ${index + 1}`} onClick={() => setMappings((previous) => previous.filter(({ mappingId }) => mappingId !== mapping.mappingId))}>Remove role mapping</button>
@@ -361,7 +362,7 @@ export function CurrentWordSymbolicGraphMeaningV0_1({
 
       <div className={cardClass}>
         <label className={labelClass}>
-          Optional alternative reading · USER_PROPOSED
+          Optional alternative reading (your proposal)
           <textarea aria-label="Optional alternative reading" className={fieldClass} rows={2} value={alternativeReadingText} disabled={!identityMatches} onChange={(event) => setAlternativeReadingText(event.target.value)} />
         </label>
       </div>
@@ -372,13 +373,12 @@ export function CurrentWordSymbolicGraphMeaningV0_1({
         <div className="min-w-0" data-testid="current-word-graph-summary">
           <h5 className="font-semibold text-[#f0ddb0]">Functional explanation</h5>
           <p className="mt-1 font-semibold text-[#f5f7fb]" data-testid="current-word-graph-summary-target">
-            {summary.targetWord || "UNKNOWN_OR_NULL"}
+            {summary.targetWord || "Word not available"}
           </p>
           {summary.meaning ? (
             <p className="mt-1 break-words" data-testid="current-word-graph-summary-meaning">
               <span className="font-medium">{summary.meaning.kind === "SOURCE_FACT" ? "Source-reported meaning:" : "Your proposed reading:"}</span>{" "}
               {summary.meaning.text}
-              {summary.meaning.kind === "SOURCE_FACT" ? <span className="text-[#d8bb7a]"> · Source citation not independently verified</span> : null}
             </p>
           ) : (
             <p className="mt-1" data-testid="current-word-graph-summary-meaning-null">Not established</p>
@@ -407,7 +407,7 @@ export function CurrentWordSymbolicGraphMeaningV0_1({
               <ul className="mt-1 list-inside list-disc">
                 {proposedInteractions.map((bridge) => (
                   <li key={bridge.bridgeId}>
-                    {bridge.role || "UNRESOLVED_ROLE"} · USER_PROPOSAL / USER_PROPOSED: {bridge.text}
+                    {bridge.role === "PRIMARY" ? "Primary proposal" : bridge.role === "ALTERNATIVE" ? "Alternative proposal" : "Proposed reading"}: {humanReadableStatusTextV0_1(bridge.text)}
                   </li>
                 ))}
               </ul>
@@ -418,12 +418,11 @@ export function CurrentWordSymbolicGraphMeaningV0_1({
             <p className="mt-2 break-words" data-testid="current-word-graph-summary-source-meanings">
               <span className="font-medium">Source also records:</span>{" "}
               {summary.sourceMeanings.slice(0, 2).map(({ text }) => text).join(" · ")}
-              <span className="text-[#d8bb7a]"> · Source citation not independently verified</span>
               {summary.sourceMeanings.length > 2 ? ` · ${summary.sourceMeanings.length - 2} more in detailed evidence` : ""}
             </p>
           ) : null}
 
-          <p className="mt-2 font-medium" data-testid="current-word-graph-plain-status">Status: {summary.statusLabel}</p>
+          <p className="mt-2 font-medium" data-testid="current-word-graph-plain-status">Status: {humanReadableStatusLabelV0_1(summary.statusLabel)}</p>
           {summary.missingDescription ? (
             <p className="mt-1 break-words text-[#d8bb7a]" data-testid="current-word-graph-summary-missing">{summary.missingDescription}</p>
           ) : null}
@@ -465,6 +464,7 @@ export function CurrentWordSymbolicGraphMeaningV0_1({
 
             <section className="min-w-0" aria-label="Source records and citations">
               <h6 className="font-semibold text-[#f5f7fb]">Source records and citations</h6>
+              {sourceRecords.length ? <p>Source citations are entered references and have not been independently verified.</p> : null}
               {sourceRecords.length ? sourceRecords.map((record) => {
                 const source = record.source;
                 const recordSenses = sourceSenseChoices.filter(({ sourceRecordId }) => sourceRecordId === record.sourceRecordId);
@@ -520,7 +520,7 @@ export function CurrentWordSymbolicGraphMeaningV0_1({
               {edges.length ? (
                 <ul className="list-inside list-disc" data-testid="current-word-graph-relationships">
                   {edges.map((edge) => (
-                    <li key={edge.edgeId}>{edge.edgeId} · {nodeTextById.get(edge.leftNodeId) ?? edge.leftNodeId} —{edge.relationText || "UNKNOWN_OR_NULL"}→ {nodeTextById.get(edge.rightNodeId) ?? edge.rightNodeId} · USER_PROPOSED</li>
+                <li key={edge.edgeId}>{nodeTextById.get(edge.leftNodeId) ?? "Unselected output"} —{edge.relationText || "relationship not entered"}→ {nodeTextById.get(edge.rightNodeId) ?? "Unselected output"} · your proposal</li>
                   ))}
                 </ul>
               ) : <p>UNKNOWN_OR_NULL · no user-proposed graph relationships.</p>}

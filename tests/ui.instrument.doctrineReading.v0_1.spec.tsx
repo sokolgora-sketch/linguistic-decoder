@@ -6,6 +6,7 @@ import { render, screen, within } from "@testing-library/react";
 import { GET } from "../app/api/analyze-v1/route";
 import { adaptAnalysisToTelemetryVM } from "../src/ui/instrument/contractAdapter";
 import { InstrumentPanel } from "../src/ui/instrument/InstrumentPanel";
+import { openInstrumentOverviewDetails } from "./helpers/openInstrumentOverviewDetails";
 
 jest.mock("@/hooks/use-toast", () => ({
   useToast: () => ({ toast: jest.fn() }),
@@ -49,6 +50,7 @@ describe("Open Instrument Seven-Voices doctrine reading UI v0.1", () => {
 
     expect(vm.doctrineReading.kind).toBe("present");
     render(<InstrumentPanel payload={body} />);
+    openInstrumentOverviewDetails();
 
     const card = screen.getByTestId("doctrine-reading-card");
     expect(within(card).getByTestId("doctrine-reading-path")).toHaveTextContent(
@@ -89,6 +91,7 @@ describe("Open Instrument Seven-Voices doctrine reading UI v0.1", () => {
 
   it("renders malformed doctrine output as a visible contract error", () => {
     render(<InstrumentPanel payload={{ word: "x", doctrineReading: "bad" }} />);
+    openInstrumentOverviewDetails();
 
     expect(screen.getByTestId("doctrine-reading-malformed")).toBeVisible();
     expect(screen.getByText("Seven-Voices doctrinal reading unavailable")).toBeVisible();
@@ -126,6 +129,7 @@ describe("Open Instrument Seven-Voices doctrine reading UI v0.1", () => {
     expect(body.doctrineReading).toBeNull();
 
     render(<InstrumentPanel payload={body} />);
+    openInstrumentOverviewDetails();
 
     expect(screen.queryByTestId("doctrine-reading-card")).not.toBeInTheDocument();
   });
@@ -136,6 +140,7 @@ describe("Open Instrument Seven-Voices doctrine reading UI v0.1", () => {
     expect(body.doctrineReading.level3WholePathReading).toBeUndefined();
 
     render(<InstrumentPanel payload={body} />);
+    openInstrumentOverviewDetails();
 
     const card = screen.getByTestId("doctrine-reading-card");
     expect(within(card).getByTestId("doctrine-reading-path")).toHaveTextContent("Ë → A → Ë");

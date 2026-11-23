@@ -1,10 +1,17 @@
 #!/usr/bin/env tsx
 
+import { readFileSync } from "node:fs";
 import { mkdir, writeFile } from "node:fs/promises";
+import { execFileSync } from "node:child_process";
 import { tmpdir } from "node:os";
 import { join, relative } from "node:path";
 import { chromium, type Browser, type Locator, type Page, type Request } from "playwright";
 import { startNextServer } from "../../tests/helpers/ownedNextServer";
+import {
+  resolveStructuralSmokeCheckoutHeadSha,
+  resolveStructuralSmokeGitProvenance,
+  type StructuralSmokeGitProvenance,
+} from "./structuralSmokeGitProvenance.v0.1";
 
 type SmokeCase = {
   word: string;
@@ -129,9 +136,8 @@ type InterpretationCaseResult = {
 };
 
 type SmokeReport = {
-  schemaVersion: "open-instrument.structural-and-interpretation-browser-smoke.v0.3";
-  currentHead: string | null;
-  expectedMain: string;
+  schemaVersion: "open-instrument.structural-and-interpretation-browser-smoke.v0.4";
+  gitProvenance: StructuralSmokeGitProvenance | null;
   page: string;
   browser: { name: string; version: string } | null;
   analyzeInteractions: number;
@@ -300,9 +306,8 @@ async function main(): Promise<void> {
   await mkdir(screenshotDirectory, { recursive: true });
 
   const report: SmokeReport = {
-    schemaVersion: "open-instrument.structural-and-interpretation-browser-smoke.v0.3",
-    currentHead: process.env.OPEN_INSTRUMENT_PR_HEAD ?? null,
-    expectedMain: "8a172fe697fbcd2c1a93f3b0baaa96ca6f3b52f4",
+    schemaVersion: "open-instrument.structural-and-interpretation-browser-smoke.v0.4",
+    gitProvenance: null,
     page: "/chat?debug=1",
     browser: null,
     analyzeInteractions: 0,
@@ -333,10 +338,21 @@ async function main(): Promise<void> {
   const localRequestFailures: string[] = [];
 
   try {
-    assert(
-      report.currentHead !== null && /^[a-f0-9]{40}$/iu.test(report.currentHead),
-      "OPEN_INSTRUMENT_PR_HEAD must contain the exact 40-character GitHub PR head SHA.",
-    );
+    const eventPayloadPath = process.env.GITHUB_EVENT_PATH;
+    let eventPayload: unknown = null;
+    if (eventPayloadPath) eventPayload = JSON.parse(readFileSync(eventPayloadPath, "utf8"));
+    report.gitProvenance = resolveStructuralSmokeGitProvenance({
+      eventName: process.env.GITHUB_EVENT_NAME ?? null,
+      eventPayload,
+      checkoutHeadSha: resolveStructuralSmokeCheckoutHeadSha(
+        process.env.GITHUB_SHA ?? null,
+        () => execFileSync("git", ["rev-parse", "HEAD"], { encoding: "utf8" }).trim(),
+      ),
+      explicitFeatureHeadSha: process.env.OPEN_INSTRUMENT_PR_HEAD ?? null,
+      explicitBaseRef: process.env.OPEN_INSTRUMENT_PR_BASE_REF ?? null,
+      explicitBaseSha: process.env.OPEN_INSTRUMENT_PR_BASE_SHA ?? null,
+      githubSha: process.env.GITHUB_SHA ?? null,
+    });
     server = await startNextServer("start");
     const localOrigin = new URL(server.base).origin;
     browser = await chromium.launch({ headless: true });
@@ -627,6 +643,22 @@ async function main(): Promise<void> {
           await ensureControlUnobscured(control, name);
           await control.click();
         };
+        const inspectTechnicalDisclosure = async (
+          disclosure: Locator,
+          label: string,
+          expectedDetails: string[],
+        ): Promise<string> => {
+          assert(await disclosure.getAttribute("open") === null, `${label} should be collapsed by default.`);
+          const summary = disclosure.locator(":scope > summary");
+          await clickControl(summary, `${label} disclosure`);
+          const detailsText = await disclosure.innerText();
+          for (const expected of expectedDetails) {
+            assert(detailsText.includes(expected), `${label} did not retain ${expected}.`);
+          }
+          await clickControl(summary, `Close ${label} disclosure`);
+          assert(await disclosure.getAttribute("open") === null, `${label} disclosure did not close.`);
+          return detailsText;
+        };
         const checkControl = async (label: string): Promise<void> => {
           const control = workbench.getByLabel(label, { exact: true });
           await ensureControlUnobscured(control, label);
@@ -683,12 +715,18 @@ async function main(): Promise<void> {
           const proposal = workbench.getByTestId("single-word-proposal-result");
           interpretation.proposalStatus = "PROPOSED";
           interpretation.strictEmbryoMeaning = "UNKNOWN_OR_NULL";
-          assert((await proposal.innerText()).includes("PROPOSED"), "Functional proposal was not kept as PROPOSED.");
-          assert((await proposal.innerText()).includes("Strict embryo meaning: Unknown / Null"), "Strict embryo meaning was promoted.");
-          assert((await proposal.innerText()).includes("A → I"), "The complete written Voice path changed after mechanical replay.");
-          assert((await proposal.innerText()).includes("historical origin: not claimed"), "Mechanical replay promoted historical origin.");
+          const proposalText = await proposal.innerText();
+          assert(proposalText.includes("Exploratory proposal by you"), "The user-facing proposal classification was missing.");
+          assert(proposalText.includes("A → I"), "The complete written Voice path changed after mechanical replay.");
+          assert(proposalText.includes("have"), "The user's proposed meaning was not retained.");
+          assert(!/\b(?:PROPOSED|UNKNOWN_OR_NULL|no_single_winner|user_decides|sourceAuthorityPromotion|historicalOrigin|NOT_CLAIMED)\b/u.test(proposalText), "Internal proposal status leaked into ordinary user-facing text.");
+          const proposalStatusDetails = proposal.getByTestId("single-word-proposal-contract-details");
+          await inspectTechnicalDisclosure(proposalStatusDetails, "Exact proposal statuses", [
+            "Candidate status: PROPOSED",
+            "Strict embryo meaning: UNKNOWN_OR_NULL",
+            "historical origin: NOT_CLAIMED",
+          ]);
           assert(await workbench.getByLabel("Component 1 evidence status", { exact: true }).inputValue() === "USER_PROPOSED", "Manual source inspection promoted component evidence status.");
-          assert((await proposal.innerText()).includes("have"), "The user's proposed meaning was not retained.");
 
           const addOperationButton = workbench.getByTestId("single-word-add-mechanical-operation");
           await clickControl(addOperationButton, "Add mechanical operation");
@@ -701,10 +739,11 @@ async function main(): Promise<void> {
           const mechanicalText = await mechanical.innerText();
           assert(mechanicalText.includes("Raw component concatenation: KANDILL"), "KANDIL raw concatenation was incorrect.");
           assert(mechanicalText.includes("Final mechanical spelling: KANDIL"), "KANDIL replay result was incorrect.");
-          assert(mechanicalText.includes("Exact comparison: MATCH"), "KANDIL exact comparison was incorrect.");
-          assert(mechanicalText.includes("DIGRAPH_REMOVED"), "KANDIL LL digraph impact was not reported.");
-          assert(mechanicalText.includes("USER_DECLARED_UNVERIFIED"), "KANDIL mechanical authority was not explicitly unverified.");
-          assert(mechanicalText.includes("linguistic validity NOT_ASSESSED"), "KANDIL replay was promoted to a linguistic-validity assessment.");
+          assert(mechanicalText.includes("Exact comparison: Matches"), "KANDIL exact comparison was not human-readable.");
+          assert(mechanicalText.includes("has not been linguistically assessed"), "KANDIL replay authority boundary was missing.");
+          assert(!/\b(?:DIGRAPH_REMOVED|USER_DECLARED_UNVERIFIED|NOT_ASSESSED|EXAMINED)\b/u.test(mechanicalText), "Mechanical status codes leaked into ordinary user-facing text.");
+          await inspectTechnicalDisclosure(mechanical.getByTestId("single-word-mechanical-technical-details"), "KANDIL operation trace and warnings", ["DIGRAPH_REMOVED"]);
+          await inspectTechnicalDisclosure(mechanical.getByTestId("single-word-mechanical-authority-details"), "KANDIL replay authority", ["USER_DECLARED_UNVERIFIED", "NOT_ASSESSED"]);
           interpretation.rawConcatenation = "KANDILL";
           interpretation.finalMechanicalSpelling = "KANDIL";
           interpretation.exactComparison = "MATCH";
@@ -741,9 +780,11 @@ async function main(): Promise<void> {
           assert(await mechanical.getAttribute("data-status") === "EXAMINED", "DRITARE mechanical replay was not examined.");
           assert(mechanicalText.includes("Raw component concatenation: DRITHARE"), "DRITARE raw concatenation was incorrect.");
           assert(mechanicalText.includes("Final mechanical spelling: DRITARE"), "DRITARE replay result was incorrect.");
-          assert(mechanicalText.includes("DIGRAPH_CROSSES_COMPONENT_BOUNDARY") && mechanicalText.includes("DIGRAPH_REMOVED"), "DRITARE TH boundary impact was not reported.");
-          assert(mechanicalText.includes("USER_DECLARED_UNVERIFIED"), "DRITARE mechanical authority was not explicitly unverified.");
-          assert(mechanicalText.includes("linguistic validity NOT_ASSESSED"), "DRITARE replay was promoted to a linguistic-validity assessment.");
+          assert(mechanicalText.includes("Exact comparison: Matches"), "DRITARE exact comparison was not human-readable.");
+          assert(mechanicalText.includes("has not been linguistically assessed"), "DRITARE replay authority boundary was missing.");
+          assert(!/\b(?:DIGRAPH_CROSSES_COMPONENT_BOUNDARY|DIGRAPH_REMOVED|USER_DECLARED_UNVERIFIED|NOT_ASSESSED|EXAMINED)\b/u.test(mechanicalText), "DRITARE mechanical status codes leaked into ordinary user-facing text.");
+          await inspectTechnicalDisclosure(mechanical.getByTestId("single-word-mechanical-technical-details"), "DRITARE operation trace and warnings", ["DIGRAPH_CROSSES_COMPONENT_BOUNDARY", "DIGRAPH_REMOVED"]);
+          await inspectTechnicalDisclosure(mechanical.getByTestId("single-word-mechanical-authority-details"), "DRITARE replay authority", ["USER_DECLARED_UNVERIFIED", "NOT_ASSESSED"]);
           assert(await workbench.getByLabel("Component 2 exact spelling", { exact: true }).inputValue() === "HARE", "The user spelling HARE was silently changed.");
           interpretation.rawConcatenation = "DRITHARE";
           interpretation.finalMechanicalSpelling = "DRITARE";
@@ -907,6 +948,13 @@ async function main(): Promise<void> {
           result.structuralReadoutStatus = "UNSUPPORTED_STRUCTURAL_INPUT_NULL";
           result.sourceStatus = "UNKNOWN_OR_NULL";
         } else {
+          const overviewDetails = page.getByTestId("instrument-tab-details-overview");
+          assert(
+            await overviewDetails.getAttribute("open") === null,
+            `Expanded Overview details should remain collapsed by default for ${testCase.word}.`,
+          );
+          await overviewDetails.locator(":scope > summary").click();
+
           await page.waitForFunction((target) => {
             const word = document.querySelector('[data-testid="instrument-word"]')?.textContent ?? "";
             const voicePath = document.querySelector('[data-testid="albanian-structural-voice-path"]')?.textContent ?? "";

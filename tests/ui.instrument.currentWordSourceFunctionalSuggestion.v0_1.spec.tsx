@@ -1,12 +1,14 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { fireEvent, render, screen, within } from "@testing-library/react";
 import {
   buildCurrentWordDaAnchoredEmbryoCandidateV0_1,
   buildCurrentWordFunctionalReasoningV0_1,
   buildCurrentWordExploratoryMotivationV0_1,
   buildCurrentWordSourceFunctionalSuggestionV0_1,
+  functionalFamilySourceLookupFormsV0_1,
   projectFreeOperatorFamilyFunctionalNetworkV0_1,
   type CurrentWordSourceFunctionalSuggestionDraftV0_1,
   type RuntimeAlbanianSourceSenseSelectionV0_1,
+  type RuntimeFjaloriFamilyFormResponseV0_1,
   type RuntimeFjaloriSourceResponseV0_1,
 } from "@/ui/instrument/sections/currentWordSourceFunctionalSuggestionAdapter.v0_1";
 import { DA_FREE_OPERATOR_PROFILE_V0_1, DI_FREE_OPERATOR_PROFILE_V0_1 } from "@/shared/freeOperatorProfile.v0_1";
@@ -161,6 +163,50 @@ function runtimeFjaloriResponse(
   };
 }
 
+function familyFjaloriResponse(
+  form: string,
+  options: Readonly<{
+    senses?: Extract<RuntimeFjaloriFamilyFormResponseV0_1, { status: "available" }>["senses"];
+    description?: string | null;
+  }> = {},
+): RuntimeFjaloriFamilyFormResponseV0_1 {
+  const canonical = form.normalize("NFC").toLocaleLowerCase("sq-AL");
+  return {
+    requestKey: `${canonical}\u0000${canonical}`,
+    queryForm: canonical,
+    status: "available",
+    exactSourceForm: canonical,
+    apiUrl: `https://fjalorishqip.org/api/v1/fjala/${encodeURIComponent(canonical)}.json`,
+    licence: "CC BY-SA 4.0",
+    analysisLanguage: "sq",
+    analysisVariety: "Standard Albanian",
+    recordSources: ["en-wiktionary", "editor", "ai"],
+    description: options.description === null ? null : {
+      text: options.description ?? `Synthetic description fixture for ${canonical}`,
+      source: "ai",
+      attribution: "Synthetic fixture attribution; not live-source evidence",
+    },
+    senses: options.senses ?? [],
+  };
+}
+
+function unavailableFamilyResponse(form: string): RuntimeFjaloriFamilyFormResponseV0_1 {
+  const canonical = form.normalize("NFC").toLocaleLowerCase("sq-AL");
+  return {
+    requestKey: `${canonical}\u0000${canonical}`,
+    queryForm: canonical,
+    status: "http-not-found",
+    httpStatus: 404,
+    exactSourceForm: null,
+    apiUrl: `https://fjalorishqip.org/api/v1/fjala/${encodeURIComponent(canonical)}.json`,
+    licence: null,
+    analysisLanguage: "sq",
+    analysisVariety: "Standard Albanian",
+    recordSources: [],
+    senses: [],
+  };
+}
+
 describe("automatic current-word functional reasoning", () => {
   function project(
     word: string,
@@ -228,6 +274,176 @@ describe("automatic current-word functional reasoning", () => {
     ]));
     expect(projection.exactCodePoints).toEqual(Array.from("NDARJE").map((character, position) => ({ character, position })));
     expect(projection.writtenVoices).toEqual([{ voice: "A", position: 2 }, { voice: "E", position: 5 }]);
+  });
+
+  it("builds an unranked source-aware DA-family action-to-event network while leaving the intermediate state Null", () => {
+    const verb = (entryIndex: number, senseIndex: number, gloss: string) => ({
+      entryIndex,
+      senseIndex,
+      partOfSpeech: "verb",
+      gloss,
+      glossLanguage: "en" as const,
+      senseSource: "en-wiktionary",
+      tags: [],
+      entrySources: ["en-wiktionary", "editor"],
+    });
+    const daj = familyFjaloriResponse("DAJ", {
+      senses: [verb(1, 1, "to divide"), {
+        entryIndex: 2,
+        senseIndex: 1,
+        partOfSpeech: "noun",
+        gloss: "maternal uncle",
+        glossLanguage: "en",
+        senseSource: "editor",
+        tags: [],
+        entrySources: ["editor"],
+      }],
+    });
+    const ndaj = familyFjaloriResponse("NDAJ", {
+      description: "Bëj që diçka e tërë të bëhet në disa pjesë.",
+      senses: [verb(2, 1, "to divide, separate a whole into several parts"), {
+        entryIndex: 1,
+        senseIndex: 2,
+        partOfSpeech: "preposition",
+        gloss: "towards; against",
+        glossLanguage: "en",
+        senseSource: "editor",
+        tags: [],
+        entrySources: ["editor"],
+      }],
+    });
+    const response: RuntimeFjaloriSourceResponseV0_1 = {
+      ...runtimeFjaloriResponse("NDARJE", ["division; separation"]),
+      description: {
+        text: "Ndarja e diçkaje në pjesë.",
+        source: "ai",
+        attribution: "Synthetic fixture attribution; not live-source evidence",
+      },
+      familyFormResponses: [daj, ndaj, unavailableFamilyResponse("NDARË"), unavailableFamilyResponse("NDARE")],
+    };
+    const projection = project("NDARJE", response);
+    const candidate = projection.candidates[0];
+    const network = candidate.familyNetwork;
+
+    expect(functionalFamilySourceLookupFormsV0_1("NDARJE", "sq")).toEqual(["daj", "ndaj", "ndarë", "ndare"]);
+    expect(functionalFamilySourceLookupFormsV0_1("STUDIM", "sq")).toEqual([]);
+    expect(functionalFamilySourceLookupFormsV0_1("DAMAGE", "en")).toEqual([]);
+    expect(network.transitionNetworks).toHaveLength(2);
+    expect(network.transitionNetworks.map(({ familyForm }) => familyForm)).toEqual(["daj", "ndaj"]);
+    expect(network.transitionNetworks.every(({ status, intermediateState, evidenceStatus, claimLayer, relationSourceRefs }) =>
+      status === "PROPOSED_ACTION_TO_EVENT" && intermediateState === "UNKNOWN_OR_NULL" &&
+      evidenceStatus === "USER_PROPOSED" && claimLayer === "EXPLORATORY_HYPOTHESIS" && relationSourceRefs.length === 0,
+    )).toBe(true);
+    expect(network.transitionNetworks[0]).toMatchObject({
+      semanticOperation: "ACTION_TO_NOMINAL_EVENT_OR_RESULT_PROPOSAL",
+      familyEvidenceStatus: "CITATION_ENTERED_UNVERIFIED",
+      targetEvidenceStatus: "CITATION_ENTERED_UNVERIFIED",
+      unresolvedDependencies: expect.arrayContaining([
+        "No exact intermediate state/result sense is available",
+      ]),
+    });
+    expect(network.functionalEquation).toContain("DA function “to split, cut, divide” (reviewed)");
+    expect(network.functionalEquation).toContain("NDAJ (verb: to divide, separate a whole into several parts");
+    expect(network.functionalEquation).toContain("proposed action-to-event relation");
+    expect(network.functionalEquation).toContain("NDARJE (division; separation");
+    expect(network.familySourceRecords.find(({ form }) => form === "ndaj")?.description?.text)
+      .toBe("Bëj që diçka e tërë të bëhet në disa pjesë.");
+    expect(network.familySourceRecords.find(({ form }) => form === "daj")?.senses.map(({ gloss }) => gloss))
+      .toEqual(["to divide", "maternal uncle"]);
+    expect(network.familySourceRecords.find(({ form }) => form === "ndarë")).toMatchObject({
+      responseStatus: "http-not-found",
+      evidenceStatus: "UNKNOWN_OR_NULL",
+      exactSourceForm: null,
+    });
+    expect(network.reasoningSteps).toEqual(expect.arrayContaining([
+      expect.objectContaining({ relationshipType: "FAMILY_ACTION_TO_TARGET_EVENT_HYPOTHESIS", evidenceStatus: "USER_PROPOSED", relationSourceRefs: [] }),
+      expect.objectContaining({ relationshipType: "INTERMEDIATE_STATE_UNKNOWN", evidenceStatus: "UNKNOWN_OR_NULL", output: null }),
+    ]));
+    expect(network.explanation).toContain("neither source reports a relation between the forms");
+    expect(network.explanation).toContain("intermediate changed state");
+    expect(candidate.selectionStatus).toBe("UNSELECTED");
+    expect(candidate.noSingleWinner).toBe(true);
+    expect(candidate.userDecisionPosture).toBe("user_decides");
+    expect(candidate.wholeWordStatus).toBe("PARTIAL_NULL");
+    expect(candidate.sourceAuthorityPromotion).toBe("NONE");
+    expect(candidate.historicalOrigin).toBe("NOT_CLAIMED");
+    expect(projection.exactCodePoints).toEqual(Array.from("NDARJE").map((character, position) => ({ character, position })));
+    expect(projection.writtenVoices).toEqual([{ voice: "A", position: 2 }, { voice: "E", position: 5 }]);
+  });
+
+  it("rejects mismatched family response identity and keeps the prior bounded candidate without contamination", () => {
+    const mismatchedNdaj = {
+      ...familyFjaloriResponse("NDAJ", { senses: [{
+        entryIndex: 1,
+        senseIndex: 1,
+        partOfSpeech: "verb",
+        gloss: "to divide",
+        glossLanguage: "en" as const,
+        senseSource: "editor",
+        tags: [],
+        entrySources: ["editor"],
+      }] }),
+      exactSourceForm: "ndare",
+    };
+    const projection = project("NDARJE", {
+      ...runtimeFjaloriResponse("NDARJE", ["division; separation"]),
+      familyFormResponses: [mismatchedNdaj],
+    });
+    const candidate = projection.candidates[0];
+    expect(candidate).toBeDefined();
+    expect(candidate.familyNetwork.transitionNetworks).toEqual([]);
+    expect(candidate.familyNetwork.familySourceRecords.find(({ form }) => form === "ndaj")).toMatchObject({
+      responseStatus: "invalid",
+      evidenceStatus: "UNKNOWN_OR_NULL",
+      exactSourceForm: null,
+      reasonCodes: ["FAMILY_SOURCE_IDENTITY_OR_PROVENANCE_INVALID"],
+    });
+    expect(candidate.familyNetwork.functionalEquation).toContain("proposed action-to-noun relation");
+    expect(candidate.familyNetwork.status).toBe("CONDITIONAL_FAMILY_READING");
+  });
+
+  it("does not require optional AI record descriptions when exact family and target senses are available", () => {
+    const family = familyFjaloriResponse("NDAJ", {
+      description: null,
+      senses: [{
+        entryIndex: 1,
+        senseIndex: 1,
+        partOfSpeech: "verb",
+        gloss: "to divide, separate a whole into parts",
+        glossLanguage: "en",
+        senseSource: "en-wiktionary",
+        tags: [],
+        entrySources: ["en-wiktionary"],
+      }],
+    });
+    const response: RuntimeFjaloriSourceResponseV0_1 = {
+      ...runtimeFjaloriResponse("NDARJE", ["division; separation"]),
+      description: null,
+      familyFormResponses: [family],
+    };
+    const candidate = project("NDARJE", response).candidates[0];
+
+    expect(candidate.familyNetwork.transitionNetworks).toHaveLength(1);
+    expect(candidate.familyNetwork.transitionNetworks[0]).toMatchObject({
+      familySourceDescription: null,
+      targetSourceDescription: null,
+      semanticOperation: "ACTION_TO_NOMINAL_EVENT_OR_RESULT_PROPOSAL",
+      status: "PROPOSED_ACTION_TO_EVENT",
+    });
+    expect(candidate.familyNetwork.transitionNetworks[0].explanation).toContain("neither source reports a relation");
+    expect(candidate.familyNetwork.wholeWordStatus).toBe("PARTIAL_NULL");
+  });
+
+  it("retains the NDARJE source sense when its exact gloss is only division", () => {
+    const projection = project("NDARJE", runtimeFjaloriResponse("NDARJE", ["division"]));
+
+    expect(projection.candidates).toHaveLength(1);
+    expect(projection.candidates[0].targetSource.glosses).toEqual(["division"]);
+    expect(projection.candidates[0].familyNetwork.status).toBe("CONDITIONAL_FAMILY_READING");
+    expect(projection.candidates[0].familyNetwork.target).toMatchObject({
+      exactForm: "ndarje",
+      senseText: "division",
+    });
   });
 
   it("runs the same mechanism for DIJE while retaining candidate-only authorization and Null for JE and both Voices", () => {
@@ -775,21 +991,29 @@ describe("current-word source functional suggestion v0.1", () => {
     expect(network).toHaveTextContent("divided");
     expect(network).toHaveTextContent("NDARJE");
     expect(network).toHaveTextContent("division; separation");
-    expect(network).toHaveTextContent("EXPLORATORY_HYPOTHESIS");
-    expect(network).toHaveTextContent("UNSELECTED");
-    expect(network).toHaveTextContent("PARTIAL_NULL");
-    expect(network).toHaveTextContent("sourceAuthorityPromotion NONE");
-    expect(network).toHaveTextContent("historicalOrigin NOT_CLAIMED");
-    expect(network).toHaveTextContent("no_single_winner / user_decides");
+    expect(network).toHaveTextContent("Proposed embryo-to-family-to-word reading");
+    expect(network).not.toHaveTextContent(/EXPLORATORY_HYPOTHESIS|PARTIAL_NULL|no_single_winner|user_decides/);
+    const generatedReading = screen.getByTestId("current-word-da-generated-functional-reading");
+    expect(generatedReading).toHaveTextContent("The relation beyond the exact overlap remains Not established; no derivation is asserted.");
+    expect(generatedReading).not.toHaveTextContent("UNKNOWN_OR_NULL");
+    expect(network).toHaveTextContent("unselected");
+    expect(network).toHaveTextContent("not verified");
+    expect(network).toHaveTextContent("you decide");
+    const mappingLabel = screen.getByTestId("current-word-da-mapping-label");
+    expect(mappingLabel).toHaveTextContent("Possible DA match at code-point span [1,3)");
+    expect(mappingLabel).toHaveTextContent("spelling overlap, not an established word part");
+    expect(mappingLabel).toHaveTextContent("Any link to the selected meaning is a proposal");
+    expect(mappingLabel).toHaveClass("min-w-0", "[overflow-wrap:anywhere]");
+    expect(mappingLabel).not.toHaveTextContent(/DERIVED_STRUCTURE|USER_PROPOSED|EXPLORATORY_HYPOTHESIS/);
     expect(screen.getByTestId("current-word-da-candidate-structure")).toHaveTextContent(
       "N@0 · D@1 · A@2 · R@3 · J@4 · E@5 · written Voices A@2 → E@5",
     );
     expect(screen.getByLabelText("Propose DA at code-point span 1 to 3")).not.toBeChecked();
     expect(screen.getByTestId("current-word-source-functional-manual-fallback")).not.toHaveAttribute("open");
     const unresolved = screen.getByTestId("current-word-da-generated-unresolved");
-    expect(unresolved).toHaveTextContent("N@0 functional association UNKNOWN_OR_NULL");
-    expect(unresolved).toHaveTextContent("R@3 functional association UNKNOWN_OR_NULL");
-    expect(unresolved).toHaveTextContent("J@4 functional association UNKNOWN_OR_NULL");
+    expect(unresolved).toHaveTextContent("N@0 functional association Not established");
+    expect(unresolved).toHaveTextContent("R@3 functional association Not established");
+    expect(unresolved).toHaveTextContent("J@4 functional association Not established");
   });
 
   it.each([
@@ -904,17 +1128,21 @@ describe("current-word source functional suggestion v0.1", () => {
         runtimeSourceStatus={{ status: "SOURCE_NOT_FOUND", reasonCode: "ALBANIAN_EXACT_FORM_NOT_FOUND" }}
       />,
     );
-    expect(screen.getByTestId("current-word-source-suggestion-runtime-status")).toHaveTextContent("SOURCE_NOT_FOUND");
-    expect(screen.getByTestId("current-word-exploratory-null")).toHaveTextContent("SOURCE_SENSE_NOT_SELECTED");
-    expect(screen.getByTestId("current-word-source-functional-null")).toHaveTextContent("UNKNOWN_OR_NULL");
+    expect(screen.getByTestId("current-word-source-suggestion-runtime-status")).toHaveTextContent("No exact source record found");
+    expect(screen.getByTestId("current-word-exploratory-null")).toHaveTextContent("No conditional explanation is available yet");
+    const sourceNull = screen.getByTestId("current-word-source-functional-null");
+    expect(sourceNull).toHaveTextContent("No source-linked suggestion is available from the current inputs.");
+    expect(sourceNull).not.toHaveTextContent(/UNKNOWN_OR_NULL|SOURCE_SENSE_NOT_SELECTED/);
+    const technicalReasons = within(sourceNull).getByText("Technical reasons").closest("details");
+    expect(technicalReasons).not.toHaveAttribute("open");
     expect(screen.queryByTestId("current-word-source-functional-suggestion-text")).not.toBeInTheDocument();
 
     fillNdarjeForm();
     expect(screen.getByTestId("current-word-source-functional-suggestion-text")).toHaveTextContent("NDARJE: Action/process corresponding to the verb function");
     expect(screen.getByTestId("current-word-source-functional-suggestion-text")).toHaveTextContent("separate things or people that are together; divide a whole into parts");
-    expect(screen.getByTestId("current-word-source-functional-suggestion-text").parentElement).toHaveTextContent("LOGICAL_INFERENCE");
-    expect(screen.getByTestId("current-word-source-functional-suggestion-text").parentElement).toHaveTextContent("CITATION_ENTERED_UNVERIFIED");
-    expect(screen.getByTestId("current-word-source-functional-suggestion-text").parentElement).toHaveTextContent("NOT_ASSESSED");
+    const visibleSuggestion = screen.getByTestId("current-word-source-functional-suggestion-result");
+    expect(visibleSuggestion).toHaveTextContent("This is an inference from information you entered");
+    expect(visibleSuggestion).not.toHaveTextContent(/LOGICAL_INFERENCE|CITATION_ENTERED_UNVERIFIED|NOT_ASSESSED/);
     expect(screen.getByTestId("current-word-source-functional-alternative")).toHaveTextContent("Part or compartment");
     expect(screen.getByTestId("current-word-source-functional-relation")).toHaveTextContent("Why suggested");
     expect(screen.getByTestId("current-word-source-functional-details")).not.toHaveAttribute("open");
@@ -923,6 +1151,8 @@ describe("current-word source functional suggestion v0.1", () => {
     expect(screen.getByText(/source authority promotion: NONE/)).toBeInTheDocument();
     expect(screen.getByText(/Unassigned target Voice roles: A@2, E@5 · UNKNOWN_OR_NULL/)).toBeInTheDocument();
     expect(screen.getByText(/Unassigned consonant associations: N@0, D@1, R@3, J@4 · UNKNOWN_OR_NULL/)).toBeInTheDocument();
+    expect(screen.getByTestId("current-word-source-functional-details")).toHaveTextContent("CITATION_ENTERED_UNVERIFIED");
+    expect(screen.getByTestId("current-word-source-functional-details")).toHaveTextContent("NOT_ASSESSED");
   });
 
   it("generates a conditional reading from the selected runtime sense and computed evaluator outputs", () => {
@@ -1196,16 +1426,16 @@ describe("current-word source functional suggestion v0.1", () => {
     const { rerender } = render(<CurrentWordSourceFunctionalSuggestionV0_1 {...props} />);
     const checkbox = screen.getByLabelText("Propose DA at code-point span 1 to 3");
     expect(checkbox).not.toBeChecked();
-    expect(screen.getByTestId("current-word-da-not-selected")).toHaveTextContent("no target mapping or interpretation is selected automatically");
+    expect(screen.getByTestId("current-word-da-not-selected")).toHaveTextContent("No target mapping or interpretation is selected automatically");
     expect(screen.getByTestId("current-word-source-functional-manual-fallback")).not.toHaveAttribute("open");
 
     fireEvent.click(checkbox);
     expect(screen.getByTestId("current-word-exploratory-explanation")).toHaveTextContent("may help motivate");
     expect(screen.getByTestId("current-word-da-computed-operations")).toHaveTextContent("A@2");
     expect(screen.getByTestId("current-word-da-overlapping-voices")).toHaveTextContent("A@2");
-    expect(screen.getByTestId("current-word-exploratory-selected-sense")).toHaveTextContent("SOURCE_FACT");
+    expect(screen.getByTestId("current-word-exploratory-selected-sense")).toHaveTextContent("Source-reported meaning");
     expect(screen.getByTestId("current-word-exploratory-alternatives")).toHaveTextContent("a divided part");
-    expect(screen.getByTestId("current-word-exploratory-decision")).toHaveTextContent("no_single_winner · user_decides");
+    expect(screen.getByTestId("current-word-exploratory-decision")).toHaveTextContent("No interpretation is selected automatically; you decide.");
     expect(screen.getAllByTestId("current-word-exploratory-explanation")).toHaveLength(1);
     expect(screen.queryByTestId("current-word-exploratory-computed-contributions")).not.toBeInTheDocument();
     fireEvent.click(screen.getByText("View DA candidate trace and evidence"));
@@ -1256,8 +1486,7 @@ describe("current-word source functional suggestion v0.1", () => {
       evaluation={evaluation}
     />);
     fireEvent.click(screen.getByLabelText("Propose DA at code-point span 1 to 3"));
-    expect(screen.getByTestId("current-word-da-proposal-null")).toHaveTextContent("PARTIAL_NULL");
-    expect(screen.getByTestId("current-word-da-proposal-null")).toHaveTextContent("NO_VERIFIABLY_COMPUTED_VOICE_OUTPUTS");
+    expect(screen.getByTestId("current-word-da-proposal-null")).toHaveTextContent("This proposal is incomplete because required computed inputs or source support are missing.");
     expect(screen.getByTestId("current-word-da-candidate-details")).toHaveTextContent("EXPLORATORY_HYPOTHESIS / USER_PROPOSED");
     expect(screen.queryByTestId("current-word-exploratory-explanation")).not.toBeInTheDocument();
   });
@@ -1336,7 +1565,7 @@ describe("current-word source functional suggestion v0.1", () => {
         identityMatches={false}
       />,
     );
-    expect(screen.getByTestId("current-word-source-suggestion-identity-null")).toHaveTextContent("PARTIAL_NULL");
+    expect(screen.getByTestId("current-word-source-suggestion-identity-null")).toHaveTextContent("The draft word does not match the analyzed form NDARJE");
     expect(screen.queryByLabelText("Exact source target form")).not.toBeInTheDocument();
     expect(screen.queryByTestId("current-word-source-functional-suggestion-text")).not.toBeInTheDocument();
   });
@@ -1361,10 +1590,15 @@ describe("current-word source functional suggestion v0.1", () => {
         } as never}
       />,
     );
-    expect(screen.getByTestId("current-word-source-functional-null")).toHaveTextContent("UNKNOWN_OR_NULL");
-    expect(screen.getByLabelText("Spectrum association for D at position 1")).toHaveValue("");
-    expect(screen.getByLabelText("Voice operator for A@2")).toHaveValue("");
-    expect(screen.getByTestId("current-word-symbolic-result")).toHaveTextContent("UNKNOWN_OR_NULL");
+    expect(screen.getByTestId("current-word-source-functional-null")).toHaveTextContent("No source-linked suggestion is available from the current inputs.");
+    const spectrumSelect = screen.getByLabelText("Spectrum association for D at position 1");
+    const voiceSelect = screen.getByLabelText("Voice operator for A@2");
+    expect(spectrumSelect).toHaveValue("");
+    expect(spectrumSelect).toHaveTextContent("division · Proposed; not source-reported");
+    expect(voiceSelect).toHaveValue("");
+    expect(voiceSelect).toHaveTextContent("INITIATE / GROUND · Proposed; not source-reported");
+    expect(spectrumSelect).not.toHaveTextContent("Proposed by you");
+    expect(screen.getByTestId("current-word-symbolic-result")).toHaveTextContent("No complete Voice operation has been selected.");
 
     fireEvent.change(screen.getByLabelText("Spectrum association for D at position 1"), { target: { value: "d:division" } });
     fireEvent.change(screen.getByLabelText("Voice operator for A@2"), { target: { value: "voice-a:initiate-ground" } });
@@ -1375,6 +1609,8 @@ describe("current-word source functional suggestion v0.1", () => {
       expect.stringContaining("initiated(division)"),
       expect.stringContaining("expanded(initiated(division))"),
     ]);
-    expect(screen.getAllByTestId("current-word-symbolic-computed-output").every((node) => node.textContent?.includes("USER_PROPOSED / EXPLORATORY_HYPOTHESIS"))).toBe(true);
+    const outputs = screen.getAllByTestId("current-word-symbolic-computed-output");
+    expect(outputs.every((node) => node.textContent?.includes("Computed from your proposed choices"))).toBe(true);
+    expect(outputs.every((node) => !/USER_PROPOSED|EXPLORATORY_HYPOTHESIS/.test(node.textContent ?? ""))).toBe(true);
   });
 });

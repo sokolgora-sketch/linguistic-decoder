@@ -483,17 +483,19 @@ describe("Single-word motivation workbench v0.1", () => {
 
     const evidence = screen.getByTestId("single-word-current-evidence");
     expect(evidence).toHaveTextContent("KANDIL");
-    expect(evidence).toHaveTextContent("MATCHES_FOUND");
+    expect(evidence).toHaveTextContent("Matching records found");
     expect(evidence).toHaveTextContent("fixture:source-record-1");
-    expect(evidence).toHaveTextContent("fixture-sense-1: fixture gloss one");
-    expect(evidence).toHaveTextContent("fixture-sense-2: fixture gloss two");
+    expect(evidence).toHaveTextContent("Sense 1: fixture gloss one");
+    expect(evidence).toHaveTextContent("Sense 2: fixture gloss two");
+    expect(evidence).toHaveTextContent("Sense 1: fixture-sense-1");
+    expect(evidence).toHaveTextContent("Sense 2: fixture-sense-2");
     expect(evidence).toHaveTextContent("fixture-source-family");
     expect(evidence).toHaveTextContent("https://example.invalid/fixture.jsonl");
     expect(evidence).toHaveTextContent("none is selected for a component proposal");
     expect(evidence).toHaveTextContent("Written Seven-Voices path");
     expect(evidence).toHaveTextContent("A → I");
     expect(evidence).toHaveTextContent("Solver-selected path");
-    expect(evidence).toHaveTextContent("pronunciation: not_established");
+    expect(evidence).toHaveTextContent("pronunciation evidence: Not established");
     expect(screen.getByLabelText("Target language")).toHaveValue("");
     expect(screen.getByLabelText("Component 1 proposed meaning")).toHaveValue("");
     expect(screen.getByTestId("single-word-proposal-incomplete")).toBeInTheDocument();
@@ -513,15 +515,15 @@ describe("Single-word motivation workbench v0.1", () => {
     );
 
     const source = screen.getByTestId("single-word-current-source-evidence");
-    expect(source).toHaveTextContent("MATCHES_FOUND");
+    expect(source).toHaveTextContent("Matching records found");
     expect(source).toHaveTextContent(
-      "MATCHES_FOUND was emitted without a displayable exact-form source fact in this payload.",
+      "The lookup reported a match, but this analysis did not include a displayable exact-form source fact.",
     );
     expect(source).not.toHaveTextContent("fixture:source-record-1");
     expect(source).not.toHaveTextContent("fixture-sense-1");
     expect(source).not.toHaveTextContent("fixture gloss");
     expect(screen.getByTestId("single-word-current-structural-evidence")).toHaveTextContent(
-      "UNKNOWN_OR_NULL",
+      "Structure supplies candidate form only. It does not assign component meaning, morphology, historical derivation, or embryo function.",
     );
     expect(screen.getByTestId("single-word-current-voice-evidence")).toHaveTextContent(
       "Written Seven-Voices path",
@@ -537,7 +539,7 @@ describe("Single-word motivation workbench v0.1", () => {
     );
 
     const evidence = screen.getByTestId("single-word-current-evidence");
-    expect(evidence).toHaveTextContent("SOURCE_NOT_FOUND");
+    expect(evidence).toHaveTextContent("No exact source record found");
     expect(evidence).toHaveTextContent("ALBANIAN_EXACT_FORM_NOT_FOUND");
     expect(evidence).toHaveTextContent("does not establish lexical absence");
     expect(evidence).toHaveTextContent("A at source position 1 (A)");
@@ -550,9 +552,9 @@ describe("Single-word motivation workbench v0.1", () => {
   });
 
   it.each([
-    ["UNAVAILABLE", "no lexical conclusion follows"],
-    ["NOT_QUERIED", "no lexical conclusion follows"],
-  ] as const)("does not turn %s into a lexical conclusion", (status, explanation) => {
+    ["UNAVAILABLE", "Unavailable", "no lexical conclusion follows"],
+    ["NOT_QUERIED", "Not checked", "no lexical conclusion follows"],
+  ] as const)("does not turn %s into a lexical conclusion", (status, displayStatus, explanation) => {
     render(
       <SingleWordMotivationWorkbenchV0_1
         initialTargetWord="KANDIL"
@@ -561,7 +563,7 @@ describe("Single-word motivation workbench v0.1", () => {
     );
 
     const evidence = screen.getByTestId("single-word-current-source-evidence");
-    expect(evidence).toHaveTextContent(status);
+    expect(evidence).toHaveTextContent(displayStatus);
     expect(evidence).toHaveTextContent(explanation);
     expect(evidence).not.toHaveTextContent("fixture gloss");
   });
@@ -589,14 +591,14 @@ describe("Single-word motivation workbench v0.1", () => {
     const progressiveWritten = screen.getByTestId("single-word-progressive-written-analysis");
     expect(progressiveWritten).toHaveTextContent("Complete input events: A → E → I → O → U → Y → Ë → A");
     expect(progressiveWritten).toHaveTextContent("A at source position 7 (A)");
-    expect(progressiveWritten).toHaveTextContent("API/event sequence comparison: MATCH");
+    expect(progressiveWritten).toHaveTextContent("Written event sequence comparison: Matches");
     expect(progressiveWritten).toHaveTextContent("Ë [6, 7) single_letter");
     expect(screen.getByTestId("single-word-progressive-functional-reading")).toHaveTextContent("Structural embryo meaning/function: UNKNOWN_OR_NULL");
     expect(screen.getByTestId("single-word-current-structural-evidence")).toHaveTextContent(
       "No structural hypotheses emitted",
     );
     expect(screen.getByTestId("single-word-current-structural-evidence")).toHaveTextContent(
-      "UNKNOWN_OR_NULL",
+      "No structural reduction candidate was produced. The complete written events above remain available; component meaning has not been established.",
     );
   });
 
@@ -613,7 +615,7 @@ describe("Single-word motivation workbench v0.1", () => {
     );
 
     const source = screen.getByTestId("single-word-current-source-evidence");
-    expect(source).toHaveTextContent("NOT_APPLICABLE_FOR_LANGUAGE");
+    expect(source).toHaveTextContent("Albanian source results are withheld because this analysis does not identify Albanian as the language");
     expect(source).toHaveTextContent("no Albanian lexical conclusion is displayed");
     expect(source).not.toHaveTextContent("MATCHES_FOUND");
     expect(source).not.toHaveTextContent("fixture:source-record-1");
@@ -638,7 +640,7 @@ describe("Single-word motivation workbench v0.1", () => {
     );
 
     const structure = screen.getByTestId("single-word-current-structural-evidence");
-    expect(structure).toHaveTextContent("fixture-hypothesis-1 · embryo AN");
+    expect(structure).toHaveTextContent("Candidate form: AN");
     expect(structure).toHaveTextContent("AN → AND → KANDIL");
     expect(structure).toHaveTextContent("CONSONANTAL_REDUCTION_SUPPORTED");
     expect(structure).toHaveTextContent("does not assign component meaning");
@@ -672,12 +674,14 @@ describe("Single-word motivation workbench v0.1", () => {
 
     const trace = screen.getByTestId("single-word-progressive-evidence-trace");
     expect(trace).toHaveTextContent("Analyzed form: dritare · language sq · profile albanian");
-    expect(trace).toHaveTextContent("Sense en-dritare-sq-noun-RP97AsgN: window");
-    expect(trace).toHaveTextContent("Sense en-dritare-sq-noun-~k6zu7Ra: access to the sea");
-    expect(trace).toHaveTextContent("Sense en-dritare-sq-noun-1Zl6eJVE: key, opening, access to knowledge");
-    expect(trace).toHaveTextContent("Sense en-dritare-sq-noun-CIjOT75H: free time");
+    expect(trace).toHaveTextContent("Sense 1: window");
+    expect(trace).toHaveTextContent("Sense 2: access to the sea");
+    expect(trace).toHaveTextContent("Sense 3: key, opening, access to knowledge");
+    expect(trace).toHaveTextContent("Sense 4: free time");
+    expect(trace).toHaveTextContent("Sense 1: en-dritare-sq-noun-RP97AsgN");
+    expect(trace).toHaveTextContent("Sense 2: en-dritare-sq-noun-~k6zu7Ra");
     expect(trace).toHaveTextContent("Complete input events: I → A → E");
-    expect(trace).toHaveTextContent("API/event sequence comparison: MATCH");
+    expect(trace).toHaveTextContent("Written event sequence comparison: Matches");
 
     const relations = screen.getByTestId("single-word-progressive-source-relationships");
     expect(reading.sourceLinkedComponentReading).toBeNull();
@@ -769,9 +773,9 @@ describe("Single-word motivation workbench v0.1", () => {
     const trace = screen.getByTestId("single-word-progressive-evidence-trace");
     expect(trace).toHaveTextContent("SH [0, 2) digraph");
     expect(trace).toHaveTextContent("Complete input events: E → Ë → A");
-    expect(trace).toHaveTextContent("SOURCE_AUTHORED_SUFFIX_TEMPLATE");
-    expect(trace).toHaveTextContent("Validated source-attributed component forms (ordered; separate from lexical records): shkencë + -tar");
-    expect(screen.getByTestId("single-word-source-surface-join")).toHaveTextContent("SHKENCËTAR = SHKENCËTAR · EXACT_SURFACE_JOIN");
+    expect(trace).toHaveTextContent("Source authored suffix template");
+    expect(trace).toHaveTextContent("Source-attributed component forms, in order: shkencë + -tar");
+    expect(screen.getByTestId("single-word-source-surface-join")).toHaveTextContent("SHKENCËTAR matches SHKENCËTAR");
     const relations = screen.getByTestId("single-word-progressive-source-relationships");
     expect(relations).toHaveTextContent("tar-agent");
     expect(relations).toHaveTextContent("tar-relational");
@@ -900,7 +904,7 @@ describe("Single-word motivation workbench v0.1", () => {
     const writtenAnalysis = screen.getByTestId("single-word-progressive-written-analysis");
     expect(writtenAnalysis).toHaveTextContent("Complete input events: E → A");
     expect(writtenAnalysis).toHaveTextContent("E at source position 2 (e) · A at source position 4 (a)");
-    expect(writtenAnalysis).toHaveTextContent("API/event sequence comparison: MATCH");
+    expect(writtenAnalysis).toHaveTextContent("Written event sequence comparison: Matches");
     expect(screen.getByTestId("single-word-progressive-v02-structure")).toBeInTheDocument();
     expect(trace).toHaveTextContent("Structural embryo meaning/function: UNKNOWN_OR_NULL");
     const explanation = screen.getByTestId("single-word-progressive-source-motivated-explanation");
@@ -908,7 +912,7 @@ describe("Single-word motivation workbench v0.1", () => {
     expect(explanation).toHaveTextContent("Possible source-motivated explanation · CONDITIONAL_INFERENCE");
     expect(explanation).toHaveTextContent("Exact target form: bletar");
     expect(explanation).toHaveTextContent("Source-attributed relationship: From bletë (“bee”) + -ar noun suffix.");
-    expect(explanation).toHaveTextContent("BLETËAR ≠ BLETAR · SURFACE_MISMATCH");
+    expect(explanation).toHaveTextContent("Source-form comparison: BLETËAR does not match BLETAR");
     expect(explanation).toHaveTextContent("bee (insect)");
     expect(explanation).toHaveTextContent("swarm (of bees)");
     expect(explanation).toHaveTextContent("quick, fast at work");
@@ -930,7 +934,7 @@ describe("Single-word motivation workbench v0.1", () => {
     for (const alternativeSense of ["bee-insect", "bee-swarm", "bee-hive", "bee-quick", "blej-form"]) {
       expect(sourceAlternatives).toHaveTextContent(alternativeSense);
     }
-    expect(sourceAlternatives).toHaveTextContent("Source-linked component reading: NULL");
+    expect(sourceAlternatives).toHaveTextContent("Source-linked component reading: Null");
     expect(sourceAlternatives).toHaveTextContent("AMBIGUOUS");
     const sourceAlignment = screen.getByTestId("single-word-structural-source-component-alignment");
     expect(sourceAlignment).toHaveAttribute("data-status", "MATCHED_ENGINE_REDUCTION");
@@ -946,7 +950,7 @@ describe("Single-word motivation workbench v0.1", () => {
     expect(sourceAlignment).toHaveTextContent("meaning UNKNOWN_OR_NULL");
     expect(sourceAlignment).toHaveTextContent("Source base bletë · resolution AMBIGUOUS");
     expect(sourceAlignment).toHaveTextContent("Target prefix surface blet [0, 4) · exact source-base spelling MISMATCH");
-    expect(sourceAlternatives).toHaveTextContent("BLETËAR ≠ BLETAR · SURFACE_MISMATCH");
+    expect(sourceAlternatives).toHaveTextContent("Source-form spelling comparison (leading affix hyphen omitted as notation only): BLETËAR does not match BLETAR");
     expect(sourceAlignment).toHaveTextContent("Complete written Voice events: E@2 → A@4");
     expect(sourceAlignment).toHaveTextContent("derivation, a target-to-component sense crosswalk, historical change");
     expect(screen.getByLabelText("Component 1 proposed meaning")).toHaveValue("");
@@ -1036,7 +1040,8 @@ describe("Single-word motivation workbench v0.1", () => {
     );
 
     expect(screen.getByTestId("single-word-progressive-functional-reading")).toHaveTextContent("operation AGENT");
-    expect(screen.getByTestId("single-word-progressive-source-relationships")).toHaveTextContent("suffix-agent-vague · agent suffix");
+    expect(screen.getByTestId("single-word-progressive-source-relationships")).toHaveTextContent("Source-authored explanation: From bletë + -ar; fixture source-authored relation text.");
+    expect(screen.getByTestId("single-word-progressive-source-relationships")).toHaveTextContent("agent suffix");
     expect(screen.queryByTestId("single-word-progressive-source-motivated-explanation")).not.toBeInTheDocument();
   });
 
@@ -1144,7 +1149,7 @@ describe("Single-word motivation workbench v0.1", () => {
       />,
     );
 
-    expect(screen.getByTestId("single-word-current-source-evidence")).toHaveTextContent("Sense beekeeper: beekeeper");
+    expect(screen.getByTestId("single-word-current-source-evidence")).toHaveTextContent("Sense 1: beekeeper");
     expect(screen.queryByTestId("single-word-progressive-source-motivated-explanation")).not.toBeInTheDocument();
     expect(screen.queryByTestId("single-word-structural-source-component-alignment")).not.toBeInTheDocument();
   });
@@ -1190,10 +1195,10 @@ describe("Single-word motivation workbench v0.1", () => {
       />,
     );
 
-    expect(screen.getByTestId("single-word-source-surface-join")).toHaveTextContent("DRITËARE ≠ DRITARE · SURFACE_MISMATCH");
+    expect(screen.getByTestId("single-word-source-surface-join")).toHaveTextContent("DRITËARE does not match DRITARE");
     const relationships = screen.getByTestId("single-word-progressive-source-relationships");
     expect(relationships).toHaveTextContent("dritë + -are");
-    expect(relationships).toHaveTextContent("-are · UNRESOLVED");
+    expect(relationships).toHaveTextContent("-are · Unresolved");
     expect(relationships).not.toHaveTextContent("suffix-sense");
     expect(screen.getByTestId("single-word-progressive-functional-reading")).toHaveTextContent("Structural embryo meaning/function: UNKNOWN_OR_NULL");
     expect(screen.queryByTestId("single-word-progressive-source-motivated-explanation")).not.toBeInTheDocument();
@@ -1338,12 +1343,12 @@ describe("Single-word motivation workbench v0.1", () => {
 
     const relations = screen.getByTestId("single-word-progressive-source-relationships");
     expect(screen.queryByTestId("single-word-structural-source-component-alignment")).not.toBeInTheDocument();
-    expect(relations).toHaveTextContent("dritë · AMBIGUOUS");
+    expect(relations).toHaveTextContent("dritë · Ambiguous");
     expect(relations).toHaveTextContent("fixture:kaikki:dritë:base, fixture:kaikki:dritë:alternative");
     expect(relations).toHaveTextContent("light-sense");
     expect(relations).toHaveTextContent("light-alternative-sense");
-    expect(screen.getByTestId("single-word-source-surface-join")).toHaveTextContent("DRITËARE ≠ DRITARE · SURFACE_MISMATCH");
-    expect(relations).toHaveTextContent("dritë · AMBIGUOUS");
+    expect(screen.getByTestId("single-word-source-surface-join")).toHaveTextContent("DRITËARE does not match DRITARE");
+    expect(relations).toHaveTextContent("dritë · Ambiguous");
   });
 
   it("withholds a discovery payload whose word differs from the current analysis", () => {
@@ -1432,6 +1437,7 @@ describe("Single-word motivation workbench v0.1", () => {
       />,
     );
 
+    fireEvent.click(screen.getByText("View detailed source, Voice and structure evidence"));
     const expectedText = `Whole-word functional bridge: UNKNOWN_OR_NULL · ${reasonCodes.join(", ")}`;
     const bridgeLine = screen.getByText(expectedText, { exact: true });
     expect(bridgeLine.textContent).toBe(expectedText);
@@ -1439,8 +1445,8 @@ describe("Single-word motivation workbench v0.1", () => {
     expect(bridgeLine).not.toHaveClass("truncate", "overflow-hidden", "whitespace-nowrap");
     expect(bridgeLine).toBeVisible();
 
-    expect(screen.getByTestId("single-word-current-source-evidence")).toHaveTextContent("MATCHES_FOUND");
-    expect(screen.getByTestId("single-word-progressive-source-relationships")).toHaveTextContent("SOURCE_AUTHORED_SUFFIX_TEMPLATE");
+    expect(screen.getByTestId("single-word-current-source-evidence")).toHaveTextContent("Matching records found");
+    expect(screen.getByTestId("single-word-progressive-source-relationships")).toHaveTextContent("Source authored suffix template");
     expect(screen.getByTestId("single-word-progressive-functional-reading")).toHaveTextContent("Structural embryo meaning/function: UNKNOWN_OR_NULL");
     expect(screen.queryByTestId("single-word-progressive-source-motivated-explanation")).not.toBeInTheDocument();
   });
@@ -1474,29 +1480,33 @@ describe("Single-word motivation workbench v0.1", () => {
     expect(mechanical).toHaveAttribute("data-status", "EXAMINED");
     expect(mechanical).toHaveTextContent("Raw component concatenation: KANDILL");
     expect(mechanical).toHaveTextContent("Final mechanical spelling: KANDIL");
-    expect(mechanical).toHaveTextContent("Exact comparison: MATCH");
+    expect(mechanical).toHaveTextContent("Exact comparison: Matches");
     expect(mechanical).toHaveTextContent("USER_DECLARED_UNVERIFIED");
-    expect(mechanical).toHaveTextContent("linguistic validity NOT_ASSESSED");
+    expect(mechanical).toHaveTextContent("linguistic validity: NOT_ASSESSED");
     expect(mechanical).toHaveTextContent("DIGRAPH_REMOVED");
 
     const proposal = screen.getByTestId("single-word-proposal-result");
     expect(proposal).toHaveTextContent("PROPOSED");
     expect(proposal).toHaveTextContent("A lamp contains or provides light");
-    expect(proposal).toHaveTextContent("Strict embryo meaning: Unknown / Null");
+    const proposalStatuses = screen.getByTestId("single-word-proposal-contract-details");
+    expect(proposalStatuses).not.toHaveAttribute("open");
+    expect(proposalStatuses).toHaveTextContent("Strict embryo meaning: UNKNOWN_OR_NULL · USER_PROPOSAL_DOES_NOT_ESTABLISH_EMBRYO_MEANING");
+    expect(screen.getByText(/Strict embryo meaning: UNKNOWN_OR_NULL/)).not.toBeVisible();
     expect(proposal).toHaveTextContent("A → I");
-    expect(proposal).toHaveTextContent("historical origin: not claimed");
+    expect(proposalStatuses).toHaveTextContent("historical origin: NOT_CLAIMED");
 
     const reading = screen.getByTestId("single-word-functional-motivation-reading");
-    expect(reading).toHaveTextContent("USER_PROPOSED · exploratory motivation");
+    expect(reading).toHaveTextContent("Exploratory proposal by you");
     expect(reading).toHaveTextContent("Whole word: KANDIL");
     expect(reading).toHaveTextContent("KAN — meaning have/possess; grammatical role verb");
     expect(reading).toHaveTextContent("DILL — meaning sun/light; grammatical role noun");
     expect(reading).toHaveTextContent("User-proposed functional interaction: A lamp contains or provides light");
-    expect(reading).toHaveTextContent("KAN + DILL = KANDILL; target KANDIL · MISMATCH");
+    expect(reading).toHaveTextContent("KAN + DILL = KANDILL; target KANDIL · Does not match");
     expect(reading).toHaveTextContent("The spelling correspondence remains unresolved");
-    expect(reading).toHaveTextContent("Strict embryo meaning: Unknown / Null (UNKNOWN_OR_NULL)");
-    expect(reading).toHaveTextContent("No interpretation is selected automatically; the user decides");
-    expect(reading).toHaveTextContent("Mechanical replay remains separate and does not validate this reading");
+    expect(reading).toHaveTextContent("Strict embryo meaning: UNKNOWN_OR_NULL · USER_PROPOSAL_DOES_NOT_ESTABLISH_EMBRYO_MEANING");
+    expect(reading).toHaveTextContent("No interpretation is selected automatically.");
+    expect(proposalStatuses).toHaveTextContent("Decision: user_decides · no-single-winner: true");
+    expect(reading).toHaveTextContent("Mechanical replay checks spelling only and does not validate this reading");
     expect(reading).not.toHaveTextContent("Final mechanical spelling:");
   });
 
@@ -1531,16 +1541,16 @@ describe("Single-word motivation workbench v0.1", () => {
     fireEvent.change(screen.getByLabelText("Component 2 language"), { target: { value: "Albanian" } });
     fireEvent.change(screen.getByLabelText("Proposed functional explanation"), { target: { value: "Carries light." } });
     const reading = screen.getByTestId("single-word-functional-motivation-reading");
-    expect(reading).toHaveTextContent("KANDIL · EXACT_MATCH");
+    expect(reading).toHaveTextContent("KANDIL · Exact match");
     fireEvent.click(screen.getByTestId("single-word-examine-interpretation"));
     expect(screen.getByTestId("single-word-mechanical-result")).toHaveAttribute("data-status", "EXAMINED");
 
     fireEvent.change(screen.getByLabelText("Component 2 exact spelling"), { target: { value: "DILL" } });
-    expect(screen.getByTestId("single-word-mechanical-result-stale")).toHaveTextContent("STALE");
+    expect(screen.getByTestId("single-word-mechanical-result-stale")).toHaveTextContent("out of date");
     expect(screen.getByTestId("single-word-mechanical-result")).toHaveAttribute("data-status", "NOT_SUBMITTED");
     expect(screen.queryByText(/Final mechanical spelling:/)).not.toBeInTheDocument();
     expect(reading).toHaveTextContent("DILL — meaning light; grammatical role noun");
-    expect(reading).toHaveTextContent("KANDILL; target KANDIL · MISMATCH");
+    expect(reading).toHaveTextContent("KANDILL; target KANDIL · Does not match");
     expect(reading).toHaveTextContent("Carries light.");
 
     fireEvent.change(screen.getByLabelText("Proposed functional explanation"), { target: { value: "local-only proposal" } });
@@ -1592,13 +1602,13 @@ describe("Single-word motivation workbench v0.1", () => {
     fireEvent.change(screen.getByLabelText("Transformation 1 to"), { target: { value: "L" } });
 
     expect(screen.getByTestId("single-word-proposal-result")).toHaveTextContent("KANDILL");
-    expect(screen.getByTestId("single-word-proposal-result")).toHaveTextContent("MISMATCH");
+    expect(screen.getByTestId("single-word-proposal-result")).toHaveTextContent("Does not match");
     expect(screen.getByTestId("single-word-proposal-result")).toHaveTextContent("Has sun / carries light");
     expect(screen.getByTestId("single-word-proposal-result")).toHaveTextContent("metaphorical");
-    expect(screen.getByTestId("single-word-proposal-result")).toHaveTextContent("Strict embryo meaning: Unknown / Null");
+    expect(screen.getByTestId("single-word-proposal-result")).toHaveTextContent("The word’s internal functional meaning has not been established");
     const reading = screen.getByTestId("single-word-functional-motivation-reading");
-    expect(reading).toHaveTextContent("KA + N + DILL = KANDILL; target KANDIL · MISMATCH");
-    expect(reading).toHaveTextContent("N: meaning and grammatical role UNKNOWN_OR_NULL; marked by the user as not yet explained.");
+    expect(reading).toHaveTextContent("KA + N + DILL = KANDILL; target KANDIL · Does not match");
+    expect(reading).toHaveTextContent("N: meaning and grammatical role not established; you marked this component as not yet explained.");
     expect(reading).toHaveTextContent("User-entered unresolved material: N role and LL/L correspondence remain unexplained.");
     expect(reading).toHaveTextContent("KAN");
     expect(reading).toHaveTextContent("DILL");
@@ -1606,7 +1616,7 @@ describe("Single-word motivation workbench v0.1", () => {
     expect(screen.getByTestId("single-word-proposal-result")).toHaveTextContent("not independently verified");
     expect(screen.getByTestId("single-word-proposal-result")).toHaveTextContent("user-declared and unverified; not applied");
     const sourceTrace = screen.getByTestId("single-word-progressive-source-relationships");
-    expect(sourceTrace).toHaveTextContent("Exact-form source status: UNAVAILABLE");
+    expect(sourceTrace).toHaveTextContent("Exact-form source lookup: Unavailable");
     expect(sourceTrace).toHaveTextContent("No source-authored component relation is available");
     expect(sourceTrace).not.toHaveTextContent("KAN + DILL");
     expect(screen.getByTestId("single-word-progressive-functional-reading")).toHaveTextContent("UNKNOWN_OR_NULL");
@@ -1632,14 +1642,17 @@ describe("Single-word motivation workbench v0.1", () => {
     expect(screen.getByTestId("single-word-proposal-result")).toHaveTextContent("U → Ë");
     const reading = screen.getByTestId("single-word-functional-motivation-reading");
     expect(reading).toHaveTextContent("Whole word: RRUGË");
-    expect(reading).toHaveTextContent("RR + UGË = RRUGË; target RRUGË · EXACT_MATCH");
+    expect(reading).toHaveTextContent("RR + UGË = RRUGË; target RRUGË · Exact match");
     expect(reading).toHaveTextContent("User-proposed functional interaction: A separately labeled proposal.");
     expect(reading).toHaveTextContent("No spelling mismatch is recorded; exact concatenation alone does not establish morphology or etymology.");
   });
 
   it("shows field-specific citation and explanation errors with their supported limits", () => {
     render(<SingleWordMotivationWorkbenchV0_1 initialTargetWord="KANDIL" />);
-    expect(screen.getByTestId("single-word-motivation-field-limits")).toHaveTextContent("evidence references and connecting material 500");
+    const fieldLimits = screen.getByTestId("single-word-motivation-field-limits");
+    expect(fieldLimits).toHaveTextContent("Evidence references and connecting material: 500");
+    expect(fieldLimits.closest("details")).not.toHaveAttribute("open");
+    expect(screen.getByText("Entry limits")).toBeInTheDocument();
     expect(screen.getByTestId("single-word-functional-explanation-count")).toHaveTextContent("0/1,000 characters");
 
     fireEvent.change(screen.getByLabelText("Target language"), { target: { value: "Albanian" } });
@@ -1735,18 +1748,18 @@ describe("Single-word motivation workbench v0.1", () => {
     const proposalBeforeSourceChecks = proposal.textContent;
     expect(proposal).toHaveTextContent("KA + N + DILL");
     expect(proposal).toHaveTextContent("KANDILL");
-    expect(proposal).toHaveTextContent("MISMATCH");
+    expect(proposal).toHaveTextContent("Does not match");
     expect(proposal).toHaveTextContent("Has sun / carries light");
-    expect(proposal).toHaveTextContent("PROPOSED");
+    expect(proposal).toHaveTextContent("Exploratory proposal by you");
     expect(proposal).toHaveTextContent("A → I");
-    expect(proposal).toHaveTextContent("Strict embryo meaning: Unknown / Null");
-    expect(proposal).toHaveTextContent("N — meaning Unknown / Null");
+    expect(screen.getByTestId("single-word-proposal-contract-details")).toHaveTextContent("Strict embryo meaning: UNKNOWN_OR_NULL · USER_PROPOSAL_DOES_NOT_ESTABLISH_EMBRYO_MEANING");
+    expect(proposal).toHaveTextContent("N — meaning Not established");
     expect(screen.getAllByTestId("single-word-component-source-check")).toHaveLength(3);
     expect(fetchMock).not.toHaveBeenCalled();
 
     fireEvent.click(screen.getByRole("button", { name: "Check source for component 2" }));
     expect(await screen.findByTestId("fjalori-evidence-null")).toHaveTextContent("SOURCE_UNAVAILABLE · UNKNOWN_OR_NULL");
-    expect(screen.getByTestId("single-word-component-source-evidence")).toHaveTextContent("User-proposed meaning (as entered): UNKNOWN_OR_NULL");
+    expect(screen.getByTestId("single-word-component-source-evidence")).toHaveTextContent("User-proposed meaning (as entered): Not established.");
     expect(screen.queryByTestId("fjalori-component-meaning-comparison")).not.toBeInTheDocument();
     expect(fetchMock).toHaveBeenCalledTimes(1);
 
@@ -1838,11 +1851,11 @@ describe("Single-word motivation workbench v0.1", () => {
     expect(fetchMock).not.toHaveBeenCalled();
     const proposal = screen.getByTestId("single-word-proposal-result");
     expect(proposal).toHaveTextContent("KANDILL");
-    expect(proposal).toHaveTextContent("MISMATCH");
+    expect(proposal).toHaveTextContent("Does not match");
     expect(proposal).toHaveTextContent("Has sun / carries light");
-    expect(proposal).toHaveTextContent("PROPOSED");
+    expect(proposal).toHaveTextContent("Exploratory proposal by you");
     expect(proposal).toHaveTextContent("A → I");
-    expect(proposal).toHaveTextContent("Strict embryo meaning: Unknown / Null");
+    expect(screen.getByTestId("single-word-proposal-contract-details")).toHaveTextContent("Strict embryo meaning: UNKNOWN_OR_NULL · USER_PROPOSAL_DOES_NOT_ESTABLISH_EMBRYO_MEANING");
 
     fireEvent.click(screen.getByRole("button", { name: "Check source for component 1" }));
     const glosses = await screen.findAllByTestId("fjalori-source-sense-gloss");
@@ -1884,7 +1897,7 @@ describe("Single-word motivation workbench v0.1", () => {
     expect(screen.getByLabelText("Component 1 proposed meaning")).toHaveValue("possesses");
     expect(screen.getByLabelText("Component 1 evidence status")).toHaveValue("USER_PROPOSED");
     expect(screen.getByTestId("single-word-proposal-result")).toHaveTextContent("Has sun / carries light");
-    expect(screen.getByTestId("single-word-proposal-result")).toHaveTextContent("Strict embryo meaning: Unknown / Null");
+    expect(screen.getByTestId("single-word-proposal-contract-details")).toHaveTextContent("Strict embryo meaning: UNKNOWN_OR_NULL · USER_PROPOSAL_DOES_NOT_ESTABLISH_EMBRYO_MEANING");
   });
 
   it("clears source-sense inspection when the component spelling changes or is removed", async () => {
@@ -2470,17 +2483,16 @@ describe("Single-word motivation workbench v0.1", () => {
 
     const result = screen.getByTestId("single-word-opaque-proposal-result");
     expect(result).toHaveTextContent("BUKË");
-    expect(result).toHaveTextContent("WHOLE_WORD_OPAQUE");
+    expect(result).toHaveTextContent("Whole-word proposal by you");
     expect(result).toHaveTextContent("Proposed components: 0");
-    expect(screen.getByTestId("single-word-opaque-meaning-claim")).toHaveTextContent("bread; meal · USER_PROPOSED");
-    expect(screen.getByTestId("single-word-opaque-source-evidence")).toHaveTextContent("CITATION_ENTERED_UNVERIFIED");
+    expect(screen.getByTestId("single-word-opaque-meaning-claim")).toHaveTextContent("bread; meal · Proposed; not source-reported · entered by you");
+    expect(screen.getByTestId("single-word-opaque-source-evidence")).toHaveTextContent("Citation not independently verified");
     expect(screen.getByTestId("single-word-opaque-source-evidence")).toHaveTextContent("https://fjale.al/buk%C3%AB");
     expect(screen.getByTestId("single-word-opaque-source-evidence")).toHaveTextContent("not independently verified");
-    expect(screen.getByTestId("single-word-functional-reading-reconstruction")).toHaveTextContent("NOT_APPLICABLE");
-    expect(screen.getByTestId("single-word-functional-reading-reconstruction")).toHaveTextContent("UNKNOWN_OR_NULL");
-    expect(screen.getByTestId("single-word-opaque-functional-description")).toHaveTextContent("Unknown / Null · UNKNOWN_OR_NULL");
+    expect(screen.getByTestId("single-word-functional-reading-reconstruction")).toHaveTextContent("Not applicable · internal functional structure Not established");
+    expect(screen.getByTestId("single-word-opaque-functional-description")).toHaveTextContent("Not established · Not established");
     expect(screen.getByTestId("single-word-opaque-written-voices")).toHaveTextContent("U@1 → Ë@3");
-    expect(result).toHaveTextContent("No interpretation is selected automatically; interpretation remains with the user.");
+    expect(result).toHaveTextContent("No interpretation is selected automatically; the choice remains with you.");
     expect(screen.queryByLabelText("Component 1 exact spelling")).not.toBeInTheDocument();
     expect(screen.queryByTestId("cross-language-functional-motivation")).not.toBeInTheDocument();
     expect(result).not.toHaveTextContent("suffix");
@@ -2610,7 +2622,7 @@ describe("Single-word motivation workbench v0.1", () => {
     const result = screen.getByTestId("single-word-proposal-result");
     expect(result).toHaveTextContent("HA + MËS = HAMËS");
     expect(screen.getByTestId("single-word-positioned-written-voices")).toHaveTextContent("A@1 → Ë@3");
-    expect(result).toHaveTextContent("MËS: meaning and grammatical role UNKNOWN_OR_NULL");
+    expect(result).toHaveTextContent("MËS: meaning and grammatical role not established");
     expect(result).toHaveTextContent("HA may contribute eating");
     expect(result).not.toHaveTextContent("participial marker");
   });

@@ -12,6 +12,7 @@ import type { SymbolicFunctionalOperationPlanInputV0_1 } from "@/shared/openInst
 import { sameAlbanianSourceForm } from "@/ui/instrument/albanianSourceFormIdentity.v0_1";
 import type { SingleWordCurrentWordEvidenceContextV0_1 } from "@/ui/instrument/sections/SingleWordMotivationWorkbenchV0_1";
 import { CurrentWordSourceFunctionalSuggestionV0_1 } from "@/ui/instrument/sections/CurrentWordSourceFunctionalSuggestionV0_1";
+import { humanReadableStatusLabelV0_1, humanReadableStatusTextV0_1 } from "@/ui/instrument/sections/humanReadableStatusLabel.v0_1";
 import type {
   RuntimeAlbanianSourceSenseSelectionV0_1,
   RuntimeFjaloriSourceResponseV0_1,
@@ -35,7 +36,7 @@ export type CurrentWordSymbolicDraftProjectionV0_1 = Readonly<{
   operations: readonly SymbolicCompositionOperationV0_3[];
 }>;
 
-const inputClass = "mt-1 w-full rounded border border-[#46505c] bg-[#0d1117] px-2 py-1.5 text-sm text-[#f5f7fb] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#d8bb7a]";
+const inputClass = "mt-1 w-full min-w-0 max-w-full rounded border border-[#46505c] bg-[#0d1117] px-2 py-1.5 text-sm text-[#f5f7fb] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#d8bb7a]";
 const labelClass = "block min-w-0 text-xs font-medium text-[#c5ced8]";
 
 function getDiscovery(context: SingleWordCurrentWordEvidenceContextV0_1 | undefined, analyzedWord: string) {
@@ -267,31 +268,51 @@ export function CurrentWordSymbolicDraftV0_1({
     <section
       aria-label="Current-word symbolic draft"
       data-testid="current-word-symbolic-draft"
-      className="mt-4 min-w-0 rounded-lg border border-[#46505c] bg-[#0e1411] p-3"
+      className="mt-4 min-w-0 [overflow-wrap:anywhere] rounded-lg border border-[#46505c] bg-[#0e1411] p-3"
     >
       <h3 className="text-sm font-semibold text-[#f5f7fb]">Current-word symbolic draft</h3>
       <p className="mt-1 text-xs leading-5 text-[#aeb7c5]">
-        The DA functional-motivation candidate below uses qualifying exact-form source facts when they are already available. Symbolic associations, Voice operators and operands remain optional explicit hypotheses; any computed overlay stays separate from source facts and does not establish a whole-word derivation.
+        Source facts and the conditional DA proposal appear below. Optional symbolic choices remain hypotheses; computed results do not establish the word’s origin.
       </p>
       <p className="mt-2 text-xs text-[#c5ced8]" data-testid="current-word-symbolic-identity">
-        Analyzed form: <strong>{analyzedWord || "UNKNOWN_OR_NULL"}</strong> · language {language} · variety {variety}
+        Analyzed form: <strong>{analyzedWord || "not supplied"}</strong> · language {language} · variety {variety}
       </p>
 
-      <div className="mt-3 rounded border border-[#38433a] p-2 text-xs leading-5" data-testid="current-word-symbolic-source-meaning">
+      <div className="mt-3 min-w-0 [overflow-wrap:anywhere] rounded border border-[#38433a] p-2 text-xs leading-5" data-testid="current-word-symbolic-source-meaning">
         <div className="font-semibold text-[#d8e4ca]">Source-reported meaning</div>
         {facts.length > 0 ? facts.map((fact) => (
           <div key={fact.sourceRecordId} className="mt-1 min-w-0 break-words">
-            <span>SOURCE_FACT · exact source form {fact.form} · {fact.sourceStatus} · attestation {fact.attestationTruth} · {fact.sourceRecordId} · {fact.entryLocator} · snapshot {fact.sourceSnapshot.sourceFamilyId} · SHA-256 {fact.sourceSnapshot.sha256}</span>
+            <span>Source-reported form {fact.form} · {humanReadableStatusLabelV0_1(fact.sourceStatus)}</span>
+            <details className="mt-1">
+              <summary className="cursor-pointer text-[#9fb1bf]">Source record details</summary>
+              <span>SOURCE_FACT · attestation {fact.attestationTruth} · {fact.sourceRecordId} · {fact.entryLocator} · snapshot {fact.sourceSnapshot.sourceFamilyId} · SHA-256 {fact.sourceSnapshot.sha256}</span>
+            </details>
             {fact.senses.map((sense, index) => (
               <div key={`${fact.sourceRecordId}-sense-${index}`} className="ml-2 text-[#c5ced8]">
-                Sense {index + 1}{sense.senseId ? ` · ${sense.senseId}` : " · UNKNOWN_OR_NULL"}: {sense.glosses.length ? sense.glosses.join("; ") : "UNKNOWN_OR_NULL"}
+                Sense {index + 1}: {sense.glosses.length ? sense.glosses.join("; ") : "meaning not recorded"}
               </div>
             ))}
           </div>
-        )) : <p className="mt-1 text-[#aeb7c5]">UNKNOWN_OR_NULL · {sourceIdentityMismatch
-          ? "source evidence withheld because the selected language or dialect differs from the analyzed source identity"
-          : `no matching exact-form source meaning is available in this analysis context${sourceStatus ? ` · source status ${sourceStatus.status}${sourceStatus.reasonCode ? ` · ${sourceStatus.reasonCode}` : ""}` : " · source status not supplied"}`
-        }.</p>}
+        )) : sourceIdentityMismatch ? (
+          <p className="mt-1 text-[#aeb7c5]">source evidence withheld because the selected language or dialect differs from the analyzed source identity</p>
+        ) : (
+          <div className="mt-1 text-[#aeb7c5]">
+            <p data-testid="current-word-symbolic-kaikki-availability">
+              No matching Kaikki source fact is available in this analysis context{sourceStatus
+                ? ` · Kaikki analysis: ${humanReadableStatusLabelV0_1(sourceStatus.status)}${sourceStatus.reasonCode ? ` (${humanReadableStatusTextV0_1(sourceStatus.reasonCode)})` : ""}`
+                : " · Kaikki analysis status not supplied"}.
+            </p>
+            <p className="mt-1" data-testid="current-word-symbolic-fjalori-availability">
+              {fjaloriResponse?.status === "available"
+                ? `A separate FjaloriShqip response for ${fjaloriResponse.queryForm} is available in the results below.`
+                : fjaloriResponse?.status === "http-not-found"
+                  ? `FjaloriShqip returned HTTP 404 for ${fjaloriResponse.queryForm}; this lookup does not establish that the form is absent.`
+                  : fjaloriResponse
+                    ? `A separate FjaloriShqip response for ${fjaloriResponse.queryForm} did not provide a usable source sense for this analysis.`
+                    : "No separate FjaloriShqip response is attached to this analysis."}
+            </p>
+          </div>
+        )}
         <p className="mt-1 text-[#aeb7c5]">This lexical evidence is displayed separately and does not authorize a symbolic association or meaning bridge.</p>
       </div>
 
@@ -318,13 +339,13 @@ export function CurrentWordSymbolicDraftV0_1({
       {structure.ok ? (
         <>
           <div className="mt-3 rounded border border-[#38433a] p-2 text-xs leading-5">
-            <div><strong>Exact written form:</strong> <span data-testid="current-word-symbolic-code-points">{structure.target.codePoints.map(({ character, position }) => `${character}@${position}`).join(" · ") || "UNKNOWN_OR_NULL"}</span></div>
+            <div><strong>Exact written form:</strong> <span data-testid="current-word-symbolic-code-points">{structure.target.codePoints.map(({ character, position }) => `${character}@${position}`).join(" · ") || "Not available"}</span></div>
             <div><strong>Orthographic Seven Voices:</strong> <span data-testid="current-word-symbolic-written-voices">{structure.target.writtenVoices.map(({ voice, position }) => `${voice}@${position}`).join(" → ") || "∅"}</span></div>
-            <div className="text-[#aeb7c5]">Pronunciation authority: NOT_ESTABLISHED</div>
+            <div className="text-[#aeb7c5]">Spelling alone does not establish pronunciation.</div>
           </div>
 
           {identityMatches ? (
-            <div className="mt-3 space-y-2" data-testid="current-word-symbolic-selection-controls">
+            <div className="mt-3 min-w-0 space-y-2" data-testid="current-word-symbolic-selection-controls">
               {structure.spectrumOccurrences.map((occurrence) => (
                 <label key={occurrence.occurrenceId} className={labelClass}>
                   Spectrum association · {occurrence.unit}@{occurrence.span.start} · exact span [{occurrence.span.start},{occurrence.span.end})
@@ -337,7 +358,7 @@ export function CurrentWordSymbolicDraftV0_1({
                     <option value="">Select a proposed association</option>
                     {occurrence.associationCandidates.map((candidate) => (
                       <option key={candidate.candidateId} value={candidate.candidateId}>
-                        {candidate.association} · {candidate.evidenceStatus} · {candidate.claimLayer}
+                        {candidate.association} · {humanReadableStatusLabelV0_1(candidate.evidenceStatus)}
                       </option>
                     ))}
                   </select>
@@ -377,7 +398,7 @@ export function CurrentWordSymbolicDraftV0_1({
                         <option value="">Select a proposed operator</option>
                         {voiceEvent.operatorCandidates.map((candidate) => (
                           <option key={candidate.candidateId} value={candidate.candidateId}>
-                            {candidate.operatorText} · {candidate.evidenceStatus}
+                            {candidate.operatorText} · {humanReadableStatusLabelV0_1(candidate.evidenceStatus)}
                           </option>
                         ))}
                       </select>
@@ -407,7 +428,7 @@ export function CurrentWordSymbolicDraftV0_1({
                           const candidate = occurrence.associationCandidates.find(({ candidateId: id }) => id === candidateId);
                           return (
                             <option key={occurrence.occurrenceId} value={`spectrum:${occurrence.occurrenceId}`}>
-                              {occurrence.unit}@{occurrence.span.start} · {candidate?.association ?? "UNKNOWN_OR_NULL"}
+                              {occurrence.unit}@{occurrence.span.start} · {candidate?.association ?? "Not established"}
                             </option>
                           );
                         })}
@@ -425,37 +446,38 @@ export function CurrentWordSymbolicDraftV0_1({
           ) : null}
         </>
       ) : (
-        <p role="status" data-testid="current-word-symbolic-structure-null" className="mt-3 text-xs text-[#e4bb9a]">
-          Symbolic structure: UNKNOWN_OR_NULL · {structure.reasonCodes.join(" · ")}
-        </p>
+        <div role="status" data-testid="current-word-symbolic-structure-null" className="mt-3 text-xs text-[#e4bb9a]">
+          Symbolic structure is unavailable. <details><summary className="cursor-pointer">Technical reason details</summary>{structure.reasonCodes.join(" · ")}</details>
+        </div>
       )}
 
-      <div className="mt-3 rounded border border-[#38433a] p-2 text-xs leading-5" data-testid="current-word-symbolic-result">
+      <div className="mt-3 min-w-0 [overflow-wrap:anywhere] rounded border border-[#38433a] p-2 text-xs leading-5" data-testid="current-word-symbolic-result">
         <h4 className="font-semibold text-[#d8e4ca]">Evaluated symbolic contributions</h4>
-        {!identityMatches ? <p>UNKNOWN_OR_NULL · draft does not identify the analyzed word.</p> : null}
+        {!identityMatches ? <p>Symbolic results are withheld because the draft word differs from the analyzed word.</p> : null}
         {identityMatches && evaluation.ok ? (
           <>
             {evaluation.symbols.filter((symbol) => symbol.symbolKind === "VOICE_TRANSFORM").length > 0 ? (
               evaluation.symbols.filter((symbol) => symbol.symbolKind === "VOICE_TRANSFORM").map((symbol) => (
                 <div key={symbol.symbolId} className="mt-1 break-words" data-testid="current-word-symbolic-computed-output">
-                  COMPUTED · {symbol.voice}@{symbol.position} · {symbol.text} · USER_PROPOSED / EXPLORATORY_HYPOTHESIS
+                  Computed from your proposed choices · {symbol.voice}@{symbol.position} · {symbol.text} · exploratory, not verified
                 </div>
               ))
-            ) : <p className="mt-1 text-[#aeb7c5]">UNKNOWN_OR_NULL · no complete Voice operator application has been selected.</p>}
-            <div className="mt-2" data-testid="current-word-symbolic-operation-trace">
+            ) : <p className="mt-1 text-[#aeb7c5]">No complete Voice operation has been selected.</p>}
+            <details className="mt-2 min-w-0 [overflow-wrap:anywhere]" data-testid="current-word-symbolic-operation-trace">
+              <summary className="cursor-pointer">View operation trace</summary>
               {evaluation.operationTrace.length ? evaluation.operationTrace.map((entry) => (
                 <div key={entry.operationId} className="break-words">
                   {entry.operationId} · {entry.kind} · {entry.status} · {entry.contribution ?? "UNKNOWN_OR_NULL"}
                   {entry.reasonCodes.length ? ` · ${entry.reasonCodes.join(", ")}` : ""}
                 </div>
-              )) : <p>UNKNOWN_OR_NULL · no operations selected.</p>}
-            </div>
+              )) : <p>No operations selected.</p>}
+            </details>
             <p className="mt-2">Whole-word functional motivation and graph-to-meaning status are shown in the explicit current-word bridge section below.</p>
-            <p>Source-authority promotion: {evaluation.sourceAuthorityPromotion} · historical origin: {evaluation.historicalOrigin}</p>
-            <p data-testid="current-word-symbolic-decision">No interpretation is selected automatically · {evaluation.interpretationSelection.userDecisionPosture}</p>
+            <p>Source authority is unchanged; historical origin is not claimed.</p>
+            <p data-testid="current-word-symbolic-decision">No interpretation is selected automatically; you decide.</p>
           </>
         ) : identityMatches ? (
-          <p>UNKNOWN_OR_NULL · {evaluationFailureReasonCodes?.join(" · ") ?? "UNKNOWN_OR_NULL"}</p>
+          <div>Evaluation is unavailable. <details><summary className="cursor-pointer">Technical reason details</summary>{evaluationFailureReasonCodes?.join(" · ") ?? "No reason supplied"}</details></div>
         ) : null}
       </div>
 

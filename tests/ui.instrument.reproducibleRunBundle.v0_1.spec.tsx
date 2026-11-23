@@ -494,9 +494,9 @@ describe("reproducible run bundle UI handoff v0.1", () => {
 
     await screen.findByTestId("open-instrument-shell");
     expect(screen.getByTestId("instrument-word")).toHaveTextContent("saved");
-    expect(
-      screen.getByRole("heading", { name: "Null — no supported candidate" }),
-    ).toBeVisible();
+    expect(screen.getByTestId("human-reading-functional-null")).toHaveTextContent(
+      "Not enough information for a functional explanation from the current evidence.",
+    );
     expect(screen.getByLabelText("Word")).toHaveValue("saved");
     expect(screen.getByLabelText("IPA")).toHaveValue("/ˈseɪvd/");
     expect(screen.getByLabelText("Intended sense")).toHaveValue("archived learning action");

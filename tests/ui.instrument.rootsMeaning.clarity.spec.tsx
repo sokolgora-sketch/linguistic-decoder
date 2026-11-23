@@ -1,5 +1,5 @@
 import React from "react";
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import MeaningPanel from "@/ui/instrument/MeaningPanel";
 import { RootMapCard } from "@/ui/instrument/RootMapCard";
 import { SoundRootsCard } from "@/ui/instrument/SoundRootsCard";
@@ -9,7 +9,7 @@ function present<T>(value: T) {
 }
 
 describe("Open Instrument roots/meaning clarity", () => {
-  it("frames MeaningPanel as deterministic inspection, not proof", () => {
+  it("frames spelling and Voice output as structure, not proof, with accessible technical details", () => {
     render(
       <MeaningPanel
         vm={{
@@ -25,12 +25,15 @@ describe("Open Instrument roots/meaning clarity", () => {
       />
     );
 
-    expect(screen.getByText("Meaning")).toBeInTheDocument();
-    expect(screen.getByText(/Human-readable deterministic reading/i)).toBeInTheDocument();
-    expect(screen.getByText("Deterministic reading")).toBeInTheDocument();
-    expect(screen.getByText("Inspection evidence posture")).toBeInTheDocument();
-    expect(screen.getByText(/Boundary: deterministic reading/i)).toBeInTheDocument();
-    expect(screen.getByText(/not a historical-chain claim/i)).toBeInTheDocument();
+    expect(screen.getByText(/reports spelling and Voice structure from the analysis/i)).toBeVisible();
+    expect(screen.getByText(/does not by itself establish a word meaning or origin/i)).toBeVisible();
+    expect(screen.getByText("Analysis path: U-I.")).toBeVisible();
+    const details = screen.getByTestId("meaning-technical-details");
+    expect(details).not.toHaveAttribute("open");
+    expect(screen.getByTestId("meaning-technical-evidence")).not.toBeVisible();
+    fireEvent.click(screen.getByText("Technical structure and evidence"));
+    expect(details).toHaveAttribute("open");
+    expect(screen.getByTestId("meaning-technical-evidence")).toBeVisible();
   });
 
   it("makes RootMapCard readable while keeping the hypothesis boundary explicit", () => {

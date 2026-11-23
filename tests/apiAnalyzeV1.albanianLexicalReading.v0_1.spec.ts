@@ -913,9 +913,9 @@ describe("analyze-v1 Albanian lexical reading reachability", () => {
 
     const reading = result.body.motivationDiscoveryV0_2.albanianLexicalReading;
     const card = renderPrimaryAlbanianReadingCard(result.body);
-    expect(card).toContain("Functional role: ENABLE_PASSAGE · exploratory");
+    expect(card).toContain("Functional role: Enable passage · exploratory");
     expect(card).toContain(`Word-specific explanation: ${reading.functionalMeaningBridge.functionalHypothesis.statement}`);
-    expect(card).toContain("Independent embryo meaning or function: UNKNOWN_OR_NULL.");
+    expect(card).toContain("Independent component meaning or function: not established.");
   });
 
   const directDritareBindingMismatches: readonly [string, (payload: any) => void][] = [

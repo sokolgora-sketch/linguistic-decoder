@@ -91,6 +91,11 @@ describe("InstrumentPanel Fjalori source-response identity handoff", () => {
   it("passes the current response to the workbench and withholds it after the analyzed word changes", () => {
     const view = render(<InstrumentPanel vm={panelVm("NDARJE")} />);
 
+    expect(screen.getByTestId("human-reading-word")).toHaveTextContent("NDARJE");
+    expect(screen.getByTestId("instrument-tab-details-overview")).not.toHaveAttribute("open");
+    for (const section of ["overview", "my-interpretation", "evidence", "candidates", "roots", "advanced"]) {
+      expect(screen.getByTestId(`instrument-tab-details-${section}`)).not.toHaveAttribute("open");
+    }
     expect(screen.getByTestId("instrument-panel-automatic-reasoning")).toHaveTextContent("PARTIAL_NULL");
     fireEvent.click(screen.getByRole("button", { name: "Emit Fjalori response" }));
     expect(screen.getByTestId("instrument-panel-fjalori-workbench-prop")).toHaveTextContent(
@@ -99,8 +104,10 @@ describe("InstrumentPanel Fjalori source-response identity handoff", () => {
     expect(screen.getByTestId("instrument-panel-automatic-reasoning")).toHaveTextContent(
       "DA (“to split, cut, divide”; source-reported verb function)",
     );
+    expect(screen.getByTestId("human-reading-meaning")).toHaveTextContent("division; separation");
 
     view.rerender(<InstrumentPanel vm={panelVm("DALLIM")} />);
+    expect(screen.getByTestId("human-reading-word")).toHaveTextContent("DALLIM");
     expect(screen.getByTestId("instrument-panel-fjalori-workbench-prop")).toHaveTextContent(
       "DALLIM · UNKNOWN_OR_NULL · UNKNOWN_OR_NULL",
     );

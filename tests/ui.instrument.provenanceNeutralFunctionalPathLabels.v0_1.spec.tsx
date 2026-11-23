@@ -62,10 +62,12 @@ describe("provenance-neutral functional path labels v0.1", () => {
 
     const expectedLabel =
       surface === "MeaningPanel"
-        ? "Functional / normalization path: A → Ë."
+        ? "Analysis path: A → Ë."
         : surface === "VoicePathCompare"
           ? "Functional / normalization path:"
-          : "Functional / normalization path";
+          : surface === "VowelPathTimeline"
+            ? "Functional or normalized sequence"
+            : "Functional / normalization path";
     expect(screen.getByText(expectedLabel, { exact: true })).toBeVisible();
     expect(screen.queryByText(/Candidate \/ structural path(?::)? A → Ë/)).not.toBeInTheDocument();
   });

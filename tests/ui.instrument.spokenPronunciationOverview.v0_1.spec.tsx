@@ -7,6 +7,7 @@ import { InstrumentPanel } from "../src/ui/instrument/InstrumentPanel";
 import { SpokenPronunciationOverviewCardV0_1 } from "../src/ui/instrument/sections/SpokenPronunciationOverviewCard.v0_1";
 import { SpokenResultCompositionSummaryV0_1 } from "../src/ui/instrument/sections/SpokenResultCompositionSummary.v0_1";
 import type { TelemetryReadout } from "../src/ui/telemetry/types";
+import { openInstrumentOverviewDetails } from "./helpers/openInstrumentOverviewDetails";
 
 async function analyze(word: string): Promise<any> {
   const response = await GET({
@@ -17,8 +18,9 @@ async function analyze(word: string): Promise<any> {
 }
 
 describe("spoken pronunciation default Overview surface v0.1", () => {
-  it("shows stone pronunciation authority and O to U without opening deterministic details", async () => {
+  it("shows stone pronunciation authority and O to U after opening Overview details", async () => {
     render(<InstrumentPanel payload={await analyze("stone")} />);
+    openInstrumentOverviewDetails();
 
     const overview = screen.getByTestId("spoken-pronunciation-overview");
     expect(overview).toBeVisible();
@@ -36,8 +38,9 @@ describe("spoken pronunciation default Overview surface v0.1", () => {
     expect(screen.getByTestId("deterministic-details")).not.toHaveAttribute("open");
   });
 
-  it("keeps unknown pronunciation Null and exposes its reason by default", async () => {
+  it("keeps unknown pronunciation Null and exposes its reason in Overview details", async () => {
     render(<InstrumentPanel payload={await analyze("zzzzzz-v0-1-missing")} />);
+    openInstrumentOverviewDetails();
 
     const overview = screen.getByTestId("spoken-pronunciation-overview");
     expect(within(overview).getByText("Spoken pronunciation unavailable.")).toBeVisible();

@@ -6,6 +6,7 @@ import { render, screen, within } from "@testing-library/react";
 import { GET } from "../app/api/analyze-v1/route";
 import { adaptAnalysisToTelemetryVM } from "../src/ui/instrument/contractAdapter";
 import { InstrumentPanel } from "../src/ui/instrument/InstrumentPanel";
+import { openInstrumentOverviewDetails } from "./helpers/openInstrumentOverviewDetails";
 
 jest.mock("@/hooks/use-toast", () => ({
   useToast: () => ({ toast: jest.fn() }),
@@ -37,6 +38,7 @@ describe("Open Instrument primary truth status v0.1", () => {
     "exposes the canonical %s status in the primary Overview",
     async (word, heading) => {
       render(<InstrumentPanel vm={adaptAnalysisToTelemetryVM(await analyze(word))} />);
+      openInstrumentOverviewDetails();
 
       const overview = visibleOverview();
       expect(
@@ -51,6 +53,7 @@ describe("Open Instrument primary truth status v0.1", () => {
         vm={adaptAnalysisToTelemetryVM(await analyze("mode"))}
       />,
     );
+    openInstrumentOverviewDetails();
 
     const overview = visibleOverview();
     expect(
@@ -67,6 +70,7 @@ describe("Open Instrument primary truth status v0.1", () => {
         vm={adaptAnalysisToTelemetryVM(await analyze("sterile"))}
       />,
     );
+    openInstrumentOverviewDetails();
 
     expect(
       within(visibleOverview()).getByText(/not reviewed functional evidence/i),
@@ -79,6 +83,7 @@ describe("Open Instrument primary truth status v0.1", () => {
         vm={adaptAnalysisToTelemetryVM(await analyze("xyz"))}
       />,
     );
+    openInstrumentOverviewDetails();
 
     const overview = visibleOverview();
     expect(within(overview).getByText(/Null is a valid result/i)).toBeVisible();

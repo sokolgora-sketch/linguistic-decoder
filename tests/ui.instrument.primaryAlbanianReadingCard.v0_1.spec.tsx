@@ -1,5 +1,5 @@
 /** @jest-environment jsdom */
-import { cleanup, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { runAnalysisDeterministic } from "@/lib/runAnalysisDeterministic";
 import { enginePayloadToAnalysisResult } from "@/shared/analysisAdapter";
 import {
@@ -259,39 +259,64 @@ function makeDiscovery(options: FixtureOptions = {}): PresentOrMissing<Motivatio
 }
 
 describe("primary Albanian conditional component reading", () => {
+  it("keeps raw source and sense IDs in the collapsed source-record details", () => {
+    render(<PrimaryAlbanianReadingCardV0_1 discovery={makeDiscovery()} analysisStatus={undefined} />);
+
+    const sourceFact = screen.getByTestId("primary-albanian-source-fact");
+    const visibleSourceFact = sourceFact.cloneNode(true) as HTMLElement;
+    visibleSourceFact.querySelectorAll("details:not([open])").forEach((details) => details.remove());
+    expect(visibleSourceFact.textContent).not.toContain(TARGET_RECORD_ID);
+    expect(visibleSourceFact.textContent).not.toContain(TARGET_SENSE_ID);
+
+    const details = screen.getAllByTestId("primary-albanian-source-record-details")[0]!;
+    expect(details).not.toHaveAttribute("open");
+    fireEvent.click(details.querySelector("summary")!);
+    expect(details).toHaveAttribute("open");
+    expect(details).toHaveTextContent(TARGET_RECORD_ID);
+    expect(details).toHaveTextContent(TARGET_ENTRY_LOCATOR);
+    expect(details).toHaveTextContent(TARGET_SENSE_ID);
+  });
+
   it("shows the ordered source-linked exploratory hypothesis without promoting operation or sense identity", () => {
     render(<PrimaryAlbanianReadingCardV0_1 discovery={makeDiscovery()} analysisStatus={undefined} />);
 
     const primary = screen.getByTestId("primary-albanian-reading");
     const componentHypothesis = screen.getByTestId("primary-albanian-source-component-hypothesis");
-    expect(componentHypothesis).toHaveTextContent("EXPLORATORY_FUNCTIONAL_HYPOTHESIS");
+    expect(componentHypothesis).toHaveTextContent("Exploratory functional proposal");
+    expect(componentHypothesis).not.toHaveTextContent("EXPLORATORY_FUNCTIONAL_HYPOTHESIS");
     expect(componentHypothesis).toHaveTextContent("Source-attributed component forms (source order): zjarr + fik + -ës");
     expect(componentHypothesis).toHaveTextContent("If the source-reported component readings apply to this attributed formation");
+    const visibleComponentHypothesis = componentHypothesis.cloneNode(true) as HTMLElement;
+    visibleComponentHypothesis.querySelectorAll("details:not([open])").forEach((details) => details.remove());
+    expect(visibleComponentHypothesis.textContent).not.toContain("synthetic-kaikki:word=zjarrfik%C3%ABs:ordinal=0");
+    expect(visibleComponentHypothesis.textContent).not.toContain("synthetic-zjarrfikës-sense");
+    fireEvent.click(screen.getByText("Source record references"));
     expect(componentHypothesis).toHaveTextContent("synthetic-kaikki:word=zjarrfik%C3%ABs:ordinal=0");
     expect(componentHypothesis).toHaveTextContent("synthetic-zjarrfikës-sense");
     expect(componentHypothesis).toHaveTextContent("Functional operation: Null — none is classified by this hypothesis.");
-    expect(componentHypothesis).toHaveTextContent("Canonical component-sense selection: UNKNOWN_OR_NULL");
+    expect(componentHypothesis).toHaveTextContent("canonical sense selection");
+    expect(componentHypothesis).not.toHaveTextContent("UNKNOWN_OR_NULL");
     expect(primary).not.toHaveTextContent(/\b(?:winner|winning|ranking|ranked)\b/i);
     expect(componentHypothesis).toHaveTextContent("Grammatical role: unclassified");
     expect(componentHypothesis).toHaveTextContent("do not establish independent morphology");
     const functionalReading = screen.getByTestId("primary-albanian-functional-reading");
     expect(functionalReading).toHaveTextContent("No functional operation is classified for this source reading.");
-    expect(functionalReading).toHaveTextContent("A separate source-linked conditional component hypothesis is shown below");
-    expect(functionalReading).toHaveTextContent("canonical component-sense selection and independent embryo meaning remain UNKNOWN_OR_NULL.");
+    expect(functionalReading).toHaveTextContent("A separate source-linked conditional component proposal appears below");
+    expect(functionalReading).toHaveTextContent("component meaning remains unestablished.");
     expect(functionalReading).not.toHaveTextContent("no supported functional interpretation is emitted");
-    expect(primary).toHaveTextContent("Independent embryo meaning or function: UNKNOWN_OR_NULL.");
+    expect(primary).toHaveTextContent("Independent component meaning or function: not established.");
     expect(primary).not.toHaveTextContent("Functional role: AGENT");
   });
 
   it("keeps a separately supported classified bridge visible alongside the conditional component reading", () => {
     render(<PrimaryAlbanianReadingCardV0_1 discovery={makeDiscovery({ classifiedOperation: "AGENT" })} analysisStatus={undefined} />);
 
-    expect(screen.getByTestId("primary-albanian-reading")).toHaveTextContent("Functional role: AGENT · exploratory");
+    expect(screen.getByTestId("primary-albanian-reading")).toHaveTextContent("Functional role: Agent · exploratory");
     expect(screen.getByTestId("primary-albanian-functional-hypothesis-statement")).toHaveTextContent(
       "A separate classified functional bridge remains available.",
     );
-    expect(screen.getByTestId("primary-albanian-source-component-hypothesis")).toHaveTextContent("EXPLORATORY_FUNCTIONAL_HYPOTHESIS");
-    expect(screen.getByTestId("primary-albanian-unknown-null")).toHaveTextContent("Independent embryo meaning or function: UNKNOWN_OR_NULL.");
+    expect(screen.getByTestId("primary-albanian-source-component-hypothesis")).toHaveTextContent("Exploratory functional proposal");
+    expect(screen.getByTestId("primary-albanian-unknown-null")).toHaveTextContent("Independent component meaning or function: not established.");
   });
 
   it.each([
@@ -319,14 +344,15 @@ describe("primary Albanian conditional component reading", () => {
     const primary = screen.getByTestId("primary-albanian-reading");
     expect(primary).toHaveTextContent(inputWord);
     expect(screen.getByTestId("primary-albanian-source-fact")).toHaveTextContent(targetGloss);
-    expect(primary).toHaveTextContent("Functional role: " + operation + " · exploratory");
+    const readableOperation = operation === "AGENT" ? "Agent" : "Enable passage";
+    expect(primary).toHaveTextContent("Functional role: " + readableOperation + " · exploratory");
     expect(screen.getByTestId("primary-albanian-functional-hypothesis-statement"))
       .toHaveTextContent("Word-specific explanation: " + statement);
     expect(screen.getByTestId("primary-albanian-functional-reading")).toHaveTextContent(
       "It does not establish morphology, historical derivation, or embryo meaning.",
     );
     expect(screen.getByTestId("primary-albanian-unknown-null")).toHaveTextContent(
-      "Independent embryo meaning or function: UNKNOWN_OR_NULL.",
+      "Independent component meaning or function: not established.",
     );
     expect(primary).not.toHaveTextContent("Evidence references:");
   });
@@ -342,7 +368,7 @@ describe("primary Albanian conditional component reading", () => {
     render(<PrimaryAlbanianReadingCardV0_1 discovery={makeDiscovery(options)} analysisStatus={undefined} />);
     expect(screen.queryByTestId("primary-albanian-source-component-hypothesis")).not.toBeInTheDocument();
     expect(screen.getByTestId("primary-albanian-functional-reading")).toHaveTextContent(
-      "UNKNOWN_OR_NULL · no supported functional interpretation is emitted for this exact source reading.",
+      "No supported functional interpretation is available for this exact source reading.",
     );
   });
 
@@ -361,7 +387,7 @@ describe("primary Albanian conditional component reading", () => {
       classifiedOperation: "ENABLE_PASSAGE",
     })} analysisStatus={undefined} />);
 
-    expect(screen.getByTestId("primary-albanian-reading")).toHaveTextContent("Functional role: ENABLE_PASSAGE · exploratory");
+    expect(screen.getByTestId("primary-albanian-reading")).toHaveTextContent("Functional role: Enable passage · exploratory");
     expect(screen.getByTestId("primary-albanian-functional-hypothesis-statement")).toHaveTextContent(
       "A separate classified functional bridge remains available.",
     );
@@ -388,7 +414,7 @@ describe("primary Albanian conditional component reading", () => {
 
     expect(screen.queryByTestId("primary-albanian-functional-hypothesis-statement")).not.toBeInTheDocument();
     expect(screen.getByTestId("primary-albanian-functional-reading")).toHaveTextContent(
-      "UNKNOWN_OR_NULL · no supported functional interpretation is emitted for this exact source reading.",
+      "No supported functional interpretation is available for this exact source reading.",
     );
   });
 
@@ -430,13 +456,17 @@ describe("primary Albanian conditional component reading", () => {
 
     const componentHypothesis = screen.getByTestId("primary-albanian-source-component-hypothesis");
     expect(componentHypothesis).toHaveTextContent("Source-attributed component forms (source order): zjarr + fik + -ës");
-    expect(componentHypothesis).toHaveTextContent("EXPLORATORY_FUNCTIONAL_HYPOTHESIS");
-    expect(componentHypothesis).toHaveTextContent("Research-level functional hypothesis only.");
+    expect(componentHypothesis).toHaveTextContent("Exploratory functional proposal");
+    expect(componentHypothesis).not.toHaveTextContent("EXPLORATORY_FUNCTIONAL_HYPOTHESIS");
+    expect(componentHypothesis).not.toHaveTextContent("Evidence references:");
+    expect(componentHypothesis).not.toHaveTextContent("en-fik-sq-verb-3UhMn1WK");
+    fireEvent.click(screen.getByText("Source record references"));
+    fireEvent.click(screen.getByText("Exact claim classifications"));
     expect(componentHypothesis).toHaveTextContent("Evidence references:");
     expect(componentHypothesis).toHaveTextContent("en-fik-sq-verb-3UhMn1WK");
-    expect(componentHypothesis).toHaveTextContent("Canonical component-sense selection: UNKNOWN_OR_NULL");
+    expect(componentHypothesis).toHaveTextContent("canonical sense selection");
     expect(componentHypothesis).toHaveTextContent("functionalOperation, composition, embryo function, and independent historical claims remain Null.");
     expect(componentHypothesis).toHaveTextContent("Functional operation: Null — none is classified by this hypothesis.");
-    expect(screen.getByTestId("primary-albanian-unknown-null")).toHaveTextContent("Independent embryo meaning or function: UNKNOWN_OR_NULL.");
+    expect(screen.getByTestId("primary-albanian-unknown-null")).toHaveTextContent("Independent component meaning or function: not established.");
   });
 });

@@ -100,6 +100,15 @@ async function main(): Promise<void> {
     console.log("CURRENT_ANALYSIS_PROVENANCE=PASS");
     console.log(`ANALYZE_REQUESTS_AFTER_FRESH=${analyzeRequests}`);
 
+    const overviewDetails = page.getByTestId("instrument-tab-details-overview");
+    assert(await overviewDetails.getAttribute("open") === null, "Expanded Overview details should remain collapsed by default.");
+    assert(
+      !(await page.getByText("MULTILINGUAL SOURCE DISCOVERY", { exact: true }).first().isVisible()),
+      "Detailed source discovery should not be visible before the user opens Overview details.",
+    );
+    await overviewDetails.locator(":scope > summary").click();
+    console.log("OVERVIEW_DETAILS_DISCLOSURE=PASS");
+
     const assertAuthorityHierarchy = async (viewportLabel: "DESKTOP" | "MOBILE") => {
       await page.getByText("MULTILINGUAL SOURCE DISCOVERY", { exact: true }).first().waitFor({ state: "visible" });
       await page.getByTestId("multilingual-discovery-role").first().waitFor({ state: "visible" });
@@ -258,6 +267,9 @@ async function main(): Promise<void> {
       await page.getByRole("button", { name: "Analyze" }).click();
       await page.getByTestId("open-instrument-shell").waitFor({ state: "visible" });
       await page.getByText("Current analysis", { exact: true }).waitFor({ state: "visible" });
+      const overviewDetails = page.getByTestId("instrument-tab-details-overview");
+      assert(await overviewDetails.getAttribute("open") === null, "Overview details should start collapsed after a fresh analysis.");
+      await overviewDetails.locator(":scope > summary").click();
       const overview = page.locator('[role="tabpanel"]:not([hidden])');
       await overview
         .getByRole("heading", { name: truthCase.status, exact: true })

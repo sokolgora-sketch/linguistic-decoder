@@ -11,7 +11,7 @@ function missing() {
 }
 
 describe('VowelPathTimeline (v0.1)', () => {
-  it('renders DIVERGE when surface != functional', () => {
+  it('explains differing paths without exposing the internal delta code', () => {
     render(
       <VowelPathTimeline
         detected={present(['U', 'I'])}
@@ -21,12 +21,18 @@ describe('VowelPathTimeline (v0.1)', () => {
       />
     );
 
-    expect(screen.getByText('DIVERGE')).toBeInTheDocument();
-    expect(screen.getAllByText('U → I').length).toBeGreaterThan(0);
+    expect(screen.getByText('Paths differ')).toBeInTheDocument();
+    expect(screen.getByText('Detected Voice sequence')).toBeInTheDocument();
+    expect(screen.getByText('Written vowel sequence')).toBeInTheDocument();
+    expect(screen.getByText('Functional or normalized sequence')).toBeInTheDocument();
+    expect(screen.getAllByText('U → I')).toHaveLength(2);
     expect(screen.getByText('U → Y')).toBeInTheDocument();
+    expect(screen.queryByText('DIVERGE')).not.toBeInTheDocument();
+    expect(screen.getByText('Functional or normalized sequence').parentElement).toHaveClass('flex-wrap', 'min-w-0');
+    expect(screen.getAllByText('U → I')[0].parentElement).toHaveClass('min-w-0');
   });
 
-  it('renders SHIFT when VM emits SHIFT', () => {
+  it('uses plain labels for matching and shifted paths', () => {
     render(
       <VowelPathTimeline
         detected={present(['U', 'I'])}
@@ -36,10 +42,11 @@ describe('VowelPathTimeline (v0.1)', () => {
       />
     );
 
-    expect(screen.getByText('SHIFT')).toBeInTheDocument();
+    expect(screen.getByText('Paths shifted')).toBeInTheDocument();
+    expect(screen.queryByText('SHIFT')).not.toBeInTheDocument();
   });
 
-  it('renders not emitted state when paths are missing', () => {
+  it('shows unavailable paths without exposing missing-state codes', () => {
     render(
       <VowelPathTimeline
         detected={missing()}
@@ -49,7 +56,9 @@ describe('VowelPathTimeline (v0.1)', () => {
       />
     );
 
-    expect(screen.getByText('NOT EMITTED')).toBeInTheDocument();
-    expect(screen.getByText('No spoken / canonical Voice path.')).toBeInTheDocument();
+    expect(screen.getByText('Comparison unavailable')).toBeInTheDocument();
+    expect(screen.getAllByText('Not available')).toHaveLength(3);
+    expect(screen.queryByText('NOT EMITTED')).not.toBeInTheDocument();
+    expect(screen.queryByText('not emitted')).not.toBeInTheDocument();
   });
 });

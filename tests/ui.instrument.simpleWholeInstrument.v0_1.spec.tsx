@@ -14,6 +14,7 @@ import ZroChatPage from "../src/components/ZroChatPage";
 import {
   InstrumentPanel,
 } from "../src/ui/instrument/InstrumentPanel";
+import { openInstrumentOverviewDetails } from "./helpers/openInstrumentOverviewDetails";
 
 async function analyze(
   word: string,
@@ -44,6 +45,7 @@ describe(
             payload={body}
           />,
         );
+        openInstrumentOverviewDetails();
 
         expect(
           screen.getByTestId(
@@ -209,6 +211,7 @@ describe(
             payload={body}
           />,
         );
+        openInstrumentOverviewDetails();
 
         const overviewPanel =
           screen.getByRole(
@@ -300,7 +303,7 @@ describe(
           within(
             rootMapSection!,
           ).getByText(
-            "STATE: PRESENT",
+            "Map status: available",
           ),
         ).toBeVisible();
 
@@ -325,6 +328,31 @@ describe(
         expect(
           boundary,
         ).toBeVisible();
+      },
+    );
+
+    it(
+      "keeps Overview concise and reveals selected tab content on demand",
+      async () => {
+        const body = await analyze("NDARJE");
+        render(<InstrumentPanel payload={body} />);
+
+        expect(screen.getByTestId("instrument-tab-details-overview")).not.toHaveAttribute("open");
+        for (const [label, id] of [
+          ["My Interpretation", "my-interpretation"],
+          ["Evidence", "evidence"],
+          ["Candidates", "candidates"],
+          ["Roots / Meaning", "roots"],
+          ["Advanced", "advanced"],
+        ] as const) {
+          const tab = screen.getByRole("tab", { name: label });
+          fireEvent.click(tab);
+          expect(tab).toHaveAttribute("aria-selected", "true");
+          expect(screen.getByTestId(`instrument-tab-details-${id}`)).toHaveAttribute("open");
+        }
+
+        fireEvent.click(screen.getByRole("tab", { name: "Overview" }));
+        expect(screen.getByTestId("instrument-tab-details-overview")).not.toHaveAttribute("open");
       },
     );
 
