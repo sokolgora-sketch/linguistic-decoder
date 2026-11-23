@@ -365,7 +365,9 @@ describe("current-word symbolic draft v0.1", () => {
       "D@0 · A@1 · L@2 · L@3 · I@4 · M@5",
     );
     expect(screen.getByTestId("current-word-symbolic-written-voices")).toHaveTextContent("A@1 → I@4");
-    expect(screen.getByTestId("current-word-symbolic-source-meaning")).toHaveTextContent("No matching exact-form source meaning is available");
+    expect(screen.getByTestId("current-word-symbolic-kaikki-availability")).toHaveTextContent("No matching Kaikki source fact is available");
+    expect(screen.getByTestId("current-word-symbolic-kaikki-availability")).toHaveTextContent("Kaikki analysis status not supplied");
+    expect(screen.getByTestId("current-word-symbolic-fjalori-availability")).toHaveTextContent("No separate FjaloriShqip response is attached to this analysis");
     expect(screen.getByTestId("current-word-symbolic-source-meaning")).not.toHaveTextContent("UNKNOWN_OR_NULL");
     expect(screen.getByTestId("current-word-symbolic-whole-word-status")).toHaveTextContent("UNKNOWN_OR_NULL");
     expect(screen.getByTestId("current-word-symbolic-graph-status")).toHaveTextContent("PARTIAL_NULL");
@@ -764,6 +766,10 @@ describe("current-word symbolic draft v0.1", () => {
 
     const generated = screen.getAllByTestId("current-word-da-generated-functional-candidate");
     expect(generated).toHaveLength(2);
+    expect(screen.getByTestId("current-word-symbolic-kaikki-availability")).toHaveTextContent("Kaikki analysis: No exact source record found");
+    expect(screen.getByTestId("current-word-symbolic-fjalori-availability")).toHaveTextContent(
+      "A separate FjaloriShqip response for NDARJE is available in the results below.",
+    );
     expect(within(generated[0]).getByTestId("current-word-da-generated-source-sense")).toHaveTextContent(
       "FjaloriShqip source response · available · exact form ndarje · Entry 1 · Sense 1 (response position, not a source-issued sense ID): division; separation",
     );
@@ -850,6 +856,10 @@ describe("current-word symbolic draft v0.1", () => {
     );
 
     expect(screen.queryByTestId("current-word-da-generated-functional-candidate")).not.toBeInTheDocument();
+    expect(screen.getByTestId("current-word-symbolic-kaikki-availability")).toHaveTextContent("Kaikki analysis: No exact source record found");
+    expect(screen.getByTestId("current-word-symbolic-fjalori-availability")).toHaveTextContent(
+      "FjaloriShqip returned HTTP 404 for NDARJE; this lookup does not establish that the form is absent.",
+    );
     const nullResult = screen.getByTestId("current-word-da-generated-functional-null");
     expect(nullResult).toHaveTextContent("No conditional DA functional reading is available");
     const reasons = within(nullResult).getByText("Technical reasons").closest("details");

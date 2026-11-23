@@ -293,10 +293,26 @@ export function CurrentWordSymbolicDraftV0_1({
               </div>
             ))}
           </div>
-        )) : <p className="mt-1 text-[#aeb7c5]">{sourceIdentityMismatch
-          ? "source evidence withheld because the selected language or dialect differs from the analyzed source identity"
-          : `No matching exact-form source meaning is available in this analysis context${sourceStatus ? ` · ${humanReadableStatusLabelV0_1(sourceStatus.status)}${sourceStatus.reasonCode ? ` (${humanReadableStatusTextV0_1(sourceStatus.reasonCode)})` : ""}` : " · source status not supplied"}`
-        }.</p>}
+        )) : sourceIdentityMismatch ? (
+          <p className="mt-1 text-[#aeb7c5]">source evidence withheld because the selected language or dialect differs from the analyzed source identity</p>
+        ) : (
+          <div className="mt-1 text-[#aeb7c5]">
+            <p data-testid="current-word-symbolic-kaikki-availability">
+              No matching Kaikki source fact is available in this analysis context{sourceStatus
+                ? ` · Kaikki analysis: ${humanReadableStatusLabelV0_1(sourceStatus.status)}${sourceStatus.reasonCode ? ` (${humanReadableStatusTextV0_1(sourceStatus.reasonCode)})` : ""}`
+                : " · Kaikki analysis status not supplied"}.
+            </p>
+            <p className="mt-1" data-testid="current-word-symbolic-fjalori-availability">
+              {fjaloriResponse?.status === "available"
+                ? `A separate FjaloriShqip response for ${fjaloriResponse.queryForm} is available in the results below.`
+                : fjaloriResponse?.status === "http-not-found"
+                  ? `FjaloriShqip returned HTTP 404 for ${fjaloriResponse.queryForm}; this lookup does not establish that the form is absent.`
+                  : fjaloriResponse
+                    ? `A separate FjaloriShqip response for ${fjaloriResponse.queryForm} did not provide a usable source sense for this analysis.`
+                    : "No separate FjaloriShqip response is attached to this analysis."}
+            </p>
+          </div>
+        )}
         <p className="mt-1 text-[#aeb7c5]">This lexical evidence is displayed separately and does not authorize a symbolic association or meaning bridge.</p>
       </div>
 
