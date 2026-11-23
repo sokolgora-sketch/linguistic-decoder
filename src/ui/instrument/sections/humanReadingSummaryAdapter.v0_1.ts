@@ -5,6 +5,7 @@ import { sameAlbanianSourceForm } from "@/ui/instrument/albanianSourceFormIdenti
 import type {
   CurrentWordFunctionalReasoningCandidateV0_1,
   CurrentWordFunctionalReasoningProjectionV0_1,
+  FunctionalFamilyPathV0_1,
   RuntimeFjaloriSourceResponseV0_1,
 } from "@/ui/instrument/sections/currentWordSourceFunctionalSuggestionAdapter.v0_1";
 
@@ -40,6 +41,7 @@ export type HumanReadingFunctionalGroupV0_1 = Readonly<{
   relationship: "ACTION_TO_EVENT_OR_RESULT" | "KNOWING_TO_KNOWLEDGE" | "SOURCE_LINKED_PROPOSAL";
   familyForms: readonly string[];
   familySenses: readonly HumanReadingFamilySenseV0_1[];
+  functionalPaths: readonly FunctionalFamilyPathV0_1[];
   explanation: string;
   candidates: readonly CurrentWordFunctionalReasoningCandidateV0_1[];
 }>;
@@ -100,6 +102,7 @@ function functionSummary(
   targetForm: string,
   targetGloss: string,
   familySenses: readonly HumanReadingFamilySenseV0_1[],
+  functionalPaths: readonly FunctionalFamilyPathV0_1[],
 ): string {
   const displayTargetForm = targetForm.toLocaleUpperCase("sq-AL");
   if (relationship === "SOURCE_LINKED_PROPOSAL") {
@@ -107,6 +110,15 @@ function functionSummary(
   }
   if (relationship === "KNOWING_TO_KNOWLEDGE") {
     return `${operator} is recorded with the function “${functionText}”. This suggests a possible knowing-to-knowledge connection for ${displayTargetForm}’s “${targetGloss}” sense, but the sources do not establish that relationship.`;
+  }
+  if (functionalPaths.length) {
+    const familyForms = [...new Set(functionalPaths.map(({ nodes }) =>
+      nodes[1].exactForm.toLocaleUpperCase("sq-AL"),
+    ))];
+    const familyClause = familyForms.length > 1
+      ? `${familyForms.slice(0, -1).join(", ")} and ${familyForms[familyForms.length - 1]}`
+      : familyForms[0];
+    return `The reviewed ${operator} function (“${functionText}”) and recorded action senses for ${familyClause} support a proposed functional progression to ${displayTargetForm}. The links are hypotheses, not source-reported relations; morphology, intermediate state, and history remain unresolved.`;
   }
   const familyForms = [...new Set(familySenses
     .filter(({ gloss }) => /\b(?:divide|dividing|divided|separate|separating|separation|split|cut)\b/iu.test(gloss))
@@ -133,6 +145,7 @@ function buildFunctionalGroups(
     relationship: HumanReadingFunctionalGroupV0_1["relationship"];
     familyForms: Set<string>;
     familySenses: Map<string, HumanReadingFamilySenseV0_1>;
+    functionalPaths: Map<string, FunctionalFamilyPathV0_1>;
     candidates: CurrentWordFunctionalReasoningCandidateV0_1[];
   }>();
 
@@ -162,9 +175,11 @@ function buildFunctionalGroups(
       relationship,
       familyForms: new Set<string>(),
       familySenses: new Map<string, HumanReadingFamilySenseV0_1>(),
+      functionalPaths: new Map<string, FunctionalFamilyPathV0_1>(),
       candidates: [],
     };
     glosses.forEach((gloss) => group.targetGlosses.add(gloss));
+    candidate.familyNetwork.functionalPaths.forEach((path) => group.functionalPaths.set(path.pathId, path));
     candidate.familyNetwork.transitionNetworks.forEach((transition) => {
       const familyForm = transition.familyForm?.trim();
       if (familyForm) group.familyForms.add(familyForm);
@@ -205,6 +220,7 @@ function buildFunctionalGroups(
       relationship: group.relationship,
       familyForms: [...group.familyForms],
       familySenses: [...group.familySenses.values()],
+      functionalPaths: [...group.functionalPaths.values()],
       explanation: functionSummary(
         group.relationship,
         group.operator,
@@ -212,6 +228,7 @@ function buildFunctionalGroups(
         group.targetForm,
         targetGlosses.join("; "),
         [...group.familySenses.values()],
+        [...group.functionalPaths.values()],
       ),
       candidates: group.candidates,
     };
@@ -312,6 +329,7 @@ export function buildHumanReadingSummaryV0_1(input: Readonly<{
       relationship: "SOURCE_LINKED_PROPOSAL",
       familyForms: bridge.relatedForm ? [bridge.relatedForm] : [],
       familySenses: [],
+      functionalPaths: [],
       explanation: bridgeHypothesis.statement,
       candidates: [],
     });

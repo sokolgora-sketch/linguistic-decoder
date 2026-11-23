@@ -386,11 +386,13 @@ describe("Motivation Discovery Lab presentation v0.1", () => {
     expect(within(humanSummary).getAllByTestId("human-reading-functional-result")).toHaveLength(1);
     expect(summary.functionalReadings[0].candidates.flatMap(({ familyNetwork }) => familyNetwork.transitionNetworks)).toHaveLength(8);
     const concise = within(humanSummary).getByTestId("human-reading-functional-results");
-    expect(concise).toHaveTextContent("DA is recorded with the function");
-    expect(concise).toHaveTextContent("Separate DAJ and NDAJ entries also describe dividing or separating");
-    expect(concise).toHaveTextContent("possible action-to-event connection for NDARJE");
-    expect(concise).toHaveTextContent("do not establish how the word was formed");
-    expect((concise.textContent?.match(/[.!?](?:\s|$)/g) ?? []).length).toBeLessThanOrEqual(3);
+    expect(concise).toHaveTextContent("The reviewed DA function");
+    expect(concise).toHaveTextContent("DAJ");
+    expect(concise).toHaveTextContent("NDAJ");
+    expect(concise).toHaveTextContent("proposed functional progression to NDARJE");
+    expect(concise).toHaveTextContent("The links are hypotheses, not source-reported relations");
+    expect((concise.textContent?.match(/[.!?](?:\s|$)/g) ?? []).length).toBe(2);
+    expect(concise.textContent?.length ?? Infinity).toBeLessThan(400);
     expect(concise).not.toHaveTextContent("division; separation");
     expect(concise).not.toHaveTextContent("UNKNOWN_OR_NULL");
     expect(concise).not.toHaveTextContent("PARTIAL_NULL");
@@ -400,6 +402,16 @@ describe("Motivation Discovery Lab presentation v0.1", () => {
     expect(within(humanSummary).getByTestId("human-reading-source-labels")).toHaveTextContent("Source: FjaloriShqip");
     expect(within(humanSummary).getByTestId("human-reading-source-labels")).not.toHaveTextContent("citation not independently verified");
     fireEvent.click(within(humanSummary).getByText("Sources and other meanings"));
+    const proposedPaths = within(sourcesDetails).getByTestId("human-reading-functional-paths");
+    expect(within(proposedPaths).getAllByTestId("human-reading-functional-path").length).toBeGreaterThan(1);
+    expect(proposedPaths).toHaveTextContent("DA");
+    expect(proposedPaths).toHaveTextContent("DAJ");
+    expect(proposedPaths).toHaveTextContent("NDAJ");
+    expect(proposedPaths).toHaveTextContent("Entry 1 · Sense 1 · response position, not a source-issued sense ID");
+    expect(proposedPaths).toHaveTextContent("These links are proposals, not source-reported relationships");
+    expect(proposedPaths).not.toHaveTextContent("Propose functional continuity");
+    expect(proposedPaths).not.toHaveTextContent("Propose connecting");
+    expect(proposedPaths.textContent?.match(/These links are proposals/g)).toHaveLength(1);
     expect(sourcesDetails).toHaveTextContent("maternal");
     expect(sourcesDetails).toHaveTextContent(/ndaj/i);
     expect(sourcesDetails).toHaveTextContent(/daj/i);
@@ -423,6 +435,8 @@ describe("Motivation Discovery Lab presentation v0.1", () => {
     expect(technical).toHaveTextContent("FJALORISHQIP");
     expect(technical).toHaveTextContent("DIRECT_FREE_OPERATOR_FORM");
     expect(technical).toHaveTextContent("INTERMEDIATE_STATE_UNKNOWN");
+    expect(technical).toHaveTextContent("Propose functional continuity");
+    expect(technical).toHaveTextContent("Propose connecting");
   });
 
   it("does not fetch DA-family records for DALLIM without a qualifying functional proposal", async () => {

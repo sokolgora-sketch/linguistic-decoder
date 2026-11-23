@@ -80,6 +80,11 @@ function deduplicatedTransitions(reading: HumanReadingSummaryProjectionV0_1["fun
   ])).values()];
 }
 
+function deduplicatedFunctionalPaths(reading: HumanReadingSummaryProjectionV0_1["functionalReadings"][number]) {
+  const paths = reading.candidates.flatMap(({ familyNetwork }) => familyNetwork.functionalPaths);
+  return [...new Map(paths.map((path) => [path.pathId, path])).values()];
+}
+
 function uniqueSources(values: readonly Readonly<{ label: string; url: string }>[]) {
   const seen = new Set<string>();
   return values.filter(({ label, url }) => {
@@ -130,6 +135,8 @@ export function HumanReadingSummaryCardV0_1({
     record,
   ])).values()];
   const sourceSenseGroups = groupSourceSenses(summary.meanings);
+  const functionalPaths = [...new Map(summary.functionalReadings.flatMap(deduplicatedFunctionalPaths)
+    .map((path) => [path.pathId, path])).values()];
 
   return (
     <section
@@ -266,6 +273,28 @@ export function HumanReadingSummaryCardV0_1({
               ) : null}
             </section>
           ))}
+          {functionalPaths.length ? (
+            <section aria-label="Inspectable proposed functional paths" data-testid="human-reading-functional-paths">
+              <h4 className="font-semibold text-[#f5f7fb]">Proposed functional paths</h4>
+              <p className="mt-1 text-xs text-[#aeb7c5]">
+                These links are proposals, not source-reported relationships; morphology and historical origin remain unestablished.
+              </p>
+              <ul className="mt-2 space-y-2">
+                {functionalPaths.map((path) => (
+                  <li key={path.pathId} data-testid="human-reading-functional-path" className="rounded border border-[#303a45] p-2">
+                    <p className="font-medium">
+                      {path.nodes[0].exactForm.toLocaleUpperCase("sq-AL")} → {path.nodes[1].exactForm.toLocaleUpperCase("sq-AL")} → {path.nodes[2].exactForm.toLocaleUpperCase("sq-AL")}
+                      <span className="font-normal"> · “{path.nodes[1].functionText}”</span>
+                    </p>
+                    <p className="mt-1 text-xs text-[#aeb7c5]">
+                      {path.nodes[1].sourceLabel} · {path.nodes[1].sourceLocator} · {sourceStatusLabel(path.nodes[1].evidenceStatus)}
+                      {path.nodes[1].sourceUrl ? <> · <a className="underline" href={path.nodes[1].sourceUrl} target="_blank" rel="noreferrer">Open source</a></> : null}
+                    </p>
+                  </li>
+                ))}
+              </ul>
+            </section>
+          ) : null}
           {familyRecords.length ? (
             <section aria-label="Related source records and sense alternatives">
               <h4 className="font-semibold text-[#f5f7fb]">Related source records and sense alternatives</h4>
@@ -374,6 +403,27 @@ export function HumanReadingSummaryCardV0_1({
               </ol>
             </section>
           )))}
+          {functionalPaths.map((path) => (
+            <section key={`path-evidence:${path.pathId}`} className="rounded border border-[#303a45] p-2">
+              <p>Typed functional path {path.pathId} · {path.evidenceStatus} · {path.claimLayer}</p>
+              <ol className="mt-2 list-decimal space-y-1 pl-5">
+                {path.nodes.map((node) => (
+                  <li key={node.nodeId}>
+                    {node.role} · node {node.nodeId} · {node.exactForm} · {node.functionText} · {node.partOfSpeech} · {node.sourceIdentity} · {node.sourceSenseIdentity} · {node.sourceLocator} · {node.evidenceStatus}/{node.claimLayer} · refs {node.sourceRefs.join(", ")}
+                  </li>
+                ))}
+              </ol>
+              <ol className="mt-2 list-decimal space-y-1 pl-5">
+                {path.edges.map((edge) => (
+                  <li key={edge.edgeId}>
+                    {edge.relationshipType} · {edge.edgeId} · {edge.fromNodeId} → {edge.toNodeId} · depends on {edge.dependsOn.join(", ")} · {edge.evidenceStatus}/{edge.claimLayer} · relationSourceRefs {edge.relationSourceRefs.join(", ") || "empty"} · {edge.reasonCodes.join(", ")} · {edge.description}
+                  </li>
+                ))}
+              </ol>
+              <p>Path result {path.wholeWordStatus} · historical origin {path.historicalOrigin} · no_single_winner {String(path.noSingleWinner)} · user_decides {path.userDecisionPosture}</p>
+              <p>Unresolved: {path.unresolvedMaterial.join(" · ")}</p>
+            </section>
+          ))}
         </div>
       </details>
     </section>
