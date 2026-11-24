@@ -349,6 +349,11 @@ export function InstrumentPanel(props: Props) {
         discovery: vm.motivationDiscoveryV0_2,
         functionalReasoning: automaticFunctionalReasoning,
         runtimeSourceResponse: runtimeFjaloriSourceForCurrentAnalysis,
+        candidateRows: vm.candidates,
+        rootMap: vm.rootMap,
+        reviewedOperators: vm.analysisStatusV0_2?.kind === "present"
+          ? vm.analysisStatusV0_2.value.reviewedOperators
+          : [],
       })
     : null,
   [isValidVm, vm, automaticFunctionalReasoning, runtimeFjaloriSourceForCurrentAnalysis]);

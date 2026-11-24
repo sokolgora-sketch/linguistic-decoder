@@ -17,6 +17,60 @@ import { analyzeStructuralInputV0_2 } from "@/shared/structuralHypothesisDiscove
 import type { MotivationDiscoveryV0_1VM } from "@/ui/telemetry/types";
 import type { AlbanianLexicalReadingV0_1 } from "@/shared/openInstrument/motivationEngineDiscoveryServerOnly.v0_1";
 
+async function analyzeForHumanReading(word: string) {
+  const response = await GET(new Request(
+    `http://localhost/api/analyze-v1?word=${encodeURIComponent(word)}&mode=strict&alphabet=albanian&providerExecution=disabled`,
+  ));
+  expect(response.status).toBe(200);
+  return adaptAnalysisToTelemetryVM(await response.json());
+}
+
+function humanReadingFromVm(
+  word: string,
+  vm: ReturnType<typeof adaptAnalysisToTelemetryVM>,
+  runtimeSourceResponse: RuntimeFjaloriSourceResponseV0_1 | null = null,
+) {
+  return buildHumanReadingSummaryV0_1({
+    word,
+    discovery: vm.motivationDiscoveryV0_2,
+    functionalReasoning: null,
+    runtimeSourceResponse,
+    candidateRows: vm.candidates,
+    rootMap: vm.rootMap,
+    reviewedOperators: vm.analysisStatusV0_2.kind === "present"
+      ? vm.analysisStatusV0_2.value.reviewedOperators
+      : [],
+  });
+}
+
+function fjaloriSenseResponse(
+  word: string,
+  glosses: readonly string[],
+): RuntimeFjaloriSourceResponseV0_1 {
+  const exactSourceForm = word.toLocaleLowerCase("sq-AL");
+  return {
+    requestKey: `${word}\u0000${exactSourceForm}`,
+    queryForm: word,
+    status: "available",
+    exactSourceForm,
+    apiUrl: `https://fjalorishqip.org/api/v1/fjala/${encodeURIComponent(exactSourceForm)}.json`,
+    licence: "CC BY-SA 4.0",
+    analysisLanguage: "sq",
+    analysisVariety: "albanian",
+    recordSources: ["sq-wiktionary"],
+    senses: glosses.map((gloss, index) => ({
+      entryIndex: 1,
+      senseIndex: index + 1,
+      partOfSpeech: "verb",
+      gloss,
+      glossLanguage: "en" as const,
+      senseSource: "sq-wiktionary",
+      tags: [],
+      entrySources: ["sq-wiktionary"],
+    })),
+  };
+}
+
 function model(overrides: Partial<MotivationDiscoveryV0_1VM> = {}): MotivationDiscoveryV0_1VM {
   const inputWord = overrides.inputWord ?? "study";
   const writtenAnalysis = analyzeStructuralInputV0_2(inputWord);
@@ -143,6 +197,144 @@ function model(overrides: Partial<MotivationDiscoveryV0_1VM> = {}): MotivationDi
 const originalFetch = global.fetch;
 afterEach(() => {
   global.fetch = originalFetch;
+});
+
+describe("Human Reading Summary raw candidate handoff", () => {
+  it("separates exact DA and DI senses from their independently reviewed operator functions", async () => {
+    const daVm = await analyzeForHumanReading("DA");
+    const daSummary = humanReadingFromVm(
+      "DA",
+      daVm,
+      fjaloriSenseResponse("DA", ["cry to a horse"]),
+    );
+    expect(daSummary.reviewedLexicalFunctions.map(({ functionText }) => functionText)).toEqual([
+      "to split, cut, divide",
+    ]);
+    expect(daSummary.functionalCandidates).toHaveLength(0);
+    const daView = render(<HumanReadingSummaryCardV0_1 summary={daSummary} />);
+    expect(screen.getByTestId("human-reading-meaning")).toHaveTextContent("cry to a horse");
+    expect(screen.getByTestId("human-reading-reviewed-functions")).toHaveTextContent("to split, cut, divide");
+    expect(screen.getByTestId("human-reading-reviewed-functions")).toHaveTextContent("Northwestern Gheg");
+    expect(screen.getByTestId("human-reading-no-whole-word-candidate")).toBeInTheDocument();
+    expect(screen.getByTestId("human-reading-written-voices")).toHaveTextContent("A@1");
+    expect(screen.queryByTestId("human-reading-functional-null")).not.toBeInTheDocument();
+    daView.unmount();
+
+    const diVm = await analyzeForHumanReading("DI");
+    const diSummary = humanReadingFromVm(
+      "DI",
+      diVm,
+      fjaloriSenseResponse("DI", ["to know", "to dawn (daylight)", "two"]),
+    );
+    expect(diSummary.reviewedLexicalFunctions.map(({ functionText }) => functionText)).toEqual([
+      "know / knowledge",
+    ]);
+    const diView = render(<HumanReadingSummaryCardV0_1 summary={diSummary} />);
+    expect(screen.getByTestId("human-reading-meaning")).toHaveTextContent("to know; to dawn (daylight); two");
+    expect(screen.getByTestId("human-reading-reviewed-functions")).toHaveTextContent("know / knowledge");
+    expect(screen.getByTestId("human-reading-written-voices")).toHaveTextContent("I@1");
+    expect(screen.queryByTestId("human-reading-functional-null")).not.toBeInTheDocument();
+    diView.unmount();
+
+    const dijeVm = await analyzeForHumanReading("DIJE");
+    const dijeSummary = humanReadingFromVm("DIJE", dijeVm);
+    expect(dijeSummary.reviewedLexicalFunctions).toHaveLength(0);
+    expect(dijeSummary.functionalCandidates).toHaveLength(0);
+    render(<HumanReadingSummaryCardV0_1 summary={dijeSummary} />);
+    expect(screen.queryByTestId("human-reading-reviewed-functions")).not.toBeInTheDocument();
+    expect(screen.queryByText(/reviewed (?:DI|Albanian).*lexical function/iu)).not.toBeInTheDocument();
+    expect(screen.getAllByTestId("human-reading-functional-null")).toHaveLength(1);
+    expect(screen.getByTestId("human-reading-written-voices")).toHaveTextContent("I@1 → E@3");
+  });
+
+  it("renders the existing Study Partial and Damage reviewed candidates without inventing target meanings or borrowing Voice paths", async () => {
+    const studyVm = await analyzeForHumanReading("study");
+    const studySummary = humanReadingFromVm("study", studyVm);
+    expect(studySummary.meanings).toHaveLength(0);
+    expect(studySummary.functionalCandidates).toHaveLength(2);
+    const studyView = render(<HumanReadingSummaryCardV0_1 summary={studySummary} />);
+    expect(screen.getByTestId("human-reading-meaning-unavailable")).toBeInTheDocument();
+    const studyCandidates = screen.getAllByTestId("human-reading-functional-candidate");
+    expect(studyCandidates).toHaveLength(2);
+    const shtuDiCandidate = studyCandidates.find((candidate) => candidate.textContent?.includes("SHTU + DI → STUDY"));
+    expect(shtuDiCandidate).toBeDefined();
+    expect(within(shtuDiCandidate as HTMLElement).getByTestId("human-reading-candidate-explanation")).toHaveTextContent(
+      "Adding or increasing knowledge; making knowledge yours through learning.",
+    );
+    expect(within(shtuDiCandidate as HTMLElement).getByTestId("human-reading-candidate-components")).toHaveTextContent(
+      "SHTU — add / increase / put-on (structural evidence); DI — know / knowledge (reviewed operator evidence)",
+    );
+    expect(shtuDiCandidate).toHaveTextContent("Partial candidate");
+    expect(within(shtuDiCandidate as HTMLElement).getByTestId("human-reading-candidate-authority")).toHaveTextContent(
+      "Albanian functional proposal · Partial candidate",
+    );
+    expect(shtuDiCandidate).toHaveTextContent("SHTU + DI → STUDY");
+    expect(within(shtuDiCandidate as HTMLElement).getByTestId("human-reading-candidate-voice-path")).toHaveTextContent("U → I");
+    const diStudyCandidate = studyCandidates.find((candidate) =>
+      candidate.textContent?.includes("DI → STUDY") && !candidate.textContent?.includes("SHTU + DI → STUDY"),
+    );
+    expect(diStudyCandidate).toBeDefined();
+    expect(within(diStudyCandidate as HTMLElement).getByTestId("human-reading-candidate-authority")).toHaveTextContent(
+      "Albanian functional proposal · Reviewed candidate · DI → STUDY",
+    );
+    expect(screen.getByText("More than one possible reading is available; you decide.")).toBeInTheDocument();
+    expect(screen.getByTestId("human-reading-written-voices")).toHaveTextContent("U@2 → Y@4");
+    expect(screen.queryByTestId("human-reading-functional-null")).not.toBeInTheDocument();
+    studyView.unmount();
+
+    const damageVm = await analyzeForHumanReading("damage");
+    const damageSummary = humanReadingFromVm("damage", damageVm);
+    expect(damageSummary.meanings).toHaveLength(0);
+    expect(damageSummary.functionalCandidates).toHaveLength(1);
+    const damageView = render(<HumanReadingSummaryCardV0_1 summary={damageSummary} />);
+    expect(screen.getByTestId("human-reading-meaning-unavailable")).toBeInTheDocument();
+    expect(screen.getByTestId("human-reading-candidate-explanation")).toHaveTextContent(
+      "what is split or divided can motivate damage/harm without making a historical-origin claim",
+    );
+    expect(screen.getByTestId("human-reading-candidate-authority")).toHaveTextContent(
+      "Albanian functional proposal · Reviewed candidate · DA → DAMAGE",
+    );
+    expect(screen.getByTestId("human-reading-candidate-voice-path")).toHaveTextContent("not emitted");
+    expect(screen.getByTestId("human-reading-functional-candidate")).not.toHaveTextContent("A → Ë");
+    expect(screen.queryByTestId("human-reading-functional-null")).not.toBeInTheDocument();
+    damageView.unmount();
+  });
+
+  it("does not present a validated Study proposal as reviewed without an authorized source row", async () => {
+    const studyVm = await analyzeForHumanReading("study");
+    const studySummary = humanReadingFromVm("study", studyVm);
+    const unreviewedValidatedCandidate = studySummary.functionalCandidates.find((candidate) =>
+      candidate.validationOutcome?.kind === "present" &&
+      candidate.validationOutcome.value === "validated" &&
+      candidate.expansionChain?.kind === "present" &&
+      candidate.expansionChain.value[candidate.expansionChain.value.length - 1]?.toLocaleUpperCase("sq-AL") === "STUDY",
+    );
+    expect(unreviewedValidatedCandidate).toBeDefined();
+    if (!unreviewedValidatedCandidate) throw new Error("expected the existing validated Study proposal");
+    const withoutReviewedSourceAuthorization = {
+      ...unreviewedValidatedCandidate,
+      id: "unreviewed-study-functional-proposal",
+      sourceId: { kind: "present" as const, value: "unreviewed.study.source" },
+    };
+
+    render(<HumanReadingSummaryCardV0_1 summary={{ ...studySummary, functionalCandidates: [withoutReviewedSourceAuthorization] }} />);
+    const authority = screen.getByTestId("human-reading-candidate-authority");
+    expect(authority).toHaveTextContent("Albanian functional proposal · Proposed candidate");
+    expect(authority).not.toHaveTextContent("Reviewed candidate");
+  });
+
+  it("keeps unsupported words empty", async () => {
+    const xyzVm = await analyzeForHumanReading("xyz");
+    const xyzSummary = humanReadingFromVm("xyz", xyzVm);
+    expect(xyzSummary.meanings).toHaveLength(0);
+    expect(xyzSummary.reviewedLexicalFunctions).toHaveLength(0);
+    expect(xyzSummary.functionalCandidates).toHaveLength(0);
+    render(<HumanReadingSummaryCardV0_1 summary={xyzSummary} />);
+    expect(screen.getByTestId("human-reading-functional-null")).toHaveTextContent(
+      "Not enough information for a functional explanation from the current evidence.",
+    );
+    expect(screen.queryByTestId("human-reading-functional-candidate")).not.toBeInTheDocument();
+  });
 });
 
 describe("Motivation Discovery Lab presentation v0.1", () => {
@@ -659,7 +851,7 @@ describe("Motivation Discovery Lab presentation v0.1", () => {
   it("keeps conditional functional-interpretation layouts shrinkable", async () => {
     const response = await GET(
       new Request(
-        "http://localhost/api/analyze-v1?word=study&mode=strict&alphabet=auto&targetSenseId=user_sense_learning&targetSenseLabel=learning",
+        "http://localhost/api/analyze-v1?word=study&mode=strict&alphabet=auto&providerExecution=disabled&targetSenseId=user_sense_learning&targetSenseLabel=learning",
       ),
     );
     const vm = adaptAnalysisToTelemetryVM(await response.json());
@@ -855,7 +1047,7 @@ describe("Motivation Discovery Lab presentation v0.1", () => {
 
   it("shows a Latin source candidate with an explicit lexical-only boundary", async () => {
     const response = await GET(
-      new Request("http://localhost/api/analyze-v1?word=bamoar&mode=strict&alphabet=auto"),
+      new Request("http://localhost/api/analyze-v1?word=bamoar&mode=strict&alphabet=auto&providerExecution=disabled"),
     );
     const vm = adaptAnalysisToTelemetryVM(await response.json());
 
@@ -1264,7 +1456,7 @@ describe("Motivation Discovery Lab presentation v0.1", () => {
     "preserves the complete evidence ledger for regression input %s",
     async (word) => {
       const response = await GET(
-        new Request(`http://localhost/api/analyze-v1?word=${encodeURIComponent(word)}&mode=strict&alphabet=auto`),
+        new Request(`http://localhost/api/analyze-v1?word=${encodeURIComponent(word)}&mode=strict&alphabet=auto&providerExecution=disabled`),
       );
       const vm = adaptAnalysisToTelemetryVM(await response.json());
       if (vm.motivationDiscoveryV0_2.kind !== "present") {
