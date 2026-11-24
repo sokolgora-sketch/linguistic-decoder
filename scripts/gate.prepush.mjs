@@ -29,6 +29,13 @@ const capabilityDependentTestPatterns = [
 ];
 
 const gateEnvironment = { ...process.env };
+// Git supplies repository context variables to pre-push hooks. Keep those
+// selectors out of validation children so fixture Git commands use their own
+// temporary repositories instead of the checkout being pushed.
+for (const key of Object.keys(gateEnvironment)) {
+  if (key.startsWith("GIT_")) delete gateEnvironment[key];
+}
+gateEnvironment.GIT_TERMINAL_PROMPT = "0";
 // Preserve an explicit disabled value so Next/Jest dotenv loading cannot
 // restore a truthy local external-root configuration from .env.test.local.
 gateEnvironment.OPEN_INSTRUMENT_EXTERNAL_SOURCE_ROOT = "";

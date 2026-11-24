@@ -334,6 +334,48 @@ describe("automatic current-word functional reasoning", () => {
       status === "PROPOSED_ACTION_TO_EVENT" && intermediateState === "UNKNOWN_OR_NULL" &&
       evidenceStatus === "USER_PROPOSED" && claimLayer === "EXPLORATORY_HYPOTHESIS" && relationSourceRefs.length === 0,
     )).toBe(true);
+    expect(network.functionalPaths).toHaveLength(2);
+    expect(network.functionalPaths.map(({ nodes }) => nodes.map(({ exactForm }) => exactForm.toLocaleUpperCase("sq-AL"))))
+      .toEqual([["DA", "DAJ", "NDARJE"], ["DA", "NDAJ", "NDARJE"]]);
+    expect(network.functionalPaths.map(({ nodes }) => nodes[1].sourceSenseIdentity)).toEqual([
+      "fjalorishqip:daj:family-record:entry-1:sense-1",
+      "fjalorishqip:ndaj:family-record:entry-2:sense-1",
+    ]);
+    expect(network.functionalPaths.every(({ nodes, edges, evidenceStatus, claimLayer, wholeWordStatus, historicalOrigin, noSingleWinner, userDecisionPosture }) =>
+      nodes.every(({ claimLayer: nodeClaimLayer, sourceIdentity, sourceLocator }) =>
+        nodeClaimLayer === "SOURCE_FACT" && Boolean(sourceIdentity) && Boolean(sourceLocator)) &&
+      edges.every(({ evidenceStatus: edgeStatus, claimLayer: edgeClaimLayer, relationSourceRefs }) =>
+        edgeStatus === "USER_PROPOSED" && edgeClaimLayer === "EXPLORATORY_HYPOTHESIS" && relationSourceRefs.length === 0) &&
+      edges[0].dependsOn.includes(edges[0].fromNodeId) &&
+      edges[1].dependsOn.includes(edges[0].edgeId) &&
+      evidenceStatus === "USER_PROPOSED" && claimLayer === "EXPLORATORY_HYPOTHESIS" &&
+      wholeWordStatus === "PARTIAL_NULL" && historicalOrigin === "NOT_CLAIMED" &&
+      noSingleWinner && userDecisionPosture === "user_decides",
+    )).toBe(true);
+    expect(project("NDARJE", response).candidates[0].familyNetwork.functionalPaths).toEqual(network.functionalPaths);
+    const incompletePathProvenance = projectFreeOperatorFamilyFunctionalNetworkV0_1({
+      profile: DA_FREE_OPERATOR_PROFILE_V0_1,
+      protoRoot: PROTO_ROOTS_V1.find(({ id }) => id === "DA") ?? null,
+      reviewedEmbryo: candidate.embryoEvidence,
+      targetForm: "NDARJE",
+      targetSense: {
+        exactSourceForm: candidate.targetSource.exactSourceForm,
+        glosses: candidate.targetSource.glosses,
+        partOfSpeech: candidate.targetSource.partOfSpeech,
+        sourceIdentity: candidate.targetSource.sourceIdentity,
+        sourceSenseIdentity: candidate.targetSource.sourceIdentity,
+        sourceLabel: "FjaloriShqip",
+        sourceUrl: candidate.targetSource.sourceUrl,
+        sourceLocator: null,
+        evidenceStatus: candidate.targetSource.evidenceStatus,
+      },
+      familySourceResponses: [daj, ndaj],
+      analysisLanguage: "sq",
+      analysisVariety: "Standard Albanian",
+    });
+    expect(incompletePathProvenance.transitionNetworks).toHaveLength(2);
+    expect(incompletePathProvenance.functionalPaths).toEqual([]);
+    expect(incompletePathProvenance.functionalPathReasonCodes).toContain("FUNCTIONAL_PATH_ENDPOINT_PROVENANCE_INCOMPLETE");
     expect(network.transitionNetworks[0]).toMatchObject({
       semanticOperation: "ACTION_TO_NOMINAL_EVENT_OR_RESULT_PROPOSAL",
       familyEvidenceStatus: "CITATION_ENTERED_UNVERIFIED",
@@ -400,6 +442,7 @@ describe("automatic current-word functional reasoning", () => {
     });
     expect(candidate.familyNetwork.functionalEquation).toContain("proposed action-to-noun relation");
     expect(candidate.familyNetwork.status).toBe("CONDITIONAL_FAMILY_READING");
+    expect(candidate.familyNetwork.functionalPaths).toEqual([]);
   });
 
   it("does not require optional AI record descriptions when exact family and target senses are available", () => {

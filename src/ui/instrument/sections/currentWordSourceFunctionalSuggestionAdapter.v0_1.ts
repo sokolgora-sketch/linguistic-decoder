@@ -564,6 +564,54 @@ export type FunctionalTransitionNetworkV0_1 = Readonly<{
   userDecisionPosture: "user_decides";
 }>;
 
+export type FunctionalFamilyPathNodeV0_1 = Readonly<{
+  nodeId: string;
+  role: "REVIEWED_EMBRYO_FUNCTION" | "FAMILY_SOURCE_SENSE" | "TARGET_SOURCE_SENSE";
+  exactForm: string;
+  functionText: string;
+  partOfSpeech: string;
+  sourceIdentity: string;
+  sourceSenseIdentity: string;
+  sourceLabel: string;
+  sourceUrl: string;
+  sourceLocator: string;
+  evidenceStatus: "reviewed_accepted" | "CITATION_ENTERED_UNVERIFIED" | "OBSERVED_EXTERNAL_SNAPSHOT";
+  claimLayer: "SOURCE_FACT";
+  profileClassification?: "DIRECT_FREE_OPERATOR_FORM" | "DERIVATIVE_FAMILY_SUPPORT";
+  sourceRefs: readonly string[];
+}>;
+
+export type FunctionalFamilyPathEdgeV0_1 = Readonly<{
+  edgeId: string;
+  relationshipType: "EMBRYO_TO_FAMILY_FUNCTIONAL_CONTINUITY" | "FAMILY_ACTION_TO_TARGET_EVENT";
+  fromNodeId: string;
+  toNodeId: string;
+  dependsOn: readonly string[];
+  description: string;
+  evidenceStatus: "USER_PROPOSED";
+  claimLayer: "EXPLORATORY_HYPOTHESIS";
+  relationSourceRefs: readonly [];
+  reasonCodes: readonly string[];
+}>;
+
+export type FunctionalFamilyPathV0_1 = Readonly<{
+  pathId: string;
+  status: "PROPOSED_FUNCTIONAL_CONTINUITY";
+  nodes: readonly [
+    FunctionalFamilyPathNodeV0_1,
+    FunctionalFamilyPathNodeV0_1,
+    FunctionalFamilyPathNodeV0_1,
+  ];
+  edges: readonly [FunctionalFamilyPathEdgeV0_1, FunctionalFamilyPathEdgeV0_1];
+  evidenceStatus: "USER_PROPOSED";
+  claimLayer: "EXPLORATORY_HYPOTHESIS";
+  unresolvedMaterial: readonly string[];
+  wholeWordStatus: "PARTIAL_NULL";
+  historicalOrigin: "NOT_CLAIMED";
+  noSingleWinner: true;
+  userDecisionPosture: "user_decides";
+}>;
+
 export type FreeOperatorFamilyFunctionalNetworkProjectionV0_1 = Readonly<{
   status: "CONDITIONAL_FAMILY_READING" | "PARTIAL_NULL";
   operator: string;
@@ -584,11 +632,17 @@ export type FreeOperatorFamilyFunctionalNetworkProjectionV0_1 = Readonly<{
     senseText: string;
     partOfSpeech: string;
     sourceIdentity: string;
+    sourceSenseIdentity: string;
+    sourceLabel: string;
+    sourceUrl: string;
+    sourceLocator: string | null;
     evidenceStatus: "CITATION_ENTERED_UNVERIFIED" | "OBSERVED_EXTERNAL_SNAPSHOT";
     claimLayer: "SOURCE_FACT";
     sourceDescription?: RuntimeFjaloriSourceDescriptionV0_1 | null;
   }> | null;
   transitionNetworks: readonly FunctionalTransitionNetworkV0_1[];
+  functionalPaths: readonly FunctionalFamilyPathV0_1[];
+  functionalPathReasonCodes: readonly string[];
   functionalEquation: string | null;
   explanation: string | null;
   reasoningSteps: readonly FunctionalReasoningStepV0_1[];
@@ -700,6 +754,10 @@ type FreeOperatorFamilyFunctionalNetworkInputV0_1 = Readonly<{
     glosses: readonly string[];
     partOfSpeech?: string | null;
     sourceIdentity: string;
+    sourceSenseIdentity?: string;
+    sourceLabel?: string;
+    sourceUrl?: string;
+    sourceLocator?: string | null;
     evidenceStatus: "CITATION_ENTERED_UNVERIFIED" | "OBSERVED_EXTERNAL_SNAPSHOT";
     sourceDescription?: RuntimeFjaloriSourceDescriptionV0_1 | null;
   }> | null;
@@ -909,6 +967,136 @@ function transitionNetworksV0_1(
   });
 }
 
+function functionalFamilyPathsV0_1(
+  transitions: readonly FunctionalTransitionNetworkV0_1[],
+  familySourceRecords: readonly FreeOperatorFamilySourceRecordV0_1[],
+  reviewedEmbryo: FreeOperatorFamilyFunctionalNetworkInputV0_1["reviewedEmbryo"],
+  target: FreeOperatorFamilyFunctionalNetworkProjectionV0_1["target"],
+): Readonly<{ paths: readonly FunctionalFamilyPathV0_1[]; reasonCodes: readonly string[] }> {
+  if (!transitions.length) return { paths: [], reasonCodes: [] };
+  if (!reviewedEmbryo || !target?.sourceLocator?.trim() || !target.sourceUrl.trim() ||
+      !target.sourceSenseIdentity.trim() || !target.sourceIdentity.trim() ||
+      !reviewedEmbryo.sourceId.trim() || !reviewedEmbryo.citationId.trim() ||
+      !reviewedEmbryo.sourceUrl.trim() || !reviewedEmbryo.locator.trim()) {
+    return { paths: [], reasonCodes: ["FUNCTIONAL_PATH_ENDPOINT_PROVENANCE_INCOMPLETE"] };
+  }
+
+  const paths: FunctionalFamilyPathV0_1[] = [];
+  for (const transition of transitions) {
+    const familyRecord = familySourceRecords.find(({ sourceIdentity, exactSourceForm }) =>
+      sourceIdentity === transition.familySourceIdentity &&
+      sameAlbanianSourceForm(exactSourceForm ?? "", transition.familyForm ?? ""),
+    );
+    const familySense = transition.familySense;
+    if (!familyRecord?.sourceIdentity || !familyRecord.exactSourceForm || !familyRecord.sourceUrl ||
+        familyRecord.evidenceStatus !== "CITATION_ENTERED_UNVERIFIED" || !familySense || !Number.isInteger(familySense.entryIndex) || familySense.entryIndex < 1 ||
+        !Number.isInteger(familySense.senseIndex) || familySense.senseIndex < 1 || !familySense.gloss.trim()) continue;
+
+    const familySenseIdentity = `${familyRecord.sourceIdentity}:entry-${familySense.entryIndex}:sense-${familySense.senseIndex}`;
+    const pathId = [
+      "functional-path",
+      encodeURIComponent(reviewedEmbryo.sourceId),
+      encodeURIComponent(familySenseIdentity),
+      encodeURIComponent(target.sourceSenseIdentity),
+    ].join(":");
+    const embryoNodeId = `${pathId}:embryo`;
+    const familyNodeId = `${pathId}:family`;
+    const targetNodeId = `${pathId}:target`;
+    const embryoNode: FunctionalFamilyPathNodeV0_1 = {
+      nodeId: embryoNodeId,
+      role: "REVIEWED_EMBRYO_FUNCTION",
+      exactForm: reviewedEmbryo.sourceForm,
+      functionText: reviewedEmbryo.attestedGloss,
+      partOfSpeech: reviewedEmbryo.partOfSpeech,
+      sourceIdentity: reviewedEmbryo.sourceId,
+      sourceSenseIdentity: reviewedEmbryo.citationId,
+      sourceLabel: reviewedEmbryo.sourceTitle,
+      sourceUrl: reviewedEmbryo.sourceUrl,
+      sourceLocator: reviewedEmbryo.locator,
+      evidenceStatus: reviewedEmbryo.citationStatus,
+      claimLayer: "SOURCE_FACT",
+      sourceRefs: [reviewedEmbryo.sourceId, reviewedEmbryo.citationId],
+    };
+    const familyNode: FunctionalFamilyPathNodeV0_1 = {
+      nodeId: familyNodeId,
+      role: "FAMILY_SOURCE_SENSE",
+      exactForm: familyRecord.exactSourceForm,
+      functionText: familySense.gloss,
+      partOfSpeech: familySense.partOfSpeech ?? "UNKNOWN_OR_NULL",
+      sourceIdentity: familyRecord.sourceIdentity,
+      sourceSenseIdentity: familySenseIdentity,
+      sourceLabel: "FjaloriShqip",
+      sourceUrl: familyRecord.sourceUrl,
+      sourceLocator: `Entry ${familySense.entryIndex} · Sense ${familySense.senseIndex} · response position, not a source-issued sense ID`,
+      evidenceStatus: familyRecord.evidenceStatus,
+      claimLayer: "SOURCE_FACT",
+      profileClassification: familyRecord.profileClassification,
+      sourceRefs: [familyRecord.sourceIdentity, familySenseIdentity],
+    };
+    const targetNode: FunctionalFamilyPathNodeV0_1 = {
+      nodeId: targetNodeId,
+      role: "TARGET_SOURCE_SENSE",
+      exactForm: target.exactForm,
+      functionText: target.senseText,
+      partOfSpeech: target.partOfSpeech,
+      sourceIdentity: target.sourceIdentity,
+      sourceSenseIdentity: target.sourceSenseIdentity,
+      sourceLabel: target.sourceLabel,
+      sourceUrl: target.sourceUrl,
+      sourceLocator: target.sourceLocator,
+      evidenceStatus: target.evidenceStatus,
+      claimLayer: "SOURCE_FACT",
+      sourceRefs: [target.sourceIdentity, target.sourceSenseIdentity],
+    };
+    const firstEdgeId = `${pathId}:edge:embryo-family`;
+    const firstEdge: FunctionalFamilyPathEdgeV0_1 = {
+      edgeId: firstEdgeId,
+      relationshipType: "EMBRYO_TO_FAMILY_FUNCTIONAL_CONTINUITY",
+      fromNodeId: embryoNodeId,
+      toNodeId: familyNodeId,
+      dependsOn: [embryoNodeId, familyNodeId],
+      description: `Propose functional continuity from the reviewed ${embryoNode.exactForm} function to the recorded ${familyNode.exactForm} action sense; this link is not source-reported and does not establish morphology.`,
+      evidenceStatus: "USER_PROPOSED",
+      claimLayer: "EXPLORATORY_HYPOTHESIS",
+      relationSourceRefs: [],
+      reasonCodes: ["EMBRYO_TO_FAMILY_RELATION_NOT_SOURCE_REPORTED"],
+    };
+    const secondEdge: FunctionalFamilyPathEdgeV0_1 = {
+      edgeId: `${pathId}:edge:family-target`,
+      relationshipType: "FAMILY_ACTION_TO_TARGET_EVENT",
+      fromNodeId: familyNodeId,
+      toNodeId: targetNodeId,
+      dependsOn: [firstEdgeId, familyNodeId, targetNodeId],
+      description: `Propose connecting the recorded ${familyNode.exactForm} action sense to the ${targetNode.exactForm} event or result sense; this link is not source-reported.`,
+      evidenceStatus: "USER_PROPOSED",
+      claimLayer: "EXPLORATORY_HYPOTHESIS",
+      relationSourceRefs: [],
+      reasonCodes: [...transition.reasonCodes],
+    };
+    paths.push({
+      pathId,
+      status: "PROPOSED_FUNCTIONAL_CONTINUITY",
+      nodes: [embryoNode, familyNode, targetNode],
+      edges: [firstEdge, secondEdge],
+      evidenceStatus: "USER_PROPOSED",
+      claimLayer: "EXPLORATORY_HYPOTHESIS",
+      unresolvedMaterial: [
+        "No source reports either proposed relation",
+        "Intermediate state and morphology remain UNKNOWN_OR_NULL",
+        "Historical origin remains NOT_CLAIMED",
+      ],
+      wholeWordStatus: "PARTIAL_NULL",
+      historicalOrigin: "NOT_CLAIMED",
+      noSingleWinner: true,
+      userDecisionPosture: "user_decides",
+    });
+  }
+  return {
+    paths,
+    reasonCodes: paths.length ? [] : ["FUNCTIONAL_PATH_FAMILY_SENSE_PROVENANCE_INCOMPLETE"],
+  };
+}
+
 /**
  * Projects existing operator-profile and carrier records into a family-level
  * functional proposal. Registry membership is shown as profile data; carrier
@@ -1008,12 +1196,22 @@ export function projectFreeOperatorFamilyFunctionalNetworkV0_1(
         senseText: targetSenseText,
         partOfSpeech: input.targetSense.partOfSpeech ?? "UNKNOWN_OR_NULL",
         sourceIdentity: input.targetSense.sourceIdentity,
+        sourceSenseIdentity: input.targetSense.sourceSenseIdentity ?? `${input.targetSense.sourceIdentity}#${input.targetSense.sourceLocator ?? "sense-locator-unavailable"}`,
+        sourceLabel: input.targetSense.sourceLabel ?? "Source",
+        sourceUrl: input.targetSense.sourceUrl ?? "",
+        sourceLocator: input.targetSense.sourceLocator ?? null,
         evidenceStatus: input.targetSense.evidenceStatus,
         claimLayer: "SOURCE_FACT" as const,
         sourceDescription: input.targetSense.sourceDescription ?? null,
       }
     : null;
   const transitionNetworks = transitionNetworksV0_1(input.profile, familySourceRecords, target, reviewedEmbryo);
+  const functionalPathProjection = functionalFamilyPathsV0_1(
+    transitionNetworks,
+    familySourceRecords,
+    reviewedEmbryo,
+    target,
+  );
   const targetFormLabel = target?.exactForm.toLocaleUpperCase("sq-AL") ?? input.targetForm.toLocaleUpperCase("sq-AL");
   const occurrence = input.occurrence ?? (reviewedEmbryo
     ? exactOrthographicOccurrencesV0_1(input.targetForm, reviewedEmbryo.sourceForm)[0] ?? null
@@ -1259,6 +1457,8 @@ export function projectFreeOperatorFamilyFunctionalNetworkV0_1(
     familySourceRecords,
     target,
     transitionNetworks,
+    functionalPaths: functionalPathProjection.paths,
+    functionalPathReasonCodes: functionalPathProjection.reasonCodes,
     functionalEquation,
     explanation,
     reasoningSteps,
@@ -1272,6 +1472,9 @@ export function projectFreeOperatorFamilyFunctionalNetworkV0_1(
       "Target internal segmentation remains UNKNOWN_OR_NULL",
       "Target-specific source-to-family relation remains an EXPLORATORY_HYPOTHESIS",
       ...(transitionNetworks.length ? ["The action-to-event transition is a USER_PROPOSED hypothesis; its intermediate state remains UNKNOWN_OR_NULL"] : []),
+      ...(functionalPathProjection.reasonCodes.length
+        ? ["Typed DA-family functional paths remain UNKNOWN_OR_NULL because exact endpoint provenance is incomplete"]
+        : []),
       ...(!reviewedEmbryo ? ["Reviewed embryo function remains UNKNOWN_OR_NULL"] : []),
       ...(!protoRootMatches
         ? [`ProtoRoots carrier annotations are UNKNOWN_OR_NULL; ${input.protoRoot ? "mismatched record ignored" : "no matching record available"}`]
@@ -1533,6 +1736,12 @@ export function buildCurrentWordFunctionalReasoningV0_1(input: Readonly<{
             glosses: targetSense.glosses,
             partOfSpeech: targetSense.partOfSpeech,
             sourceIdentity: targetSense.sourceIdentity,
+            sourceSenseIdentity: targetSense.provider === "FJALORISHQIP"
+              ? targetSense.sourceIdentity
+              : targetSense.senseId ?? `${targetSense.sourceIdentity}:sense-${targetSense.senseOrdinal}`,
+            sourceLabel: targetSense.provider === "KAIKKI" ? "Kaikki" : "FjaloriShqip",
+            sourceUrl: targetSense.sourceUrl,
+            sourceLocator: targetSense.locator,
             evidenceStatus: targetSense.evidenceStatus,
             sourceDescription: targetSense.sourceDescription ?? null,
           },
@@ -1839,6 +2048,16 @@ function generatedDaFunctionalMotivationV0_1(input: Readonly<{
                 ? senseRecord.sourceFact.partOfSpeech
                 : senseRecord.sense.partOfSpeech,
               sourceIdentity,
+              sourceSenseIdentity: senseRecord.provider === "FJALORISHQIP"
+                ? sourceIdentity
+                : senseRecord.senseId ?? `${sourceIdentity}:sense-${senseRecord.senseOrdinal}`,
+              sourceLabel: senseRecord.provider === "KAIKKI" ? "Kaikki" : "FjaloriShqip",
+              sourceUrl: senseRecord.provider === "KAIKKI"
+                ? senseRecord.sourceFact.sourceSnapshot.sourceUrl
+                : senseRecord.sourceResponse.apiUrl,
+              sourceLocator: senseRecord.provider === "KAIKKI"
+                ? `${senseRecord.sourceFact.entryLocator} · sense ${senseRecord.senseId ?? senseRecord.senseOrdinal}`
+                : `Entry ${senseRecord.sense.entryIndex} · Sense ${senseRecord.sense.senseIndex} · response position, not a source-issued sense ID`,
               evidenceStatus: senseRecord.provider === "KAIKKI"
                 ? "OBSERVED_EXTERNAL_SNAPSHOT"
                 : "CITATION_ENTERED_UNVERIFIED",
