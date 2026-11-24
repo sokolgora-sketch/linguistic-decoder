@@ -1,6 +1,13 @@
 import { extractSevenVowelsFromString } from "@/shared/math7.core";
 import type { AlbanianKaikkiExactLexicalSourceFactV0_1 } from "@/shared/openInstrument/albanianKaikkiServerOnlyExactLexicalSource.v0_1";
-import type { MotivationDiscoveryV0_2VM, PresentOrMissing } from "@/ui/telemetry/types";
+import { getReviewedExternalLexiconProductionSourceRowsV0_1 } from "@/shared/reviewedExternalLexiconSourceRowRegistry.v0_1";
+import { projectReviewedExternalLexiconProductionRowForRuntimeV0_1 } from "@/shared/reviewedExternalLexiconRuntimeProjection.v0_1";
+import type {
+  CandidateRowVM,
+  MotivationDiscoveryV0_2VM,
+  PresentOrMissing,
+  RootMapVM,
+} from "@/ui/telemetry/types";
 import { sameAlbanianSourceForm } from "@/ui/instrument/albanianSourceFormIdentity.v0_1";
 import type {
   CurrentWordFunctionalReasoningCandidateV0_1,
@@ -46,11 +53,23 @@ export type HumanReadingFunctionalGroupV0_1 = Readonly<{
   candidates: readonly CurrentWordFunctionalReasoningCandidateV0_1[];
 }>;
 
+export type HumanReadingReviewedLexicalFunctionV0_1 = Readonly<{
+  operator: string;
+  functionText: string;
+  sourceId: string;
+  sourceTitle: string;
+  sourceUrl: string;
+  locator: string;
+  evidenceText: string;
+}>;
+
 export type HumanReadingSummaryProjectionV0_1 = Readonly<{
   word: string;
   meanings: readonly HumanReadingSourceSenseV0_1[];
   writtenVoiceEvents: readonly Readonly<{ voice: string; position: number }>[];
   functionalReadings: readonly HumanReadingFunctionalGroupV0_1[];
+  reviewedLexicalFunctions: readonly HumanReadingReviewedLexicalFunctionV0_1[];
+  functionalCandidates: readonly CandidateRowVM[];
   sourceAvailability: "AVAILABLE" | "NOT_AVAILABLE";
   alternativesAvailable: boolean;
   technicalReasonCodes: readonly string[];
@@ -78,6 +97,125 @@ function addSense(
 ): void {
   if (!sense.gloss.trim() || !sense.exactForm.trim()) return;
   senses.set(exactSenseKey(sense), sense);
+}
+
+function presentValue<T>(value: PresentOrMissing<T> | undefined): T | null {
+  return value?.kind === "present" ? value.value : null;
+}
+
+function matchesReviewedSourceRow(
+  candidate: CandidateRowVM,
+  sourceRow: ReturnType<typeof getReviewedExternalLexiconProductionSourceRowsV0_1>[number],
+): boolean {
+  const sourceId = presentValue(candidate.sourceId);
+  const language = presentValue(candidate.language);
+  const form = presentValue(candidate.form);
+  const sourceKind = presentValue(candidate.sourceKind);
+  const sourceStatus = presentValue(candidate.sourceStatus);
+  const embryo = presentValue(candidate.embryo);
+  const gloss = presentValue(candidate.plainStandaloneGloss);
+  const semanticBridge = presentValue(candidate.semanticBridge);
+  const evidenceRefs = presentValue(candidate.evidenceRefs) ?? [];
+  const normalize = (value: string) => value.normalize("NFC").trim().toLocaleLowerCase("sq-AL");
+
+  if (
+    candidate.id !== sourceRow.candidateId ||
+    sourceId !== sourceRow.sourceId ||
+    !language || !form || !sourceKind || !sourceStatus || !embryo || !gloss ||
+    !semanticBridge ||
+    presentValue(candidate.claimType) !== "functionalMotivation" ||
+    presentValue(candidate.validationOutcome) !== "validated"
+  ) return false;
+
+  const hasReviewedCitation = sourceRow.externalCitations.some((citation) =>
+    citation.citationStatus === "reviewed_accepted" && evidenceRefs.includes(citation.citationId),
+  );
+  return Boolean(
+    sourceRow.isolatedStandaloneForm &&
+    sourceKind === sourceRow.sourceKind &&
+    sourceStatus === sourceRow.sourceStatus &&
+    normalize(language) === normalize(sourceRow.candidateLanguage) &&
+    sameAlbanianSourceForm(form, sourceRow.isolatedStandaloneForm) &&
+    normalize(embryo) === normalize(sourceRow.embryo) &&
+    normalize(gloss) === normalize(sourceRow.plainStandaloneGloss ?? "") &&
+    semanticBridge === sourceRow.semanticBridge &&
+    hasReviewedCitation,
+  );
+}
+
+function buildReviewedLexicalFunctions(
+  word: string,
+  candidates: readonly CandidateRowVM[],
+  rootMap: PresentOrMissing<RootMapVM> | undefined,
+  reviewedOperators: readonly string[],
+): HumanReadingReviewedLexicalFunctionV0_1[] {
+  if (rootMap?.kind !== "present") return [];
+  const reviewedOperatorSet = new Set(reviewedOperators.map((operator) =>
+    operator.normalize("NFC").trim().toLocaleUpperCase("sq-AL"),
+  ));
+  const productionRows = getReviewedExternalLexiconProductionSourceRowsV0_1();
+
+  return rootMap.value.keys.flatMap((key) => {
+    const operator = key.token.trim();
+    if (
+      key.status !== "supported" ||
+      !sameAlbanianSourceForm(operator, word) ||
+      !reviewedOperatorSet.has(operator.normalize("NFC").toLocaleUpperCase("sq-AL"))
+    ) return [];
+
+    const sourceRow = productionRows.find((row) =>
+      sameAlbanianSourceForm(row.embryo, operator) &&
+      sameAlbanianSourceForm(row.isolatedStandaloneForm ?? "", word),
+    );
+    if (!sourceRow) return [];
+    const candidate = candidates.find((row) => matchesReviewedSourceRow(row, sourceRow));
+    if (!candidate) return [];
+
+    const projection = projectReviewedExternalLexiconProductionRowForRuntimeV0_1(sourceRow);
+    const citation = sourceRow.externalCitations.find((row) =>
+      row.citationStatus === "reviewed_accepted" && projection?.evidenceRefs.includes(row.citationId),
+    );
+    if (!projection || !citation?.attestedGloss || !citation.sourceTitle || !citation.sourceUrlOrArchiveRef || !citation.entryLocator) {
+      return [];
+    }
+
+    return [{
+      operator,
+      functionText: citation.attestedGloss,
+      sourceId: sourceRow.sourceId,
+      sourceTitle: citation.sourceTitle,
+      sourceUrl: citation.sourceUrlOrArchiveRef,
+      locator: citation.entryLocator,
+      evidenceText: projection.evidenceText,
+    }];
+  });
+}
+
+function buildExactFunctionalCandidates(
+  word: string,
+  candidates: readonly CandidateRowVM[],
+): CandidateRowVM[] {
+  const unique = new Map<string, CandidateRowVM>();
+  for (const candidate of candidates) {
+    const chain = presentValue(candidate.expansionChain);
+    const statement = presentValue(candidate.functionalStatement);
+    const validation = presentValue(candidate.validationOutcome);
+    const boundary = presentValue(candidate.claimBoundary) ?? "";
+    const targetWord = presentValue(candidate.targetWord);
+    if (
+      presentValue(candidate.claimType) !== "functionalMotivation" ||
+      (validation !== "validated" && validation !== "partial") ||
+      presentValue(candidate.userDecisionPosture) !== "user_decides" ||
+      !/not historical origin/iu.test(boundary) ||
+      !chain || chain.length < 2 ||
+      !sameAlbanianSourceForm(chain[chain.length - 1], word) ||
+      chain.slice(0, -1).every((form) => sameAlbanianSourceForm(form, word)) ||
+      (targetWord && !sameAlbanianSourceForm(targetWord, word)) ||
+      !statement?.trim()
+    ) continue;
+    unique.set(candidate.id, candidate);
+  }
+  return [...unique.values()];
 }
 
 function candidateRelationship(
@@ -240,10 +378,21 @@ export function buildHumanReadingSummaryV0_1(input: Readonly<{
   discovery?: PresentOrMissing<MotivationDiscoveryV0_2VM>;
   functionalReasoning: CurrentWordFunctionalReasoningProjectionV0_1 | null;
   runtimeSourceResponse: RuntimeFjaloriSourceResponseV0_1 | null;
+  candidateRows?: readonly CandidateRowVM[];
+  rootMap?: PresentOrMissing<RootMapVM>;
+  reviewedOperators?: readonly string[];
 }>): HumanReadingSummaryProjectionV0_1 {
   const meanings = new Map<string, HumanReadingSourceSenseV0_1>();
   const discovery = input.discovery?.kind === "present" ? input.discovery.value : null;
   const functionalReadings = buildFunctionalGroups(input.word, input.functionalReasoning);
+  const candidateRows = input.candidateRows ?? [];
+  const reviewedLexicalFunctions = buildReviewedLexicalFunctions(
+    input.word,
+    candidateRows,
+    input.rootMap,
+    input.reviewedOperators ?? [],
+  );
+  const functionalCandidates = buildExactFunctionalCandidates(input.word, candidateRows);
 
   const runtime = input.runtimeSourceResponse;
   if (runtime?.status === "available" &&
@@ -346,6 +495,8 @@ export function buildHumanReadingSummaryV0_1(input: Readonly<{
     meanings: [...meanings.values()],
     writtenVoiceEvents,
     functionalReadings,
+    reviewedLexicalFunctions,
+    functionalCandidates,
     sourceAvailability: meanings.size ? "AVAILABLE" : "NOT_AVAILABLE",
     alternativesAvailable: [...meanings.values()].length > 1 || functionalReadings.length > 1 ||
       functionalReadings.some(({ candidates }) => candidates.some(({ familyNetwork }) =>

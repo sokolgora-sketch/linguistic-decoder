@@ -1,4 +1,5 @@
 import { fireEvent, render, screen } from "@testing-library/react";
+import { GET } from "../app/api/analyze-v1/route";
 import { InstrumentPanel } from "@/ui/instrument/InstrumentPanel";
 import { adaptAnalysisToTelemetryVM } from "@/ui/instrument/contractAdapter";
 import type { MotivationDiscoveryV0_2VM, TelemetryViewModel } from "@/ui/telemetry/types";
@@ -88,6 +89,24 @@ function panelVm(word: string): TelemetryViewModel {
 }
 
 describe("InstrumentPanel Fjalori source-response identity handoff", () => {
+  it("passes existing Analyze candidate rows into the primary reading", async () => {
+    const response = await GET(new Request(
+      "http://localhost/api/analyze-v1?word=study&mode=strict&alphabet=auto",
+    ));
+    expect(response.status).toBe(200);
+    const vm = adaptAnalysisToTelemetryVM(await response.json());
+
+    render(<InstrumentPanel vm={vm} />);
+
+    expect(screen.getByTestId("human-reading-meaning-unavailable")).toBeInTheDocument();
+    const candidates = screen.getAllByTestId("human-reading-functional-candidate");
+    expect(candidates).toHaveLength(2);
+    expect(candidates.some((candidate) => candidate.textContent?.includes("SHTU + DI → STUDY"))).toBe(true);
+    expect(candidates.some((candidate) => candidate.textContent?.includes("DI → STUDY"))).toBe(true);
+    expect(screen.getByText("More than one possible reading is available; you decide.")).toBeInTheDocument();
+    expect(screen.queryByTestId("human-reading-functional-null")).not.toBeInTheDocument();
+  });
+
   it("passes the current response to the workbench and withholds it after the analyzed word changes", () => {
     const view = render(<InstrumentPanel vm={panelVm("NDARJE")} />);
 

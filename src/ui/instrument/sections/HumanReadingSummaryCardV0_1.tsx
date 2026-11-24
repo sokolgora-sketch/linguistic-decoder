@@ -2,6 +2,34 @@ import type {
   HumanReadingSourceSenseV0_1,
   HumanReadingSummaryProjectionV0_1,
 } from "@/ui/instrument/sections/humanReadingSummaryAdapter.v0_1";
+import type { CandidateRowVM, PresentOrMissing } from "@/ui/telemetry/types";
+
+function candidateField<T>(value: PresentOrMissing<T> | undefined): T | null {
+  return value?.kind === "present" ? value.value : null;
+}
+
+function candidateChainLabel(candidate: CandidateRowVM): string {
+  const chain = candidateField<string[]>(candidate.expansionChain) ?? [];
+  const components = candidateField(candidate.functionalComponents) ?? [];
+  if (chain.length < 2) return chain.join(" → ");
+  const target = chain[chain.length - 1];
+  const source = chain.slice(0, -1);
+  return components.length > 1
+    ? `${source.join(" + ")} → ${target}`
+    : chain.join(" → ");
+}
+
+function candidateComponentEvidenceLabel(value: string | null): string {
+  if (value === "reviewed") return "reviewed operator evidence";
+  if (value === "structural") return "structural evidence";
+  return value ? value.replaceAll("_", " ") : "evidence status unavailable";
+}
+
+function candidateValidationLabel(candidate: CandidateRowVM): string {
+  return candidateField<string>(candidate.validationOutcome) === "partial"
+    ? "Partial candidate"
+    : "Validated candidate";
+}
 
 function sourceStatusLabel(status: string): string {
   switch (status) {
@@ -127,7 +155,11 @@ export function HumanReadingSummaryCardV0_1({
       ? [{ label: `${record.form} source record`, url: record.sourceUrl }]
       : []),
   ]));
-  const sources = uniqueSources([...summarySources, ...functionalSources]);
+  const reviewedFunctionSources = summary.reviewedLexicalFunctions.map((item) => ({
+    label: `${item.operator} reviewed lexical function`,
+    url: item.sourceUrl,
+  }));
+  const sources = uniqueSources([...summarySources, ...functionalSources, ...reviewedFunctionSources]);
   const familyRecords = [...new Map(summary.functionalReadings.flatMap(({ candidates }) =>
     candidates.flatMap(({ familyNetwork }) => familyNetwork.familySourceRecords),
   ).map((record) => [
@@ -177,19 +209,68 @@ export function HumanReadingSummaryCardV0_1({
         </div>
       </div>
 
+      {summary.reviewedLexicalFunctions.length ? (
+        <div className="mt-4 border-t border-[#2c3a49] pt-3" data-testid="human-reading-reviewed-functions">
+          <h3 className="text-xs font-semibold uppercase tracking-[0.12em] text-[#9fb1bf]">Reviewed lexical function</h3>
+          <div className="mt-2 space-y-2">
+            {summary.reviewedLexicalFunctions.map((item) => (
+              <article key={item.sourceId} className="min-w-0">
+                <p className="text-sm leading-6 text-[#e7eee5]">
+                  {item.operator}: “{item.functionText}”
+                </p>
+                <p className="text-xs text-[#aeb7c5]">
+                  {item.sourceTitle} · {item.locator} · <a className="underline" href={item.sourceUrl} target="_blank" rel="noreferrer">reviewed source</a>
+                </p>
+              </article>
+            ))}
+          </div>
+        </div>
+      ) : null}
+
       <div className="mt-4 border-t border-[#2c3a49] pt-3">
         <h3 className="text-xs font-semibold uppercase tracking-[0.12em] text-[#9fb1bf]">Possible connection</h3>
-        {summary.functionalReadings.length ? (
+        {summary.functionalReadings.length || summary.functionalCandidates.length ? (
           <div className="mt-2 space-y-3" data-testid="human-reading-functional-results">
             {summary.functionalReadings.map((reading) => (
               <article key={reading.groupId} data-testid="human-reading-functional-result" className="min-w-0">
                 <p className="text-sm leading-6 text-[#e7eee5]">{reading.explanation}</p>
               </article>
             ))}
-            {summary.functionalReadings.length > 1 ? (
+            {summary.functionalCandidates.map((candidate) => {
+              const components = candidateField(candidate.functionalComponents) ?? [];
+              const voicePath = candidateField<string[]>(candidate.vowelPath) ?? [];
+              return (
+                <article key={candidate.id} data-testid="human-reading-functional-candidate" className="min-w-0 rounded-md border border-[#303a45] p-3">
+                  <p data-testid="human-reading-candidate-explanation" className="text-sm leading-6 text-[#e7eee5]">
+                    {candidateField<string>(candidate.functionalStatement)}
+                  </p>
+                  <p className="mt-1 text-xs font-semibold text-[#cfe6ff]">
+                    {candidateValidationLabel(candidate)} · {candidateChainLabel(candidate)}
+                  </p>
+                  {components.length ? (
+                    <p className="mt-1 text-xs leading-5 text-[#c5ced8]" data-testid="human-reading-candidate-components">
+                      Components: {components.map((component) =>
+                        `${component.embryo} — ${candidateField<string>(component.plainMeaning) ?? "meaning unavailable"} (${candidateComponentEvidenceLabel(candidateField<string>(component.evidenceState))})`,
+                      ).join("; ")}
+                    </p>
+                  ) : null}
+                  <p className="mt-1 text-xs leading-5 text-[#aeb7c5]">
+                    Functional proposal only; historical origin is not claimed. You decide.
+                  </p>
+                  <p className="mt-1 text-xs text-[#aeb7c5]" data-testid="human-reading-candidate-voice-path">
+                    Candidate Voice path: {voicePath.length ? voicePath.join(" → ") : "not emitted"}
+                  </p>
+                </article>
+              );
+            })}
+            {summary.functionalReadings.length + summary.functionalCandidates.length > 1 ? (
               <p className="text-xs text-[#aeb7c5]">More than one possible reading is available; you decide.</p>
             ) : null}
           </div>
+        ) : summary.reviewedLexicalFunctions.length ? (
+          <p data-testid="human-reading-no-whole-word-candidate" className="mt-1 text-sm leading-6 text-[#c5ced8]">
+            No whole-word functional candidate is available for this exact spelling.
+          </p>
         ) : (
           <p data-testid="human-reading-functional-null" className="mt-1 text-sm leading-6 text-[#c5ced8]">
             Not enough information for a functional explanation from the current evidence.
@@ -271,6 +352,33 @@ export function HumanReadingSummaryCardV0_1({
               {!reading.candidates.length ? (
                 <p className="mt-1">This source-linked proposal does not supply an independently reported relation.</p>
               ) : null}
+            </section>
+          ))}
+          {summary.reviewedLexicalFunctions.map((item) => (
+            <section key={`reviewed-function:${item.sourceId}`} aria-label={`Reviewed lexical evidence for ${item.operator}`}>
+              <h4 className="font-semibold text-[#f5f7fb]">Reviewed {item.operator} lexical function</h4>
+              <p className="mt-1">{item.functionText} · {item.sourceTitle} · {item.locator}</p>
+              <p className="mt-1 text-xs text-[#aeb7c5]">{item.evidenceText}</p>
+            </section>
+          ))}
+          {summary.functionalCandidates.map((candidate) => (
+            <section key={`candidate-source:${candidate.id}`} aria-label={`Source details for ${candidate.id}`}>
+              <h4 className="font-semibold text-[#f5f7fb]">Existing functional candidate source</h4>
+              <p className="mt-1">{candidate.id} · {candidateField<string>(candidate.sourceId) ?? "source identity unavailable"} · {candidateField<string>(candidate.sourceStatus) ?? "source status unavailable"}</p>
+              <p className="mt-1">{candidateChainLabel(candidate)} · {candidateField<string>(candidate.claimBoundary) ?? "claim boundary unavailable"} · {candidateField<string>(candidate.userDecisionPosture) ?? "decision posture unavailable"}</p>
+              {candidateField<string[]>(candidate.evidenceRefs)?.length ? (
+                <p className="mt-1">Evidence references: {candidateField<string[]>(candidate.evidenceRefs)?.join(" · ")}</p>
+              ) : null}
+              {candidateField(candidate.functionalComponents)?.length ? (
+                <ul className="mt-1 list-disc pl-5">
+                  {candidateField(candidate.functionalComponents)?.map((component, index) => (
+                    <li key={`${candidate.id}:${component.embryo}:${index}`}>
+                      {component.embryo} · {candidateField<string>(component.plainMeaning) ?? "meaning unavailable"} · {candidateComponentEvidenceLabel(candidateField<string>(component.evidenceState))}
+                    </li>
+                  ))}
+                </ul>
+              ) : null}
+              <p className="mt-1">Candidate-owned Voice path: {candidateField<string[]>(candidate.vowelPath)?.join(" → ") ?? "not emitted"}</p>
             </section>
           ))}
           {functionalPaths.length ? (
