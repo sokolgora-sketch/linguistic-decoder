@@ -143,6 +143,22 @@ function matchesReviewedSourceRow(
   );
 }
 
+export type HumanReadingCandidateAuthorityV0_1 = "Reviewed" | "Partial" | "Proposed";
+
+export function humanReadingCandidateAuthorityV0_1(
+  candidate: CandidateRowVM,
+): HumanReadingCandidateAuthorityV0_1 {
+  const validationOutcome = presentValue(candidate.validationOutcome);
+  if (validationOutcome === "partial") return "Partial";
+  if (validationOutcome !== "validated") return "Proposed";
+
+  const hasReviewedSourceAuthorization =
+    getReviewedExternalLexiconProductionSourceRowsV0_1().some((sourceRow) =>
+      matchesReviewedSourceRow(candidate, sourceRow),
+    );
+  return hasReviewedSourceAuthorization ? "Reviewed" : "Proposed";
+}
+
 function buildReviewedLexicalFunctions(
   word: string,
   candidates: readonly CandidateRowVM[],

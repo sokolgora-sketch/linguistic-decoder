@@ -91,7 +91,7 @@ function panelVm(word: string): TelemetryViewModel {
 describe("InstrumentPanel Fjalori source-response identity handoff", () => {
   it("passes existing Analyze candidate rows into the primary reading", async () => {
     const response = await GET(new Request(
-      "http://localhost/api/analyze-v1?word=study&mode=strict&alphabet=auto",
+      "http://localhost/api/analyze-v1?word=study&mode=strict&alphabet=albanian&providerExecution=disabled",
     ));
     expect(response.status).toBe(200);
     const vm = adaptAnalysisToTelemetryVM(await response.json());

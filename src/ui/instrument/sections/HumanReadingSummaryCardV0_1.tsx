@@ -1,6 +1,7 @@
-import type {
-  HumanReadingSourceSenseV0_1,
-  HumanReadingSummaryProjectionV0_1,
+import {
+  humanReadingCandidateAuthorityV0_1,
+  type HumanReadingSourceSenseV0_1,
+  type HumanReadingSummaryProjectionV0_1,
 } from "@/ui/instrument/sections/humanReadingSummaryAdapter.v0_1";
 import type { CandidateRowVM, PresentOrMissing } from "@/ui/telemetry/types";
 
@@ -25,10 +26,18 @@ function candidateComponentEvidenceLabel(value: string | null): string {
   return value ? value.replaceAll("_", " ") : "evidence status unavailable";
 }
 
-function candidateValidationLabel(candidate: CandidateRowVM): string {
-  return candidateField<string>(candidate.validationOutcome) === "partial"
-    ? "Partial candidate"
-    : "Validated candidate";
+function candidateProposalLabel(candidate: CandidateRowVM): string {
+  const language = candidateField<string>(candidate.language)?.trim();
+  if (!language) return "Functional proposal · candidate language not supplied";
+  const knownLanguageNames: Record<string, string> = {
+    sq: "Albanian",
+    en: "English",
+    la: "Latin",
+    latin: "Latin",
+    albanian: "Albanian",
+    english: "English",
+  };
+  return `${knownLanguageNames[language.toLocaleLowerCase("en-US")] ?? language} functional proposal`;
 }
 
 function sourceStatusLabel(status: string): string {
@@ -241,11 +250,11 @@ export function HumanReadingSummaryCardV0_1({
               const voicePath = candidateField<string[]>(candidate.vowelPath) ?? [];
               return (
                 <article key={candidate.id} data-testid="human-reading-functional-candidate" className="min-w-0 rounded-md border border-[#303a45] p-3">
-                  <p data-testid="human-reading-candidate-explanation" className="text-sm leading-6 text-[#e7eee5]">
-                    {candidateField<string>(candidate.functionalStatement)}
+                  <p data-testid="human-reading-candidate-authority" className="mt-1 text-xs font-semibold text-[#cfe6ff]">
+                    {candidateProposalLabel(candidate)} · {humanReadingCandidateAuthorityV0_1(candidate)} candidate · {candidateChainLabel(candidate)}
                   </p>
-                  <p className="mt-1 text-xs font-semibold text-[#cfe6ff]">
-                    {candidateValidationLabel(candidate)} · {candidateChainLabel(candidate)}
+                  <p data-testid="human-reading-candidate-explanation" className="mt-1 text-sm leading-6 text-[#e7eee5]">
+                    {candidateField<string>(candidate.functionalStatement)}
                   </p>
                   {components.length ? (
                     <p className="mt-1 text-xs leading-5 text-[#c5ced8]" data-testid="human-reading-candidate-components">
