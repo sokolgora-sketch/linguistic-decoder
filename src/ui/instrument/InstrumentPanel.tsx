@@ -351,7 +351,7 @@ export function InstrumentPanel(props: Props) {
         runtimeSourceResponse: runtimeFjaloriSourceForCurrentAnalysis,
         candidateRows: vm.candidates,
         rootMap: vm.rootMap,
-        reviewedOperators: vm.analysisStatusV0_2.kind === "present"
+        reviewedOperators: vm.analysisStatusV0_2?.kind === "present"
           ? vm.analysisStatusV0_2.value.reviewedOperators
           : [],
       })
