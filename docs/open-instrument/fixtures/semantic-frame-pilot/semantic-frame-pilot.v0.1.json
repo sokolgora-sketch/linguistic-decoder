@@ -1,0 +1,248 @@
+{
+  "schemaVersion": "open-instrument.semantic-frame-pilot.packet.v0_1",
+  "packetId": "ze15.s3.source-bound-frame-pilot.v0_1",
+  "milestoneId": "ZE-15/S3",
+  "status": "RESEARCH_ONLY_NOT_PRODUCTION_AUTHORITY",
+  "authorityBoundary": {
+    "citationStatusForNewFjaleRecords": "CITATION_ENTERED_UNVERIFIED",
+    "licensingStatus": "NOT_ASSESSED",
+    "reusePermission": "NOT_STATED_ON_ACCESSED_ENTRIES",
+    "storedSourceText": "MINIMAL_PARAPHRASES_ONLY_NO_DICTIONARY_DEFINITIONS",
+    "sourceAuthorityPromotion": "NONE",
+    "historicalOrigin": "NOT_CLAIMED",
+    "winner": "NO_SINGLE_WINNER",
+    "userDecisionPosture": "user_decides",
+    "productionBehaviorChanged": false
+  },
+  "executionLimits": {
+    "providerId": "openai_compat",
+    "localOnly": true,
+    "maximumCandidateTargets": 3,
+    "maximumCallCount": 3,
+    "timeoutMs": 8000,
+    "maximumOutputTokens": 512,
+    "maximumRetryCount": 0,
+    "truthBoundary": "hypothesis_only_user_decides_no_evidence_promotion"
+  },
+  "sources": [
+    {
+      "sourceId": "fjalor-shqip-ndarje-sense-1",
+      "sourceTitle": "FJALË — Fjalor Shqip",
+      "sourceUrl": "https://fjale.al/ndarje",
+      "entryLocator": "NDARJE f., sense 1",
+      "sourceNativeSenseId": null,
+      "localSenseId": "fjalor-shqip:ndarje:sense-1",
+      "language": "Albanian",
+      "variety": "NOT_STATED_ON_ENTRY",
+      "exactForm": "NDARJE",
+      "sourceStatus": "CITATION_ENTERED_UNVERIFIED",
+      "citationStatus": "CITATION_ENTERED_UNVERIFIED",
+      "licensingStatus": "NOT_ASSESSED",
+      "reusePermission": "NOT_STATED_ON_ACCESSED_ENTRY",
+      "rightsNote": "Accessed entry displays a copyright notice; reuse permission was not stated. The packet stores only a minimal paraphrase, URL, and sense locator.",
+      "accessedOn": "2026-11-25"
+    },
+    {
+      "sourceId": "fjalor-shqip-ndaj-sense-5",
+      "sourceTitle": "FJALË — Fjalor Shqip",
+      "sourceUrl": "https://fjale.al/ndaj",
+      "entryLocator": "NDAJ kal., sense 5",
+      "sourceNativeSenseId": null,
+      "localSenseId": "fjalor-shqip:ndaj:sense-5",
+      "language": "Albanian",
+      "variety": "NOT_STATED_ON_ENTRY",
+      "exactForm": "NDAJ",
+      "sourceStatus": "CITATION_ENTERED_UNVERIFIED",
+      "citationStatus": "CITATION_ENTERED_UNVERIFIED",
+      "licensingStatus": "NOT_ASSESSED",
+      "reusePermission": "NOT_STATED_ON_ACCESSED_ENTRY",
+      "rightsNote": "Accessed entry displays a copyright notice; reuse permission was not stated. The packet stores only a minimal paraphrase, URL, and sense locator.",
+      "accessedOn": "2026-11-25"
+    },
+    {
+      "sourceId": "fjalor-shqip-dije-sense-1",
+      "sourceTitle": "FJALË — Fjalor Shqip",
+      "sourceUrl": "https://fjale.al/dije",
+      "entryLocator": "DIJE f., sense 1",
+      "sourceNativeSenseId": null,
+      "localSenseId": "fjalor-shqip:dije:sense-1",
+      "language": "Albanian",
+      "variety": "NOT_STATED_ON_ENTRY",
+      "exactForm": "DIJE",
+      "sourceStatus": "CITATION_ENTERED_UNVERIFIED",
+      "citationStatus": "CITATION_ENTERED_UNVERIFIED",
+      "licensingStatus": "NOT_ASSESSED",
+      "reusePermission": "NOT_STATED_ON_ACCESSED_ENTRY",
+      "rightsNote": "Accessed entry displays a copyright notice; reuse permission was not stated. The packet stores only a minimal paraphrase, URL, and sense locator.",
+      "accessedOn": "2026-11-25"
+    },
+    {
+      "sourceId": "fjalor-shqip-di-sense-1",
+      "sourceTitle": "FJALË — Fjalor Shqip",
+      "sourceUrl": "https://fjale.al/di",
+      "entryLocator": "DI kal., sense 1",
+      "sourceNativeSenseId": null,
+      "localSenseId": "fjalor-shqip:di:sense-1",
+      "language": "Albanian",
+      "variety": "NOT_STATED_ON_ENTRY",
+      "exactForm": "DI",
+      "sourceStatus": "CITATION_ENTERED_UNVERIFIED",
+      "citationStatus": "CITATION_ENTERED_UNVERIFIED",
+      "licensingStatus": "NOT_ASSESSED",
+      "reusePermission": "NOT_STATED_ON_ACCESSED_ENTRY",
+      "rightsNote": "Accessed entry displays a copyright notice; reuse permission was not stated. The packet stores only a minimal paraphrase, URL, and sense locator.",
+      "accessedOn": "2026-11-25"
+    },
+    {
+      "sourceId": "fjalor-shqip-liri-I-sense-2",
+      "sourceTitle": "FJALË — Fjalor Shqip",
+      "sourceUrl": "https://fjale.al/liri",
+      "entryLocator": "LIRI I f., sense 2; distinct from LIRI II",
+      "sourceNativeSenseId": null,
+      "localSenseId": "fjalor-shqip:liri-I:sense-2",
+      "existingResearchEvidenceId": "research.external.albanian-liri-freedom.scale50.cohortG.v0_1",
+      "existingCitationId": "research.external.fjale-liri-freedom.scale50.cohortG.citation.v0_1",
+      "language": "Albanian",
+      "variety": "NOT_STATED_ON_ENTRY",
+      "exactForm": "LIRI",
+      "sourceStatus": "research_candidate",
+      "citationStatus": "CITATION_ENTERED_UNVERIFIED",
+      "licensingStatus": "NOT_ASSESSED",
+      "reusePermission": "NOT_STATED_ON_ACCESSED_ENTRY",
+      "rightsNote": "Accessed entry displays a copyright notice; reuse permission was not stated. The packet stores only a minimal paraphrase, URL, and sense locator.",
+      "accessedOn": "2026-11-25"
+    },
+    {
+      "sourceId": "fjalor-shqip-liroj-sense-2",
+      "sourceTitle": "FJALË — Fjalor Shqip",
+      "sourceUrl": "https://fjale.al/liroj",
+      "entryLocator": "LIROJ kal., sense 2",
+      "sourceNativeSenseId": null,
+      "localSenseId": "fjalor-shqip:liroj:sense-2",
+      "language": "Albanian",
+      "variety": "NOT_STATED_ON_ENTRY",
+      "exactForm": "LIROJ",
+      "sourceStatus": "CITATION_ENTERED_UNVERIFIED",
+      "citationStatus": "CITATION_ENTERED_UNVERIFIED",
+      "licensingStatus": "NOT_ASSESSED",
+      "reusePermission": "NOT_STATED_ON_ACCESSED_ENTRY",
+      "rightsNote": "Accessed entry displays a copyright notice; reuse permission was not stated. The packet stores only a minimal paraphrase, URL, and sense locator.",
+      "accessedOn": "2026-11-25"
+    },
+    {
+      "sourceId": "reviewed.external.gheg-da.damage.candidate.v0_1",
+      "sourceTitle": "Linguistic variation within the Northwestern Gheg Albanian dialect",
+      "sourceUrl": "https://doi.org/10.3765/plsa.v8i1.5501",
+      "entryLocator": "Example (4), page 3; footnote 1",
+      "sourceNativeSenseId": null,
+      "language": "Albanian",
+      "variety": "Northwestern Gheg; source row identifies Malsia and Shkodër/Lezhë forms",
+      "exactForm": "da",
+      "sourceStatus": "reviewed_accepted",
+      "citationStatus": "reviewed_accepted",
+      "licensingStatus": "NOT_ASSESSED",
+      "reusePermission": "NOT_ASSESSED_IN_REVIEWED_ROW",
+      "existingCandidateId": "albanian-da-dam-damage-functional",
+      "scope": "Reviewed isolated-form function; accepted functional candidate is damage/harm. No source-reported relation to NDARJE."
+    },
+    {
+      "sourceId": "reviewed.external.di.knowledge.candidate.v0_1",
+      "sourceTitle": "di",
+      "sourceUrl": "https://en.wiktionary.org/wiki/di#Albanian",
+      "entryLocator": "Albanian > Etymology 1 > Verb > di",
+      "sourceNativeSenseId": null,
+      "language": "Albanian",
+      "variety": "NOT_STATED_IN_REVIEWED_ROW",
+      "exactForm": "di",
+      "sourceStatus": "reviewed_accepted",
+      "citationStatus": "reviewed_accepted",
+      "licensingStatus": "NOT_ASSESSED",
+      "reusePermission": "NOT_ASSESSED_IN_REVIEWED_ROW",
+      "existingCandidateId": "albanian-di-know-functional",
+      "scope": "Reviewed isolated-form function only; the existing carrier-scope review withholds this citation for DIJE."
+    }
+  ],
+  "sourceFacts": [
+    {
+      "claimId": "ndarje-sense-1-report",
+      "text": "NDARJE sense 1 describes an action or state according to the verb senses of NDAJ/NDAHEM.",
+      "claimStatus": "SOURCE_REPORTED",
+      "evidenceStatus": "CITATION_ENTERED_UNVERIFIED",
+      "sourceIds": ["fjalor-shqip-ndarje-sense-1"]
+    },
+    {
+      "claimId": "ndaj-sense-5-operation",
+      "text": "NDAJ sense 5 describes dividing one whole into separate parts.",
+      "claimStatus": "SOURCE_REPORTED",
+      "evidenceStatus": "CITATION_ENTERED_UNVERIFIED",
+      "sourceIds": ["fjalor-shqip-ndaj-sense-5"]
+    },
+    {
+      "claimId": "reviewed-da-isolated-function",
+      "text": "The reviewed isolated Northwestern Gheg form da has a split/cut/divide function; its accepted functional candidate concerns damage/harm.",
+      "claimStatus": "SOURCE_REPORTED",
+      "evidenceStatus": "reviewed_accepted",
+      "sourceIds": ["reviewed.external.gheg-da.damage.candidate.v0_1"]
+    },
+    {
+      "claimId": "dije-sense-1-report",
+      "text": "DIJE sense 1 describes a systematic body of acquired knowledge.",
+      "claimStatus": "SOURCE_REPORTED",
+      "evidenceStatus": "CITATION_ENTERED_UNVERIFIED",
+      "sourceIds": ["fjalor-shqip-dije-sense-1"]
+    },
+    {
+      "claimId": "di-sense-1-report",
+      "text": "DI sense 1 describes knowing something through experience such as seeing, hearing, or studying.",
+      "claimStatus": "SOURCE_REPORTED",
+      "evidenceStatus": "CITATION_ENTERED_UNVERIFIED",
+      "sourceIds": ["fjalor-shqip-di-sense-1"]
+    },
+    {
+      "claimId": "liri-I-sense-2-report",
+      "text": "LIRI I sense 2 describes a state outside imprisonment and with civil rights.",
+      "claimStatus": "SOURCE_REPORTED",
+      "evidenceStatus": "CITATION_ENTERED_UNVERIFIED",
+      "sourceIds": ["fjalor-shqip-liri-I-sense-2"]
+    },
+    {
+      "claimId": "liroj-sense-2-operation",
+      "text": "LIROJ sense 2 describes taking a person out of prison and releasing them to move freely.",
+      "claimStatus": "SOURCE_REPORTED",
+      "evidenceStatus": "CITATION_ENTERED_UNVERIFIED",
+      "sourceIds": ["fjalor-shqip-liroj-sense-2"]
+    }
+  ],
+  "targets": [
+    {
+      "word": "NDARJE",
+      "targetSenseId": "fjalor-shqip:ndarje:sense-1",
+      "targetSourceId": "fjalor-shqip-ndarje-sense-1",
+      "sourceFactIds": ["ndarje-sense-1-report", "ndaj-sense-5-operation", "reviewed-da-isolated-function"],
+      "excludedSourceIds": [],
+      "carrierRelationBoundary": "NDAJ sense 5 is a related source sense, not proof of an internal DA morpheme; reviewed da evidence is isolated and its target relation remains a hypothesis."
+    },
+    {
+      "word": "DIJE",
+      "targetSenseId": "fjalor-shqip:dije:sense-1",
+      "targetSourceId": "fjalor-shqip-dije-sense-1",
+      "sourceFactIds": ["dije-sense-1-report", "di-sense-1-report"],
+      "excludedSourceIds": ["reviewed.external.di.knowledge.candidate.v0_1"],
+      "carrierRelationBoundary": "The FJALË DI entry is an unreviewed source report, not a source-reported DI-DIJE morphological relation. Reviewed isolated DI evidence is excluded for the DIJE carrier."
+    },
+    {
+      "word": "LIRI",
+      "targetSenseId": "fjalor-shqip:liri-I:sense-2",
+      "targetSourceId": "fjalor-shqip-liri-I-sense-2",
+      "sourceFactIds": ["liri-I-sense-2-report", "liroj-sense-2-operation"],
+      "excludedSourceIds": [],
+      "carrierRelationBoundary": "LIRI I sense 2 and LIROJ sense 2 are distinct source senses; no source-reported word-family or derivational relation is asserted."
+    }
+  ],
+  "nullControl": {
+    "word": "xyz",
+    "status": "UNKNOWN_OR_NULL",
+    "providerCalls": 0,
+    "reason": "No lexical source or embryo is supplied; this control is never placed in the provider target list."
+  }
+}
