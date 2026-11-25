@@ -276,6 +276,17 @@ function isLoopbackUrlV0_1(value: string): boolean {
   }
 }
 
+function hasOpenAICompatV1BasePathV0_1(value: string): boolean {
+  try {
+    const url = new URL(value);
+    return url.pathname === "/v1" && url.search === "" && url.hash === "" &&
+      !value.includes("?") && !value.includes("#") &&
+      url.username === "" && url.password === "" && !value.endsWith("/");
+  } catch {
+    return false;
+  }
+}
+
 function sourceMapV0_1(packet: SemanticFramePilotPacketV0_1): Map<string, SemanticFramePilotSourceV0_1> {
   return new Map(packet.sources.map((source) => [source.sourceId, source]));
 }
@@ -744,6 +755,8 @@ function validateExecutionPlanV0_1(
   const reasons: string[] = [];
   if (plan.providerId !== "openai_compat" || !plan.localOnly || !isLoopbackUrlV0_1(plan.endpointUrl)) {
     reasons.push("LOCAL_LOOPBACK_PROVIDER_REQUIRED");
+  } else if (!hasOpenAICompatV1BasePathV0_1(plan.endpointUrl)) {
+    reasons.push("OPENAI_COMPAT_V1_BASE_URL_REQUIRED");
   }
   if (!isNonemptyStringV0_1(plan.modelId)) reasons.push("MODEL_ID_REQUIRED");
   if (packet.targets.length > SEMANTIC_FRAME_PILOT_MAX_CALLS_V0_1 ||
@@ -834,6 +847,11 @@ export async function runSemanticFramePilotV0_1(
   if (packetReasons.length || planReasons.length || authReasons.length) {
     return blockedExecutionV0_1([...packetReasons, ...planReasons, ...authReasons], plannedCalls);
   }
+  const configuredBaseUrl = process.env.OPENAI_BASE_URL?.trim() ?? "";
+  if (configuredBaseUrl && isLoopbackUrlV0_1(configuredBaseUrl) &&
+      !hasOpenAICompatV1BasePathV0_1(configuredBaseUrl)) {
+    return blockedExecutionV0_1(["OPENAI_COMPAT_V1_BASE_URL_REQUIRED"], plannedCalls);
+  }
   const hasOverrides = Boolean(options.execute || options.runtimePreflight);
   if (hasOverrides && process.env.NODE_ENV !== "test") {
     return blockedExecutionV0_1(["TEST_EXECUTOR_OVERRIDE_FORBIDDEN"], plannedCalls);
@@ -842,7 +860,7 @@ export async function runSemanticFramePilotV0_1(
     return blockedExecutionV0_1(["TEST_EXECUTOR_AND_PREFLIGHT_REQUIRED"], plannedCalls);
   }
   if (!options.execute && (
-    (process.env.OPENAI_BASE_URL?.trim() ?? "") !== plan.endpointUrl ||
+    configuredBaseUrl !== plan.endpointUrl ||
     (process.env.OPENAI_MODEL?.trim() ?? "") !== plan.modelId ||
     !(process.env.OPENAI_API_KEY?.trim())
   )) {

@@ -23,7 +23,7 @@ function targetFor(word: string): SemanticFramePilotTargetV0_1 {
 
 function planFor(
   packetUnderTest: SemanticFramePilotPacketV0_1 = packet,
-  endpointUrl = "http://127.0.0.1:11434",
+  endpointUrl = "http://127.0.0.1:11434/v1",
 ): SemanticFramePilotExecutionPlanV0_1 {
   return {
     providerId: "openai_compat",
@@ -85,7 +85,7 @@ function proposalFor(target: SemanticFramePilotTargetV0_1): string {
 const runtimeReady = {
   providerId: "openai_compat",
   modelId: "qwen3:8b",
-  endpointUrl: "http://127.0.0.1:11434",
+  endpointUrl: "http://127.0.0.1:11434/v1",
   endpointReachable: true,
   modelVisible: true,
   residencyObservationSupported: true,
@@ -273,6 +273,51 @@ describe("source-bound semantic frame pilot", () => {
     expect(execute).not.toHaveBeenCalled();
   });
 
+  test("rejects a root-only loopback endpoint before preflight or provider calls", async () => {
+    const plan = planFor(packet, "http://127.0.0.1:11434");
+    const authorization = authorizationFor(packet, plan);
+    const preflight = jest.fn(async () => runtimeReady);
+    const execute = jest.fn(async () => ({ provider: "openai_compat" as const, rawText: "{}" }));
+
+    const result = await runSemanticFramePilotV0_1(packet, plan, authorization, {
+      runtimePreflight: preflight,
+      execute,
+    });
+
+    expect(result.status).toBe("blocked");
+    expect(result.attemptedCalls).toBe(0);
+    expect(result.reasonCodes).toContain("OPENAI_COMPAT_V1_BASE_URL_REQUIRED");
+    expect(preflight).not.toHaveBeenCalled();
+    expect(execute).not.toHaveBeenCalled();
+  });
+
+  test("diagnoses a root-only configured base URL before provider preflight", async () => {
+    const previousNodeEnv = process.env.NODE_ENV;
+    const previousBaseUrl = process.env.OPENAI_BASE_URL;
+    const previousFetch = global.fetch;
+    const fetchMock = jest.fn();
+    process.env.NODE_ENV = "production";
+    process.env.OPENAI_BASE_URL = "http://127.0.0.1:11434";
+    global.fetch = fetchMock as typeof fetch;
+    const plan = planFor();
+    const authorization = authorizationFor(packet, plan);
+
+    try {
+      const result = await runSemanticFramePilotV0_1(packet, plan, authorization);
+
+      expect(result.status).toBe("blocked");
+      expect(result.attemptedCalls).toBe(0);
+      expect(result.reasonCodes).toContain("OPENAI_COMPAT_V1_BASE_URL_REQUIRED");
+      expect(fetchMock).not.toHaveBeenCalled();
+    } finally {
+      if (previousNodeEnv === undefined) delete process.env.NODE_ENV;
+      else process.env.NODE_ENV = previousNodeEnv;
+      if (previousBaseUrl === undefined) delete process.env.OPENAI_BASE_URL;
+      else process.env.OPENAI_BASE_URL = previousBaseUrl;
+      global.fetch = previousFetch;
+    }
+  });
+
   test("consumes one authorization once and calls no more than three injected targets", async () => {
     const plan = planFor();
     const authorization = authorizationFor(packet, plan);
@@ -293,6 +338,12 @@ describe("source-bound semantic frame pilot", () => {
     expect(first.rows).toHaveLength(3);
     expect(first.rows.every((row) => row.status === "proposed" && row.frame !== null)).toBe(true);
     expect(execute).toHaveBeenCalledTimes(3);
+    expect(preflight).toHaveBeenCalledWith(
+      "openai_compat",
+      "qwen3:8b",
+      "http://127.0.0.1:11434/v1",
+      true,
+    );
 
     const second = await runSemanticFramePilotV0_1(packet, plan, authorization, {
       runtimePreflight: preflight,
