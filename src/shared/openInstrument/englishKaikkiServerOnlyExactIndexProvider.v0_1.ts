@@ -11,6 +11,7 @@ import {
   ENGLISH_KAIKKI_SNAPSHOT_ID_V0_1,
   projectEnglishKaikkiSourceRecordToGenericWitnessRecordsV0_1,
   type EnglishKaikkiSourceRecordAdapterResultV0_1,
+  type EnglishKaikkiSourceRecordV0_1,
   type EnglishKaikkiVerifiedSnapshotIdentityV0_1,
 } from "./englishKaikkiSourceFamilyAdapter.v0_1";
 import {
@@ -116,6 +117,8 @@ export type EnglishKaikkiServerOnlyExactIndexProviderV0_1 = Readonly<{
   ) => Promise<Readonly<{
     result: EnglishKaikkiServerOnlyExactIndexProviderResultV0_1;
     metrics: EnglishKaikkiServerOnlyExactIndexProviderLookupMetricsV0_1;
+    /** Raw, hash-verified records are available only on this server-only diagnostic path. */
+    sourceRecords?: readonly EnglishKaikkiSourceRecordV0_1[];
   }>>;
 }>;
 
@@ -583,6 +586,7 @@ async function performLookupV0_1(
 ): Promise<Readonly<{
   result: EnglishKaikkiServerOnlyExactIndexProviderResultV0_1;
   metrics: EnglishKaikkiServerOnlyExactIndexProviderLookupMetricsV0_1;
+  sourceRecords?: readonly EnglishKaikkiSourceRecordV0_1[];
 }>> {
   const metrics: LookupMetricsMutableV0_1 = {
     directoryBytesRead: 0,
@@ -649,7 +653,7 @@ async function performLookupV0_1(
       state.manifest.files[1].bytes,
     );
     sourceHandle = await open(state.sourcePath, "r");
-    const sourceRecords = [];
+    const sourceRecords: EnglishKaikkiSourceRecordV0_1[] = [];
     for (const posting of postings) {
       if (
         posting.recordByteOffset + posting.recordByteLength < posting.recordByteOffset ||
@@ -714,6 +718,7 @@ async function performLookupV0_1(
           matchingSourceRecordIds: Object.freeze(sourceRecords.map((record) => record.sourceRecordId)),
         }),
         metrics: Object.freeze(metrics),
+        sourceRecords: Object.freeze(sourceRecords),
       });
     }
     return Object.freeze({
@@ -723,6 +728,7 @@ async function performLookupV0_1(
         records: Object.freeze(records),
       }),
       metrics: Object.freeze(metrics),
+      sourceRecords: Object.freeze(sourceRecords),
     });
   } catch (error) {
     const reasonCode = error instanceof Error && /^[A-Z0-9_]+$/u.test(error.message)

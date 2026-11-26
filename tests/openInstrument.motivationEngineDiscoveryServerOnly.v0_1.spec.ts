@@ -156,6 +156,15 @@ describe("server-only English Kaikki Discovery integration v0.1", () => {
       lexicalMisses: expect.any(Number),
       failureReasonCodes: [],
     });
+    expect(result.targetLexicalSenseLookupV0_1).toMatchObject({
+      status: "MATCHES_FOUND",
+      reasonCode: null,
+    });
+    expect(result.targetLexicalSenseLookupV0_1.sourceRecords?.map((record) => ({
+      word: record.word,
+      partOfSpeech: record.pos,
+      senseCount: record.senses.length,
+    }))).toEqual([{ word: "Banana", partOfSpeech: "noun", senseCount: 2 }]);
     const english = result.discovery.candidates.filter(
       (candidate) => candidate.candidateLanguage === "English",
     );
@@ -197,6 +206,10 @@ describe("server-only English Kaikki Discovery integration v0.1", () => {
       matchQueries: 0,
       failureReasonCodes: [],
     });
+    expect(result.targetLexicalSenseLookupV0_1).toMatchObject({
+      status: "LEXICAL_SENSE_SOURCE_NOT_FOUND",
+      sourceRecords: [],
+    });
     expect(result.discovery.candidates.filter(
       (candidate) => candidate.candidateLanguage === "English",
     )).toEqual([]);
@@ -219,6 +232,10 @@ describe("server-only English Kaikki Discovery integration v0.1", () => {
     expect(result.englishProvider).toMatchObject({
       status: "UNAVAILABLE",
       failureReasonCodes: ["PROVIDER_CONFIGURATION_FAILURE"],
+    });
+    expect(result.targetLexicalSenseLookupV0_1).toMatchObject({
+      status: "UNAVAILABLE",
+      reasonCode: "PROVIDER_CONFIGURATION_FAILURE",
     });
     expect(result.discovery.candidates.filter(
       (candidate) => candidate.candidateLanguage === "English",

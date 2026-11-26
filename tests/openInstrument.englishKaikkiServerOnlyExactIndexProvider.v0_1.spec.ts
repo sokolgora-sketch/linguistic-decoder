@@ -144,6 +144,14 @@ describe("English Kaikki server-only exact index provider v0.1", () => {
       expect(result.result.records.every((record) => record.embryoRelation === "exact_form")).toBe(true);
       expect(result.result.records.every((record) => record.sourceProvenance?.entryLocator.startsWith("jsonl://record/"))).toBe(true);
     }
+    expect(result.sourceRecords?.map((record) => ({
+      word: record.word,
+      partOfSpeech: record.pos,
+      senseCount: record.senses.length,
+    }))).toEqual([
+      { word: "Apple", partOfSpeech: "noun", senseCount: 2 },
+      { word: "apple", partOfSpeech: "verb", senseCount: 1 },
+    ]);
     expect(result.metrics.postingsBytesRead).toBe(946);
     expect(result.metrics.sourceBytesRead).toBe(348);
     expect(result.metrics.directoryBytesRead).toBeGreaterThan(0);
