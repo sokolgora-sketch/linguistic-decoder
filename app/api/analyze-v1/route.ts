@@ -53,11 +53,17 @@ import { buildHeartInstrumentV1 } from "@/v1/heartInstrument.v1";
 import { projectDoctrineReadingV1 } from "@/shared/openInstrument/doctrineReadingContract.v1";
 import {
   buildMotivationEngineDiscoveryServerOnlyV0_1,
+  lookupEnglishTargetSenseServerOnlyV0_1,
   projectMotivationEngineDiscoverySourceFamiliesV0_1,
 } from "@/shared/openInstrument/motivationEngineDiscoveryServerOnly.v0_1";
 import {
   buildMotivationEngineDiscoveryV0_1,
 } from "@/shared/openInstrument/motivationEngineDiscovery.v0_1";
+import {
+  bindNativeLexicalTargetSenseV0_1,
+  buildNativeLexicalTargetSenseAlternativesV0_1,
+  buildNativeLexicalTargetSenseResultV0_1,
+} from "@/shared/openInstrument/nativeLexicalSenseBinding.v0_1";
 import {
   buildFunctionalMotivationInterpretationV0_2,
 } from "@/shared/openInstrument/functionalMotivationInterpretation.v0_2";
@@ -79,6 +85,8 @@ const BodySchema = z
     // Named extensions remain permissive; route-level guards preserve legacy behavior.
     targetSenseId: z.unknown().optional(),
     targetSenseLabel: z.unknown().optional(),
+    targetLexicalSenseId: z.unknown().optional(),
+    targetLexicalGloss: z.unknown().optional(),
     opts: z.union([
       z
         .object({
@@ -104,6 +112,16 @@ type AnalyzeV1InvalidRequestReasonV0_1 =
   | "INVALID_ALBANIAN_SOURCE_RECORD_ID"
   | "DUPLICATE_ALBANIAN_SOURCE_RECORD_ID"
   | "ALBANIAN_SOURCE_RECORD_SELECTOR_REQUIRES_ALBANIAN_INPUT"
+  | "INVALID_TARGET_LEXICAL_SENSE_ID"
+  | "INVALID_TARGET_LEXICAL_GLOSS"
+  | "DUPLICATE_TARGET_LEXICAL_SENSE_ID"
+  | "DUPLICATE_TARGET_LEXICAL_GLOSS"
+  | "TARGET_LEXICAL_GLOSS_REQUIRES_SENSE_ID"
+  | "CONFLICTING_TARGET_SENSE_SELECTION"
+  | "TARGET_LEXICAL_SENSE_NOT_FOUND"
+  | "TARGET_LEXICAL_GLOSS_NOT_FOUND"
+  | "TARGET_LEXICAL_SENSE_LOOKUP_UNAVAILABLE"
+  | "TARGET_LEXICAL_SENSE_REQUIRES_ENGLISH_INPUT"
   | "REQUEST_TOO_LARGE"
   | AnalyzeInputSizeFailureReasonV0_1;
 
@@ -117,6 +135,57 @@ function invalidRequestResponseV0_1(
 function isValidAlbanianSourceRecordIdInputV0_1(value: unknown): value is string {
   return typeof value === "string" && value.length > 0 && value.length <= 512 &&
     value.trim() === value && !/[\u0000-\u001f\u007f]/u.test(value);
+}
+
+function isValidTargetLexicalSenseIdV0_1(value: unknown): value is string {
+  return typeof value === "string" && value.length > 0 && value.length <= 2048 &&
+    value.trim() === value && value.normalize("NFC") === value &&
+    !/[\u0000-\u001f\u007f]/u.test(value);
+}
+
+function isValidTargetLexicalGlossV0_1(value: unknown): value is string {
+  return typeof value === "string" && value.length > 0 && value.length <= 4096 &&
+    value.trim() === value && value.normalize("NFC") === value &&
+    !/[\u0000-\u001f\u007f]/u.test(value);
+}
+
+type NativeTargetSenseSelectionInputV0_1 =
+  | Readonly<{ ok: true; senseId?: string; gloss?: string }>
+  | Readonly<{
+      ok: false;
+      reason:
+        | "INVALID_TARGET_LEXICAL_SENSE_ID"
+        | "INVALID_TARGET_LEXICAL_GLOSS"
+        | "TARGET_LEXICAL_GLOSS_REQUIRES_SENSE_ID"
+        | "CONFLICTING_TARGET_SENSE_SELECTION";
+    }>;
+
+function validateNativeTargetSenseSelectionInputV0_1(input: Readonly<{
+  senseId: unknown;
+  gloss: unknown;
+  legacySenseId: unknown;
+  legacySenseLabel: unknown;
+}>): NativeTargetSenseSelectionInputV0_1 {
+  if (input.senseId !== undefined && !isValidTargetLexicalSenseIdV0_1(input.senseId)) {
+    return Object.freeze({ ok: false, reason: "INVALID_TARGET_LEXICAL_SENSE_ID" });
+  }
+  if (input.gloss !== undefined && !isValidTargetLexicalGlossV0_1(input.gloss)) {
+    return Object.freeze({ ok: false, reason: "INVALID_TARGET_LEXICAL_GLOSS" });
+  }
+  if (input.gloss !== undefined && input.senseId === undefined) {
+    return Object.freeze({ ok: false, reason: "TARGET_LEXICAL_GLOSS_REQUIRES_SENSE_ID" });
+  }
+  const hasLegacySense = [input.legacySenseId, input.legacySenseLabel].some(
+    (value) => typeof value === "string" && value.trim().length > 0,
+  );
+  if (input.senseId !== undefined && hasLegacySense) {
+    return Object.freeze({ ok: false, reason: "CONFLICTING_TARGET_SENSE_SELECTION" });
+  }
+  return Object.freeze({
+    ok: true,
+    ...(typeof input.senseId === "string" ? { senseId: input.senseId } : {}),
+    ...(typeof input.gloss === "string" ? { gloss: input.gloss } : {}),
+  });
 }
 
 function isAlbanianSourceRecordSelectionInputV0_1(
@@ -1121,6 +1190,8 @@ async function applyAutomaticFunctionalVoiceNormalizationV0_1(
 type AnalyzeV1OrchestrationInput = {
   word: string;
   albanianSourceRecordId?: string;
+  targetLexicalSenseId?: string;
+  targetLexicalGloss?: string;
   engineMode: "strict" | "open" | undefined;
   engineAlphabet: string | undefined;
   payloadMode: string;
@@ -1145,6 +1216,8 @@ async function runAnalyzeV1Orchestration(
   const {
     word,
     albanianSourceRecordId,
+    targetLexicalSenseId,
+    targetLexicalGloss,
     engineMode,
     engineAlphabet,
     payloadMode,
@@ -1563,12 +1636,17 @@ async function runAnalyzeV1Orchestration(
         value.normalize("NFC").trim().toLocaleLowerCase("en-US") === "sq" ||
         value.normalize("NFC").trim().toLocaleLowerCase("en-US") === "albanian",
       );
-      const discoveryResult = !publicBetaDeterministicOnly && providerExecution === "disabled" && !isAlbanianDiscoveryInput
+      const useEstablishedProviderFreeDiscovery =
+        !publicBetaDeterministicOnly && providerExecution === "disabled" && !isAlbanianDiscoveryInput;
+      const discoveryResult = useEstablishedProviderFreeDiscovery
         ? {
             discovery: projectMotivationEngineDiscoverySourceFamiliesV0_1(
               buildMotivationEngineDiscoveryV0_1(discoveryInput),
             ),
             englishProvider: { status: "NOT_QUERIED" as const },
+            // Exact local lexical retrieval is independent of AI execution,
+            // while the pre-existing candidate-discovery path remains intact.
+            targetLexicalSenseLookupV0_1: await lookupEnglishTargetSenseServerOnlyV0_1(discoveryInput),
           }
         : await buildMotivationEngineDiscoveryServerOnlyV0_1(discoveryInput);
       if (discoveryResult.englishProvider.status === "UNAVAILABLE") {
@@ -1582,16 +1660,65 @@ async function runAnalyzeV1Orchestration(
         }
       }
       (final as any).motivationDiscoveryV0_1 = discoveryResult.discovery;
+      const targetLexicalSenseAlternatives = buildNativeLexicalTargetSenseAlternativesV0_1({
+        inputForm: word,
+        lookupStatus: discoveryResult.targetLexicalSenseLookupV0_1.status,
+        sourceRecords: discoveryResult.targetLexicalSenseLookupV0_1.sourceRecords,
+        reasonCode: discoveryResult.targetLexicalSenseLookupV0_1.reasonCode,
+      });
+      const targetLexicalSenseSelection = bindNativeLexicalTargetSenseV0_1({
+        alternatives: targetLexicalSenseAlternatives,
+        requestedSenseId: targetLexicalSenseId,
+        requestedGloss: targetLexicalGloss,
+      });
+      if (targetLexicalSenseId !== undefined) {
+        const selectionFailure = {
+          SOURCE_LOOKUP_NOT_APPLICABLE: [
+            "Target lexical-sense selection requires an English input profile.",
+            "TARGET_LEXICAL_SENSE_REQUIRES_ENGLISH_INPUT",
+          ],
+          SOURCE_LOOKUP_UNAVAILABLE: [
+            "The exact English lexical source lookup was unavailable; the source sense cannot be verified.",
+            "TARGET_LEXICAL_SENSE_LOOKUP_UNAVAILABLE",
+          ],
+          SENSE_ID_NOT_FOUND: [
+            "The selected source sense does not belong to this exact target word.",
+            "TARGET_LEXICAL_SENSE_NOT_FOUND",
+          ],
+          GLOSS_NOT_FOUND: [
+            "The selected gloss is not present in the selected source sense.",
+            "TARGET_LEXICAL_GLOSS_NOT_FOUND",
+          ],
+        } as const;
+        const failure = selectionFailure[targetLexicalSenseSelection.status as keyof typeof selectionFailure];
+        if (failure) {
+          return invalidRequestResponseV0_1(
+            failure[0],
+            failure[1],
+          );
+        }
+      }
+      (final as any).nativeLexicalTargetSensesV0_1 = buildNativeLexicalTargetSenseResultV0_1(
+        targetLexicalSenseAlternatives,
+        targetLexicalSenseSelection,
+      );
+      const interpretationTargetSense = targetLexicalSenseSelection.status === "BOUND"
+        ? {
+            id: targetLexicalSenseSelection.selectedSenseId as string,
+            label: targetLexicalSenseSelection.selectedGloss as string,
+            authority: "EXPLICIT_USER_OR_AUTHORIZED_SOURCE" as const,
+          }
+        : targetLexicalSenseId === undefined && targetSenseId && targetSenseLabel
+          ? {
+              id: targetSenseId,
+              label: targetSenseLabel,
+              authority: "EXPLICIT_USER_OR_AUTHORIZED_SOURCE" as const,
+            }
+          : null;
       const functionalMotivationInterpretationV0_2 =
         buildFunctionalMotivationInterpretationV0_2({
           discovery: discoveryResult.discovery,
-          targetSense: targetSenseId && targetSenseLabel
-            ? {
-                id: targetSenseId,
-                label: targetSenseLabel,
-                authority: "EXPLICIT_USER_OR_AUTHORIZED_SOURCE",
-              }
-            : null,
+          targetSense: interpretationTargetSense,
           heart: heartInstrumentV1,
         });
       (final as any).functionalMotivationInterpretationV0_2 =
@@ -1672,6 +1799,12 @@ export async function POST(req: Request) {
       "DUPLICATE_ALBANIAN_SOURCE_RECORD_ID",
     );
   }
+  if (rawBodyText !== undefined && hasDuplicateTopLevelJsonPropertyV0_1(rawBodyText, "targetLexicalSenseId")) {
+    return invalidRequestResponseV0_1('Supply "targetLexicalSenseId" at most once.', "DUPLICATE_TARGET_LEXICAL_SENSE_ID");
+  }
+  if (rawBodyText !== undefined && hasDuplicateTopLevelJsonPropertyV0_1(rawBodyText, "targetLexicalGloss")) {
+    return invalidRequestResponseV0_1('Supply "targetLexicalGloss" at most once.', "DUPLICATE_TARGET_LEXICAL_GLOSS");
+  }
 
   const parsed = BodySchema.safeParse(body);
   if (!parsed.success) {
@@ -1689,9 +1822,21 @@ export async function POST(req: Request) {
     language: languageRaw,
     targetSenseId: targetSenseIdRaw,
     targetSenseLabel: targetSenseLabelRaw,
+    targetLexicalSenseId: targetLexicalSenseIdRaw,
+    targetLexicalGloss: targetLexicalGlossRaw,
     providerExecution: providerExecutionRaw,
     albanianSourceRecordId: albanianSourceRecordIdRaw,
   } = parsed.data;
+
+  const nativeSelectionInput = validateNativeTargetSenseSelectionInputV0_1({
+    senseId: targetLexicalSenseIdRaw,
+    gloss: targetLexicalGlossRaw,
+    legacySenseId: targetSenseIdRaw,
+    legacySenseLabel: targetSenseLabelRaw,
+  });
+  if (!nativeSelectionInput.ok) {
+    return invalidRequestResponseV0_1("Invalid native lexical target-sense selection.", nativeSelectionInput.reason);
+  }
 
   if (
     albanianSourceRecordIdRaw !== undefined &&
@@ -1805,6 +1950,8 @@ export async function POST(req: Request) {
   return runAnalyzeV1Orchestration({
     word,
     albanianSourceRecordId,
+    targetLexicalSenseId: nativeSelectionInput.senseId,
+    targetLexicalGloss: nativeSelectionInput.gloss,
     engineMode: modeParsed,
     engineAlphabet: alphabetParsed,
     payloadMode: modeParsed ?? "strict",
@@ -1858,6 +2005,15 @@ export async function GET(req: Request) {
     );
   }
 
+  const targetLexicalSenseSelectors = url.searchParams.getAll("targetLexicalSenseId");
+  if (targetLexicalSenseSelectors.length > 1) {
+    return invalidRequestResponseV0_1('Supply "targetLexicalSenseId" at most once.', "DUPLICATE_TARGET_LEXICAL_SENSE_ID");
+  }
+  const targetLexicalGlossSelectors = url.searchParams.getAll("targetLexicalGloss");
+  if (targetLexicalGlossSelectors.length > 1) {
+    return invalidRequestResponseV0_1('Supply "targetLexicalGloss" at most once.', "DUPLICATE_TARGET_LEXICAL_GLOSS");
+  }
+
 
 
     const ipa = (url.searchParams.get("ipa") ?? "").trim();
@@ -1867,8 +2023,21 @@ export async function GET(req: Request) {
       (url.searchParams.get("targetSenseId") ?? "").trim();
     const targetSenseLabel =
       (url.searchParams.get("targetSenseLabel") ?? "").trim();
+    const targetLexicalSenseIdRaw = targetLexicalSenseSelectors[0];
+    const targetLexicalGlossRaw = targetLexicalGlossSelectors[0];
     const providerExecutionRaw =
       url.searchParams.get("providerExecution") ?? "";
+
+  const nativeSelectionInput = validateNativeTargetSenseSelectionInputV0_1({
+    senseId: targetLexicalSenseIdRaw,
+    gloss: targetLexicalGlossRaw,
+    legacySenseId: targetSenseIdRaw,
+    legacySenseLabel: targetSenseLabel,
+  });
+  if (!nativeSelectionInput.ok) {
+    return invalidRequestResponseV0_1("Invalid native lexical target-sense selection.", nativeSelectionInput.reason);
+  }
+
     const targetSenseId =
       targetSenseIdRaw || deriveTargetSenseIdV0_1(targetSenseLabel);
 
@@ -1938,6 +2107,8 @@ if (!word) {
   return runAnalyzeV1Orchestration({
     word,
     albanianSourceRecordId,
+    targetLexicalSenseId: nativeSelectionInput.senseId,
+    targetLexicalGloss: nativeSelectionInput.gloss,
     engineMode: modeParsed,
     engineAlphabet: alphabetParsed,
     payloadMode: modeParsed ?? "strict",

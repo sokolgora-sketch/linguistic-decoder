@@ -9,6 +9,7 @@ import {
   type EnglishKaikkiServerOnlyExactIndexProviderResultV0_1,
   type EnglishKaikkiServerOnlyExactIndexProviderV0_1,
 } from "@/shared/openInstrument/englishKaikkiServerOnlyExactIndexProvider.v0_1";
+import type { EnglishKaikkiSourceRecordV0_1 } from "@/shared/openInstrument/englishKaikkiSourceFamilyAdapter.v0_1";
 import {
   type AlbanianKaikkiExactLexicalSourceCategoryV0_1,
   type AlbanianKaikkiExactLexicalSourceFactV0_1,
@@ -634,6 +635,16 @@ export type MotivationEngineDiscoveryWithAlbanianLexicalFactsV0_1 = Readonly<
 export type MotivationEngineDiscoveryServerOnlyResultV0_1 = Readonly<{
   discovery: MotivationEngineDiscoveryWithAlbanianLexicalFactsV0_1;
   englishProvider: EnglishKaikkiProviderOperationalStatusV0_1;
+  targetLexicalSenseLookupV0_1: Readonly<{
+    status:
+      | "MATCHES_FOUND"
+      | "LEXICAL_SENSE_SOURCE_NOT_FOUND"
+      | "LEXICAL_SENSE_GLOSS_NOT_FOUND"
+      | "UNAVAILABLE"
+      | "NOT_QUERIED";
+    reasonCode: string | null;
+    sourceRecords?: readonly EnglishKaikkiSourceRecordV0_1[];
+  }>;
 }>;
 
 let productionProviderPromise:
@@ -645,6 +656,50 @@ function getProductionProviderV0_1(): Promise<EnglishKaikkiServerOnlyExactIndexP
   productionProviderPromise ??=
     createEnglishKaikkiServerOnlyExactIndexProviderV0_1();
   return productionProviderPromise;
+}
+
+async function lookupExactEnglishTargetSenseV0_1(
+  input: Readonly<{ word: string; inputLanguage: string }>,
+  provider: EnglishKaikkiServerOnlyExactIndexProviderV0_1,
+): Promise<MotivationEngineDiscoveryServerOnlyResultV0_1["targetLexicalSenseLookupV0_1"]> {
+  const language = input.inputLanguage.normalize("NFC").trim().toLocaleLowerCase("en-US");
+  if (language !== "en" && language !== "english") {
+    return Object.freeze({ status: "NOT_QUERIED", reasonCode: "TARGET_LANGUAGE_NOT_ENGLISH" });
+  }
+  try {
+    const result = await provider.queryWithMetrics(input.word);
+    const status = result.result.status;
+    if (status === "MATCHES_FOUND" || status === "LEXICAL_SENSE_GLOSS_NOT_FOUND") {
+      if (result.sourceRecords === undefined) {
+        return Object.freeze({ status: "UNAVAILABLE", reasonCode: "SOURCE_RECORDS_NOT_EXPOSED" });
+      }
+      return Object.freeze({ status, reasonCode: null, sourceRecords: result.sourceRecords });
+    }
+    if (status === "LEXICAL_SENSE_SOURCE_NOT_FOUND") {
+      return Object.freeze({ status, reasonCode: null, sourceRecords: Object.freeze([]) });
+    }
+    return Object.freeze({
+      status: "UNAVAILABLE",
+      reasonCode: "reasonCode" in result.result ? result.result.reasonCode : status,
+    });
+  } catch {
+    return Object.freeze({ status: "UNAVAILABLE", reasonCode: "TARGET_SENSE_LOOKUP_FAILURE" });
+  }
+}
+
+/** Exact target-sense retrieval for the API path that intentionally keeps the
+ * established synchronous Discovery candidate set. This performs one local,
+ * source-index lookup and does not expand candidate discovery forms. */
+export async function lookupEnglishTargetSenseServerOnlyV0_1(
+  input: Readonly<{ word: string; inputLanguage: string }>,
+  providerOverride?: EnglishKaikkiServerOnlyExactIndexProviderV0_1,
+): Promise<MotivationEngineDiscoveryServerOnlyResultV0_1["targetLexicalSenseLookupV0_1"]> {
+  try {
+    const provider = providerOverride ?? await getProductionProviderV0_1();
+    return await lookupExactEnglishTargetSenseV0_1(input, provider);
+  } catch {
+    return Object.freeze({ status: "UNAVAILABLE", reasonCode: "TARGET_SENSE_LOOKUP_FAILURE" });
+  }
 }
 
 function getProductionAlbanianLexicalSourceProviderV0_1(): Promise<AlbanianKaikkiServerOnlyExactLexicalSourceProviderV0_1> {
@@ -3958,7 +4013,10 @@ export async function buildMotivationEngineDiscoveryServerOnlyV0_1(input: {
       }
     : input.analysis;
   const queryForms = getMotivationEngineDiscoveryQueryFormsV0_1(input);
-  const resolved = await resolveEnglishRecordsV0_1(provider, queryForms);
+  const [resolved, targetLexicalSenseLookupV0_1] = await Promise.all([
+    resolveEnglishRecordsV0_1(provider, queryForms),
+    lookupExactEnglishTargetSenseV0_1(input, provider),
+  ]);
   const albanianLexicalSourceProvider = input.albanianLexicalSourceProvider ?? await getProductionAlbanianLexicalSourceProviderV0_1();
   const albanianLexicalSourceResult = isAlbanianInputV0_1(input)
     ? await albanianLexicalSourceProvider.query(input.word)
@@ -4025,5 +4083,6 @@ export async function buildMotivationEngineDiscoveryServerOnlyV0_1(input: {
       }),
     }),
     englishProvider: resolved.operationalStatus,
+    targetLexicalSenseLookupV0_1,
   });
 }
