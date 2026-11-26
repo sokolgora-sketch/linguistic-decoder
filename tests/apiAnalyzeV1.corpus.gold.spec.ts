@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import { normalizeForSnapshotV0_1 } from "./_helpers/snapshotNormalize.v0.1";
 import { GET } from "@/app/api/analyze-v1/route";
 import { toAnalyzeWordResultV2Contract } from "@/shared/analyzeWordResult.v2.contract";
+import { OPEN_INSTRUMENT_EXTERNAL_SOURCE_ROOT_ENV_V0_1 } from "@/shared/openInstrument/englishKaikkiServerOnlyExactIndexProvider.v0_1";
 
 // Keep this small + representative. Expand later once stable.
 const CORPUS = [
@@ -27,6 +28,25 @@ const CORPUS = [
 
 describe("active Analyze API — corpus gold (V2 contract projection)", () => {
   jest.setTimeout(180_000);
+
+  const originalExternalSourceRoot =
+    process.env[OPEN_INSTRUMENT_EXTERNAL_SOURCE_ROOT_ENV_V0_1];
+
+  beforeAll(() => {
+    // The route still performs local lexical lookup when AI execution is disabled.
+    // Pin its external root inside this checkout so optional workstation dictionaries
+    // cannot change the golden response or inject their records into the snapshot.
+    process.env[OPEN_INSTRUMENT_EXTERNAL_SOURCE_ROOT_ENV_V0_1] = process.cwd();
+  });
+
+  afterAll(() => {
+    if (originalExternalSourceRoot === undefined) {
+      delete process.env[OPEN_INSTRUMENT_EXTERNAL_SOURCE_ROOT_ENV_V0_1];
+    } else {
+      process.env[OPEN_INSTRUMENT_EXTERNAL_SOURCE_ROOT_ENV_V0_1] =
+        originalExternalSourceRoot;
+    }
+  });
 
   it("strict corpus matches snapshot", async () => {
     const out: Record<string, any> = {};
