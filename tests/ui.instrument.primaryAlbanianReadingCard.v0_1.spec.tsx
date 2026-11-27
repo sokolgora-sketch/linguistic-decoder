@@ -459,7 +459,9 @@ describe("primary Albanian conditional component reading", () => {
     expect(componentHypothesis).toHaveTextContent("Exploratory functional proposal");
     expect(componentHypothesis).not.toHaveTextContent("EXPLORATORY_FUNCTIONAL_HYPOTHESIS");
     expect(componentHypothesis).not.toHaveTextContent("Evidence references:");
-    expect(componentHypothesis).not.toHaveTextContent("en-fik-sq-verb-3UhMn1WK");
+    const visibleComponentHypothesis = componentHypothesis.cloneNode(true) as HTMLElement;
+    visibleComponentHypothesis.querySelectorAll("details:not([open])").forEach((details) => details.remove());
+    expect(visibleComponentHypothesis.textContent).not.toContain("en-fik-sq-verb-3UhMn1WK");
     fireEvent.click(screen.getByText("Source record references"));
     fireEvent.click(screen.getByText("Exact claim classifications"));
     expect(componentHypothesis).toHaveTextContent("Evidence references:");

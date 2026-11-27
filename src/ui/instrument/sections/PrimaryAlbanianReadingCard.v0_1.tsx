@@ -228,7 +228,7 @@ export function PrimaryAlbanianReadingCardV0_1({
               ))}
             </ul>
           </details>
-          <p className="mt-2 text-xs">Written Voices: {nativeSeparativeReading.writtenVoices.map(({ voice, position }) => `${voice}@${position + 1}`).join(" → ") || "Unknown/Null"} · orthographic only · no winner selected.</p>
+          <p className="mt-2 text-xs">Written Voices: {nativeSeparativeReading.writtenVoices.map(({ voice, position }) => `${voice}@${position + 1}`).join(" → ") || "Unknown/Null"} · orthographic only · interpretation remains with the user.</p>
         </section>
       ) : null}
 

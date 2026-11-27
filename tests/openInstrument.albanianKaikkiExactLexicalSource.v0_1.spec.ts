@@ -28,7 +28,7 @@ import { adaptAnalysisToTelemetryVM } from "@/ui/instrument/contractAdapter";
 import { MotivationDiscoveryCardV0_1 } from "@/ui/instrument/sections/MotivationDiscoveryCard.v0_1";
 import { SingleWordMotivationWorkbenchV0_1 } from "@/ui/instrument/sections/SingleWordMotivationWorkbenchV0_1";
 import { createElement } from "react";
-import { cleanup, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 
 function fixtureFact(
   overrides: Omit<Partial<AlbanianKaikkiExactLexicalSourceFactV0_1>, "relatedForms"> & {
@@ -84,12 +84,29 @@ function legacyPayloadWithoutSenseOwnershipV0_1<T>(value: T): T {
     }
     if (!node || typeof node !== "object") return;
     const record = node as Record<string, unknown>;
-    delete record.sourceRelationAssertion;
-    delete record.sourceSenseOrdinal;
+    if (Object.prototype.hasOwnProperty.call(record, "sourceRelationAssertion")) {
+      delete record.sourceRelationAssertion;
+      delete record.sourceSenseOrdinal;
+    }
     Object.values(record).forEach(stripOwnership);
   };
   stripOwnership(copy);
   return copy as T;
+}
+
+function discoveryWithoutSenseAlignedEvidenceWhenExactFactsAreOmittedV0_1(
+  value: Discovery,
+): Discovery {
+  const reading = value.albanianLexicalReading as Record<string, unknown>;
+  return {
+    ...value,
+    exactLexicalSourceFacts: undefined,
+    sourceIpaSevenVoiceAnalyses: undefined,
+    albanianLexicalReading: {
+      ...reading,
+      senseAlignedLexicalRole: undefined,
+    },
+  };
 }
 
 function unsupportedAfArityFixtureFactsV0_1(
@@ -1717,7 +1734,7 @@ describe("real Albanian exact lexical source integration v0.1", () => {
     ]);
 
     const vm = adaptAnalysisToTelemetryVM({
-      motivationDiscoveryV0_1: { ...discovery, exactLexicalSourceFacts: undefined, sourceIpaSevenVoiceAnalyses: undefined },
+      motivationDiscoveryV0_1: discoveryWithoutSenseAlignedEvidenceWhenExactFactsAreOmittedV0_1(discovery),
     });
     expect(vm.motivationDiscoveryV0_2).toMatchObject({ kind: "present" });
     if (vm.motivationDiscoveryV0_2?.kind === "present") {
@@ -4330,11 +4347,10 @@ describe("real Albanian exact lexical source integration v0.1", () => {
       member.evidenceBasis.includes("SOURCE_DERIVED_FORM_LINK"),
     )).toBe(true);
     expect(reading?.functionalFamilyReading?.statement).toContain("frozen Kaikki");
-    const vm = adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: {
-      ...result.discovery,
-      exactLexicalSourceFacts: undefined,
-      sourceIpaSevenVoiceAnalyses: undefined,
-    } });
+    const vm = adaptAnalysisToTelemetryVM({
+      motivationDiscoveryV0_1:
+        discoveryWithoutSenseAlignedEvidenceWhenExactFactsAreOmittedV0_1(result.discovery as Discovery),
+    });
     expect(vm.motivationDiscoveryV0_2).toMatchObject({ kind: "present" });
     if (vm.motivationDiscoveryV0_2?.kind === "present") {
       render(createElement(MotivationDiscoveryCardV0_1, { discovery: vm.motivationDiscoveryV0_2 }));
@@ -7135,7 +7151,11 @@ describe("pinned BLETAR source-authored suffix template v0.1", () => {
       expect(structuralAlignment).toHaveTextContent("meaning UNKNOWN_OR_NULL");
       expect(structuralAlignment).toHaveTextContent("Source base bletë · resolution AMBIGUOUS");
       expect(structuralAlignment).toHaveTextContent("blet [0, 4) · exact source-base spelling MISMATCH");
-      expect(screen.getByTestId("single-word-source-surface-join")).toHaveTextContent("BLETËAR ≠ BLETAR · SURFACE_MISMATCH");
+      expect(screen.getByTestId("single-word-source-surface-join")).toHaveTextContent("BLETËAR does not match BLETAR");
+      const exactSurfaceStatusDisclosure = screen.getByText("View exact comparison status").closest("details")!;
+      expect(exactSurfaceStatusDisclosure).toHaveTextContent("SURFACE_MISMATCH");
+      fireEvent.click(exactSurfaceStatusDisclosure.querySelector("summary")!);
+      expect(exactSurfaceStatusDisclosure).toHaveAttribute("open");
       const sourceRelationships = screen.getByTestId("single-word-progressive-source-relationships");
       expect(sourceRelationships).toHaveTextContent("Source-linked component reading: NULL");
       expect(sourceRelationships).toHaveTextContent("en-bletë-sq-noun-~JN5tcXA");
