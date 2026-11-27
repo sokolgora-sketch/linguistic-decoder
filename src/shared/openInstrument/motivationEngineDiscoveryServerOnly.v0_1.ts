@@ -1,3 +1,11 @@
+import {
+  buildNativeDomainToAgentV0_1,
+  type NativeDomainToAgentReadingV0_1,
+} from "./albanianNativeDomainToAgent.v0_1";
+import {
+  lookupOewnAgentFramesServerOnlyV0_1,
+  OEWN_AGENT_ARCHIVE_PATH_ENV_V0_1,
+} from "./oewnAgentFramesServerOnly.v0_1";
 import type { AnalyzeWordResultV1 } from "@/shared/analysisResult.v1";
 import {
   createAlbanianLexicalSubstrateWitnessAdapterV0_1,
@@ -280,6 +288,7 @@ export type AlbanianLexicalReadingV0_1 = Readonly<{
   /** Additive bounded comparison for the five configured source-backed window forms. */
   fiveWindowsComparison?: AlbanianFiveWindowsComparisonV0_1 | null;
   sourceLinkedComponentReading?: AlbanianSourceLinkedComponentReadingV0_1 | null;
+  nativeDomainToAgent?: NativeDomainToAgentReadingV0_1;
   sourceLinkedComparison?: AlbanianSourceLinkedComparisonV0_1 | null;
   /** Additive product bridge; this never upgrades source evidence into morphology or proof. */
   functionalMeaningBridge: AlbanianFunctionalMeaningBridgeV0_1;
@@ -1131,19 +1140,21 @@ function sourceComponentReferencesV0_1(
     if (!template || suffixTemplates.length !== 1 || templates.length !== 1) return null;
     const args = template.args;
     const argumentKeys = Object.keys(args);
-    const allowedArgumentKeys = new Set(["1", "2", "3", "4", "t1"]);
+    const allowedArgumentKeys = new Set(["1", "2", "3", "4", "t1", "gloss1"]);
     const hasArgument4 = Object.prototype.hasOwnProperty.call(args, "4");
-    const hasGlossAnnotation = Object.prototype.hasOwnProperty.call(args, "t1");
+    const annotationKey = Object.prototype.hasOwnProperty.call(args, "t1") ? "t1" : "gloss1";
+    const hasGlossAnnotation = Object.prototype.hasOwnProperty.call(args, annotationKey);
     const baseForm = template.args["2"]?.normalize("NFC").trim() ?? "";
     const rawSuffix = template.args["3"]?.normalize("NFC").trim() ?? "";
     const suffixBody = rawSuffix.startsWith("-") ? rawSuffix.slice(1) : rawSuffix;
     const canonicalSuffix = `-${suffixBody}`;
     const normalizedBase = normalizedAlbanianFormV0_1(baseForm);
     const normalizedSuffix = normalizedAlbanianFormV0_1(suffixBody);
-    const glossAnnotation = args["t1"]?.normalize("NFC").trim() ?? "";
+    const glossAnnotation = args[annotationKey]?.normalize("NFC").trim() ?? "";
     if (
       !["1", "2", "3"].every((key) => Object.prototype.hasOwnProperty.call(args, key)) ||
       argumentKeys.some((key) => !allowedArgumentKeys.has(key)) ||
+      (annotationKey === "t1" && Object.prototype.hasOwnProperty.call(args, "gloss1")) ||
       (hasArgument4 && args["4"] !== "") ||
       template.args["1"] !== "sq" ||
       !baseForm ||
@@ -3854,17 +3865,29 @@ async function buildAlbanianLexicalReadingV0_1(input: Readonly<{
   const sourceLinkedComparison = selectedRelatedCandidate?.sourceLinkedComparison ?? null;
   const selectedRelatedFunctionalBridge = selectedRelatedCandidate?.functionalMeaningBridge ?? null;
   const targetComponentEvidence = sourceComponentReferencesV0_1(primary);
+  const nativeAgentPathConfigured = Boolean(process.env[OEWN_AGENT_ARCHIVE_PATH_ENV_V0_1]);
   const sourceLinkedComponentReading = (
     targetComponentEvidence?.relation === "SOURCE_AUTHORED_AF_TEMPLATE" ||
     targetComponentEvidence?.relation === "SOURCE_AUTHORED_SUFFIX_TEMPLATE"
   ) &&
-    selectedRelatedFunctionalBridge?.status === "SUPPORTED"
+    selectedRelatedFunctionalBridge?.status === "SUPPORTED" &&
+    !(nativeAgentPathConfigured && targetComponentEvidence.relation === "SOURCE_AUTHORED_SUFFIX_TEMPLATE")
     ? null
     : await buildSourceLinkedComponentReadingV0_1({
         primary,
         primaryAnalyses: input.analyses,
         provider: input.provider,
       });
+  const nativeDomainToAgent = nativeAgentPathConfigured && sourceLinkedComponentReading &&
+    sourceLinkedComponentReading.relation.relation === "SOURCE_AUTHORED_SUFFIX_TEMPLATE" &&
+    primary.partOfSpeech === "noun" && input.sourceStatus.status === "MATCHES_FOUND" &&
+    hasValidUniqueAlbanianSourceRecordIdV0_1(primary, input.facts)
+    ? buildNativeDomainToAgentV0_1(
+        input.word,
+        sourceLinkedComponentReading,
+        await lookupOewnAgentFramesServerOnlyV0_1(distinctGlossesV0_1([primary])),
+      )
+    : null;
   const targetRoleFunctionalBridge = input.sourceStatus.status === "MATCHES_FOUND"
     ? buildTargetRoleAgentFunctionalBridgeV0_1({
         targetFact: primary,
@@ -3971,6 +3994,7 @@ async function buildAlbanianLexicalReadingV0_1(input: Readonly<{
     senseAlignedLexicalRole,
     fiveWindowsComparison,
     sourceLinkedComponentReading,
+    ...(nativeDomainToAgent ? { nativeDomainToAgent } : {}),
     sourceLinkedComparison,
     functionalMeaningBridge,
     composition,
