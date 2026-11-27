@@ -7,6 +7,11 @@ import {
   type NativeDomainToAgentSourceDerivedInputV0_1,
 } from "@/shared/openInstrument/albanianNativeDomainToAgent.v0_1";
 import {
+  buildNativeSeparativeEventToStateV0_1,
+  nativeSeparativeEventToStateInputSchemaV0_1,
+  nativeSeparativeEventToStateReadingSchemaV0_1,
+} from "@/shared/openInstrument/nativeSeparativeEventToState.v0_1";
+import {
   buildNativeCognitiveStateToContentV0_1,
   nativeCognitiveStateToContentReadingSchemaV0_1,
   nativeCognitiveStateToContentSourceInputSchemaV0_1,
@@ -2931,9 +2936,26 @@ function parseMotivationDiscoveryV0_2(
           const canonical = nativeCognitiveStateToContentReadingSchemaV0_1.safeParse(expected);
           return canonical.success && JSON.stringify(canonical.data) === JSON.stringify(parsed.data);
         })();
+    const validNativeSeparativeEventToState = reading.nativeSeparativeEventToState === undefined
+      ? reading.nativeSeparativeEventToStateInput === undefined
+      : (() => {
+          const parsed = nativeSeparativeEventToStateReadingSchemaV0_1.safeParse(
+            reading.nativeSeparativeEventToState,
+          );
+          const sourceInput = nativeSeparativeEventToStateInputSchemaV0_1.safeParse(
+            reading.nativeSeparativeEventToStateInput,
+          );
+          if (!parsed.success || !sourceInput.success || parsed.data.inputForm !== value.inputWord ||
+            sourceInput.data.inputForm !== value.inputWord ||
+            parsed.data.alternatives.length !== sourceInput.data.targetSenses.length) return false;
+          const expected = buildNativeSeparativeEventToStateV0_1(sourceInput.data);
+          const canonical = nativeSeparativeEventToStateReadingSchemaV0_1.safeParse(expected);
+          return canonical.success && JSON.stringify(canonical.data) === JSON.stringify(parsed.data);
+        })();
     return validPrimary && validPronunciation && validRelated &&
       validNativeDomainToAgent &&
       validNativeCognitiveStateToContent &&
+      validNativeSeparativeEventToState &&
       validComposition &&
       validSourceLinkedComponentReading &&
       validSourceLinkedComparison &&

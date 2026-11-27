@@ -4,6 +4,11 @@ import {
   type NativeDomainToAgentReadingV0_1,
 } from "./albanianNativeDomainToAgent.v0_1";
 import {
+  buildNativeSeparativeEventToStateV0_1,
+  type NativeSeparativeEventToStateInputV0_1,
+  type NativeSeparativeEventToStateReadingV0_1,
+} from "./nativeSeparativeEventToState.v0_1";
+import {
   buildNativeCognitiveStateToContentV0_1,
   isReviewedCognitiveCandidateFormV0_1,
   type NativeCognitiveStateToContentSourceInputV0_1,
@@ -50,6 +55,7 @@ import {
 } from "@/shared/openInstrument/albanetSourceFamilyAdapter.v0_1";
 import {
   ALBANET_SOURCE_FAMILY_ID_V0_1,
+  ALBANET_SOURCE_FILE_BYTES_V0_1,
   ALBANET_SOURCE_FILE_SHA256_V0_1,
   ALBANET_SOURCE_REPOSITORY_V0_1,
   ALBANET_SOURCE_REVISION_V0_1,
@@ -300,6 +306,8 @@ export type AlbanianLexicalReadingV0_1 = Readonly<{
   nativeDomainToAgentSourceDerivedInput?: NativeDomainToAgentSourceDerivedInputV0_1;
   nativeCognitiveStateToContent?: NativeCognitiveStateToContentReadingV0_1;
   nativeCognitiveStateToContentSourceInput?: NativeCognitiveStateToContentSourceInputV0_1;
+  nativeSeparativeEventToState?: NativeSeparativeEventToStateReadingV0_1;
+  nativeSeparativeEventToStateInput?: NativeSeparativeEventToStateInputV0_1;
   sourceLinkedComparison?: AlbanianSourceLinkedComparisonV0_1 | null;
   /** Additive product bridge; this never upgrades source evidence into morphology or proof. */
   functionalMeaningBridge: AlbanianFunctionalMeaningBridgeV0_1;
@@ -3810,6 +3818,29 @@ async function buildAlbanianLexicalReadingV0_1(input: Readonly<{
     sourceStatus: input.sourceStatus,
     albanetSourceAdapter: input.albanetSourceAdapter,
   });
+  const albaNetTargetRecords = input.albanetSourceAdapter?.getLemmaRecords(input.word) ?? [];
+  const nativeSeparativeEventToStateInput: NativeSeparativeEventToStateInputV0_1 | undefined =
+    albaNetTargetRecords.length > 0 ? {
+      inputForm: input.word,
+      sourceIdentity: {
+        sourceFamilyId: ALBANET_SOURCE_FAMILY_ID_V0_1,
+        revision: ALBANET_SOURCE_REVISION_V0_1,
+        sha256: ALBANET_SOURCE_FILE_SHA256_V0_1,
+        bytes: ALBANET_SOURCE_FILE_BYTES_V0_1,
+      },
+      targetSenses: albaNetTargetRecords.map((record) => ({
+        sourceRecordId: record.sourceRecordId,
+        synsetId: record.synsetId,
+        lemma: record.lemma,
+        definitions: [...record.definitions],
+        examples: [...record.examples],
+        entryLocator: record.entryLocator,
+        sourceStatus: "SOURCE_REPORTED_UNREVIEWED_RESEARCH_CANDIDATE" as const,
+      })),
+    } : undefined;
+  const nativeSeparativeEventToState = nativeSeparativeEventToStateInput
+    ? buildNativeSeparativeEventToStateV0_1(nativeSeparativeEventToStateInput) ?? undefined
+    : undefined;
 
   if (!primary) {
     return Object.freeze({
@@ -3824,6 +3855,10 @@ async function buildAlbanianLexicalReadingV0_1(input: Readonly<{
       fiveWindowsComparison,
       sourceLinkedComponentReading: null,
       sourceLinkedComparison: null,
+      ...(nativeSeparativeEventToState ? { nativeSeparativeEventToState } : {}),
+      ...(nativeSeparativeEventToState && nativeSeparativeEventToStateInput
+        ? { nativeSeparativeEventToStateInput }
+        : {}),
       functionalMeaningBridge: nullFunctionalMeaningBridgeV0_1({
         sourceFacts: null,
         reasonCodes: Object.freeze([sourceRecordSelectionReason ?? "PRIMARY_SOURCE_RECORD_NOT_FOUND"]),
@@ -4134,6 +4169,10 @@ async function buildAlbanianLexicalReadingV0_1(input: Readonly<{
     ...(nativeCognitiveStateToContent ? { nativeCognitiveStateToContent } : {}),
     ...(nativeCognitiveStateToContent && nativeCognitiveStateToContentSourceInput
       ? { nativeCognitiveStateToContentSourceInput }
+      : {}),
+    ...(nativeSeparativeEventToState ? { nativeSeparativeEventToState } : {}),
+    ...(nativeSeparativeEventToState && nativeSeparativeEventToStateInput
+      ? { nativeSeparativeEventToStateInput }
       : {}),
     sourceLinkedComparison,
     functionalMeaningBridge,
