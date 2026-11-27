@@ -2,6 +2,8 @@
 
 This repo has strict rules so we don’t break the Seven-Voices engine or the Firebase Studio setup.
 
+Every AI task prompt states its scope, validation tier, reuse plan, exact checks, and stop boundary before expensive work, and names an available Codex model and reasoning effort suitable for the task.
+
 ## 1. Core safety rails
 
 - **Never** run auto-fix tools that touch many files at once (Gemini, `next lint --fix`, etc.).
@@ -100,7 +102,9 @@ After identifying the intended repository-relative changed paths, run `node scri
 
 ### Checkout hook bootstrap (mandatory for implementation)
 
-After safe preflight and before edits, run `npm run hooks:setup && npm run hooks:check` in the actual feature checkout. The repository `prepare` lifecycle also activates/verifies hooks during ordinary `npm ci`/`npm install` in a Git clone. It checks that `.githooks/pre-push` is a regular executable file; refuses conflicting effective `core.hooksPath` values; and avoids changing shared Git config from a linked worktree without preexisting per-worktree config. Non-Git npm installs may safely skip `prepare` hook setup. A missing or unsafe hook is a STOP, not permission to run a no-context FULL gate in place of the correct pre-push hook. Normal push must invoke the hook with genuine Git-supplied context. Hook/bootstrap/dependency changes are HIGH_IMPACT and require FULL validation.
+Before creating or attaching a linked worktree, inspect the exact target path and cleanliness, effective `core.hooksPath` with origin/scope, existing `extensions.worktreeConfig`, the resolved hook directory and its contents/symlinks, target worktree-specific config, and the tracked executable `.githooks/pre-push`. Relative hook paths resolve from the worktree root. Preserve real custom hooks. A conflicting shared path may be repaired only when worktree config is already enabled, the target has no custom hook to preserve, and a feature-only `git config --worktree core.hooksPath .githooks` can be verified without changing shared or sibling worktree configuration. Otherwise STOP; never enable shared worktree config, overwrite shared hooksPath, or bypass a hook.
+
+After safe preflight and before edits, run `npm run hooks:setup && npm run hooks:check` in the actual feature checkout. The repository `prepare` lifecycle also activates/verifies hooks during ordinary `npm ci`/`npm install` in a Git clone. Non-Git npm installs may safely skip `prepare` hook setup. A missing or unsafe hook is a STOP, not permission to run a no-context FULL gate in place of the correct pre-push hook. Normal push must invoke the hook with genuine Git-supplied context. Hook/bootstrap/dependency changes are HIGH_IMPACT and require FULL validation.
 
 
 Run focused tests first for changed behavior. Use the actual repository commands for repository-wide validation:
@@ -112,7 +116,7 @@ Run focused tests first for changed behavior. Use the actual repository commands
 Use `npm run gate` or a separately executed `npm run build` when production-build validation is required. Pre-merge proof must show the command that actually provided build coverage.
 
 The repository pre-push hook always enters through `npm run gate:prepush`. For
-a verified changeset outside the two verified fast paths below, or when
+a verified changeset outside the three verified fast paths below, or when
 fast-path selection remains uncertain, it runs repository lint plus Jest in `--ci --runInBand` mode
 with `OPEN_INSTRUMENT_EXTERNAL_SOURCE_ROOT` unset so deterministic local
 results cannot change with an optional external provider. It excludes only the
@@ -146,8 +150,8 @@ frontmatter and AGENTS reference checks, and local Markdown-link checks.
 Multiple refs, tags, deletes, renames, mode changes, symlinks, MDX, code,
 tests, CI, hooks, gate/dependency/config changes, unusual paths, stale or
 missing refs, dirty state, and any ambiguous Git/remote result do not qualify
-for DOCS_ONLY. The classifier may then consider the separate SCOPED_CODE
-allowlist below. If the changeset is verified but fast-path selection remains
+for DOCS_ONLY. The classifier may then consider the separate SCOPED_CODE or
+SCOPED_ENGINE allowlists below. If the changeset is verified but fast-path selection remains
 uncertain, the gate uses FULL. If the Git ref or changed-path context cannot be
 verified, the gate stops with `FROZEN_CHANGESET_UNVERIFIED` before validation.
 A failing docs check fails the gate.
@@ -171,18 +175,35 @@ direct test must be registered, the cross-cutting guard inventory must be
 present, and the union must be no larger than 150 suites or 20% of the
 registered Jest inventory, whichever limit is smaller. Any failed, empty,
 malformed, oversized, or otherwise uncertain selection falls back to FULL.
-Shared engines/contracts, APIs, security, generated artifacts/baselines,
+Broader shared engines/contracts, APIs, security, generated artifacts/baselines,
 dependencies, configuration, CI, hooks, gate scripts, deletions, renames,
 symlinks, and unrecognized paths are never eligible. Selected Jest execution
 remains serial; this path does not replace full hosted CI.
+
+For a clean single-ref push whose entire regular `100644` diff contains only
+`src/shared/openInstrument/nativeCognitiveStateToContent.v0_1.ts` and/or its
+focused test `tests/openInstrument.albanianNativeDomainToAgent.v0_1.spec.ts`,
+the classifier may select `SCOPED_ENGINE`. This is the initial narrow engine
+lane; it does not cover the server-only composition engine or other shared
+modules. Its selector derives Jest's registered suite inventory, `--findRelatedTests`
+dependencies, direct changed tests, and registered tests that reference the
+source, then includes required engine/API/UI-contract/scientific guards and the
+four filesystem-scanning guards listed above. An absent guard, failed or
+ambiguous discovery, empty related tests, an unregistered path, or a selection
+above 150 suites or 20% of the complete registered suite inventory falls back
+to FULL. A proven selection runs ESLint on every committed changed path,
+`npm run typecheck:prod`, and only the selected suites serially. The frozen
+contract preflight still runs before either fast path, and hosted CI continues
+to run its full unit, integration, build, browser, and contract requirements.
 
 Never claim PASS, build success, CI success, or gate success without actual output. Do not encode transient test counts in this durable workflow.
 
 For an ordinary scoped code change, default local validation is focused tests,
 changed-file ESLint, and the applicable production or contract typecheck. Keep
 the normal pre-push hook enabled; it must complete `npm run gate:prepush` on
-every push, selecting only a verified docs path, a verified bounded Instrument
-UI path, or the existing full lane.
+every push, selecting only a verified docs, bounded Instrument UI, or exact
+native cognitive engine path, or the existing full lane. Changes to the
+classifier, selector, gate, hooks, or workflow policy remain FULL.
 
 Before lint/Jest, the gate also requires verified Git ref and changeset context.
 Missing or invalid context fails immediately with

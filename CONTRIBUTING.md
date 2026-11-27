@@ -1,6 +1,6 @@
 # Contributing
 
-This repo is run as a deterministic instrument. Preserve correctness, scientific reproducibility, and source authority while keeping validation proportional to the change.
+This repo is run as a deterministic instrument. Preserve correctness, scientific reproducibility, and source authority while keeping validation proportional to the change. Every task states scope, tier, reuse plan, exact checks, and stop boundary before expensive work, and recommends an available Codex model and reasoning effort.
 
 ## Non-negotiables
 
@@ -10,14 +10,14 @@ This repo is run as a deterministic instrument. Preserve correctness, scientific
 
 ## Default workflow for an ordinary scoped PR
 
-1. Sync from the current `main` and create a feature branch. After safe checkout preflight and before editing, run `npm run hooks:setup && npm run hooks:check` in that checkout.
+1. Before creating or attaching a linked worktree, inspect effective `core.hooksPath` with origin/scope, `extensions.worktreeConfig`, the resolved hook directory and its files/symlinks, the target worktree config, and tracked `.githooks/pre-push`. If a shared path conflicts, use a feature-only `git config --worktree core.hooksPath .githooks` only when per-worktree config is already enabled and no custom hook needs preservation; verify shared and sibling config hashes are unchanged. Otherwise stop without changing shared hooks or extensions. Sync from verified current `main` and create the isolated feature branch. Before editing, run `npm run hooks:setup && npm run hooks:check` in that checkout.
 2. Identify the intended changed paths. Before editing any path that may be checksum-frozen, run `node scripts/frozenContractPreflight.v0_1.cjs --planned <repo-relative-paths>` with the planned paths. This read-only check reports registered owners and expected hashes; it does not replace mandatory hooked validation. Then make the smallest scoped change.
 3. During implementation, run the focused tests relevant to the changed behavior, ESLint on changed files, and the applicable production or contract typecheck. Add other focused checks when the change warrants them.
 4. Avoid repeating broad validation after edits that do not invalidate its result. Do not automatically run both broad local gates for every ordinary PR.
 5. Before pushing, verify the repository's normal pre-push hook is active and leave it enabled. The hook runs `npm run gate:prepush` on every push, including later pushes to the same PR. Unverified Git ref or changeset context fails immediately with `FROZEN_CHANGESET_UNVERIFIED`. With verified context, a frozen-identity mismatch fails before lint or Jest; clean identities continue to normal gate classification. If fast-path selection is uncertain after changeset verification, the existing FULL validation runs.
 6. Open or update the PR and wait for all required GitHub checks to pass before merge. Obtain any separately required owner approval; do not merge automatically.
 
-The default workflow does **not** require a separate `npm run gate:quick` immediately before the push hook. Hook activation belongs to initial checkout setup, not to a late gate fallback: `npm run hooks:setup` safely sets `core.hooksPath=.githooks` in a standalone clone; `npm run hooks:check` verifies it. `npm ci` also runs `prepare`, but preexisting dependencies or disabled lifecycle scripts do not prove activation. Conflicting custom hooks and linked worktrees without safe per-worktree config STOP instead of being silently overwritten. If setup fails, STOP and diagnose; do not run a no-context FULL gate merely because the hook is missing. Normal Git push executes the hook with real ref context. Never use `--no-verify` or forged hook arguments.
+The default workflow does **not** require a separate `npm run gate:quick` immediately before the push hook. `npm run hooks:setup` and `npm run hooks:check` verify the tracked hook. `npm ci` also runs `prepare`, but preexisting dependencies or disabled lifecycle scripts do not prove activation. Inspect custom hook paths before worktree creation; preserve real custom hooks. For a safe linked-worktree repair, require already-enabled per-worktree config, no target custom hooks, a target-only `.githooks` setting, and unchanged shared/sibling configs. If setup or isolation fails, STOP; do not run a no-context FULL gate as a substitute. Normal Git push executes the hook with real ref context. Never use `--no-verify` or forged hook arguments.
 
 ## Gate coverage and broader local validation
 
@@ -42,6 +42,8 @@ The separate `SCOPED_CODE` path is limited to regular `100644` changes whose ent
 Use `npm run gate:quick` when broader local integration validation is justified—for example, changes to API/runtime behavior, Next.js server behavior, shared analysis engines, cross-cutting contracts, uncertain dependency impact, or when diagnosing a failure. Do not treat the pre-push gate as a replacement for integration coverage. Run `npm run build` locally when the change or an explicit requirement warrants it; the existing hosted CI also performs build validation.
 
 The existing GitHub CI and required status checks remain the complete PR validation path. Keep them enabled and require their success; a focused local run or either local gate alone is not a substitute for required hosted checks.
+
+The verified `SCOPED_ENGINE` lane is limited to `src/shared/openInstrument/nativeCognitiveStateToContent.v0_1.ts` and its focused test `tests/openInstrument.albanianNativeDomainToAgent.v0_1.spec.ts`. It derives changed paths from the clean committed Git diff and live remote refs, selects Jest related tests and source consumers, and requires engine, API, UI-contract/scientific, and filesystem-scanning guards. Missing guards, incomplete discovery, selections above 200 suites or 20% of registered suites, shared-engine composition changes, and every unrecognized path use FULL. The hook still runs changed-file lint, production typecheck, and selected serial Jest for eligible commits; hosted CI remains comprehensive.
 
 ## Helpful commands
 

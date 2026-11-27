@@ -18,6 +18,7 @@ const { classifyPrePush } = classifier;
 const { validateDocsOnlyCommit } = docsValidation;
 const { verifyChangedFiles } = frozenContractPreflight;
 const { selectScopedCodeTests } = scopedCodeSelection;
+const { selectScopedEngineTests } = scopedCodeSelection;
 
 const capabilityDependentTestPatterns = [
   "tests/apiAnalyzeV1\\.evidence\\.smoke\\.curl\\.spec\\.ts$",
@@ -55,7 +56,13 @@ function run(command, args, label = command) {
 
   const elapsedSeconds = Number(process.hrtime.bigint() - startedAt) / 1_000_000_000;
   console.log(`[gate:prepush] ${label} elapsed ${elapsedSeconds.toFixed(2)}s`);
-  if (result.status !== 0) process.exit(result.status ?? 1);
+  if (result.status !== 0) {
+    const failure = result.signal
+      ? `terminated by signal ${result.signal}`
+      : `exited with code ${result.status ?? "unknown"}`;
+    console.error(`[gate:prepush] ${label} ${failure}`);
+    process.exit(result.status ?? 1);
+  }
 }
 
 const hookArgs = process.argv.slice(2);
@@ -154,17 +161,48 @@ if (classification.tier === "DOCS_ONLY") {
     process.exit(0);
   }
   console.log(`pre-push: scoped-code selection became uncertain (${selection.reason}); using full gate`);
+} else if (classification.tier === "SCOPED_ENGINE") {
+  const selection = selectScopedEngineTests({
+    repoRoot: process.cwd(),
+    changedPaths: classification.changedPaths,
+  });
+  if (selection.state === "SELECTED") {
+    console.log(
+      `pre-push: verified scoped native cognitive reasoning change (${selection.reason}); ` +
+        `${selection.testPaths.length}/${selection.totalSuiteCount} serial Jest suites, ` +
+        `${selection.engineGuardCount} engine/API/UI-contract guards, ` +
+        `${selection.filesystemScanGuardCount} filesystem-scanning guards, ` +
+        `${selection.explicitConsumerCount} source-referencing consumers`,
+    );
+    run("node_modules/.bin/eslint", ["-c", "eslint.config.mjs", ...classification.changedPaths], "changed-file ESLint");
+    run("npm", ["run", "typecheck:prod"], "production typecheck");
+    run(
+      "npm",
+      [
+        "test",
+        "--",
+        "--ci",
+        "--runInBand",
+        "--runTestsByPath",
+        ...selection.testPaths.map((testPath) => `${process.cwd()}/${testPath}`),
+      ],
+      `selected serial Jest (${selection.testPaths.length} suites)`,
+    );
+    console.log("\n✅ gate:prepush passed (verified scoped native cognitive reasoning validation)\n");
+    process.exit(0);
+  }
+  console.log(`pre-push: scoped-engine selection became uncertain (${selection.reason}); using full gate`);
 } else {
   console.log(`pre-push: using full validation (${classification.reason})`);
 }
 
-run("npm", ["run", "lint"]);
+run("npm", ["run", "lint"], "repository lint");
 run("npm", [
   "test",
   "--",
   "--ci",
   "--runInBand",
   `--testPathIgnorePatterns=(${capabilityDependentTestPatterns.join("|")})`,
-]);
+], "full serial Jest");
 
 console.log("\n✅ gate:prepush passed (deterministic local validation)\n");

@@ -13,10 +13,26 @@ const FILESYSTEM_SCAN_GUARD_TESTS = [
   "tests/vowels/orthographySsot.guard.v0.1.spec.ts",
   "tests/vowels/phoneticIpaSsot.guard.v0.1.spec.ts",
 ];
+const ENGINE_SOURCE_PATHS = new Set([
+  "src/shared/openInstrument/nativeCognitiveStateToContent.v0_1.ts",
+]);
+const ENGINE_DIRECT_TEST_PATHS = new Set([
+  "tests/openInstrument.albanianNativeDomainToAgent.v0_1.spec.ts",
+]);
+const ENGINE_REQUIRED_GUARD_TESTS = [
+  "tests/openInstrument.albanianNativeDomainToAgent.v0_1.spec.ts",
+  "tests/openInstrument.motivationEngineDiscovery.v0_1.spec.ts",
+  "tests/openInstrument.motivationEngineDiscoveryServerOnly.v0_1.spec.ts",
+  "tests/openInstrument.deterministicBetaSafety.v0_1.spec.ts",
+  "tests/apiAnalyzeV1.nativeLexicalSenseBinding.v0_1.spec.ts",
+  "tests/apiAnalyzeV1.albanianLexicalReading.v0_1.spec.ts",
+  "tests/ui.instrument.primaryAlbanianReadingCard.v0_1.spec.tsx",
+];
 const MAX_CHANGED_PATHS = 20;
 const MAX_CHANGED_SOURCES = 5;
 const MAX_CHANGED_TESTS = 15;
 const MAX_SELECTED_SUITES = 150;
+const MAX_ENGINE_SELECTED_SUITES = 200;
 const MAX_SELECTED_FRACTION = 0.2;
 const MIN_UI_GUARD_SUITES = 80;
 
@@ -60,7 +76,7 @@ function parseJestList(stdout, repoRoot) {
   const paths = [];
   for (const item of value) {
     const normalized = normalizeTestPath(repoRoot, item);
-    if (!normalized) return { error: "Jest listed a path outside the repository test tree" };
+    if (!normalized) return { error: `Jest listed a path outside the repository test tree: ${item}` };
     paths.push(normalized);
   }
   return { paths: [...new Set(paths)].sort() };
@@ -210,4 +226,95 @@ function selectScopedCodeTests({ repoRoot, changedPaths, runner = runJest }) {
   };
 }
 
-module.exports = { selectScopedCodeTests };
+function selectScopedEngineTests({ repoRoot, changedPaths, runner = runJest }) {
+  if (!repoRoot || !Array.isArray(changedPaths) || changedPaths.length === 0) {
+    return full("scoped-engine inputs are missing");
+  }
+  if (changedPaths.length > MAX_CHANGED_PATHS || new Set(changedPaths).size !== changedPaths.length) {
+    return full("changed path count is too large or ambiguous");
+  }
+  if (changedPaths.some((item) => !safeRelativePath(item))) {
+    return full("a changed path is malformed or outside the repository");
+  }
+
+  const sourcePaths = changedPaths.filter((item) => ENGINE_SOURCE_PATHS.has(item));
+  const directChangedTests = changedPaths.filter((item) => ENGINE_DIRECT_TEST_PATHS.has(item));
+  if (sourcePaths.length + directChangedTests.length !== changedPaths.length) {
+    return full("a changed path is outside the bounded native cognitive reasoning allowlist");
+  }
+  if (sourcePaths.length > MAX_CHANGED_SOURCES || directChangedTests.length > MAX_CHANGED_TESTS) {
+    return full("too many native reasoning sources or direct tests for a scoped selection");
+  }
+  if (sourcePaths.length === 0 && directChangedTests.length === 0) {
+    return full("no supported native reasoning source or direct test was changed");
+  }
+
+  const allResult = listTests(repoRoot, null, runner);
+  if (allResult.error) return full(allResult.error);
+  const allTests = allResult.paths;
+  if (allTests.length === 0) return full("Jest discovered no registered test suites");
+  const allTestSet = new Set(allTests);
+
+  for (const directTest of directChangedTests) {
+    if (!allTestSet.has(directTest)) {
+      return full(`directly changed test is not registered with Jest: ${directTest}`);
+    }
+  }
+
+  const selected = new Set(directChangedTests);
+  const relatedTestPaths = new Set();
+  let relatedCount = 0;
+  for (const sourcePath of sourcePaths) {
+    const related = listTests(repoRoot, sourcePath, runner);
+    if (related.error) return full(related.error);
+    if (related.paths.length === 0) {
+      return full(`Jest found no related tests for changed source ${sourcePath}`);
+    }
+    for (const testPath of related.paths) {
+      if (!allTestSet.has(testPath)) {
+        return full(`related-test selection returned an unregistered suite: ${testPath}`);
+      }
+      selected.add(testPath);
+      relatedTestPaths.add(testPath);
+    }
+    relatedCount += related.paths.length;
+  }
+
+  for (const testPath of [...ENGINE_REQUIRED_GUARD_TESTS, ...FILESYSTEM_SCAN_GUARD_TESTS]) {
+    if (!allTestSet.has(testPath)) {
+      return full(`required engine or cross-cutting guard is not registered with Jest: ${testPath}`);
+    }
+    selected.add(testPath);
+  }
+
+  const explicitConsumers = explicitSourceConsumers(repoRoot, allTests, sourcePaths);
+  if (explicitConsumers.error) return full(explicitConsumers.error);
+  for (const testPath of explicitConsumers.paths) selected.add(testPath);
+
+  if (selected.size === 0) return full("scoped engine test selection is empty");
+  const allowedSize = Math.min(MAX_ENGINE_SELECTED_SUITES, Math.floor(allTests.length * MAX_SELECTED_FRACTION));
+  if (selected.size > allowedSize) {
+    return full(`selected suite count ${selected.size} exceeds the safe cap ${allowedSize}`);
+  }
+
+  return {
+    state: "SELECTED",
+    reason: "related tests, direct tests, engine/API/UI-contract guards, filesystem-scanning guards, and source-referencing consumers were included",
+    testPaths: [...selected].sort(),
+    relatedTestPaths: [...relatedTestPaths].sort(),
+    sourcePaths,
+    directChangedTests,
+    relatedTestCount: relatedCount,
+    engineGuardCount: ENGINE_REQUIRED_GUARD_TESTS.length,
+    filesystemScanGuardCount: FILESYSTEM_SCAN_GUARD_TESTS.length,
+    explicitConsumerCount: explicitConsumers.paths.length,
+    totalSuiteCount: allTests.length,
+  };
+}
+
+module.exports = {
+  ENGINE_REQUIRED_GUARD_TESTS,
+  FILESYSTEM_SCAN_GUARD_TESTS,
+  selectScopedCodeTests,
+  selectScopedEngineTests,
+};

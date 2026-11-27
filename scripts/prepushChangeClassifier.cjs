@@ -11,6 +11,12 @@ const ALLOWED_ROOT_DOCS = new Set([
 ]);
 const ALLOWED_DOCS_PREFIXES = ["docs/process/"];
 const SAFE_REPO_PATH = /^[A-Za-z0-9._/-]+$/;
+const ALLOWED_SCOPED_ENGINE_SOURCES = new Set([
+  "src/shared/openInstrument/nativeCognitiveStateToContent.v0_1.ts",
+]);
+const ALLOWED_SCOPED_ENGINE_TESTS = new Set([
+  "tests/openInstrument.albanianNativeDomainToAgent.v0_1.spec.ts",
+]);
 
 function full(reason) {
   return { tier: "FULL", reason };
@@ -83,6 +89,13 @@ function isAllowedScopedCodePath(filePath) {
     return true;
   }
   return /^tests\/(?:ui\.instrument|instrumentPanel)\.[A-Za-z0-9._-]+\.spec\.tsx?$/.test(filePath);
+}
+
+function isAllowedScopedEnginePath(filePath) {
+  return (
+    isSafeRepoPath(filePath) &&
+    (ALLOWED_SCOPED_ENGINE_SOURCES.has(filePath) || ALLOWED_SCOPED_ENGINE_TESTS.has(filePath))
+  );
 }
 
 function parseSingleUpdate(input, hashLength) {
@@ -302,6 +315,15 @@ function classifyPrePush({ repoRoot, remoteName, remoteUrl, stdin }) {
       changedPaths,
     };
   }
+  if (fastPathEligible && changedPaths.every(isAllowedScopedEnginePath)) {
+    return {
+      tier: "SCOPED_ENGINE",
+      reason: "single clean branch update contains only the bounded native cognitive reasoning module and its focused regression suite",
+      baseSha,
+      headSha,
+      changedPaths,
+    };
+  }
   return {
     ...full("the complete pushed diff is not wholly within a verified fast-path allowlist"),
     baseSha,
@@ -314,5 +336,6 @@ module.exports = {
   classifyPrePush,
   isAllowedDocsPath,
   isAllowedScopedCodePath,
+  isAllowedScopedEnginePath,
   readRawChanges,
 };

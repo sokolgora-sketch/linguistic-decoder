@@ -18,6 +18,13 @@ const { validateDocsOnlyCommit } = require("../scripts/prepushDocsValidation.cjs
     reason: string;
   };
 };
+const {
+  ENGINE_REQUIRED_GUARD_TESTS,
+  FILESYSTEM_SCAN_GUARD_TESTS,
+} = require("../scripts/prepushScopedCodeSelection.v0_1.cjs") as {
+  ENGINE_REQUIRED_GUARD_TESTS: string[];
+  FILESYSTEM_SCAN_GUARD_TESTS: string[];
+};
 
 type Fixture = {
   root: string;
@@ -164,6 +171,53 @@ describe("pre-push fast-path classifier", () => {
       "src/ui/instrument/InstrumentPanel.tsx",
       "tests/ui.instrument.scopedGate.spec.tsx",
     ]);
+  });
+
+  it("selects SCOPED_ENGINE for the exact native cognitive module and its focused regression suite", () => {
+    const fixture = fresh();
+    const source = path.join(
+      fixture.root,
+      "src/shared/openInstrument/nativeCognitiveStateToContent.v0_1.ts",
+    );
+    const test = path.join(
+      fixture.root,
+      "tests/openInstrument.albanianNativeDomainToAgent.v0_1.spec.ts",
+    );
+    fs.mkdirSync(path.dirname(source), { recursive: true });
+    fs.mkdirSync(path.dirname(test), { recursive: true });
+    fs.writeFileSync(source, "export const nativeReasoning = true;\n");
+    fs.writeFileSync(test, "describe('native reasoning', () => {});\n");
+    commit(fixture, "bounded native cognitive reasoning change");
+
+    const result = classify(fixture);
+
+    expect(result).toMatchObject({
+      tier: "SCOPED_ENGINE",
+      changedPaths: [
+        "src/shared/openInstrument/nativeCognitiveStateToContent.v0_1.ts",
+        "tests/openInstrument.albanianNativeDomainToAgent.v0_1.spec.ts",
+      ],
+    });
+  });
+
+  it.each([
+    ["shared server composition module", "src/shared/openInstrument/motivationEngineDiscoveryServerOnly.v0_1.ts"],
+    ["OEWN provider module", "src/shared/openInstrument/oewnAgentFramesServerOnly.v0_1.ts"],
+    ["unrelated shared module", "src/shared/openInstrument/otherReasoning.ts"],
+  ])("keeps %s in FULL even beside an allowlisted native reasoning source", (_label, extraPath) => {
+    const fixture = fresh();
+    const source = path.join(
+      fixture.root,
+      "src/shared/openInstrument/nativeCognitiveStateToContent.v0_1.ts",
+    );
+    const extra = path.join(fixture.root, extraPath);
+    fs.mkdirSync(path.dirname(source), { recursive: true });
+    fs.mkdirSync(path.dirname(extra), { recursive: true });
+    fs.writeFileSync(source, "export const nativeReasoning = true;\n");
+    fs.writeFileSync(extra, "export const sharedReasoning = true;\n");
+    commit(fixture, "unsafe mixed engine change");
+
+    expect(classify(fixture).tier).toBe("FULL");
   });
 
   it.each([
@@ -437,6 +491,49 @@ describe("pre-push fast-path classifier", () => {
     expect(result.stdout.indexOf("frozen-contract preflight passed")).toBeLessThan(result.stdout.indexOf("FULL_LINT"));
   });
 
+  it("reports child-process exit codes and termination signals from the mandatory gate", () => {
+    const fixture = fresh();
+    fs.mkdirSync(path.join(fixture.root, "src"), { recursive: true });
+    fs.writeFileSync(path.join(fixture.root, "src/example.ts"), "export const example = true;\n");
+    const headSha = commit(fixture, "ordinary source change for failure diagnostics");
+    const update = `${fixture.topicRef} ${headSha} ${fixture.topicRef} ${fixture.zeroSha}\n`;
+    const hookScript = path.resolve(__dirname, "../.githooks/pre-push");
+    const gateScript = path.resolve(process.cwd(), "scripts/gate.prepush.mjs");
+    const fakeBin = path.join(path.dirname(fixture.root), "fake-bin");
+    const fakeNpm = path.join(fakeBin, "npm");
+    fs.mkdirSync(fakeBin, { recursive: true });
+
+    const writeNpm = (lintFailure: "signal" | "exit") => {
+      fs.writeFileSync(
+        fakeNpm,
+        `#!/bin/sh\nif [ "$1" = "run" ] && [ "$2" = "gate:prepush" ]; then\n  shift 3\n  exec ${JSON.stringify(process.execPath)} ${JSON.stringify(gateScript)} "$@"\nfi\nif [ "$1" = "run" ] && [ "$2" = "lint" ]; then\n  ${lintFailure === "signal" ? "kill -TERM \"$$\"" : "exit 23"}\nfi\nexit 99\n`,
+        { mode: 0o755 },
+      );
+    };
+    const runHook = () => spawnSync("bash", [hookScript, "origin", fixture.remote], {
+      cwd: fixture.root,
+      env: { ...process.env, PATH: `${fakeBin}${path.delimiter}${process.env.PATH || ""}` },
+      encoding: "utf8",
+      input: update,
+      shell: false,
+      timeout: 30_000,
+    });
+
+    writeNpm("signal");
+    const signaled = runHook();
+    expect(signaled.status).toBe(1);
+    expect(signaled.stdout + signaled.stderr).toContain(
+      "[gate:prepush] repository lint terminated by signal SIGTERM",
+    );
+
+    writeNpm("exit");
+    const exited = runHook();
+    expect(exited.status).toBe(23);
+    expect(exited.stdout + exited.stderr).toContain(
+      "[gate:prepush] repository lint exited with code 23",
+    );
+  });
+
   it("rejects a changed frozen source before full lint and Jest start", () => {
     const protectedPath = "src/shared/openInstrument/motivationEngineDiscovery.v0_1.ts";
     const manifestPath = "docs/open-instrument/research-artifacts/test-s2/hash-manifest.json";
@@ -580,6 +677,98 @@ describe("pre-push fast-path classifier", () => {
     expect(uncertain.stdout).toContain("using full gate");
     expect(uncertain.stdout).toContain("FULL_LINT");
     expect(uncertain.stdout).toContain("SCOPED_TEST");
+  });
+
+  it("runs the verified native reasoning lane with its full registered guard set", () => {
+    const fixture = fresh();
+    const sourcePath = "src/shared/openInstrument/nativeCognitiveStateToContent.v0_1.ts";
+    const directTestPath = "tests/openInstrument.albanianNativeDomainToAgent.v0_1.spec.ts";
+    const source = path.join(fixture.root, sourcePath);
+    const directTest = path.join(fixture.root, directTestPath);
+    fs.mkdirSync(path.dirname(source), { recursive: true });
+    fs.mkdirSync(path.dirname(directTest), { recursive: true });
+    const relatedTestPath = "tests/nativeReasoning.consumer.spec.ts";
+    const unrelatedTestPaths = Array.from({ length: 100 }, (_, index) => `tests/unrelated-${index}.spec.ts`);
+    const listedTestPaths = [
+      ...new Set([
+        ...ENGINE_REQUIRED_GUARD_TESTS,
+        ...FILESYSTEM_SCAN_GUARD_TESTS,
+        relatedTestPath,
+        ...unrelatedTestPaths,
+      ]),
+    ];
+    git(fixture.root, "checkout", "main");
+    for (const testPath of listedTestPaths) {
+      const absolute = path.join(fixture.root, testPath);
+      fs.mkdirSync(path.dirname(absolute), { recursive: true });
+      fs.writeFileSync(
+        absolute,
+        testPath === relatedTestPath
+          ? `import "${sourcePath}";\ndescribe('consumer', () => {});\n`
+          : "describe('guard', () => {});\n",
+      );
+    }
+    commit(fixture, "seed native reasoning test inventory");
+    git(fixture.root, "push", "origin", "main");
+    git(fixture.root, "checkout", "topic/docs");
+    git(fixture.root, "merge", "--ff-only", "main");
+    fs.writeFileSync(source, "export const nativeReasoning = true;\n");
+    fs.writeFileSync(directTest, "describe('native reasoning', () => {});\n");
+    commit(fixture, "bounded native reasoning change");
+    const headSha = git(fixture.root, "rev-parse", "HEAD");
+
+    const nodeModules = path.join(fixture.root, "node_modules");
+    const jestBin = path.join(nodeModules, "jest/bin");
+    const executableBin = path.join(nodeModules, ".bin");
+    fs.mkdirSync(jestBin, { recursive: true });
+    fs.mkdirSync(executableBin, { recursive: true });
+    fs.appendFileSync(path.join(fixture.root, ".git/info/exclude"), "\n/node_modules/\n");
+    fs.writeFileSync(
+      path.join(executableBin, "eslint"),
+      "#!/bin/sh\necho ENGINE_LINT\n",
+      { mode: 0o755 },
+    );
+    fs.writeFileSync(
+      path.join(jestBin, "jest.js"),
+      "const path = require('node:path');\n" +
+        "const root = process.cwd();\n" +
+        `const paths = ${JSON.stringify(listedTestPaths)}.map(testPath => path.join(root, testPath));\n` +
+        `const related = ${JSON.stringify([directTestPath, relatedTestPath])}.map(testPath => path.join(root, testPath));\n` +
+        "process.stdout.write(JSON.stringify(process.argv.includes('--findRelatedTests') ? related : paths));\n",
+    );
+
+    const fakeBin = path.join(path.dirname(fixture.root), "fake-bin");
+    const fakeNpm = path.join(fakeBin, "npm");
+    fs.mkdirSync(fakeBin, { recursive: true });
+    fs.writeFileSync(
+      fakeNpm,
+      `#!/bin/sh\nif [ "$1" = "run" ] && [ "$2" = "gate:prepush" ]; then\n  shift 3\n  exec ${JSON.stringify(process.execPath)} ${JSON.stringify(path.resolve(process.cwd(), "scripts/gate.prepush.mjs"))} "$@"\nfi\nif [ "$1" = "run" ] && [ "$2" = "typecheck:prod" ]; then echo ENGINE_TYPECHECK; exit 0; fi\nif [ "$1" = "test" ]; then echo ENGINE_TEST; exit 0; fi\nexit 99\n`,
+      { mode: 0o755 },
+    );
+
+    const hookScript = path.resolve(__dirname, "../.githooks/pre-push");
+    const update = `${fixture.topicRef} ${headSha} ${fixture.topicRef} ${fixture.zeroSha}\n`;
+    const result = spawnSync("bash", [hookScript, "origin", fixture.remote], {
+      cwd: fixture.root,
+      env: { ...process.env, PATH: `${fakeBin}${path.delimiter}${process.env.PATH || ""}` },
+      encoding: "utf8",
+      input: update,
+      shell: false,
+      timeout: 30_000,
+    });
+
+    if (result.status !== 0) {
+      throw new Error(`scoped engine hook failed\nstdout:\n${result.stdout}\nstderr:\n${result.stderr}`);
+    }
+    expect(result.stdout).toContain("verified scoped native cognitive reasoning change");
+    expect(result.stdout).toContain("12/112 serial Jest suites");
+    expect(result.stdout).toContain("7 engine/API/UI-contract guards");
+    expect(result.stdout).toContain("4 filesystem-scanning guards");
+    expect(result.stdout).toContain("1 source-referencing consumers");
+    expect(result.stdout).toContain("ENGINE_LINT");
+    expect(result.stdout).toContain("ENGINE_TYPECHECK");
+    expect(result.stdout).toContain("ENGINE_TEST");
+    expect(result.stdout).not.toContain("FULL_LINT");
   });
 });
 
