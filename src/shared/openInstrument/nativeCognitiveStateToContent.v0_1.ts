@@ -220,6 +220,13 @@ function baseGlossContainsLemma(glosses: readonly string[], lemma: string): bool
     .some((token) => token.toLocaleLowerCase("en-US") === lemmaKey));
 }
 
+function isAdmittedCognitiveFrame(frame: OewnCognitiveStateFrameV0_1): boolean {
+  const admittedSenseId = NATIVE_COGNITIVE_STATE_OEWN_SENSE_ID_BY_LEMMA_V0_1[
+    frame.lemma.toLocaleLowerCase("en-US")
+  ];
+  return Boolean(admittedSenseId && frame.senseId === admittedSenseId);
+}
+
 export function buildNativeCognitiveStateToContentV0_1(
   inputForm: string,
   sourceInput: NativeCognitiveStateToContentSourceInputV0_1 | undefined,
@@ -246,18 +253,27 @@ export function buildNativeCognitiveStateToContentV0_1(
       if (!kind) return [];
       return baseSenses.flatMap((baseSense) => orderedFrames.flatMap((candidateFrame) => {
         if (candidateFrame.semanticCategory !== "verb.cognition" ||
+          !isAdmittedCognitiveFrame(candidateFrame) ||
           !baseGlossContainsLemma(baseSense.glosses, candidateFrame.lemma) ||
           !baseGlossContainsLemma([row.plainStandaloneGloss], candidateFrame.lemma)) return [];
         const gloss = targetSense.glosses.join(" / ");
         const baseGloss = baseSense.glosses.join(" / ");
         const stateText = "being aware of or possessing knowledge about a fact or information";
+        const hasLearningFacet = /\blearning\b/iu.test(gloss);
+        const hasNewsFacet = /\bnews\b/iu.test(gloss);
         const knowledgeExplanation = "The target source sense “" + gloss +
-          "” can provisionally name known content or the state associated with knowing. The “learning” facet does not establish an acquisition event.";
+          "” can provisionally name known content or the state associated with knowing." +
+          (kind === "KNOWLEDGE" && hasLearningFacet
+            ? " The “learning” facet does not establish an acquisition event."
+            : "");
         const informationExplanation = "The target source sense “" + gloss +
-          "” can be investigated as content associated with knowing. This relation does not explain the “news” nuance.";
+          "” can be investigated as content associated with knowing." +
+          (hasNewsFacet ? " This relation does not explain the “news” nuance." : "");
+        const acquisitionReason = "The source gloss “" + baseGloss +
+          "” and its approximate cognitive definition do not independently establish an acquisition event." +
+          (hasLearningFacet ? " The target sense's learning facet does not establish one either." : "");
         const unresolved = [
           "The target source record reports this relation; reviewed morphology is not established.",
-          "No function is assigned to J or E.",
         ];
         return [{
           base: baseSense,
@@ -283,8 +299,7 @@ export function buildNativeCognitiveStateToContentV0_1(
           acquisition: {
             claimStatus: "UNKNOWN_OR_NULL" as const,
             text: null,
-            reason: "The source gloss “" + baseGloss +
-              "” and its approximate cognitive definition do not independently establish acquiring or learning.",
+            reason: acquisitionReason,
           },
           unknownToKnownTransition: {
             claimStatus: "UNKNOWN_OR_NULL" as const,

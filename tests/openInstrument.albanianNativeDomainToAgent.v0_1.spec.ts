@@ -274,13 +274,18 @@ describe("native domain to agent reading", () => {
 
     const vm = adaptAnalysisToTelemetryVM(payload);
     expect(vm.motivationDiscoveryV0_2?.kind).toBe("present");
+    const incompatibleFramePayload = JSON.parse(JSON.stringify(payload));
+    incompatibleFramePayload.motivationDiscoveryV0_2.albanianLexicalReading
+      .nativeCognitiveStateToContent.alternatives[0].frame.senseId = "know%2:31:02::";
+    expect(adaptAnalysisToTelemetryVM(incompatibleFramePayload).motivationDiscoveryV0_2?.kind)
+      .toBe("missing");
     const markup = renderToStaticMarkup(createElement(InstrumentPanel, { vm }));
     expect(markup).toContain('data-testid="primary-albanian-native-cognitive-state-to-content"');
     expect(markup).toContain("State of knowing (inferred)");
     expect(markup).toContain("Acquisition · Unknown/Null");
     expect(markup).toContain("Kaikki reports: From di");
     expect(markup).toContain("does not explain the “news” nuance");
-    expect(markup).toContain("No function is assigned to J or E.");
+    expect(JSON.stringify(cognitive)).not.toContain("No function is assigned to J or E.");
     expect((await analyze("DIJE", dije.sourceRecordId)).motivationDiscoveryV0_2.albanianLexicalReading
       .nativeCognitiveStateToContent).toEqual(cognitive);
     expect(globalThis.fetch).not.toHaveBeenCalled();
@@ -290,6 +295,27 @@ describe("native domain to agent reading", () => {
     const payload = await analyze("DIJE", dije.sourceRecordId);
     const reading = payload.motivationDiscoveryV0_2.albanianLexicalReading;
     const input = reading.nativeCognitiveStateToContentSourceInput;
+    expect(buildNativeCognitiveStateToContentV0_1("DIJE", input, [knowFrame])?.alternatives)
+      .toHaveLength(2);
+    expect(buildNativeCognitiveStateToContentV0_1("DIJE", input, [{
+      ...knowFrame,
+      senseId: "know%2:31:02::",
+    }])).toBeNull();
+
+    const genericTarget = {
+      ...input,
+      target: {
+        ...input.target,
+        form: "UPR",
+        sourceRecordId: "synthetic:upr:0",
+        entryLocator: "jsonl://word/upr/match/0",
+        sourceSenses: [{ sourceSenseOrdinal: 0, senseId: "synthetic-upr-sense", glosses: ["knowledge"] }],
+      },
+    };
+    const genericCognitive = buildNativeCognitiveStateToContentV0_1("UPR", genericTarget as never, [knowFrame]);
+    expect(genericCognitive?.alternatives).toHaveLength(1);
+    expect(JSON.stringify(genericCognitive)).not.toMatch(/learning|news|J or E/iu);
+
     const dawnOnly = {
       target: input.target,
       bases: input.bases.filter((candidate: { sourceRecord: { sourceRecordId: string } }) =>
