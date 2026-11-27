@@ -202,10 +202,18 @@ describeWithRealSource("source-authored suffix direct-target AGENT with the froz
       functionalHypothesis: {
         status: "UNKNOWN_OR_NULL",
         functionalOperation: null,
-        noSingleWinner: true,
+        interpretationDecisionPolicy: {
+          schemaVersion: "open-instrument.interpretation-decision-policy.v0_1",
+          multipleInterpretationsMayCoexist: true,
+          automaticInterpretationSelection: "DISABLED",
+          interpretationDecisionAuthority: "USER_DECIDES",
+          alternativeProvenance: "PRESERVED_PER_INTERPRETATION",
+          alternativeClaimStatus: "PRESERVED_PER_INTERPRETATION",
+        },
         userDecisionPosture: "user_decides",
       },
     });
+    expect(componentReading.functionalHypothesis).not.toHaveProperty("noSingleWinner");
     const bridge = functionalBridge(reading);
     expect(bridge.status).toBe("SUPPORTED");
     expect(bridge.relatedForm).toBeNull();
@@ -258,6 +266,31 @@ describeWithRealSource("source-authored suffix direct-target AGENT with the froz
             ? (((reading.sourceLinkedComponentReading as Record<string, unknown>).relation as Record<string, unknown>).relation)
             : null,
       };
+      if (word === "fuzhnjar") {
+        const hypothesis = bridge.functionalHypothesis as Record<string, unknown>;
+        const sourceFacts = bridge.sourceFacts as Record<string, unknown>;
+        const primary = sourceFacts.primary as Record<string, unknown>;
+        expect(hypothesis.basis).toEqual(expect.arrayContaining([
+          "SOURCE_ATTESTED_TARGET_ROLE_CATEGORY",
+          "SOURCE_ATTESTED_FINAL_SENSE_CATEGORY",
+          "TARGET_SOURCE_ROLE_HAS_NO_VALIDATED_COMPONENT_TEMPLATE",
+        ]));
+        expect(primary.sourceRecordId).toBe("kaikki-albanian-jsonl:word=fuzhnjar:ordinal=0");
+        expect(primary.sourceSenses).toEqual(expect.arrayContaining([
+          expect.objectContaining({
+            senseId: "en-fuzhnjar-sq-noun-l0FOuyMg",
+            glosses: ["person who uses a harpoon to catch fish"],
+            categories: expect.arrayContaining([
+              expect.objectContaining({
+                name: "Occupations",
+                orig: "sq:Occupations",
+                langcode: "sq",
+                source: "w",
+              }),
+            ]),
+          }),
+        ]));
+      }
     }
     expect(outputs["shkencë"]).toMatchObject({ status: "SUPPORTED", operation: "AGENT", relation: "SOURCE_RELATED_FORM" });
     expect(outputs["orëndreqës"]).toMatchObject({ status: "SUPPORTED", operation: "AGENT", relation: "SOURCE_AUTHORED_AF_TEMPLATE" });
@@ -266,7 +299,8 @@ describeWithRealSource("source-authored suffix direct-target AGENT with the froz
       status: "SUPPORTED",
       operation: "AGENT",
     });
-    for (const word of ["zjarrfikës", "luleshitës", "fuzhnjar", "thëngjilltar", "gjitar", "kombëtar"]) {
+    expect(outputs["fuzhnjar"]).toMatchObject({ status: "SUPPORTED", operation: "AGENT" });
+    for (const word of ["zjarrfikës", "luleshitës", "thëngjilltar", "gjitar", "kombëtar"]) {
       expect(outputs[word]).toMatchObject({ status: "NULL", operation: null });
     }
   });

@@ -43,6 +43,14 @@ export function PrimaryAlbanianReadingCardV0_1({
   const records = (value.exactLexicalSourceFacts ?? []).filter((fact) =>
     fact.languageCode === "sq" && sameWord(fact.form, value.inputWord),
   );
+  const nativeSeparativeReading = reading?.nativeSeparativeEventToState?.inputForm === value.inputWord
+    ? reading.nativeSeparativeEventToState
+    : null;
+  const nativeSeparativeSourceAlternatives = nativeSeparativeReading
+    ? [...new Map(nativeSeparativeReading.alternatives.map((alternative) =>
+        [alternative.target.sourceRecordId, alternative] as const,
+      )).values()]
+    : [];
   const bridge = reading?.functionalMeaningBridge;
   const hypothesis = bridge?.functionalHypothesis;
   const primarySourceFact = reading?.primarySourceFact ?? null;
@@ -182,6 +190,55 @@ export function PrimaryAlbanianReadingCardV0_1({
           {exactSourceStatusLabel(exactSourceStatus)}
         </span>
       </div>
+
+      {nativeSeparativeReading ? (
+        <section
+          aria-label="Native separative functional reasoning"
+          data-testid="primary-albanian-native-separative"
+          className="mt-3 min-w-0 rounded-lg border border-[#5e4b22] bg-[#19140d] p-3 text-sm leading-5 text-[#f0ddb0] [overflow-wrap:anywhere]"
+        >
+          <h3 className="text-base font-semibold text-[#f5e8c8]">Functional event to changed state · exploratory</h3>
+          <p className="mt-1 text-xs text-[#d8bb7a]">Source meanings remain separate from the proposed functional bridge.</p>
+          <div className="mt-3 space-y-3">
+            {nativeSeparativeReading.alternatives.filter((alternative) =>
+              alternative.compatibility === "COMPATIBLE_FUNCTION_FAMILY" && alternative.explanation,
+            ).map((alternative) => (
+              <article
+                key={`${alternative.target.sourceRecordId}:${alternative.functionalEmbryo?.sourceId ?? "no-bridge"}`}
+                className="min-w-0 rounded border border-[#40361f] p-2"
+              >
+                <p className="font-semibold">{alternative.functionalEmbryo?.form} → division / separation → changed state</p>
+                <p className="mt-1"><span className="font-semibold">Action · source-reported:</span> {alternative.action.text}</p>
+                <p><span className="font-semibold">Affected entity · inferred:</span> {alternative.patient.description.text}; identity Unknown/Null</p>
+                <p><span className="font-semibold">Initial state · inferred:</span> {alternative.initialState.text}</p>
+                <p><span className="font-semibold">Changed state · inferred:</span> {alternative.changedState.text}</p>
+                <p><span className="font-semibold">Target meaning · AlbaNet source-reported:</span> {alternative.wholeWordMeaning.text}</p>
+                <p className="mt-1">{alternative.explanation}</p>
+                <details className="mt-2 text-xs">
+                  <summary className="cursor-pointer">Source records and retained alternatives</summary>
+                  <p className="mt-1">DA source row {alternative.functionalEmbryo?.sourceId}: {alternative.functionalEmbryo?.lexicalFunction}</p>
+                  <p>{alternative.functionalEmbryo?.sourceTitle} · {alternative.functionalEmbryo?.citationId} · {alternative.functionalEmbryo?.locator}</p>
+                  <a className="underline" href={alternative.functionalEmbryo?.citationUrl} target="_blank" rel="noreferrer">Open DA source citation</a>
+                  <p className="mt-1">AlbaNet {alternative.target.synsetId} · {alternative.target.sourceRecordId} · {alternative.target.entryLocator}</p>
+                  <p>Source revision {nativeSeparativeReading.albanetSource.revision} · SHA-256 {nativeSeparativeReading.albanetSource.sha256} · target status: {alternative.target.sourceStatus}</p>
+                  <p>Functional compatibility is a hypothesis; no source relation or historical origin is claimed.</p>
+                </details>
+              </article>
+            ))}
+          </div>
+          <details className="mt-3 text-xs">
+            <summary className="cursor-pointer">All {nativeSeparativeSourceAlternatives.length} source senses, including those without a bridge</summary>
+            <ul className="mt-1 space-y-1">
+              {nativeSeparativeSourceAlternatives.map((alternative) => (
+                <li key={alternative.target.sourceRecordId}>
+                  {alternative.target.synsetId} · {alternative.target.definitions.join("; ") || "Definition unavailable"} · {alternative.compatibility === "COMPATIBLE_FUNCTION_FAMILY" ? "hypothesis available" : "no bridge produced"} · {alternative.target.entryLocator}
+                </li>
+              ))}
+            </ul>
+          </details>
+          <p className="mt-2 text-xs">Written Voices: {nativeSeparativeReading.writtenVoices.map(({ voice, position }) => `${voice}@${position + 1}`).join(" → ") || "Unknown/Null"} · orthographic only · interpretation remains with the user.</p>
+        </section>
+      ) : null}
 
       <div className="mt-3 grid grid-cols-1 gap-3 md:grid-cols-2">
         <section
