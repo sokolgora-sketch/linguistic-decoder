@@ -394,7 +394,10 @@ export function InstrumentPanel(props: Props) {
     : undefined;
   const hasNativeAlbanianReading = isValidVm &&
     vm.motivationDiscoveryV0_2?.kind === "present" &&
-    Boolean(vm.motivationDiscoveryV0_2.value.albanianLexicalReading?.nativeDomainToAgent);
+    Boolean(
+      vm.motivationDiscoveryV0_2.value.albanianLexicalReading?.nativeDomainToAgent ||
+      vm.motivationDiscoveryV0_2.value.albanianLexicalReading?.nativeCognitiveStateToContent,
+    );
   const primaryNullStatus =
     isValidVm &&
     analysisStatusForUi?.kind === "present" &&

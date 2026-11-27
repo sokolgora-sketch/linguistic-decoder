@@ -160,6 +160,14 @@ export function PrimaryAlbanianReadingCardV0_1({
     )
     ? reading.nativeDomainToAgent
     : null;
+  const nativeCognitiveReading = exactSourceStatus === "MATCHES_FOUND" &&
+    reading?.nativeCognitiveStateToContent?.inputForm === value.inputWord &&
+    reading.nativeCognitiveStateToContent.alternatives.every((alternative) =>
+      records.some((record) => record.sourceRecordId === alternative.target.sourceRecordId &&
+        sameWord(record.form, alternative.target.form)),
+    )
+    ? reading.nativeCognitiveStateToContent
+    : null;
   const sourceUnavailable = exactSourceStatus === "UNAVAILABLE";
 
   return (
@@ -254,6 +262,44 @@ export function PrimaryAlbanianReadingCardV0_1({
           <h3 className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#d8bb7a]">
             Exploratory functional interpretation
           </h3>
+          {nativeCognitiveReading ? (
+            <div className="mt-2 min-w-0 space-y-2" data-testid="primary-albanian-native-cognitive-state-to-content">
+              <p className="font-semibold">Cognitive state to content · exploratory</p>
+              {nativeCognitiveReading.alternatives.map((alternative) => (
+                <div
+                  key={JSON.stringify([alternative.base.sourceRecordId, alternative.base.senseId,
+                    alternative.target.sourceRecordId, alternative.target.senseId, alternative.frame.senseId])}
+                  className="min-w-0 space-y-1 [overflow-wrap:anywhere]"
+                >
+                  <p data-testid="primary-albanian-native-cognitive-explanation">{alternative.explanation}</p>
+                  <p><span className="font-semibold">State of knowing (inferred):</span> {alternative.stateOfKnowing.text}</p>
+                  <p><span className="font-semibold">Known content (inferred):</span> {alternative.knownContent.text}</p>
+                  <p><span className="font-semibold">Acquisition · Unknown/Null:</span> {alternative.acquisition.reason}</p>
+                  <p><span className="font-semibold">Unknown-to-known transition · Unknown/Null:</span> {alternative.unknownToKnownTransition.reason}</p>
+                  <details className="mt-2 text-xs [overflow-wrap:anywhere]">
+                    <summary className="cursor-pointer">Sources and unresolved parts</summary>
+                    <p className="mt-1">Kaikki reports: {alternative.sourceRelation.sourceText}</p>
+                    <p>Source record {alternative.sourceRelation.targetSourceRecordId} · {alternative.sourceRelation.targetEntryLocator}</p>
+                    <p>Base record {alternative.sourceRelation.baseSourceRecordId} · {alternative.sourceRelation.baseEntryLocator}</p>
+                    <p>Linked form {alternative.sourceRelation.sourceForm} · {alternative.sourceRelation.reference}</p>
+                    <p>Kaikki source SHA-256 {alternative.sourceRelation.albanianSourceSha256}</p>
+                    <p>Reviewed candidate: {alternative.sourceRelation.reviewedCandidateDisplayForm} · {alternative.sourceRelation.reviewedCandidateSourceId}</p>
+                    <p>Base sense {alternative.base.senseId} · {alternative.base.entryLocator}</p>
+                    <p>Target sense {alternative.target.senseId} · {alternative.target.entryLocator}</p>
+                    <p>
+                      Approximate English comparison ·{" "}
+                      <a className="underline" href="https://en-word.net/" target="_blank" rel="noreferrer">Open English WordNet 2025</a>
+                      {" "}· CC BY 4.0 · Princeton WordNet and Open English WordNet Community
+                    </p>
+                    <p>OEWN verb.cognition sense {alternative.frame.senseId} · {alternative.frame.synsetId}</p>
+                    <p>Approximate definition: {alternative.frame.definition}</p>
+                    <p>Archive SHA-256 {nativeCognitiveReading.oewnArtifactSha256}</p>
+                    <p>{alternative.unresolved.join(" ")}</p>
+                  </details>
+                </div>
+              ))}
+            </div>
+          ) : null}
           {nativeReading && (sourceComponentReading || nativeSourceDerivedInput) ? (
             <div className="mt-2 space-y-2" data-testid="primary-albanian-native-agent">
               <p className="font-semibold">Domain to agent role · exploratory</p>

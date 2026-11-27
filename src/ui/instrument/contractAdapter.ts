@@ -6,6 +6,12 @@ import {
   nativeDomainToAgentSourceDerivedInputSchemaV0_1,
   type NativeDomainToAgentSourceDerivedInputV0_1,
 } from "@/shared/openInstrument/albanianNativeDomainToAgent.v0_1";
+import {
+  buildNativeCognitiveStateToContentV0_1,
+  nativeCognitiveStateToContentReadingSchemaV0_1,
+  nativeCognitiveStateToContentSourceInputSchemaV0_1,
+  type NativeCognitiveStateToContentSourceInputV0_1,
+} from "@/shared/openInstrument/nativeCognitiveStateToContent.v0_1";
 import type { AlbanianSourceLinkedComponentReadingV0_1 } from "@/shared/openInstrument/motivationEngineDiscoveryServerOnly.v0_1";
 import { normalizePrinciplesToLabels } from "@/v1/principles.vocab.v0.1";
 import {
@@ -2883,8 +2889,51 @@ function parseMotivationDiscoveryV0_2(
       const canonical = nativeDomainToAgentReadingSchemaV0_1.safeParse(expected);
       return canonical.success && JSON.stringify(canonical.data) === JSON.stringify(parsed.data);
     })();
+    const validNativeCognitiveStateToContent = reading.nativeCognitiveStateToContent === undefined
+      ? reading.nativeCognitiveStateToContentSourceInput === undefined
+      : (() => {
+          const parsed = nativeCognitiveStateToContentReadingSchemaV0_1.safeParse(
+            reading.nativeCognitiveStateToContent,
+          );
+          const sourceInput = nativeCognitiveStateToContentSourceInputSchemaV0_1.safeParse(
+            reading.nativeCognitiveStateToContentSourceInput,
+          );
+          if (!parsed.success || !sourceInput.success || reading.status !== "SUPPORTED" ||
+            !exactPrimarySourceFact || parsed.data.inputForm !== value.inputWord) return false;
+          const target = sourceInput.data.target;
+          const exactSenses = Array.isArray(exactPrimarySourceFact.senses)
+            ? exactPrimarySourceFact.senses
+            : null;
+          const exactLinks = Array.isArray(exactPrimarySourceFact.etymologyLinks)
+            ? exactPrimarySourceFact.etymologyLinks
+            : [];
+          const targetLinks = target.etymologyLinks ?? [];
+          if (!exactSenses || target.sourceRecordId !== exactPrimarySourceFact.sourceRecordId ||
+            target.entryLocator !== exactPrimarySourceFact.entryLocator ||
+            target.form !== exactPrimarySourceFact.form ||
+            target.partOfSpeech !== exactPrimarySourceFact.partOfSpeech ||
+            target.etymologyText !== (exactPrimarySourceFact.etymologyText ?? null) ||
+            target.sourceSenses.length !== exactSenses.length ||
+            targetLinks.length !== exactLinks.length ||
+            JSON.stringify(targetLinks) !== JSON.stringify(exactLinks) ||
+            !target.sourceSenses.every((sense, ordinal) => {
+              const exactSense = exactSenses[ordinal];
+              return isRecord(exactSense) && sense.sourceSenseOrdinal === ordinal &&
+                sense.senseId === exactSense.senseId && isStringArray(exactSense.glosses) &&
+                JSON.stringify(sense.glosses) === JSON.stringify(exactSense.glosses);
+            })) return false;
+          const frames = new Map(parsed.data.alternatives.map(({ frame }) => [frame.senseId, frame]));
+          const expected = buildNativeCognitiveStateToContentV0_1(
+            parsed.data.inputForm,
+            sourceInput.data as unknown as NativeCognitiveStateToContentSourceInputV0_1,
+            [...frames.values()],
+          );
+          const canonical = nativeCognitiveStateToContentReadingSchemaV0_1.safeParse(expected);
+          return canonical.success && JSON.stringify(canonical.data) === JSON.stringify(parsed.data);
+        })();
     return validPrimary && validPronunciation && validRelated &&
       validNativeDomainToAgent &&
+      validNativeCognitiveStateToContent &&
       validComposition &&
       validSourceLinkedComponentReading &&
       validSourceLinkedComparison &&

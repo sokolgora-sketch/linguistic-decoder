@@ -15,6 +15,7 @@ import * as sourceDelivery from "@/shared/openInstrument/albanianKaikkiServerOnl
 import {
   buildNativeDomainToAgentV0_1,
 } from "@/shared/openInstrument/albanianNativeDomainToAgent.v0_1";
+import { buildNativeCognitiveStateToContentV0_1 } from "@/shared/openInstrument/nativeCognitiveStateToContent.v0_1";
 import * as oewn from "@/shared/openInstrument/oewnAgentFramesServerOnly.v0_1";
 import { adaptAnalysisToTelemetryVM } from "@/ui/instrument/contractAdapter";
 import { InstrumentPanel } from "@/ui/instrument/InstrumentPanel";
@@ -26,6 +27,7 @@ jest.mock("@/shared/openInstrument/albanianKaikkiServerOnlySourceDelivery.v0_1",
 jest.mock("@/shared/openInstrument/oewnAgentFramesServerOnly.v0_1", () => ({
   ...jest.requireActual("@/shared/openInstrument/oewnAgentFramesServerOnly.v0_1"),
   lookupOewnAgentFramesServerOnlyV0_1: jest.fn(),
+  lookupOewnCognitiveStateFramesServerOnlyV0_1: jest.fn(),
 }));
 
 function fact(
@@ -54,6 +56,26 @@ function fact(
       sha256: ALBANIAN_KAIKKI_LEXICAL_SOURCE_SHA256_V0_1,
       bytes: ALBANIAN_KAIKKI_LEXICAL_SOURCE_BYTES_V0_1,
     },
+  };
+}
+
+function linkedRecord(source: AlbanianKaikkiExactLexicalSourceFactV0_1) {
+  return {
+    sourceRecordId: source.sourceRecordId,
+    entryLocator: source.entryLocator,
+    physicalRecordOrdinal: source.physicalRecordOrdinal,
+    form: source.form,
+    partOfSpeech: source.partOfSpeech,
+    meaningGlosses: source.senses.flatMap((sense) => sense.glosses),
+    sourceSenses: source.senses.map((sense, sourceSenseOrdinal) => ({
+      sourceSenseOrdinal,
+      senseId: sense.senseId,
+      glosses: sense.glosses,
+    })),
+    etymologyText: source.etymologyText ?? null,
+    etymologyLinks: source.etymologyLinks ?? [],
+    etymologyTemplates: source.etymologyTemplates ?? [],
+    pronunciationVariants: [],
   };
 }
 
@@ -96,6 +118,17 @@ const fishBase = {
   }],
 };
 const fisherman = fact("peshkatar", 3, "noun", [{ senseId: "fixture-fisherman", glosses: ["fisherman"] }]);
+const diKnow = fact("di", 0, "verb", [{ senseId: "en-di-sq-verb-Vk7G5aRj", glosses: ["to know"] }]);
+const diDawn = fact("di", 1, "verb", [{ senseId: "en-di-sq-verb-h6fUq9k6", glosses: ["to dawn (daylight)"] }]);
+const dije = {
+  ...fact("dije", 0, "noun", [
+    { senseId: "en-dije-sq-noun-6dnldYrF", glosses: ["knowledge, learning"] },
+    { senseId: "en-dije-sq-noun-t8J1GPF-", glosses: ["news, information"] },
+  ]),
+  etymologyText: "From di (“to know”).",
+  etymologyLinks: [{ sourceForm: "di", reference: "di#Albanian" }],
+};
+const dijeName = fact("Dije", 1, "name", [{ senseId: "en-Dije-sq-name-pLhOhtoi", glosses: ["a female given name"] }]);
 const frames = [{
   lemma: "worker",
   senseId: "worker%1:18:00::",
@@ -109,6 +142,20 @@ const fishermanFrame = {
   synsetId: "83380317-n",
   definition: "a man whose occupation is catching fish",
   semanticCategory: "noun.person" as const,
+};
+const knowFrame = {
+  lemma: "know",
+  senseId: "know%2:31:01::",
+  synsetId: "00596016-v",
+  definition: "be cognizant or aware of a fact or a specific piece of information; possess knowledge or information about",
+  semanticCategory: "verb.cognition" as const,
+};
+const dawnFrame = {
+  lemma: "dawn",
+  senseId: "dawn%2:30:00::",
+  synsetId: "00242389-v",
+  definition: "become clear or enter one's consciousness or emotions",
+  semanticCategory: "verb.cognition" as const,
 };
 
 async function analyze(word = "PUNËTOR", selector?: string) {
@@ -136,11 +183,14 @@ describe("native domain to agent reading", () => {
     });
     jest.mocked(sourceDelivery.createAlbanianKaikkiServerOnlyProductionProviderV0_1).mockResolvedValue(
       createAlbanianKaikkiServerOnlyExactLexicalSourceProviderForSyntheticFixtureV0_1({
-        facts: [base, suffix, target, adjective, fishBase, fisherman],
+        facts: [base, suffix, target, adjective, fishBase, fisherman, diKnow, diDawn, dije, dijeName],
       }),
     );
     jest.mocked(oewn.lookupOewnAgentFramesServerOnlyV0_1).mockImplementation(async (glosses) =>
       glosses.some((gloss) => gloss.toLowerCase() === "fisherman") ? [fishermanFrame] : frames,
+    );
+    jest.mocked(oewn.lookupOewnCognitiveStateFramesServerOnlyV0_1).mockImplementation(async () =>
+      [knowFrame, dawnFrame],
     );
     jest.spyOn(globalThis, "fetch").mockRejectedValue(new Error("Unexpected network call"));
   });
@@ -181,6 +231,126 @@ describe("native domain to agent reading", () => {
 
     reading.nativeDomainToAgent.alternatives[0].base.senseId = "different-source-sense";
     expect(adaptAnalysisToTelemetryVM(payload).motivationDiscoveryV0_2?.kind).toBe("missing");
+  });
+
+  it("explains the two exact DIJE content senses and renders the unresolved acquisition boundary", async () => {
+    const payload = await analyze("DIJE", dije.sourceRecordId);
+    const reading = payload.motivationDiscoveryV0_2.albanianLexicalReading;
+    const cognitive = reading.nativeCognitiveStateToContent;
+    expect(cognitive).toMatchObject({
+      origin: "NATIVE_GENERATED",
+      status: "EXPLORATORY_FUNCTIONAL_HYPOTHESIS",
+      operation: "COGNITIVE_STATE_TO_CONTENT",
+      userDecisionPosture: "user_decides",
+      inputForm: "DIJE",
+      voiceBasis: "ORTHOGRAPHIC_ONLY",
+      writtenVoices: [{ voice: "I", position: 1 }, { voice: "E", position: 3 }],
+    });
+    expect(cognitive.alternatives.map(({ target }) => target.senseId)).toEqual([
+      "en-dije-sq-noun-6dnldYrF",
+      "en-dije-sq-noun-t8J1GPF-",
+    ]);
+    expect(cognitive.alternatives.map(({ base }) => base.senseId)).toEqual([
+      "en-di-sq-verb-Vk7G5aRj",
+      "en-di-sq-verb-Vk7G5aRj",
+    ]);
+    expect(cognitive.alternatives[0]).toMatchObject({
+      sourceRelation: {
+        sourceText: "From di (“to know”).",
+        sourceForm: "di",
+        reference: "di#Albanian",
+      },
+      stateOfKnowing: { claimStatus: "INFERRED" },
+      knownContent: { claimStatus: "INFERRED" },
+      acquisition: { claimStatus: "UNKNOWN_OR_NULL", text: null },
+      unknownToKnownTransition: { claimStatus: "UNKNOWN_OR_NULL", text: null },
+      claimStatus: "EXPLORATORY_HYPOTHESIS",
+      interpretationDecisionPolicy: { automaticInterpretationSelection: "DISABLED" },
+      userDecisionPosture: "user_decides",
+    });
+    expect(cognitive.alternatives[0].explanation).toContain("knowledge, learning");
+    expect(cognitive.alternatives[1].explanation).toContain("does not explain the “news” nuance");
+    expect(cognitive.alternatives.every(({ base }) => base.senseId !== "en-di-sq-verb-h6fUq9k6")).toBe(true);
+
+    const vm = adaptAnalysisToTelemetryVM(payload);
+    expect(vm.motivationDiscoveryV0_2?.kind).toBe("present");
+    const incompatibleFramePayload = JSON.parse(JSON.stringify(payload));
+    incompatibleFramePayload.motivationDiscoveryV0_2.albanianLexicalReading
+      .nativeCognitiveStateToContent.alternatives[0].frame.senseId = "know%2:31:02::";
+    expect(adaptAnalysisToTelemetryVM(incompatibleFramePayload).motivationDiscoveryV0_2?.kind)
+      .toBe("missing");
+    const markup = renderToStaticMarkup(createElement(InstrumentPanel, { vm }));
+    expect(markup).toContain('data-testid="primary-albanian-native-cognitive-state-to-content"');
+    expect(markup).toContain("State of knowing (inferred)");
+    expect(markup).toContain("Acquisition · Unknown/Null");
+    expect(markup).toContain("Kaikki reports: From di");
+    expect(markup).toContain("does not explain the “news” nuance");
+    expect(JSON.stringify(cognitive)).not.toContain("No function is assigned to J or E.");
+    expect((await analyze("DIJE", dije.sourceRecordId)).motivationDiscoveryV0_2.albanianLexicalReading
+      .nativeCognitiveStateToContent).toEqual(cognitive);
+    expect(globalThis.fetch).not.toHaveBeenCalled();
+  });
+
+  it("withholds the cognitive operation for the DI dawn sense, the Dije name, and removed evidence", async () => {
+    const payload = await analyze("DIJE", dije.sourceRecordId);
+    const reading = payload.motivationDiscoveryV0_2.albanianLexicalReading;
+    const input = reading.nativeCognitiveStateToContentSourceInput;
+    expect(buildNativeCognitiveStateToContentV0_1("DIJE", input, [knowFrame])?.alternatives)
+      .toHaveLength(2);
+    expect(buildNativeCognitiveStateToContentV0_1("DIJE", input, [{
+      ...knowFrame,
+      senseId: "know%2:31:02::",
+    }])).toBeNull();
+
+    const genericTarget = {
+      ...input,
+      target: {
+        ...input.target,
+        form: "UPR",
+        sourceRecordId: "synthetic:upr:0",
+        entryLocator: "jsonl://word/upr/match/0",
+        sourceSenses: [{ sourceSenseOrdinal: 0, senseId: "synthetic-upr-sense", glosses: ["knowledge"] }],
+      },
+    };
+    const genericCognitive = buildNativeCognitiveStateToContentV0_1("UPR", genericTarget as never, [knowFrame]);
+    expect(genericCognitive?.alternatives).toHaveLength(1);
+    expect(JSON.stringify(genericCognitive)).not.toMatch(/learning|news|J or E/iu);
+
+    const dawnOnly = {
+      target: input.target,
+      bases: input.bases.filter((candidate: { sourceRecord: { sourceRecordId: string } }) =>
+        candidate.sourceRecord.sourceRecordId === diDawn.sourceRecordId),
+    };
+    expect(buildNativeCognitiveStateToContentV0_1("DIJE", dawnOnly as never, [knowFrame])).toBeNull();
+
+    const withoutKnowingSense = {
+      ...input,
+      bases: input.bases.map((candidate: typeof input.bases[number]) =>
+        candidate.sourceRecord.sourceRecordId === diKnow.sourceRecordId
+          ? {
+              ...candidate,
+              base: { ...candidate.base, sourceSenses: candidate.base.sourceSenses?.map((sense) => ({ ...sense, glosses: [] })) },
+              sourceRecord: { ...candidate.sourceRecord, senses: candidate.sourceRecord.senses.map((sense) => ({ ...sense, glosses: [] })) },
+            }
+          : candidate),
+    };
+    expect(buildNativeCognitiveStateToContentV0_1("DIJE", withoutKnowingSense as never, [knowFrame])).toBeNull();
+    expect(buildNativeCognitiveStateToContentV0_1("DIJE", input, [])).toBeNull();
+
+    const namePayload = await analyze("Dije", dijeName.sourceRecordId);
+    const nameReading = namePayload.motivationDiscoveryV0_2.albanianLexicalReading;
+    expect(nameReading.status).toBe("NULL");
+    expect(nameReading.nativeCognitiveStateToContent).toBeUndefined();
+    expect(nameReading.nativeCognitiveStateToContentSourceInput).toBeUndefined();
+    expect(buildNativeCognitiveStateToContentV0_1("Dije", {
+      target: linkedRecord(dijeName),
+      bases: [{
+        base: linkedRecord(diKnow),
+        sourceRecord: diKnow,
+        etymologyLink: { sourceForm: "di", reference: "di#Albanian" },
+      }],
+    } as never, [knowFrame])).toBeNull();
+    expect(globalThis.fetch).not.toHaveBeenCalled();
   });
 
   it("keeps the exact adjective record outside the operation", async () => {
