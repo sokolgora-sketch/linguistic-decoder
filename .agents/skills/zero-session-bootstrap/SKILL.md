@@ -13,7 +13,7 @@ After the read-only preflight needed to understand the request, state the valida
 
 - **A — READ_ONLY:** inspection, review, research, or planning. Do not run tests, gates, builds, or installations and do not mutate the repository.
 - **B — DOCS_ONLY:** non-executable Markdown documentation or instruction skills. Check the exact changed-file scope, formatting, frontmatter, references, and links. Let `npm run gate:prepush` select its docs-only lane only when its live-Git classifier proves eligibility; on verified Git context, uncertain fast-path selection uses the existing full lint and serial Jest lane.
-- **C — SCOPED_CODE:** code, tests, or ordinary implementation. Run focused regression tests, applicable changed-file lint/typechecks, and the required push gate. The hook may select the bounded Instrument UI path documented in `CONTRIBUTING.md` only after live diff classification and complete test selection succeed; otherwise it runs FULL.
+- **C — SCOPED_CODE:** ordinary code/tests, or an exact verified Instrument UI/native cognitive engine path. Run focused regression tests and applicable changed-file lint/typechecks. Existing scoped paths still require the normal mandatory hooked gate; unsafe, broad, or uncertain selections use FULL.
 - **D — HIGH_IMPACT:** gate/hook, CI, dependency, runtime, security, or scientific-contract changes. Add justified integration/contract coverage and run the full required push gate.
 
 The tier describes the requested change, not an environment setting or a caller-provided file list. Fast-path eligibility must be proven from the actual pushed ref and live remote base. Do not use `SKIP_PREPUSH`, `--no-verify`, or another bypass. Avoid duplicate broad gates, unnecessary installation, and repeated unchanged failing validation.
@@ -26,7 +26,8 @@ The tier describes the requested change, not an environment setting or a caller-
 3. Check Codex task/session inventory for concurrent work. Do not treat an absent PR or a clean branch as proof that no task is running. If a concurrent task or ownership boundary cannot be resolved, stop and report `ACTIVE_CODEX_STATUS_UNKNOWN`.
 4. Verify the canonical repository path and identity; live GitHub `main`; relevant open PRs, exact heads, merge/CI status, and parked dispositions; local branch, HEAD, `origin/main`, divergence, and `git status --porcelain=v1 -uall`.
 5. List every registered worktree and inspect its branch, HEAD, and tracked/untracked status. Preserve protected or dirty paths. Never reset, clean, stash, prune, switch, or write to them.
-6. Check that the requested lane does not overlap an active task or protected work. Stop on repository mismatch, unexplained drift, unsafe state, or unresolved concurrency.
+6. Before creating or attaching a linked feature worktree, inspect the effective `core.hooksPath` with origin/scope, `extensions.worktreeConfig`, its resolved directory and hook files/symlinks, the target worktree's existing config, and the tracked `.githooks/pre-push`. A shared conflicting path may be overridden only in the target worktree, only when worktree config is already enabled, and only after confirming no custom hook requires preservation. Record shared and sibling config hashes before an authorized `git config --worktree core.hooksPath .githooks` repair and verify they remain unchanged. If any condition fails, stop without changing shared settings or custom hooks.
+7. Check that the requested lane does not overlap an active task or protected work. Stop on repository mismatch, unexplained drift, unsafe state, or unresolved concurrency.
 
 Once the intended repository-relative changed paths are identified, before editing any path that may be checksum-frozen, run `node scripts/frozenContractPreflight.v0_1.cjs --planned <repo-relative-paths>` with the planned paths. This is read-only planning output; it does not authorize a checksum change or replace the mandatory pre-push hook.
 
@@ -34,7 +35,7 @@ The hook's frozen-identity outcomes are distinct: missing or invalid Git ref/cha
 
 ## Mandatory hook bootstrap before implementation
 
-After safe live repository/worktree preflight and BEFORE editing or publishing a branch, run `npm run hooks:setup && npm run hooks:check` in the actual checkout. This activates `.githooks/pre-push` locally in a standalone clone and verifies the executable hook. `npm ci`/`npm install` also run the repository `prepare` bootstrap, but cached dependencies or skipped lifecycle scripts are insufficient proof. A conflicting hooksPath or linked worktree without safe existing per-worktree configuration is a STOP, not permission to alter sibling worktrees. Never replace missing-hook setup with an explicit no-context FULL `npm run gate:prepush`, a skipped hook, or fabricated push ref data.
+After safe live repository/worktree preflight and BEFORE editing or publishing a branch, run `npm run hooks:setup && npm run hooks:check` in the actual checkout. This verifies the executable hook. `npm ci`/`npm install` also run the repository `prepare` bootstrap, but cached dependencies or skipped lifecycle scripts are insufficient proof. For an existing linked-worktree conflict, use only the preflight's narrowly authorized target-worktree repair; never silently overwrite shared `core.hooksPath`, add shared `extensions.worktreeConfig`, or replace real custom hooks. If isolation cannot be established, stop. Never replace missing-hook setup with a no-context FULL gate, a skipped hook, or fabricated push ref data.
 
 ## Route to a specialist
 
