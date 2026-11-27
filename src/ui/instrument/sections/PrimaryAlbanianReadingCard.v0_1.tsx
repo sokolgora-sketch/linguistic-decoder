@@ -151,6 +151,15 @@ export function PrimaryAlbanianReadingCardV0_1({
     sourceComponentReading.claimBoundary.trim().length > 0 &&
     isInterpretationDecisionPolicyV0_1(sourceComponentHypothesis.interpretationDecisionPolicy) &&
     sourceComponentHypothesis.userDecisionPosture === "user_decides";
+  const nativeSourceDerivedInput = reading?.nativeDomainToAgentSourceDerivedInput;
+  const nativeReading = exactSourceStatus === "MATCHES_FOUND" &&
+    reading?.nativeDomainToAgent?.inputForm === value.inputWord &&
+    reading.nativeDomainToAgent.alternatives.every((alternative) =>
+      records.some((record) => record.sourceRecordId === alternative.target.sourceRecordId &&
+        sameWord(record.form, alternative.target.form)),
+    )
+    ? reading.nativeDomainToAgent
+    : null;
   const sourceUnavailable = exactSourceStatus === "UNAVAILABLE";
 
   return (
@@ -245,7 +254,56 @@ export function PrimaryAlbanianReadingCardV0_1({
           <h3 className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#d8bb7a]">
             Exploratory functional interpretation
           </h3>
-          {supportedHypothesis ? (
+          {nativeReading && (sourceComponentReading || nativeSourceDerivedInput) ? (
+            <div className="mt-2 space-y-2" data-testid="primary-albanian-native-agent">
+              <p className="font-semibold">Domain to agent role · exploratory</p>
+              {nativeReading.alternatives.map(({ base, target, frames, explanation }) => (
+                <div key={JSON.stringify([base.sourceRecordId, base.senseId, target.sourceRecordId, target.senseId])}>
+                  <p data-testid="primary-albanian-native-agent-explanation">{explanation}</p>
+                  <details className="mt-2 text-xs [overflow-wrap:anywhere]">
+                    <summary className="cursor-pointer">Sources and alternatives</summary>
+                    {sourceComponentReading
+                      ? <p>Kaikki reports: {sourceComponentReading.relation.sourceAuthoredExplanation}</p>
+                      : <p>
+                          Source-reported relation: {nativeSourceDerivedInput?.bases.map(({ base, relation }) =>
+                            `${base.form} record ${relation.sourceRelationAssertion.assertionScope === "SOURCE_SENSE"
+                              ? `sense ${relation.sourceRelationAssertion.sourceSenseId}`
+                              : ""} lists ${relation.form} as a derived form`,
+                          ).join(" / ")}. Suffix function remains unresolved.
+                        </p>}
+                    <p>Base sense {base.senseId} · {base.entryLocator}</p>
+                    <p>Target sense {target.senseId} · {target.entryLocator}</p>
+                    <p>
+                      Approximate English comparison ·{" "}
+                      <a className="underline" href="https://en-word.net/" target="_blank" rel="noreferrer">Open English WordNet 2025</a>
+                      {" "}·{" "}
+                      <a className="underline" href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noreferrer">CC BY 4.0</a>
+                      {" "}· Princeton WordNet and Open English WordNet Community
+                    </p>
+                    <p>Archive SHA-256 {nativeReading.oewnArtifactSha256}</p>
+                    <ul>
+                      {frames.map(({ senseId, synsetId }) => <li key={senseId}>{senseId} · {synsetId}</li>)}
+                    </ul>
+                    <p>Source meanings retained</p>
+                    <ul>
+                      {(sourceComponentReading
+                        ? [sourceComponentReading.primary, ...sourceComponentReading.components]
+                        : nativeSourceDerivedInput
+                          ? [nativeSourceDerivedInput.target, ...nativeSourceDerivedInput.bases.map(({ base }) => base)]
+                          : []).flatMap((record) =>
+                        (record.sourceSenses ?? []).map((sense) => (
+                          <li key={JSON.stringify([record.sourceRecordId, sense.sourceSenseOrdinal])}>
+                            {record.form} · {sense.glosses.join(" / ")} · {sense.senseId ?? "Sense ID unavailable"} · {record.entryLocator}
+                          </li>
+                        )))}
+                    </ul>
+                    <p>Written Voices {nativeReading.writtenVoices.map(({ voice, position }) => `${voice}@${position}`).join(" → ")}</p>
+                    <p>Suffix function, minimal embryo status, and functional Voice roles remain unresolved.</p>
+                  </details>
+                </div>
+              ))}
+            </div>
+          ) : supportedHypothesis ? (
             <>
               <p className="mt-2 font-semibold">
                 Functional role: {humanReadableStatusLabelV0_1(hypothesis.functionalOperation)} · exploratory
@@ -367,7 +425,9 @@ export function PrimaryAlbanianReadingCardV0_1({
                 ? `${reading.sourcePronunciation.rawIpa} · current Kaikki record only, not frozen spoken authority.`
                 : "Null / unavailable."}
             </li>
-            <li>Independent component meaning or function: not established.</li>
+            <li>{nativeReading
+              ? "Smallest functional embryo and suffix contribution remain unresolved."
+              : "Independent component meaning or function: not established."}</li>
           </ul>
         </section>
       </div>

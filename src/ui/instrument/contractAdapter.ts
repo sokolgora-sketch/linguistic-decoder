@@ -1,5 +1,12 @@
 "use client";
 
+import {
+  buildNativeDomainToAgentV0_1,
+  nativeDomainToAgentReadingSchemaV0_1,
+  nativeDomainToAgentSourceDerivedInputSchemaV0_1,
+  type NativeDomainToAgentSourceDerivedInputV0_1,
+} from "@/shared/openInstrument/albanianNativeDomainToAgent.v0_1";
+import type { AlbanianSourceLinkedComponentReadingV0_1 } from "@/shared/openInstrument/motivationEngineDiscoveryServerOnly.v0_1";
 import { normalizePrinciplesToLabels } from "@/v1/principles.vocab.v0.1";
 import {
   SEVEN_VOICE_CATEGORY_TO_VOICE_V0_1,
@@ -1135,18 +1142,21 @@ function parseMotivationDiscoveryV0_2(
     const templateExpansion = template.expansion as string;
     const args = template.args as Record<string, unknown>;
     const argumentKeys = Object.keys(args);
-    const allowedArgumentKeys = new Set(["1", "2", "3", "4", "t1"]);
+    const allowedArgumentKeys = new Set(["1", "2", "3", "4", "t1", "gloss1"]);
     const hasArgument4 = Object.prototype.hasOwnProperty.call(args, "4");
-    const hasGlossAnnotation = Object.prototype.hasOwnProperty.call(args, "t1");
+    const annotationKey = Object.prototype.hasOwnProperty.call(args, "t1") ? "t1" : "gloss1";
+    const hasGlossAnnotation = Object.prototype.hasOwnProperty.call(args, annotationKey);
     const base = typeof args["2"] === "string" ? args["2"].normalize("NFC").trim() : "";
     const rawSuffix = typeof args["3"] === "string" ? args["3"].normalize("NFC").trim() : "";
     const suffixBody = rawSuffix.startsWith("-") ? rawSuffix.slice(1) : rawSuffix;
     const canonicalSuffix = `-${suffixBody}`;
-    const glossAnnotation = typeof args.t1 === "string" ? args.t1.normalize("NFC").trim() : "";
+    const annotation = args[annotationKey];
+    const glossAnnotation = typeof annotation === "string" ? annotation.normalize("NFC").trim() : "";
     const normalizedBase = normalizeAlbanianRelationForm(base);
     const normalizedSuffix = normalizeAlbanianRelationForm(suffixBody);
     if (!(["1", "2", "3"].every((key) => Object.prototype.hasOwnProperty.call(args, key))) ||
       argumentKeys.some((key) => !allowedArgumentKeys.has(key)) ||
+      (annotationKey === "t1" && Object.prototype.hasOwnProperty.call(args, "gloss1")) ||
       (hasArgument4 && args["4"] !== "") || args["1"] !== "sq" || !base ||
       !/^[a-zçë]+$/u.test(normalizedBase) || !suffixBody || !/^[a-zçë]+$/u.test(normalizedSuffix) ||
       (hasGlossAnnotation && (!glossAnnotation || /[\r\n()+“”"]/u.test(glossAnnotation)))) return false;
@@ -2828,7 +2838,53 @@ function parseMotivationDiscoveryV0_2(
       return batch.candidates.every(validCandidate) &&
         ((batch.status === "CANDIDATES_FOUND") === (batch.candidates.length > 0));
     };
+    const validNativeDomainToAgent = reading.nativeDomainToAgent === undefined || (() => {
+      const parsed = nativeDomainToAgentReadingSchemaV0_1.safeParse(reading.nativeDomainToAgent);
+      if (!parsed.success || reading.status !== "SUPPORTED" || !exactPrimarySourceFact ||
+        parsed.data.inputForm !== value.inputWord) return false;
+      const frames = new Map(parsed.data.alternatives.flatMap((alternative) =>
+        alternative.frames.map(({ lemma, senseId, synsetId, definition }) =>
+          [senseId, {
+            lemma,
+            senseId,
+            synsetId,
+            definition,
+            semanticCategory: "noun.person" as const,
+          }] as const)));
+      const usesSourceDerivedRelation = parsed.data.alternatives.some((alternative) =>
+        alternative.sourceDerivedRelation !== undefined,
+      );
+      let expected: ReturnType<typeof buildNativeDomainToAgentV0_1>;
+      if (usesSourceDerivedRelation) {
+        const sourceDerivedInput = nativeDomainToAgentSourceDerivedInputSchemaV0_1.safeParse(
+          reading.nativeDomainToAgentSourceDerivedInput,
+        );
+        if (!sourceDerivedInput.success || validSourceAuthoredSuffixTemplateReading(sourceLinkedComponentReading) ||
+          !isRecord(sourceDerivedInput.data.target) ||
+          sourceDerivedInput.data.target.sourceRecordId !== exactPrimarySourceFact.sourceRecordId ||
+          !sameNormalizedAlbanianRelationForm(sourceDerivedInput.data.target.form, value.inputWord)) return false;
+        expected = buildNativeDomainToAgentV0_1(
+          parsed.data.inputForm,
+          null,
+          [...frames.values()],
+          reading.nativeDomainToAgentSourceDerivedInput as NativeDomainToAgentSourceDerivedInputV0_1,
+        );
+      } else {
+        if (reading.nativeDomainToAgentSourceDerivedInput !== undefined || !validSourceLinkedComponentReading ||
+          !isRecord(sourceLinkedComponentReading) || !isRecord(sourceLinkedComponentReading.primary) ||
+          sourceLinkedComponentReading.primary.sourceRecordId !== exactPrimarySourceFact.sourceRecordId ||
+          !validSourceAuthoredSuffixTemplateReading(sourceLinkedComponentReading)) return false;
+        expected = buildNativeDomainToAgentV0_1(
+          parsed.data.inputForm,
+          sourceLinkedComponentReading as unknown as AlbanianSourceLinkedComponentReadingV0_1,
+          [...frames.values()],
+        );
+      }
+      const canonical = nativeDomainToAgentReadingSchemaV0_1.safeParse(expected);
+      return canonical.success && JSON.stringify(canonical.data) === JSON.stringify(parsed.data);
+    })();
     return validPrimary && validPronunciation && validRelated &&
+      validNativeDomainToAgent &&
       validComposition &&
       validSourceLinkedComponentReading &&
       validSourceLinkedComparison &&

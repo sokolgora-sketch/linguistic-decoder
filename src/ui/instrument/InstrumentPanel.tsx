@@ -392,6 +392,9 @@ export function InstrumentPanel(props: Props) {
   const analysisStatusForUi = isValidVm
     ? vm.analysisStatusV0_2
     : undefined;
+  const hasNativeAlbanianReading = isValidVm &&
+    vm.motivationDiscoveryV0_2?.kind === "present" &&
+    Boolean(vm.motivationDiscoveryV0_2.value.albanianLexicalReading?.nativeDomainToAgent);
   const primaryNullStatus =
     isValidVm &&
     analysisStatusForUi?.kind === "present" &&
@@ -650,6 +653,14 @@ export function InstrumentPanel(props: Props) {
           </div>
         </div>
 
+        {hasNativeAlbanianReading ? (
+          <div data-testid="primary-reading-scroll-target" className="min-w-0 scroll-mt-24 [overflow-wrap:anywhere] sm:scroll-mt-0">
+            <PrimaryAlbanianReadingCardV0_1
+              discovery={vm.motivationDiscoveryV0_2}
+              analysisStatus={analysisStatusForUi}
+            />
+          </div>
+        ) : null}
         {humanReadingSummary ? <HumanReadingSummaryCardV0_1 summary={humanReadingSummary} /> : null}
 
         <SectionTabs
@@ -672,15 +683,17 @@ export function InstrumentPanel(props: Props) {
               ) : null}
               <TabContentDisclosure id="overview" activeSection={activeSection} label="Technical source and analysis details">
               <div className="space-y-4">
-              <div
-                data-testid="primary-reading-scroll-target"
-                className="scroll-mt-24 sm:scroll-mt-0"
-              >
-                <PrimaryAlbanianReadingCardV0_1
-                  discovery={vm.motivationDiscoveryV0_2}
-                  analysisStatus={analysisStatusForUi}
-                />
-              </div>
+              {!hasNativeAlbanianReading ? (
+                <div
+                  data-testid="primary-reading-scroll-target"
+                  className="scroll-mt-24 sm:scroll-mt-0"
+                >
+                  <PrimaryAlbanianReadingCardV0_1
+                    discovery={vm.motivationDiscoveryV0_2}
+                    analysisStatus={analysisStatusForUi}
+                  />
+                </div>
+              ) : null}
 
               <SpokenPronunciationOverviewCardV0_1 readout={vm.readout} />
 
