@@ -4,7 +4,14 @@ import {
   type NativeDomainToAgentReadingV0_1,
 } from "./albanianNativeDomainToAgent.v0_1";
 import {
+  buildNativeCognitiveStateToContentV0_1,
+  isReviewedCognitiveCandidateFormV0_1,
+  type NativeCognitiveStateToContentSourceInputV0_1,
+  type NativeCognitiveStateToContentReadingV0_1,
+} from "./nativeCognitiveStateToContent.v0_1";
+import {
   lookupOewnAgentFramesServerOnlyV0_1,
+  lookupOewnCognitiveStateFramesServerOnlyV0_1,
   OEWN_AGENT_ARCHIVE_PATH_ENV_V0_1,
 } from "./oewnAgentFramesServerOnly.v0_1";
 import type { AnalyzeWordResultV1 } from "@/shared/analysisResult.v1";
@@ -291,6 +298,8 @@ export type AlbanianLexicalReadingV0_1 = Readonly<{
   sourceLinkedComponentReading?: AlbanianSourceLinkedComponentReadingV0_1 | null;
   nativeDomainToAgent?: NativeDomainToAgentReadingV0_1;
   nativeDomainToAgentSourceDerivedInput?: NativeDomainToAgentSourceDerivedInputV0_1;
+  nativeCognitiveStateToContent?: NativeCognitiveStateToContentReadingV0_1;
+  nativeCognitiveStateToContentSourceInput?: NativeCognitiveStateToContentSourceInputV0_1;
   sourceLinkedComparison?: AlbanianSourceLinkedComparisonV0_1 | null;
   /** Additive product bridge; this never upgrades source evidence into morphology or proof. */
   functionalMeaningBridge: AlbanianFunctionalMeaningBridgeV0_1;
@@ -1785,6 +1794,46 @@ async function sourceDerivedDomainBaseInputV0_1(input: Readonly<{
     target: sourceRecordProjectionV0_1(input.target, input.targetAnalyses),
     bases: Object.freeze(bases),
   });
+}
+
+async function sourceReportedCognitiveStateInputV0_1(input: Readonly<{
+  target: AlbanianKaikkiExactLexicalSourceFactV0_1;
+  targetAnalyses: readonly AlbanianKaikkiSourceIpaSevenVoiceAnalysisV0_1[];
+  provider: AlbanianKaikkiServerOnlyExactLexicalSourceProviderV0_1;
+}>): Promise<NativeCognitiveStateToContentSourceInputV0_1 | undefined> {
+  if (input.target.partOfSpeech !== "noun" || !input.target.etymologyText?.trim()) return undefined;
+  const target = sourceRecordProjectionV0_1(input.target, input.targetAnalyses);
+  const links = (input.target.etymologyLinks ?? []).filter((link) =>
+    link.sourceForm.length > 1 && !link.sourceForm.startsWith("-") &&
+    isReviewedCognitiveCandidateFormV0_1(link.sourceForm),
+  );
+  const bases: NativeCognitiveStateToContentSourceInputV0_1["bases"][number][] = [];
+  const seen = new Set<string>();
+  for (const link of links) {
+    let result: AlbanianKaikkiExactLexicalSourceLookupResultV0_1;
+    try {
+      result = await input.provider.query(link.sourceForm);
+    } catch {
+      continue;
+    }
+    if (result.status !== "MATCHES_FOUND") continue;
+    const matches = result.facts.filter((fact) =>
+      fact.language === "Albanian" && fact.languageCode === "sq" && fact.partOfSpeech === "verb" &&
+      normalizedAlbanianFormV0_1(fact.form) === normalizedAlbanianFormV0_1(link.sourceForm),
+    );
+    for (const base of matches) {
+      const key = JSON.stringify([base.sourceRecordId, link.sourceForm, link.reference]);
+      if (seen.has(key)) continue;
+      seen.add(key);
+      bases.push({
+        base: sourceRecordProjectionV0_1(base, projectAlbanianKaikkiFactSourceIpaToSevenVoicesV0_1(base)),
+        sourceRecord: base,
+        etymologyLink: { sourceForm: link.sourceForm, reference: link.reference },
+      });
+    }
+  }
+  if (bases.length === 0) return undefined;
+  return Object.freeze({ target, bases: Object.freeze(bases) });
 }
 
 function supportedVoicePathKeysV0_1(
@@ -3952,6 +4001,26 @@ async function buildAlbanianLexicalReadingV0_1(input: Readonly<{
         nativeDomainToAgentSourceDerivedInput,
       )
     : null;
+  const nativeCognitiveStateToContentSourceInput = nativeAgentPathConfigured &&
+    primary.partOfSpeech === "noun" && input.sourceStatus.status === "MATCHES_FOUND" &&
+    hasValidUniqueAlbanianSourceRecordIdV0_1(primary, input.facts)
+    ? await sourceReportedCognitiveStateInputV0_1({
+        target: primary,
+        targetAnalyses: input.analyses,
+        provider: input.provider,
+      })
+    : undefined;
+  const nativeCognitiveStateToContent = nativeCognitiveStateToContentSourceInput
+    ? buildNativeCognitiveStateToContentV0_1(
+        input.word,
+        nativeCognitiveStateToContentSourceInput,
+        await lookupOewnCognitiveStateFramesServerOnlyV0_1(
+          nativeCognitiveStateToContentSourceInput.bases.flatMap(({ base }) =>
+            base.sourceSenses?.flatMap((sense) => sense.glosses) ?? [],
+          ),
+        ),
+      )
+    : null;
   const targetRoleFunctionalBridge = input.sourceStatus.status === "MATCHES_FOUND"
     ? buildTargetRoleAgentFunctionalBridgeV0_1({
         targetFact: primary,
@@ -4061,6 +4130,10 @@ async function buildAlbanianLexicalReadingV0_1(input: Readonly<{
     ...(nativeDomainToAgent ? { nativeDomainToAgent } : {}),
     ...(nativeDomainToAgent && nativeDomainToAgentSourceDerivedInput
       ? { nativeDomainToAgentSourceDerivedInput }
+      : {}),
+    ...(nativeCognitiveStateToContent ? { nativeCognitiveStateToContent } : {}),
+    ...(nativeCognitiveStateToContent && nativeCognitiveStateToContentSourceInput
+      ? { nativeCognitiveStateToContentSourceInput }
       : {}),
     sourceLinkedComparison,
     functionalMeaningBridge,
