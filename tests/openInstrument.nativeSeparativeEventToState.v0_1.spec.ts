@@ -1,9 +1,12 @@
 import {
   ALBANET_SOURCE_FILE_BYTES_V0_1,
+  ALBANET_SOURCE_FILE_RELATIVE_PATH_V0_1,
   ALBANET_SOURCE_FILE_SHA256_V0_1,
   ALBANET_SOURCE_FAMILY_ID_V0_1,
   ALBANET_SOURCE_REVISION_V0_1,
 } from "@/shared/openInstrument/albanetSourceIdentity.v0_1";
+import { canonicalOperatorProfilesV0_1 } from "@/shared/canonicalOperatorProfile.v0_1";
+import { reviewedExternalLexiconSourceRowCandidateRegistryV0_1 } from "@/shared/reviewedExternalLexiconSourceRowRegistry.v0_1";
 import { buildNativeSeparativeEventToStateV0_1 } from "@/shared/openInstrument/nativeSeparativeEventToState.v0_1";
 
 const sourceIdentity = {
@@ -12,6 +15,20 @@ const sourceIdentity = {
   sha256: ALBANET_SOURCE_FILE_SHA256_V0_1,
   bytes: ALBANET_SOURCE_FILE_BYTES_V0_1,
 };
+
+function targetSense(synsetId: string, definition: string, lemma = "ndarje") {
+  const encodedLemma = encodeURIComponent(lemma);
+  return {
+    sourceRecordId: `${ALBANET_SOURCE_FAMILY_ID_V0_1}:${synsetId}:lemma=${encodedLemma}`,
+    synsetId,
+    lemma,
+    definitions: [definition],
+    examples: [],
+    entryLocator:
+      `${ALBANET_SOURCE_FILE_RELATIVE_PATH_V0_1}#synset=${synsetId};lemma=${encodedLemma}`,
+    sourceStatus: "SOURCE_REPORTED_UNREVIEWED_RESEARCH_CANDIDATE" as const,
+  };
+}
 
 const targetSenses = [
   ["00053097-n", "mënyrë e shmangies me politesë"],
@@ -23,19 +40,54 @@ const targetSenses = [
   ["05867413-n", "ajo që i bie dikujt kur ndahet një trashëgim"],
   ["09258715-n", "një vend i gjatë i hapur"],
   ["09410928-n", "një hapje e diçkaje me forcë si një zbërthim"],
-].map(([synsetId, definition]) => ({
-  sourceRecordId: `albanet:${synsetId}:lemma=ndarje`,
-  synsetId,
-  lemma: "ndarje",
-  definitions: [definition],
-  examples: [],
-  entryLocator: `wns/als/wn-data-als.tab#synset=${synsetId};lemma=ndarje`,
-  sourceStatus: "SOURCE_REPORTED_UNREVIEWED_RESEARCH_CANDIDATE" as const,
-}));
+].map(([synsetId, definition]) => targetSense(synsetId, definition));
+
+function withAlternativeSeparativeEmbryo<T>(run: () => T): T {
+  const daSourceId = "reviewed.external.gheg-da.damage.candidate.v0_1";
+  const daProfile = canonicalOperatorProfilesV0_1.find((profile) => profile.sourceId === daSourceId);
+  const daRow = reviewedExternalLexiconSourceRowCandidateRegistryV0_1.find((row) =>
+    row.sourceId === daSourceId,
+  );
+  if (!daProfile || !daRow) throw new Error("Expected reviewed DA profile and source row");
+
+  const alternateSourceId = "test.only.separative.divide.candidate.v0_1";
+  const alternateProfile = {
+    ...daProfile,
+    operatorId: "TEST-DIVIDE",
+    embryo: "DIVIDE-TEST",
+    sourceId: alternateSourceId,
+  };
+  const alternateRow = {
+    ...daRow,
+    sourceId: alternateSourceId,
+    plainStandaloneGloss: "divide",
+    externalCitations: daRow.externalCitations.map((citation) => ({
+      ...citation,
+      citationId: "test.only.separative.divide.citation.v0_1",
+      sourceTitle: "Test-only separative candidate",
+      sourceUrlOrArchiveRef: "https://example.invalid/test-only-separative-candidate",
+      entryLocator: "test-only fixture",
+      attestedForm: "DIVIDE-TEST",
+      attestedGloss: "divide",
+    })),
+  };
+  const mutableProfiles = canonicalOperatorProfilesV0_1 as unknown as unknown[];
+  const mutableRows = reviewedExternalLexiconSourceRowCandidateRegistryV0_1 as unknown as unknown[];
+  mutableProfiles.push(alternateProfile);
+  mutableRows.push(alternateRow);
+  try {
+    return run();
+  } finally {
+    mutableRows.pop();
+    mutableProfiles.pop();
+  }
+}
 
 describe("native separative event-to-state reasoning", () => {
   it("preserves nine exact senses and builds only compatible source-grounded hypotheses", () => {
-    const reading = buildNativeSeparativeEventToStateV0_1({ inputForm: "NDARJE", sourceIdentity, targetSenses });
+    const reading = withAlternativeSeparativeEmbryo(() =>
+      buildNativeSeparativeEventToStateV0_1({ inputForm: "NDARJE", sourceIdentity, targetSenses }),
+    );
     expect(reading).toMatchObject({
       origin: "NATIVE_GENERATED",
       operation: "SEPARATIVE_EVENT_TO_STATE",
@@ -45,7 +97,10 @@ describe("native separative event-to-state reasoning", () => {
       userDecisionPosture: "user_decides",
       historicalOriginClaim: "NOT_CLAIMED",
     });
-    expect(reading?.alternatives).toHaveLength(9);
+    const distinctSourceSenses = new Set(reading?.alternatives.map((alternative) =>
+      alternative.target.sourceRecordId,
+    ));
+    expect(distinctSourceSenses.size).toBe(9);
     const compatible = reading?.alternatives.filter((alternative) =>
       alternative.compatibility === "COMPATIBLE_FUNCTION_FAMILY",
     ) ?? [];
@@ -75,8 +130,24 @@ describe("native separative event-to-state reasoning", () => {
     )).toMatchObject({
       compatibility: "NO_COMPATIBLE_FUNCTION_CUE",
       functionalEmbryo: null,
+      action: { status: "UNKNOWN_OR_NULL", text: null },
+      patient: { role: "UNKNOWN_OR_NULL", description: { status: "UNKNOWN_OR_NULL", text: null } },
+      initialState: { status: "UNKNOWN_OR_NULL", text: null },
+      changedState: { status: "UNKNOWN_OR_NULL", text: null },
+      wholeWordMeaning: { status: "SOURCE_REPORTED", text: "një distribucion në përhapje" },
       explanation: null,
+      claimStatus: "UNKNOWN_OR_NULL",
     });
+    for (const target of targetSenses.filter((candidate) =>
+      compatible.some((alternative) => alternative.target.synsetId === candidate.synsetId),
+    )) {
+      expect(compatible.filter((alternative) => alternative.target.synsetId === target.synsetId)
+        .map((alternative) => alternative.functionalEmbryo?.sourceId))
+        .toEqual([
+          "reviewed.external.gheg-da.damage.candidate.v0_1",
+          "test.only.separative.divide.candidate.v0_1",
+        ]);
+    }
     expect(reading?.writtenVoices).toEqual([
       { voice: "A", position: 2 },
       { voice: "E", position: 5 },
@@ -87,22 +158,30 @@ describe("native separative event-to-state reasoning", () => {
     const reading = buildNativeSeparativeEventToStateV0_1({
       inputForm: "SHTËPI",
       sourceIdentity,
-      targetSenses: [{
-        sourceRecordId: "albanet:fixture:lemma=shtëpi",
-        synsetId: "fixture-n",
-        lemma: "shtëpi",
-        definitions: ["shtëpi, ndërtesë për banim"],
-        examples: [],
-        entryLocator: "fixture#synset=fixture-n;lemma=shtëpi",
-        sourceStatus: "SOURCE_REPORTED_UNREVIEWED_RESEARCH_CANDIDATE",
-      }],
+      targetSenses: [targetSense("fixture-n", "shtëpi, ndërtesë për banim", "shtëpi")],
     });
-    expect(reading?.alternatives[0]).toMatchObject({
-      compatibility: "NO_COMPATIBLE_FUNCTION_CUE",
-      functionalEmbryo: null,
-      initialState: { status: "UNKNOWN_OR_NULL", text: null },
-      changedState: { status: "UNKNOWN_OR_NULL", text: null },
-    });
+    expect(reading).toBeNull();
+  });
+
+  it.each([
+    ["normalized target lemma", (target: (typeof targetSenses)[number]) => ({ ...target, lemma: "ndarje tjetër" })],
+    ["canonical source record ID", (target: (typeof targetSenses)[number]) => ({ ...target, sourceRecordId: "albanet:wrong:lemma=ndarje" })],
+    ["canonical locator", (target: (typeof targetSenses)[number]) => ({ ...target, entryLocator: "wrong/path#synset=00383606-n;lemma=ndarje" })],
+    ["synset identity", (target: (typeof targetSenses)[number]) => ({ ...target, synsetId: "00397953-n" })],
+  ])("rejects mismatched %s", (_label, mutate) => {
+    expect(buildNativeSeparativeEventToStateV0_1({
+      inputForm: "NDARJE",
+      sourceIdentity,
+      targetSenses: [mutate(targetSenses[1])],
+    })).toBeNull();
+  });
+
+  it("rejects duplicate AlbaNet records", () => {
+    expect(buildNativeSeparativeEventToStateV0_1({
+      inputForm: "NDARJE",
+      sourceIdentity,
+      targetSenses: [targetSenses[1], targetSenses[1]],
+    })).toBeNull();
   });
 
   it("is deterministic and fails closed on source identity mismatch", () => {

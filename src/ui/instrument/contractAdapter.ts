@@ -2946,9 +2946,10 @@ function parseMotivationDiscoveryV0_2(
             reading.nativeSeparativeEventToStateInput,
           );
           if (!parsed.success || !sourceInput.success || parsed.data.inputForm !== value.inputWord ||
-            sourceInput.data.inputForm !== value.inputWord ||
-            parsed.data.alternatives.length !== sourceInput.data.targetSenses.length) return false;
+            sourceInput.data.inputForm !== value.inputWord) return false;
+          // This rebuild checks client payload consistency only; it does not authenticate source bytes.
           const expected = buildNativeSeparativeEventToStateV0_1(sourceInput.data);
+          if (expected === null) return false;
           const canonical = nativeSeparativeEventToStateReadingSchemaV0_1.safeParse(expected);
           return canonical.success && JSON.stringify(canonical.data) === JSON.stringify(parsed.data);
         })();

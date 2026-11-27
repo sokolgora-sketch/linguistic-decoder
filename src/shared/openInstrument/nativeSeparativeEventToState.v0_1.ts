@@ -1,6 +1,7 @@
 import { z } from "zod";
 import {
   ALBANET_SOURCE_FILE_BYTES_V0_1,
+  ALBANET_SOURCE_FILE_RELATIVE_PATH_V0_1,
   ALBANET_SOURCE_FILE_SHA256_V0_1,
   ALBANET_SOURCE_FAMILY_ID_V0_1,
   ALBANET_SOURCE_REVISION_V0_1,
@@ -60,7 +61,7 @@ const alternative = z.object({
   }).strict().nullable(),
   action: claim,
   patient: z.object({
-    role: z.literal("AFFECTED_ENTITY"),
+    role: z.enum(["AFFECTED_ENTITY", "UNKNOWN_OR_NULL"]),
     description: claim,
     identity: claim,
   }).strict(),
@@ -68,7 +69,7 @@ const alternative = z.object({
   changedState: claim,
   wholeWordMeaning: claim,
   explanation: text.nullable(),
-  claimStatus: z.literal("EXPLORATORY_HYPOTHESIS"),
+  claimStatus: z.enum(["EXPLORATORY_HYPOTHESIS", "UNKNOWN_OR_NULL"]),
 }).strict();
 
 export const nativeSeparativeEventToStateReadingSchemaV0_1 = z.object({
@@ -100,6 +101,54 @@ function tokens(value: string): Set<string> {
   return new Set((value.normalize("NFC").toLocaleLowerCase("sq-AL").match(/[\p{L}]+/gu) ?? []));
 }
 
+// Matches normalizeAlbaNetLemmaV0_1 without importing the server-only adapter into client validation.
+function normalizeAlbaNetTargetLemmaV0_1(value: string): string {
+  return value.normalize("NFC").trim().toLocaleLowerCase("en-US").normalize("NFC");
+}
+
+function validTargetSenseOwnershipV0_1(
+  inputForm: string,
+  targetSenses: readonly NativeSeparativeTargetSenseInputV0_1[],
+): boolean {
+  const inputLemma = normalizeAlbaNetTargetLemmaV0_1(inputForm);
+  const seenRecordIds = new Set<string>();
+  const seenLocators = new Set<string>();
+  const seenSynsetLemmas = new Set<string>();
+
+  for (const target of targetSenses) {
+    if (
+      target.lemma !== target.lemma.normalize("NFC") ||
+      normalizeAlbaNetTargetLemmaV0_1(target.lemma) !== inputLemma ||
+      target.synsetId !== target.synsetId.normalize("NFC") ||
+      target.synsetId.trim() !== target.synsetId
+    ) return false;
+
+    const encodedLemma = encodeURIComponent(target.lemma);
+    const expectedRecordId =
+      `${ALBANET_SOURCE_FAMILY_ID_V0_1}:${target.synsetId}:lemma=${encodedLemma}`;
+    const expectedLocator =
+      `${ALBANET_SOURCE_FILE_RELATIVE_PATH_V0_1}#synset=${target.synsetId};lemma=${encodedLemma}`;
+    const synsetLemmaIdentity = JSON.stringify([
+      normalizeAlbaNetTargetLemmaV0_1(target.lemma),
+      target.synsetId,
+    ]);
+
+    if (
+      target.sourceRecordId !== expectedRecordId ||
+      target.entryLocator !== expectedLocator ||
+      seenRecordIds.has(target.sourceRecordId) ||
+      seenLocators.has(target.entryLocator) ||
+      seenSynsetLemmas.has(synsetLemmaIdentity)
+    ) return false;
+
+    seenRecordIds.add(target.sourceRecordId);
+    seenLocators.add(target.entryLocator);
+    seenSynsetLemmas.add(synsetLemmaIdentity);
+  }
+
+  return true;
+}
+
 const SEPARATIVE_SOURCE_FUNCTION_TERMS_V0_1 = new Set(["split", "divide", "separate"]);
 const SEPARATIVE_ALBANIAN_SENSE_TERMS_V0_1 = new Set([
   "veçim", "veçimit", "veçime", "veçohen", "veçuar", "veçuarit",
@@ -129,7 +178,9 @@ function reviewedSeparativeEmbryos() {
       citationUrl: citation.sourceUrlOrArchiveRef,
       locator: citation.entryLocator,
     }];
-  });
+  }).sort((left, right) =>
+    left.sourceId < right.sourceId ? -1 : left.sourceId > right.sourceId ? 1 : 0,
+  );
 }
 
 function writtenVoices(inputForm: string): NativeSeparativeEventToStateReadingV0_1["writtenVoices"] {
@@ -145,59 +196,68 @@ export function buildNativeSeparativeEventToStateV0_1(
   input: NativeSeparativeEventToStateInputV0_1,
 ): NativeSeparativeEventToStateReadingV0_1 | null {
   const parsedInput = nativeSeparativeEventToStateInputSchemaV0_1.safeParse(input);
-  if (!parsedInput.success) return null;
+  if (!parsedInput.success || !validTargetSenseOwnershipV0_1(
+    parsedInput.data.inputForm,
+    parsedInput.data.targetSenses,
+  )) return null;
   const embryos = reviewedSeparativeEmbryos();
   const alternatives = [...parsedInput.data.targetSenses]
     .sort((left, right) => left.sourceRecordId < right.sourceRecordId ? -1 :
       left.sourceRecordId > right.sourceRecordId ? 1 : 0)
-    .map((target) => {
+    .flatMap((target) => {
       const compatible = [...tokens(target.definitions.join(" "))].some((term) =>
         SEPARATIVE_ALBANIAN_SENSE_TERMS_V0_1.has(term),
       );
-      const embryo = compatible ? embryos[0] ?? null : null;
-      const targetRef = `${target.sourceRecordId} · ${target.entryLocator}`;
-      const actionRef = embryo ? `${embryo.sourceId} · ${embryo.citationId}` : "";
-      const sourceAction = embryo?.lexicalFunction ?? null;
-      const explanation = compatible && embryo
-        ? `${embryo.form} is independently source-reported as “${sourceAction}.” As a functional hypothesis, a division/separation action can affect an initially undivided whole and leave distinct parts or separated entities; that proposed event-to-state frame is compatible with this source-reported target meaning: “${target.definitions.join("; ")}.” The sources do not report a morphological or historical relation between the records.`
-        : null;
-      return {
-        target,
-        compatibility: compatible && embryo ? "COMPATIBLE_FUNCTION_FAMILY" as const : "NO_COMPATIBLE_FUNCTION_CUE" as const,
-        functionalEmbryo: embryo,
-        action: {
-          status: "SOURCE_REPORTED" as const,
-          text: sourceAction,
-          evidenceRefs: embryo ? [actionRef] : [],
-        },
-        patient: {
-          role: "AFFECTED_ENTITY" as const,
-          description: {
-            status: compatible ? "INFERRED" as const : "UNKNOWN_OR_NULL" as const,
-            text: compatible ? "an initially undivided whole" : null,
-            evidenceRefs: compatible && embryo ? [actionRef] : [],
+      const candidates = compatible && embryos.length > 0 ? embryos : [null];
+      return candidates.map((embryo) => {
+        const hasBridge = compatible && embryo !== null;
+        const targetRef = `${target.sourceRecordId} · ${target.entryLocator}`;
+        const actionRef = embryo ? `${embryo.sourceId} · ${embryo.citationId}` : "";
+        const sourceAction = embryo?.lexicalFunction ?? null;
+        const explanation = hasBridge && embryo
+          ? `${embryo.form} is independently source-reported as “${sourceAction}.” As a functional hypothesis, a division/separation action can affect an initially undivided whole and leave distinct parts or separated entities; that proposed event-to-state frame is compatible with this source-reported target meaning: “${target.definitions.join("; ")}.” The sources do not report a morphological or historical relation between the records.`
+          : null;
+        return {
+          target,
+          compatibility: hasBridge ? "COMPATIBLE_FUNCTION_FAMILY" as const : "NO_COMPATIBLE_FUNCTION_CUE" as const,
+          functionalEmbryo: embryo,
+          action: {
+            status: hasBridge ? "SOURCE_REPORTED" as const : "UNKNOWN_OR_NULL" as const,
+            text: sourceAction,
+            evidenceRefs: embryo ? [actionRef] : [],
           },
-          identity: { status: "UNKNOWN_OR_NULL" as const, text: null, evidenceRefs: [] },
-        },
-        initialState: {
-          status: compatible ? "INFERRED" as const : "UNKNOWN_OR_NULL" as const,
-          text: compatible ? "one undivided whole" : null,
-          evidenceRefs: compatible && embryo ? [actionRef] : [],
-        },
-        changedState: {
-          status: compatible ? "INFERRED" as const : "UNKNOWN_OR_NULL" as const,
-          text: compatible ? "distinct parts or separated entities" : null,
-          evidenceRefs: compatible && embryo ? [actionRef, targetRef] : [],
-        },
-        wholeWordMeaning: {
-          status: target.definitions.length > 0 ? "SOURCE_REPORTED" as const : "UNKNOWN_OR_NULL" as const,
-          text: target.definitions.length > 0 ? target.definitions.join("; ") : null,
-          evidenceRefs: target.definitions.length > 0 ? [targetRef] : [],
-        },
-        explanation,
-        claimStatus: "EXPLORATORY_HYPOTHESIS" as const,
-      };
+          patient: {
+            role: hasBridge ? "AFFECTED_ENTITY" as const : "UNKNOWN_OR_NULL" as const,
+            description: {
+              status: hasBridge ? "INFERRED" as const : "UNKNOWN_OR_NULL" as const,
+              text: hasBridge ? "an initially undivided whole" : null,
+              evidenceRefs: hasBridge ? [actionRef] : [],
+            },
+            identity: { status: "UNKNOWN_OR_NULL" as const, text: null, evidenceRefs: [] },
+          },
+          initialState: {
+            status: hasBridge ? "INFERRED" as const : "UNKNOWN_OR_NULL" as const,
+            text: hasBridge ? "one undivided whole" : null,
+            evidenceRefs: hasBridge ? [actionRef] : [],
+          },
+          changedState: {
+            status: hasBridge ? "INFERRED" as const : "UNKNOWN_OR_NULL" as const,
+            text: hasBridge ? "distinct parts or separated entities" : null,
+            evidenceRefs: hasBridge ? [actionRef, targetRef] : [],
+          },
+          wholeWordMeaning: {
+            status: target.definitions.length > 0 ? "SOURCE_REPORTED" as const : "UNKNOWN_OR_NULL" as const,
+            text: target.definitions.length > 0 ? target.definitions.join("; ") : null,
+            evidenceRefs: target.definitions.length > 0 ? [targetRef] : [],
+          },
+          explanation,
+          claimStatus: hasBridge ? "EXPLORATORY_HYPOTHESIS" as const : "UNKNOWN_OR_NULL" as const,
+        };
+      });
     });
+  if (!alternatives.some((alternative) => alternative.compatibility === "COMPATIBLE_FUNCTION_FAMILY")) {
+    return null;
+  }
   const reading = {
     schemaVersion: NATIVE_SEPARATIVE_EVENT_TO_STATE_SCHEMA_V0_1,
     origin: "NATIVE_GENERATED" as const,

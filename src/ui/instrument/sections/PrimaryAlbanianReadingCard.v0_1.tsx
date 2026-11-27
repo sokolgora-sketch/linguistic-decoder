@@ -46,6 +46,11 @@ export function PrimaryAlbanianReadingCardV0_1({
   const nativeSeparativeReading = reading?.nativeSeparativeEventToState?.inputForm === value.inputWord
     ? reading.nativeSeparativeEventToState
     : null;
+  const nativeSeparativeSourceAlternatives = nativeSeparativeReading
+    ? [...new Map(nativeSeparativeReading.alternatives.map((alternative) =>
+        [alternative.target.sourceRecordId, alternative] as const,
+      )).values()]
+    : [];
   const bridge = reading?.functionalMeaningBridge;
   const hypothesis = bridge?.functionalHypothesis;
   const primarySourceFact = reading?.primarySourceFact ?? null;
@@ -198,7 +203,10 @@ export function PrimaryAlbanianReadingCardV0_1({
             {nativeSeparativeReading.alternatives.filter((alternative) =>
               alternative.compatibility === "COMPATIBLE_FUNCTION_FAMILY" && alternative.explanation,
             ).map((alternative) => (
-              <article key={alternative.target.sourceRecordId} className="min-w-0 rounded border border-[#40361f] p-2">
+              <article
+                key={`${alternative.target.sourceRecordId}:${alternative.functionalEmbryo?.sourceId ?? "no-bridge"}`}
+                className="min-w-0 rounded border border-[#40361f] p-2"
+              >
                 <p className="font-semibold">{alternative.functionalEmbryo?.form} → division / separation → changed state</p>
                 <p className="mt-1"><span className="font-semibold">Action · source-reported:</span> {alternative.action.text}</p>
                 <p><span className="font-semibold">Affected entity · inferred:</span> {alternative.patient.description.text}; identity Unknown/Null</p>
@@ -219,9 +227,9 @@ export function PrimaryAlbanianReadingCardV0_1({
             ))}
           </div>
           <details className="mt-3 text-xs">
-            <summary className="cursor-pointer">All {nativeSeparativeReading.alternatives.length} source senses, including those without a bridge</summary>
+            <summary className="cursor-pointer">All {nativeSeparativeSourceAlternatives.length} source senses, including those without a bridge</summary>
             <ul className="mt-1 space-y-1">
-              {nativeSeparativeReading.alternatives.map((alternative) => (
+              {nativeSeparativeSourceAlternatives.map((alternative) => (
                 <li key={alternative.target.sourceRecordId}>
                   {alternative.target.synsetId} · {alternative.target.definitions.join("; ") || "Definition unavailable"} · {alternative.compatibility === "COMPATIBLE_FUNCTION_FAMILY" ? "hypothesis available" : "no bridge produced"} · {alternative.target.entryLocator}
                 </li>
