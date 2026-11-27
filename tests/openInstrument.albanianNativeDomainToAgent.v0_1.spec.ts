@@ -79,19 +79,44 @@ const adjective = {
   ...target,
   ...fact("punëtor", 1, "adj", [{ senseId: "fixture-hardworking", glosses: ["hardworking"] }]),
 };
+const fishBase = {
+  ...fact("peshk", 2, "noun", [{ senseId: "fixture-fish", glosses: ["fish"] }]),
+  relatedForms: [{
+    form: "peshkatar",
+    relation: "SOURCE_DERIVED_FORM" as const,
+    entryLocator: "jsonl://word/peshkatar",
+    sourceRelationAssertion: {
+      assertionScope: "SOURCE_SENSE" as const,
+      sourceSenseId: "fixture-fish",
+      sourceSenseOrdinal: 0,
+      sourceSenseIdentityStatus: "VERIFIED" as const,
+      sourceAssertionOrdinal: 0,
+      reasonCodes: [],
+    },
+  }],
+};
+const fisherman = fact("peshkatar", 3, "noun", [{ senseId: "fixture-fisherman", glosses: ["fisherman"] }]);
 const frames = [{
   lemma: "worker",
   senseId: "worker%1:18:00::",
   synsetId: "09655706-n",
   definition: "a person who works at a specific occupation",
+  semanticCategory: "noun.person" as const,
 }];
+const fishermanFrame = {
+  lemma: "fisherman",
+  senseId: "fisherman%1:18:00::",
+  synsetId: "83380317-n",
+  definition: "a man whose occupation is catching fish",
+  semanticCategory: "noun.person" as const,
+};
 
-async function analyze(selector?: string) {
+async function analyze(word = "PUNËTOR", selector?: string) {
   const response = await POST(new Request("http://localhost/api/analyze-v2", {
     method: "POST",
     headers: { "content-type": "application/json" },
     body: JSON.stringify({
-      word: "PUNËTOR",
+      word,
       language: "sq",
       alphabet: "albanian",
       providerExecution: "disabled",
@@ -111,10 +136,12 @@ describe("native domain to agent reading", () => {
     });
     jest.mocked(sourceDelivery.createAlbanianKaikkiServerOnlyProductionProviderV0_1).mockResolvedValue(
       createAlbanianKaikkiServerOnlyExactLexicalSourceProviderForSyntheticFixtureV0_1({
-        facts: [base, suffix, target, adjective],
+        facts: [base, suffix, target, adjective, fishBase, fisherman],
       }),
     );
-    jest.mocked(oewn.lookupOewnAgentFramesServerOnlyV0_1).mockResolvedValue(frames);
+    jest.mocked(oewn.lookupOewnAgentFramesServerOnlyV0_1).mockImplementation(async (glosses) =>
+      glosses.some((gloss) => gloss.toLowerCase() === "fisherman") ? [fishermanFrame] : frames,
+    );
     jest.spyOn(globalThis, "fetch").mockRejectedValue(new Error("Unexpected network call"));
   });
 
@@ -157,9 +184,67 @@ describe("native domain to agent reading", () => {
   });
 
   it("keeps the exact adjective record outside the operation", async () => {
-    const payload = await analyze(adjective.sourceRecordId);
+    const payload = await analyze("PUNËTOR", adjective.sourceRecordId);
     expect(payload.motivationDiscoveryV0_2.albanianLexicalReading.nativeDomainToAgent).toBeUndefined();
     expect(oewn.lookupOewnAgentFramesServerOnlyV0_1).not.toHaveBeenCalled();
+  });
+
+  it("uses an exact base-side derived-form assertion and noun.person membership for PESHKATAR", async () => {
+    const payload = await analyze("PESHKATAR");
+    const reading = payload.motivationDiscoveryV0_2.albanianLexicalReading;
+    expect(reading.nativeDomainToAgentSourceDerivedInput.bases[0].relation).toMatchObject({
+      form: "peshkatar",
+      relation: "SOURCE_DERIVED_FORM",
+      sourceRelationAssertion: {
+        assertionScope: "SOURCE_SENSE",
+        sourceSenseId: "fixture-fish",
+        sourceSenseIdentityStatus: "VERIFIED",
+      },
+    });
+    expect(reading.nativeDomainToAgent.alternatives).toEqual([expect.objectContaining({
+      base: expect.objectContaining({ form: "peshk", sourceRecordId: fishBase.sourceRecordId, senseId: "fixture-fish", glosses: ["fish"] }),
+      target: expect.objectContaining({ form: "peshkatar", sourceRecordId: fisherman.sourceRecordId, senseId: "fixture-fisherman", glosses: ["fisherman"] }),
+      sourceDerivedRelation: expect.objectContaining({ direction: "BASE_SOURCE_RECORD_TO_TARGET_DERIVED_FORM", assertionScope: "SOURCE_SENSE", sourceSenseId: "fixture-fish" }),
+      frames: expect.arrayContaining([expect.objectContaining({ semanticCategory: "noun.person", definition: "a man whose occupation is catching fish" })]),
+    })]);
+    expect(reading.nativeDomainToAgent.alternatives[0].explanation).toContain("suffix function remains unresolved");
+    expect(reading.nativeDomainToAgent.writtenVoices).toEqual([
+      { voice: "E", position: 1 }, { voice: "A", position: 5 }, { voice: "A", position: 7 },
+    ]);
+    expect(adaptAnalysisToTelemetryVM(payload).motivationDiscoveryV0_2?.kind).toBe("present");
+    expect(globalThis.fetch).not.toHaveBeenCalled();
+  });
+
+  it("rejects unrelated source relations and frames outside noun.person", () => {
+    const unrelated = {
+      target: { ...({ ...fishBase, form: "other" } as never) },
+      bases: [{ base: fishBase as never, relation: { ...fishBase.relatedForms[0]!, form: "other" } }],
+    };
+    expect(buildNativeDomainToAgentV0_1("PESHKATAR", null, [fishermanFrame], unrelated as never)).toBeNull();
+    const nonPerson = { ...fishermanFrame, semanticCategory: "noun.artifact" };
+    expect(buildNativeDomainToAgentV0_1("PESHKATAR", null, [nonPerson as never], {
+      target: fisherman as never,
+      bases: [{ base: fishBase as never, relation: fishBase.relatedForms[0]! }],
+    } as never)).toBeNull();
+  });
+
+  it("withholds the base-side contribution when the source-attested base sense is removed", async () => {
+    const payload = await analyze("PESHKATAR");
+    const reading = payload.motivationDiscoveryV0_2.albanianLexicalReading;
+    const basis = reading.nativeDomainToAgentSourceDerivedInput;
+    const frames = reading.nativeDomainToAgent.alternatives.flatMap((alternative: typeof reading.nativeDomainToAgent.alternatives[number]) =>
+      alternative.frames.map(({ lemma, senseId, synsetId, definition, semanticCategory }) =>
+        ({ lemma, senseId, synsetId, definition, semanticCategory })),
+    );
+    const removed = {
+      ...basis,
+      bases: basis.bases.map((candidate: typeof basis.bases[number]) => ({
+        ...candidate,
+        base: { ...candidate.base, sourceSenses: candidate.base.sourceSenses.map((sense) => ({ ...sense, glosses: [] })) },
+        sourceRecord: { ...candidate.sourceRecord, senses: candidate.sourceRecord.senses.map((sense) => ({ ...sense, glosses: [] })) },
+      })),
+    };
+    expect(buildNativeDomainToAgentV0_1("PESHKATAR", null, frames, removed as never)).toBeNull();
   });
 
   it("withholds the contribution when base semantic support is removed", async () => {

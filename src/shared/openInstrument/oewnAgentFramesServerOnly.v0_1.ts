@@ -45,7 +45,7 @@ async function openFrameLookup(path: string): Promise<FrameLookup | null> {
         if (!Object.prototype.hasOwnProperty.call(entries, lemma)) return [];
         return (entries[lemma]?.n?.sense ?? []).flatMap(({ id, synset }) => {
           const definition = synsets[synset]?.definition?.join("; ");
-          return definition ? [{ lemma, senseId: id, synsetId: synset, definition }] : [];
+          return definition ? [{ lemma, senseId: id, synsetId: synset, definition, semanticCategory: "noun.person" as const }] : [];
         });
       }));
       return results.flat();

@@ -1,5 +1,6 @@
 import {
   buildNativeDomainToAgentV0_1,
+  type NativeDomainToAgentSourceDerivedInputV0_1,
   type NativeDomainToAgentReadingV0_1,
 } from "./albanianNativeDomainToAgent.v0_1";
 import {
@@ -289,6 +290,7 @@ export type AlbanianLexicalReadingV0_1 = Readonly<{
   fiveWindowsComparison?: AlbanianFiveWindowsComparisonV0_1 | null;
   sourceLinkedComponentReading?: AlbanianSourceLinkedComponentReadingV0_1 | null;
   nativeDomainToAgent?: NativeDomainToAgentReadingV0_1;
+  nativeDomainToAgentSourceDerivedInput?: NativeDomainToAgentSourceDerivedInputV0_1;
   sourceLinkedComparison?: AlbanianSourceLinkedComparisonV0_1 | null;
   /** Additive product bridge; this never upgrades source evidence into morphology or proof. */
   functionalMeaningBridge: AlbanianFunctionalMeaningBridgeV0_1;
@@ -1726,6 +1728,62 @@ async function buildSourceLinkedComponentReadingV0_1(input: Readonly<{
       : componentEvidence.relation === "SOURCE_AUTHORED_SUFFIX_TEMPLATE"
         ? "The exact source-authored suffix template and Albanian references are preserved as attributed evidence. No suffix function, derivation rule, component-sense alignment, functional operation, or embryo meaning is claimed by this component reading."
       : "The exact source-authored compound template and Albanian references are preserved. IPA and Voice structure remain Null when the source supplies no pronunciation; composition remains separately Null.",
+  });
+}
+
+async function sourceDerivedDomainBaseInputV0_1(input: Readonly<{
+  target: AlbanianKaikkiExactLexicalSourceFactV0_1;
+  targetAnalyses: readonly AlbanianKaikkiSourceIpaSevenVoiceAnalysisV0_1[];
+  provider: AlbanianKaikkiServerOnlyExactLexicalSourceProviderV0_1;
+}>): Promise<NativeDomainToAgentSourceDerivedInputV0_1 | undefined> {
+  if (input.target.partOfSpeech !== "noun") return undefined;
+  const targetKey = normalizedAlbanianFormV0_1(input.target.form);
+  const targetLocator = `jsonl://word/${encodeURIComponent(input.target.form)}`;
+  const form = Array.from(input.target.form.normalize("NFC"));
+  const prefixCandidates = Array.from({ length: Math.min(form.length - 2, 18) }, (_, index) =>
+    form.slice(0, index + 2).join(""),
+  );
+  const bases: NativeDomainToAgentSourceDerivedInputV0_1["bases"][number][] = [];
+
+  // Prefixes are only lookup candidates. A base is admitted only by its own exact source record's derived-form assertion.
+  for (const candidateForm of prefixCandidates) {
+    let result: AlbanianKaikkiExactLexicalSourceLookupResultV0_1;
+    try {
+      result = await input.provider.query(candidateForm);
+    } catch {
+      continue;
+    }
+    if (result.status !== "MATCHES_FOUND") continue;
+    const matches = result.facts.filter((fact) =>
+      fact.language === "Albanian" && fact.languageCode === "sq" && fact.partOfSpeech === "noun" &&
+      normalizedAlbanianFormV0_1(fact.form) === normalizedAlbanianFormV0_1(candidateForm),
+    );
+    if (matches.length !== 1) continue;
+    const base = matches[0];
+    if (!base) continue;
+    const relations = (base.relatedForms ?? []).filter((relation) =>
+      relation.relation === "SOURCE_DERIVED_FORM" &&
+      normalizedAlbanianFormV0_1(relation.form) === targetKey && relation.entryLocator === targetLocator,
+    );
+    if (relations.length !== 1) continue;
+    const relation = relations[0];
+    const assertion = relation.sourceRelationAssertion;
+    if (!relation || assertion.sourceAssertionOrdinal === null ||
+      (assertion.assertionScope === "SOURCE_SENSE" &&
+        (assertion.sourceSenseIdentityStatus !== "VERIFIED" ||
+          !base.senses.some((sense) => sense.senseId === assertion.sourceSenseId))) ||
+      (assertion.assertionScope === "SOURCE_RECORD" &&
+        (assertion.sourceSenseIdentityStatus !== "NOT_APPLICABLE" || assertion.sourceSenseId !== null))) continue;
+    bases.push({
+      base: sourceRecordProjectionV0_1(base, projectAlbanianKaikkiFactSourceIpaToSevenVoicesV0_1(base)),
+      sourceRecord: base,
+      relation,
+    });
+  }
+  if (bases.length === 0) return undefined;
+  return Object.freeze({
+    target: sourceRecordProjectionV0_1(input.target, input.targetAnalyses),
+    bases: Object.freeze(bases),
   });
 }
 
@@ -3878,14 +3936,20 @@ async function buildAlbanianLexicalReadingV0_1(input: Readonly<{
         primaryAnalyses: input.analyses,
         provider: input.provider,
       });
-  const nativeDomainToAgent = nativeAgentPathConfigured && sourceLinkedComponentReading &&
-    sourceLinkedComponentReading.relation.relation === "SOURCE_AUTHORED_SUFFIX_TEMPLATE" &&
+  const nativeDomainToAgentSourceDerivedInput = nativeAgentPathConfigured && !sourceLinkedComponentReading &&
+    primary.partOfSpeech === "noun" && input.sourceStatus.status === "MATCHES_FOUND" &&
+    hasValidUniqueAlbanianSourceRecordIdV0_1(primary, input.facts)
+    ? await sourceDerivedDomainBaseInputV0_1({ target: primary, targetAnalyses: input.analyses, provider: input.provider })
+    : undefined;
+  const nativeDomainToAgent = nativeAgentPathConfigured &&
+    (sourceLinkedComponentReading?.relation.relation === "SOURCE_AUTHORED_SUFFIX_TEMPLATE" || nativeDomainToAgentSourceDerivedInput) &&
     primary.partOfSpeech === "noun" && input.sourceStatus.status === "MATCHES_FOUND" &&
     hasValidUniqueAlbanianSourceRecordIdV0_1(primary, input.facts)
     ? buildNativeDomainToAgentV0_1(
         input.word,
-        sourceLinkedComponentReading,
+        sourceLinkedComponentReading?.relation.relation === "SOURCE_AUTHORED_SUFFIX_TEMPLATE" ? sourceLinkedComponentReading : null,
         await lookupOewnAgentFramesServerOnlyV0_1(distinctGlossesV0_1([primary])),
+        nativeDomainToAgentSourceDerivedInput,
       )
     : null;
   const targetRoleFunctionalBridge = input.sourceStatus.status === "MATCHES_FOUND"
@@ -3995,6 +4059,9 @@ async function buildAlbanianLexicalReadingV0_1(input: Readonly<{
     fiveWindowsComparison,
     sourceLinkedComponentReading,
     ...(nativeDomainToAgent ? { nativeDomainToAgent } : {}),
+    ...(nativeDomainToAgent && nativeDomainToAgentSourceDerivedInput
+      ? { nativeDomainToAgentSourceDerivedInput }
+      : {}),
     sourceLinkedComparison,
     functionalMeaningBridge,
     composition,

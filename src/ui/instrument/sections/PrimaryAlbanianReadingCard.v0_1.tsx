@@ -151,8 +151,13 @@ export function PrimaryAlbanianReadingCardV0_1({
     sourceComponentReading.claimBoundary.trim().length > 0 &&
     isInterpretationDecisionPolicyV0_1(sourceComponentHypothesis.interpretationDecisionPolicy) &&
     sourceComponentHypothesis.userDecisionPosture === "user_decides";
-  const nativeReading = exactSourceStatus === "MATCHES_FOUND" && sourceComponentReading &&
-    reading?.nativeDomainToAgent?.inputForm === value.inputWord
+  const nativeSourceDerivedInput = reading?.nativeDomainToAgentSourceDerivedInput;
+  const nativeReading = exactSourceStatus === "MATCHES_FOUND" &&
+    reading?.nativeDomainToAgent?.inputForm === value.inputWord &&
+    reading.nativeDomainToAgent.alternatives.every((alternative) =>
+      records.some((record) => record.sourceRecordId === alternative.target.sourceRecordId &&
+        sameWord(record.form, alternative.target.form)),
+    )
     ? reading.nativeDomainToAgent
     : null;
   const sourceUnavailable = exactSourceStatus === "UNAVAILABLE";
@@ -249,7 +254,7 @@ export function PrimaryAlbanianReadingCardV0_1({
           <h3 className="text-[11px] font-semibold uppercase tracking-[0.12em] text-[#d8bb7a]">
             Exploratory functional interpretation
           </h3>
-          {nativeReading && sourceComponentReading ? (
+          {nativeReading && (sourceComponentReading || nativeSourceDerivedInput) ? (
             <div className="mt-2 space-y-2" data-testid="primary-albanian-native-agent">
               <p className="font-semibold">Domain to agent role · exploratory</p>
               {nativeReading.alternatives.map(({ base, target, frames, explanation }) => (
@@ -257,7 +262,15 @@ export function PrimaryAlbanianReadingCardV0_1({
                   <p data-testid="primary-albanian-native-agent-explanation">{explanation}</p>
                   <details className="mt-2 text-xs [overflow-wrap:anywhere]">
                     <summary className="cursor-pointer">Sources and alternatives</summary>
-                    <p>Kaikki reports: {sourceComponentReading.relation.sourceAuthoredExplanation}</p>
+                    {sourceComponentReading
+                      ? <p>Kaikki reports: {sourceComponentReading.relation.sourceAuthoredExplanation}</p>
+                      : <p>
+                          Source-reported relation: {nativeSourceDerivedInput?.bases.map(({ base, relation }) =>
+                            `${base.form} record ${relation.sourceRelationAssertion.assertionScope === "SOURCE_SENSE"
+                              ? `sense ${relation.sourceRelationAssertion.sourceSenseId}`
+                              : ""} lists ${relation.form} as a derived form`,
+                          ).join(" / ")}. Suffix function remains unresolved.
+                        </p>}
                     <p>Base sense {base.senseId} · {base.entryLocator}</p>
                     <p>Target sense {target.senseId} · {target.entryLocator}</p>
                     <p>
@@ -273,7 +286,11 @@ export function PrimaryAlbanianReadingCardV0_1({
                     </ul>
                     <p>Source meanings retained</p>
                     <ul>
-                      {[sourceComponentReading.primary, ...sourceComponentReading.components].flatMap((record) =>
+                      {(sourceComponentReading
+                        ? [sourceComponentReading.primary, ...sourceComponentReading.components]
+                        : nativeSourceDerivedInput
+                          ? [nativeSourceDerivedInput.target, ...nativeSourceDerivedInput.bases.map(({ base }) => base)]
+                          : []).flatMap((record) =>
                         (record.sourceSenses ?? []).map((sense) => (
                           <li key={JSON.stringify([record.sourceRecordId, sense.sourceSenseOrdinal])}>
                             {record.form} · {sense.glosses.join(" / ")} · {sense.senseId ?? "Sense ID unavailable"} · {record.entryLocator}

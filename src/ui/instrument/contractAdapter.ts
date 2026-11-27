@@ -3,6 +3,8 @@
 import {
   buildNativeDomainToAgentV0_1,
   nativeDomainToAgentReadingSchemaV0_1,
+  nativeDomainToAgentSourceDerivedInputSchemaV0_1,
+  type NativeDomainToAgentSourceDerivedInputV0_1,
 } from "@/shared/openInstrument/albanianNativeDomainToAgent.v0_1";
 import type { AlbanianSourceLinkedComponentReadingV0_1 } from "@/shared/openInstrument/motivationEngineDiscoveryServerOnly.v0_1";
 import { normalizePrinciplesToLabels } from "@/v1/principles.vocab.v0.1";
@@ -2838,18 +2840,46 @@ function parseMotivationDiscoveryV0_2(
     };
     const validNativeDomainToAgent = reading.nativeDomainToAgent === undefined || (() => {
       const parsed = nativeDomainToAgentReadingSchemaV0_1.safeParse(reading.nativeDomainToAgent);
-      if (!parsed.success || !validSourceLinkedComponentReading ||
-        reading.status !== "SUPPORTED" || !exactPrimarySourceFact ||
-        !isRecord(sourceLinkedComponentReading) || !isRecord(sourceLinkedComponentReading.primary) ||
-        sourceLinkedComponentReading.primary.sourceRecordId !== exactPrimarySourceFact.sourceRecordId ||
-        !validSourceAuthoredSuffixTemplateReading(sourceLinkedComponentReading) ||
+      if (!parsed.success || reading.status !== "SUPPORTED" || !exactPrimarySourceFact ||
         parsed.data.inputForm !== value.inputWord) return false;
       const frames = new Map(parsed.data.alternatives.flatMap((alternative) =>
         alternative.frames.map(({ lemma, senseId, synsetId, definition }) =>
-          [senseId, { lemma, senseId, synsetId, definition }] as const)));
-      const expected = buildNativeDomainToAgentV0_1(parsed.data.inputForm,
-        sourceLinkedComponentReading as unknown as AlbanianSourceLinkedComponentReadingV0_1,
-        [...frames.values()]);
+          [senseId, {
+            lemma,
+            senseId,
+            synsetId,
+            definition,
+            semanticCategory: "noun.person" as const,
+          }] as const)));
+      const usesSourceDerivedRelation = parsed.data.alternatives.some((alternative) =>
+        alternative.sourceDerivedRelation !== undefined,
+      );
+      let expected: ReturnType<typeof buildNativeDomainToAgentV0_1>;
+      if (usesSourceDerivedRelation) {
+        const sourceDerivedInput = nativeDomainToAgentSourceDerivedInputSchemaV0_1.safeParse(
+          reading.nativeDomainToAgentSourceDerivedInput,
+        );
+        if (!sourceDerivedInput.success || validSourceAuthoredSuffixTemplateReading(sourceLinkedComponentReading) ||
+          !isRecord(sourceDerivedInput.data.target) ||
+          sourceDerivedInput.data.target.sourceRecordId !== exactPrimarySourceFact.sourceRecordId ||
+          !sameNormalizedAlbanianRelationForm(sourceDerivedInput.data.target.form, value.inputWord)) return false;
+        expected = buildNativeDomainToAgentV0_1(
+          parsed.data.inputForm,
+          null,
+          [...frames.values()],
+          reading.nativeDomainToAgentSourceDerivedInput as NativeDomainToAgentSourceDerivedInputV0_1,
+        );
+      } else {
+        if (reading.nativeDomainToAgentSourceDerivedInput !== undefined || !validSourceLinkedComponentReading ||
+          !isRecord(sourceLinkedComponentReading) || !isRecord(sourceLinkedComponentReading.primary) ||
+          sourceLinkedComponentReading.primary.sourceRecordId !== exactPrimarySourceFact.sourceRecordId ||
+          !validSourceAuthoredSuffixTemplateReading(sourceLinkedComponentReading)) return false;
+        expected = buildNativeDomainToAgentV0_1(
+          parsed.data.inputForm,
+          sourceLinkedComponentReading as unknown as AlbanianSourceLinkedComponentReadingV0_1,
+          [...frames.values()],
+        );
+      }
       const canonical = nativeDomainToAgentReadingSchemaV0_1.safeParse(expected);
       return canonical.success && JSON.stringify(canonical.data) === JSON.stringify(parsed.data);
     })();
