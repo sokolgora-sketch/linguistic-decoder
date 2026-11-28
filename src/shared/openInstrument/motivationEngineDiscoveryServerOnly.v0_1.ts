@@ -1,4 +1,16 @@
 import {
+  buildIndependentFunctionalCompositionV0_1,
+  independentActivityProbesV0_1,
+  independentComparisonLemmasV0_1,
+  independentCompositionFormKeyV0_1,
+  independentCompositionSplitsV0_1,
+  independentModifierProbesV0_1,
+  isJointModifierV0_1,
+  type IndependentCompositionInputV0_1,
+  type IndependentCompositionRecordV0_1,
+  type IndependentFunctionalCompositionV0_1,
+} from "./independentFunctionalComposition.v0_1";
+import {
   buildNativeDomainToAgentV0_1,
   type NativeDomainToAgentSourceDerivedInputV0_1,
   type NativeDomainToAgentReadingV0_1,
@@ -17,6 +29,7 @@ import {
 import {
   lookupOewnAgentFramesServerOnlyV0_1,
   lookupOewnCognitiveStateFramesServerOnlyV0_1,
+  lookupOewnCompositionComparisonsServerOnlyV0_1,
   OEWN_AGENT_ARCHIVE_PATH_ENV_V0_1,
 } from "./oewnAgentFramesServerOnly.v0_1";
 import type { AnalyzeWordResultV1 } from "@/shared/analysisResult.v1";
@@ -302,6 +315,8 @@ export type AlbanianLexicalReadingV0_1 = Readonly<{
   /** Additive bounded comparison for the five configured source-backed window forms. */
   fiveWindowsComparison?: AlbanianFiveWindowsComparisonV0_1 | null;
   sourceLinkedComponentReading?: AlbanianSourceLinkedComponentReadingV0_1 | null;
+  independentFunctionalComposition?: IndependentFunctionalCompositionV0_1;
+  independentFunctionalCompositionInput?: IndependentCompositionInputV0_1;
   nativeDomainToAgent?: NativeDomainToAgentReadingV0_1;
   nativeDomainToAgentSourceDerivedInput?: NativeDomainToAgentSourceDerivedInputV0_1;
   nativeCognitiveStateToContent?: NativeCognitiveStateToContentReadingV0_1;
@@ -1558,6 +1573,59 @@ function buildThreeComponentFunctionalHypothesisV0_1(input: Readonly<{
     noSingleWinner: true,
     userDecisionPosture: "user_decides" as const,
   });
+}
+
+function independentCompositionRecord(
+  fact: AlbanianKaikkiExactLexicalSourceFactV0_1,
+): IndependentCompositionRecordV0_1 {
+  const { form, partOfSpeech, sourceRecordId, entryLocator } = fact;
+  return {
+    form, partOfSpeech, sourceRecordId, entryLocator,
+    senses: fact.senses.map(({ senseId, glosses }) => ({ senseId, glosses: [...glosses] })),
+  };
+}
+
+async function discoverIndependentCompositionInput(input: Readonly<{
+  word: string;
+  primary: AlbanianKaikkiExactLexicalSourceFactV0_1;
+  provider: AlbanianKaikkiServerOnlyExactLexicalSourceProviderV0_1;
+}>): Promise<IndependentCompositionInputV0_1 | undefined> {
+  const { word, primary, provider } = input;
+  if (primary.partOfSpeech !== "noun" ||
+    independentCompositionFormKeyV0_1(primary.form) !== independentCompositionFormKeyV0_1(word)) return undefined;
+  const queried = new Map<string, Promise<IndependentCompositionRecordV0_1[]>>();
+  const lookup = (form: string) => {
+    const key = independentCompositionFormKeyV0_1(form);
+    let records = queried.get(key);
+    if (!records) {
+      records = provider.query(key).then((result) => {
+        if (result.status !== "MATCHES_FOUND") return [];
+        return result.facts.filter((fact) =>
+          fact.languageCode === "sq" && fact.language === "Albanian" &&
+          independentCompositionFormKeyV0_1(fact.form) === key &&
+          hasValidUniqueAlbanianSourceRecordIdV0_1(fact, result.facts),
+        ).map(independentCompositionRecord);
+      }).catch(() => []);
+      queried.set(key, records);
+    }
+    return records;
+  };
+
+  const splits = independentCompositionSplitsV0_1(word);
+  const leftRecords = await Promise.all(splits.map(({ left }) => lookup(left)));
+  const candidateSplits = splits.filter((_, i) => leftRecords[i]?.some(isJointModifierV0_1));
+  if (!candidateSplits.length) return undefined;
+  const comparisons = await lookupOewnCompositionComparisonsServerOnlyV0_1(
+    primary.senses.flatMap(({ glosses }) => glosses.flatMap(independentComparisonLemmasV0_1)),
+  );
+  if (!comparisons.length) return undefined;
+  const forms = candidateSplits.flatMap(({ left, right }) => [
+    left,
+    ...independentModifierProbesV0_1(left),
+    ...independentActivityProbesV0_1(right).map(({ lookup }) => lookup),
+  ]);
+  const records = await Promise.all([...new Set(forms.map(independentCompositionFormKeyV0_1))].map(lookup));
+  return { inputForm: word, target: independentCompositionRecord(primary), lexicalRecords: records.flat(), comparisons };
 }
 
 async function buildSourceLinkedComponentReadingV0_1(input: Readonly<{
@@ -4016,6 +4084,13 @@ async function buildAlbanianLexicalReadingV0_1(input: Readonly<{
         primaryAnalyses: input.analyses,
         provider: input.provider,
       });
+  const independentFunctionalCompositionInput = nativeAgentPathConfigured &&
+    input.sourceStatus.status === "MATCHES_FOUND" && hasValidUniqueAlbanianSourceRecordIdV0_1(primary, input.facts)
+    ? await discoverIndependentCompositionInput({ word: input.word, primary, provider: input.provider })
+    : undefined;
+  const independentFunctionalComposition = independentFunctionalCompositionInput
+    ? buildIndependentFunctionalCompositionV0_1(independentFunctionalCompositionInput)
+    : null;
   const nativeDomainToAgentSourceDerivedInput = nativeAgentPathConfigured && !sourceLinkedComponentReading &&
     primary.partOfSpeech === "noun" && input.sourceStatus.status === "MATCHES_FOUND" &&
     hasValidUniqueAlbanianSourceRecordIdV0_1(primary, input.facts)
@@ -4163,6 +4238,10 @@ async function buildAlbanianLexicalReadingV0_1(input: Readonly<{
     senseAlignedLexicalRole,
     fiveWindowsComparison,
     sourceLinkedComponentReading,
+    ...(independentFunctionalComposition ? {
+      independentFunctionalComposition,
+      independentFunctionalCompositionInput,
+    } : {}),
     ...(nativeDomainToAgent ? { nativeDomainToAgent } : {}),
     ...(nativeDomainToAgent && nativeDomainToAgentSourceDerivedInput
       ? { nativeDomainToAgentSourceDerivedInput }
