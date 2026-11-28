@@ -1,6 +1,10 @@
 "use client";
 
 import {
+  buildIndependentFunctionalCompositionV0_1,
+  independentCompositionInputSchemaV0_1,
+} from "@/shared/openInstrument/independentFunctionalComposition.v0_1";
+import {
   buildNativeDomainToAgentV0_1,
   nativeDomainToAgentReadingSchemaV0_1,
   nativeDomainToAgentSourceDerivedInputSchemaV0_1,
@@ -2970,7 +2974,24 @@ function parseMotivationDiscoveryV0_2(
           const canonical = nativeSeparativeEventToStateReadingSchemaV0_1.safeParse(expected);
           return canonical.success && JSON.stringify(canonical.data) === JSON.stringify(parsed.data);
         })();
+    const validIndependentComposition = reading.independentFunctionalComposition === undefined
+      ? reading.independentFunctionalCompositionInput === undefined
+      : (() => {
+          const parsed = independentCompositionInputSchemaV0_1.safeParse(reading.independentFunctionalCompositionInput);
+          if (!parsed.success || !exactPrimarySourceFact || !Array.isArray(exactPrimarySourceFact.senses) ||
+            parsed.data.inputForm !== value.inputWord || reading.status !== "SUPPORTED") return false;
+          const { target } = parsed.data;
+          if (target.form !== exactPrimarySourceFact.form || target.sourceRecordId !== exactPrimarySourceFact.sourceRecordId ||
+            target.entryLocator !== exactPrimarySourceFact.entryLocator || target.partOfSpeech !== exactPrimarySourceFact.partOfSpeech ||
+            JSON.stringify(target.senses) !== JSON.stringify(exactPrimarySourceFact.senses.map((sense) =>
+              isRecord(sense) ? { senseId: sense.senseId, glosses: sense.glosses } : null,
+            ))) return false;
+          // Rebuilding binds the explanation to the supplied payload and written spans.
+          const expected = buildIndependentFunctionalCompositionV0_1(parsed.data);
+          return expected !== null && JSON.stringify(expected) === JSON.stringify(reading.independentFunctionalComposition);
+        })();
     return validPrimary && validPronunciation && validRelated &&
+      validIndependentComposition &&
       validNativeDomainToAgent &&
       validNativeCognitiveStateToContent &&
       validNativeSeparativeEventToState &&

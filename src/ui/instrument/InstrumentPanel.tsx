@@ -395,6 +395,7 @@ export function InstrumentPanel(props: Props) {
   const hasNativeAlbanianReading = isValidVm &&
     vm.motivationDiscoveryV0_2?.kind === "present" &&
     Boolean(
+      vm.motivationDiscoveryV0_2.value.albanianLexicalReading?.independentFunctionalComposition ||
       vm.motivationDiscoveryV0_2.value.albanianLexicalReading?.nativeDomainToAgent ||
       vm.motivationDiscoveryV0_2.value.albanianLexicalReading?.nativeCognitiveStateToContent ||
       vm.motivationDiscoveryV0_2.value.albanianLexicalReading?.nativeSeparativeEventToState,

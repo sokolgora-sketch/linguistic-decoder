@@ -39,6 +39,7 @@ export function PrimaryAlbanianReadingCardV0_1({
   if (value.inputLanguage !== "sq" && value.inputProfile !== "albanian") return null;
 
   const reading = value.albanianLexicalReading;
+  const independentComposition = reading?.independentFunctionalComposition;
   const exactSourceStatus = value.exactLexicalSourceStatus?.status ?? "NOT_EMITTED";
   const records = (value.exactLexicalSourceFacts ?? []).filter((fact) =>
     fact.languageCode === "sq" && sameWord(fact.form, value.inputWord),
@@ -190,6 +191,61 @@ export function PrimaryAlbanianReadingCardV0_1({
           {exactSourceStatusLabel(exactSourceStatus)}
         </span>
       </div>
+
+      {independentComposition ? (
+        <section
+          aria-label="Exploratory functional composition"
+          data-testid="primary-albanian-independent-composition"
+          className="mt-3 min-w-0 rounded-lg border border-[#5e4b22] bg-[#19140d] p-3 text-sm leading-5 text-[#f0ddb0] [overflow-wrap:anywhere]"
+        >
+          <h3 className="text-base font-semibold text-[#f5e8c8]">How the word could express a shared activity or state</h3>
+          <ol className="mt-2 space-y-3">
+            {independentComposition.alternatives.map((alternative, index) => (
+              <li key={index} className="min-w-0 rounded border border-[#40361f] p-2">
+                <p className="font-semibold">
+                  {alternative.modifier.surface} + {alternative.activity.surface}
+                  {alternative.unresolved.map(({ surface, start }) => (
+                    <span key={start}> + {surface} (unresolved)</span>
+                  ))}
+                </p>
+                <p className="mt-1">{alternative.explanation}</p>
+                <details className="mt-2 text-xs">
+                  <summary className="cursor-pointer">Source senses and smaller units</summary>
+                  {[alternative.modifier, alternative.activity].map(({ surface, start, end, record, senseOrdinal }) => (
+                    <p key={start} className="mt-1">
+                      Written {surface}, letters {start + 1}–{end} · Kaikki {record.form}, sense {senseOrdinal + 1}: {record.senses[senseOrdinal]?.glosses.join("; ")}
+                      {" · "}{record.sourceRecordId} · {record.entryLocator}
+                    </p>
+                  ))}
+                  <p className="mt-1">
+                    English comparison · OEWN 2025 {alternative.comparison.lemma}: {alternative.comparison.definition}
+                    {" · "}{alternative.comparison.senseId} · {alternative.comparison.synsetId}
+                  </p>
+                  <p className="mt-1">Whole word · Kaikki sense {alternative.targetSenseOrdinal + 1}</p>
+                  {alternative.smallerProbes.length > 0 ? (
+                    <ul className="mt-1">
+                      {alternative.smallerProbes.map((probe) => (
+                        <li key={`${probe.start}:${probe.end}`}>
+                          {probe.form} ({probe.start + 1}–{probe.end}) · function unresolved
+                          {probe.records.map((record) => (
+                            <p key={record.sourceRecordId}>
+                              Kaikki {record.form}: {record.senses.flatMap(({ glosses }) => glosses).join("; ") || "meaning unavailable"}
+                              {" · "}{record.entryLocator}
+                            </p>
+                          ))}
+                        </li>
+                      ))}
+                    </ul>
+                  ) : null}
+                </details>
+              </li>
+            ))}
+          </ol>
+          <p className="mt-2 text-xs">
+            Smallest functional unit unresolved. Written Voices: {independentComposition.writtenVoices.map(({ voice, position }) => `${voice}@${position + 1}`).join(" → ") || "Unknown/Null"} · interpretation remains with the user.
+          </p>
+        </section>
+      ) : null}
 
       {nativeSeparativeReading ? (
         <section
