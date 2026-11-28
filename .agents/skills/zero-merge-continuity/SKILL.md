@@ -7,6 +7,10 @@ description: "Use when the user requests an owner-authorized merge decision, pos
 
 This skill does not authorize merging. Require explicit owner authorization for the exact PR and head before any merge action; never infer it from task completion, review, or green CI.
 
+## Binding owner Rule No. 1 — Functional discovery first
+
+For ZË-RO functional work discussed during closure or handoff, do not require historical proof, conventional morphology, scientific consensus, dictionary wording, template classifications, or fixed embryo registries before exploratory reasoning. Uncertainty qualifies claim status; it does not prohibit investigation. Keep source facts separate from functional inferences and hypotheses, preserve local `Null`, and do not present exploratory output as reviewed or production authority. This rule changes no merge, deployment, or repository authorization requirement.
+
 ## Before an authorized merge
 
 Verify live PR status, base and exact head, changed-file scope, mergeability, terminal success for every required hosted check, and substantive review findings/threads. Stop on pending or failing required checks, unresolved findings, or missing owner approval.

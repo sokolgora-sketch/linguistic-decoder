@@ -1327,13 +1327,6 @@ function sourceComponentReferencesV0_1(
     ) {
       reasons.add("SOURCE_AF_TEMPLATE_EXPANSION_MISMATCH");
     }
-    const sourceExplanation = normalizedSourceTemplateTextV0_1(primary.etymologyText ?? "")
-      .replace(/[.!?]+$/u, "");
-    const expectedExplanation = normalizedSourceTemplateTextV0_1(`A compound of ${template.expansion}`)
-      .replace(/[.!?]+$/u, "");
-    if (!sourceExplanation || sourceExplanation !== expectedExplanation) {
-      reasons.add("SOURCE_AF_TEMPLATE_EXPLANATION_MISMATCH");
-    }
   }
 
   return Object.freeze({
@@ -4013,7 +4006,10 @@ async function buildAlbanianLexicalReadingV0_1(input: Readonly<{
     targetComponentEvidence?.relation === "SOURCE_AUTHORED_SUFFIX_TEMPLATE"
   ) &&
     selectedRelatedFunctionalBridge?.status === "SUPPORTED" &&
-    !(nativeAgentPathConfigured && targetComponentEvidence.relation === "SOURCE_AUTHORED_SUFFIX_TEMPLATE")
+    !(nativeAgentPathConfigured && (
+      targetComponentEvidence.relation === "SOURCE_AUTHORED_AF_TEMPLATE" ||
+      targetComponentEvidence.relation === "SOURCE_AUTHORED_SUFFIX_TEMPLATE"
+    ))
     ? null
     : await buildSourceLinkedComponentReadingV0_1({
         primary,
@@ -4026,12 +4022,17 @@ async function buildAlbanianLexicalReadingV0_1(input: Readonly<{
     ? await sourceDerivedDomainBaseInputV0_1({ target: primary, targetAnalyses: input.analyses, provider: input.provider })
     : undefined;
   const nativeDomainToAgent = nativeAgentPathConfigured &&
-    (sourceLinkedComponentReading?.relation.relation === "SOURCE_AUTHORED_SUFFIX_TEMPLATE" || nativeDomainToAgentSourceDerivedInput) &&
+    (sourceLinkedComponentReading?.relation.relation === "SOURCE_AUTHORED_AF_TEMPLATE" ||
+      sourceLinkedComponentReading?.relation.relation === "SOURCE_AUTHORED_SUFFIX_TEMPLATE" ||
+      nativeDomainToAgentSourceDerivedInput) &&
     primary.partOfSpeech === "noun" && input.sourceStatus.status === "MATCHES_FOUND" &&
     hasValidUniqueAlbanianSourceRecordIdV0_1(primary, input.facts)
     ? buildNativeDomainToAgentV0_1(
         input.word,
-        sourceLinkedComponentReading?.relation.relation === "SOURCE_AUTHORED_SUFFIX_TEMPLATE" ? sourceLinkedComponentReading : null,
+        sourceLinkedComponentReading?.relation.relation === "SOURCE_AUTHORED_AF_TEMPLATE" ||
+          sourceLinkedComponentReading?.relation.relation === "SOURCE_AUTHORED_SUFFIX_TEMPLATE"
+          ? sourceLinkedComponentReading
+          : null,
         await lookupOewnAgentFramesServerOnlyV0_1(distinctGlossesV0_1([primary])),
         nativeDomainToAgentSourceDerivedInput,
       )

@@ -97,6 +97,23 @@ const target = {
     expansion: "punë (“work; labour”) + -tor",
   }],
 };
+const gardenBase = fact("kopsht", 0, "noun", [
+  { senseId: "en-kopsht-sq-noun-I-62nGgd", glosses: ["garden"] },
+  { senseId: "en-kopsht-sq-noun-fki4IPTI", glosses: ["kindergarten"] },
+]);
+const arSuffix = fact("-ar", 0, "suffix", [{
+  senseId: "en--ar-sq-suffix-QBm9Eqa-",
+  glosses: ["a suffix appended to words to create an agent noun, much like English -er/-or"],
+}]);
+const gardener = {
+  ...fact("kopshtar", 0, "noun", [{ senseId: "en-kopshtar-sq-noun-lBap31Mo", glosses: ["gardener"] }]),
+  etymologyText: "From kopsht + -ar.",
+  etymologyLinks: [
+    { sourceForm: "kopsht", reference: "kopsht#Albanian" },
+    { sourceForm: "-ar", reference: "-ar#Albanian" },
+  ],
+  etymologyTemplates: [{ name: "af", args: { "1": "sq", "2": "kopsht", "3": "-ar" }, expansion: "kopsht + -ar" }],
+};
 const adjective = {
   ...target,
   ...fact("punëtor", 1, "adj", [{ senseId: "fixture-hardworking", glosses: ["hardworking"] }]),
@@ -136,6 +153,13 @@ const frames = [{
   definition: "a person who works at a specific occupation",
   semanticCategory: "noun.person" as const,
 }];
+const gardenerFrame = {
+  lemma: "gardener",
+  senseId: "gardener%1:18:00::",
+  synsetId: "10140328-n",
+  definition: "someone employed to work in a garden",
+  semanticCategory: "noun.person" as const,
+};
 const fishermanFrame = {
   lemma: "fisherman",
   senseId: "fisherman%1:18:00::",
@@ -183,11 +207,16 @@ describe("native domain to agent reading", () => {
     });
     jest.mocked(sourceDelivery.createAlbanianKaikkiServerOnlyProductionProviderV0_1).mockResolvedValue(
       createAlbanianKaikkiServerOnlyExactLexicalSourceProviderForSyntheticFixtureV0_1({
-        facts: [base, suffix, target, adjective, fishBase, fisherman, diKnow, diDawn, dije, dijeName],
+        facts: [
+          base, suffix, target, adjective, fishBase, fisherman, diKnow, diDawn, dije, dijeName,
+          gardenBase, arSuffix, gardener,
+        ],
       }),
     );
     jest.mocked(oewn.lookupOewnAgentFramesServerOnlyV0_1).mockImplementation(async (glosses) =>
-      glosses.some((gloss) => gloss.toLowerCase() === "fisherman") ? [fishermanFrame] : frames,
+      glosses.some((gloss) => gloss.toLowerCase() === "fisherman")
+        ? [fishermanFrame]
+        : glosses.some((gloss) => gloss.toLowerCase() === "gardener") ? [gardenerFrame] : frames,
     );
     jest.mocked(oewn.lookupOewnCognitiveStateFramesServerOnlyV0_1).mockImplementation(async () =>
       [knowFrame, dawnFrame],
@@ -231,6 +260,83 @@ describe("native domain to agent reading", () => {
 
     reading.nativeDomainToAgent.alternatives[0].base.senseId = "different-source-sense";
     expect(adaptAnalysisToTelemetryVM(payload).motivationDiscoveryV0_2?.kind).toBe("missing");
+  });
+
+  it("uses AF component structure and source meanings without requiring dictionary explanation wording", async () => {
+    const payload = await analyze("KOPSHTAR");
+    const reading = payload.motivationDiscoveryV0_2.albanianLexicalReading;
+    const componentReading = reading.sourceLinkedComponentReading;
+    const operation = reading.nativeDomainToAgent;
+    expect(componentReading).toMatchObject({
+      status: "SUPPORTED",
+      relation: {
+        relation: "SOURCE_AUTHORED_AF_TEMPLATE",
+        sourceAuthoredExplanation: "From kopsht + -ar.",
+        references: [
+          { sourceForm: "kopsht", reference: "kopsht#Albanian" },
+          { sourceForm: "-ar", reference: "-ar#Albanian" },
+        ],
+      },
+    });
+    expect(componentReading.primary.etymologyTemplates[0]).toMatchObject({ name: "af" });
+    expect(componentReading.components.find((component: typeof componentReading.primary) => component.form === "kopsht")?.sourceSenses)
+      .toEqual(expect.arrayContaining([
+        expect.objectContaining({ senseId: "en-kopsht-sq-noun-I-62nGgd", glosses: ["garden"] }),
+        expect.objectContaining({ senseId: "en-kopsht-sq-noun-fki4IPTI", glosses: ["kindergarten"] }),
+      ]));
+    expect(operation).toMatchObject({
+      status: "EXPLORATORY_FUNCTIONAL_HYPOTHESIS",
+      operation: "DOMAIN_TO_AGENT_ROLE",
+      interpretationDecisionPolicy: { automaticInterpretationSelection: "DISABLED" },
+      userDecisionPosture: "user_decides",
+      alternatives: [expect.objectContaining({
+        base: expect.objectContaining({ form: "kopsht", senseId: "en-kopsht-sq-noun-I-62nGgd", glosses: ["garden"] }),
+        target: expect.objectContaining({ form: "kopshtar", senseId: "en-kopshtar-sq-noun-lBap31Mo", glosses: ["gardener"] }),
+        frames: expect.arrayContaining([expect.objectContaining({
+          lemma: "gardener",
+          synsetId: "10140328-n",
+          definition: "someone employed to work in a garden",
+        })]),
+      })],
+    });
+    expect(operation.alternatives).toHaveLength(1);
+    expect(operation.alternatives[0].explanation).toContain("“kopsht” means “garden”");
+    expect(operation.alternatives[0].explanation).toContain("“gardener” means “someone employed to work in a garden”");
+    expect(adaptAnalysisToTelemetryVM(payload).motivationDiscoveryV0_2?.kind).toBe("present");
+    const markup = renderToStaticMarkup(createElement(InstrumentPanel, {
+      vm: adaptAnalysisToTelemetryVM(payload),
+    }));
+    expect(markup).toContain("From kopsht + -ar.");
+    expect(markup).toContain(operation.alternatives[0].explanation);
+    expect((await analyze("KOPSHTAR")).motivationDiscoveryV0_2.albanianLexicalReading.nativeDomainToAgent)
+      .toEqual(operation);
+    expect(globalThis.fetch).not.toHaveBeenCalled();
+
+    const mismatchedReference = JSON.parse(JSON.stringify(componentReading)) as typeof componentReading;
+    mismatchedReference.relation.references[0].sourceForm = "kopshtish";
+    expect(buildNativeDomainToAgentV0_1("KOPSHTAR", mismatchedReference, [gardenerFrame])).toBeNull();
+  });
+
+  it("keeps the AF-based operation when another component record is unresolved", async () => {
+    const payload = await analyze("KOPSHTAR");
+    const reading = payload.motivationDiscoveryV0_2.albanianLexicalReading;
+    const partial = JSON.parse(JSON.stringify(reading.sourceLinkedComponentReading)) as typeof reading.sourceLinkedComponentReading;
+    partial.status = "NULL";
+    partial.reasonCodes = ["SOURCE_COMPONENT_RECORD_NOT_FOUND"];
+    partial.components = partial.components.filter((component: typeof partial.primary) => component.form === "kopsht");
+    partial.componentResolutions[1] = {
+      sourceForm: "-ar",
+      reference: "-ar#Albanian",
+      status: "UNRESOLVED",
+      sourceRecordIds: [],
+      reasonCodes: ["SOURCE_COMPONENT_RECORD_NOT_FOUND"],
+    };
+    const operation = buildNativeDomainToAgentV0_1("KOPSHTAR", partial, [gardenerFrame]);
+    expect(operation?.alternatives).toEqual([expect.objectContaining({
+      base: expect.objectContaining({ form: "kopsht", senseId: "en-kopsht-sq-noun-I-62nGgd" }),
+      target: expect.objectContaining({ form: "kopshtar", senseId: "en-kopshtar-sq-noun-lBap31Mo" }),
+    })]);
+    expect(globalThis.fetch).not.toHaveBeenCalled();
   });
 
   it("explains the two exact DIJE content senses and renders the unresolved acquisition boundary", async () => {

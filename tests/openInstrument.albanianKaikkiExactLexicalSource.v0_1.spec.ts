@@ -1577,6 +1577,44 @@ describe("real Albanian exact lexical source integration v0.1", () => {
     });
   });
 
+  it("keeps the source-category AGENT reading when AF explanation wording differs", async () => {
+    const sourceExplanation = "Not a compound of orë (“watch”) + ndreqës (“repairer, fixer”).";
+    const discovery = await discoveryForFactsV0_1(orendreqesAfTargetFixtureFactsV0_1({
+      targetOverrides: { etymologyText: sourceExplanation },
+    }), "orëndreqës");
+    const reading = discovery.albanianLexicalReading;
+    expect(reading?.sourceLinkedComponentReading).toMatchObject({
+      status: "NULL",
+      relation: {
+        relation: "SOURCE_AUTHORED_AF_TEMPLATE",
+        sourceAuthoredExplanation: sourceExplanation,
+        references: [
+          { sourceForm: "orë", reference: "orë#Albanian" },
+          { sourceForm: "ndreqës", reference: "ndreqës#Albanian" },
+        ],
+      },
+    });
+    expect(reading?.functionalMeaningBridge).toMatchObject({
+      status: "SUPPORTED",
+      relatedForm: null,
+      derivedStructure: null,
+      functionalHypothesis: {
+        status: "EXPLORATORY_FUNCTIONAL_HYPOTHESIS",
+        functionalOperation: "AGENT",
+        basis: expect.arrayContaining([
+          "SOURCE_ATTESTED_TARGET_ROLE_CATEGORY",
+          "TARGET_SOURCE_AUTHORED_AF_TEMPLATE",
+        ]),
+        statement: expect.stringContaining("clockmaker, watchmaker"),
+      },
+    });
+    expect(reading?.functionalMeaningBridge.functionalHypothesis.statement)
+      .not.toContain(sourceExplanation);
+    expect(reading?.interpretation.status).toBe("EXPLORATORY_ZHEJI_READING");
+    expect(adaptAnalysisToTelemetryVM({ motivationDiscoveryV0_1: discovery }).motivationDiscoveryV0_2)
+      .toMatchObject({ kind: "present" });
+  });
+
   it.each([
     ["missing target role category", { senses: [{ senseId: "en-orëndreqës-sq-noun-BYDVVPw3", glosses: ["clockmaker, watchmaker"] }] }],
     ["disambiguated-only target category", { senses: [{
@@ -1589,8 +1627,7 @@ describe("real Albanian exact lexical source integration v0.1", () => {
       { sourceForm: "orë", reference: "orë#Ottoman_Turkish" },
       { sourceForm: "ndreqës", reference: "ndreqës#Albanian" },
     ] }],
-    ["unsupported target-authored explanation", { etymologyText: "Not a compound of orë (“watch”) + ndreqës (“repairer, fixer”)." }],
-  ] as const)("keeps direct orëndreqës AGENT Null for %s", async (_label, targetOverrides) => {
+  ] as const)("keeps direct orëndreqës AGENT Null for malformed evidence: %s", async (_label, targetOverrides) => {
     const discovery = await discoveryForFactsV0_1(orendreqesAfTargetFixtureFactsV0_1({
       targetOverrides: targetOverrides as Partial<AlbanianKaikkiExactLexicalSourceFactV0_1>,
     }), "orëndreqës");

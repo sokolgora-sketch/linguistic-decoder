@@ -7,6 +7,10 @@ description: "Use when the owner authorizes an Open Instrument or ZË-RO code, t
 
 This skill governs an already authorized change. Complete `zero-session-bootstrap` first; this skill does not grant mutation, publication, or merge authority.
 
+## Product methodology boundary
+
+Apply binding owner Rule No. 1 for ZË-RO reasoning: do not make historical proof, conventional morphology, scientific consensus, dictionary wording, template classifications, fixed embryo registries, or independent lexical attestation prerequisites for exploring functional candidates. Use uncertainty to set claim status and specificity, preserve source attribution, and keep unresolved components local `Null`; do not suppress otherwise useful investigation. Validation checks implementation integrity and delivery requirements, not whether an exploratory hypothesis has been historically certified. Existing authorization, provider-execution, authority-promotion, publication, and merge safeguards remain separate and in force.
+
 ## Validation tier
 
 Before expensive commands, state scope, validation tier, reuse plan, exact checks, stop boundary, and an available Codex model/reasoning effort appropriate to the risk:
