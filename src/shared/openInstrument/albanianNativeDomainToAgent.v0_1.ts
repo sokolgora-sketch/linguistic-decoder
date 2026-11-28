@@ -178,6 +178,48 @@ function uniquelyIdentifiedSenses(record: AlbanianSourceLinkedComponentReadingV0
   );
 }
 
+function nativeAgentComponentFormsFromAuthoredTemplate(
+  reading: AlbanianSourceLinkedComponentReadingV0_1,
+  inputForm: string,
+): readonly string[] | null {
+  const { relation, primary } = reading;
+  if (sourceKey(primary.form) !== sourceKey(inputForm) ||
+    relation.primarySourceRecordId !== primary.sourceRecordId ||
+    relation.primaryEntryLocator !== primary.entryLocator ||
+    relation.sourceAuthoredExplanation !== primary.etymologyText ||
+    relation.references.length !== 2) return null;
+
+  if (relation.relation === "SOURCE_AUTHORED_SUFFIX_TEMPLATE") {
+    const [baseReference, suffixReference] = relation.references;
+    if (!baseReference || !suffixReference ||
+      sourceKey(primary.form) !== sourceKey(baseReference.sourceForm + suffixReference.sourceForm.slice(1))) return null;
+    return [baseReference.sourceForm, suffixReference.sourceForm];
+  }
+
+  if (relation.relation !== "SOURCE_AUTHORED_AF_TEMPLATE") return null;
+  const templates = primary.etymologyTemplates ?? [];
+  if (templates.length !== 1 || templates[0]?.name !== "af" || typeof templates[0].expansion !== "string") return null;
+  const args = templates[0].args;
+  const keys = Object.keys(args);
+  if (args["1"] !== "sq" ||
+    keys.filter((key) => /^\d+$/u.test(key)).sort((left, right) => Number(left) - Number(right)).join(",") !== "1,2,3" ||
+    keys.some((key) => !["1", "2", "3", "t1", "t2"].includes(key)) ||
+    keys.filter((key) => key === "t1" || key === "t2").some((key) => typeof args[key] !== "string")) return null;
+
+  const componentForms = [args["2"], args["3"]].map((form) => form?.normalize("NFC").trim() ?? "");
+  const links = primary.etymologyLinks ?? [];
+  if (componentForms.some((form, index) => !form ||
+      componentForms.findIndex((candidate) => sourceKey(candidate) === sourceKey(form)) !== index ||
+      sourceKey(form) === sourceKey(primary.form)) ||
+    links.length !== 2 || relation.references.some((reference, index) =>
+      reference.sourceForm !== componentForms[index] ||
+      reference.reference !== `${componentForms[index]}#Albanian` ||
+      links[index]?.sourceForm !== reference.sourceForm ||
+      links[index]?.reference !== reference.reference)) return null;
+
+  return componentForms;
+}
+
 export function buildNativeDomainToAgentV0_1(
   inputForm: string,
   reading: AlbanianSourceLinkedComponentReadingV0_1 | null,
@@ -186,11 +228,11 @@ export function buildNativeDomainToAgentV0_1(
 ): NativeDomainToAgentReadingV0_1 | null {
   const target = reading?.primary ?? sourceDerivedInput?.target;
   if (!target || target.partOfSpeech !== "noun" || sourceKey(target.form) !== sourceKey(inputForm)) return null;
+  let sourceComponentForms: readonly string[] = [];
   if (reading) {
-    const [baseReference, suffixReference] = reading.relation.references;
-    if (reading.relation.relation !== "SOURCE_AUTHORED_SUFFIX_TEMPLATE" ||
-      reading.relation.references.length !== 2 || !baseReference || !suffixReference ||
-      sourceKey(target.form) !== sourceKey(baseReference.sourceForm + suffixReference.sourceForm.slice(1))) return null;
+    const componentForms = nativeAgentComponentFormsFromAuthoredTemplate(reading, inputForm);
+    if (!componentForms) return null;
+    sourceComponentForms = componentForms;
   } else if (!sourceDerivedInput || sourceKey(sourceDerivedInput.target.form) !== sourceKey(inputForm) ||
     sourceDerivedInput.bases.length === 0 ||
     !nativeDomainToAgentSourceDerivedInputSchemaV0_1.safeParse(sourceDerivedInput).success) {
@@ -200,7 +242,7 @@ export function buildNativeDomainToAgentV0_1(
   const baseEntries = reading
     ? reading.components
         .filter((component) => component.partOfSpeech === "noun" &&
-          sourceKey(component.form) === sourceKey(reading.relation.references[0]?.sourceForm ?? ""))
+          sourceComponentForms.some((form) => sourceKey(component.form) === sourceKey(form)))
         .map((base) => ({ base, sourceDerivedRelation: undefined }))
     : (sourceDerivedInput?.bases ?? []).flatMap(({ base, relation, sourceRecord }) => {
         const assertion = relation.sourceRelationAssertion;

@@ -2379,8 +2379,7 @@ function parseMotivationDiscoveryV0_2(
         if (!componentPrimary || rawTargetTemplates === null || projectedTemplateArray === null ||
           rawLinks === null || projectedLinks === null || references.length !== 2 ||
           rawTargetTemplates.length !== projectedTemplateArray.length ||
-          rawLinks.length !== projectedLinks.length || rawLinks.length !== 2 ||
-          typeof componentPrimary.etymologyText !== "string") return false;
+          rawLinks.length !== projectedLinks.length || rawLinks.length !== 2) return false;
         const sameTemplate = (left: unknown, right: unknown): boolean => {
           if (!isRecord(left) || !isRecord(right) || !isRecord(left.args) || !isRecord(right.args)) return false;
           const leftArgs = left.args as Record<string, unknown>;
@@ -2417,9 +2416,7 @@ function parseMotivationDiscoveryV0_2(
         };
         if (expansionParts.length !== 2 ||
           !matchesExpansionRoot(expansionParts[0], templateBaseForm) ||
-          !matchesExpansionRoot(expansionParts[1], templateComponentForm) ||
-          normalizeText(componentPrimary.etymologyText).replace(/[.!?]+$/u, "") !==
-            normalizeText(`A compound of ${template.expansion}`).replace(/[.!?]+$/u, "")) return false;
+          !matchesExpansionRoot(expansionParts[1], templateComponentForm)) return false;
         validTemplateEvidence = references.every((reference, index) => {
           const link = projectedLinks[index];
           return isRecord(reference) && isRecord(link) &&
@@ -2850,6 +2847,26 @@ function parseMotivationDiscoveryV0_2(
         ((batch.status === "CANDIDATES_FOUND") === (batch.candidates.length > 0));
     };
     const validNativeDomainToAgent = reading.nativeDomainToAgent === undefined || (() => {
+      const validNativeAgentSourceLinkedTemplateReading = (componentReading: unknown): boolean => {
+        if (!isRecord(componentReading) || !isRecord(componentReading.relation) ||
+          !isRecord(componentReading.primary)) return false;
+        const relation = componentReading.relation;
+        if (relation.relation === "SOURCE_AUTHORED_SUFFIX_TEMPLATE") {
+          return validSourceAuthoredSuffixTemplateReading(componentReading);
+        }
+        if (relation.relation !== "SOURCE_AUTHORED_AF_TEMPLATE" ||
+          !validSourceLinkedComponentReading ||
+          !exactPrimarySourceFact ||
+          (componentReading.status !== "SUPPORTED" && componentReading.status !== "NULL")) return false;
+        const primary = componentReading.primary;
+        return primary.sourceRecordId === exactPrimarySourceFact.sourceRecordId &&
+          primary.entryLocator === exactPrimarySourceFact.entryLocator &&
+          primary.form === exactPrimarySourceFact.form &&
+          relation.primarySourceRecordId === primary.sourceRecordId &&
+          relation.primaryEntryLocator === primary.entryLocator &&
+          relation.sourceAuthoredExplanation === primary.etymologyText &&
+          Array.isArray(relation.references) && relation.references.length === 2;
+      };
       const parsed = nativeDomainToAgentReadingSchemaV0_1.safeParse(reading.nativeDomainToAgent);
       if (!parsed.success || reading.status !== "SUPPORTED" || !exactPrimarySourceFact ||
         parsed.data.inputForm !== value.inputWord) return false;
@@ -2870,7 +2887,7 @@ function parseMotivationDiscoveryV0_2(
         const sourceDerivedInput = nativeDomainToAgentSourceDerivedInputSchemaV0_1.safeParse(
           reading.nativeDomainToAgentSourceDerivedInput,
         );
-        if (!sourceDerivedInput.success || validSourceAuthoredSuffixTemplateReading(sourceLinkedComponentReading) ||
+        if (!sourceDerivedInput.success || validNativeAgentSourceLinkedTemplateReading(sourceLinkedComponentReading) ||
           !isRecord(sourceDerivedInput.data.target) ||
           sourceDerivedInput.data.target.sourceRecordId !== exactPrimarySourceFact.sourceRecordId ||
           !sameNormalizedAlbanianRelationForm(sourceDerivedInput.data.target.form, value.inputWord)) return false;
@@ -2884,7 +2901,7 @@ function parseMotivationDiscoveryV0_2(
         if (reading.nativeDomainToAgentSourceDerivedInput !== undefined || !validSourceLinkedComponentReading ||
           !isRecord(sourceLinkedComponentReading) || !isRecord(sourceLinkedComponentReading.primary) ||
           sourceLinkedComponentReading.primary.sourceRecordId !== exactPrimarySourceFact.sourceRecordId ||
-          !validSourceAuthoredSuffixTemplateReading(sourceLinkedComponentReading)) return false;
+          !validNativeAgentSourceLinkedTemplateReading(sourceLinkedComponentReading)) return false;
         expected = buildNativeDomainToAgentV0_1(
           parsed.data.inputForm,
           sourceLinkedComponentReading as unknown as AlbanianSourceLinkedComponentReadingV0_1,
