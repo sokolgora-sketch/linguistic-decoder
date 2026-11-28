@@ -8,6 +8,10 @@ This repo is run as a deterministic instrument. Preserve correctness, scientific
 - Preserve existing tests, gate scripts, Git hooks, CI checks, contracts, and production safeguards.
 - Do not bypass the mandatory pre-push hook or merge before all required GitHub checks pass.
 
+## Binding owner Rule No. 1 — Functional discovery first
+
+ZË-RO explores functional meaning. Do not make historical proof, conventional morphology, scientific consensus, dictionary wording, template classifications, fixed embryo registries, or independent lexical attestation gates for exploratory reasoning. Use available information to discover, compare, connect, compose, and explain candidates. Uncertainty affects claim status and specificity, not permission to investigate; an unknown component stays local `Null` rather than erasing other useful reasoning. Preserve exact spellings and source integrity, distinguish source facts from generated hypotheses, and retain canonical Seven Voices `A E I O U Y Ë`, deterministic behavior, `no_single_winner`, and `user_decides`. This rule does not authorize source/provider execution, authority promotion, merge, or deployment.
+
 ## Default workflow for an ordinary scoped PR
 
 1. Before creating or attaching a linked worktree, inspect effective `core.hooksPath` with origin/scope, `extensions.worktreeConfig`, the resolved hook directory and its files/symlinks, the target worktree config, and tracked `.githooks/pre-push`. If a shared path conflicts, use a feature-only `git config --worktree core.hooksPath .githooks` only when per-worktree config is already enabled and no custom hook needs preservation; verify shared and sibling config hashes are unchanged. Otherwise stop without changing shared hooks or extensions. Sync from verified current `main` and create the isolated feature branch. Before editing, run `npm run hooks:setup && npm run hooks:check` in that checkout.

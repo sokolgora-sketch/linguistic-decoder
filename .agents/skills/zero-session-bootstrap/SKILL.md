@@ -7,6 +7,10 @@ description: "Use at the start of any Open Instrument or ZË-RO Codex session, i
 
 This skill is the repository entry point. It checks current authority and state; it does not authorize edits, source acquisition, experiments, PR publication, or merging.
 
+## Binding owner Rule No. 1 — Functional discovery first
+
+For ZË-RO work, exploratory functional reasoning is never gated on historical proof, conventional morphology, scientific consensus, dictionary wording, a template classification, a fixed embryo registry, or independent lexical attestation. Discover, compare, connect, compose, and explain plausible candidates from available information. Uncertainty changes claim status and specificity, not permission to investigate; an unknown component stays local `Null` and does not cancel useful reasoning from other components. Preserve source integrity and clearly mark generated claims. This owner rule supersedes older linguistic restrictions but does not authorize repository changes, external execution, authority promotion, merge, or deployment; the safe workflow below still applies.
+
 ## Classify before expensive commands
 
 After the read-only preflight needed to understand the request, state the validation tier and planned checks before running tests, gates, builds, installations, or other expensive commands:

@@ -315,9 +315,11 @@ Safe parallel lanes include research, read-only architecture inspection, test an
 
 ## 12. Open Instrument boundaries
 
-Preserve the repository's canonical rules for Seven Voices `A E I O U Y Ë`, canonical `Y`, vowel-driven analysis, embryo-first reasoning, Fact / Inference / Hypothesis / Unknown, valid Null, `no_single_winner`, `user_decides`, evidence provenance, gated research/provider promotion, deterministic evidence-first behavior, and the prohibition on word-specific production shortcuts.
+Binding owner Rule No. 1 is **FUNCTIONAL DISCOVERY FIRST / NO HISTORICAL-PROOF GATING**. ZË-RO is a functional meaning-discovery engine, not a historical, scientific-consensus, or conventional-etymology certification system. Historical proof, conventional morphology, scientific consensus, dictionary wording, template classifications, fixed embryo registries, and independent lexical attestation must not block exploratory functional reasoning. Use available information to discover, investigate, connect, compare, compose, and explain plausible candidates. Uncertainty changes claim status and specificity, not permission to reason; an unknown component remains local `Null` and does not cancel otherwise useful analysis. Preserve source integrity by distinguishing source-reported facts from generated inferences and hypotheses, without making source authority a prerequisite to exploration.
 
-The owning constitutional and contract documents remain authoritative. This workflow does not create new analytical semantics.
+Preserve canonical Seven Voices `A E I O U Y Ë`, canonical `Y`, vowel-driven analysis, `Fact / Inference / Hypothesis / Unknown`, deterministic results, valid local `Null`, `no_single_winner`, and `user_decides`. Research authorization, provider execution, reviewed/production authority promotion, and production safeguards remain separate controls for those actions; they do not gate local exploratory reasoning. Do not add word-specific production shortcuts.
+
+The owning constitutional and contract documents remain authoritative. This workflow records the owner-supplied Rule No. 1 and does not independently create additional analytical semantics.
 
 ## 13. Post-merge proof, Linear, and DF_BRAIN
 

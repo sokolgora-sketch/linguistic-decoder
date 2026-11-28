@@ -13,7 +13,8 @@ Do not treat a PR, code spike, passing test, or existing Linear issue as approva
 2. State an observable outcome, scope, controls, evidence sources and rights, acceptance criteria, falsifiers, stopping rules, and what remains explicitly Unknown/Null.
 3. Separate demonstrated capability from plausibility. Identify material blockers and the smallest evidence that would resolve each; do not repeat an audit without a changed evidence mechanism.
 4. A new ZË-RO milestone may begin only with both explicit owner approval and evidence-backed confidence **greater than 80%** that its agreed observable outcome can be delivered. Do not invent or reverse-engineer a percentage. If the evidence cannot justify the threshold, report `NOT ESTABLISHED` and REVISE; do not start the milestone.
-5. Preserve scientific boundaries: retrospective exposed cases are not blind trials; source meaning or morphology does not prove embryo function; no real M2 intake, selection, reveal, or authority promotion without separate explicit authorization.
+   This threshold is a governance requirement for starting a separate milestone; it is not an evidentiary or historical-proof prerequisite for exploratory functional reasoning inside an already authorized task. Binding owner Rule No. 1 supersedes any older wording that could be read to block such reasoning.
+5. Preserve claim boundaries: retrospective exposed cases are not blind trials; source meaning or morphology does not establish embryo function as a fact, but may inform an exploratory candidate with uncertain status. No real M2 intake, selection, reveal, or authority promotion without separate explicit authorization.
 6. Do not create or update Linear records unless the user explicitly authorizes that mutation.
 
 ## Decision and report
